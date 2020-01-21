@@ -193,6 +193,15 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
         return resultWithError;
     }
 
+    /**
+     * Clear (remove) the given key from the lookup table.
+     *
+     * @param key The key that should be cleared.
+     */
+    public void clearKey(Object key) {
+        // This cannot be abstract due to backwards compatibility with version < 3.2.0
+    }
+
     public LookupDataAdapterConfiguration getConfig() {
         return config;
     }

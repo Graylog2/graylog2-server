@@ -565,6 +565,7 @@ public class LookupTableService extends AbstractIdleService {
             }
             return lookupTable.setValue(key, value);
         }
+
         public LookupResult setStringList(@Nonnull Object key, @Nonnull List<String> value) {
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
@@ -572,6 +573,7 @@ public class LookupTableService extends AbstractIdleService {
             }
             return lookupTable.setStringList(key, value);
         }
+
         public LookupResult addStringList(@Nonnull Object key, @Nonnull List<String> value, boolean keepDuplicates) {
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
@@ -579,12 +581,21 @@ public class LookupTableService extends AbstractIdleService {
             }
             return lookupTable.addStringList(key, value, keepDuplicates);
         }
+
         public LookupResult removeStringList(@Nonnull Object key, @Nonnull List<String> value) {
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
                 return LookupResult.withError();
             }
             return lookupTable.removeStringList(key, value);
+        }
+
+        public void clearKey(@Nonnull Object key) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return;
+            }
+            lookupTable.clearKey(key);
         }
 
         public LookupTable getTable() {

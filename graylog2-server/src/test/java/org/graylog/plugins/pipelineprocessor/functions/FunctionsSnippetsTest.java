@@ -85,6 +85,7 @@ import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
@@ -167,9 +168,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -351,6 +354,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(MetricCounterIncrement.NAME, new MetricCounterIncrement(metricRegistry));
 
         functions.put(LookupSetValue.NAME, new LookupSetValue(lookupTableService));
+        functions.put(LookupClearKey.NAME, new LookupClearKey(lookupTableService));
         functions.put(LookupSetStringList.NAME, new LookupSetStringList(lookupTableService));
         functions.put(LookupAddStringList.NAME, new LookupAddStringList(lookupTableService));
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
@@ -1065,6 +1069,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         verifyNoMoreInteractions(lookupTable);
 
         assertThat(message.getField("new_value")).isEqualTo(123);
+    }
+
+    @Test
+    public void lookupClearKey() {
+        // Stub method call to avoid having verifyNoMoreInteractions() fail
+        doNothing().when(lookupTable).clearKey(any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        evaluateRule(rule);
+
+        verify(lookupTable, times(1)).clearKey("key");
+        verifyNoMoreInteractions(lookupTable);
     }
 
     @Test

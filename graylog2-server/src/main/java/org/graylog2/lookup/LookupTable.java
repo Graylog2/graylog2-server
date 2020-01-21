@@ -93,15 +93,22 @@ public abstract class LookupTable {
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
     }
+
     public LookupResult addStringList(@Nonnull Object key, @Nonnull List<String> value, boolean keepDuplicates) {
         final LookupResult result = dataAdapter().addStringList(key, value, keepDuplicates);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
     }
+
     public LookupResult removeStringList(@Nonnull Object key, @Nonnull List<String> value) {
         final LookupResult result = dataAdapter().removeStringList(key, value);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
+    }
+
+    public void clearKey(@Nonnull Object key) {
+        dataAdapter().clearKey(key);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
     }
 
     @AutoValue.Builder
