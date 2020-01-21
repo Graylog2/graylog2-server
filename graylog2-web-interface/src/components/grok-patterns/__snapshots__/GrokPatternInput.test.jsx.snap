@@ -545,7 +545,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "fKpPRI",
+                          "lastClassName": "jNPkhE",
                           "rules": Array [
                             "background-color:",
                             "#FFF",
@@ -570,12 +570,16 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             ";.list-group-item-heading{color:",
                             "#1F1F1F",
                             ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                            "#e373af",
-                            ";border-color:",
-                            "#c9277e",
+                            "#F1F2F2",
                             ";color:",
+                            "#9E1F63",
+                            ";&.active{color:",
                             "#FFF",
-                            ";}}",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";}}}",
                             [Function],
                           ],
                         },
@@ -596,14 +600,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                       header="COMMONMAC"
                       id="list-item-0"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                         id="list-item-0"
                         onKeyDown={[Function]}
                       >
@@ -729,7 +733,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "fKpPRI",
+                          "lastClassName": "jNPkhE",
                           "rules": Array [
                             "background-color:",
                             "#FFF",
@@ -754,12 +758,16 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             ";.list-group-item-heading{color:",
                             "#1F1F1F",
                             ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                            "#e373af",
-                            ";border-color:",
-                            "#c9277e",
+                            "#F1F2F2",
                             ";color:",
+                            "#9E1F63",
+                            ";&.active{color:",
                             "#FFF",
-                            ";}}",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";}}}",
                             [Function],
                           ],
                         },
@@ -780,14 +788,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                       header="DATA"
                       id="list-item-1"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                         id="list-item-1"
                         onKeyDown={[Function]}
                       >
@@ -913,7 +921,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "fKpPRI",
+                          "lastClassName": "jNPkhE",
                           "rules": Array [
                             "background-color:",
                             "#FFF",
@@ -938,12 +946,16 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             ";.list-group-item-heading{color:",
                             "#1F1F1F",
                             ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                            "#e373af",
-                            ";border-color:",
-                            "#c9277e",
+                            "#F1F2F2",
                             ";color:",
+                            "#9E1F63",
+                            ";&.active{color:",
                             "#FFF",
-                            ";}}",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";}}}",
                             [Function],
                           ],
                         },
@@ -964,14 +976,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                       header="DATE"
                       id="list-item-2"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                         id="list-item-2"
                         onKeyDown={[Function]}
                       >

@@ -101,9 +101,14 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
 
         &:hover:not(.disabled),
         &:focus:not(.disabled) {
-          background-color: ${lighten(0.30, colors.tertiary.quattro)};
-          border-color: ${lighten(0.10, colors.tertiary.quattro)};
-          color: ${util.readableColor(lighten(0.10, colors.tertiary.quattro))};
+          background-color: ${colors.secondary.due};
+          color: ${util.readableColor(colors.secondary.due, colors.tertiary.quattro)};
+
+          &.active {
+            color: ${util.readableColor(colors.tertiary.quattro)};
+            border-color: ${colors.tertiary.quattro};
+            background-color: ${colors.tertiary.quattro};
+          }
         }
       }
 

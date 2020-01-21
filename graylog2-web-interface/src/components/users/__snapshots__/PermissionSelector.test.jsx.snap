@@ -771,7 +771,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -796,12 +796,16 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -819,11 +823,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <Input
                                                       addonAfter={null}
@@ -959,7 +963,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -984,12 +988,16 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -1007,11 +1015,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <div
                                                       className="itemWrapper "
@@ -1316,7 +1324,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -1341,12 +1349,16 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -1364,11 +1376,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <div
                                                       className="itemWrapper "
@@ -2210,7 +2222,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -2235,12 +2247,16 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -2258,11 +2274,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <Input
                                                       addonAfter={null}
@@ -2398,7 +2414,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -2423,12 +2439,16 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -2446,11 +2466,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <div
                                                       className="itemWrapper "
@@ -2755,7 +2775,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -2780,12 +2800,16 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -2803,11 +2827,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <div
                                                       className="itemWrapper "
@@ -3892,7 +3916,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -3917,12 +3941,16 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -3940,11 +3968,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <Input
                                                       addonAfter={null}
@@ -4080,7 +4108,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -4105,12 +4133,16 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -4128,11 +4160,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <div
                                                       className="itemWrapper "
@@ -4437,7 +4469,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -4462,12 +4494,16 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -4485,11 +4521,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <div
                                                       className="itemWrapper "
@@ -5331,7 +5367,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -5356,12 +5392,16 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -5379,11 +5419,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <Input
                                                       addonAfter={null}
@@ -5519,7 +5559,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -5544,12 +5584,16 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -5567,11 +5611,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <div
                                                       className="itemWrapper "
@@ -5876,7 +5920,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "fKpPRI",
+                                                      "lastClassName": "jNPkhE",
                                                       "rules": Array [
                                                         "background-color:",
                                                         "#FFF",
@@ -5901,12 +5945,16 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";.list-group-item-heading{color:",
                                                         "#1F1F1F",
                                                         ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#e373af",
-                                                        ";border-color:",
-                                                        "#c9277e",
+                                                        "#F1F2F2",
                                                         ";color:",
+                                                        "#9E1F63",
+                                                        ";&.active{color:",
                                                         "#FFF",
-                                                        ";}}",
+                                                        ";border-color:",
+                                                        "#9E1F63",
+                                                        ";background-color:",
+                                                        "#9E1F63",
+                                                        ";}}}",
                                                         [Function],
                                                       ],
                                                     },
@@ -5924,11 +5972,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                               >
                                                 <ListGroupItem
                                                   bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 fKpPRI"
+                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                   listItem={false}
                                                 >
                                                   <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 fKpPRI list-group-item"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                   >
                                                     <div
                                                       className="itemWrapper "
