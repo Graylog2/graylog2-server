@@ -27,7 +27,7 @@ import org.graylog2.lookup.LookupTableService;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class LookupClearKey extends AbstractFunction<Object> {
+public class LookupClearKey extends AbstractFunction<Void> {
 
     public static final String NAME = "lookup_clear_key";
 
@@ -62,8 +62,8 @@ public class LookupClearKey extends AbstractFunction<Object> {
     }
 
     @Override
-    public FunctionDescriptor<Object> descriptor() {
-        return FunctionDescriptor.builder()
+    public FunctionDescriptor<Void> descriptor() {
+        return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .description("Clear (remove) a key in the named lookup table.")
                 .params(lookupTableParam, keyParam)
