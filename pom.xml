@@ -128,8 +128,8 @@
         <kafka.version>0.9.0.1</kafka.version>
         <log4j.version>2.11.0</log4j.version>
         <metrics.version>4.0.3</metrics.version>
-        <mongodb-driver.version>3.6.4</mongodb-driver.version>
-        <mongojack.version>2.10.0</mongojack.version>
+        <mongodb-driver.version>3.12.1</mongodb-driver.version>
+        <mongojack.version>2.10.1</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.45.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.28.Final</netty-tcnative-boringssl-static.version>
