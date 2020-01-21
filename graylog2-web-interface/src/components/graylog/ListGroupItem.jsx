@@ -109,12 +109,6 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
             border-color: ${colors.tertiary.quattro};
             background-color: ${colors.tertiary.quattro};
           }
-
-          &.active {
-            color: ${util.readableColor(colors.secondary.tre)};
-            background-color: ${colors.secondary.tre};
-            border-color: ${colors.secondary.tre};
-          }
         }
       }
 
