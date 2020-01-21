@@ -3,17 +3,19 @@ import React, { useEffect, useState } from 'react';
 
 import UserNotification from 'util/UserNotification';
 
-import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
 import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 import { ViewActions } from 'views/stores/ViewStore';
-import View from 'views/logic/views/View';
-import withPluginEntities from 'views/logic/withPluginEntities';
-import type { ViewHook } from 'views/logic/hooks/ViewHook';
-import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import Spinner from 'components/common/Spinner';
-import { ExtendedSearchPage } from 'views/pages';
 import { SearchActions } from 'views/stores/SearchStore';
 
+import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
+import View from 'views/logic/views/View';
+import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
+import ViewLoaderContext from 'views/logic/ViewLoaderContext';
+import withPluginEntities from 'views/logic/withPluginEntities';
+import type { ViewHook } from 'views/logic/hooks/ViewHook';
+
+import Spinner from 'components/common/Spinner';
+import { ExtendedSearchPage } from 'views/pages';
 
 type Props = {
   params: {
@@ -32,8 +34,8 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
   const { query } = location;
   const [hookComponent, setHookComponent] = useState(undefined);
 
-  useEffect(() => {
-    processHooks(
+  const loadNewView = () => {
+    return processHooks(
       ViewActions.create(View.Type.Search, streamId)
         .then(({ view, activeQuery }) => {
           return QueryFiltersActions.streams(activeQuery, [streamId]).then(() => view);
@@ -44,9 +46,11 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
     ).then(
       () => setLoaded(true),
     ).catch(
-      (error) => { UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'); },
+      error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
     );
-  }, [streamId]);
+  };
+
+  useEffect(() => { loadNewView(); }, [streamId]);
 
   const loadView = (viewId: string): Promise<?View> => {
     return ViewLoader(
@@ -78,7 +82,9 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
   if (loaded) {
     return (
       <ViewLoaderContext.Provider value={loadView}>
-        <ExtendedSearchPage route={route} />
+        <NewViewLoaderContext.Provider value={loadNewView}>
+          <ExtendedSearchPage route={route} />
+        </NewViewLoaderContext.Provider>
       </ViewLoaderContext.Provider>
     );
   }
