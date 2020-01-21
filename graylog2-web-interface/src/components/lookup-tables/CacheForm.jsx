@@ -72,7 +72,7 @@ class CacheForm extends React.Component {
     this._clearTimer();
   }
 
-  updateState = (dataAdapter) => {
+  updateState = (cache) => {
     this.setState(this._initialState(dataAdapter));
   }
 
