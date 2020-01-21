@@ -94,27 +94,6 @@ class EventDefinitionFormContainer extends React.Component {
     history.push(Routes.ALERTS.DEFINITIONS.LIST);
   };
 
-  _validate = (eventDefinition) => {
-    const validation = {
-      isValid: false,
-    };
-
-    const { query_parameters: queryParameters } = eventDefinition.config;
-    if (queryParameters.length > 0 && queryParameters.some(p => p.embryonic)) {
-      const undeclaredParameters = queryParameters.filter(p => p.embryonic)
-        .map(p => p.name)
-        .join(', ');
-      validation.results = {
-        errors: {
-          query_parameters: [`Undeclared parameters: ${undeclaredParameters}.`],
-        },
-      };
-      return validation;
-    }
-
-    return { isValid: true };
-  };
-
   handleSubmitSuccessResponse = () => {
     this.setState({ isDirty: false }, () => history.push(Routes.ALERTS.DEFINITIONS.LIST));
   };
@@ -128,11 +107,19 @@ class EventDefinitionFormContainer extends React.Component {
       }
       if (body.type && body.type === 'ApiError') {
         if (body.message.includes('org.graylog.events.conditions.Expression')
-        || body.message.includes('org.graylog.events.conditions.Expr')
-        || body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')) {
+          || body.message.includes('org.graylog.events.conditions.Expr')
+          || body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')) {
           this.setState({
             validation: {
               errors: { conditions: ['Aggregation condition is not valid'] },
+            },
+          });
+          return;
+        }
+        if (body.message.includes('embryonic')) {
+          this.setState({
+            validation: {
+              errors: { query_parameters: ['Query parameters must be declared'] },
             },
           });
         }
@@ -143,11 +130,6 @@ class EventDefinitionFormContainer extends React.Component {
   handleSubmit = () => {
     const { action } = this.props;
     const { eventDefinition } = this.state;
-    const validation = this._validate(eventDefinition);
-    if (!validation.isValid) {
-      this.setState({ validation: validation.results });
-      return;
-    }
 
     if (action === 'create') {
       EventDefinitionsActions.create(eventDefinition)
