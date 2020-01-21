@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import history from 'util/History';
 
 import connect from 'stores/connect';
 import Spinner from 'components/common/Spinner';
@@ -13,6 +14,7 @@ import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
 import { SearchActions } from 'views/stores/SearchStore';
+import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 
 import { ExtendedSearchPage } from 'views/pages';
 
@@ -71,6 +73,10 @@ class ShowViewPage extends React.Component<Props, State> {
     return this.loadView(viewId);
   };
 
+  loadNewView = () => {
+    return history.push('/search');
+  }
+
   loadView = (viewId: string): Promise<?View> => {
     const { location, loadingViewHooks, executingViewHooks, viewLoader } = this.props;
     // eslint-disable-next-line react/prop-types
@@ -113,9 +119,11 @@ class ShowViewPage extends React.Component<Props, State> {
     const { route } = this.props;
 
     return (
-      <ViewLoaderContext.Provider value={this.loadView}>
-        <ExtendedSearchPage route={route} />
-      </ViewLoaderContext.Provider>
+      <NewViewLoaderContext.Provider value={this.loadNewView}>
+        <ViewLoaderContext.Provider value={this.loadView}>
+          <ExtendedSearchPage route={route} />
+        </ViewLoaderContext.Provider>
+      </NewViewLoaderContext.Provider>
     );
   }
 }
