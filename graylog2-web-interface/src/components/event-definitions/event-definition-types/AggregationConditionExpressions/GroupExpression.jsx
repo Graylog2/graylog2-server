@@ -16,7 +16,7 @@ const Group = styled.div`
 `;
 
 const GroupExpression = (props) => {
-  const { expression, level, onChange, onChildChange } = props;
+  const { expression, level, onChange, onChildChange, validation } = props;
 
   const handleOperatorChange = (nextOperator) => {
     const nextExpression = cloneDeep(expression);
@@ -32,6 +32,7 @@ const GroupExpression = (props) => {
       <Group>
         <AggregationConditionExpression {...props}
                                         expression={expression.child}
+                                        validation={validation.child}
                                         parent={expression}
                                         onChange={onChildChange('child')}
                                         level={level + 1} />
@@ -45,7 +46,11 @@ GroupExpression.propTypes = {
   level: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,
-  validation: PropTypes.object.isRequired,
+  validation: PropTypes.object,
+};
+
+GroupExpression.defaultProps = {
+  validation: {},
 };
 
 export default GroupExpression;

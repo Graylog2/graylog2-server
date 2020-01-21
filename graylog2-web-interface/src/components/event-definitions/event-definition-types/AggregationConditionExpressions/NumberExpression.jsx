@@ -23,8 +23,8 @@ const NumberExpression = ({ expression, onChange, renderLabel, validation }) => 
              label={renderLabel ? 'Threshold' : ''}
              type="number"
              value={lodash.get(expression, 'value')}
-             bsStyle={validation.errors.conditions ? 'error' : null}
-             help={lodash.get(validation, 'errors.conditions[0]', null)}
+             bsStyle={validation.message ? 'error' : null}
+             help={validation.message}
              onChange={handleChange} />
     </Col>
   );
@@ -34,7 +34,11 @@ NumberExpression.propTypes = {
   expression: numberExpressionNodePropType.isRequired,
   onChange: PropTypes.func.isRequired,
   renderLabel: PropTypes.bool.isRequired,
-  validation: PropTypes.object.isRequired,
+  validation: PropTypes.object,
+};
+
+NumberExpression.defaultProps = {
+  validation: {},
 };
 
 export default NumberExpression;

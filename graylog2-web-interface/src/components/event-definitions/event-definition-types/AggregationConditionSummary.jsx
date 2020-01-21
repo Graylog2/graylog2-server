@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 
 const AggregationConditionSummary = ({ conditions, series }) => {
   const renderExpression = (expression) => {
+    if (!expression) {
+      return 'No condition configured';
+    }
+
     switch (expression.expr) {
       case 'number':
         return expression.value;
