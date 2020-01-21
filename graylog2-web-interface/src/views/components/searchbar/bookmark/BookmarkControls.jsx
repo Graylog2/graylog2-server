@@ -15,10 +15,10 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
+import CSVExport from 'views/components/searchbar/CSVExport';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
-import CSVExport from "../CSVExport";
 
 type Props = {
   viewStoreState: ViewStoreState,
@@ -215,7 +215,7 @@ class BookmarkControls extends React.Component<Props, State> {
               {bookmarkList}
               <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
                 <MenuItem onSelect={this.loadAsDashboard}><Icon name="dashboard" /> Export to dashboard</MenuItem>
-                <MenuItem onSelect={this.toggleCSVExport}>Export to CSV</MenuItem>
+                <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download" /> Export to CSV</MenuItem>
                 <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
                   <Icon name="eraser" /> Reset search
                 </MenuItem>

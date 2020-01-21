@@ -80,7 +80,7 @@ const CSVExport = ({ closeModal, availableStreams, availableFields }: Props) => 
         Download
       </a>
     )
-    : <p>Select at least on field to export messages as CVS.</p>;
+    : <p>Select at least on field to export messages as CSV.</p>;
 
   const infoText = (URLUtils.areCredentialsInURLSupported()
     ? 'Please right click the download link below and choose "Save Link As..." to download the CSV file.'
@@ -94,7 +94,7 @@ const CSVExport = ({ closeModal, availableStreams, availableFields }: Props) => 
   return (
     <Modal show>
       <Modal.Header>
-        <Modal.Title>Export search results as CVS</Modal.Title>
+        <Modal.Title>Export search results as CSV</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Content>
