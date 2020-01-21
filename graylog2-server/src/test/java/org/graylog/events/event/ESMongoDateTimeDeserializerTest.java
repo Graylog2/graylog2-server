@@ -19,16 +19,13 @@ package org.graylog.events.event;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.DBCollection;
-import org.graylog2.database.MongoConnectionRule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mongojack.Id;
@@ -38,11 +35,8 @@ import org.mongojack.ObjectId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ESMongoDateTimeDeserializerTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ObjectMapper objectMapper;
 
@@ -66,9 +60,9 @@ public class ESMongoDateTimeDeserializerTest {
     }
 
     @Test
-    @UsingDataSet(locations = "DateTime.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DateTime.json")
     public void deserializeMongoDateTime() throws Exception {
-        final DBCollection date_collection = mongoRule.getMongoConnection().getDatabase().getCollection("date_collection");
+        final DBCollection date_collection = mongodb.mongoConnection().getDatabase().getCollection("date_collection");
         final JacksonDBCollection<DTO, ObjectId> db = JacksonDBCollection.wrap(date_collection, DTO.class, ObjectId.class, objectMapper, null);
 
         final DTO value = db.findOne();

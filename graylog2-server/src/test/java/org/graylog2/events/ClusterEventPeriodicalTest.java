@@ -21,17 +21,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
@@ -41,7 +38,6 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -54,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -63,12 +58,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ClusterEventPeriodicalTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
 
-    @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -87,14 +80,14 @@ public class ClusterEventPeriodicalTest {
     public void setUpService() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
 
-        this.mongoConnection = mongoRule.getMongoConnection();
+        this.mongoConnection = mongodb.mongoConnection();
 
         MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
         when(nodeId.toString()).thenReturn("ID");
 
         this.clusterEventPeriodical = new ClusterEventPeriodical(
                 provider,
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 nodeId,
                 new ChainingClassLoader(getClass().getClassLoader()),
                 serverEventBus,
@@ -114,7 +107,6 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void runHandlesInvalidPayloadsGracefully() throws Exception {
         DBObject event = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
@@ -142,7 +134,6 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void serverEventBusDispatchesTypedEvents() throws Exception {
         final SimpleEventHandler handler = new SimpleEventHandler();
         serverEventBus.register(handler);
@@ -156,7 +147,8 @@ public class ClusterEventPeriodicalTest {
                 .get();
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
-        assertThat(collection.save(event).getN()).isEqualTo(1);
+        assertThat(collection.count()).isEqualTo(0L);
+        assertThat(collection.save(event).wasAcknowledged()).isTrue();
         assertThat(collection.count()).isEqualTo(1L);
         assertThat(handler.invocations).hasValue(0);
 
@@ -174,7 +166,6 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void runHandlesAutoValueCorrectly() throws Exception {
         final DebugEvent event = DebugEvent.create("Node ID", TIME, "test");
         DBObject dbObject = new BasicDBObjectBuilder()
@@ -203,7 +194,6 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testRun() throws Exception {
         DBObject event = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
@@ -231,7 +221,6 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testPublishClusterEvent() throws Exception {
         @SuppressWarnings("deprecation")
         DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
@@ -255,7 +244,6 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void publishClusterEventHandlesAutoValueCorrectly() throws Exception {
         @SuppressWarnings("deprecation")
         DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
@@ -275,7 +263,6 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void publishClusterEventSkipsDeadEvent() throws Exception {
         @SuppressWarnings("deprecation")
         DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
@@ -304,10 +291,10 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void prepareCollectionCreatesCollectionIfItDoesNotExist() throws Exception {
         @SuppressWarnings("deprecation")
         final DB database = mongoConnection.getDatabase();
+        database.getCollection(ClusterEventPeriodical.COLLECTION_NAME).drop();
         assertThat(database.collectionExists(ClusterEventPeriodical.COLLECTION_NAME)).isFalse();
         DBCollection collection = ClusterEventPeriodical.prepareCollection(mongoConnection);
 

@@ -18,17 +18,14 @@ package org.graylog2.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
@@ -39,7 +36,6 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -49,19 +45,18 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 public class ClusterConfigServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
     private static final String COLLECTION_NAME = ClusterConfigServiceImpl.COLLECTION_NAME;
 
-    @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -78,14 +73,14 @@ public class ClusterConfigServiceImplTest {
     public void setUpService() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
 
-        this.mongoConnection = mongoRule.getMongoConnection();
+        this.mongoConnection = mongodb.mongoConnection();
 
         MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
         when(nodeId.toString()).thenReturn("ID");
 
         this.clusterConfigService = new ClusterConfigServiceImpl(
                 provider,
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 nodeId,
                 new ChainingClassLoader(getClass().getClassLoader()),
                 clusterEventBus
@@ -99,7 +94,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getReturnsExistingConfig() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
@@ -118,7 +112,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getReturnsNullOnNonExistingConfig() throws Exception {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
@@ -128,7 +121,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getReturnsNullOnInvalidPayload() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
@@ -146,7 +138,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getWithKeyReturnsExistingConfig() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", "foo")
@@ -166,7 +157,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getWithKeyReturnsNullOnNonExistingConfig() throws Exception {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
@@ -176,7 +166,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getOrDefaultReturnsExistingConfig() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
@@ -198,7 +187,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getOrDefaultReturnsDefaultValueOnNonExistingConfig() throws Exception {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
@@ -211,7 +199,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getOrDefaultReturnsDefaultValueOnInvalidPayload() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
@@ -232,7 +219,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void writeIgnoresNull() throws Exception {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
@@ -244,7 +230,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void writePersistsClusterConfig() throws Exception {
         CustomConfig customConfig = new CustomConfig();
         customConfig.text = "TEST";
@@ -263,7 +248,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void writeUpdatesExistingClusterConfig() throws Exception {
         CustomConfig customConfig = new CustomConfig();
         customConfig.text = "TEST";
@@ -294,7 +278,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void writePostsClusterConfigChangedEvent() throws Exception {
         CustomConfig customConfig = new CustomConfig();
         customConfig.text = "TEST";
@@ -332,10 +315,10 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void prepareCollectionCreatesCollectionIfItDoesNotExist() throws Exception {
         @SuppressWarnings("deprecation")
         final DB database = mongoConnection.getDatabase();
+        database.getCollection(COLLECTION_NAME).drop();
         assertThat(database.collectionExists(COLLECTION_NAME)).isFalse();
         DBCollection collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection);
 
@@ -345,7 +328,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void removeDoesNothingIfConfigDoesNotExist() throws Exception {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
@@ -355,7 +337,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void removeSuccessfullyRemovesConfig() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
@@ -373,7 +354,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void listReturnsAllClasses() throws Exception {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
@@ -397,7 +377,6 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void listIgnoresInvalidClasses() throws Exception {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);

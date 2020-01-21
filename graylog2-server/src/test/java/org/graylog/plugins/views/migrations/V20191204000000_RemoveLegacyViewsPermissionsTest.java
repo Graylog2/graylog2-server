@@ -22,7 +22,7 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -35,8 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class V20191204000000_RemoveLegacyViewsPermissionsTest {
 
-    @ClassRule
-    public static MongoDBInstance mongo = MongoDBInstance.createForClass();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private MongoCollection<Document> rolesCollection;
     private MongoCollection<Document> usersCollection;
@@ -45,11 +45,11 @@ public class V20191204000000_RemoveLegacyViewsPermissionsTest {
 
     @Before
     public void setUp() throws Exception {
-        MongoDatabase mongoDatabase = mongo.mongoConnection().getMongoDatabase();
+        MongoDatabase mongoDatabase = mongodb.mongoConnection().getMongoDatabase();
         mongoDatabase.drop();
         rolesCollection = mongoDatabase.getCollection("roles");
         usersCollection = mongoDatabase.getCollection("users");
-        migration = new V20191204000000_RemoveLegacyViewsPermissions(mongo.mongoConnection());
+        migration = new V20191204000000_RemoveLegacyViewsPermissions(mongodb.mongoConnection());
     }
 
     @Test

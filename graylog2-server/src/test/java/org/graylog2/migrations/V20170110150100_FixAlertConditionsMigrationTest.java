@@ -22,11 +22,13 @@ import com.mongodb.client.MongoDatabase;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.fongo.SeedingFongoRule;
 import org.graylog2.migrations.V20170110150100_FixAlertConditionsMigration.MigrationCompleted;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -53,8 +55,8 @@ import static org.mockito.Mockito.when;
 
 public class V20170110150100_FixAlertConditionsMigrationTest {
     @Rule
-    public SeedingFongoRule fongoRule = SeedingFongoRule.create("graylog_test")
-            .addSeed("org/graylog2/migrations/V20170110150100_FixAlertConditionsMigration.json");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -71,11 +73,11 @@ public class V20170110150100_FixAlertConditionsMigrationTest {
     @Before
     public void setUp() throws Exception {
         this.clusterConfigService = spy(new ClusterConfigServiceImpl(objectMapperProvider,
-                fongoRule.getConnection(), nodeId,
+                mongodb.mongoConnection(), nodeId,
                 new ChainingClassLoader(getClass().getClassLoader()), new ClusterEventBus()));
 
-        final MongoConnection mongoConnection = spy(fongoRule.getConnection());
-        final MongoDatabase mongoDatabase = spy(fongoRule.getDatabase());
+        final MongoConnection mongoConnection = spy(mongodb.mongoConnection());
+        final MongoDatabase mongoDatabase = spy(mongoConnection.getMongoDatabase());
 
         when(mongoConnection.getMongoDatabase()).thenReturn(mongoDatabase);
 
@@ -92,6 +94,7 @@ public class V20170110150100_FixAlertConditionsMigrationTest {
     }
 
     @Test
+    @MongoDBFixtures("V20170110150100_FixAlertConditionsMigration.json")
     public void upgrade() throws Exception {
         // First check all types of the existing documents
         AlertConditionAssertions.assertThat(getAlertCondition("2fa6a415-ce0c-4a36-accc-dd9519eb06d9"))
@@ -159,7 +162,7 @@ public class V20170110150100_FixAlertConditionsMigrationTest {
 
         migration.upgrade();
 
-        verify(collection, never()).updateOne(any(), any());
+        verify(collection, never()).updateOne(any(), (Bson) any());
         verify(clusterConfigService, never()).write(any(MigrationCompleted.class));
     }
 

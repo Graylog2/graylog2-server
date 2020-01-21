@@ -16,15 +16,12 @@
  */
 package org.graylog2.savedsearches;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
-import org.graylog2.database.MongoConnectionRule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -32,26 +29,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class SavedSearchServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private SavedSearchService savedSearchService;
 
     @Before
     public void setUpService() throws Exception {
-        this.savedSearchService = new SavedSearchServiceImpl(mongoRule.getMongoConnection());
+        this.savedSearchService = new SavedSearchServiceImpl(mongodb.mongoConnection());
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testAllEmptyCollection() throws Exception {
         final List<SavedSearch> savedSearches = this.savedSearchService.all();
 
@@ -60,7 +52,7 @@ public class SavedSearchServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "savedSearchSingleDocument.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("savedSearchSingleDocument.json")
     public void testAllSingleDocumentInCollection() throws Exception {
         final List<SavedSearch> savedSearches = this.savedSearchService.all();
 
@@ -69,7 +61,7 @@ public class SavedSearchServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = {"savedSearchSingleDocument.json", "savedSearchSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"savedSearchSingleDocument.json", "savedSearchSingleDocument2.json"})
     public void testAllMultipleDocumentsInCollection() throws Exception {
         final List<SavedSearch> savedSearches = this.savedSearchService.all();
 
@@ -78,7 +70,7 @@ public class SavedSearchServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = {"savedSearchSingleDocument.json", "savedSearchSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"savedSearchSingleDocument.json", "savedSearchSingleDocument2.json"})
     public void testLoad() throws Exception {
         final String id1 = "5400deadbeefdeadbeefaffe";
         final SavedSearch savedSearch = savedSearchService.load(id1);
@@ -94,19 +86,16 @@ public class SavedSearchServiceImplTest {
     }
 
     @Test(expected = NotFoundException.class)
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testLoadNonexisting() throws Exception {
         savedSearchService.load("54e3deadbeefdeadbeefaffe");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testLoadInvalidId() throws Exception {
         savedSearchService.load("foobar");
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testCreate() throws Exception {
         final String title = "Example Title";
         final Map<String, Object> query =Collections.emptyMap();

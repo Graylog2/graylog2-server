@@ -16,17 +16,13 @@
  */
 package org.graylog.plugins.views.search.db;
 
-import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
-import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
@@ -37,7 +33,6 @@ import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +40,6 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.Collections;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -56,13 +50,9 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(JukitoRunner.class)
 @UseModules({ObjectMapperModule.class, ValidatorModule.class})
-@CustomComparisonStrategy(comparisonStrategy = MongoFlexibleComparisonStrategy.class)
 public class SearchesCleanUpJobWithDBServicesTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private SearchesCleanUpJob searchesCleanUpJob;
     private SearchDbService searchDbService;
@@ -81,13 +71,13 @@ public class SearchesCleanUpJobWithDBServicesTest {
 
         final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
         final ViewService viewService = new TestViewService(
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 mapperProvider,
                 clusterConfigService
         );
         this.searchDbService = spy(
                 new SearchDbService(
-                        mongoRule.getMongoConnection(),
+                        mongodb.mongoConnection(),
                         mapperProvider,
                         dto -> new SearchRequirements(Collections.emptySet(), dto)
                 )
@@ -108,7 +98,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
     }
 
     @Test
-    @UsingDataSet(locations = "mixedExpiredAndNonExpiredSearches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("mixedExpiredAndNonExpiredSearches.json")
     public void testMixedExpiredAndNonExpiredSearches() {
         this.searchesCleanUpJob.doRun();
 
@@ -119,7 +109,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
     }
 
     @Test
-    @UsingDataSet(locations = "mixedExpiredNonExpiredReferencedAndNonReferencedSearches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("mixedExpiredNonExpiredReferencedAndNonReferencedSearches.json")
     public void testMixedExpiredNonExpiredReferencedAndNonReferencedSearches() {
         this.searchesCleanUpJob.doRun();
 

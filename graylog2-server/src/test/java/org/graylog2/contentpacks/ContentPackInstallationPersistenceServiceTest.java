@@ -19,17 +19,14 @@ package org.graylog2.contentpacks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -38,15 +35,11 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContentPackInstallationPersistenceServiceTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("content_packs");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ContentPackInstallationPersistenceService persistenceService;
 
@@ -57,18 +50,18 @@ public class ContentPackInstallationPersistenceServiceTest {
 
         persistenceService = new ContentPackInstallationPersistenceService(
                 mongoJackObjectMapperProvider,
-                mongoRule.getMongoConnection());
+                mongodb.mongoConnection());
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void loadAll() {
         final Set<ContentPackInstallation> contentPacks = persistenceService.loadAll();
         assertThat(contentPacks).hasSize(4);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void findById() {
         final ObjectId objectId = new ObjectId("5b4c935b4b900a0000000001");
         final Optional<ContentPackInstallation> contentPacks = persistenceService.findById(objectId);
@@ -80,14 +73,14 @@ public class ContentPackInstallationPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void findByIdWithInvalidId() {
         final Optional<ContentPackInstallation> contentPacks = persistenceService.findById(new ObjectId("0000000000000000deadbeef"));
         assertThat(contentPacks).isEmpty();
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void findByContentPackId() {
         final ModelId id = ModelId.of("4e3d7025-881e-6870-da03-cafebabe0001");
         final Set<ContentPackInstallation> contentPacks = persistenceService.findByContentPackId(id);
@@ -100,7 +93,7 @@ public class ContentPackInstallationPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void findByContentPackIdWithInvalidId() {
         final Set<ContentPackInstallation> contentPacks = persistenceService.findByContentPackId(ModelId.of("does-not-exist"));
 
@@ -108,7 +101,7 @@ public class ContentPackInstallationPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void findByContentPackIdAndRevision() {
         final ModelId id = ModelId.of("4e3d7025-881e-6870-da03-cafebabe0001");
         final Set<ContentPackInstallation> contentPack = persistenceService.findByContentPackIdAndRevision(id, 1);
@@ -119,7 +112,7 @@ public class ContentPackInstallationPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void findByContentPackIdAndRevisionWithInvalidId() {
         final Set<ContentPackInstallation> contentPack = persistenceService.findByContentPackIdAndRevision(ModelId.of("4e3d7025-881e-6870-da03-cafebabe0001"), 3);
 
@@ -127,7 +120,6 @@ public class ContentPackInstallationPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void insert() {
         final ContentPackInstallation contentPackInstallation = ContentPackInstallation.builder()
                 .contentPackId(ModelId.of("content-pack-id"))
@@ -145,7 +137,7 @@ public class ContentPackInstallationPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void deleteById() {
         final ObjectId objectId = new ObjectId("5b4c935b4b900a0000000001");
         final int deletedContentPacks = persistenceService.deleteById(objectId);
@@ -158,7 +150,7 @@ public class ContentPackInstallationPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void deleteByIdWithInvalidId() {
         final int deletedContentPacks = persistenceService.deleteById(new ObjectId("0000000000000000deadbeef"));
         final Set<ContentPackInstallation> contentPacks = persistenceService.loadAll();
@@ -168,7 +160,7 @@ public class ContentPackInstallationPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackInstallationPersistenceServiceTest.json")
     public void countInstallationOfEntityById() {
         final long countedInstallations1 = persistenceService.countInstallationOfEntityById(ModelId.of("5b4c920b4b900a0024af2b5d"));
         assertThat(countedInstallations1).isEqualTo(2);

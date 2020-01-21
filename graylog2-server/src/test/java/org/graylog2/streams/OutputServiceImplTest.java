@@ -18,17 +18,14 @@ package org.graylog2.streams;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -38,16 +35,12 @@ import org.mockito.junit.MockitoRule;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class OutputServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("inputs-test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -64,7 +57,7 @@ public class OutputServiceImplTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         outputService = new OutputServiceImpl(
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 mapperProvider,
                 streamService,
                 outputRegistry
@@ -72,14 +65,14 @@ public class OutputServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("OutputServiceImplTest.json")
     public void loadAllReturnsAllOutputs() {
         final Set<Output> outputs = outputService.loadAll();
         assertThat(outputs).hasSize(2);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("OutputServiceImplTest.json")
     public void loadByIdsReturnsRequestedOutputs() {
         assertThat(outputService.loadByIds(ImmutableSet.of())).isEmpty();
         assertThat(outputService.loadByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
@@ -88,27 +81,27 @@ public class OutputServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("OutputServiceImplTest.json")
     public void loadReturnsExistingOutput() throws NotFoundException {
         final Output output = outputService.load("54e3deadbeefdeadbeef0001");
         assertThat(output.getId()).isEqualTo("54e3deadbeefdeadbeef0001");
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("OutputServiceImplTest.json")
     public void loadThrowsNotFoundExceptionForNonExistingOutput() {
         assertThatThrownBy(() -> outputService.load("54e300000000000000000000"))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("OutputServiceImplTest.json")
     public void countReturnsNumberOfOutputs() {
         assertThat(outputService.count()).isEqualTo(2L);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("OutputServiceImplTest.json")
     public void countByTypeReturnsNumberOfOutputsByType() {
         assertThat(outputService.countByType())
                 .hasSize(2)
@@ -117,7 +110,7 @@ public class OutputServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "single-output.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("single-output.json")
     public void updatingOutputIsPersistent() throws Exception {
         final String outputId = "5b927d32a7c8644ed44576ed";
         final Output newOutput = outputService.update(outputId, Collections.singletonMap("title", "Some other Title"));

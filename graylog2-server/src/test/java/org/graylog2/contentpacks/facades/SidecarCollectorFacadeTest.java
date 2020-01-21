@@ -19,11 +19,10 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.graph.Graph;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -36,25 +35,19 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SidecarCollectorFacadeTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("collectors");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private CollectorService collectorService;
@@ -63,12 +56,12 @@ public class SidecarCollectorFacadeTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        collectorService = new CollectorService(mongoRule.getMongoConnection(), mapperProvider);
+        collectorService = new CollectorService(mongodb.mongoConnection(), mapperProvider);
         facade = new SidecarCollectorFacade(objectMapper, collectorService);
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
     public void exportNativeEntity() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
         final EntityDescriptor descriptor = EntityDescriptor.create(collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1);
@@ -92,7 +85,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
@@ -116,7 +109,6 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void createNativeEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
@@ -145,7 +137,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
@@ -172,7 +164,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
     public void delete() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
 
@@ -182,7 +174,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
     public void createExcerpt() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
         final EntityExcerpt excerpt = facade.createExcerpt(collector);
@@ -193,7 +185,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
     public void listEntityExcerpts() {
         final Set<EntityExcerpt> entityExcerpts = facade.listEntityExcerpts();
         assertThat(entityExcerpts).containsOnly(
@@ -216,7 +208,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
@@ -224,7 +216,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))

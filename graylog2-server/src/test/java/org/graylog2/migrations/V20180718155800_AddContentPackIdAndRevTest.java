@@ -16,38 +16,32 @@
  */
 package org.graylog2.migrations;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.model.ContentPack;
-import org.graylog2.database.MongoConnectionRule;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.exists;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class V20180718155800_AddContentPackIdAndRevTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private V20180718155800_AddContentPackIdAndRev migration;
 
     @Before
     public void setUp() {
-        this.migration = new V20180718155800_AddContentPackIdAndRev(mongoRule.getMongoConnection());
+        this.migration = new V20180718155800_AddContentPackIdAndRev(mongodb.mongoConnection());
     }
 
     @Test
@@ -56,9 +50,9 @@ public class V20180718155800_AddContentPackIdAndRevTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("V20180718155800_AddContentPackIdAndRevTest.json")
     public void upgrade() {
-        final MongoCollection<Document> collection = mongoRule.getMongoConnection()
+        final MongoCollection<Document> collection = mongodb.mongoConnection()
                 .getMongoDatabase()
                 .getCollection(ContentPackPersistenceService.COLLECTION_NAME);
         final Bson filter = and(exists(ContentPack.FIELD_META_ID), exists(ContentPack.FIELD_META_REVISION));

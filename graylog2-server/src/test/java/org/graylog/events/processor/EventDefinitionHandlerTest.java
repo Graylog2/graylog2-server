@@ -19,9 +19,6 @@ package org.graylog.events.processor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.TestEventProcessorParameters;
@@ -32,14 +29,14 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -59,11 +56,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionHandlerTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Rule
@@ -95,9 +90,9 @@ public class EventDefinitionHandlerTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        this.eventDefinitionService = spy(new DBEventDefinitionService(mongoRule.getMongoConnection(), mapperProvider, stateService));
-        this.jobDefinitionService = spy(new DBJobDefinitionService(mongoRule.getMongoConnection(), mapperProvider));
-        this.jobTriggerService = spy(new DBJobTriggerService(mongoRule.getMongoConnection(), mapperProvider, nodeId, clock));
+        this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService));
+        this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
+        this.jobTriggerService = spy(new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock));
 
         this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock);
     }
@@ -155,7 +150,7 @@ public class EventDefinitionHandlerTest {
     }
 
     @Test
-    @UsingDataSet(locations = "event-processors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("event-processors.json")
     public void update() {
         final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
         final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
@@ -211,7 +206,7 @@ public class EventDefinitionHandlerTest {
     }
 
     @Test
-    @UsingDataSet(locations = "event-processors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("event-processors.json")
     public void updateWithErrors() {
         final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
         final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
@@ -292,7 +287,7 @@ public class EventDefinitionHandlerTest {
     }
 
     @Test
-    @UsingDataSet(locations = "event-processors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("event-processors.json")
     public void delete() {
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
         assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isPresent();

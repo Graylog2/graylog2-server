@@ -20,15 +20,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.AccessTokenService;
@@ -41,7 +39,6 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -52,19 +49,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UserServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb MONGO = newInMemoryMongoDbRule().build();
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    
+
     private MongoConnection mongoConnection;
     private Configuration configuration;
     private UserImpl.Factory userFactory;
@@ -81,7 +76,7 @@ public class UserServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        this.mongoConnection = mongoRule.getMongoConnection();
+        this.mongoConnection = mongodb.mongoConnection();
         this.configuration = new Configuration();
         this.userFactory = new UserImplFactory(configuration);
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
@@ -92,7 +87,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoad() throws Exception {
         final User user = userService.load("user1");
         assertThat(user).isNotNull();
@@ -101,13 +96,13 @@ public class UserServiceImplTest {
     }
 
     @Test(expected = RuntimeException.class)
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadDuplicateUser() throws Exception {
         userService.load("user-duplicate");
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("UserServiceImplTest.json")
     public void testDelete() throws Exception {
         assertThat(userService.delete("user1")).isEqualTo(1);
         assertThat(userService.delete("user-duplicate")).isEqualTo(2);
@@ -115,13 +110,12 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadAll() throws Exception {
         assertThat(userService.loadAll()).hasSize(4);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testSave() throws Exception {
         final User user = userService.create();
         user.setName("TEST");
@@ -150,7 +144,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("UserServiceImplTest.json")
     public void testCount() throws Exception {
         assertThat(userService.count()).isEqualTo(4L);
     }

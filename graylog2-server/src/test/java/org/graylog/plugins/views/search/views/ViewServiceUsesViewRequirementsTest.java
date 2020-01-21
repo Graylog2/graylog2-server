@@ -19,17 +19,14 @@ package org.graylog.plugins.views.search.views;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.search.SearchQueryParser;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,7 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -50,10 +46,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ViewServiceUsesViewRequirementsTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -85,7 +80,7 @@ public class ViewServiceUsesViewRequirementsTest {
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProviderForTest(new ObjectMapper());
         this.viewService = new ViewService(
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 objectMapperProvider,
                 clusterConfigService,
                 viewRequirementsFactory
@@ -95,7 +90,7 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @After
     public void tearDown() {
-        mongoRule.getMongoConnection().getMongoDatabase().drop();
+        mongodb.mongoConnection().getMongoDatabase().drop();
     }
 
     @Test
@@ -134,7 +129,7 @@ public class ViewServiceUsesViewRequirementsTest {
     }
 
     @Test
-    @UsingDataSet(locations = "views.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("views.json")
     public void getReturnsViewWithViewRequirements() {
         final ViewDTO view = viewService.get("5ced4a4485b52a86b96a0a63")
                 .orElseThrow(() -> new IllegalStateException("This should not happen!"));
@@ -143,7 +138,7 @@ public class ViewServiceUsesViewRequirementsTest {
     }
 
     @Test
-    @UsingDataSet(locations = "views.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("views.json")
     public void getDefaultReturnsViewWithViewRequirements() {
         when(clusterConfigService.get(ViewClusterConfig.class)).thenReturn(
                 ViewClusterConfig.builder().defaultViewId("5ced4df1d6e8104c16f50e00").build()
@@ -156,7 +151,7 @@ public class ViewServiceUsesViewRequirementsTest {
     }
 
     @Test
-    @UsingDataSet(locations = "views.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("views.json")
     public void forSearchReturnsViewWithViewRequirements() {
         final ViewDTO view = new ArrayList<>(viewService.forSearch("5ced4deed6e8104c16f50df9")).get(0);
 
@@ -164,7 +159,7 @@ public class ViewServiceUsesViewRequirementsTest {
     }
 
     @Test
-    @UsingDataSet(locations = "views.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("views.json")
     public void searchPaginatedReturnsViewWithViewRequirements() {
         final PaginatedList<ViewDTO> views = viewService.searchPaginated(
                 searchQueryParser.parse("*"),
@@ -182,7 +177,7 @@ public class ViewServiceUsesViewRequirementsTest {
     }
 
     @Test
-    @UsingDataSet(locations = "views.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("views.json")
     public void streamAllReturnsViewWithViewRequirements() {
         final List<ViewDTO> views = viewService.streamAll().collect(Collectors.toList());
 
@@ -193,7 +188,7 @@ public class ViewServiceUsesViewRequirementsTest {
     }
 
     @Test
-    @UsingDataSet(locations = "views.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("views.json")
     public void streamByIdsReturnsViewWithViewRequirements() {
         final List<ViewDTO> views = viewService.streamByIds(
                 ImmutableSet.of("5ced4df1d6e8104c16f50e00", "5ced4a4485b52a86b96a0a63")

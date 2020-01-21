@@ -18,14 +18,12 @@ package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
@@ -39,7 +37,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -54,16 +51,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 public class MongoIndexSetServiceTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("index-sets");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -83,13 +76,13 @@ public class MongoIndexSetServiceTest {
     @Before
     public void setUp() throws Exception {
         clusterEventBus = new ClusterEventBus();
-        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongoRule.getMongoConnection(),
+        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongodb.mongoConnection(),
                 nodeId, new ChainingClassLoader(getClass().getClassLoader()), clusterEventBus);
-        indexSetService = new MongoIndexSetService(mongoRule.getMongoConnection(), objectMapperProvider, streamService, clusterConfigService, clusterEventBus);
+        indexSetService = new MongoIndexSetService(mongodb.mongoConnection(), objectMapperProvider, streamService, clusterConfigService, clusterEventBus);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void getWithStringId() throws Exception {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get("57f3d721a43c2d59cb750001");
         assertThat(indexSetConfig)
@@ -118,7 +111,7 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void getReturnsExistingIndexSetConfig() throws Exception {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(new ObjectId("57f3d721a43c2d59cb750001"));
         assertThat(indexSetConfig)
@@ -147,14 +140,13 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getReturnsAbsentOptionalIfIndexSetConfigDoesNotExist() throws Exception {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(new ObjectId("57f3d3f0a43c2d595eb0a348"));
         assertThat(indexSetConfig).isEmpty();
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void getDefault() throws Exception {
         clusterConfigService.write(DefaultIndexSetConfig.create("57f3d721a43c2d59cb750002"));
 
@@ -165,12 +157,13 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void getDefaultWithoutDefault() throws Exception {
         indexSetService.getDefault();
     }
 
     @Test
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void findOne() throws Exception {
         final Optional<IndexSetConfig> config3 = indexSetService.findOne(DBQuery.is("title", "Test 2"));
         assertThat(config3).isPresent();
@@ -181,7 +174,7 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void findAll() throws Exception {
         final List<IndexSetConfig> configs = indexSetService.findAll();
 
@@ -250,7 +243,6 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void save() throws Exception {
         final IndexSetCreatedSubscriber subscriber = new IndexSetCreatedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
@@ -285,7 +277,7 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void deleteWithStringId() throws Exception {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
@@ -300,7 +292,7 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void deleteRemovesExistingIndexSetConfig() throws Exception {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
@@ -315,7 +307,7 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void deleteDoesNothingIfIndexSetConfigDoesNotExist() throws Exception {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
@@ -330,7 +322,7 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void deleteWithAssignedStreams() throws Exception {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);

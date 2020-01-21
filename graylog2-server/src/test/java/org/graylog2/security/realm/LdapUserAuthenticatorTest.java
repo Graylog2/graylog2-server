@@ -17,8 +17,6 @@
 package org.graylog2.security.realm;
 
 import com.google.common.collect.Maps;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
@@ -175,7 +173,6 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testSyncFromLdapEntry() {
         final LdapUserAuthenticator authenticator = spy(new LdapUserAuthenticator(ldapConnector,
                                                                                   ldapSettingsService,
@@ -205,7 +202,6 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testSyncFromLdapEntryExistingUser() {
         final LdapUserAuthenticator authenticator = spy(new LdapUserAuthenticator(ldapConnector,
                                                                                   ldapSettingsService,

@@ -16,29 +16,22 @@
  */
 package org.graylog2.decorators;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DecoratorServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("decorators_test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -49,11 +42,11 @@ public class DecoratorServiceImplTest {
     public void setUp() {
         final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
         final MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapperProvider.get());
-        decoratorService = new DecoratorServiceImpl(mongoRule.getMongoConnection(), provider);
+        decoratorService = new DecoratorServiceImpl(mongodb.mongoConnection(), provider);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DecoratorServiceImplTest.json")
     public void findForStreamReturnsDecoratorsForStream() {
         assertThat(decoratorService.findForStream("000000000000000000000001"))
                 .hasSize(2)
@@ -63,7 +56,7 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DecoratorServiceImplTest.json")
     public void findForGlobalReturnsDecoratorForGlobalStream() {
         assertThat(decoratorService.findForGlobal())
                 .hasSize(1)
@@ -72,7 +65,7 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DecoratorServiceImplTest.json")
     public void findByIdReturnsValidDecorator() throws NotFoundException {
         final Decorator decorator = decoratorService.findById("588bcafebabedeadbeef0001");
         assertThat(decorator.id()).isEqualTo("588bcafebabedeadbeef0001");
@@ -83,7 +76,6 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void findByIdThrowsNotFoundExceptionForMissingDecorator() throws NotFoundException {
         expectedException.expect(NotFoundException.class);
         expectedException.expectMessage("Decorator with id 588bcafebabedeadbeef0001 not found.");
@@ -92,7 +84,6 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void findByIdThrowsIllegalArgumentExceptionForInvalidObjectId() throws NotFoundException {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("invalid hexadecimal representation of an ObjectId: [NOPE]");
@@ -101,7 +92,7 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DecoratorServiceImplTest.json")
     public void findAllReturnsAllDecorators() {
         assertThat(decoratorService.findAll())
                 .hasSize(3)
@@ -136,7 +127,6 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void saveWritesDecoratorToDatabase() throws NotFoundException {
         final Decorator decorator = decoratorService.create("type", singletonMap("foo", "bar"), "000000000000000000000001", 42);
 
@@ -151,7 +141,6 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void saveWritesGlobalDecoratorToDatabase() throws NotFoundException {
         final Decorator decorator = decoratorService.create("type", singletonMap("foo", "bar"), 42);
 
@@ -164,7 +153,7 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DecoratorServiceImplTest.json")
     public void delete() {
         assertThat(decoratorService.findAll()).hasSize(3);
         assertThat(decoratorService.delete("588bcafebabedeadbeef0001")).isEqualTo(1);
@@ -174,7 +163,6 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void deleteThrowsIllegalArgumentExceptionForInvalidObjectId() {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("invalid hexadecimal representation of an ObjectId: [NOPE]");

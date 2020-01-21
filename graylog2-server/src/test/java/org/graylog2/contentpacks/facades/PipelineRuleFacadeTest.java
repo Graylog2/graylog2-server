@@ -19,12 +19,11 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.graph.Graph;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
@@ -38,13 +37,11 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -53,16 +50,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PipelineRuleFacadeTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -74,7 +67,7 @@ public class PipelineRuleFacadeTest {
     public void setUp() throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         ruleService = new MongoDbRuleService(
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
                 clusterEventBus);
 
@@ -105,7 +98,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
@@ -122,7 +115,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
     public void delete() throws NotFoundException {
         final RuleDao ruleDao = ruleService.loadByName("debug");
         assertThat(ruleService.loadAll()).hasSize(2);
@@ -134,7 +127,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("debug"))
@@ -154,7 +147,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
     public void findExistingWithDifferentSource() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("debug"))
@@ -170,7 +163,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("debug"))
@@ -185,7 +178,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
@@ -208,7 +201,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("5adf25034b900a0fdb4e5338"))
@@ -226,7 +219,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);

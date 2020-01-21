@@ -16,9 +16,8 @@
  */
 package org.graylog2.alarmcallbacks;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoDBServiceTest;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
@@ -40,11 +39,11 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
 
     @Before
     public void setUpService() throws Exception {
-        this.alarmCallbackConfigurationService = new AlarmCallbackConfigurationServiceImpl(mongoRule.getMongoConnection(), mapperProvider);
+        this.alarmCallbackConfigurationService = new AlarmCallbackConfigurationServiceImpl(mongodb.mongoConnection(), mapperProvider);
     }
 
     @Test
-    @UsingDataSet(locations = "alarmCallbackConfigurationsSingleDocument.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("alarmCallbackConfigurationsSingleDocument.json")
     public void testGetForStreamIdSingleDocument() throws Exception {
         final List<AlarmCallbackConfiguration> configs = alarmCallbackConfigurationService.getForStreamId("5400deadbeefdeadbeefaffe");
 
@@ -53,26 +52,26 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
     }
 
     @Test
-    @UsingDataSet(locations = "alarmCallbackConfigurationsSingleDocumentStringDate.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("alarmCallbackConfigurationsSingleDocumentStringDate.json")
     public void testGetForStreamIdSingleDocumentStringDate() throws Exception {
         testGetForStreamIdSingleDocument();
     }
 
     @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"})
     public void testGetForStreamIdMultipleDocuments() throws Exception {
         assertEquals("There should be multiple documents in the collection", 2, alarmCallbackConfigurationService.count());
         testGetForStreamIdSingleDocument();
     }
 
     @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocumentStringDate.json", "alarmCallbackConfigurationsSingleDocumentStringDate2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"alarmCallbackConfigurationsSingleDocumentStringDate.json", "alarmCallbackConfigurationsSingleDocumentStringDate2.json"})
     public void testGetForStreamIdMultipleDocumentsStringDate() throws Exception {
         testGetForStreamIdMultipleDocuments();
     }
 
     @Test
-    @UsingDataSet(locations = "alarmCallbackConfigurationsSingleDocument.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("alarmCallbackConfigurationsSingleDocument.json")
     public void testGetForStreamSingleDocument() throws Exception {
         final Stream stream = mock(StreamImpl.class);
         final String streamId = "5400deadbeefdeadbeefaffe";
@@ -87,32 +86,32 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
     }
 
     @Test
-    @UsingDataSet(locations = "alarmCallbackConfigurationsSingleDocumentStringDate.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("alarmCallbackConfigurationsSingleDocumentStringDate.json")
     public void testGetForStreamSingleDocumentStringDate() throws Exception {
         testGetForStreamSingleDocument();
     }
 
     @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"})
     public void testGetForStreamMultipleDocuments() throws Exception {
         assertEquals("There should be multiple documents in the collection", 2, alarmCallbackConfigurationService.count());
         testGetForStreamSingleDocument();
     }
 
     @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocumentStringDate.json", "alarmCallbackConfigurationsSingleDocumentStringDate2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"alarmCallbackConfigurationsSingleDocumentStringDate.json", "alarmCallbackConfigurationsSingleDocumentStringDate2.json"})
     public void testGetForStreamMultipleDocumentsStringDate() throws Exception {
         testGetForStreamMultipleDocuments();
     }
 
     @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocumentStringDate.json", "alarmCallbackConfigurationsSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"alarmCallbackConfigurationsSingleDocumentStringDate.json", "alarmCallbackConfigurationsSingleDocument2.json"})
     public void testGetForStreamMultipleDocumentsMixedDates() throws Exception {
         testGetForStreamMultipleDocuments();
     }
 
     @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"})
     public void testLoadExistingDocument() throws Exception {
         final AlarmCallbackConfiguration config = alarmCallbackConfigurationService.load("54e3deadbeefdeadbeefaffe");
 
@@ -121,7 +120,7 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
     }
 
     @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocumentStringDate.json", "alarmCallbackConfigurationsSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"alarmCallbackConfigurationsSingleDocumentStringDate.json", "alarmCallbackConfigurationsSingleDocument2.json"})
     public void testLoadExistingDocumentStringDate() throws Exception {
         final AlarmCallbackConfiguration config = alarmCallbackConfigurationService.load("54e3deadbeefdeadbeefaffe");
 
@@ -130,7 +129,6 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testLoadNonExistingDocument() throws Exception {
         final AlarmCallbackConfiguration config = alarmCallbackConfigurationService.load(new ObjectId().toHexString());
 
@@ -138,13 +136,11 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
     }
 
     @Test(expected = IllegalArgumentException.class)
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testLoadInvalidObjectId() throws Exception {
         final AlarmCallbackConfiguration config = alarmCallbackConfigurationService.load("foobar");
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testCreate() throws Exception {
         final CreateAlarmCallbackRequest request = CreateAlarmCallbackRequest.create("", "", Collections.emptyMap());
 
@@ -159,7 +155,7 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
     }
 
     @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"})
     public void testDeleteAlarmCallback() throws Exception {
         assertEquals("There should be multiple documents in the collection", 2, alarmCallbackConfigurationService.count());
         final AlarmCallbackConfiguration alarmCallback = mock(AlarmCallbackConfiguration.class);

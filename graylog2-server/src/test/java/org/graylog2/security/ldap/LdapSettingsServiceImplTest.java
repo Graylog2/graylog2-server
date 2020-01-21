@@ -16,18 +16,15 @@
  */
 package org.graylog2.security.ldap;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.users.RoleService;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,15 +34,11 @@ import org.mockito.junit.MockitoRule;
 import java.net.URI;
 import java.util.Map;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LdapSettingsServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -74,11 +67,11 @@ public class LdapSettingsServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        ldapSettingsService = new LdapSettingsServiceImpl(mongoRule.getMongoConnection(), factory);
+        ldapSettingsService = new LdapSettingsServiceImpl(mongodb.mongoConnection(), factory);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("LdapSettingsServiceImplTest.json")
     public void loadReturnsLdapSettings() throws Exception {
         final LdapSettings ldapSettings = ldapSettingsService.load();
         assertThat(ldapSettings).isNotNull();
@@ -88,32 +81,30 @@ public class LdapSettingsServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT, locations = "LdapSettingsServiceImplTest-invalid-password.json")
+    @MongoDBFixtures("LdapSettingsServiceImplTest-invalid-password.json")
     public void loadReturnNullIfPasswordSecretIsWrong() throws Exception {
         final LdapSettings ldapSettings = ldapSettingsService.load();
         assertThat(ldapSettings).isNull();
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void loadReturnsNullIfDatabaseIsEmpty() throws Exception {
         assertThat(ldapSettingsService.load()).isNull();
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void loadReturnsNullIfDatabaseHasMoreThanOneEntry() throws Exception {
         @SuppressWarnings("deprecation")
-        final DBCollection collection = mongoRule.getMongoConnection().getDatabase().getCollection("ldap_settings");
+        final DBCollection collection = mongodb.mongoConnection().getDatabase().getCollection("ldap_settings");
         collection.insert(new BasicDBObject("foo", "bar"), new BasicDBObject("quux", "baz"));
         assertThat(ldapSettingsService.load()).isNull();
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("LdapSettingsServiceImplTest.json")
     public void deleteRemovesAllLdapSettings() throws Exception {
         @SuppressWarnings("deprecation")
-        final DBCollection collection = mongoRule.getMongoConnection().getDatabase().getCollection("ldap_settings");
+        final DBCollection collection = mongodb.mongoConnection().getDatabase().getCollection("ldap_settings");
         assertThat(collection.count()).isEqualTo(1L);
         ldapSettingsService.delete();
         assertThat(collection.count()).isEqualTo(0);
