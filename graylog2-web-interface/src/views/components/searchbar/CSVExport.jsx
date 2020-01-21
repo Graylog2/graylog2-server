@@ -3,11 +3,14 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
 import connect from 'stores/connect';
+/* $FlowFixMe: Need to add to flow typed */
+import styled from 'styled-components';
 
 import { StreamsStore } from 'views/stores/StreamsStore';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import URLUtils from 'util/URLUtils';
-import { Modal, Button } from 'components/graylog';
+import { Modal, Button, Row } from 'components/graylog';
 import { Icon } from 'components/common';
 import ApiRoutes from 'routing/ApiRoutes';
 import StoreProvider from 'injection/StoreProvider';
@@ -16,17 +19,18 @@ import Select from 'views/components/Select';
 
 const SessionStore = StoreProvider.getStore('Session');
 
-type StreamEntry = {
+type Option = {
   label: String,
   value: String,
 };
 
 type Props = {
-  availableStreams: Array<StreamEntry>,
+  availableStreams: Array<Option>,
+  availableFields: Array<Option>,
   closeModal: () => void,
 };
 
-const getURLForExportAsCSV = (selectedStream: ?String) => {
+const getURLForExportAsCSV = (selectedStream: ?string, selectedFields: Array<string> = []) => {
   const { view } = ViewStore.getInitialState() || {};
   if (view && view.type === View.Type.Search) {
     const { queries } = view.search;
@@ -45,7 +49,7 @@ const getURLForExportAsCSV = (selectedStream: ?String) => {
           selectedStream,
           0,
           0,
-          ['timestamp', 'message', 'source'],
+          selectedFields,
         ).url,
       ));
       if (URLUtils.areCredentialsInURLSupported()) {
@@ -60,34 +64,62 @@ const getURLForExportAsCSV = (selectedStream: ?String) => {
   return new URI(URLUtils.qualifyUrl('/notfound'));
 };
 
-const CSVExport = ({ closeModal, availableStreams }: Props) => {
+const wrapOption = o => ({ label: o, value: o });
+const defaultFields = ['timestamp', 'source', 'message'];
+const defaultFieldOptions = defaultFields.map(wrapOption);
+
+const CSVExport = ({ closeModal, availableStreams, availableFields }: Props) => {
   const [selectedStream, setSelectedStream] = useState();
+  const [selectedFields, setSelectedFields] = useState(defaultFieldOptions);
+
+  const link = selectedFields.length > 0
+    ? (
+      /* eslint-disable-next-line react/jsx-no-target-blank */
+      <a href={getURLForExportAsCSV((selectedStream || {}).value, selectedFields.map(f => f.value))} target="_blank">
+        <Icon name="cloud-download" />&nbsp;
+        Download
+      </a>
+    )
+    : <p>Select at least on field to export messages as CVS.</p>;
 
   const infoText = (URLUtils.areCredentialsInURLSupported()
     ? 'Please right click the download link below and choose "Save Link As..." to download the CSV file.'
     : 'Please click the download link below. Your browser may ask for your username and password to '
     + 'download the CSV file.');
+
+  const Content = styled.div`
+    margin-left: 10px;
+    margin-right: 10px;
+  `;
   return (
     <Modal show>
       <Modal.Header>
         <Modal.Title>Export search results as CVS</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>{infoText}</p>
-        <div>
-          <span>Add stream to filter message:</span>
-          <Select placeholder="None: click to add stream"
-                  onChange={selection => setSelectedStream(selection)}
-                  options={availableStreams}
-                  value={selectedStream} />
-        </div>
-        <p>
-          {/* eslint-disable-next-line react/jsx-no-target-blank */}
-          <a href={getURLForExportAsCSV((selectedStream || {}).value)} target="_blank">
-            <Icon name="cloud-download" />&nbsp;
-            Download
-          </a>
-        </p>
+        <Content>
+          <Row>
+            <p>{infoText}</p>
+          </Row>
+          <Row>
+            <span>Add stream to filter messages:</span>
+            <Select placeholder="None: click to add stream"
+                    onChange={selection => setSelectedStream(selection)}
+                    options={availableStreams}
+                    value={selectedStream} />
+          </Row>
+          <Row>
+            <span>Select fields to export:</span>
+            <Select placeholder="None: click to add fields"
+                    onChange={selection => setSelectedFields(selection)}
+                    options={availableFields}
+                    value={selectedFields}
+                    isMulti />
+          </Row>
+          <Row>
+            {link}
+          </Row>
+        </Content>
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={closeModal}>Close</Button>
@@ -99,20 +131,24 @@ const CSVExport = ({ closeModal, availableStreams }: Props) => {
 CSVExport.propTypes = {
   closeModal: PropTypes.func,
   availableStreams: PropTypes.array,
+  availableFields: PropTypes.array,
 };
 
 CSVExport.defaultProps = {
   closeModal: () => {},
   availableStreams: [],
+  availableFields: [],
 };
 
 export default connect(
   CSVExport,
   {
     availableStreams: StreamsStore,
+    availableFields: FieldTypesStore,
   },
-  ({ availableStreams: { streams }, ...rest }) => ({
+  ({ availableStreams: { streams }, availableFields: { all }, ...rest }) => ({
     ...rest,
     availableStreams: streams.map(stream => ({ label: stream.title, value: stream.id })),
+    availableFields: all.map(field => ({ label: field.name, value: field.name })),
   }),
 );
