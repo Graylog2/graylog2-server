@@ -1,8 +1,10 @@
 // @flow strict
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
+import connect from 'stores/connect';
 
+import { StreamsStore } from 'views/stores/StreamsStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import URLUtils from 'util/URLUtils';
 import { Modal, Button } from 'components/graylog';
@@ -10,14 +12,21 @@ import { Icon } from 'components/common';
 import ApiRoutes from 'routing/ApiRoutes';
 import StoreProvider from 'injection/StoreProvider';
 import View from 'views/logic/views/View';
+import Select from 'views/components/Select';
 
 const SessionStore = StoreProvider.getStore('Session');
 
+type StreamEntry = {
+  label: String,
+  value: String,
+};
+
 type Props = {
+  availableStreams: Array<StreamEntry>,
   closeModal: () => void,
 };
 
-const getURLForExportAsCSV = () => {
+const getURLForExportAsCSV = (selectedStream: ?String) => {
   const { view } = ViewStore.getInitialState() || {};
   if (view && view.type === View.Type.Search) {
     const { queries } = view.search;
@@ -33,7 +42,7 @@ const getURLForExportAsCSV = () => {
           timerange.type,
           query,
           timerange,
-          undefined,
+          selectedStream,
           0,
           0,
           ['timestamp', 'message', 'source'],
@@ -51,7 +60,9 @@ const getURLForExportAsCSV = () => {
   return new URI(URLUtils.qualifyUrl('/notfound'));
 };
 
-const CSVExport = ({ closeModal }: Props) => {
+const CSVExport = ({ closeModal, availableStreams }: Props) => {
+  const [selectedStream, setSelectedStream] = useState();
+
   const infoText = (URLUtils.areCredentialsInURLSupported()
     ? 'Please right click the download link below and choose "Save Link As..." to download the CSV file.'
     : 'Please click the download link below. Your browser may ask for your username and password to '
@@ -63,9 +74,16 @@ const CSVExport = ({ closeModal }: Props) => {
       </Modal.Header>
       <Modal.Body>
         <p>{infoText}</p>
+        <div>
+          <span>Add stream to filter message:</span>
+          <Select placeholder="None: click to add stream"
+                  onChange={selection => setSelectedStream(selection)}
+                  options={availableStreams}
+                  value={selectedStream} />
+        </div>
         <p>
           {/* eslint-disable-next-line react/jsx-no-target-blank */}
-          <a href={getURLForExportAsCSV()} target="_blank">
+          <a href={getURLForExportAsCSV((selectedStream || {}).value)} target="_blank">
             <Icon name="cloud-download" />&nbsp;
             Download
           </a>
@@ -80,10 +98,21 @@ const CSVExport = ({ closeModal }: Props) => {
 
 CSVExport.propTypes = {
   closeModal: PropTypes.func,
+  availableStreams: PropTypes.array,
 };
 
 CSVExport.defaultProps = {
   closeModal: () => {},
+  availableStreams: [],
 };
 
-export default CSVExport;
+export default connect(
+  CSVExport,
+  {
+    availableStreams: StreamsStore,
+  },
+  ({ availableStreams: { streams }, ...rest }) => ({
+    ...rest,
+    availableStreams: streams.map(stream => ({ label: stream.title, value: stream.id })),
+  }),
+);
