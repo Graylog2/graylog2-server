@@ -1,13 +1,23 @@
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import React from 'react';
-import { Button, Panel } from 'components/graylog';
+import styled from 'styled-components';
+
+import { Button, Panel, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
+
 import { Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
+const StyledPanel = styled(Panel)`
+  margin-top: 20px;
+`;
+
+const StyledInlineCode = styled('code')`
+  margin: 0 0.25em;
+  white-space: nowrap;
+`;
 
 class EditQueryParameterModal extends React.Component {
   static propTypes = {
@@ -22,7 +32,7 @@ class EditQueryParameterModal extends React.Component {
 
     const { queryParameter } = this.props;
     this.state = {
-      lastParameter: lodash.cloneDeep(queryParameter),
+      queryParameter: lodash.cloneDeep(queryParameter),
       validation: {},
     };
   }
@@ -32,59 +42,48 @@ class EditQueryParameterModal extends React.Component {
   };
 
   _saved = () => {
-    const { queryParameter } = this.props;
-    if (this._hasErrors()) {
+    const { queryParameter } = this.state;
+    if (!this._validate(queryParameter)) {
       return;
     }
-    // TODO find a nicer way to handle this
-    this.setState({ lastParameter: queryParameter });
+    this.propagateChanges();
     this.modal.close();
   };
 
   _cleanState = () => {
-    const { eventDefinition, onChange, queryParameter } = this.props;
+    const { queryParameter } = this.props;
+    this.setState({ queryParameter: lodash.cloneDeep(queryParameter) });
+  }
+
+  propagateChanges = () => {
+    const { eventDefinition, onChange, queryParameter: prevQueryParameter } = this.props;
+    const { queryParameter } = this.state;
     const config = lodash.cloneDeep(eventDefinition.config);
-    const queryParameters = config.query_parameters;
-    const idx = queryParameters.findIndex(p => p.name === queryParameter.name);
-    if (idx === -1) {
+    const { query_parameters: queryParameters } = config;
+    const index = queryParameters.findIndex(p => p.name === prevQueryParameter.name);
+    if (index < 0) {
       throw new Error(`Query parameter "${queryParameter.name}" not found`);
     }
-    const { lastParameter } = this.state;
-    queryParameters[idx] = lastParameter;
-    config.query_parameters = queryParameters;
+    queryParameters[index] = lodash.omit(queryParameter, 'embryonic');
     onChange('config', config);
   };
 
-  propagateChanges = (key, value) => {
-    const { eventDefinition, onChange, queryParameter } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    const queryParameters = config.query_parameters;
-    const idx = queryParameters.findIndex(p => p.name === queryParameter.name);
-    if (idx === -1) {
-      throw new Error(`Query parameter "${queryParameter.name}" not found`);
-    }
-
-    queryParameters[idx][key] = value;
-
-    if (this._validate(queryParameters[idx])) {
-      delete queryParameters[idx].embryonic;
-    } else {
-      queryParameters[idx].embryonic = true;
-    }
-    config.query_parameters = queryParameters;
-    onChange('config', config);
+  handleParameterChange = (key, value) => {
+    const { queryParameter } = this.state;
+    const nextQueryParameter = Object.assign({}, queryParameter, { [key]: value });
+    this.setState({ queryParameter: nextQueryParameter });
   };
 
   handleSelectChange = (key) => {
     return (nextLookupTable) => {
-      this.propagateChanges(key, nextLookupTable);
+      this.handleParameterChange(key, nextLookupTable);
     };
   };
 
   handleChange = (event) => {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
-    this.propagateChanges(name, value);
+    this.handleParameterChange(name, value);
   };
 
   _validate = (queryParameter) => {
@@ -99,11 +98,6 @@ class EditQueryParameterModal extends React.Component {
     return lodash.isEmpty(newValidation);
   };
 
-  _hasErrors = () => {
-    const { validation } = this.state;
-    return !lodash.isEmpty(validation);
-  };
-
   formatLookupTables = (lookupTables) => {
     if (!lookupTables) {
       return [];
@@ -114,22 +108,21 @@ class EditQueryParameterModal extends React.Component {
   };
 
   render() {
-    const { queryParameter, lookupTables } = this.props;
-    const { validation } = this.state;
+    const { lookupTables } = this.props;
+    const { queryParameter, validation } = this.state;
     const parameterSyntax = `$${queryParameter.name}$`;
     return (
       <React.Fragment>
         <Button bsSize="small"
-                bsStyle={queryParameter.embryonic ? 'warning' : 'info'}
+                bsStyle={queryParameter.embryonic ? 'primary' : 'info'}
                 onClick={() => this.openModal()}>
-          {queryParameter.name}
+          {queryParameter.name}{queryParameter.embryonic && ': undeclared'}
         </Button>
 
         <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
                             title={`Declare Query Parameter "${queryParameter.name}" from Lookup Table`}
                             onSubmitForm={this._saved}
                             onModalClose={this._cleanState}
-                            submitButtonDisabled={this._hasErrors()}
                             submitButtonText="Save">
 
           <FormGroup controlId="lookup-provider-table" validationState={validation.lookup_table ? 'error' : null}>
@@ -139,6 +132,8 @@ class EditQueryParameterModal extends React.Component {
                     onChange={this.handleSelectChange('lookup_table')}
                     options={this.formatLookupTables(lookupTables)}
                     value={queryParameter.lookup_table}
+                    autoFocus
+                    clearable={false}
                     required />
             <HelpBlock>
               {validation.lookup_table || 'Select the Lookup Table Graylog should use to get the values.'}
@@ -152,7 +147,6 @@ class EditQueryParameterModal extends React.Component {
                  onChange={this.handleChange}
                  bsStyle={validation.key ? 'error' : null}
                  help={validation.key ? validation.key : 'Select the Lookup Table Key'}
-                 autoFocus
                  spellCheck={false}
                  required />
           <Input id={`default-value-${queryParameter.name}`}
@@ -163,34 +157,30 @@ class EditQueryParameterModal extends React.Component {
                  defaultValue={queryParameter.default_value}
                  spellCheck={false}
                  onChange={this.handleChange} />
-          <Panel header="How to use" style={{ marginTop: 20 }}>
+          <StyledPanel header="How to use">
+            <h5>General Usage</h5>
             <p>
-              <h5>General Usage</h5>
-              After declaring it, the parameter {' '}
-              <span style={{ whiteSpace: 'nowrap' }}>
-                <code>{parameterSyntax}</code>
-              </span>{' '}
+              After declaring it, the parameter
+              <StyledInlineCode>{parameterSyntax}</StyledInlineCode>
               in your query, will be replaced with the list of results from the lookup table.
               The list of results will be presented in the form of a Lucene BooleanQuery. E.g.:
-              <span style={{ whiteSpace: 'nowrap' }}>
-                <code>(&quot;foo&quot; OR &quot;bar&quot; OR &quot;baz&quot;)</code>
-              </span>
+              <StyledInlineCode>(&quot;foo&quot; OR &quot;bar&quot; OR &quot;baz&quot;)</StyledInlineCode>
             </p>
+            <h5>Behaviour on empty lookup result list</h5>
             <p>
-              <h5>Behaviour on empty lookup result list</h5>
               The event definition query is only executed if a value for the parameter is present.
               If the lookup result is empty, the execution will be skipped and treated as if the <i>Search Query</i> found
-              no messages. If an execution is desired a <i>Default Value</i> that yields the desired search result needs to be provided.
-              For example, (depending on the use case) a wildcard like <span style={{ whiteSpace: 'nowrap' }}><code>*</code></span>
+              no messages. If an execution is desired a <i>Default Value</i> that yields the desired search result
+              needs to be provided. For example, (depending on the use case) a wildcard like
+              <StyledInlineCode>*</StyledInlineCode>
               can be a meaningful Default Value.
             </p>
+            <h5>Limitations</h5>
             <p>
-              <h5>Limitations</h5>
               Please note that maximum number of supported results is 1024. If the lookup table returns
               more results, the event definition is not executed.
             </p>
-
-          </Panel>
+          </StyledPanel>
         </BootstrapModalForm>
       </React.Fragment>
     );

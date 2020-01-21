@@ -61,6 +61,22 @@ describe('SeriesConfiguration', () => {
     expect(onClose).toHaveBeenCalledWith(newSeries);
   });
 
+  it('prevents entering a duplicate series name', () => {
+    const onClose = jest.fn();
+    const series = createNewSeries();
+    const wrapper = mount(<SeriesConfiguration series={series} onClose={onClose} usedNames={['Already Exists']} />);
+    const input = wrapper.find('input');
+
+    expect(input).toHaveProp('value', 'count()');
+
+    input.simulate('change', { target: { value: 'Already Exists' } });
+
+    wrapper.update();
+    const submit = wrapper.find('button');
+    expect(submit).toBeDisabled();
+    expect(wrapper).toIncludeText('Name must be unique');
+  });
+
   it('returns original metric function name upon submit, when no name is defined', () => {
     const onClose = jest.fn();
     const series = createNewSeries(undefined, 'Some other value');

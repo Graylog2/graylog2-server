@@ -45,7 +45,7 @@ class FullSizeContainer extends React.Component<Props, State> {
     const { children } = this.props;
     const { height, width } = this.state;
     return (
-      <div ref={(elem) => { this.wrapper = elem; }} style={{ height: '100%', width: '100%' }}>
+      <div ref={(elem) => { this.wrapper = elem; }} style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
         {children({ height, width })}
       </div>
     );

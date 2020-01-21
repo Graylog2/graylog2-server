@@ -43,8 +43,9 @@ public class BeatsTransport extends AbstractTcpTransport {
                           EventLoopGroupFactory eventLoopGroupFactory,
                           NettyTransportConfiguration nettyTransportConfiguration,
                           ThroughputCounter throughputCounter,
-                          LocalMetricRegistry localRegistry) {
-        super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration);
+                          LocalMetricRegistry localRegistry,
+                          org.graylog2.Configuration graylogConfiguration) {
+        super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, graylogConfiguration);
     }
 
     @Override

@@ -143,12 +143,13 @@ public class PivotAggregationSearchTest {
     public void testExtractValuesWithoutGroupBy() throws Exception {
         final RelativeRange timerange = RelativeRange.create(3600);
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
+        final AggregationSeries seriesCountNoField = AggregationSeries.create("abc123", AggregationFunction.COUNT, "");
         final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .query("")
                 .streams(Collections.emptySet())
                 .groupBy(Collections.emptyList())
-                .series(ImmutableList.of(seriesCount, seriesCard))
+                .series(ImmutableList.of(seriesCount, seriesCountNoField, seriesCard))
                 .conditions(null)
                 .searchWithinMs(30000)
                 .executeEveryMs(30000)
@@ -176,6 +177,7 @@ public class PivotAggregationSearchTest {
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of())
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
+                        .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/<no-field>/abc123"), 23, true, "row-leaf"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-leaf"))
                         .source("leaf")
                         .build())
@@ -192,6 +194,11 @@ public class PivotAggregationSearchTest {
                                 .key(ImmutableList.of())
                                 .value(42.0)
                                 .series(seriesCount)
+                                .build(),
+                        AggregationSeriesValue.builder()
+                                .key(ImmutableList.of())
+                                .value(23.0)
+                                .series(seriesCountNoField)
                                 .build(),
                         AggregationSeriesValue.builder()
                                 .key(ImmutableList.of())

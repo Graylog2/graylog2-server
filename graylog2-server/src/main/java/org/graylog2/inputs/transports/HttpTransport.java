@@ -65,13 +65,15 @@ public class HttpTransport extends AbstractTcpTransport {
                          EventLoopGroupFactory eventLoopGroupFactory,
                          NettyTransportConfiguration nettyTransportConfiguration,
                          ThroughputCounter throughputCounter,
-                         LocalMetricRegistry localRegistry) {
+                         LocalMetricRegistry localRegistry,
+                         org.graylog2.Configuration graylogConfiguration) {
         super(configuration,
               throughputCounter,
               localRegistry,
               eventLoopGroup,
               eventLoopGroupFactory,
-              nettyTransportConfiguration);
+              nettyTransportConfiguration,
+              graylogConfiguration);
 
         enableCors = configuration.getBoolean(CK_ENABLE_CORS);
 

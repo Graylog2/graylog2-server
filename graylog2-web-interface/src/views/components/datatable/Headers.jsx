@@ -12,9 +12,9 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
 import styles from './DataTable.css';
 
-const _headerField = (activeQuery: string, fields, field: string, prefix: (string | number) = '', span: number = 1) => (
+const _headerField = (activeQuery: string, fields, field: string, prefix: (string | number) = '', span: number = 1, title: string = field) => (
   <th key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
-    <Field name={field} queryId={activeQuery} type={fieldTypeFor(field, fields)}>{field}</Field>
+    <Field name={field} queryId={activeQuery} type={fieldTypeFor(field, fields)}>{title}</Field>
   </th>
 );
 
@@ -62,11 +62,10 @@ type Props = {
 const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields }: Props) => {
   const rowFieldNames = rowPivots.map(pivot => pivot.field);
   const columnFieldNames = columnPivots.map(pivot => pivot.field);
-  const headerField = (field, prefix = '', span: number = 1) => _headerField(activeQuery, fields, field, prefix, span);
+  const headerField = (field, prefix = '', span: number = 1, title = field) => _headerField(activeQuery, fields, field, prefix, span, title);
   const rowPivotFields = rowFieldNames.map(fieldName => headerField(fieldName));
-  const effectiveSeries: Array<string> = series.map(s => s.effectiveName);
-  const seriesFields = effectiveSeries.map(fieldName => headerField(fieldName));
-  const columnPivotFields = flatten(actualColumnPivotFields.map(key => effectiveSeries.map(s => headerField(s, key.join('-')))));
+  const seriesFields = series.map(s => headerField(s.function, '', 1, s.effectiveName));
+  const columnPivotFields = flatten(actualColumnPivotFields.map(key => series.map(s => headerField(s.function, key.join('-'), 1, s.effectiveName))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
 
   return (

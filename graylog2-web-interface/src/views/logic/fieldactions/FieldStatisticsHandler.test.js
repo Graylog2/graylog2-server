@@ -6,6 +6,8 @@ import Widget from 'views/logic/widgets/Widget';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import handler from './FieldStatisticsHandler';
 import FieldType from '../fieldtypes/FieldType';
+import { createElasticsearchQueryString } from '../queries/Query';
+import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -76,6 +78,28 @@ describe('FieldStatisticsHandler', () => {
       const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
       expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, widget.id, `Field Statistics for ${fieldName}`);
+    });
+  });
+  it('duplicates query/timerange/streams/filter of original widget', () => {
+    const origWidget = Widget.builder()
+      .filter('author: "Vanth"')
+      .query(createElasticsearchQueryString('foo:42'))
+      .streams(['stream1', 'stream23'])
+      .timerange({ type: 'relative', range: 3600 })
+      .build();
+
+    return handler({
+      queryId,
+      field: fieldName,
+      type: nonNumericFieldType,
+      contexts: { widget: origWidget },
+    }).then(() => {
+      expect(WidgetActions.create).toHaveBeenCalled();
+      const { filter, query, streams, timerange }: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+      expect(filter).toEqual('author: "Vanth"');
+      expect(query).toEqual(createElasticsearchQueryString('foo:42'));
+      expect(streams).toEqual(['stream1', 'stream23']);
+      expect(timerange).toEqual({ type: 'relative', range: 3600 });
     });
   });
 });

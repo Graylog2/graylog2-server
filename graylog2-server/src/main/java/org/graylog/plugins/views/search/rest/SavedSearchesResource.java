@@ -46,7 +46,7 @@ import java.util.Optional;
 import static java.util.Locale.ENGLISH;
 
 @RequiresAuthentication
-@Api(value = "SavedSearches")
+@Api(value = "Search/Saved")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/views/savedSearches")
 public class SavedSearchesResource extends RestResource {

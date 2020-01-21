@@ -73,7 +73,7 @@ public class MockedMessagesTest {
 
     @Before
     public void setUp() throws Exception {
-        this.messages = new Messages(new MetricRegistry(), jestClient, new InMemoryProcessingStatusRecorder());
+        this.messages = new Messages(new MetricRegistry(), jestClient, new InMemoryProcessingStatusRecorder(), true);
     }
 
     @Test

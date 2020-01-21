@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Link } from 'react-router';
 
+import { Alert } from 'components/graylog';
+import { Icon } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
 import PermissionsMixin from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 
+import AggregationConditionSummary from './AggregationConditionSummary';
 import withStreams from './withStreams';
 import { TIME_UNITS } from './FilterForm';
 
@@ -54,10 +56,26 @@ class FilterAggregationSummary extends React.Component {
       .map(this.formatStreamOrId);
   };
 
+  renderQueryParameters = (queryParameters) => {
+    if (queryParameters.some(p => p.embryonic)) {
+      const undeclaredParameters = queryParameters.filter(p => p.embryonic)
+        .map(p => p.name)
+        .join(', ');
+      return (
+        <Alert bsStyle="danger">
+          <Icon name="exclamation-triangle" />&nbsp;There are undeclared query parameters: {undeclaredParameters}
+        </Alert>
+      );
+    }
+
+    return <dd>{queryParameters.map(p => p.name).join(', ')}</dd>;
+  }
+
   render() {
     const { config, currentUser } = this.props;
     const {
       query,
+      query_parameters: queryParameters,
       streams,
       search_within_ms: searchWithinMs,
       execute_every_ms: executeEveryMs,
@@ -71,8 +89,6 @@ class FilterAggregationSummary extends React.Component {
     const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
 
-    const expressionResults = AggregationExpressionParser.parseExpression(conditions);
-
     const effectiveStreamIds = PermissionsMixin.isPermitted(currentUser.permissions, 'streams:read')
       ? streams : [];
 
@@ -82,6 +98,7 @@ class FilterAggregationSummary extends React.Component {
         <dd>{lodash.upperFirst(conditionType)}</dd>
         <dt>Search Query</dt>
         <dd>{query || '*'}</dd>
+        {queryParameters.length > 0 && this.renderQueryParameters(queryParameters)}
         <dt>Streams</dt>
         <dd className={styles.streamList}>{this.renderStreams(effectiveStreamIds)}</dd>
         <dt>Search within</dt>
@@ -94,8 +111,7 @@ class FilterAggregationSummary extends React.Component {
             <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
             <dt>Create Events if</dt>
             <dd>
-              {series[0] ? <em>{series[0].function}({series[0].field})</em> : <span>No series selected</span>}
-              {' '}{expressionResults.operator} {expressionResults.value}
+              <AggregationConditionSummary series={series} conditions={conditions} />
             </dd>
           </React.Fragment>
         )}

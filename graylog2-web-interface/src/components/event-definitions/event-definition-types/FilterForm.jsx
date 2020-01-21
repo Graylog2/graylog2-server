@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import uuid from 'uuid/v4';
-import { ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Well } from 'components/graylog';
+import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import moment from 'moment';
 
 import connect from 'stores/connect';
@@ -165,7 +165,7 @@ class FilterForm extends React.Component {
       type: 'lut-parameter-v1',
       data_type: 'any',
       title: 'new title',
-      // has no binding!
+      // has no binding, no need to set binding property
     });
   };
 
@@ -215,14 +215,21 @@ class FilterForm extends React.Component {
     }
     const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter(param => (param.embryonic)));
     return (
-      <FormGroup validationState={hasEmbryonicParameters && 'error'}>
+      <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
         <ControlLabel>Query Parameters</ControlLabel>
-        <Well>
+        <Alert bsStyle={hasEmbryonicParameters ? 'danger' : 'info'}>
           <ButtonToolbar>
             {parameterButtons}
           </ButtonToolbar>
-        </Well>
-        { hasEmbryonicParameters && <HelpBlock>Please define the missing query parameters by clicking on the buttons above.</HelpBlock> }
+        </Alert>
+        {hasEmbryonicParameters && (
+          <HelpBlock>
+            {validation.errors.query_parameters
+              ? lodash.get(validation, 'errors.query_parameters[0]')
+              : 'Please declare missing query parameters by clicking on the buttons above.'
+            }
+          </HelpBlock>
+        )}
       </FormGroup>
     );
   };
@@ -243,14 +250,16 @@ class FilterForm extends React.Component {
                name="query"
                label="Search Query"
                type="text"
-               help="Search query that Messages should match. You can use the same syntax as in the Search page."
+               help={(
+                 <span>
+                  Search query that Messages should match. You can use the same syntax as in the Search page,
+                  including declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
+                 </span>
+               )}
                value={lodash.defaultTo(eventDefinition.config.query, '')}
                onChange={this.handleQueryChange} />
 
-        <FormGroup controlId="filter-query-parameters">
-
-          {this.renderQueryParameters()}
-        </FormGroup>
+        {this.renderQueryParameters()}
 
         <FormGroup controlId="filter-streams">
           <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>

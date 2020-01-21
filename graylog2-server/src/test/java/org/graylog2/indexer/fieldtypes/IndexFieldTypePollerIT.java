@@ -77,7 +77,7 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         final Indices indices = new Indices(jestClient(),
                 new ObjectMapperProvider().get(),
                 new IndexMappingFactory(new Node(jestClient())),
-                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder()),
+                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus("index-field-type-poller-it"));
@@ -117,6 +117,7 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 FieldTypeDTO.create("timestamp", "date"),
                 FieldTypeDTO.create("gl2_receive_timestamp", "date"),
                 FieldTypeDTO.create("gl2_processing_timestamp", "date"),
+                FieldTypeDTO.create("gl2_accounted_message_size", "long"),
                 FieldTypeDTO.create("streams", "keyword")
         );
     }
@@ -140,6 +141,7 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 FieldTypeDTO.create("timestamp", "date"),
                 FieldTypeDTO.create("gl2_receive_timestamp", "date"),
                 FieldTypeDTO.create("gl2_processing_timestamp", "date"),
+                FieldTypeDTO.create("gl2_accounted_message_size", "long"),
                 FieldTypeDTO.create("streams", "keyword")
         );
     }

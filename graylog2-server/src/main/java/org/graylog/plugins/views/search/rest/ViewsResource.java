@@ -65,7 +65,7 @@ import java.util.Set;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;
 
-@Api(value = "Enterprise/Views", description = "Views management")
+@Api(value = "Views")
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -131,7 +131,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{id}")
     @ApiOperation("Get a single view")
-    public ViewDTO get(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public ViewDTO get(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
@@ -162,7 +162,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
-    public ViewDTO update(@ApiParam @PathParam("id") @NotEmpty String id,
+    public ViewDTO update(@ApiParam(name="id") @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid ViewDTO dto) {
         checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
         loadView(id);
@@ -173,7 +173,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}/default")
     @ApiOperation("Configures the view as default view")
     @AuditEvent(type = ViewsAuditEventTypes.DEFAULT_VIEW_SET)
-    public void setDefault(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public void setDefault(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_READ, id);
         checkPermission(ViewsRestPermissions.DEFAULT_VIEW_SET);
         dbService.saveDefault(loadView(id));
@@ -183,7 +183,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Delete view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
-    public ViewDTO delete(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public ViewDTO delete(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_DELETE, id);
         final ViewDTO dto = loadView(id);
         dbService.delete(id);

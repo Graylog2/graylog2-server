@@ -56,4 +56,4 @@ Footer.defaultProps = {
   system: undefined,
 };
 
-export default connect(Footer, { system: SystemStore });
+export default connect(Footer, { system: SystemStore }, ({ system: { system } = {} }) => ({ system }));

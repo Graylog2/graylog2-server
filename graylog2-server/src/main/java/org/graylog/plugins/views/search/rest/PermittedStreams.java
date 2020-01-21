@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
-import javax.ws.rs.ForbiddenException;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -45,9 +44,6 @@ public class PermittedStreams {
                 .filter(id -> !DEFAULT_EVENT_STREAM_IDS.contains(id))
                 .filter(isStreamIdPermitted)
                 .collect(toSet());
-
-        if (result.isEmpty())
-            throw new ForbiddenException("There are no streams you are permitted to use.");
 
         return ImmutableSet.copyOf(result);
     }

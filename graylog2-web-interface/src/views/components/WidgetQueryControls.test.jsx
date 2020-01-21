@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { render, waitForElement, cleanup, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import '@testing-library/jest-dom/extend-expect';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+import SearchActions from 'views/actions/SearchActions';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetQueryControls from './WidgetQueryControls';
 import { WidgetActions } from '../stores/WidgetStore';
@@ -17,8 +18,11 @@ jest.mock('views/stores/WidgetStore', () => ({
 }));
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideActions: {
-    reset: jest.fn(),
+    reset: jest.fn(() => Promise.resolve()),
   },
+}));
+jest.mock('views/actions/SearchActions', () => ({
+  refresh: jest.fn(() => Promise.resolve()),
 }));
 jest.mock('stores/connect', () => x => x);
 
@@ -74,6 +78,13 @@ describe('WidgetQueryControls', () => {
       const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
       fireEvent.click(resetFilterButton);
       expect(GlobalOverrideActions.reset).toHaveBeenCalled();
+    });
+
+    it('executes search when reset filter button is clicked', async () => {
+      const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
+      fireEvent.click(resetFilterButton);
+      await wait(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notification', async () => {

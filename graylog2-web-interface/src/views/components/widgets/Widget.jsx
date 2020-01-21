@@ -269,7 +269,6 @@ class Widget extends React.Component<Props, State> {
                              type={widget.type}
                              onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
                 <WidgetErrorBoundary>
-
                   {visualization}
                 </WidgetErrorBoundary>
               </EditComponent>
@@ -315,7 +314,6 @@ class Widget extends React.Component<Props, State> {
             )}
           </InteractiveContext.Consumer>
           <WidgetErrorBoundary>
-
             {visualization}
           </WidgetErrorBoundary>
         </WidgetFrame>
