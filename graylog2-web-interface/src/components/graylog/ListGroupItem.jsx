@@ -9,34 +9,35 @@ import { useTheme } from 'theme/GraylogThemeContext';
 import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
-const listGroupItemStyles = (hex) => {
+const listGroupItemStyles = (hex, variant) => {
   const backgroundColor = util.colorLevel(hex, -9);
   const textColor = util.colorLevel(hex, 6);
 
   return css`
-    && {
+    &.list-group-item-${variant} {
       color: ${textColor};
       background-color: ${backgroundColor};
 
-      &.list-group-item-action {
+      a&,
+      button& {
+        color: ${textColor};
+
+        .list-group-item-heading {
+          color: inherit;
+          font-weight: bold;
+        }
+
         &:hover,
         &:focus {
           color: ${textColor};
-          background-color: ${darken(0.05, backgroundColor)};
+          background-color: ${darken(0.2, backgroundColor)};
         }
-
-        &.active {
-          color: ${util.contrastingColor(textColor)};
+        &.active,
+        &.active:hover,
+        &.active:focus {
+          color: #fff;
           background-color: ${textColor};
           border-color: ${textColor};
-        }
-      }
-
-      &.list-group-item {
-        &.active {
-          color: ${util.contrastingColor(hex)};
-          background-color: ${hex};
-          border-color: ${hex};
         }
       }
     }
@@ -46,37 +47,73 @@ const listGroupItemStyles = (hex) => {
 const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
   const { colors } = useTheme();
   const StyledListGroupItem = useMemo(
-    () => {
-      return styled(BootstrapListGroupItem)`
-        &.list-group-item-action {
-          color: ${colors.primary.tre};
+    () => styled(BootstrapListGroupItem)`
+      background-color: ${colors.primary.due};
+      border-color: ${colors.secondary.tre};
 
-          &:hover,
-          &:focus {
-            color: ${colors.primary.tre};
-            background-color: ${colors.secondary.due};
-          }
+      .list-group-item-heading {
+        font-weight: bold;
+      }
 
-          &:active {
-            color: ${util.contrastingColor(colors.secondary.tre)};
-            background-color: ${colors.secondary.tre};
-          }
+      &.disabled,
+      &.disabled:hover,
+      &.disabled:focus {
+        color: ${util.contrastingColor(colors.secondary.due, 'AA')};
+        background-color: ${colors.secondary.due};
+
+        .list-group-item-heading {
+          color: inherit;
+          font-weight: bold;
         }
 
-        &.list-group-item {
-          background-color: ${colors.primary.due};
-          border-color: ${colors.secondary.tre};
+        .list-group-item-text {
+          color: ${util.contrastingColor(colors.secondary.due, 'AA')};
+        }
+      }
 
-          &.disabled,
-          &:disabled {
-            color: ${colors.primary.tre};
-            background-color: ${colors.primary.due};
-          }
+      &.active,
+      &.active:hover,
+      &.active:focus {
+        color: ${util.readableColor(colors.tertiary.quattro)};
+        border-color: ${colors.tertiary.quattro};
+        background-color: ${colors.tertiary.quattro};
+
+        .list-group-item-heading,
+        .list-group-item-heading > small,
+        .list-group-item-heading > .small {
+          color: inherit;
+          font-weight: bold;
         }
 
-        ${bsStyleThemeVariant(listGroupItemStyles)}
-      `;
-    },
+        .list-group-item-text {
+          color: ${util.contrastingColor(colors.tertiary.quattro)};
+        }
+      }
+
+      a&,
+      button& {
+        color: ${colors.primary.tre};
+
+        .list-group-item-heading {
+          color: ${util.readableColor(colors.primary.due)};
+          font-weight: bold;
+        }
+
+        &:hover:not(.disabled),
+        &:focus:not(.disabled) {
+          background-color: ${colors.secondary.due};
+          color: ${util.readableColor(colors.secondary.due, colors.tertiary.quattro)};
+
+          &.active {
+            color: ${util.readableColor(colors.tertiary.quattro)};
+            border-color: ${colors.tertiary.quattro};
+            background-color: ${colors.tertiary.quattro};
+          }
+        }
+      }
+
+      ${bsStyleThemeVariant(listGroupItemStyles)}
+    `,
     [bsStyle, colors],
   );
 
