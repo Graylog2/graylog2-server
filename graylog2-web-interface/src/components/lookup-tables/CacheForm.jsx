@@ -73,7 +73,7 @@ class CacheForm extends React.Component {
   }
 
   updateState = (cache) => {
-    this.setState(this._initialState(dataAdapter));
+    this.setState(this._initialState(cache));
   }
 
   _initialState = (c) => {
