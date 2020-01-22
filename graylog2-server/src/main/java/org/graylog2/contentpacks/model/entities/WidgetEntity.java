@@ -151,7 +151,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                         .map(nativeEntities::get)
                         .map(object -> {
                             if (object == null) {
-                                throw new ContentPackException("Missing Stream for event definition");
+                                throw new ContentPackException("Missing Stream for widget entity");
                             } else if (object instanceof Stream) {
                                 Stream stream = (Stream) object;
                                 return stream.getId();
@@ -170,12 +170,12 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         return widgetBuilder.build();
     }
 
-    public List<SearchType> createSearchType(RandomUUIDProvider randomUUIDProvider) {
+    public List<SearchTypeEntity> createSearchTypeEntity(RandomUUIDProvider randomUUIDProvider) {
         if (! type().matches(AggregationConfigDTO.NAME)) {
             return ImmutableList.of();
         }
         AggregationConfigDTO config = (AggregationConfigDTO) config();
-        final Pivot.Builder pivotBuilder = Pivot.builder()
+        final PivotEntity.Builder pivotBuilder = PivotEntity.builder()
                 .name("chart")
                 .streams(streams())
                 .rollup(true)
@@ -187,8 +187,8 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         timerange().ifPresent(pivotBuilder::timerange);
 
         if (config.visualization().matches("numeric")) {
-            final Pivot chart = pivotBuilder.build();
-            final Pivot trend = pivotBuilder
+            final PivotEntity chart = pivotBuilder.build();
+            final PivotEntity trend = pivotBuilder
                     .id(new UUID().toString())
                     .name("trend")
                     .timerange(OffsetRange.Builder.builder()

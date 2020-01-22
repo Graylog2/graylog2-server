@@ -25,7 +25,9 @@ import org.graylog.plugins.views.search.views.Titles;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog2.contentpacks.model.entities.DashboardEntity;
 import org.graylog2.contentpacks.model.entities.DashboardWidgetEntity;
+import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
@@ -70,14 +72,14 @@ public class EntityConverter {
         final  Titles titles = DashboardEntity.widgetTitles(widgets, parameters);
 
         final Map<String, Set<String>> widgetMapping = new HashMap<>();
-        final Set<SearchType> searchTypes = new HashSet<>();
+        final Set<SearchTypeEntity> searchTypes = new HashSet<>();
         for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgets.entrySet()) {
             widgetEntityListEntry.getValue().forEach(widgetEntity -> {
-                final List<SearchType> currentSearchTypes;
-                currentSearchTypes = widgetEntity.createSearchType(randomUUIDProvider);
+                final List<SearchTypeEntity> currentSearchTypes;
+                currentSearchTypes = widgetEntity.createSearchTypeEntity(randomUUIDProvider);
                 searchTypes.addAll(currentSearchTypes);
                 widgetMapping.put(widgetEntity.id(),
-                        currentSearchTypes.stream().map(SearchType::id).collect(Collectors.toSet()));
+                        currentSearchTypes.stream().map(SearchTypeEntity::id).collect(Collectors.toSet()));
             });
         }
 
@@ -110,9 +112,9 @@ public class EntityConverter {
                 .build();
     }
 
-    private SearchEntity createSearchEntity(String queryId, Set<SearchType> searchTypes)
+    private SearchEntity createSearchEntity(String queryId, Set<SearchTypeEntity> searchTypes)
             throws InvalidRangeParametersException {
-        final Query query = Query.builder()
+        final QueryEntity query = QueryEntity.builder()
                 .id(queryId)
                 .searchTypes(searchTypes)
                 .timerange(RelativeRange.create(300))

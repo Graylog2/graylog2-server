@@ -29,6 +29,7 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -48,13 +49,17 @@ import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
 import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.streams.StreamImpl;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -64,6 +69,8 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -115,6 +122,8 @@ public class DashboardV1FacadeTest {
         objectMapper.registerSubtypes(new NamedType(TimeHistogramConfigDTO.class, TimeHistogramConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(ValueConfigDTO.class, ValueConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(PivotSortConfig.class, PivotSortConfig.Type));
+        objectMapper.registerSubtypes(new NamedType(PivotEntity.class, PivotEntity.NAME));
+        objectMapper.registerSubtypes(new NamedType(PivotSort.class, PivotSort.Type));
         objectMapper.registerSubtypes(new NamedType(OrFilter.class, OrFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(StreamFilter.class, StreamFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(QueryStringFilter.class, QueryStringFilter.NAME));
@@ -135,8 +144,13 @@ public class DashboardV1FacadeTest {
         assertThat(contentPack).isInstanceOf(ContentPackV1.class);
         final ContentPackV1 contentPackV1 = (ContentPackV1) contentPack;
         final Entity entity = contentPackV1.entities().iterator().next();
+
+        final StreamImpl stream = new StreamImpl(Collections.emptyMap());
+        final Map<EntityDescriptor, Object> nativeEntities = new HashMap<>(1);
+        nativeEntities.put(EntityDescriptor.create("58b3d55a-51ad-4b3e-865c-85776016a151", ModelTypes.STREAM_V1), stream);
+
         final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(entity,
-                ImmutableMap.of(), ImmutableMap.of(), "kmerz");
+                ImmutableMap.of(), nativeEntities, "kmerz");
         assertThat(nativeEntity).isNotNull();
 
         final ViewDTO viewDTO = nativeEntity.entity();
