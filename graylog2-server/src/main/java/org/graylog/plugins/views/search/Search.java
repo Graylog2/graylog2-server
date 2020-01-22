@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -153,7 +154,7 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         return Builder.create().parameters(of()).queries(ImmutableSet.<Query>builder().build());
     }
 
-    Set<String> usedStreamIds() {
+    public Set<String> usedStreamIds() {
         final Set<String> queryStreamIds = queries().stream()
                 .map(Query::usedStreamIds)
                 .reduce(Collections.emptySet(), Sets::union);
@@ -208,7 +209,9 @@ public abstract class Search implements ContentPackable<SearchEntity> {
     @Override
     public SearchEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final SearchEntity.Builder searchEntityBuilder = SearchEntity.builder()
-                .queries(this.queries())
+                .queries(ImmutableSet.copyOf(this.queries().stream()
+                        .map(query -> query.toContentPackEntity(entityDescriptorIds))
+                        .collect(Collectors.toSet())))
                 .parameters(this.parameters())
                 .requires(this.requires())
                 .createdAt(this.createdAt());

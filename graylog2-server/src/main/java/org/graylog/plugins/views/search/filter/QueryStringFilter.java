@@ -48,8 +48,15 @@ public abstract class QueryStringFilter implements Filter {
     @JsonProperty("query")
     public abstract String query();
 
+    public abstract Builder toBuilder();
+
+    @Override
+    public Filter.Builder toGenericBuilder() {
+        return toBuilder();
+    }
+
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements Filter.Builder {
 
         @JsonCreator
         public static Builder create() {

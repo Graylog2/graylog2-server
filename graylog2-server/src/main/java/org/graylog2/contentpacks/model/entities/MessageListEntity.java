@@ -14,43 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.searchtypes.pivot;
+package org.graylog2.contentpacks.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
-import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.entities.PivotEntity;
-import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.Sort;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog.plugins.views.search.timeranges.OffsetRange;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.decorators.Decorator;
+import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.google.common.collect.ImmutableList.of;
-
 @AutoValue
-@JsonTypeName(Pivot.NAME)
-@JsonDeserialize(builder = Pivot.Builder.class)
-public abstract class Pivot implements SearchType {
-    public static final String NAME = "pivot";
+@JsonTypeName(MessageListEntity.NAME)
+@JsonDeserialize(builder = MessageListEntity.Builder.class)
+public abstract class MessageListEntity implements SearchTypeEntity {
+    public static final String NAME = "messages";
 
     @Override
     public abstract String type();
@@ -63,47 +63,44 @@ public abstract class Pivot implements SearchType {
     @JsonProperty
     public abstract Optional<String> name();
 
-    @JsonProperty("row_groups")
-    public abstract List<BucketSpec> rowGroups();
-
-    @JsonProperty("column_groups")
-    public abstract List<BucketSpec> columnGroups();
-
-    @JsonProperty
-    public abstract List<SeriesSpec> series();
-
-    @JsonProperty
-    public abstract List<SortSpec> sort();
-
-    @JsonProperty
-    public abstract boolean rollup();
-
     @Nullable
     @Override
     public abstract Filter filter();
 
+    @JsonProperty
+    public abstract int limit();
+
+    @JsonProperty
+    public abstract int offset();
+
+    @Nullable
+    public abstract List<Sort> sort();
+
+    @JsonProperty
+    public abstract List<Decorator> decorators();
+
+    @JsonCreator
+    public static Builder builder() {
+        return new AutoValue_MessageListEntity.Builder()
+                .type(NAME)
+                .limit(150)
+                .offset(0)
+                .streams(Collections.emptySet())
+                .decorators(Collections.emptyList());
+    }
+
     public abstract Builder toBuilder();
 
     @Override
-    public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
-        return this;
-    }
-
-    public static Builder builder() {
-        return new AutoValue_Pivot.Builder()
-                .type(NAME)
-                .rowGroups(of())
-                .columnGroups(of())
-                .sort(of())
-                .streams(Collections.emptySet());
+    public Builder toGenericBuilder() {
+        return toBuilder();
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public abstract static class Builder implements SearchTypeEntity.Builder {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
-                    .sort(Collections.emptyList())
                     .streams(Collections.emptySet());
         }
 
@@ -115,21 +112,6 @@ public abstract class Pivot implements SearchType {
 
         @JsonProperty
         public abstract Builder name(@Nullable String name);
-
-        @JsonProperty("row_groups")
-        public abstract Builder rowGroups(@Nullable List<BucketSpec> rowGroups);
-
-        @JsonProperty("column_groups")
-        public abstract Builder columnGroups(@Nullable List<BucketSpec> columnGroups);
-
-        @JsonProperty
-        public abstract Builder series(List<SeriesSpec> series);
-
-        @JsonProperty
-        public abstract Builder sort(List<SortSpec> sort);
-
-        @JsonProperty
-        public abstract Builder rollup(boolean rollup);
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
@@ -153,24 +135,39 @@ public abstract class Pivot implements SearchType {
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
-        public abstract Pivot build();
+        @JsonProperty
+        public abstract Builder limit(int limit);
+
+        @JsonProperty
+        public abstract Builder offset(int offset);
+
+        @JsonProperty
+        public abstract Builder sort(@Nullable List<Sort> sort);
+
+        @JsonProperty("decorators")
+        public Builder _decorators(List<DecoratorImpl> decorators) {
+            return decorators(new ArrayList<>(decorators));
+        }
+
+        public abstract Builder decorators(List<Decorator> decorators);
+
+        public abstract MessageListEntity build();
     }
 
     @Override
-    public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        return PivotEntity.builder()
-                .sort(sort())
-                .streams(mappedStreams(entityDescriptorIds))
-                .timerange(timerange().orElse(null))
-                .columnGroups(columnGroups())
-                .rowGroups(rowGroups())
-                .filter(filter())
-                .query(query().orElse(null))
-                .id(id())
-                .name(name().orElse(null))
-                .rollup(rollup())
-                .series(series())
-                .type(type())
-                .build();
+    public SearchType toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+       return MessageList.builder()
+       .limit(limit())
+       .streams(mappedStreams(nativeEntities))
+       .id(id())
+       .offset(offset())
+       .decorators(decorators())
+       .timerange(timerange().orElse(null))
+       .filter(filter())
+       .name(name().orElse(null))
+       .type(type())
+       .query(query().orElse(null))
+       .sort(sort())
+       .build();
     }
 }

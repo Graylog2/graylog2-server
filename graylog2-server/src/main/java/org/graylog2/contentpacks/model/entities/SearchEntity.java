@@ -23,12 +23,17 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -36,6 +41,8 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -48,7 +55,7 @@ public abstract class SearchEntity implements NativeEntityConverter<Search> {
     public static final String FIELD_OWNER = "owner";
 
     @JsonProperty
-    public abstract ImmutableSet<Query> queries();
+    public abstract ImmutableSet<QueryEntity> queries();
 
     @JsonProperty
     public abstract ImmutableSet<Parameter> parameters();
@@ -65,14 +72,14 @@ public abstract class SearchEntity implements NativeEntityConverter<Search> {
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return Builder.create().parameters(of()).queries(ImmutableSet.<Query>builder().build());
+        return Builder.create().parameters(of()).queries(ImmutableSet.<QueryEntity>builder().build());
     }
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder {
         @JsonProperty
-        public abstract Builder queries(ImmutableSet<Query> queries);
+        public abstract Builder queries(ImmutableSet<QueryEntity> queries);
 
         @JsonProperty
         public abstract Builder parameters(ImmutableSet<Parameter> parameters);
@@ -98,10 +105,26 @@ public abstract class SearchEntity implements NativeEntityConverter<Search> {
 
     }
 
+    public Set<String> usedStreamIds() {
+        final Set<String> queryStreamIds = queries().stream()
+                .map(QueryEntity::usedStreamIds)
+                .reduce(Collections.emptySet(), Sets::union);
+        final Set<String> searchTypeStreamIds = queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .map(SearchTypeEntity::effectiveStreams)
+                .reduce(Collections.emptySet(), Sets::union);
+
+        return Sets.union(queryStreamIds, searchTypeStreamIds);
+    }
+
     @Override
-    public Search toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+    public Search toNativeEntity(Map<String, ValueReference> parameters,
+                                 Map<EntityDescriptor, Object> nativeEntities) {
         final Search.Builder searchBuilder = Search.builder()
-                .queries(this.queries())
+                .queries(ImmutableSet.copyOf(
+                        queries().stream()
+                                .map(q -> q.toNativeEntity(parameters, nativeEntities))
+                                .collect(Collectors.toSet())))
                 .parameters(this.parameters())
                 .requires(this.requires())
                 .createdAt(this.createdAt());

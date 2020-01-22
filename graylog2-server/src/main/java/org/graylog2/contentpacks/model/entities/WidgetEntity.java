@@ -26,14 +26,18 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.streams.Stream;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetEntity.Builder.class)
@@ -115,7 +119,20 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 .config(this.config())
                 .filter(this.filter())
                 .id(this.id())
-                .streams(this.streams())
+                .streams(this.streams().stream()
+                        .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
+                        .map(nativeEntities::get)
+                        .map(object -> {
+                            if (object == null) {
+                                throw new ContentPackException("Missing Stream for event definition");
+                            } else if (object instanceof Stream) {
+                                Stream stream = (Stream) object;
+                                return stream.getId();
+                            } else {
+                                throw new ContentPackException(
+                                        "Invalid type for stream Stream for event definition: " + object.getClass());
+                            }
+                        }).collect(Collectors.toSet()))
                 .type(this.type());
         if (this.query().isPresent()) {
             widgetBuilder.query(this.query().get());

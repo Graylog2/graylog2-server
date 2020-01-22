@@ -50,8 +50,15 @@ public abstract class AndFilter implements Filter {
                 .build();
     }
 
+    public abstract Builder toBuilder();
+
+    @Override
+    public Filter.Builder toGenericBuilder() {
+        return toBuilder();
+    }
+
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements Filter.Builder {
         @JsonProperty
         public abstract Builder type(String type);
 
