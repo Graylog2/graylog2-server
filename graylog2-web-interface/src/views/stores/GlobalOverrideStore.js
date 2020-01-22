@@ -59,8 +59,8 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
     },
     rangeType(newType: string) {
       if (newType === 'disabled') {
-        const { timerange, ...rest } = this.globalOverride || {};
-        const newGlobalOverride: ?GlobalOverride = isEmpty(rest) ? undefined : { ...rest };
+        const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
+        const newGlobalOverride: ?GlobalOverride = currentGlobalOverride.toBuilder().timerange(undefined).build();
         const promise = this._propagateNewGlobalOverride(newGlobalOverride);
         GlobalOverrideActions.rangeType.promise(promise);
         return promise;
