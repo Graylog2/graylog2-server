@@ -61,16 +61,20 @@ const ViewActionsMenu = ({ view, isNewView, metadata, onSaveView, onSaveAsView, 
         </IfDashboard>
       </DropdownButton>
       <DebugOverlay show={debugOpen} onClose={() => setDebugOpen(false)} />
-      <ViewPropertiesModal view={view.toBuilder().newId().build()}
-                           title="Save new dashboard"
-                           onSave={onSaveAsView}
-                           show={saveAsViewOpen}
-                           onClose={() => setSaveAsViewOpen(false)} />
-      <ViewPropertiesModal view={view}
-                           title="Editing dashboard"
-                           onSave={onSaveView}
-                           show={editViewOpen}
-                           onClose={() => setEditViewOpen(false)} />
+      {saveAsViewOpen && (
+        <ViewPropertiesModal view={view.toBuilder().newId().build()}
+                             title="Save new dashboard"
+                             onSave={onSaveAsView}
+                             show
+                             onClose={() => setSaveAsViewOpen(false)} />
+      )}
+      {editViewOpen && (
+        <ViewPropertiesModal view={view}
+                             title="Editing dashboard"
+                             onSave={onSaveView}
+                             show
+                             onClose={() => setEditViewOpen(false)} />
+      )}
       {shareViewOpen && <ShareViewModal view={view} show onClose={() => setShareViewOpen(false)} />}
     </React.Fragment>
   );
