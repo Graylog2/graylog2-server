@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.configuration.converters.URIListConverter;
+import org.graylog2.configuration.validators.HttpOrHttpsSchemeValidator;
 import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidator;
 import org.graylog2.configuration.validators.NonEmptyListValidator;
 
@@ -56,8 +57,11 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_discovery_filter")
     String discoveryFilter = null;
 
-    @Parameter(value = "elasticsearch_discovery_frequency", validator = PositiveDurationValidator.class)
+    @Parameter(value = "elasticsearch_discovery_frequency", validators = {PositiveDurationValidator.class})
     Duration discoveryFrequency = Duration.seconds(30L);
+
+    @Parameter(value = "elasticsearch_discovery_default_scheme", validators = {HttpOrHttpsSchemeValidator.class})
+    String defaultSchemeForDiscoveredNodes = "http";
 
     @Parameter(value = "elasticsearch_compression_enabled")
     boolean compressionEnabled = false;

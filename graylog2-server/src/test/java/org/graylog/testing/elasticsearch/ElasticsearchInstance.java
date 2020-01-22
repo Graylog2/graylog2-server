@@ -125,6 +125,7 @@ public class ElasticsearchInstance extends ExternalResource {
                 false,
                 null,
                 Duration.seconds(60),
+                "http",
                 false,
                 new ObjectMapperProvider().get()
         ).get();

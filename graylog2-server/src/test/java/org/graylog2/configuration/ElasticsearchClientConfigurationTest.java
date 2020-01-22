@@ -45,6 +45,7 @@ public class ElasticsearchClientConfigurationTest {
                 .put("elasticsearch_discovery_enabled", "true")
                 .put("elasticsearch_discovery_filter", "foo:bar")
                 .put("elasticsearch_discovery_frequency", "1m")
+                .put("elasticsearch_discovery_default_scheme", "http")
                 .put("elasticsearch_compression_enabled", "true")
                 .build();
         final InMemoryRepository repository = new InMemoryRepository(configMap);
@@ -62,6 +63,7 @@ public class ElasticsearchClientConfigurationTest {
         assertThat(configuration.discoveryEnabled).isTrue();
         assertThat(configuration.discoveryFilter).isEqualTo("foo:bar");
         assertThat(configuration.discoveryFrequency).isEqualTo(Duration.minutes(1L));
+        assertThat(configuration.defaultSchemeForDiscoveredNodes).isEqualTo("http");
         assertThat(configuration.compressionEnabled).isTrue();
     }
 
@@ -135,5 +137,14 @@ public class ElasticsearchClientConfigurationTest {
         JadConfig jadConfig = new JadConfig(repository, configuration);
         assertThatExceptionOfType(ParameterException.class).isThrownBy(jadConfig::process)
                 .withMessage("Couldn't convert value for parameter \"elasticsearch_discovery_frequency\"");
+    }
+
+    @Test
+    public void jadConfigFailsWithInvalidDiscoveryDefaultScheme() throws Exception {
+        final InMemoryRepository repository = new InMemoryRepository(Collections.singletonMap("elasticsearch_discovery_default_scheme", "foobar"));
+        final ElasticsearchClientConfiguration configuration = new ElasticsearchClientConfiguration();
+        JadConfig jadConfig = new JadConfig(repository, configuration);
+        assertThatExceptionOfType(ValidationException.class).isThrownBy(jadConfig::process)
+                .withMessage("Parameter elasticsearch_discovery_default_scheme must be one of [http,https]");
     }
 }
