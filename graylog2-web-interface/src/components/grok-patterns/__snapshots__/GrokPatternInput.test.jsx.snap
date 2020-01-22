@@ -545,27 +545,41 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "igGIXt",
+                          "lastClassName": "jNPkhE",
                           "rules": Array [
-                            "&.list-group-item-action{color:",
-                            "#1F1F1F",
-                            ";&:hover,&:focus{color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#F1F2F2",
-                            ";}&:active{color:",
-                            "#424344",
-                            ";background-color:",
-                            "#DCE1E5",
-                            ";}}&.list-group-item{background-color:",
+                            "background-color:",
                             "#FFF",
                             ";border-color:",
                             "#DCE1E5",
-                            ";&.disabled,&:disabled{color:",
-                            "#1F1F1F",
+                            ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                            "#6c6c6c",
                             ";background-color:",
+                            "#F1F2F2",
+                            ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                            "#6c6c6c",
+                            ";}}&.active,&.active:hover,&.active:focus{color:",
                             "#FFF",
-                            ";}}",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                            "#faf3f7",
+                            ";}}a&,button&{color:",
+                            "#1F1F1F",
+                            ";.list-group-item-heading{color:",
+                            "#1F1F1F",
+                            ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                            "#F1F2F2",
+                            ";color:",
+                            "#9E1F63",
+                            ";&.active{color:",
+                            "#FFF",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";}}}",
                             [Function],
                           ],
                         },
@@ -586,14 +600,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                       header="COMMONMAC"
                       id="list-item-0"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                         id="list-item-0"
                         onKeyDown={[Function]}
                       >
@@ -719,27 +733,41 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "igGIXt",
+                          "lastClassName": "jNPkhE",
                           "rules": Array [
-                            "&.list-group-item-action{color:",
-                            "#1F1F1F",
-                            ";&:hover,&:focus{color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#F1F2F2",
-                            ";}&:active{color:",
-                            "#424344",
-                            ";background-color:",
-                            "#DCE1E5",
-                            ";}}&.list-group-item{background-color:",
+                            "background-color:",
                             "#FFF",
                             ";border-color:",
                             "#DCE1E5",
-                            ";&.disabled,&:disabled{color:",
-                            "#1F1F1F",
+                            ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                            "#6c6c6c",
                             ";background-color:",
+                            "#F1F2F2",
+                            ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                            "#6c6c6c",
+                            ";}}&.active,&.active:hover,&.active:focus{color:",
                             "#FFF",
-                            ";}}",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                            "#faf3f7",
+                            ";}}a&,button&{color:",
+                            "#1F1F1F",
+                            ";.list-group-item-heading{color:",
+                            "#1F1F1F",
+                            ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                            "#F1F2F2",
+                            ";color:",
+                            "#9E1F63",
+                            ";&.active{color:",
+                            "#FFF",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";}}}",
                             [Function],
                           ],
                         },
@@ -760,14 +788,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                       header="DATA"
                       id="list-item-1"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                         id="list-item-1"
                         onKeyDown={[Function]}
                       >
@@ -893,27 +921,41 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "igGIXt",
+                          "lastClassName": "jNPkhE",
                           "rules": Array [
-                            "&.list-group-item-action{color:",
-                            "#1F1F1F",
-                            ";&:hover,&:focus{color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#F1F2F2",
-                            ";}&:active{color:",
-                            "#424344",
-                            ";background-color:",
-                            "#DCE1E5",
-                            ";}}&.list-group-item{background-color:",
+                            "background-color:",
                             "#FFF",
                             ";border-color:",
                             "#DCE1E5",
-                            ";&.disabled,&:disabled{color:",
-                            "#1F1F1F",
+                            ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                            "#6c6c6c",
                             ";background-color:",
+                            "#F1F2F2",
+                            ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                            "#6c6c6c",
+                            ";}}&.active,&.active:hover,&.active:focus{color:",
                             "#FFF",
-                            ";}}",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                            "#faf3f7",
+                            ";}}a&,button&{color:",
+                            "#1F1F1F",
+                            ";.list-group-item-heading{color:",
+                            "#1F1F1F",
+                            ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                            "#F1F2F2",
+                            ";color:",
+                            "#9E1F63",
+                            ";&.active{color:",
+                            "#FFF",
+                            ";border-color:",
+                            "#9E1F63",
+                            ";background-color:",
+                            "#9E1F63",
+                            ";}}}",
                             [Function],
                           ],
                         },
@@ -934,14 +976,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                       header="DATE"
                       id="list-item-2"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                         id="list-item-2"
                         onKeyDown={[Function]}
                       >

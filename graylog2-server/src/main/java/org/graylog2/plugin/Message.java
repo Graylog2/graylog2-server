@@ -91,6 +91,11 @@ public class Message implements Messages {
     public static final String INTERNAL_FIELD_PREFIX = "gl2_";
 
     /**
+     * Will be set to the accounted message size in bytes.
+     */
+    public static final String FIELD_GL2_ACCOUNTED_MESSAGE_SIZE = "gl2_accounted_message_size";
+
+    /**
      * This is the message ID. It will be set to a {@link de.huxhorn.sulky.ulid.ULID} during processing.
      * <p></p>
      * <b>Attention:</b> This is currently NOT the "_id" field which is used as ID for the document in Elasticsearch!
@@ -182,6 +187,7 @@ public class Message implements Messages {
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
+        FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
         FIELD_GL2_ORIGINAL_TIMESTAMP,
         FIELD_GL2_PROCESSING_ERROR,
         FIELD_GL2_PROCESSING_TIMESTAMP,
@@ -384,6 +390,7 @@ public class Message implements Messages {
         obj.put(FIELD_MESSAGE, getMessage());
         obj.put(FIELD_SOURCE, getSource());
         obj.put(FIELD_STREAMS, getStreamIds());
+        obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime;

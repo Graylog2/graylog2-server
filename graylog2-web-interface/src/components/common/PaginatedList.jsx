@@ -1,8 +1,10 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import * as React from 'react';
+
 import { Pagination } from 'components/graylog';
 import { Input } from 'components/bootstrap';
+import IfInteractive from 'views/components/dashboard/IfInteractive';
 
 const defaultPageSizes = [10, 50, 100];
 
@@ -119,17 +121,19 @@ class PaginatedList extends React.Component<Props, State> {
 
         {children}
 
-        <div className="text-center">
-          <Pagination bsSize="small"
-                      items={numberPages}
-                      maxButtons={10}
-                      activePage={currentPage}
-                      onSelect={this._onChangePage}
-                      prev
-                      next
-                      first
-                      last />
-        </div>
+        <IfInteractive>
+          <div className="text-center">
+            <Pagination bsSize="small"
+                        items={numberPages}
+                        maxButtons={10}
+                        activePage={currentPage}
+                        onSelect={this._onChangePage}
+                        prev
+                        next
+                        first
+                        last />
+          </div>
+        </IfInteractive>
       </>
     );
   }

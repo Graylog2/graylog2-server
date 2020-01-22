@@ -25,7 +25,7 @@ const styles = { position: 'relative', display: 'inline-block' };
 ### Hover
 
 ```js
-import { ButtonToolbar, Button, OverlayTrigger } from './index';
+import { ButtonToolbar, Button, OverlayTrigger } from 'components/graylog';
 
 const TooltipExample = () => {
   const tooltip = (

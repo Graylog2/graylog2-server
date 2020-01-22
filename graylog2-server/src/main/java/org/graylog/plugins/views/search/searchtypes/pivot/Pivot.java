@@ -29,6 +29,9 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.PivotEntity;
+import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
@@ -79,6 +82,8 @@ public abstract class Pivot implements SearchType {
     @Override
     public abstract Filter filter();
 
+    public abstract Builder toBuilder();
+
     @Override
     public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
         return this;
@@ -95,7 +100,6 @@ public abstract class Pivot implements SearchType {
 
     @AutoValue.Builder
     public static abstract class Builder {
-
         @JsonCreator
         public static Builder createDefault() {
             return builder()
@@ -152,4 +156,21 @@ public abstract class Pivot implements SearchType {
         public abstract Pivot build();
     }
 
+    @Override
+    public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        return PivotEntity.builder()
+                .sort(sort())
+                .streams(mappedStreams(entityDescriptorIds))
+                .timerange(timerange().orElse(null))
+                .columnGroups(columnGroups())
+                .rowGroups(rowGroups())
+                .filter(filter())
+                .query(query().orElse(null))
+                .id(id())
+                .name(name().orElse(null))
+                .rollup(rollup())
+                .series(series())
+                .type(type())
+                .build();
+    }
 }

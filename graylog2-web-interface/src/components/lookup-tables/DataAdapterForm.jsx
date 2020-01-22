@@ -15,6 +15,8 @@ const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableData
 class DataAdapterForm extends React.Component {
   validationCheckTimer = undefined;
 
+  _input = undefined;
+
   static propTypes = {
     type: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
@@ -48,6 +50,7 @@ class DataAdapterForm extends React.Component {
   }
 
   componentDidMount() {
+    this._input.getInputDOMNode().focus();
     const { create, dataAdapter } = this.props;
 
     if (!create) {
@@ -56,17 +59,22 @@ class DataAdapterForm extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
+    this._input.getInputDOMNode().focus();
     const { dataAdapter } = this.props;
-    if (_.isEqual(dataAdapter, nextProps.dataAdapter)) {
+    if (_.isEqual(dataAdapter, prevProps.dataAdapter)) {
       // props haven't changed, don't update our state from them
       return;
     }
-    this.setState(this._initialState(nextProps.dataAdapter));
+    this.updateState(dataAdapter);
   }
 
   componentWillUnmount() {
     this._clearTimer();
+  }
+
+  updateState = (dataAdapter) => {
+    this.setState(this._initialState(dataAdapter));
   }
 
   _initialState = (dataAdapter) => {
@@ -264,6 +272,7 @@ class DataAdapterForm extends React.Component {
                        help="A short title for this data adapter."
                        value={dataAdapter.title}
                        labelClassName="col-sm-3"
+                       ref={(ref) => { this._input = ref; }}
                        wrapperClassName="col-sm-9" />
 
                 <Input type="text"

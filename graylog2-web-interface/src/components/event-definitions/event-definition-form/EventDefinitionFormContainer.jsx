@@ -94,32 +94,49 @@ class EventDefinitionFormContainer extends React.Component {
     history.push(Routes.ALERTS.DEFINITIONS.LIST);
   };
 
+  handleSubmitSuccessResponse = () => {
+    this.setState({ isDirty: false }, () => history.push(Routes.ALERTS.DEFINITIONS.LIST));
+  };
+
+  handleSubmitFailureResponse = (errorResponse) => {
+    const { body } = errorResponse.additional;
+    if (errorResponse.status === 400) {
+      if (body && body.failed) {
+        this.setState({ validation: body });
+        return;
+      }
+      if (body.type && body.type === 'ApiError') {
+        if (body.message.includes('org.graylog.events.conditions.Expression')
+          || body.message.includes('org.graylog.events.conditions.Expr')
+          || body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')) {
+          this.setState({
+            validation: {
+              errors: { conditions: ['Aggregation condition is not valid'] },
+            },
+          });
+          return;
+        }
+        if (body.message.includes('embryonic')) {
+          this.setState({
+            validation: {
+              errors: { query_parameters: ['Query parameters must be declared'] },
+            },
+          });
+        }
+      }
+    }
+  };
+
   handleSubmit = () => {
     const { action } = this.props;
     const { eventDefinition } = this.state;
 
     if (action === 'create') {
       EventDefinitionsActions.create(eventDefinition)
-        .then(
-          () => this.setState({ isDirty: false }, () => history.push(Routes.ALERTS.DEFINITIONS.LIST)),
-          (errorResponse) => {
-            const { body } = errorResponse.additional;
-            if (errorResponse.status === 400 && body && body.failed) {
-              this.setState({ validation: body });
-            }
-          },
-        );
+        .then(this.handleSubmitSuccessResponse, this.handleSubmitFailureResponse);
     } else {
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
-        .then(
-          () => this.setState({ isDirty: false }, () => history.push(Routes.ALERTS.DEFINITIONS.LIST)),
-          (errorResponse) => {
-            const { body } = errorResponse.additional;
-            if (errorResponse.status === 400 && body && body.failed) {
-              this.setState({ validation: body });
-            }
-          },
-        );
+        .then(this.handleSubmitSuccessResponse, this.handleSubmitFailureResponse);
     }
   };
 

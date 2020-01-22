@@ -78,6 +78,12 @@ import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -253,6 +259,12 @@ public class ProcessorFunctionsModule extends PluginModule {
         // Lookup tables
         addMessageProcessorFunction(Lookup.NAME, Lookup.class);
         addMessageProcessorFunction(LookupValue.NAME, LookupValue.class);
+        addMessageProcessorFunction(LookupStringList.NAME, LookupStringList.class);
+        addMessageProcessorFunction(LookupSetValue.NAME, LookupSetValue.class);
+        addMessageProcessorFunction(LookupClearKey.NAME, LookupClearKey.class);
+        addMessageProcessorFunction(LookupSetStringList.NAME, LookupSetStringList.class);
+        addMessageProcessorFunction(LookupAddStringList.NAME, LookupAddStringList.class);
+        addMessageProcessorFunction(LookupRemoveStringList.NAME, LookupRemoveStringList.class);
 
         // Debug
         addMessageProcessorFunction(Debug.NAME, Debug.class);

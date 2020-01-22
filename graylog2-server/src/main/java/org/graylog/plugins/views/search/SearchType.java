@@ -26,6 +26,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -33,6 +39,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A search type represents parts of a query that generates a {@see Result result}.
@@ -47,7 +54,7 @@ import java.util.Set;
         visible = true,
         defaultImpl = SearchType.Fallback.class)
 @JsonAutoDetect
-public interface SearchType {
+public interface SearchType extends ContentPackable<SearchTypeEntity> {
     String TYPE_FIELD = "type";
 
     @JsonProperty(TYPE_FIELD)
@@ -194,5 +201,18 @@ public interface SearchType {
         public int hashCode() {
             return Objects.hash(type, id, props);
         }
+
+        @Override
+        public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+            return null;
+        }
+    }
+
+    default Set<String> mappedStreams(EntityDescriptorIds entityDescriptorIds) {
+        return streams().stream()
+                .map(streamId -> entityDescriptorIds.get(EntityDescriptor.create(streamId, ModelTypes.STREAM_V1)))
+                .map(optionalStreamId -> optionalStreamId.orElseThrow(() ->
+                        new ContentPackException("Did not find matching stream id")))
+                .collect(Collectors.toSet());
     }
 }

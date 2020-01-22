@@ -3,10 +3,14 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Link } from 'react-router';
 
+import { Alert } from 'components/graylog';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
+import { Icon } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
+import validateExpression from 'logic/alerts/AggregationExpressionValidation';
+
 
 import AggregationConditionSummary from './AggregationConditionSummary';
 import withStreams from './withStreams';
@@ -54,10 +58,26 @@ class FilterAggregationSummary extends React.Component {
       .map(this.formatStreamOrId);
   };
 
+  renderQueryParameters = (queryParameters) => {
+    if (queryParameters.some(p => p.embryonic)) {
+      const undeclaredParameters = queryParameters.filter(p => p.embryonic)
+        .map(p => p.name)
+        .join(', ');
+      return (
+        <Alert bsStyle="danger">
+          <Icon name="exclamation-triangle" />&nbsp;There are undeclared query parameters: {undeclaredParameters}
+        </Alert>
+      );
+    }
+
+    return <dd>{queryParameters.map(p => p.name).join(', ')}</dd>;
+  }
+
   render() {
     const { config, currentUser } = this.props;
     const {
       query,
+      query_parameters: queryParameters,
       streams,
       search_within_ms: searchWithinMs,
       execute_every_ms: executeEveryMs,
@@ -74,12 +94,15 @@ class FilterAggregationSummary extends React.Component {
     const effectiveStreamIds = PermissionsMixin.isPermitted(currentUser.permissions, 'streams:read')
       ? streams : [];
 
+    const validationResults = validateExpression(conditions.expression, series);
+
     return (
       <dl>
         <dt>Type</dt>
         <dd>{lodash.upperFirst(conditionType)}</dd>
         <dt>Search Query</dt>
         <dd>{query || '*'}</dd>
+        {queryParameters.length > 0 && this.renderQueryParameters(queryParameters)}
         <dt>Streams</dt>
         <dd className={styles.streamList}>{this.renderStreams(effectiveStreamIds)}</dd>
         <dt>Search within</dt>
@@ -92,7 +115,14 @@ class FilterAggregationSummary extends React.Component {
             <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
             <dt>Create Events if</dt>
             <dd>
-              <AggregationConditionSummary series={series} conditions={conditions} />
+              {validationResults.isValid
+                ? <AggregationConditionSummary series={series} conditions={conditions} />
+                : (
+                  <Alert bsSize="small" bsStyle="danger"><Icon name="exclamation-triangle" />&nbsp;
+                    Condition is not valid: {validationResults.errors.join(', ')}
+                  </Alert>
+                )
+              }
             </dd>
           </React.Fragment>
         )}

@@ -88,7 +88,7 @@ public class MigrationHelpers {
         User previousUser = null;
         try {
             previousUser = userService.load(userName);
-            if (previousUser == null || !expectedRoles.equals(previousUser.getRoleIds())) {
+            if (previousUser == null || !previousUser.getRoleIds().containsAll(expectedRoles)) {
                 final String msg = "Invalid user '" + userName + "', fixing it.";
                 LOG.error(msg);
                 throw new IllegalArgumentException(msg);

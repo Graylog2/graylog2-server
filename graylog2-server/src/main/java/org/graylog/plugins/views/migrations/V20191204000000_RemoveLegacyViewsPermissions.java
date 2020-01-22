@@ -49,8 +49,6 @@ public class V20191204000000_RemoveLegacyViewsPermissions extends Migration {
         if (viewsUserRole != null) {
             removeRoleFromUsers(viewsUserRole);
         }
-
-        removePermissionsFromViewsManagerRole(roles);
     }
 
     private void removeRoleFromUsers(Document viewsUserRole) {
@@ -58,11 +56,5 @@ public class V20191204000000_RemoveLegacyViewsPermissions extends Migration {
         users.updateMany(
                 new Document().append("roles", viewsUserRole.get("_id")),
                 new Document().append("$pull", new Document().append("roles", viewsUserRole.get("_id"))));
-    }
-
-    private void removePermissionsFromViewsManagerRole(MongoCollection<Document> roles) {
-        roles.updateOne(
-                eq("name", "Views Manager"),
-                new Document().append("$pullAll", new Document().append("permissions", LegacyViewsPermissions.all())));
     }
 }

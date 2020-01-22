@@ -25,6 +25,8 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
@@ -32,6 +34,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetDTO.Builder.class)
@@ -110,11 +113,16 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
 
     @Override
     public WidgetEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        Set<String> mappedStreams = streams().stream().map(streamId ->
+                entityDescriptorIds.get(EntityDescriptor.create(streamId, ModelTypes.STREAM_V1)))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
         final WidgetEntity.Builder builder = WidgetEntity.builder()
                 .id(this.id())
                 .config(this.config())
                 .filter(this.filter())
-                .streams(this.streams())
+                .streams(mappedStreams)
                 .type(this.type());
         if (this.query().isPresent()) {
             builder.query(this.query().get());

@@ -107,9 +107,8 @@ class BookmarkList extends React.Component<Props, State> {
       return (
         <ListGroupItem active={selectedBookmark === bookmark.id}
                        onClick={() => this.setState({ selectedBookmark: bookmark.id })}
-                       header={bookmark.title}
                        key={bookmark.id}>
-          {bookmark.summary}
+          {bookmark.title}
         </ListGroupItem>
       );
     });

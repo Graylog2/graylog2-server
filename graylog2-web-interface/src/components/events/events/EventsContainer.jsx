@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isObject } from 'lodash';
 
 import { Spinner } from 'components/common';
 
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
+import Store from 'logic/local-storage/Store';
 
 import Events from './Events';
 
@@ -13,6 +15,8 @@ import {} from 'components/event-definitions/event-definition-types';
 const { EventsStore, EventsActions } = CombinedProvider.get('Events');
 const { EventDefinitionsStore, EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
+const LOCAL_STORAGE_ITEM = 'events-last-search';
 
 class EventsContainer extends React.Component {
   static propTypes = {
@@ -28,9 +32,15 @@ class EventsContainer extends React.Component {
 
   componentDidMount() {
     const { streamId } = this.props;
+    const lastSearch = Store.get(LOCAL_STORAGE_ITEM) || {};
+
     const params = {};
     if (streamId) {
       params.query = `source_streams:${streamId}`;
+    }
+    if (lastSearch && isObject(lastSearch)) {
+      params.filter = lastSearch.filter;
+      params.timerange = lastSearch.timerange;
     }
 
     this.fetchEvents(params);
@@ -38,6 +48,7 @@ class EventsContainer extends React.Component {
   }
 
   fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
+    Store.set(LOCAL_STORAGE_ITEM, { filter: filter, timerange: timerange });
     return EventsActions.search({
       query: query,
       page: page,

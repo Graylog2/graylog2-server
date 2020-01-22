@@ -30,6 +30,9 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.MessageListEntity;
+import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -213,5 +216,22 @@ public abstract class MessageList implements SearchType {
 
             public abstract Result build();
         }
+    }
+
+    @Override
+    public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        return MessageListEntity.builder()
+                .decorators(decorators())
+                .streams(mappedStreams(entityDescriptorIds))
+                .timerange(timerange().orElse(null))
+                .limit(limit())
+                .offset(offset())
+                .filter(filter())
+                .id(id())
+                .name(name().orElse(null))
+                .query(query().orElse(null))
+                .type(type())
+                .sort(sort())
+                .build();
     }
 }
