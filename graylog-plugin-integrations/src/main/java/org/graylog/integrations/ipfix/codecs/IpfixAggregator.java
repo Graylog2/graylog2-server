@@ -94,8 +94,8 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
             }
             boolean packetBuffered = false;
 
-            // the list of template keys to return in the result
-            final Set<TemplateKey> templatesList = new HashSet<>();
+            // the list of template keys to return in the result ( TODO this copies all of the templates all the time :( )
+            final Set<TemplateKey> templatesList = new HashSet<>(templateCache.asMap().keySet());
 
             bufferedTemplateIdList.addAll(messageDescription.referencedTemplateIds());
             LOG.debug("Finding the needed templates for the buffered and current packets");

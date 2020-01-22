@@ -203,7 +203,7 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
                                if (templateRecord == null) {
                                    throw new IpfixException("Missing required template in journal entry for data records: template id " + templateId);
                                }
-                               final Set<Flow> flows = parser.parseDataSet(templateRecord.informationElements(),
+                               final Set<Flow> flows = parser.parseDataSet(templateRecord.informationElements(), templateRecordMap,
                                                                            Unpooled.wrappedBuffer(dataSet.getDataRecords().toByteArray()));
                                return flows.stream()
                                            .map(flow -> formatFlow(flowExportTimestamp, sender, flow));
