@@ -47,50 +47,56 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
 
   return (
     <Modal show bsSize="large" onHide={onCancel}>
-      <Modal.Header closeButton>
-        <Modal.Title>Configuring Full Screen</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Input id="refresh-interval"
-               type="number"
-               name="refresh-interval"
-               label="Refresh Interval"
-               help="After how many seconds should the dashboard refresh?"
-               onChange={({ target: { value } }) => setRefreshInterval(Number.parseInt(value, 10))}
-               required
-               value={refreshInterval} />
+      <form onSubmit={_onSave} data-testid="display-mode-config-form">
+        <Modal.Header closeButton>
+          <Modal.Title>Configuring Full Screen</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Input id="refresh-interval"
+                 type="number"
+                 min="1"
+                 name="refresh-interval"
+                 label="Refresh Interval"
+                 help="After how many seconds should the dashboard refresh?"
+                 onChange={({ target: { value } }) => setRefreshInterval(value ? Number.parseInt(value, 10) : value)}
+                 required
+                 step="1"
+                 value={refreshInterval} />
 
-        <FormGroup>
-          <ControlLabel>Tabs</ControlLabel>
-          <ul>
-            {availableTabs.map(([idx, title]) => (
-              <li key={`${idx}-${title}`}>
-                <Checkbox inline
-                          checked={queryTabs.includes(idx)}
-                          onChange={event => (event.target.checked ? addQueryTab(idx) : removeQueryTab(idx))}>
-                  {title}
-                </Checkbox>
-              </li>
-            ))}
-          </ul>
-          <HelpBlock>
+          <FormGroup>
+            <ControlLabel>Tabs</ControlLabel>
+            <ul>
+              {availableTabs.map(([idx, title]) => (
+                <li key={`${idx}-${title}`}>
+                  <Checkbox inline
+                            checked={queryTabs.includes(idx)}
+                            onChange={event => (event.target.checked ? addQueryTab(idx) : removeQueryTab(idx))}>
+                    {title}
+                  </Checkbox>
+                </li>
+              ))}
+            </ul>
+            <HelpBlock>
             Select the query tabs to include in rotation.
-          </HelpBlock>
-        </FormGroup>
+            </HelpBlock>
+          </FormGroup>
 
-        <Input id="query-cycle-interval"
-               type="number"
-               name="query-cycle-interval"
-               label="Tab cycle interval"
-               help="After how many seconds should the next tab be shown?"
-               onChange={({ target: { value } }) => setQueryCycleInterval(value)}
-               required
-               value={queryCycleInterval} />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={_onSave} bsStyle="success">Save</Button>
-        <Button onClick={onCancel}>Cancel</Button>
-      </Modal.Footer>
+          <Input id="query-cycle-interval"
+                 type="number"
+                 min="1"
+                 name="query-cycle-interval"
+                 label="Tab cycle interval"
+                 help="After how many seconds should the next tab be shown?"
+                 onChange={({ target: { value } }) => setQueryCycleInterval(value ? Number.parseInt(value, 10) : value)}
+                 required
+                 step="1"
+                 value={queryCycleInterval} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button bsStyle="success" type="submit">Save</Button>
+          <Button onClick={onCancel}>Cancel</Button>
+        </Modal.Footer>
+      </form>
     </Modal>
   );
 };

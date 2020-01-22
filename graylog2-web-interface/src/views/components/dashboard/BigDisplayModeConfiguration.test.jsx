@@ -56,7 +56,7 @@ describe('BigDisplayModeConfiguration', () => {
   it('disables menu item if `disabled` prop is `true`', () => {
     const { getByText, queryByText } = render(<BigDisplayModeConfiguration view={view} disabled />);
     const menuItem = getByText('Full Screen');
-    fireEvent.click(menuItem);
+    fireEvent.submit(menuItem);
 
     expect(queryByText('Configuring Full Screen')).toBeNull();
   });
@@ -84,45 +84,63 @@ describe('BigDisplayModeConfiguration', () => {
     expect(getByText('Query#3')).not.toBeNull();
   });
 
+  it('should not allow strings for the refresh interval', () => {
+    const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} show />);
+
+    const refreshInterval = getByLabelText('Refresh Interval');
+
+    fireEvent.change(refreshInterval, { target: { value: 'a string' } });
+    expect(refreshInterval.value).toBe('');
+  });
+
+  it('should not allow strings for the cycle interval', () => {
+    const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} show />);
+
+    const cycleInterval = getByLabelText('Tab cycle interval');
+
+    fireEvent.change(cycleInterval, { target: { value: 'a string' } });
+    expect(cycleInterval.value).toBe('');
+  });
+
   describe('redirects to tv mode page', () => {
     beforeEach(() => {
       history.push = jest.fn();
       Routes.pluginRoute = jest.fn(() => viewId => `/dashboards/tv/${viewId}`);
     });
 
-    it('when "Save" is clicked', () => {
-      const { getByText } = render(<BigDisplayModeConfiguration view={view} show />);
-      const saveButton = getByText('Save');
-      expect(saveButton).not.toBeNull();
+    it('on form submit', () => {
+      const { getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
+      const form = getByTestId('display-mode-config-form');
+      expect(form).not.toBeNull();
 
-      fireEvent.click(saveButton);
+      fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10');
     });
 
     it('including changed refresh interval', () => {
-      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} show />);
+      const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
 
       const refreshInterval = getByLabelText('Refresh Interval');
 
       fireEvent.change(refreshInterval, { target: { value: 42 } });
 
-      const saveButton = getByText('Save');
-      fireEvent.click(saveButton);
+      const form = getByTestId('display-mode-config-form');
+      fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=42');
     });
 
     it('including tab cycle interval setting', () => {
-      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} show />);
+      const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
 
       const cycleInterval = getByLabelText('Tab cycle interval');
       fireEvent.change(cycleInterval, { target: { value: 4242 } });
 
-      const saveButton = getByText('Save');
-      fireEvent.click(saveButton);
+      const form = getByTestId('display-mode-config-form');
+      fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&refresh=10');
@@ -130,13 +148,13 @@ describe('BigDisplayModeConfiguration', () => {
 
     it('including selected tabs', () => {
       const viewWithQueries = createViewWithQueries();
-      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
+      const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
 
       const query1 = getByLabelText('Query#1');
       fireEvent.click(query1);
 
-      const saveButton = getByText('Save');
-      fireEvent.click(saveButton);
+      const form = getByTestId('display-mode-config-form');
+      fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10&tabs=1%2C2');
