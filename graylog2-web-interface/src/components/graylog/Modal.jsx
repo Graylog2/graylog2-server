@@ -1,12 +1,12 @@
 // eslint-disable-next-line no-restricted-imports
 import { Modal as BootstrapModal } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { transparentize } from 'polished';
+import chroma from 'chroma-js';
 
 const Modal = styled(BootstrapModal)(({ theme }) => css`
   .modal-content {
     background-color: ${theme.color.global.contentBackground};
-    border-color: ${transparentize(0.8, theme.color.gray[10])};
+    border-color: ${chroma(theme.color.gray[10]).alpha(0.2)};
 
     .modal-header {
       border-bottom-color: ${theme.color.gray[90]};

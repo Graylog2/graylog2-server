@@ -2,10 +2,19 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { opacify, transparentize } from 'polished';
+import chroma from 'chroma-js';
+
+function opacify(amount, color) {
+  if (color === 'transparent') return color;
+
+  const parsedAlpha = chroma(color).alpha();
+  const newAlpha = (parsedAlpha * 100 + parseFloat(amount) * 100) / 100;
+
+  return chroma(color).alpha(newAlpha).css();
+}
 
 const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
-  const borderColor = transparentize(0.8, theme.color.gray[10]);
+  const borderColor = chroma(theme.color.gray[10]).alpha(0.2).css();
 
   return css`
     & {
@@ -14,6 +23,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
 
       &.top > .arrow {
         border-top-color: ${opacify(0.05, borderColor)};
+        border-top-color: ${chroma(borderColor).alpha()};
 
         &:after {
           border-top-color: ${theme.color.gray[100]};

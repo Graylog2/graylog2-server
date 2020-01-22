@@ -1,21 +1,21 @@
 import chroma from 'chroma-js';
 
-import teinte from '../variants/teinte'; // TODO: replace this with whatever is coming from ThemeProvider
+import colors from 'theme/colors';
 
-export default function readableColor(color, darkColor = teinte.global.textDefault, lightColor = teinte.global.textAlt) {
+export default function readableColor(
+  hex,
+  darkColor = colors.teinte.global.textDefault,
+  lightColor = colors.teinte.global.textAlt,
+) {
   /**
-   * Generating a readable color following W3C specs using [polished](https://polished.js.org/docs/#readablecolor)
+   * Returns `textDefault` or `textAlt` (or optional light and dark return colors) for best contrast depending on the luminosity of the given color. Follows [W3C specs for readability](https://www.w3.org/TR/WCAG20-TECHS/G18.html).
    *
    * @param {string} color - any string that represents a color (ex: "#f00" or "rgb(255, 0, 0)")
    * @param {string} darkColor - defaults to theme's darkest gray
    * @param {string} lightColor - defaults to theme's lightest gray
    */
 
-  const contrastRatio = 4.5;
+  const luminanceRatio = 0.179;
 
-  if (chroma.contrast(color, darkColor) >= contrastRatio) {
-    return darkColor;
-  }
-
-  return lightColor;
+  return chroma(hex).luminance() < luminanceRatio ? lightColor : darkColor;
 }

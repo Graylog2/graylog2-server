@@ -22,12 +22,16 @@ const Swatch = styled.div(({ color }) => `
   height: 60px;
   background-color: ${color};
   border: 1px solid #222;
-  color: ${util.readableColor(color)};
   display: flex;
   padding: 3px;
   flex-direction: column;
   cursor: pointer;
   flex: 1;
+
+  ${Name},
+  ${Value} {
+    color: ${util.readableColor(color)};
+  }
 
   &:hover {
     ${Value} {

@@ -32,18 +32,19 @@ const StyledColorSwatch = styled(ColorSwatch)`
 `;
 
 const getValues = (data = {}, callback = () => {}) => {
-  return Object.keys(data).map((key) => callback(key));
+  return Object.keys(data).map((key, index) => callback(key, index));
 }
 
 const SectionWrap = (mode, section) => {
   return (
     <>
       <Swatches>
-        {getValues(mode, (name) =>
+        {getValues(mode, (name, index) =>
           typeof mode[name] === 'string' && (
             <StyledColorSwatch name={name}
-                                  color={mode[name]}
-                                  copyText={`theme.color.${section}.${name}`} />
+                               color={mode[name]}
+                               key={`${index}.${section}.${name}`}
+                               copyText={`theme.color.${section}.${name}`} />
           )
         )}
       </Swatches>
@@ -55,9 +56,10 @@ const SectionWrap = (mode, section) => {
               <Section>{section} &mdash; {name}</Section>
 
               <Swatches>
-                {getValues(mode[name], (subname) => (
+                {getValues(mode[name], (subname, index) => (
                   <StyledColorSwatch name={subname}
                                       color={mode[name][subname]}
+                                      key={`${index}.${section}.${name}`}
                                       copyText={`theme.color.${section}.${name}.${subname}`} />
                 ))}
               </Swatches>

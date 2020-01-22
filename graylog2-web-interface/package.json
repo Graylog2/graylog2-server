@@ -19,8 +19,8 @@
     "build:analyze": "yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode=\"static\" --report=\"./webpack/analysis-$(git rev-parse --abbrev-ref HEAD).html\"",
     "lint": "eslint --ext js,jsx src",
     "lint:path": "eslint --ext js,jsx",
-    "lint:styles":"stylelint --",
-    "lint:styles:all":"stylelint './src/**/*.{js,jsx,tsx}'",
+    "lint:styles": "stylelint --",
+    "lint:styles:all": "stylelint './src/**/*.{js,jsx,tsx}'",
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest",
     "check-production-build": "node checkProductionBuild.js"
@@ -91,7 +91,6 @@
     "numeral": "^2.0.6",
     "opensans-npm-webfont": "^1.0.0",
     "plotly.js": "^1.48.1",
-    "polished": "^3.4.1",
     "qs": "^6.3.0",
     "react-ace-builds": "^7.2.4",
     "react-color": "^2.14.0",

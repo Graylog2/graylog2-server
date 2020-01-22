@@ -1,44 +1,45 @@
-import { darken, lighten, tint, invert } from 'polished';
+import chroma from 'chroma-js';
 import teinte from './teinte';
 
-const brand = {
-  primary: invert(teinte.brand.primary),
-  secondary: invert(teinte.brand.secondary),
-  tertiary: invert(teinte.brand.tertiary),
-};
+const desaturate = color => chroma(color).desaturate(2).css();
 
-const gray = {};
-const darkestGray = brand.tertiary;
-let i = 0;
-while (i <= 100) {
-  gray[i] = tint((i / 100), darkestGray);
-  i += 10;
-}
+const brand = {
+  primary: desaturate(teinte.brand.primary),
+  secondary: desaturate(teinte.brand.secondary),
+  tertiary: desaturate(teinte.brand.tertiary),
+};
 
 const global = {
-  textDefault: gray[0],
-  textAlt: gray[100],
-  background: gray[90],
-  contentBackground: invert(teinte.global.contentBackground),
-  link: invert(teinte.global.link),
-  linkHover: invert(darken(0.10, teinte.global.linkHover)),
+  textDefault: desaturate(teinte.global.textDefault),
+  textAlt: desaturate(teinte.global.textAlt),
+  background: desaturate(teinte.global.background),
+  contentBackground: desaturate(teinte.global.contentBackground),
+  link: desaturate(teinte.global.link),
+  linkHover: desaturate(teinte.global.linkHover),
 };
 
+const grayScale = chroma.scale([global.textDefault, global.textAlt]).colors(10);
+const gray = {};
+grayScale.forEach((tint, index) => {
+  const key = (index + 1) * 10;
+  gray[key] = tint;
+});
+
 const variant = {
-  danger: invert(teinte.variant.danger),
-  default: invert(teinte.variant.default),
-  info: invert(teinte.variant.info),
-  primary: invert(teinte.variant.primary),
-  success: invert(teinte.variant.success),
-  warning: invert(teinte.variant.warning),
+  danger: desaturate(teinte.variant.danger),
+  default: desaturate(teinte.variant.default),
+  info: desaturate(teinte.variant.info),
+  primary: desaturate(teinte.variant.primary),
+  success: desaturate(teinte.variant.success),
+  warning: desaturate(teinte.variant.warning),
 };
 
 const variantLight = {};
 const variantDark = {};
 
 Object.keys(variant).forEach((name) => {
-  variantLight[name] = lighten(0.33, variant[name]);
-  variantDark[name] = darken(0.17, variant[name]);
+  variantLight[name] = chroma(variant[name]).brighten(1).hex();
+  variantDark[name] = chroma(variant[name]).darken(1.5).hex();
 });
 
 const noire = {
