@@ -1,14 +1,13 @@
 // @flow strict
 import Reflux from 'reflux';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
-import { SearchExecutionStateStore, SearchExecutionStateActions } from './SearchExecutionStateStore';
+import { SearchExecutionStateActions, SearchExecutionStateStore } from './SearchExecutionStateStore';
 
 export type GlobalOverrideActionsType = RefluxActions<{
   rangeType: (string) => Promise<?GlobalOverride>,
