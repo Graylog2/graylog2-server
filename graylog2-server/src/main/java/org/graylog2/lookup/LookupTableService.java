@@ -16,6 +16,7 @@
  */
 package org.graylog2.lookup;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -47,6 +48,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -458,7 +460,8 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     @Nullable
-    private LookupTable getTable(String name) {
+    @VisibleForTesting
+    public LookupTable getTable(String name) {
         final LookupTable lookupTable = liveTables.get(name);
         if (lookupTable == null) {
             LOG.warn("Lookup table <{}> does not exist", name);
@@ -553,6 +556,46 @@ public class LookupTableService extends AbstractIdleService {
             }
 
             return result;
+        }
+
+        public LookupResult setValue(@Nonnull Object key, @Nonnull Object value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.setValue(key, value);
+        }
+
+        public LookupResult setStringList(@Nonnull Object key, @Nonnull List<String> value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.setStringList(key, value);
+        }
+
+        public LookupResult addStringList(@Nonnull Object key, @Nonnull List<String> value, boolean keepDuplicates) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.addStringList(key, value, keepDuplicates);
+        }
+
+        public LookupResult removeStringList(@Nonnull Object key, @Nonnull List<String> value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.removeStringList(key, value);
+        }
+
+        public void clearKey(@Nonnull Object key) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return;
+            }
+            lookupTable.clearKey(key);
         }
 
         public LookupTable getTable() {
