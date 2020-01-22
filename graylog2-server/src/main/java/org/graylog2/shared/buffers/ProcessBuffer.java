@@ -21,6 +21,7 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -39,11 +40,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
@@ -119,13 +116,12 @@ public class ProcessBuffer extends Buffer {
         incomingMessages.mark(n);
     }
 
-    public Map<String,String> getDump() {
-        Map<String, String> processBufferDump = new HashMap<>();
-        AtomicInteger i = new AtomicInteger(0);
-        Arrays.stream(processors).forEach(proc -> {
-            processBufferDump.put("ProcessBufferProcessor #" + i.toString(), proc.getCurrentMessage().map(Message::toString).orElse("idle"));
-            i.getAndIncrement();
-        });
-        return processBufferDump;
+    public ImmutableMap<String,String> getDump() {
+        final ImmutableMap.Builder<String, String> processBufferDump = ImmutableMap.builder();
+        for (int i = 0, processorsLength = processors.length; i < processorsLength; i++) {
+            final ProcessBufferProcessor proc = processors[i];
+            processBufferDump.put("ProcessBufferProcessor #" + i, proc.getCurrentMessage().map(Message::toString).orElse("idle"));
+        }
+        return processBufferDump.build();
     }
 }
