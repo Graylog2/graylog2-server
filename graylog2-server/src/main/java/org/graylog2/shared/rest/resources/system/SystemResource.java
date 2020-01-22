@@ -31,8 +31,10 @@ import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.rest.models.system.responses.LocalesResponse;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.rest.models.system.responses.SystemProcessBufferDumpResponse;
 import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
 import org.graylog2.shared.ServerVersion;
+import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -55,11 +57,13 @@ import java.util.Map;
 public class SystemResource extends RestResource {
     private final ServerStatus serverStatus;
     private final ClusterId clusterId;
+    private final ProcessBuffer processBuffer;
 
     @Inject
-    public SystemResource(ServerStatus serverStatus, ClusterConfigService clusterConfigService) {
+    public SystemResource(ServerStatus serverStatus, ClusterConfigService clusterConfigService, ProcessBuffer processBuffer) {
         this.serverStatus = serverStatus;
         this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
+        this.processBuffer = processBuffer;
     }
 
     @GET
@@ -114,6 +118,15 @@ public class SystemResource extends RestResource {
 
         threadDump.dump(output);
         return SystemThreadDumpResponse.create(new String(output.toByteArray(), StandardCharsets.UTF_8));
+    }
+
+    @GET
+    @Path("/processbufferdump")
+    @Timed
+    @ApiOperation(value = "Get a process buffer dump")
+    public SystemProcessBufferDumpResponse processBufferDump() {
+        checkPermission(RestPermissions.PROCESSBUFFER_DUMP, serverStatus.getNodeId().toString());
+       return SystemProcessBufferDumpResponse.create(processBuffer.getDump());
     }
 
     @GET

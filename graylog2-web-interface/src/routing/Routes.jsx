@@ -65,6 +65,7 @@ const Routes = {
     THREADDUMP: nodeId => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
+    PROCESSBUFFERDUMP: nodeId => `/system/processbufferdump/${nodeId}`,
     AUTHENTICATION: {
       OVERVIEW: '/system/authentication',
       ROLES: '/system/authentication/roles',

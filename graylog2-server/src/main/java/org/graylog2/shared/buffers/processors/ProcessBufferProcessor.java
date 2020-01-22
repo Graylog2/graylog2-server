@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -56,6 +57,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final ULID ulid;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
+    private volatile Message currentMessage;
 
     @AssistedInject
     public ProcessBufferProcessor(MetricRegistry metricRegistry,
@@ -75,6 +77,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
         processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
+        currentMessage = null;
     }
 
     @Override
@@ -103,7 +106,12 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         }
     }
 
+    public Optional<Message> getCurrentMessage() {
+        return Optional.ofNullable(currentMessage);
+    }
+
     private void dispatchMessage(final Message msg) {
+        currentMessage = msg;
         incomingMessages.mark();
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
@@ -114,6 +122,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         } catch (Exception e) {
             LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
         } finally {
+            currentMessage = null;
             outgoingMessages.mark();
         }
     }
