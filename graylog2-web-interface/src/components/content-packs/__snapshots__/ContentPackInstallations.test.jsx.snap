@@ -221,7 +221,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "cAlWKw",
+                                        "lastClassName": "emPIcl",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -245,12 +245,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 dYxYaY"
+                                    className="Button__StyledButton-c9cbmb-0 hGhRKT"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-sm btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-sm btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -295,7 +295,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "cAlWKw",
+                                        "lastClassName": "emPIcl",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -319,12 +319,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                                    className="Button__StyledButton-c9cbmb-0 emPIcl"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-sm btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 emPIcl btn btn-sm btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -370,7 +370,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Modal-nuree8-0",
                                         "isStatic": false,
-                                        "lastClassName": "gVCAoS",
+                                        "lastClassName": "fWjYOf",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -395,7 +395,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     backdrop="static"
                                     bsClass="modal"
                                     bsSize="large"
-                                    className="Modal-nuree8-0 gVCAoS"
+                                    className="Modal-nuree8-0 fWjYOf"
                                     dialogComponentClass={[Function]}
                                     enforceFocus={true}
                                     keyboard={true}

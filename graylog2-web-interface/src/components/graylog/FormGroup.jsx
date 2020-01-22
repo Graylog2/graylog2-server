@@ -38,7 +38,7 @@ const createCss = validationState => css(({ theme }) => {
         border-color: ${border};
 
         &:focus {
-          border-color: ${chroma(0.10, border).darken(0.1)};
+          border-color: ${chroma(border).darken(0.1)};
           box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px ${chroma(border).brighten(0.2)};
         }
       }

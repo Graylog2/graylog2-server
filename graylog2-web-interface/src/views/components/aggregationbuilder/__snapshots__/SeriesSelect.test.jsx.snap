@@ -33,6 +33,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
       closeMenuOnSelect={false}
       components={
         Object {
+          "Menu": [Function],
           "MultiValue": [Function],
           "MultiValueLabel": [Function],
           "MultiValueRemove": [Function],
@@ -49,9 +50,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
       placeholder="None: click to add series"
       styles={
         Object {
+          "menu": [Function],
           "multiValue": [Function],
           "multiValueLabel": [Function],
           "multiValueRemove": [Function],
+          "option": [Function],
           "valueContainer": [Function],
         }
       }
@@ -66,6 +69,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
         closeMenuOnSelect={false}
         components={
           Object {
+            "Menu": [Function],
             "MultiValue": [Function],
             "MultiValueLabel": [Function],
             "MultiValueRemove": [Function],
@@ -106,9 +110,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
         screenReaderStatus={[Function]}
         styles={
           Object {
+            "menu": [Function],
             "multiValue": [Function],
             "multiValueLabel": [Function],
             "multiValueRemove": [Function],
+            "option": [Function],
             "valueContainer": [Function],
           }
         }
@@ -142,6 +148,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
               "closeMenuOnScroll": false,
               "closeMenuOnSelect": false,
               "components": Object {
+                "Menu": [Function],
                 "MultiValue": [Function],
                 "MultiValueLabel": [Function],
                 "MultiValueRemove": [Function],
@@ -180,9 +187,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
               "placeholder": "None: click to add series",
               "screenReaderStatus": [Function],
               "styles": Object {
+                "menu": [Function],
                 "multiValue": [Function],
                 "multiValueLabel": [Function],
                 "multiValueRemove": [Function],
+                "option": [Function],
                 "valueContainer": [Function],
               },
               "tabIndex": "0",
@@ -253,6 +262,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                   "closeMenuOnScroll": false,
                   "closeMenuOnSelect": false,
                   "components": Object {
+                    "Menu": [Function],
                     "MultiValue": [Function],
                     "MultiValueLabel": [Function],
                     "MultiValueRemove": [Function],
@@ -291,9 +301,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                   "placeholder": "None: click to add series",
                   "screenReaderStatus": [Function],
                   "styles": Object {
+                    "menu": [Function],
                     "multiValue": [Function],
                     "multiValueLabel": [Function],
                     "multiValueRemove": [Function],
+                    "option": [Function],
                     "valueContainer": [Function],
                   },
                   "tabIndex": "0",
@@ -356,6 +368,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                       "closeMenuOnScroll": false,
                       "closeMenuOnSelect": false,
                       "components": Object {
+                        "Menu": [Function],
                         "MultiValue": [Function],
                         "MultiValueLabel": [Function],
                         "MultiValueRemove": [Function],
@@ -394,9 +407,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                       "placeholder": "None: click to add series",
                       "screenReaderStatus": [Function],
                       "styles": Object {
+                        "menu": [Function],
                         "multiValue": [Function],
                         "multiValueLabel": [Function],
                         "multiValueRemove": [Function],
+                        "option": [Function],
                         "valueContainer": [Function],
                       },
                       "tabIndex": "0",
@@ -459,6 +474,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           "closeMenuOnScroll": false,
                           "closeMenuOnSelect": false,
                           "components": Object {
+                            "Menu": [Function],
                             "MultiValue": [Function],
                             "MultiValueLabel": [Function],
                             "MultiValueRemove": [Function],
@@ -497,9 +513,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           "placeholder": "None: click to add series",
                           "screenReaderStatus": [Function],
                           "styles": Object {
+                            "menu": [Function],
                             "multiValue": [Function],
                             "multiValueLabel": [Function],
                             "multiValueRemove": [Function],
+                            "option": [Function],
                             "valueContainer": [Function],
                           },
                           "tabIndex": "0",
@@ -566,6 +584,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           "closeMenuOnScroll": false,
                           "closeMenuOnSelect": false,
                           "components": Object {
+                            "Menu": [Function],
                             "MultiValue": [Function],
                             "MultiValueLabel": [Function],
                             "MultiValueRemove": [Function],
@@ -604,9 +623,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           "placeholder": "None: click to add series",
                           "screenReaderStatus": [Function],
                           "styles": Object {
+                            "menu": [Function],
                             "multiValue": [Function],
                             "multiValueLabel": [Function],
                             "multiValueRemove": [Function],
+                            "option": [Function],
                             "valueContainer": [Function],
                           },
                           "tabIndex": "0",
@@ -757,6 +778,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                       "closeMenuOnScroll": false,
                       "closeMenuOnSelect": false,
                       "components": Object {
+                        "Menu": [Function],
                         "MultiValue": [Function],
                         "MultiValueLabel": [Function],
                         "MultiValueRemove": [Function],
@@ -795,9 +817,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                       "placeholder": "None: click to add series",
                       "screenReaderStatus": [Function],
                       "styles": Object {
+                        "menu": [Function],
                         "multiValue": [Function],
                         "multiValueLabel": [Function],
                         "multiValueRemove": [Function],
+                        "option": [Function],
                         "valueContainer": [Function],
                       },
                       "tabIndex": "0",
@@ -859,6 +883,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           "closeMenuOnScroll": false,
                           "closeMenuOnSelect": false,
                           "components": Object {
+                            "Menu": [Function],
                             "MultiValue": [Function],
                             "MultiValueLabel": [Function],
                             "MultiValueRemove": [Function],
@@ -897,9 +922,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           "placeholder": "None: click to add series",
                           "screenReaderStatus": [Function],
                           "styles": Object {
+                            "menu": [Function],
                             "multiValue": [Function],
                             "multiValueLabel": [Function],
                             "multiValueRemove": [Function],
+                            "option": [Function],
                             "valueContainer": [Function],
                           },
                           "tabIndex": "0",
@@ -969,6 +996,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           "closeMenuOnScroll": false,
                           "closeMenuOnSelect": false,
                           "components": Object {
+                            "Menu": [Function],
                             "MultiValue": [Function],
                             "MultiValueLabel": [Function],
                             "MultiValueRemove": [Function],
@@ -1007,9 +1035,11 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           "placeholder": "None: click to add series",
                           "screenReaderStatus": [Function],
                           "styles": Object {
+                            "menu": [Function],
                             "multiValue": [Function],
                             "multiValueLabel": [Function],
                             "multiValueRemove": [Function],
+                            "option": [Function],
                             "valueContainer": [Function],
                           },
                           "tabIndex": "0",

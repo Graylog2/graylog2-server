@@ -39,7 +39,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                     "componentStyle": ComponentStyle {
                       "componentId": "Popover__StyledPopover-wd1j0g-0",
                       "isStatic": false,
-                      "lastClassName": "cmfXru",
+                      "lastClassName": "ePWBSy",
                       "rules": Array [
                         [Function],
                       ],
@@ -60,13 +60,13 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
               >
                 <Popover
                   bsClass="popover"
-                  className="Popover__StyledPopover-wd1j0g-0 cmfXru"
+                  className="Popover__StyledPopover-wd1j0g-0 ePWBSy"
                   id="bookmark-popover"
                   placement="right"
                   title="Name of search"
                 >
                   <div
-                    className="Popover__StyledPopover-wd1j0g-0 cmfXru popover right"
+                    className="Popover__StyledPopover-wd1j0g-0 ePWBSy popover right"
                     id="bookmark-popover"
                     role="tooltip"
                     style={
@@ -149,7 +149,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "ControlLabel-sc-1edmum5-0",
                                             "isStatic": false,
-                                            "lastClassName": "brPnzl",
+                                            "lastClassName": "hOUeaI",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -168,11 +168,11 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                     >
                                       <ControlLabel
                                         bsClass="control-label"
-                                        className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                        className="ControlLabel-sc-1edmum5-0 hOUeaI"
                                         srOnly={false}
                                       >
                                         <label
-                                          className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                          className="ControlLabel-sc-1edmum5-0 hOUeaI control-label"
                                         >
                                           Title
                                         </label>
@@ -199,7 +199,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormControl-sc-1amoaox-0",
                                             "isStatic": false,
-                                            "lastClassName": "jJEiYy",
+                                            "lastClassName": "drUgaP",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -222,7 +222,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                     >
                                       <FormControl
                                         bsClass="form-control"
-                                        className="FormControl-sc-1amoaox-0 jJEiYy"
+                                        className="FormControl-sc-1amoaox-0 drUgaP"
                                         componentClass="input"
                                         onChange={[Function]}
                                         placeholder="Enter title"
@@ -230,7 +230,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                         value="new Title"
                                       >
                                         <input
-                                          className="FormControl-sc-1amoaox-0 jJEiYy form-control"
+                                          className="FormControl-sc-1amoaox-0 drUgaP form-control"
                                           onChange={[Function]}
                                           placeholder="Enter title"
                                           type="text"
@@ -283,7 +283,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "kojzoH",
+                                    "lastClassName": "iWqiEF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -307,13 +307,13 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="info"
-                                className="button Button__StyledButton-c9cbmb-0 cAlWKw"
+                                className="button Button__StyledButton-c9cbmb-0 emPIcl"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
                                 <button
-                                  className="button Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info"
+                                  className="button Button__StyledButton-c9cbmb-0 emPIcl btn btn-info"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="submit"
@@ -358,7 +358,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "kojzoH",
+                                    "lastClassName": "iWqiEF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -381,12 +381,12 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="button Button__StyledButton-c9cbmb-0 kojzoH"
+                                className="button Button__StyledButton-c9cbmb-0 iWqiEF"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                                  className="button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -450,7 +450,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                     "componentStyle": ComponentStyle {
                       "componentId": "Popover__StyledPopover-wd1j0g-0",
                       "isStatic": false,
-                      "lastClassName": "cmfXru",
+                      "lastClassName": "ePWBSy",
                       "rules": Array [
                         [Function],
                       ],
@@ -471,13 +471,13 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
               >
                 <Popover
                   bsClass="popover"
-                  className="Popover__StyledPopover-wd1j0g-0 cmfXru"
+                  className="Popover__StyledPopover-wd1j0g-0 ePWBSy"
                   id="bookmark-popover"
                   placement="right"
                   title="Name of search"
                 >
                   <div
-                    className="Popover__StyledPopover-wd1j0g-0 cmfXru popover right"
+                    className="Popover__StyledPopover-wd1j0g-0 ePWBSy popover right"
                     id="bookmark-popover"
                     role="tooltip"
                     style={
@@ -560,7 +560,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                           "componentStyle": ComponentStyle {
                                             "componentId": "ControlLabel-sc-1edmum5-0",
                                             "isStatic": false,
-                                            "lastClassName": "brPnzl",
+                                            "lastClassName": "hOUeaI",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -579,11 +579,11 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                     >
                                       <ControlLabel
                                         bsClass="control-label"
-                                        className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                        className="ControlLabel-sc-1edmum5-0 hOUeaI"
                                         srOnly={false}
                                       >
                                         <label
-                                          className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                          className="ControlLabel-sc-1edmum5-0 hOUeaI control-label"
                                         >
                                           Title
                                         </label>
@@ -610,7 +610,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormControl-sc-1amoaox-0",
                                             "isStatic": false,
-                                            "lastClassName": "jJEiYy",
+                                            "lastClassName": "drUgaP",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -633,7 +633,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                     >
                                       <FormControl
                                         bsClass="form-control"
-                                        className="FormControl-sc-1amoaox-0 jJEiYy"
+                                        className="FormControl-sc-1amoaox-0 drUgaP"
                                         componentClass="input"
                                         onChange={[Function]}
                                         placeholder="Enter title"
@@ -641,7 +641,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                         value="new Title"
                                       >
                                         <input
-                                          className="FormControl-sc-1amoaox-0 jJEiYy form-control"
+                                          className="FormControl-sc-1amoaox-0 drUgaP form-control"
                                           onChange={[Function]}
                                           placeholder="Enter title"
                                           type="text"
@@ -691,7 +691,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "kojzoH",
+                                    "lastClassName": "iWqiEF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -715,13 +715,13 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="primary"
-                                className="button Button__StyledButton-c9cbmb-0 dYxYaY"
+                                className="button Button__StyledButton-c9cbmb-0 hGhRKT"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
                                 <button
-                                  className="button Button__StyledButton-c9cbmb-0 dYxYaY btn btn-primary"
+                                  className="button Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="submit"
@@ -771,7 +771,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "kojzoH",
+                                    "lastClassName": "iWqiEF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -795,13 +795,13 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="info"
-                                className="button Button__StyledButton-c9cbmb-0 cAlWKw"
+                                className="button Button__StyledButton-c9cbmb-0 emPIcl"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="submit"
                               >
                                 <button
-                                  className="button Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info"
+                                  className="button Button__StyledButton-c9cbmb-0 emPIcl btn btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="submit"
@@ -846,7 +846,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "kojzoH",
+                                    "lastClassName": "iWqiEF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -869,12 +869,12 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="button Button__StyledButton-c9cbmb-0 kojzoH"
+                                className="button Button__StyledButton-c9cbmb-0 iWqiEF"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                                  className="button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -938,7 +938,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                     "componentStyle": ComponentStyle {
                       "componentId": "Popover__StyledPopover-wd1j0g-0",
                       "isStatic": false,
-                      "lastClassName": "cmfXru",
+                      "lastClassName": "ePWBSy",
                       "rules": Array [
                         [Function],
                       ],
@@ -959,13 +959,13 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
               >
                 <Popover
                   bsClass="popover"
-                  className="Popover__StyledPopover-wd1j0g-0 cmfXru"
+                  className="Popover__StyledPopover-wd1j0g-0 ePWBSy"
                   id="bookmark-popover"
                   placement="right"
                   title="Name of search"
                 >
                   <div
-                    className="Popover__StyledPopover-wd1j0g-0 cmfXru popover right"
+                    className="Popover__StyledPopover-wd1j0g-0 ePWBSy popover right"
                     id="bookmark-popover"
                     role="tooltip"
                     style={
@@ -1048,7 +1048,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "ControlLabel-sc-1edmum5-0",
                                             "isStatic": false,
-                                            "lastClassName": "brPnzl",
+                                            "lastClassName": "hOUeaI",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -1067,11 +1067,11 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                     >
                                       <ControlLabel
                                         bsClass="control-label"
-                                        className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                        className="ControlLabel-sc-1edmum5-0 hOUeaI"
                                         srOnly={false}
                                       >
                                         <label
-                                          className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                          className="ControlLabel-sc-1edmum5-0 hOUeaI control-label"
                                         >
                                           Title
                                         </label>
@@ -1098,7 +1098,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormControl-sc-1amoaox-0",
                                             "isStatic": false,
-                                            "lastClassName": "jJEiYy",
+                                            "lastClassName": "drUgaP",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -1121,7 +1121,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                     >
                                       <FormControl
                                         bsClass="form-control"
-                                        className="FormControl-sc-1amoaox-0 jJEiYy"
+                                        className="FormControl-sc-1amoaox-0 drUgaP"
                                         componentClass="input"
                                         onChange={[Function]}
                                         placeholder="Enter title"
@@ -1129,7 +1129,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                         value="new Title"
                                       >
                                         <input
-                                          className="FormControl-sc-1amoaox-0 jJEiYy form-control"
+                                          className="FormControl-sc-1amoaox-0 drUgaP form-control"
                                           onChange={[Function]}
                                           placeholder="Enter title"
                                           type="text"
@@ -1179,7 +1179,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "kojzoH",
+                                    "lastClassName": "iWqiEF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1203,13 +1203,13 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="primary"
-                                className="button Button__StyledButton-c9cbmb-0 dYxYaY"
+                                className="button Button__StyledButton-c9cbmb-0 hGhRKT"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
                                 <button
-                                  className="button Button__StyledButton-c9cbmb-0 dYxYaY btn btn-primary"
+                                  className="button Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="submit"
@@ -1259,7 +1259,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "kojzoH",
+                                    "lastClassName": "iWqiEF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1283,13 +1283,13 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="info"
-                                className="button Button__StyledButton-c9cbmb-0 cAlWKw"
+                                className="button Button__StyledButton-c9cbmb-0 emPIcl"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
                                 <button
-                                  className="button Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info"
+                                  className="button Button__StyledButton-c9cbmb-0 emPIcl btn btn-info"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="submit"
@@ -1334,7 +1334,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "kojzoH",
+                                    "lastClassName": "iWqiEF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1357,12 +1357,12 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="button Button__StyledButton-c9cbmb-0 kojzoH"
+                                className="button Button__StyledButton-c9cbmb-0 iWqiEF"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                                  className="button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"

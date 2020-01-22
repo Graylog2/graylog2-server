@@ -42,7 +42,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               "componentStyle": ComponentStyle {
                 "componentId": "Button__StyledButton-c9cbmb-0",
                 "isStatic": false,
-                "lastClassName": "dRMLmK",
+                "lastClassName": "jTGFJ",
                 "rules": Array [
                   [Function],
                 ],
@@ -66,13 +66,13 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
             block={false}
             bsClass="btn"
             bsStyle="success"
-            className="button Button__StyledButton-c9cbmb-0 dRMLmK"
+            className="button Button__StyledButton-c9cbmb-0 jTGFJ"
             disabled={false}
             id="upload-content-pack-button"
             onClick={[Function]}
           >
             <button
-              className="button Button__StyledButton-c9cbmb-0 dRMLmK btn btn-success"
+              className="button Button__StyledButton-c9cbmb-0 jTGFJ btn btn-success"
               disabled={false}
               id="upload-content-pack-button"
               onClick={[Function]}
@@ -128,7 +128,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "gVCAoS",
+                  "lastClassName": "fWjYOf",
                   "rules": Array [
                     [Function],
                   ],
@@ -152,7 +152,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               autoFocus={true}
               backdrop="static"
               bsClass="modal"
-              className="Modal-nuree8-0 gVCAoS"
+              className="Modal-nuree8-0 fWjYOf"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}

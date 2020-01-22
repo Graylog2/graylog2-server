@@ -144,7 +144,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "ControlLabel-sc-1edmum5-0",
                                   "isStatic": false,
-                                  "lastClassName": "brPnzl",
+                                  "lastClassName": "hOUeaI",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -163,11 +163,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           >
                             <ControlLabel
                               bsClass="control-label"
-                              className="col-sm-3 ControlLabel-sc-1edmum5-0 brPnzl"
+                              className="col-sm-3 ControlLabel-sc-1edmum5-0 hOUeaI"
                               srOnly={false}
                             >
                               <label
-                                className="col-sm-3 ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                className="col-sm-3 ControlLabel-sc-1edmum5-0 hOUeaI control-label"
                                 htmlFor="comment"
                               >
                                 Comment
@@ -207,7 +207,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                     "componentStyle": ComponentStyle {
                                       "componentId": "FormControl-sc-1amoaox-0",
                                       "isStatic": false,
-                                      "lastClassName": "jJEiYy",
+                                      "lastClassName": "drUgaP",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -234,7 +234,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 jJEiYy"
+                                  className="FormControl-sc-1amoaox-0 drUgaP"
                                   componentClass="input"
                                   inputRef={[Function]}
                                   label="Comment"
@@ -246,7 +246,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   value=""
                                 >
                                   <input
-                                    className="FormControl-sc-1amoaox-0 jJEiYy form-control"
+                                    className="FormControl-sc-1amoaox-0 drUgaP form-control"
                                     id="comment"
                                     label="Comment"
                                     maxLength={512}
@@ -371,7 +371,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "ControlLabel-sc-1edmum5-0",
                                   "isStatic": false,
-                                  "lastClassName": "brPnzl",
+                                  "lastClassName": "hOUeaI",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -390,11 +390,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           >
                             <ControlLabel
                               bsClass="control-label"
-                              className="col-sm-3 ControlLabel-sc-1edmum5-0 brPnzl"
+                              className="col-sm-3 ControlLabel-sc-1edmum5-0 hOUeaI"
                               srOnly={false}
                             >
                               <label
-                                className="col-sm-3 ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                className="col-sm-3 ControlLabel-sc-1edmum5-0 hOUeaI control-label"
                                 htmlFor="PARAM"
                               >
                                 A parameter
@@ -435,7 +435,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                     "componentStyle": ComponentStyle {
                                       "componentId": "FormControl-sc-1amoaox-0",
                                       "isStatic": false,
-                                      "lastClassName": "jJEiYy",
+                                      "lastClassName": "drUgaP",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -463,7 +463,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 jJEiYy"
+                                  className="FormControl-sc-1amoaox-0 drUgaP"
                                   componentClass="input"
                                   inputRef={[Function]}
                                   label="A parameter"
@@ -476,7 +476,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   value="parameter"
                                 >
                                   <input
-                                    className="FormControl-sc-1amoaox-0 jJEiYy form-control"
+                                    className="FormControl-sc-1amoaox-0 drUgaP form-control"
                                     id="PARAM"
                                     label="A parameter"
                                     maxLength={250}
@@ -664,7 +664,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "emPIcl",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -687,12 +687,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
+                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -747,7 +747,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "emPIcl",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -771,13 +771,13 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
+                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -977,7 +977,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "cAlWKw",
+                                                    "lastClassName": "emPIcl",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1001,12 +1001,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="info"
-                                                className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                                                className="Button__StyledButton-c9cbmb-0 emPIcl"
                                                 disabled={false}
                                                 onClick={[Function]}
                                               >
                                                 <button
-                                                  className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-xs btn-info"
+                                                  className="Button__StyledButton-c9cbmb-0 emPIcl btn btn-xs btn-info"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   type="button"
@@ -1055,7 +1055,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "gVCAoS",
+                                              "lastClassName": "fWjYOf",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1080,7 +1080,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 gVCAoS"
+                                          className="Modal-nuree8-0 fWjYOf"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
