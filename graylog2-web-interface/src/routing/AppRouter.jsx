@@ -57,6 +57,7 @@ import {
   NotFoundPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
+  ProcessBufferDumpPage,
   RolesPage,
   RuleDetailsPage,
   RulesPage,
@@ -214,6 +215,7 @@ const AppRouter = () => {
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
+              <Route path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
               <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
               <Route path={Routes.SYSTEM.ENTERPRISE} component={EnterprisePage} />
 

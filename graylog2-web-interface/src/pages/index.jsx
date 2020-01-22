@@ -75,6 +75,7 @@ const StreamsPage = loadAsync(() => import('./StreamsPage'));
 const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
+const ProcessBufferDumpPage = loadAsync(() => import('./ProcessBufferDumpPage'));
 const UsersPage = loadAsync(() => import('./UsersPage'));
 
 export {
@@ -126,6 +127,7 @@ export {
   NotFoundPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
+  ProcessBufferDumpPage,
   RolesPage,
   RuleDetailsPage,
   RulesPage,

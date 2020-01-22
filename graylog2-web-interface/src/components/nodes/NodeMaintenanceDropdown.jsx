@@ -24,6 +24,12 @@ class NodeMaintenanceDropdown extends React.Component {
             </LinkContainer>
           </IfPermitted>
 
+          <IfPermitted permissions="processbuffer:dump">
+            <LinkContainer to={Routes.SYSTEM.PROCESSBUFFERDUMP(this.props.node.node_id)}>
+              <MenuItem>Get process-buffer dump</MenuItem>
+            </LinkContainer>
+          </IfPermitted>
+
           <LinkContainer to={Routes.SYSTEM.METRICS(this.props.node.node_id)}>
             <MenuItem>Metrics</MenuItem>
           </LinkContainer>
