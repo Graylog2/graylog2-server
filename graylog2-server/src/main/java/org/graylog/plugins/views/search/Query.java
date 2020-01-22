@@ -248,13 +248,14 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         }
     }
 
-    // This code assumes that we only add streams via gui shallow.
+    // TODO: This code assumes that we only use shallow filters for streams.
+    //       If this ever changes, we need to implement a mapper that can handle filter trees.
     private Filter shallowMappedFilter(EntityDescriptorIds entityDescriptorIds) {
         return Optional.ofNullable(filter())
                 .map(optFilter -> {
                     Set<Filter> newFilters = optFilter.filters().stream()
                             .map(filter -> {
-                                if (filter.type().matches(StreamFilter.NAME)) {
+                                if (filter.type().equals(StreamFilter.NAME)) {
                                     final StreamFilter streamFilter = (StreamFilter) filter;
                                     final String streamId = entityDescriptorIds.
                                             getOrThrow(streamFilter.streamId(), ModelTypes.STREAM_V1);

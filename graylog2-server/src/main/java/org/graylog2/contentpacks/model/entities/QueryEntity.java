@@ -130,7 +130,8 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
         }
     }
 
-    // This code assumes that we only add streams via gui shallow.
+    // TODO: This code assumes that we only use shallow filters for streams.
+    //       If this ever changes, we need to implement a mapper that can handle filter trees.
     private Filter shallowMappedFilter(Map<EntityDescriptor, Object> nativeEntities) {
        return Optional.ofNullable(filter())
                .map(optFilter -> {
