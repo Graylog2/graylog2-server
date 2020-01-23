@@ -15,7 +15,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import CSVExport from 'views/components/searchbar/CSVExport';
+import CSVExportModal from 'views/components/searchbar/CSVExportModal';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
@@ -27,6 +27,7 @@ type Props = {
 type State = {
   showForm: boolean,
   showList: boolean,
+  showCSVExport: boolean,
   newTitle: string,
 };
 
@@ -162,7 +163,7 @@ class BookmarkControls extends React.Component<Props, State> {
     const { view, dirty } = viewStoreState;
 
     const csvExport = showCSVExport && (
-      <CSVExport closeModal={this.toggleCSVExport} />
+      <CSVExportModal closeModal={this.toggleCSVExport} />
     );
 
     const bookmarkList = showList && (

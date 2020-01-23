@@ -1,6 +1,7 @@
 // @flow strict
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { sortBy } from 'lodash';
 import URI from 'urijs';
 import connect from 'stores/connect';
 /* $FlowFixMe: Need to add to flow typed */
@@ -11,6 +12,7 @@ import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import URLUtils from 'util/URLUtils';
 import { Modal, Button, Row } from 'components/graylog';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Icon } from 'components/common';
 import ApiRoutes from 'routing/ApiRoutes';
 import StoreProvider from 'injection/StoreProvider';
@@ -68,14 +70,13 @@ const wrapOption = o => ({ label: o, value: o });
 const defaultFields = ['timestamp', 'source', 'message'];
 const defaultFieldOptions = defaultFields.map(wrapOption);
 
-const CSVExport = ({ closeModal, availableStreams, availableFields }: Props) => {
+const CSVExportModal = ({ closeModal, availableStreams, availableFields }: Props) => {
   const [selectedStream, setSelectedStream] = useState();
   const [selectedFields, setSelectedFields] = useState(defaultFieldOptions);
 
   const link = selectedFields.length > 0
     ? (
-      /* eslint-disable-next-line react/jsx-no-target-blank */
-      <a href={getURLForExportAsCSV((selectedStream || {}).value, selectedFields.map(f => f.value))} target="_blank">
+      <a href={getURLForExportAsCSV((selectedStream || {}).value, selectedFields.map(f => f.value))} target="_parent">
         <Icon name="cloud-download" />&nbsp;
         Download
       </a>
@@ -92,7 +93,7 @@ const CSVExport = ({ closeModal, availableStreams, availableFields }: Props) => 
     margin-right: 10px;
   `;
   return (
-    <Modal show>
+    <BootstrapModalWrapper showModal>
       <Modal.Header>
         <Modal.Title>Export search results as CSV</Modal.Title>
       </Modal.Header>
@@ -124,31 +125,31 @@ const CSVExport = ({ closeModal, availableStreams, availableFields }: Props) => 
       <Modal.Footer>
         <Button onClick={closeModal}>Close</Button>
       </Modal.Footer>
-    </Modal>
+    </BootstrapModalWrapper>
   );
 };
 
-CSVExport.propTypes = {
+CSVExportModal.propTypes = {
   closeModal: PropTypes.func,
   availableStreams: PropTypes.array,
   availableFields: PropTypes.array,
 };
 
-CSVExport.defaultProps = {
+CSVExportModal.defaultProps = {
   closeModal: () => {},
   availableStreams: [],
   availableFields: [],
 };
 
 export default connect(
-  CSVExport,
+  CSVExportModal,
   {
     availableStreams: StreamsStore,
     availableFields: FieldTypesStore,
   },
   ({ availableStreams: { streams }, availableFields: { all }, ...rest }) => ({
     ...rest,
-    availableStreams: streams.map(stream => ({ label: stream.title, value: stream.id })),
-    availableFields: all.map(field => ({ label: field.name, value: field.name })),
+    availableStreams: sortBy(streams.map(stream => ({ label: stream.title, value: stream.id })), ['label']),
+    availableFields: all.map(field => ({ label: field.name, value: field.name })).sortBy(f => f.label).toArray(),
   }),
 );
