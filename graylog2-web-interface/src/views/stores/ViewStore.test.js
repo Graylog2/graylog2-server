@@ -10,7 +10,6 @@ import mockAction from 'helpers/mocking/MockAction';
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import { ViewActions, ViewStore } from './ViewStore';
 
-
 jest.mock('views/actions/SearchActions');
 jest.mock('views/logic/Widgets', () => ({
   widgetDefinition: () => ({
