@@ -9,7 +9,7 @@ import View from 'views/logic/views/View';
 import mockAction from 'helpers/mocking/MockAction';
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import { ViewActions, ViewStore } from './ViewStore';
-import { ViewManagementActions } from './ViewManagementStore';
+
 
 jest.mock('views/actions/SearchActions');
 jest.mock('views/logic/Widgets', () => ({
@@ -46,6 +46,31 @@ describe('ViewStore', () => {
   it('.load should allow to mark isNew as true', () => ViewActions.selectQuery('nonExistingQueryId')
     .then(() => ViewActions.load(dummyView, true))
     .then(state => expect(state.isNew).toBe(true)));
+
+
+  it('.update should update existing view state', () => {
+    // const search = Search.create();
+    const newView = View.builder()
+      .newId()
+      .title('Initial title')
+      .description('Initail description')
+      .summary('Initial summary')
+      .build();
+    return ViewActions.load(newView)
+      .then(({ view }) => {
+        const updatedView = view.toBuilder()
+          .title('New title')
+          .description('New description')
+          .summary('New summary')
+          .build();
+        return ViewActions.update(updatedView);
+      }).then(() => {
+        const state = ViewStore.getInitialState();
+        expect(state.view.title).toEqual('New title');
+        expect(state.view.description).toEqual('New description');
+        expect(state.view.summary).toEqual('New summary');
+      });
+  });
   describe('maintains dirty flag:', () => {
     beforeEach(() => {
       SearchActions.create = mockAction(jest.fn(s => Promise.resolve({ search: s })));
@@ -54,11 +79,11 @@ describe('ViewStore', () => {
       const search = Search.create();
       const newView = View.builder().newId().search(search).build();
       return ViewActions.load(newView)
-        .then(() => ViewActions.description('My view!'))
-        .then(({ view }) => {
+        .then(() => ViewActions.search(search.toBuilder().newId().build()))
+        .then((view) => {
           const state = ViewStore.getInitialState();
           expect(state.dirty).toEqual(true);
-          return ViewManagementActions.update(view);
+          return ViewActions.update(view);
         })
         .then(() => {
           const state = ViewStore.getInitialState();
