@@ -33,7 +33,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -42,13 +41,16 @@ import java.util.stream.Stream;
 public class DashboardV1Facade extends ViewFacade {
     public static final ModelType TYPE_V1 = ModelTypes.DASHBOARD_V1;
     private ObjectMapper objectMapper;
+    private EntityConverter entityConverter;
 
     @Inject
     public DashboardV1Facade(ObjectMapper objectMapper,
                              SearchDbService searchDbService,
+                             EntityConverter entityConverter,
                              ViewService viewService) {
         super(objectMapper, searchDbService, viewService);
         this.objectMapper = objectMapper;
+        this.entityConverter = entityConverter;
     }
 
     @Override
@@ -69,24 +71,16 @@ public class DashboardV1Facade extends ViewFacade {
 
     @Override
     public NativeEntity<ViewDTO> createNativeEntity(Entity entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities, String username) {
-        if (entity instanceof EntityV1) {
-            try {
-                return decode((EntityV1) entity, parameters, nativeEntities);
-            } catch (InvalidRangeParametersException e) {
-                throw new IllegalArgumentException("The provided entity does not have a valid TimeRange", e);
-            }
-        } else {
-            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-        }
+        ensureV1(entity);
+        return decode((EntityV1) entity, parameters, nativeEntities);
     }
 
     @Override
     protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
                                            Map<String, ValueReference> parameters,
-                                           Map<EntityDescriptor, Object> nativeEntities) throws InvalidRangeParametersException {
+                                           Map<EntityDescriptor, Object> nativeEntities) {
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entityV1.data(), DashboardEntity.class);
-        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters);
-        final ViewEntity viewEntity = entityConverter.convert();
+        final ViewEntity viewEntity = entityConverter.convert(dashboardEntity, parameters);
         final JsonNode data = objectMapper.convertValue(viewEntity, JsonNode.class);
         final EntityV1 convertedEntity = entityV1.toBuilder().data(data).type(ModelTypes.DASHBOARD_V2).build();
         return super.decode(convertedEntity, parameters, nativeEntities);
@@ -97,11 +91,8 @@ public class DashboardV1Facade extends ViewFacade {
     public Graph<Entity> resolveForInstallation(Entity entity,
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
-        if (entity instanceof EntityV1) {
-            return resolveEntityV1((EntityV1) entity, parameters, entities);
-        } else {
-            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-        }
+        ensureV1(entity);
+        return resolveEntityV1((EntityV1) entity, parameters, entities);
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -110,8 +101,7 @@ public class DashboardV1Facade extends ViewFacade {
                                           Map<EntityDescriptor, Entity> entities) {
 
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
-        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters);
-        final ViewEntity viewEntity = entityConverter.convert();
+        final ViewEntity viewEntity = entityConverter.convert(dashboardEntity, parameters);
         return resolveViewEntity(entity, viewEntity, entities);
     }
 }

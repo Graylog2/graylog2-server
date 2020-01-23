@@ -56,10 +56,14 @@ public abstract class AbsoluteRangeEntity extends TimeRangeEntity {
     }
 
     @Override
-    public final TimeRange convert(Map<String, ValueReference> parameters) throws InvalidRangeParametersException {
+    public final TimeRange convert(Map<String, ValueReference> parameters) {
         final String from = from().asString(parameters);
         final String to = to().asString(parameters);
-        return AbsoluteRange.create(from, to);
+        try {
+            return AbsoluteRange.create(from, to);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("Invalid timerange.", e);
+        }
     }
 
     @AutoValue.Builder

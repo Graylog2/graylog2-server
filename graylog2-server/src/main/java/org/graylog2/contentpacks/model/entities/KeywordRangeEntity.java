@@ -50,9 +50,13 @@ public abstract class KeywordRangeEntity extends TimeRangeEntity {
     }
 
     @Override
-    public final TimeRange convert(Map<String, ValueReference> parameters) throws InvalidRangeParametersException {
+    public final TimeRange convert(Map<String, ValueReference> parameters) {
         final String keyword = keyword().asString(parameters);
-        return KeywordRange.create(keyword);
+        try {
+            return KeywordRange.create(keyword);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("Invalid timerange.", e);
+        }
     }
 
     @AutoValue.Builder

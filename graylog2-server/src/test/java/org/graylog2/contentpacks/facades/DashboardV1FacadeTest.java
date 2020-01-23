@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -46,6 +47,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSort
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
+import org.graylog2.contentpacks.facades.dashboardV1.DashboardWidgetConverter;
+import org.graylog2.contentpacks.facades.dashboardV1.EntityConverter;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -63,8 +66,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
@@ -109,10 +112,11 @@ public class DashboardV1FacadeTest {
     private final String newViewId = "5def958063303ae5f68edead";
     private final String newStreamId = "5def958063303ae5f68ebeaf";
     private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
+    private ViewDTO viewDTO;
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(LineVisualizationConfigDTO.class, LineVisualizationConfigDTO.NAME));
@@ -131,12 +135,9 @@ public class DashboardV1FacadeTest {
                 new MongoJackObjectMapperProvider(objectMapper));
         viewService = new ViewFacadeTest.TestViewService(mongoRule.getMongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper), null);
-        facade = new DashboardV1Facade(objectMapper, searchDbService, viewService);
-    }
-
-    @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void shouldConvertAndInstallAOldDashboardAsNewView() throws Exception {
+        final DashboardWidgetConverter dashboardWidgetConverter = new DashboardWidgetConverter();
+        final EntityConverter entityConverter = new EntityConverter(dashboardWidgetConverter);
+        facade = new DashboardV1Facade(objectMapper, searchDbService, entityConverter, viewService);
         final URL resourceUrl = Resources.getResource(DashboardV1Facade.class, "content-pack-dashboard-v1.json");
         final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
         assertThat(contentPack).isInstanceOf(ContentPackV1.class);
@@ -151,20 +152,21 @@ public class DashboardV1FacadeTest {
                 ImmutableMap.of(), nativeEntities, "kmerz");
         assertThat(nativeEntity).isNotNull();
 
-        final ViewDTO viewDTO = nativeEntity.entity();
-        viewDOTShouldHaveGeneralInformation(viewDTO);
-        viewDTOShouldHaveACorrectViewState(viewDTO);
-        viewDTOShouldHaveACorrectSearch(viewDTO);
+        viewDTO = nativeEntity.entity();
     }
 
-    private void viewDOTShouldHaveGeneralInformation(ViewDTO viewDTO) {
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void viewDOTShouldHaveGeneralInformation() {
         assertThat(viewDTO).isNotNull();
         assertThat(viewDTO.title()).matches("ContentPack Dashboard");
         assertThat(viewDTO.description()).matches("A dashboard for content packs");
         assertThat(viewDTO.summary()).matches("Converted Dashboard");
     }
 
-    private void viewDTOShouldHaveACorrectViewState(ViewDTO viewDTO) {
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void viewDTOShouldHaveACorrectViewState() {
         assertThat(viewDTO.type()).isEqualByComparingTo(ViewDTO.Type.DASHBOARD);
         assertThat(viewDTO.state()).isNotNull();
         assertThat(viewDTO.state().size()).isEqualTo(1);
@@ -177,7 +179,9 @@ public class DashboardV1FacadeTest {
         widgetIds.forEach(widgetId -> assertThat(viewState.widgetMapping().get(widgetId)).isNotEmpty());
     }
 
-    private void viewDTOShouldHaveACorrectSearch(ViewDTO viewDTO) throws NotFoundException {
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void viewDTOShouldHaveACorrectSearch() throws NotFoundException {
         Optional<Search> optionalSearch = searchDbService.get(viewDTO.searchId());
         Search search = optionalSearch.orElseThrow(NotFoundException::new);
         assertThat(search.queries().size()).isEqualTo(1);

@@ -52,5 +52,5 @@ public abstract class TimeRangeEntity implements TypedEntity {
         }
     }
 
-    public abstract TimeRange convert(Map<String, ValueReference> parameters) throws InvalidRangeParametersException;
+    public abstract TimeRange convert(Map<String, ValueReference> parameters);
 }

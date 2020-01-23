@@ -102,21 +102,24 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
 
     public abstract ModelType getModelType();
 
-    @Override
-    public NativeEntity<ViewDTO> createNativeEntity(Entity entity,
-                                                    Map<String, ValueReference> parameters,
-                                                    Map<EntityDescriptor, Object> nativeEntities,
-                                                    String username) throws InvalidRangeParametersException {
-        if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, parameters, nativeEntities);
-        } else {
+    protected void  ensureV1(Entity entity) {
+        if (!(entity instanceof EntityV1)) {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
+    @Override
+    public NativeEntity<ViewDTO> createNativeEntity(Entity entity,
+                                                    Map<String, ValueReference> parameters,
+                                                    Map<EntityDescriptor, Object> nativeEntities,
+                                                    String username) {
+        ensureV1(entity);
+        return decode((EntityV1) entity, parameters, nativeEntities);
+    }
+
     protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
                                          Map<String, ValueReference> parameters,
-                                         Map<EntityDescriptor, Object> nativeEntities) throws InvalidRangeParametersException {
+                                         Map<EntityDescriptor, Object> nativeEntities) {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
         final Map<String, ViewStateDTO> viewStateMap = new HashMap<>(viewEntity.state().size());
         for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {
@@ -185,11 +188,8 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
     public Graph<Entity> resolveForInstallation(Entity entity,
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
-        if (entity instanceof EntityV1) {
-            return resolveEntityV1((EntityV1) entity, entities);
-        } else {
-            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-        }
+        ensureV1(entity);
+        return resolveEntityV1((EntityV1) entity, entities);
     }
 
     @SuppressWarnings("UnstableApiUsage")

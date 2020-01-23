@@ -49,34 +49,25 @@ public class EntityConverter {
 
     private DashboardEntity dashboardEntity;
     private Map<String, ValueReference> parameters;
+    private DashboardWidgetConverter dashboardWidgetConverter;
 
-    public EntityConverter(DashboardEntity dashboardEntity,
-                           Map<String, ValueReference> parameters) {
-       this.dashboardEntity = dashboardEntity;
-       this.parameters = parameters;
+    public EntityConverter(DashboardWidgetConverter dashboardWidgetConverter) {
+       this.dashboardWidgetConverter = dashboardWidgetConverter;
     }
 
-    public ViewEntity convert() {
+    public ViewEntity convert(DashboardEntity dashboardEntity, Map<String, ValueReference> parameters) {
+        this.parameters = parameters;
+        this.dashboardEntity = dashboardEntity;
+
         final String queryId = UUID.randomUUID().toString();
 
-        final Map<DashboardWidgetEntity, List<WidgetEntity>> widgets = new HashMap<>();
-        for (DashboardWidgetEntity widgetEntity : dashboardEntity.widgets()) {
-            widgets.put(widgetEntity, DashboardWidgetConverter.convert(widgetEntity, parameters));
-        }
+        final Map<DashboardWidgetEntity, List<WidgetEntity>> widgets = convertWidgets();
         final Map<String, WidgetPositionDTO> widgetPositionMap = DashboardEntity.positionMap(parameters, widgets);
         final  Titles titles = DashboardEntity.widgetTitles(widgets, parameters);
 
         final Map<String, Set<String>> widgetMapping = new HashMap<>();
         final Set<SearchTypeEntity> searchTypes = new HashSet<>();
-        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgets.entrySet()) {
-            widgetEntityListEntry.getValue().forEach(widgetEntity -> {
-                final List<SearchTypeEntity> currentSearchTypes;
-                currentSearchTypes = widgetEntity.createSearchTypeEntity();
-                searchTypes.addAll(currentSearchTypes);
-                widgetMapping.put(widgetEntity.id(),
-                        currentSearchTypes.stream().map(SearchTypeEntity::id).collect(Collectors.toSet()));
-            });
-        }
+        createSearchTypes(widgets, widgetMapping, searchTypes);
 
         SearchEntity searchEntity;
         try {
@@ -91,6 +82,7 @@ public class EntityConverter {
                 .widgetMapping(widgetMapping)
                 .widgetPositions(widgetPositionMap)
                 .build();
+
         final Map<String, ViewStateEntity> viewStateEntityMap = new HashMap<>(1);
         viewStateEntityMap.put(queryId, viewStateEntity);
 
@@ -105,6 +97,28 @@ public class EntityConverter {
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .type(ViewEntity.Type.DASHBOARD)
                 .build();
+    }
+
+    private Map<DashboardWidgetEntity, List<WidgetEntity>> convertWidgets() {
+        final Map<DashboardWidgetEntity, List<WidgetEntity>> widgets = new HashMap<>();
+        for (DashboardWidgetEntity widgetEntity : dashboardEntity.widgets()) {
+            widgets.put(widgetEntity, dashboardWidgetConverter.convert(widgetEntity, parameters));
+        }
+        return widgets;
+    }
+
+    private void createSearchTypes(Map<DashboardWidgetEntity, List<WidgetEntity>> widgets,
+                                   Map<String, Set<String>> widgetMapping,
+                                   Set<SearchTypeEntity> searchTypes) {
+        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgets.entrySet()) {
+            widgetEntityListEntry.getValue().forEach(widgetEntity -> {
+                final List<SearchTypeEntity> currentSearchTypes;
+                currentSearchTypes = widgetEntity.createSearchTypeEntity();
+                searchTypes.addAll(currentSearchTypes);
+                widgetMapping.put(widgetEntity.id(),
+                        currentSearchTypes.stream().map(SearchTypeEntity::id).collect(Collectors.toSet()));
+            });
+        }
     }
 
     private SearchEntity createSearchEntity(String queryId, Set<SearchTypeEntity> searchTypes)

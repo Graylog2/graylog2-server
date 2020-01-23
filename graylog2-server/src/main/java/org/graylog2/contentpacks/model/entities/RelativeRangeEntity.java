@@ -46,9 +46,13 @@ public abstract class RelativeRangeEntity extends TimeRangeEntity {
     }
 
     @Override
-    public final TimeRange convert(Map<String, ValueReference> parameters) throws InvalidRangeParametersException {
+    public final TimeRange convert(Map<String, ValueReference> parameters) {
         final int range = range().asInteger(parameters);
-        return RelativeRange.create(range);
+        try {
+            return RelativeRange.create(range);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("Invalid timerange.", e);
+        }
     }
 
     static RelativeRangeEntity.Builder builder() {

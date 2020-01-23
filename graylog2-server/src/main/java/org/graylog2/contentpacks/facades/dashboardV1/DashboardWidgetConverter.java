@@ -58,50 +58,35 @@ public class DashboardWidgetConverter {
     private DashboardWidgetEntity dashboardWidgetEntity;
     private WidgetConfig config;
 
-    public DashboardWidgetConverter(DashboardWidgetEntity dashboardWidgetEntity,
-                                    Map<String, ValueReference> parameters) {
+    public List<WidgetEntity> convert(DashboardWidgetEntity dashboardWidgetEntity,
+                                      Map<String, ValueReference> parameters) {
         this.dashboardWidgetEntity = dashboardWidgetEntity;
-        this.parameters = parameters;
         this.config = new WidgetConfig(dashboardWidgetEntity.configuration(), parameters);
-    }
+        this.parameters = parameters;
 
-    public static List<WidgetEntity> convert(DashboardWidgetEntity dashboardWidgetEntity,
-                                             Map<String, ValueReference> parameters) {
-        final DashboardWidgetConverter converter = new DashboardWidgetConverter(dashboardWidgetEntity, parameters);
-        return converter.convert();
-    }
-
-    public List<WidgetEntity> convert() {
         final String type = dashboardWidgetEntity.type().asString(parameters);
 
-        try {
-            switch (type.toUpperCase(Locale.ENGLISH)) {
-                case "SEARCH_RESULT_CHART":
-                    return createHistogramWidget();
-                case "FIELD_CHART":
-                    return createFieldChartWidget();
-                case "STACKED_CHART":
-                    return createStackedChartWidget();
-                case "STATS_COUNT":
-                    return createStatsCountWidget();
-                case "QUICKVALUES":
-                    return createQuickValueWidgets();
-                case "STREAM_SEARCH_RESULT_COUNT":
-                case "SEARCH_RESULT_COUNT":
-                    return createSearchResultCount();
-                case "QUICKVALUES_HISTOGRAM":
-                    return createQuickValueHistogramWidgets();
-                case "ORG.GRAYLOG.PLUGINS.MAP.WIDGET.STRATEGY.MAPWIDGETSTRATEGY":
-                    return createMapWidget();
-                default: {
-                    throw new IllegalArgumentException(
-                            "The provided entity does not have a valid Widget type: " + type);
-                }
+        switch (type.toUpperCase(Locale.ENGLISH)) {
+            case "SEARCH_RESULT_CHART":
+                return createHistogramWidget();
+            case "FIELD_CHART":
+                return createFieldChartWidget();
+            case "STACKED_CHART":
+                return createStackedChartWidget();
+            case "STATS_COUNT":
+                return createStatsCountWidget();
+            case "QUICKVALUES":
+                return createQuickValueWidgets();
+            case "STREAM_SEARCH_RESULT_COUNT":
+            case "SEARCH_RESULT_COUNT":
+                return createSearchResultCount();
+            case "QUICKVALUES_HISTOGRAM":
+                return createQuickValueHistogramWidgets();
+            case "ORG.GRAYLOG.PLUGINS.MAP.WIDGET.STRATEGY.MAPWIDGETSTRATEGY":
+                return createMapWidget();
+            default: {
+                throw new RuntimeException("The provided entity does not have a valid Widget type: " + type);
             }
-        } catch (
-                InvalidRangeParametersException e) {
-            throw new IllegalArgumentException(
-                    "The provided entity does not have a valid timerange type: " + e.getMessage());
         }
     }
 
@@ -124,7 +109,7 @@ public class DashboardWidgetConverter {
                 .build();
     }
 
-    private WidgetEntity.Builder aggregationWidgetBuilder() throws InvalidRangeParametersException {
+    private WidgetEntity.Builder aggregationWidgetBuilder() {
         final WidgetEntity.Builder widgetEntityBuilder = WidgetEntity.builder()
                 .type(AggregationConfigDTO.NAME)
                 .id(UUID.randomUUID().toString())
@@ -140,7 +125,7 @@ public class DashboardWidgetConverter {
         return widgetEntityBuilder;
     }
 
-    private List<WidgetEntity> createHistogramWidget() throws InvalidRangeParametersException {
+    private List<WidgetEntity> createHistogramWidget() {
         final WidgetConfigDTO widgetConfigDTO = defaultWidgetConfig();
         final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder()
                 .config(widgetConfigDTO);
@@ -194,10 +179,7 @@ public class DashboardWidgetConverter {
         return Optional.empty();
     }
 
-    private WidgetEntity fieldChartWidget(String renderer,
-                                          String valueType,
-                                          String field,
-                                          String query) throws InvalidRangeParametersException {
+    private WidgetEntity fieldChartWidget(String renderer, String valueType, String field, String query) {
         final AggregationConfigDTO.Builder configBuilder = AggregationConfigDTO.Builder.builder()
                 .series(ImmutableList.of(createSeriesDTO(valueType, field)))
                 .visualization(mapRendererToVisualization(renderer))
@@ -218,7 +200,7 @@ public class DashboardWidgetConverter {
                 .build();
     }
 
-    private List<WidgetEntity> createFieldChartWidget() throws InvalidRangeParametersException {
+    private List<WidgetEntity> createFieldChartWidget() {
         final String renderer = config.getString("renderer");
         final String valueType = config.getString("valuetype");
         final String field = config.getString("field");
@@ -235,15 +217,11 @@ public class DashboardWidgetConverter {
             final String valueType = (String) seriesConfig.get("statistical_function");
             final String field = (String) seriesConfig.get("field");
             final String query = (String) seriesConfig.getOrDefault("query", "");
-            try {
-                return fieldChartWidget(renderer, valueType, field, query);
-            } catch (InvalidRangeParametersException e) {
-                return null;
-            }
+            return fieldChartWidget(renderer, valueType, field, query);
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private List<WidgetEntity> createStatsCountWidget() throws InvalidRangeParametersException {
+    private List<WidgetEntity> createStatsCountWidget() {
         final String function = config.getString("stats_function");
         final String field = config.getString("field");
         final boolean trend = config.getBoolean("trend");
@@ -271,7 +249,7 @@ public class DashboardWidgetConverter {
         return ImmutableList.of(widgetEntityBuilder.build());
     }
 
-    private List<WidgetEntity> createQuickValueWidgets() throws InvalidRangeParametersException {
+    private List<WidgetEntity> createQuickValueWidgets() {
         final List<WidgetEntity> result = new ArrayList<>(2);
         final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder();
 
@@ -317,7 +295,7 @@ public class DashboardWidgetConverter {
         return result;
     }
 
-    private List<WidgetEntity> createSearchResultCount() throws InvalidRangeParametersException {
+    private List<WidgetEntity> createSearchResultCount() {
         final boolean trend = config.getBoolean("trend");
         final boolean lowerIsBetter = config.getBoolean("lower_is_better");
         final AggregationConfigDTO widgetConfig = AggregationConfigDTO.Builder.builder()
@@ -341,7 +319,7 @@ public class DashboardWidgetConverter {
         return ImmutableList.of(widgetEntityBuilder.build());
     }
 
-    private List<WidgetEntity> createQuickValueHistogramWidgets() throws InvalidRangeParametersException {
+    private List<WidgetEntity> createQuickValueHistogramWidgets() {
         final List<WidgetEntity> result = new ArrayList<>(2);
         final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder();
 
@@ -386,7 +364,7 @@ public class DashboardWidgetConverter {
         return result;
     }
 
-    private List<WidgetEntity> createMapWidget() throws InvalidRangeParametersException {
+    private List<WidgetEntity> createMapWidget() {
         final String field = config.getString("field");
         final PivotDTO fieldPivot = PivotDTO.Builder.builder()
                 .type("values")
