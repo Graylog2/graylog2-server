@@ -32,11 +32,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.Period;
@@ -50,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class QueryTest {
 
@@ -115,4 +119,59 @@ public class QueryTest {
         assertThat(msgList).extracting(MessageList::limit).containsExactly(300);
     }
 
+    @Test
+    public void appliesExecutionStateTimeRangeToGlobalOverride() {
+        Map<String, Object> executionState = of(
+                "timerange", of("type", RelativeRange.RELATIVE, "range", "60")
+        );
+        Query sut = validQueryBuilder().build();
+        Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+        assertThat(query.globalOverride()).hasValueSatisfying(go ->
+                assertThat(go.timerange()).contains(relativeRange(60)));
+    }
+    @Test
+    public void appliesExecutionStateQueryToGlobalOverride() {
+        Map<String, Object> executionState = of(
+                "query", of("type", ElasticsearchQueryString.NAME, "query_string", "NACKEN")
+        );
+        Query sut = validQueryBuilder().build();
+        Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+        assertThat(query.globalOverride()).hasValueSatisfying(go ->
+                assertThat(go.query()).contains(ElasticsearchQueryString.builder().queryString("NACKEN").build()));
+    }
+    @Test
+    public void appliesExecutionStateTimeRangeAndQueryToGlobalOverrideIfBothArePresent() {
+        Map<String, Object> executionState = of(
+                "timerange", of("type", RelativeRange.RELATIVE, "range", "60"),
+                "query", of("type", ElasticsearchQueryString.NAME, "query_string", "NACKEN")
+        );
+        Query sut = validQueryBuilder().build();
+        Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+        assertThat(query.globalOverride()).hasValueSatisfying(go -> {
+            assertThat(go.timerange()).contains(relativeRange(60));
+            assertThat(go.query()).contains(ElasticsearchQueryString.builder().queryString("NACKEN").build());
+        });
+    }
+    @Test
+    public void doesNotAddGlobalOverrideIfNeitherTimeRangeNorQueryArePresent() {
+        Map<String, Object> executionState = of(
+                "search_types", of(
+                        "some-id",
+                        of("type", MessageList.NAME, "id", "some-id", "offset", 150, "limit", 300)
+                )
+        );
+        Query sut = validQueryBuilder().build();
+        Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
+        assertThat(query.globalOverride()).isEmpty();
+    }
+    private RelativeRange relativeRange(int range) {
+        try {
+            return RelativeRange.create(range);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("invalid time range", e);
+        }
+    }
+    private Query.Builder validQueryBuilder() {
+        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback());
+    }
 }
