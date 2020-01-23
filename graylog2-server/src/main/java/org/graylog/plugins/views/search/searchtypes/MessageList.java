@@ -26,10 +26,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.MessageListEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
@@ -37,7 +38,6 @@ import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.DecorationStats;
@@ -49,7 +49,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @AutoValue
 @JsonTypeName(MessageList.NAME)
@@ -192,6 +191,9 @@ public abstract class MessageList implements SearchType {
         public abstract Optional<DecorationStats> decorationStats();
 
         @JsonProperty
+        public abstract AbsoluteRange effectiveTimerange();
+
+        @JsonProperty
         public abstract long totalResults();
 
         public static Builder builder() {
@@ -213,6 +215,8 @@ public abstract class MessageList implements SearchType {
             public abstract Builder totalResults(long totalResults);
 
             public abstract Builder decorationStats(DecorationStats decorationStats);
+
+            public abstract Builder effectiveTimerange(AbsoluteRange effectiveTimerange);
 
             public abstract Result build();
         }

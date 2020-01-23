@@ -38,6 +38,7 @@ import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
@@ -137,6 +138,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
         final MessageList.Result.Builder resultBuilder = MessageList.Result.result(searchType.id())
                 .messages(decoratedSearchResponse.messages())
+                .effectiveTimerange(AbsoluteRange.create(from, to))
                 .totalResults(decoratedSearchResponse.totalResults());
         return searchType.name().map(resultBuilder::name).orElse(resultBuilder).build();
     }
