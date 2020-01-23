@@ -47,7 +47,6 @@ describe('ViewStore', () => {
     .then(() => ViewActions.load(dummyView, true))
     .then(state => expect(state.isNew).toBe(true)));
 
-
   it('.update should update existing view state', () => {
     // const search = Search.create();
     const newView = View.builder()
