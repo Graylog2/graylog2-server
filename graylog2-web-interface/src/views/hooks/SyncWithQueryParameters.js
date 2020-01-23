@@ -26,7 +26,8 @@ const extractTimerangeParams = (timerange) => {
   }
 };
 
-export const syncWithQueryParameters = (query: string) => {
+export const syncWithQueryParameters = (pathname: string, search: string) => {
+  const query = `${pathname}${search}`;
   const { view } = ViewStore.getInitialState() || {};
   if (view && view.type === View.Type.Search) {
     const { queries } = view.search;
@@ -45,17 +46,22 @@ export const syncWithQueryParameters = (query: string) => {
         .reduce((prev, [key, value]) => prev.setSearch(key, value), baseUri)
         .toString();
       if (query !== uri) {
-        history.push(uri);
+        if (search) {
+          history.push(uri);
+        } else {
+          history.replace(uri);
+        }
       }
     }
   }
 };
 
-export const useSyncWithQueryParameters = (query: string) => {
-  useEffect(() => syncWithQueryParameters(query), []);
+export const useSyncWithQueryParameters = (pathname: string, search: string) => {
+  const query = `${pathname}${search}`;
+  useEffect(() => syncWithQueryParameters(pathname, search), []);
   useActionListeners(
     [QueriesActions.query.completed, QueriesActions.timerange.completed],
-    () => syncWithQueryParameters(query),
+    () => syncWithQueryParameters(pathname, search),
     [query],
   );
 };

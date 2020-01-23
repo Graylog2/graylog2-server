@@ -131,14 +131,13 @@ const useStyle = () => {
 
 const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
-  const query = `${pathname}${search}`;
   const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
 
   useEffect(() => {
     const { view } = ViewStore.getInitialState();
 
     bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
-  }, [query]);
+  }, [pathname, search]);
 
   useStyle();
 
@@ -159,7 +158,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
     return () => storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc());
   }, []);
 
-  useSyncWithQueryParameters(query);
+  useSyncWithQueryParameters(pathname, search);
 
   return (
     <CurrentViewTypeProvider>
