@@ -28,6 +28,7 @@ const Description = styled.p`
 
 const Textarea = styled.textarea(props => css`
   width: 100%;
+  padding: 3px;
   resize: none;
   flex: 1;
   margin-bottom: 15px;
@@ -35,6 +36,8 @@ const Textarea = styled.textarea(props => css`
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
               0 0 8px ${rgba(props.copied ? teinte.tertiary.tre : teinte.secondary.tre, 0.6)};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 14px;
 
   :focus {
     border-color: ${teinte.tertiary.due};
@@ -182,7 +185,8 @@ const Scratchpad = () => {
                   onBlur={handleSaveMessage}
                   value={scratchData}
                   id={TEXTAREA_ID}
-                  copied={copied} />
+                  copied={copied}
+                  spellCheck={false} />
 
         <Footer>
           <SavingMessage visible={recentlySaved}><Icon name="hdd-o" /> Saved!</SavingMessage>
