@@ -22,6 +22,7 @@ import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoDBUpsertRetryer;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
@@ -70,7 +71,7 @@ public class IndexFieldTypesService {
     }
 
     public Optional<IndexFieldTypesDTO> upsert(IndexFieldTypesDTO dto) {
-        final WriteResult<IndexFieldTypesDTO, ObjectId> update = db.update(
+        final WriteResult<IndexFieldTypesDTO, ObjectId> update = MongoDBUpsertRetryer.run(() -> db.update(
                 DBQuery.and(
                         DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_NAME, dto.indexName()),
                         DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, dto.indexSetId())
@@ -78,7 +79,7 @@ public class IndexFieldTypesService {
                 dto,
                 true,
                 false
-        );
+        ));
 
         final Object upsertedId = update.getUpsertedId();
         if (upsertedId instanceof ObjectId) {
