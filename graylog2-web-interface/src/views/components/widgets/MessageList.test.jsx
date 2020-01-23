@@ -49,7 +49,19 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     'listen',
-    ['getInitialState', () => ({ result: { results: { somequery: { effectiveTimerange: { from: '2019-11-15T14:40:48.666Z', to: '2019-11-29T14:40:48.666Z', type: 'absolute' } } } } })],
+    ['getInitialState', () => ({
+      result: {
+        results: {
+          somequery: {
+            searchTypes: {
+              'search-type-id': {
+                effectiveTimerange: { from: '2019-11-15T14:40:48.666Z', to: '2019-11-29T14:40:48.666Z', type: 'absolute' },
+              },
+            },
+          },
+        },
+      },
+    })],
   ),
   SearchActions: {
     reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve({ result: { errors: [] } })),
@@ -66,7 +78,7 @@ jest.mock('views/components/messagelist');
 
 describe('MessageList', () => {
   const data = {
-    id: '6ec30961-2519-45f5-80b6-849e3deb1c32',
+    id: 'search-type-id',
     type: 'messages',
     messages: [
       {
@@ -80,7 +92,6 @@ describe('MessageList', () => {
       },
     ],
     total: 1,
-
   };
   beforeEach(() => {
     // eslint-disable-next-line import/namespace

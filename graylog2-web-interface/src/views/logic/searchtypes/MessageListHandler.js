@@ -14,6 +14,7 @@ export default {
 
     return {
       id: result.id,
+      effectiveTimerange: result.effective_timerange,
       type: result.type,
       messages: result.messages,
       total: result.total_results,
