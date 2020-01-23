@@ -27,14 +27,12 @@ export type ViewStoreState = {
 
 type ViewActionsType = RefluxActions<{
   create: (ViewType, ?string) => Promise<ViewStoreState>,
-  description: (string) => Promise<ViewStoreState>,
   load: (View, ?boolean) => Promise<ViewStoreState>,
   properties: (Properties) => Promise<void>,
   search: (Search) => Promise<View>,
   selectQuery: (string) => Promise<string>,
   state: (ViewState) => Promise<View>,
-  summary: (string) => Promise<void>,
-  title: (string) => Promise<void>,
+  update: (View) => Promise<ViewStoreState>,
 }>;
 
 export const ViewActions: ViewActionsType = singletonActions(
@@ -42,15 +40,13 @@ export const ViewActions: ViewActionsType = singletonActions(
   () => Reflux.createActions({
     create: { asyncResult: true },
     dashboardState: { asyncResult: true },
-    description: { asyncResult: true },
     load: { asyncResult: true },
     properties: { asyncResult: true },
     search: { asyncResult: true },
     selectQuery: { asyncResult: true },
     state: { asyncResult: true },
-    summary: { asyncResult: true },
-    title: { asyncResult: true },
     setNew: { asyncResult: true },
+    update: { asyncResult: true },
   }),
 );
 
@@ -120,12 +116,12 @@ export const ViewStore: ViewStoreType = singletonStore(
 
       QueriesActions.create.promise(promise);
     },
-    description(newDescription: string) {
-      this.dirty = true;
-      this.view = this.view.toBuilder().description(newDescription).build();
+    update(view: View) {
+      this.dirty = false;
+      this.view = view;
       this._trigger();
       const promise = Promise.resolve(this._state());
-      ViewActions.description.promise(promise);
+      ViewActions.update.promise(promise);
       return promise;
     },
     load(view: View, isNew: ?boolean = false): Promise<ViewStoreState> {
@@ -173,16 +169,6 @@ export const ViewStore: ViewStoreType = singletonStore(
       const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
       ViewActions.state.promise(promise);
       return promise;
-    },
-    summary(newSummary) {
-      this.dirty = true;
-      this.view = this.view.toBuilder().summary(newSummary).build();
-      this._trigger();
-    },
-    title(newTitle) {
-      this.dirty = true;
-      this.view = this.view.toBuilder().title(newTitle).build();
-      this._trigger();
     },
     _updateSearch(view: View): [View, boolean] {
       if (!view.search) {

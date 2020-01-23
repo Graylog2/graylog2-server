@@ -5,10 +5,15 @@ jest.mock('routing/Routes', () => ({ VIEWS: { VIEWID: viewId => `/views/${viewId
 // eslint-disable-next-line global-require
 const loadSUT = () => require('./OnSaveViewAction');
 
+const mockBaseView = { id: 'deadbeef', title: 'View title' };
+
 const mockActions = () => {
-  const ViewActions = { load: jest.fn(() => Promise.resolve({ view: { id: 'deadbeef' } })).mockName('load') };
+  const ViewActions = {
+    load: jest.fn(() => Promise.resolve({ view: mockBaseView })).mockName('load'),
+    update: jest.fn(() => Promise.resolve({ view: mockBaseView })).mockName('update'),
+  };
   const ViewManagementActions = {
-    update: jest.fn(() => Promise.resolve()).mockName('update'),
+    update: jest.fn(() => Promise.resolve(mockBaseView)).mockName('update'),
   };
   jest.doMock('views/stores/ViewManagementStore', () => ({ ViewManagementActions }));
   jest.doMock('views/stores/ViewStore', () => ({ ViewActions }));
@@ -21,14 +26,16 @@ describe('OnSaveViewAction', () => {
     jest.resetModules();
   });
   it('saves a given view', () => {
-    const { ViewManagementActions } = mockActions();
+    const { ViewManagementActions, ViewActions } = mockActions();
     const onSaveView = loadSUT();
     const view = View.create();
     const router = [];
 
     return onSaveView(view, router).then(() => {
+      expect(ViewActions.update).toHaveBeenCalledTimes(1);
+      expect(ViewActions.update.mock.calls[0][0]).toEqual(view);
       expect(ViewManagementActions.update).toHaveBeenCalledTimes(1);
-      expect(ViewManagementActions.update.mock.calls[0][0]).toEqual(view);
+      expect(ViewManagementActions.update.mock.calls[0][0]).toEqual(mockBaseView);
     });
   });
 
@@ -60,12 +67,12 @@ describe('OnSaveViewAction', () => {
     const UserNotification = { success: jest.fn().mockName('success') };
     jest.doMock('util/UserNotification', () => UserNotification);
     const onSaveView = loadSUT();
-    const view = View.create().toBuilder().title('Test View').build();
+    const view = View.create();
     const router = [];
 
     return onSaveView(view, router).then(() => {
       expect(UserNotification.success).toHaveBeenCalledTimes(1);
-      expect(UserNotification.success.mock.calls[0][0]).toEqual(`Saving view "${view.title}" was successful!`);
+      expect(UserNotification.success.mock.calls[0][0]).toEqual(`Saving view "${mockBaseView.title}" was successful!`);
       expect(UserNotification.success.mock.calls[0][1]).toEqual('Success!');
     });
   });
