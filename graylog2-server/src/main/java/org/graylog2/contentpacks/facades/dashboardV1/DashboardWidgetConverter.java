@@ -46,6 +46,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,7 +75,7 @@ public class DashboardWidgetConverter {
         final String type = dashboardWidgetEntity.type().asString(parameters);
 
         try {
-            switch (type.toUpperCase()) {
+            switch (type.toUpperCase(Locale.ENGLISH)) {
                 case "SEARCH_RESULT_CHART":
                     return createHistogramWidget();
                 case "FIELD_CHART":
