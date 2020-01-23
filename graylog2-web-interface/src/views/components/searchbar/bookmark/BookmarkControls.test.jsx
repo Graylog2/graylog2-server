@@ -1,36 +1,38 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import { browserHistory } from 'react-router';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import Routes from 'routing/Routes';
+import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 
 import BookmarkControls from './BookmarkControls';
 
 describe('BookmarkControls', () => {
+  const createViewStoreState = (dirty = true) => ({
+    activeQuery: '',
+    view: View.builder()
+      .title('title')
+      .description('description')
+      .search(Search.create().toBuilder().id('id-beef').build())
+      .build(),
+    dirty,
+  });
   describe('Button handling', () => {
     it('should clear a view', (done) => {
-      browserHistory.push = jest.fn();
-      const viewStoreState = {
-        activeQuery: '',
-        view: View.builder()
-          .title('title')
-          .description('description')
-          .search(Search.create().toBuilder().id('id-beef').build())
-          .build(),
-        dirty: true,
-      };
-      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
-      wrapper.find('button[title="Empty search"]').simulate('click');
-      setImmediate(() => {
-        expect(browserHistory.push).toHaveBeenCalledWith(Routes.SEARCH);
+      const loadNewView = jest.fn(() => {
         done();
+        return Promise.resolve();
       });
+      const wrapper = mount((
+        <NewViewLoaderContext.Provider value={loadNewView}>
+          <BookmarkControls viewStoreState={createViewStoreState()} />
+        </NewViewLoaderContext.Provider>
+      ));
+      wrapper.find('a[data-testid="reset-search"]').simulate('click');
     });
 
     it('should loadView after create', (done) => {
@@ -38,18 +40,9 @@ describe('BookmarkControls', () => {
       const onLoadView = jest.fn((view) => {
         return new Promise(() => view);
       });
-      const viewStoreState = {
-        activeQuery: '',
-        view: View.builder()
-          .title('title')
-          .description('description')
-          .search(Search.create().toBuilder().id('id-beef').build())
-          .build(),
-        dirty: false,
-      };
       const wrapper = mount(
         <ViewLoaderContext.Provider value={onLoadView}>
-          <BookmarkControls viewStoreState={viewStoreState} />
+          <BookmarkControls viewStoreState={createViewStoreState(false)} />
         </ViewLoaderContext.Provider>,
       );
       wrapper.find('button[title="Save search"]').simulate('click');
@@ -64,17 +57,9 @@ describe('BookmarkControls', () => {
 
   describe('render the BookmarkControls', () => {
     it('should render not dirty with unsaved view', () => {
-      const viewStoreState = {
-        activeQuery: '',
-        view: View.builder()
-          .title('title')
-          .description('description')
-          .search(Search.create().toBuilder().id('id-beef').build())
-          .build(),
-        dirty: false,
-      };
-      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
-      expect(wrapper).toMatchSnapshot();
+      const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false)} />);
+      const saveButton = wrapper.find('button[title="Save search"]');
+      expect(saveButton).toMatchSnapshot();
     });
 
     it('should render not dirty', () => {
@@ -89,7 +74,8 @@ describe('BookmarkControls', () => {
         dirty: false,
       };
       const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
-      expect(wrapper).toMatchSnapshot();
+      const saveButton = wrapper.find('button[title="Saved search"]');
+      expect(saveButton).toMatchSnapshot();
     });
 
     it('should render dirty', () => {
@@ -105,7 +91,8 @@ describe('BookmarkControls', () => {
         dirty: true,
       };
       const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
-      expect(wrapper).toMatchSnapshot();
+      const saveButton = wrapper.find('button[title="Unsaved changes"]');
+      expect(saveButton).toMatchSnapshot();
     });
   });
 });

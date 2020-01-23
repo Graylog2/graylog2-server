@@ -7,6 +7,7 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 import { Spinner } from 'components/common';
 import { ViewActions } from 'views/stores/ViewStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
+import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import View from 'views/logic/views/View';
 import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
@@ -45,9 +46,13 @@ class NewSearchPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    this.loadNewView();
+  }
+
+  loadNewView = () => {
     const { location, loadingViewHooks, executingViewHooks } = this.props;
     const { query } = location;
-    processHooks(
+    return processHooks(
       ViewActions.create(View.Type.Search).then(({ view }) => view),
       loadingViewHooks,
       executingViewHooks,
@@ -57,7 +62,7 @@ class NewSearchPage extends React.Component<Props, State> {
     ).catch(
       error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
     );
-  }
+  };
 
   loadView = (viewId: string): Promise<?View> => {
     const { location, loadingViewHooks, executingViewHooks } = this.props;
@@ -97,7 +102,9 @@ class NewSearchPage extends React.Component<Props, State> {
       const { location, route } = this.props;
       return (
         <ViewLoaderContext.Provider value={this.loadView}>
-          <ExtendedSearchPage route={route} location={location} />
+          <NewViewLoaderContext.Provider value={this.loadNewView}>
+            <ExtendedSearchPage route={route} location={location} />
+          </NewViewLoaderContext.Provider>
         </ViewLoaderContext.Provider>
       );
     }

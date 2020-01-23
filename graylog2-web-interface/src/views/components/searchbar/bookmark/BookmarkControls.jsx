@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 
 import Routes from 'routing/Routes';
 import { newDashboardsPath } from 'views/Constants';
-import { Button, ButtonGroup } from 'components/graylog';
+import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
@@ -14,6 +14,8 @@ import View from 'views/logic/views/View';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
+import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
+import CSVExportModal from 'views/components/searchbar/CSVExportModal';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
@@ -25,6 +27,7 @@ type Props = {
 type State = {
   showForm: boolean,
   showList: boolean,
+  showCSVExport: boolean,
   newTitle: string,
 };
 
@@ -42,6 +45,7 @@ class BookmarkControls extends React.Component<Props, State> {
     const { view } = viewStoreState;
 
     this.state = {
+      showCSVExport: false,
       showForm: false,
       showList: false,
       newTitle: (view && view.title) || '',
@@ -56,6 +60,11 @@ class BookmarkControls extends React.Component<Props, State> {
   toggleListModal = () => {
     const { showList } = this.state;
     this.setState({ showList: !showList });
+  };
+
+  toggleCSVExport = () => {
+    const { showCSVExport } = this.state;
+    this.setState({ showCSVExport: !showCSVExport });
   };
 
   onChangeTitle = (e: SyntheticInputEvent<HTMLInputElement>) => {
@@ -149,10 +158,13 @@ class BookmarkControls extends React.Component<Props, State> {
   static contextType = ViewLoaderContext;
 
   render() {
-    const { showForm, showList, newTitle } = this.state;
+    const { showForm, showList, newTitle, showCSVExport } = this.state;
     const { viewStoreState } = this.props;
     const { view, dirty } = viewStoreState;
 
+    const csvExport = showCSVExport && (
+      <CSVExportModal closeModal={this.toggleCSVExport} />
+    );
 
     const bookmarkList = showList && (
       <BookmarkList loadBookmark={this.loadBookmark}
@@ -161,7 +173,7 @@ class BookmarkControls extends React.Component<Props, State> {
     );
 
     const loaded = (view && view.id);
-    const bookmarkStyle = loaded ? 'bookmark' : 'bookmark-o';
+    const bookmarkStyle = loaded ? 'star' : 'star-o';
     let bookmarkColor: string = '';
     if (loaded) {
       bookmarkColor = dirty ? '#ffc107' : '#007bff';
@@ -187,32 +199,33 @@ class BookmarkControls extends React.Component<Props, State> {
     );
 
     return (
-      <div className="pull-right">
-        <ButtonGroup>
-          <React.Fragment>
-            <Button title="Export to new dashboard"
-                    onClick={this.loadAsDashboard}>
-              <Icon name="dashboard" />
-            </Button>
-            <Button disabled={disableReset}
-                    title="Empty search"
-                    onClick={() => {
-                      browserHistory.push(Routes.SEARCH);
-                    }}>
-              <Icon name="eraser" />
-            </Button>
-            <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-              <Icon style={{ color: bookmarkColor }} name={bookmarkStyle} />
-            </Button>
-            {bookmarkForm}
-          </React.Fragment>
-          <Button title="List of saved searches"
-                  onClick={this.toggleListModal}>
-            <Icon name="folder-o" />
-          </Button>
-          {bookmarkList}
-        </ButtonGroup>
-      </div>
+      <NewViewLoaderContext.Consumer>
+        {loadNewView => (
+          <div className="pull-right">
+            <ButtonGroup>
+              <React.Fragment>
+                <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
+                  <Icon style={{ color: bookmarkColor }} name={bookmarkStyle} /> Save
+                </Button>
+                {bookmarkForm}
+              </React.Fragment>
+              <Button title="Load a previously saved search"
+                      onClick={this.toggleListModal}>
+                <Icon name="folder-o" /> Load
+              </Button>
+              {bookmarkList}
+              <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
+                <MenuItem onSelect={this.loadAsDashboard}><Icon name="dashboard" /> Export to dashboard</MenuItem>
+                <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download" /> Export to CSV</MenuItem>
+                <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
+                  <Icon name="eraser" /> Reset search
+                </MenuItem>
+              </DropdownButton>
+              {csvExport}
+            </ButtonGroup>
+          </div>
+        )}
+      </NewViewLoaderContext.Consumer>
     );
   }
 }
