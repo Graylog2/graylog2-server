@@ -162,7 +162,10 @@ public class QueryTest {
         );
         Query sut = validQueryBuilder().build();
         Query query = sut.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
-        assertThat(query.globalOverride()).isEmpty();
+        assertThat(query.globalOverride()).isPresent();
+        final GlobalOverride override = query.globalOverride().get();
+        assertThat(override.timerange()).isEmpty();
+        assertThat(override.query()).isEmpty();
     }
     private RelativeRange relativeRange(int range) {
         try {
