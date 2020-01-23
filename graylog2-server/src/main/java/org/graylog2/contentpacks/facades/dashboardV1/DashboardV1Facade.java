@@ -42,16 +42,13 @@ import java.util.stream.Stream;
 public class DashboardV1Facade extends ViewFacade {
     public static final ModelType TYPE_V1 = ModelTypes.DASHBOARD_V1;
     private ObjectMapper objectMapper;
-    private RandomUUIDProvider randomUUIDProvider;
 
     @Inject
     public DashboardV1Facade(ObjectMapper objectMapper,
                              SearchDbService searchDbService,
-                             RandomUUIDProvider randomUUIDProvider,
                              ViewService viewService) {
         super(objectMapper, searchDbService, viewService);
         this.objectMapper = objectMapper;
-        this.randomUUIDProvider = randomUUIDProvider;
     }
 
     @Override
@@ -65,7 +62,7 @@ public class DashboardV1Facade extends ViewFacade {
     }
 
     @Override
-    public Stream<ViewDTO> getNativeViews() {
+    protected Stream<ViewDTO> getNativeViews() {
         /* There are no old dashboards in the system */
         return ImmutableSet.<ViewDTO>of().stream();
     }
@@ -88,7 +85,7 @@ public class DashboardV1Facade extends ViewFacade {
                                            Map<String, ValueReference> parameters,
                                            Map<EntityDescriptor, Object> nativeEntities) throws InvalidRangeParametersException {
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entityV1.data(), DashboardEntity.class);
-        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters, randomUUIDProvider);
+        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters);
         final ViewEntity viewEntity = entityConverter.convert();
         final JsonNode data = objectMapper.convertValue(viewEntity, JsonNode.class);
         final EntityV1 convertedEntity = entityV1.toBuilder().data(data).type(ModelTypes.DASHBOARD_V2).build();
@@ -113,7 +110,7 @@ public class DashboardV1Facade extends ViewFacade {
                                           Map<EntityDescriptor, Entity> entities) {
 
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
-        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters, randomUUIDProvider);
+        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters);
         final ViewEntity viewEntity = entityConverter.convert();
         return resolveViewEntity(entity, viewEntity, entities);
     }

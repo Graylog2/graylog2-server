@@ -46,7 +46,6 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSort
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
-import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -132,8 +131,7 @@ public class DashboardV1FacadeTest {
                 new MongoJackObjectMapperProvider(objectMapper));
         viewService = new ViewFacadeTest.TestViewService(mongoRule.getMongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper), null);
-        final RandomUUIDProvider randomUUIDProvider = new RandomUUIDProvider(new Date(1575020937839L), 1575020937839L);
-        facade = new DashboardV1Facade(objectMapper, searchDbService, randomUUIDProvider, viewService);
+        facade = new DashboardV1Facade(objectMapper, searchDbService, viewService);
     }
 
     @Test

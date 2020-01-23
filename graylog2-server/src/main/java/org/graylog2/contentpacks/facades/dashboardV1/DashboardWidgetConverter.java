@@ -49,28 +49,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class DashboardWidgetConverter {
     private Map<String, ValueReference> parameters;
-    private RandomUUIDProvider randomUUIDProvider;
     private DashboardWidgetEntity dashboardWidgetEntity;
     private WidgetConfig config;
 
     public DashboardWidgetConverter(DashboardWidgetEntity dashboardWidgetEntity,
-                                    Map<String, ValueReference> parameters,
-                                    RandomUUIDProvider randomUUIDProvider) {
+                                    Map<String, ValueReference> parameters) {
         this.dashboardWidgetEntity = dashboardWidgetEntity;
         this.parameters = parameters;
-        this.randomUUIDProvider = randomUUIDProvider;
         this.config = new WidgetConfig(dashboardWidgetEntity.configuration(), parameters);
     }
 
     public static List<WidgetEntity> convert(DashboardWidgetEntity dashboardWidgetEntity,
-                                             Map<String, ValueReference> parameters,
-                                             RandomUUIDProvider randomUUIDProvider) {
-        final DashboardWidgetConverter converter = new DashboardWidgetConverter(
-                dashboardWidgetEntity, parameters, randomUUIDProvider);
+                                             Map<String, ValueReference> parameters) {
+        final DashboardWidgetConverter converter = new DashboardWidgetConverter(dashboardWidgetEntity, parameters);
         return converter.convert();
     }
 
@@ -78,7 +74,7 @@ public class DashboardWidgetConverter {
         final String type = dashboardWidgetEntity.type().asString(parameters);
 
         try {
-            switch (type) {
+            switch (type.toUpperCase()) {
                 case "SEARCH_RESULT_CHART":
                     return createHistogramWidget();
                 case "FIELD_CHART":
@@ -130,7 +126,7 @@ public class DashboardWidgetConverter {
     private WidgetEntity.Builder aggregationWidgetBuilder() throws InvalidRangeParametersException {
         final WidgetEntity.Builder widgetEntityBuilder = WidgetEntity.builder()
                 .type(AggregationConfigDTO.NAME)
-                .id(randomUUIDProvider.get())
+                .id(UUID.randomUUID().toString())
                 .timerange(dashboardWidgetEntity.timeRange().convert(parameters));
 
         final Optional<String> streamId = config.getOptionalString("stream_id");
@@ -314,7 +310,7 @@ public class DashboardWidgetConverter {
                     aggregationConfigBuilder.visualization("table")
                             .rowPivots(genPivotForPie(field, stackedFields, dataTableLimit))
                             .build())
-                    .id(randomUUIDProvider.get())
+                    .id(UUID.randomUUID().toString())
                     .build());
         }
         return result;
@@ -384,7 +380,7 @@ public class DashboardWidgetConverter {
                         ))
                         .columnPivots(genPivotForPie(field, stackedFields, limit))
                         .build())
-                .id(randomUUIDProvider.get())
+                .id(UUID.randomUUID().toString())
                 .build());
         return result;
     }

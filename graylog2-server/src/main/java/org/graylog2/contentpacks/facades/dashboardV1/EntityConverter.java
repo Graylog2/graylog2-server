@@ -18,8 +18,6 @@ package org.graylog2.contentpacks.facades.dashboardV1;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.views.Titles;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
@@ -44,29 +42,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class EntityConverter {
 
     private DashboardEntity dashboardEntity;
     private Map<String, ValueReference> parameters;
-    private RandomUUIDProvider randomUUIDProvider;
 
     public EntityConverter(DashboardEntity dashboardEntity,
-                           Map<String, ValueReference> parameters,
-                           RandomUUIDProvider randomUUIDProvider) {
+                           Map<String, ValueReference> parameters) {
        this.dashboardEntity = dashboardEntity;
        this.parameters = parameters;
-       this.randomUUIDProvider = randomUUIDProvider;
     }
 
     public ViewEntity convert() {
-        final String queryId = randomUUIDProvider.get();
+        final String queryId = UUID.randomUUID().toString();
 
         final Map<DashboardWidgetEntity, List<WidgetEntity>> widgets = new HashMap<>();
         for (DashboardWidgetEntity widgetEntity : dashboardEntity.widgets()) {
-            widgets.put(widgetEntity, DashboardWidgetConverter.convert(widgetEntity, parameters,
-                    randomUUIDProvider));
+            widgets.put(widgetEntity, DashboardWidgetConverter.convert(widgetEntity, parameters));
         }
         final Map<String, WidgetPositionDTO> widgetPositionMap = DashboardEntity.positionMap(parameters, widgets);
         final  Titles titles = DashboardEntity.widgetTitles(widgets, parameters);
@@ -76,7 +71,7 @@ public class EntityConverter {
         for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgets.entrySet()) {
             widgetEntityListEntry.getValue().forEach(widgetEntity -> {
                 final List<SearchTypeEntity> currentSearchTypes;
-                currentSearchTypes = widgetEntity.createSearchTypeEntity(randomUUIDProvider);
+                currentSearchTypes = widgetEntity.createSearchTypeEntity();
                 searchTypes.addAll(currentSearchTypes);
                 widgetMapping.put(widgetEntity.id(),
                         currentSearchTypes.stream().map(SearchTypeEntity::id).collect(Collectors.toSet()));

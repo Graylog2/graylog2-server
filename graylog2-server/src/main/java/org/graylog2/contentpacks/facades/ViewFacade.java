@@ -149,7 +149,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
     }
 
-public Stream<ViewDTO> getNativeViews() {
+    protected Stream<ViewDTO> getNativeViews() {
         return viewService.streamAll().filter(v -> v.type().equals(this.getDTOType()));
     }
 

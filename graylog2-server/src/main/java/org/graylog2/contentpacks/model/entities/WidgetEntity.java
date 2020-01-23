@@ -16,7 +16,6 @@
  */
 package org.graylog2.contentpacks.model.entities;
 
-import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -24,10 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
@@ -49,7 +46,6 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationCon
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
-import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -62,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -170,7 +167,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         return widgetBuilder.build();
     }
 
-    public List<SearchTypeEntity> createSearchTypeEntity(RandomUUIDProvider randomUUIDProvider) {
+    public List<SearchTypeEntity> createSearchTypeEntity() {
         if (! type().matches(AggregationConfigDTO.NAME)) {
             return ImmutableList.of();
         }
@@ -182,14 +179,14 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 .sort(toSortSpec(config))
                 .rowGroups(toRowGroups(config))
                 .series(toSeriesSpecs(config))
-                .id(randomUUIDProvider.get());
+                .id(UUID.randomUUID().toString());
         query().ifPresent(pivotBuilder::query);
         timerange().ifPresent(pivotBuilder::timerange);
 
         if (config.visualization().matches("numeric")) {
             final PivotEntity chart = pivotBuilder.build();
             final PivotEntity trend = pivotBuilder
-                    .id(new UUID().toString())
+                    .id(UUID.randomUUID().toString())
                     .name("trend")
                     .timerange(OffsetRange.Builder.builder()
                             .source("search_type")
