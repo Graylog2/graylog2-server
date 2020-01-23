@@ -91,7 +91,7 @@ public class DashboardWidgetConverter {
                     return createSearchResultCount();
                 case "QUICKVALUES_HISTOGRAM":
                     return createQuickValueHistogramWidgets();
-                case "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy":
+                case "ORG.GRAYLOG.PLUGINS.MAP.WIDGET.STRATEGY.MAPWIDGETSTRATEGY":
                     return createMapWidget();
                 default: {
                     throw new IllegalArgumentException(
