@@ -95,7 +95,7 @@ class MessageList extends React.Component<Props, State> {
   _resetPagination = () => {
     const { currentPage } = this.state;
     if (currentPage !== 1) {
-      this.setState({ currentPage: 1 });
+      this.setState({ currentPage: 1, errors: [] });
     }
   }
 
