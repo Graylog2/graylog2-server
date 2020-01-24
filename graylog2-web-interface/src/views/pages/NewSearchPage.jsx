@@ -79,7 +79,6 @@ class NewSearchPage extends React.Component<Props, State> {
       loadingViewHooks,
       executingViewHooks,
       currentURLQuery,
-    ).then(
       () => this.setState({ loaded: true }),
     ).catch(
       error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),

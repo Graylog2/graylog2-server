@@ -68,7 +68,6 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
       loadingViewHooks,
       executingViewHooks,
       currentURLQuery,
-    ).then(
       () => setLoaded(true),
     ).catch(
       error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
