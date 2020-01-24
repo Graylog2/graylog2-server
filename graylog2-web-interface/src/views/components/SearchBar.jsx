@@ -89,7 +89,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                 </Row>
 
                 <Row className="no-bm">
-                  <Col md={10} xs={9}>
+                  <Col md={9} xs={8}>
                     <div className="pull-right search-help">
                       <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                          title="Search query syntax documentation"
@@ -102,7 +102,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                                 onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
                                 onExecute={performSearch} />
                   </Col>
-                  <Col md={2} xs={3}>
+                  <Col md={3} xs={4}>
                     <BookmarkControls />
                   </Col>
                 </Row>

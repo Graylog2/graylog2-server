@@ -32,6 +32,21 @@ export type ElasticsearchQueryString = {
 
 export const createElasticsearchQueryString = (query: string = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
 
+const _streamFilters = (selectedStreams: Array<string>): Array<{ type: string, id: string }> => {
+  return selectedStreams.map(stream => ({ type: 'stream', id: stream }));
+};
+
+export const filtersForQuery = (streams: ?Array<string>) => {
+  if (!streams || streams.length === 0) {
+    return null;
+  }
+  const streamFilters = _streamFilters(streams);
+  return {
+    type: 'or',
+    filters: streamFilters,
+  };
+};
+
 export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';

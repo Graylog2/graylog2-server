@@ -3,50 +3,41 @@ import React, { useEffect, useState } from 'react';
 
 import UserNotification from 'util/UserNotification';
 
-import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
-import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 import { ViewActions } from 'views/stores/ViewStore';
+import { SearchActions } from 'views/stores/SearchStore';
+import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
+
+import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import View from 'views/logic/views/View';
+import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
+import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
-import ViewLoaderContext from 'views/logic/ViewLoaderContext';
+
 import Spinner from 'components/common/Spinner';
 import { ExtendedSearchPage } from 'views/pages';
-import { SearchActions } from 'views/stores/SearchStore';
 
+type URLQuery = { [string]: any }
 
 type Props = {
-  params: {
-    streamId: string,
-  },
+  executingViewHooks: Array<ViewHook>,
+  loadingViewHooks: Array<ViewHook>,
   location: {
     query: { [string]: any },
   },
+  params: {
+    streamId: string,
+  },
   route: {},
-  loadingViewHooks: Array<ViewHook>,
-  executingViewHooks: Array<ViewHook>,
+  router: {
+    getCurrentLocation: () => ({ pathname: string, search: string }),
+  },
 };
 
-const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, executingViewHooks, location }: Props) => {
+const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHooks, executingViewHooks, location }: Props) => {
   const [loaded, setLoaded] = useState(false);
   const { query } = location;
   const [hookComponent, setHookComponent] = useState(undefined);
-
-  useEffect(() => {
-    processHooks(
-      ViewActions.create(View.Type.Search, streamId)
-        .then(({ view, activeQuery }) => {
-          return QueryFiltersActions.streams(activeQuery, [streamId]).then(() => view);
-        }),
-      loadingViewHooks,
-      executingViewHooks,
-      query,
-    ).then(
-      () => setLoaded(true),
-    ).catch(
-      (error) => { UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'); },
-    );
-  }, [streamId]);
 
   const loadView = (viewId: string): Promise<?View> => {
     return ViewLoader(
@@ -71,6 +62,32 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
     }).catch(e => e);
   };
 
+  const loadNewView = (currentURLQuery: URLQuery): Promise<?View> => {
+    return processHooks(
+      ViewActions.create(View.Type.Search, streamId).then(({ view }) => view),
+      loadingViewHooks,
+      executingViewHooks,
+      currentURLQuery,
+      () => setLoaded(true),
+    ).catch(
+      error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
+    );
+  };
+
+  const loadViewFromParams = (): Promise<?View> => {
+    return loadNewView({ ...query });
+  };
+
+  const loadEmptyView = (): Promise<?View> => {
+    return loadNewView({}).then(() => {
+      const { pathname, search } = router.getCurrentLocation();
+      const currentQuery = `${pathname}${search}`;
+      syncWithQueryParameters(currentQuery);
+    });
+  };
+
+  useEffect(() => { loadViewFromParams(); }, [streamId]);
+
   if (hookComponent) {
     return (<>{hookComponent}</>);
   }
@@ -78,7 +95,9 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
   if (loaded) {
     return (
       <ViewLoaderContext.Provider value={loadView}>
-        <ExtendedSearchPage route={route} />
+        <NewViewLoaderContext.Provider value={loadEmptyView}>
+          <ExtendedSearchPage route={route} />
+        </NewViewLoaderContext.Provider>
       </ViewLoaderContext.Provider>
     );
   }
