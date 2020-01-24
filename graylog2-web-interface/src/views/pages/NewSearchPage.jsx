@@ -67,8 +67,7 @@ class NewSearchPage extends React.Component<Props, State> {
     const { router } = this.props;
     return this.loadNewView({}).then(() => {
       const { pathname, search } = router.getCurrentLocation();
-      const query = `${pathname}${search}`;
-      syncWithQueryParameters(query);
+      syncWithQueryParameters(pathname, search);
     });
   }
 
