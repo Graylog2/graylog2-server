@@ -17,7 +17,6 @@ import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import Spinner from 'components/common/Spinner';
 import { ExtendedSearchPage } from 'views/pages';
 
-
 type URLQuery = { [string]: any }
 
 type Props = {
