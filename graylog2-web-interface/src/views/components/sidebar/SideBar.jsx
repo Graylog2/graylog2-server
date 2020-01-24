@@ -86,10 +86,11 @@ class SideBar extends React.Component<Props, State> {
     this.setState({ disabledAutoClose: !disabledAutoClose });
   };
 
-  setSelectedKey = (key: string) => {
-    const { open } = this.state;
-    return () => this.setState(
-      { selectedKey: key },
+  onNavItemClick = (key: string) => () => {
+    const { open, selectedKey } = this.state;
+    const nextKey = key === selectedKey ? undefined : key;
+    this.setState(
+      { selectedKey: nextKey },
       () => !open && this.toggleOpen(),
     );
   };
@@ -131,28 +132,28 @@ class SideBar extends React.Component<Props, State> {
               <NavItem isSelected={open && selectedKey === 'viewDescription'}
                        text="Description"
                        icon="info"
-                       onClick={this.setSelectedKey('viewDescription')}
+                       onClick={this.onNavItemClick('viewDescription')}
                        isOpen={open}>
                 {this.navItemChildren(<ViewDescription viewMetadata={viewMetadata} results={results} />)}
               </NavItem>
               <NavItem isSelected={open && selectedKey === 'createWidget'}
                        text="Create"
                        icon="plus"
-                       onClick={this.setSelectedKey('createWidget')}
+                       onClick={this.onNavItemClick('createWidget')}
                        isOpen={open}>
                 {this.navItemChildren(<AddWidgetButton onClick={this.toggleOpen} toggleAutoClose={this.toggleAutoClose} queryId={queryId} />)}
               </NavItem>
               <NavItem isSelected={open && selectedKey === 'highlighting'}
                        text="Formatting & Highlighting"
                        icon="paragraph"
-                       onClick={this.setSelectedKey('highlighting')}
+                       onClick={this.onNavItemClick('highlighting')}
                        isOpen={open}>
                 {this.navItemChildren(<HighlightingRules />)}
               </NavItem>
               <NavItem isSelected={open && selectedKey === 'fields'}
                        text="Fields"
                        icon="subscript"
-                       onClick={this.setSelectedKey('fields')}
+                       onClick={this.onNavItemClick('fields')}
                        expandRight
                        isOpen={open}>
                 {this.navItemChildren(children)}
