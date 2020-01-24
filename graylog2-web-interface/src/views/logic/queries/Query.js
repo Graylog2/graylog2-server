@@ -47,7 +47,6 @@ export const filtersForQuery = (streams: ?Array<string>) => {
   };
 };
 
-
 export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
