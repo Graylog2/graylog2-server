@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetFormattingSettings.Builder.class)
@@ -30,19 +30,19 @@ public abstract class WidgetFormattingSettings {
     private static final String FIELD_CHART_COLORS = "chart_colors";
 
     @JsonProperty(FIELD_CHART_COLORS)
-    public abstract Map<String, ChartColor> chartColors();
+    public abstract List<ChartColorSetting> chartColorSettings();
 
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_CHART_COLORS)
-        public abstract Builder chartColors(Map<String, ChartColor> chartColors);
+        public abstract Builder chartColorSettings(List<ChartColorSetting> chartColorSettings);
 
         public abstract WidgetFormattingSettings build();
 
         @JsonCreator
         static Builder builder() {
             return new AutoValue_WidgetFormattingSettings.Builder()
-                    .chartColors(Collections.emptyMap());
+                    .chartColorSettings(Collections.emptyList());
         }
     }
 }
