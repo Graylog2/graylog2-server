@@ -102,28 +102,31 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         final boolean hasQuery = state.hasNonNull("query");
         final boolean hasSearchTypes = state.hasNonNull("search_types");
         final boolean hasKeepSearchTypes = state.hasNonNull("keep_search_types");
-        final GlobalOverride.Builder globalOverrideBuilder = globalOverride().map(GlobalOverride::toBuilder)
-                .orElseGet(GlobalOverride::builder);
-
         if (hasTimerange || hasQuery || hasSearchTypes || hasKeepSearchTypes) {
             final Builder builder = toBuilder();
-            if (hasTimerange) {
-                try {
-                    final Object rawTimerange = state.path("timerange");
-                    final TimeRange newTimeRange = objectMapper.convertValue(rawTimerange, TimeRange.class);
-                    globalOverrideBuilder.timerange(newTimeRange);
-                    builder.timerange(newTimeRange);
-                } catch (Exception e) {
-                    LOG.error("Unable to deserialize execution state for time range", e);
+
+            if (hasTimerange || hasQuery) {
+                final GlobalOverride.Builder globalOverrideBuilder = globalOverride().map(GlobalOverride::toBuilder)
+                        .orElseGet(GlobalOverride::builder);
+                if (hasTimerange) {
+                    try {
+                        final Object rawTimerange = state.path("timerange");
+                        final TimeRange newTimeRange = objectMapper.convertValue(rawTimerange, TimeRange.class);
+                        globalOverrideBuilder.timerange(newTimeRange);
+                        builder.timerange(newTimeRange);
+                    } catch (Exception e) {
+                        LOG.error("Unable to deserialize execution state for time range", e);
+                    }
                 }
+                if (hasQuery) {
+                    final Object rawQuery = state.path("query");
+                    final BackendQuery newQuery = objectMapper.convertValue(rawQuery, BackendQuery.class);
+                    globalOverrideBuilder.query(newQuery);
+                    builder.query(newQuery);
+                }
+                builder.globalOverride(globalOverrideBuilder.build());
             }
-            if (hasQuery) {
-                final Object rawQuery = state.path("query");
-                final BackendQuery newQuery = objectMapper.convertValue(rawQuery, BackendQuery.class);
-                globalOverrideBuilder.query(newQuery);
-                builder.query(newQuery);
-            }
-            builder.globalOverride(globalOverrideBuilder.build());
+
             if (hasSearchTypes || hasKeepSearchTypes) {
                 final Set<SearchType> searchTypesToKeep = hasKeepSearchTypes
                         ? filterForWhiteListFromState(searchTypes(), state)
