@@ -14,36 +14,51 @@ class StreamRuleList extends React.Component {
     streamRuleTypes: PropTypes.array.isRequired,
   };
 
+  static defaultProps = {
+    matchData: {},
+    onSubmit: () => {},
+    onDelete: () => {},
+  }
+
   _formatStreamRules = (streamRules) => {
     if (streamRules && streamRules.length > 0) {
-      return streamRules.map((streamRule) => {
-        return (
-          <StreamRule key={streamRule.id}
-                      permissions={this.props.permissions}
-                      matchData={this.props.matchData}
-                      onSubmit={this.props.onSubmit}
-                      onDelete={this.props.onDelete}
-                      stream={this.props.stream}
-                      streamRule={streamRule}
-                      streamRuleTypes={this.props.streamRuleTypes} />
-        );
-      });
+      const {
+        matchData,
+        onDelete,
+        onSubmit,
+        permissions,
+        stream,
+        streamRuleTypes,
+      } = this.props;
+
+      return streamRules.map(streamRule => (
+        <StreamRule key={streamRule.id}
+                    permissions={permissions}
+                    matchData={matchData}
+                    onSubmit={onSubmit}
+                    onDelete={onDelete}
+                    stream={stream}
+                    streamRule={streamRule}
+                    streamRuleTypes={streamRuleTypes} />
+      ));
     }
     return <li>No rules defined.</li>;
   };
 
   render() {
-    if (this.props.stream) {
-      const streamRules = this._formatStreamRules(this.props.stream.rules);
+    const { stream } = this.props;
+
+    if (stream) {
+      const streamRules = this._formatStreamRules(stream.rules);
+
       return (
         <ul className="streamrules-list">
           {streamRules}
         </ul>
       );
     }
-    return (
-      <Spinner />
-    );
+
+    return <Spinner />;
   }
 }
 
