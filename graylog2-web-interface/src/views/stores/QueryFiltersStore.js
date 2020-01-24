@@ -6,7 +6,6 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { filtersForQuery } from 'views/logic/queries/Query';
 import { QueriesActions, QueriesStore } from './QueriesStore';
 
-
 export const QueryFiltersActions = singletonActions(
   'views.QueryFilters',
   () => Reflux.createActions({
