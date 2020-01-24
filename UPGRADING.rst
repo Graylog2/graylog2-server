@@ -56,7 +56,6 @@ Known Bugs and Limitations
 
   * Content Packs containing old Dashbords can not be installed in Graylog 3.2.
   * Some functionality of the search has been removed, namely:
-    * Exporting a result set to CSV from the UI.
     * Retrieving the full query that is sent to Elasticsearch.
     * Retrieving the list of terms a message field value was indexed with.
     * The list of indices the current search used to generate results.
