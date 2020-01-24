@@ -119,7 +119,7 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
         type: 'elasticsearch',
         query_string: newQueryString,
       };
-      const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(this.globalOverride.newTimerange, newQuery) : new GlobalOverride(undefined, newQuery);
+      const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(this.globalOverride.timerange, newQuery) : new GlobalOverride(undefined, newQuery);
       const promise = this._propagateNewGlobalOverride(newGlobalOverride);
       GlobalOverrideActions.query.promise(promise);
       return promise;
