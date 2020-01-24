@@ -59,7 +59,7 @@
             } else if (response.status === 404) {
               return _this.fail('Can\'t read swagger JSON from ' + _this.url);
             } else {
-              return _this.fail(response.status + ' : ' + response.statusText + ' ' + _this.url);
+              return _this.fail('Server return ' + response.status + ' for ' + _this.url);
             }
           },
           response: function(rawResponse) {
@@ -305,7 +305,7 @@
           headers: {},
           on: {
             error: function(response) {
-              return _this.api.fail("Unable to read api '" + _this.name + "' from path " + _this.url + " (server returned " + error.statusText + ")");
+              return _this.api.fail("Unable to read api '" + _this.name + "' from path " + _this.url + " (server returned " + response.status + ")");
             },
             response: function(rawResponse) {
               var response;
