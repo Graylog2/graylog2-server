@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 
 import UserNotification from 'util/UserNotification';
 
-import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
@@ -65,10 +64,7 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
 
   const loadNewView = (currentURLQuery: URLQuery): Promise<?View> => {
     return processHooks(
-      ViewActions.create(View.Type.Search, streamId)
-        .then(({ view, activeQuery }) => {
-          return QueryFiltersActions.streams(activeQuery, [streamId]).then(() => view);
-        }),
+      ViewActions.create(View.Type.Search, streamId).then(({ view }) => view),
       loadingViewHooks,
       executingViewHooks,
       currentURLQuery,
