@@ -131,6 +131,7 @@ export default {
       defaultWidth: 6,
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
+      needsControlledHeight: false,
       searchResultTransformer: (data: Array<*>) => data[0],
       searchTypes: MessageConfigGenerator,
       titleGenerator: () => 'Untitled Message Table',
@@ -142,6 +143,7 @@ export default {
       defaultWidth: 4,
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationControls,
+      needsControlledHeight: true,
       searchResultTransformer: PivotTransformer,
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget: Widget) => {
@@ -157,6 +159,7 @@ export default {
     {
       type: 'default',
       visualizationComponent: UnknownWidget,
+      needsControlledHeight: true,
       editComponent: UnknownWidget,
       searchTypes: () => [],
     },
