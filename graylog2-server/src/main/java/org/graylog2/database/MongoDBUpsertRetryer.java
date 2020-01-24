@@ -48,7 +48,7 @@ public class MongoDBUpsertRetryer {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
                         if (attempt.hasException()) {
-                            LOG.info("Upsert failed with {}. Retrying request", attempt.getExceptionCause().toString());
+                            LOG.debug("Upsert failed with {}. Retrying request", attempt.getExceptionCause().toString());
                         }
                     }
                 })
