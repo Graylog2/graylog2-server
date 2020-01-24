@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 import { StoreMock as MockStore } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
 
 import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -60,7 +61,7 @@ jest.mock('views/stores/RefreshStore', () => ({
     disable: jest.fn(),
   },
 }));
-jest.mock('legacy/result-histogram', () => 'Histogram');
+jest.mock('legacy/result-histogram', () => 'Histograrem');
 jest.mock('views/components/messagelist');
 
 describe('MessageList', () => {
@@ -176,6 +177,25 @@ describe('MessageList', () => {
                                        setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
     expect(RefreshActions.disable).toHaveBeenCalledTimes(1);
+  });
+
+  it('displays error description, when using pagination throws an error', async () => {
+    asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(Promise.resolve({
+      result: { errors: [{ description: 'Error description' }] },
+    }));
+
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const secondPageSize = 10;
+    const wrapper = mount(<MessageList editing
+                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                       fields={Immutable.List([])}
+                                       config={config}
+                                       setLoadingState={() => {}} />);
+
+    await wrapper.find('[aria-label="Next"]').simulate('click');
+    wrapper.update();
+
+    expect(wrapper.find('ErrorWidget').text()).toContain('Error description');
   });
 
   it('calls render completion callback after first render', () => {
