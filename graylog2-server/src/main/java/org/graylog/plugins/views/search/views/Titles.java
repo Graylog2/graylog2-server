@@ -17,10 +17,12 @@
 package org.graylog.plugins.views.search.views;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.auto.value.AutoValue;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,6 +36,12 @@ public abstract class Titles {
     @JsonCreator
     public static Titles of(Map<String, Map<String, String>> titles) {
         return new AutoValue_Titles(titles);
+    }
+
+    public static Titles withWidgetTitle(Map<String, String> widgetTitleMap) {
+        final Map<String, Map<String, String>> titlesMap = new HashMap<>(1);
+        titlesMap.put(KEY_WIDGETS, widgetTitleMap);
+        return of(titlesMap);
     }
 
     public static Titles empty() {

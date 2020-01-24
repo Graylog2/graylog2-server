@@ -40,7 +40,7 @@ public abstract class ValueConfigDTO implements PivotConfigDTO {
         public abstract ValueConfigDTO build();
 
         @JsonCreator
-        static Builder builder() {
+        public static Builder builder() {
             return new AutoValue_ValueConfigDTO.Builder().limit(15);
         }
     }

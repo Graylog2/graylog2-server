@@ -41,6 +41,7 @@ import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,19 +102,22 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
 
     public abstract ModelType getModelType();
 
+    protected void  ensureV1(Entity entity) {
+        if (!(entity instanceof EntityV1)) {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
     @Override
     public NativeEntity<ViewDTO> createNativeEntity(Entity entity,
                                                     Map<String, ValueReference> parameters,
                                                     Map<EntityDescriptor, Object> nativeEntities,
                                                     String username) {
-        if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, parameters, nativeEntities);
-        } else {
-            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-        }
+        ensureV1(entity);
+        return decode((EntityV1) entity, parameters, nativeEntities);
     }
 
-    private NativeEntity<ViewDTO> decode(EntityV1 entityV1,
+    protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
                                          Map<String, ValueReference> parameters,
                                          Map<EntityDescriptor, Object> nativeEntities) {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
@@ -148,7 +152,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
     }
 
-public Stream<ViewDTO> getNativeViews() {
+    protected Stream<ViewDTO> getNativeViews() {
         return viewService.streamAll().filter(v -> v.type().equals(this.getDTOType()));
     }
 
@@ -184,20 +188,23 @@ public Stream<ViewDTO> getNativeViews() {
     public Graph<Entity> resolveForInstallation(Entity entity,
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
-        if (entity instanceof EntityV1) {
-            return resolveEntityV1((EntityV1) entity, entities);
-        } else {
-            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-        }
+        ensureV1(entity);
+        return resolveEntityV1((EntityV1) entity, entities);
     }
 
     @SuppressWarnings("UnstableApiUsage")
     private Graph<Entity> resolveEntityV1(EntityV1 entity,
                                           Map<EntityDescriptor, Entity> entities) {
+        final ViewEntity viewEntity = objectMapper.convertValue(entity.data(), ViewEntity.class);
+        return resolveViewEntity(entity, viewEntity, entities);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    protected Graph<Entity> resolveViewEntity(EntityV1 entity,
+                                              ViewEntity viewEntity,
+                                              Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
-
-        final ViewEntity viewEntity = objectMapper.convertValue(entity.data(), ViewEntity.class);
         viewEntity.search().usedStreamIds().stream()
                 .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
                 .map(entities::get)
