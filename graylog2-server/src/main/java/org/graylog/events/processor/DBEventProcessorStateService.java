@@ -22,6 +22,7 @@ import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoDBUpsertRetryer;
 import org.joda.time.DateTime;
 import org.mongojack.DBQuery;
 import org.mongojack.DBUpdate;
@@ -138,7 +139,7 @@ public class DBEventProcessorStateService {
                 .addOperation("$min", FIELD_MIN_PROCESSED_TIMESTAMP, updateValue(minProcessedTimestamp))
                 .addOperation("$max", FIELD_MAX_PROCESSED_TIMESTAMP, updateValue(maxProcessedTimestamp));
 
-        return Optional.ofNullable(db.findAndModify(
+        return Optional.ofNullable(MongoDBUpsertRetryer.run(() -> db.findAndModify(
                 // We have a unique index on the eventDefinitionId so this query is enough
                 DBQuery.is(FIELD_EVENT_DEFINITION_ID, eventDefinitionId),
                 null,
@@ -146,7 +147,7 @@ public class DBEventProcessorStateService {
                 false,
                 update,
                 true, // We want to return the updated document to the caller
-                true));
+                true)));
     }
 
     /**
