@@ -60,5 +60,8 @@ Known Bugs and Limitations
     * Retrieving the full query that is sent to Elasticsearch.
     * Retrieving the list of terms a message field value was indexed with.
     * The list of indices the current search used to generate results.
+    * The count of all received messages displayed next to the search.
+      We will add the count again, once the calculation works as expected.
+      As a workaround a message count widget can be added to the search.
   * The "Show surrounding messages" action is not part of 3.2.0, but will be reimplemented in a next version.
 
