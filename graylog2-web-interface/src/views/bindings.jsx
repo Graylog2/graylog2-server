@@ -146,10 +146,10 @@ export default {
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget: Widget) => {
         if (widget.config.rowPivots.length > 0) {
-          return `Aggregating ${widget.config.series.map(s => s.effectiveName)} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
+          return `Aggregating ${widget.config.series.map(s => s.effectiveName).join(', ')} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
         }
         if (widget.config.series.length > 0) {
-          return `Aggregating ${widget.config.series.map(s => s.effectiveName)}`;
+          return `Aggregating ${widget.config.series.map(s => s.effectiveName).join(', ')}`;
         }
         return 'Untitled Aggregation';
       },
