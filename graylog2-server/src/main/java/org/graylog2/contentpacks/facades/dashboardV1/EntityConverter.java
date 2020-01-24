@@ -83,8 +83,7 @@ public class EntityConverter {
                 .widgetPositions(widgetPositionMap)
                 .build();
 
-        final Map<String, ViewStateEntity> viewStateEntityMap = new HashMap<>(1);
-        viewStateEntityMap.put(queryId, viewStateEntity);
+        final Map<String, ViewStateEntity> viewStateEntityMap = ImmutableMap.of(queryId, viewStateEntity);
 
         return ViewEntity.builder()
                 .search(searchEntity)

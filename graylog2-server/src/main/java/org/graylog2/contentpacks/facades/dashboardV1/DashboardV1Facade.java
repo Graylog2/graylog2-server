@@ -79,11 +79,16 @@ public class DashboardV1Facade extends ViewFacade {
     protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
                                            Map<String, ValueReference> parameters,
                                            Map<EntityDescriptor, Object> nativeEntities) {
+        final EntityV1 convertedEntity = convertEntity(entityV1, parameters);
+        return super.decode(convertedEntity, parameters, nativeEntities);
+    }
+
+    private EntityV1 convertEntity(EntityV1 entityV1,
+                                   Map<String, ValueReference> parameters) {
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entityV1.data(), DashboardEntity.class);
         final ViewEntity viewEntity = entityConverter.convert(dashboardEntity, parameters);
         final JsonNode data = objectMapper.convertValue(viewEntity, JsonNode.class);
-        final EntityV1 convertedEntity = entityV1.toBuilder().data(data).type(ModelTypes.DASHBOARD_V2).build();
-        return super.decode(convertedEntity, parameters, nativeEntities);
+        return entityV1.toBuilder().data(data).type(ModelTypes.DASHBOARD_V2).build();
     }
 
     @SuppressWarnings("UnstableApiUsage")
