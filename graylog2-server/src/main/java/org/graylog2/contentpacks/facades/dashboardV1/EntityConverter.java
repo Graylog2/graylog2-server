@@ -35,6 +35,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ public class EntityConverter {
     private Map<String, ValueReference> parameters;
     private DashboardWidgetConverter dashboardWidgetConverter;
 
+    @Inject
     public EntityConverter(DashboardWidgetConverter dashboardWidgetConverter) {
        this.dashboardWidgetConverter = dashboardWidgetConverter;
     }
