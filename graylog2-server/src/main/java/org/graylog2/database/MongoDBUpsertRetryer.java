@@ -24,6 +24,7 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +41,14 @@ public class MongoDBUpsertRetryer {
 
     public static <T> T run(Callable<T> c) {
         final Retryer<T> retryer = RetryerBuilder.<T>newBuilder()
-                .retryIfException(t -> t instanceof DuplicateKeyException && ((DuplicateKeyException) t).getErrorCode() == 11000)
-                .withStopStrategy(StopStrategies.stopAfterAttempt(1))
+                .retryIfException(t -> t instanceof DuplicateKeyException && ((DuplicateKeyException) t).getErrorCode() == 11000 ||
+                        t instanceof MongoCommandException && ((MongoCommandException) t).getErrorCode() == 11000)
+                .withStopStrategy(StopStrategies.stopAfterAttempt(2))
                 .withRetryListener(new RetryListener() {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {
                         if (attempt.hasException()) {
-                            LOG.info("Upsert failed with DuplicateKeyException (E11000). Retrying request");
+                            LOG.info("Upsert failed with {}. Retrying request", attempt.getExceptionCause().toString());
                         }
                     }
                 })
