@@ -216,4 +216,22 @@ describe('<Sidebar />', () => {
     wrapper.find('div[children="Fields"]').simulate('click');
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
+
+  it('should close a section when clicking on its title', () => {
+    const SideBar = loadSUT();
+    const wrapper = mount(
+      <SideBar viewMetadata={viewMetaData}
+               toggleOpen={jest.fn}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </SideBar>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('SearchResultOverview')).toExist();
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('SearchResultOverview')).not.toExist();
+  });
 });
