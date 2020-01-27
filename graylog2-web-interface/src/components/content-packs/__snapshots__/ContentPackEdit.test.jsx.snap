@@ -1280,7 +1280,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 addonAfter={null}
                                 bsStyle={null}
                                 buttonAfter={null}
-                                help="Required. Who did this content pack and how can he be reached. e.g Name and eMail"
+                                help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
                                 id="vendor"
                                 label="Vendor"
                                 maxLength={250}
@@ -1515,7 +1515,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     <span
                                                       className="HelpBlock-i8is92-0 huFHQV help-block"
                                                     >
-                                                      Required. Who did this content pack and how can he be reached. e.g Name and eMail
+                                                      Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                                     </span>
                                                   </HelpBlock>
                                                 </StyledComponent>
@@ -3727,7 +3727,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 addonAfter={null}
                                 bsStyle={null}
                                 buttonAfter={null}
-                                help="Required. Who did this content pack and how can he be reached. e.g Name and eMail"
+                                help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
                                 id="vendor"
                                 label="Vendor"
                                 maxLength={250}
@@ -3962,7 +3962,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     <span
                                                       className="HelpBlock-i8is92-0 huFHQV help-block"
                                                     >
-                                                      Required. Who did this content pack and how can he be reached. e.g Name and eMail
+                                                      Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                                     </span>
                                                   </HelpBlock>
                                                 </StyledComponent>
