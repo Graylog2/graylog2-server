@@ -31,6 +31,11 @@ export default class EditableTitle extends React.Component {
     }
   };
 
+  _onBlur = () => {
+    this._toggleEditing();
+    this._onSubmit();
+  };
+
   _onChange = (evt) => {
     evt.preventDefault();
     this.setState({ value: evt.target.value });
@@ -53,7 +58,7 @@ export default class EditableTitle extends React.Component {
           <input autoFocus
                  type="text"
                  value={value}
-                 onBlur={this._toggleEditing}
+                 onBlur={this._onBlur}
                  onChange={this._onChange} />
         </form>
       </span>
