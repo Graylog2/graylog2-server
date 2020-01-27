@@ -19,6 +19,7 @@ package org.graylog.events.contentpack.facade;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -27,18 +28,18 @@ import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity
 import org.graylog.events.contentpack.entities.NotificationEntity;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.NotificationDto;
+import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
+import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.DBEventProcessorStateService;
+import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.Entity;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
-import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.NativeEntity;
-import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.*;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.SuppressForbidden;
@@ -57,6 +58,9 @@ import java.util.Set;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class NotificationFacadeTest {
 
@@ -71,7 +75,19 @@ public class NotificationFacadeTest {
     private NotificationFacade facade;
 
     @Mock
+    private DBJobDefinitionService jobDefinitionService;
+
+    @Mock
+    private DBEventProcessorStateService stateService;
+
+    @Mock
+    private DBEventDefinitionService eventDefinitionService;
+
+    @Mock
     private DBNotificationService notificationService;
+
+    @Mock
+    private NotificationResourceHandler notificationResourceHandler;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -87,8 +103,13 @@ public class NotificationFacadeTest {
                 HttpEventNotificationConfigEntity.class,
                 HTTPEventNotificationConfig.class
         );
+        jobDefinitionService = mock(DBJobDefinitionService.class);
+        stateService = mock(DBEventProcessorStateService.class);
+        eventDefinitionService = new DBEventDefinitionService(mongoRule.getMongoConnection(), mapperProvider, stateService);
+
         notificationService = new DBNotificationService(mongoRule.getMongoConnection(), mapperProvider);
-        facade = new NotificationFacade(objectMapper, notificationService);
+        notificationResourceHandler = new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, Maps.newHashMap());
+        facade = new NotificationFacade(objectMapper, notificationResourceHandler, notificationService);
     }
 
     @Test
@@ -128,15 +149,19 @@ public class NotificationFacadeTest {
 
     @Test
     public void createNativeEntity() {
-       final EntityV1 entityV1 = createTestEntity();
-       final NativeEntity<NotificationDto> nativeEntity = facade.createNativeEntity(
-               entityV1,
-               ImmutableMap.of(),
-               ImmutableMap.of(),
-               "kmerz");
-       assertThat(nativeEntity).isNotNull();
+        final EntityV1 entityV1 = createTestEntity();
+        final JobDefinitionDto jobDefinitionDto = mock(JobDefinitionDto.class);
 
-       final NotificationDto notificationDto = nativeEntity.entity();
+        when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
+
+        final NativeEntity<NotificationDto> nativeEntity = facade.createNativeEntity(
+            entityV1,
+            ImmutableMap.of(),
+            ImmutableMap.of(),
+            "kmerz");
+        assertThat(nativeEntity).isNotNull();
+
+        final NotificationDto notificationDto = nativeEntity.entity();
         assertThat(notificationDto.title()).isEqualTo("title");
         assertThat(notificationDto.description()).isEqualTo("descriptions");
         assertThat(notificationDto.config().type()).isEqualTo("http-notification-v1");
