@@ -60,7 +60,10 @@ class DataAdapterForm extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    this._input.getInputDOMNode().focus();
+    const { type: currentType } = this.props;
+    if (prevProps.type !== currentType) {
+      this._input.getInputDOMNode().focus();
+    }
     const { dataAdapter } = this.props;
     if (_.isEqual(dataAdapter, prevProps.dataAdapter)) {
       // props haven't changed, don't update our state from them
