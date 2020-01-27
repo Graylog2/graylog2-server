@@ -17,6 +17,7 @@ export default class EditableTitle extends React.Component {
 
   state = {
     editing: false,
+    // eslint-disable-next-line react/destructuring-assignment
     value: this.props.value,
   };
 
