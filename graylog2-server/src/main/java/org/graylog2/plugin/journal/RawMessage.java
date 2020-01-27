@@ -67,6 +67,7 @@ public class RawMessage implements Serializable {
     private transient final JournalMessage.Builder msgBuilder;
     private final UUID id;
     private final long journalOffset;
+    private int sequenceNr;
     private Configuration codecConfig;
 
     public RawMessage(@Nonnull byte[] payload) {
@@ -88,6 +89,7 @@ public class RawMessage implements Serializable {
                       @Nonnull byte[] payload) {
         checkNotNull(id, "The message id must not be null!");
         checkNotNull(payload, "The message payload must not be null!");
+        sequenceNr = 0;
         if (payload.length == 0 && log.isTraceEnabled()) {
             log.trace("The message payload should not be empty, message {} from {} will be discarded.",
                       id,
@@ -112,19 +114,20 @@ public class RawMessage implements Serializable {
         msgBuilder.setPayload(ByteString.copyFrom(payload));
     }
 
+    public RawMessage(JournalMessage journalMessage, long journalOffset) {
+        this.journalOffset = journalOffset;
+        sequenceNr = journalMessage.getSequenceNr();
+        id = new UUID(journalMessage.getUuidTime(), journalMessage.getUuidClockseq());
+        msgBuilder = JournalMessage.newBuilder(journalMessage);
+        codecConfig = Configuration.deserializeFromJson(journalMessage.getCodec().getConfig());
+    }
+
     public void addSourceNode(String sourceInputId, NodeId nodeId) {
         msgBuilder.addSourceNodesBuilder()
                   .setInputId(sourceInputId)
                   .setId(nodeId.toString())
                   .setType(JournalMessages.SourceNode.Type.SERVER)
                   .build();
-    }
-
-    public RawMessage(JournalMessage journalMessage, long journalOffset) {
-        this.journalOffset = journalOffset;
-        id = new UUID(journalMessage.getUuidTime(), journalMessage.getUuidClockseq());
-        msgBuilder = JournalMessage.newBuilder(journalMessage);
-        codecConfig = Configuration.deserializeFromJson(journalMessage.getCodec().getConfig());
     }
 
     @Nullable
@@ -246,6 +249,14 @@ public class RawMessage implements Serializable {
         return list;
     }
 
+    public void setSequenceNr(int sequenceNr) {
+        this.sequenceNr = sequenceNr;
+        msgBuilder.setSequenceNr(sequenceNr);
+    }
+    public int getSequenceNr() {
+        return sequenceNr;
+    }
+
     @Override
     public String toString() {
         final MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(this);
@@ -253,7 +264,8 @@ public class RawMessage implements Serializable {
                 .add("journalOffset", getJournalOffset())
                 .add("codec", getCodecName())
                 .add("payloadSize", getPayload().length)
-                .add("timestamp", getTimestamp());
+                .add("timestamp", getTimestamp())
+                .add("seqenceNr", getSequenceNr());
         if (getRemoteAddress() != null) {
             helper.add("remoteAddress", getRemoteAddress().getInetSocketAddress().toString());
         }

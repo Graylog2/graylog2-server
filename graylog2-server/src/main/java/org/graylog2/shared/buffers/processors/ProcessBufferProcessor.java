@@ -55,6 +55,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final OutputBuffer outputBuffer;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final ULID ulid;
+    private final MessageULIDGenerator messageULIDGenerator;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
     private volatile Message currentMessage;
@@ -65,12 +66,14 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   OutputBuffer outputBuffer,
                                   ProcessingStatusRecorder processingStatusRecorder,
                                   ULID ulid,
+                                  MessageULIDGenerator messageULIDGenerator,
                                   @Assisted DecodingProcessor decodingProcessor,
                                   @DefaultStream Provider<Stream> defaultStreamProvider) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
         this.ulid = ulid;
+        this.messageULIDGenerator = messageULIDGenerator;
         this.decodingProcessor = decodingProcessor;
         this.defaultStreamProvider = defaultStreamProvider;
 
@@ -137,7 +140,12 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         for (Message message : messages) {
             // Set the message ID once all message processors have finished
             // See documentation of Message.FIELD_GL2_MESSAGE_ID for details
-            message.addField(Message.FIELD_GL2_MESSAGE_ID, ulid.nextULID());
+
+            // Don't overwrite already existing message IDs.
+            // They might already be set if we are receiving messages from a Graylog forwarder
+            if (message.getField(Message.FIELD_GL2_MESSAGE_ID) == null) {
+                message.addField(Message.FIELD_GL2_MESSAGE_ID, messageULIDGenerator.createULID(message));
+            }
 
             // The processing time should only be set once all message processors have finished
             message.setProcessingTime(Tools.nowUTC());
