@@ -18,7 +18,6 @@ type Props = {
   element: React.Node,
   field: string,
   menuContainer: ?HTMLElement,
-  oppositePlacement: Boolean,
   queryId: QueryId,
   type: FieldType,
   value: React.Node,
@@ -45,8 +44,6 @@ class ValueActions extends React.Component<Props, State> {
     type: FieldType.Unknown,
   };
 
-  static contextType = ActionContext;
-
   constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
     this.state = {
@@ -57,8 +54,10 @@ class ValueActions extends React.Component<Props, State> {
 
   _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
 
+  static contextType = ActionContext;
+
   render() {
-    const { children, element, field, menuContainer, oppositePlacement, queryId, type, value } = this.props;
+    const { children, element, field, menuContainer, queryId, type, value } = this.props;
     const { open, overflowingComponents: components } = this.state;
     // $FlowFixMe: Object.values signature is in the way for this one
     const overflowingComponents: Array<React.Node> = Object.values(components);
@@ -87,19 +86,18 @@ class ValueActions extends React.Component<Props, State> {
         );
       });
 
-    console.log('element', element);
     return (
       <React.Fragment>
         <OverlayDropdown show={open}
                          toggle={element}
-                         placement={oppositePlacement ? 'left' : 'right'}
+                         placement="right"
                          onToggle={this._onMenuToggle}
                          menuContainer={menuContainer}>
-          <div className={style.bottomSpacer}>
+          <li className={style.bottomSpacer}>
             <span className={style.dropdownheader}>
               {children}
             </span>
-          </div>
+          </li>
 
           <MenuItem divider />
           <MenuItem header>Actions</MenuItem>
