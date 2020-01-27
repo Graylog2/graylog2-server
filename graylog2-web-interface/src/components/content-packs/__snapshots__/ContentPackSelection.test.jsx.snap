@@ -803,7 +803,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   addonAfter={null}
                   bsStyle={null}
                   buttonAfter={null}
-                  help="Required. Who did this content pack and how can he be reached. e.g Name and eMail"
+                  help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
                   id="vendor"
                   label="Vendor"
                   maxLength={250}
@@ -1038,7 +1038,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       <span
                                         className="HelpBlock-i8is92-0 huFHQV help-block"
                                       >
-                                        Required. Who did this content pack and how can he be reached. e.g Name and eMail
+                                        Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                       </span>
                                     </HelpBlock>
                                   </StyledComponent>
@@ -2423,7 +2423,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   addonAfter={null}
                   bsStyle={null}
                   buttonAfter={null}
-                  help="Required. Who did this content pack and how can he be reached. e.g Name and eMail"
+                  help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
                   id="vendor"
                   label="Vendor"
                   maxLength={250}
@@ -2658,7 +2658,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       <span
                                         className="HelpBlock-i8is92-0 huFHQV help-block"
                                       >
-                                        Required. Who did this content pack and how can he be reached. e.g Name and eMail
+                                        Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                       </span>
                                     </HelpBlock>
                                   </StyledComponent>
