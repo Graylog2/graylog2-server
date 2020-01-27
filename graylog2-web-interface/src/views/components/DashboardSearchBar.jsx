@@ -8,7 +8,6 @@ import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
-import HorizontalSpacer from 'views/components/horizontalspacer/HorizontalSpacer';
 import { Icon, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import TimeRangeOverrideTypeSelector from 'views/components/searchbar/TimeRangeOverrideTypeSelector';
