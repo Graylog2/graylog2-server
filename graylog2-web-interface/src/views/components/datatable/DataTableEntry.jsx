@@ -27,11 +27,18 @@ type Props = {
 
 const _c = (field, value, path) => ({ field, value, path });
 
-const _column = (field: string, value: *, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath) => (
+const _column = (field: string, value: *, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath, isLastColumn: boolean) => (
   <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
     <AdditionalContext.Provider value={{ valuePath }}>
       <CustomHighlighting field={field} value={value}>
-        {value !== null && value !== undefined ? <Value field={field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : null}
+        {value !== null && value !== undefined ? (
+          <Value field={field}
+                 type={type}
+                 value={value}
+                 queryId={selectedQuery}
+                 render={DecoratedValue}
+                 oppositePlacement={isLastColumn} />
+        ) : null}
       </CustomHighlighting>
     </AdditionalContext.Provider>
   </td>
@@ -47,7 +54,16 @@ const columnNameToField = (column, series = []) => {
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
+const DataTableEntry = ({
+  columnPivots,
+  columnPivotValues,
+  currentView,
+  fields,
+  item,
+  series,
+  types,
+  valuePath,
+}: Props) => {
   const classes = 'message-group';
   const { activeQuery } = currentView;
 
@@ -68,10 +84,15 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   }));
 
   const columns = flatten([fieldColumns, columnPivotFields]);
+
   return (
     <tbody className={classes}>
       <tr className="fields-row">
-        {columns.map(({ field, value, path }, idx) => _column(field, value, activeQuery, idx, fieldTypeFor(columnNameToField(field, series), types), path.slice()))}
+        {columns.map(({ field, value, path }, idx) => {
+          const isLastColumn = columns.length - 1 === idx;
+
+          return _column(field, value, activeQuery, idx, fieldTypeFor(columnNameToField(field, series), types), path.slice(), isLastColumn);
+        })}
       </tr>
     </tbody>
   );

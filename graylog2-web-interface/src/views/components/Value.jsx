@@ -11,15 +11,16 @@ import InteractiveContext from './contexts/InteractiveContext';
 type Props = {|
   children?: React.Node,
   field: string,
-  value: *,
-  render?: ValueRenderer,
   queryId: ?string,
+  render?: ValueRenderer,
   type: FieldType,
+  value: *,
+  oppositePlacement?: boolean,
 |};
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
+const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown, oppositePlacement }: Props) => {
   const RenderComponent: ValueRenderer = render || ((props: ValueRendererProps) => props.value);
   const Component = v => <RenderComponent field={field} value={v.value} type={type} />;
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
@@ -28,7 +29,7 @@ const Value = ({ children, field, value, queryId, render = defaultRenderer, type
     <InteractiveContext.Consumer>
       {interactive => ((interactive && queryId)
         ? (
-          <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
+          <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value} oppositePlacement={oppositePlacement}>
             {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
           </ValueActions>
         )
@@ -40,6 +41,7 @@ const Value = ({ children, field, value, queryId, render = defaultRenderer, type
 Value.defaultProps = {
   render: defaultRenderer,
   children: null,
+  oppositePlacement: false,
 };
 
 export default Value;
