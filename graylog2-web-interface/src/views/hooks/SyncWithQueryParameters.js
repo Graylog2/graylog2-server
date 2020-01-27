@@ -57,11 +57,10 @@ export const syncWithQueryParameters = (pathname: string, search: string) => {
 };
 
 export const useSyncWithQueryParameters = (pathname: string, search: string) => {
-  const query = `${pathname}${search}`;
   useEffect(() => syncWithQueryParameters(pathname, search), []);
   useActionListeners(
     [QueriesActions.query.completed, QueriesActions.timerange.completed],
     () => syncWithQueryParameters(pathname, search),
-    [query],
+    [pathname, search],
   );
 };
