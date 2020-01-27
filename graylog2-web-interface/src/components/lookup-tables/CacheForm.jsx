@@ -58,9 +58,11 @@ class CacheForm extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    this._input.getInputDOMNode().focus();
+    const { type: currentType } = this.props;
+    if (prevProps.type !== currentType) {
+      this._input.getInputDOMNode().focus();
+    }
     const { cache } = this.props;
-
     if (_.isEqual(cache, prevProps.cache)) {
       // props haven't change, don't update our state from them
       return;
