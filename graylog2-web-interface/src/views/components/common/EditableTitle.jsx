@@ -17,7 +17,6 @@ export default class EditableTitle extends React.Component {
 
   state = {
     editing: false,
-    onChange: () => {},
     value: this.props.value,
   };
 
@@ -26,7 +25,8 @@ export default class EditableTitle extends React.Component {
   }
 
   _toggleEditing = () => {
-    if (!this.props.disabled) {
+    const { disabled } = this.props;
+    if (!disabled) {
       this.setState(state => ({ editing: !state.editing }));
     }
   };
@@ -42,10 +42,12 @@ export default class EditableTitle extends React.Component {
   };
 
   _onSubmit = () => {
-    if (this.state.value !== '') {
-      this.props.onChange(this.state.value);
+    const { value } = this.state;
+    const { onChange, value: propsValue } = this.props;
+    if (value !== '') {
+      onChange(value);
     } else {
-      this.setState({ value: this.props.value });
+      this.setState({ value: propsValue });
     }
     this.setState({ editing: false });
   };
@@ -55,6 +57,7 @@ export default class EditableTitle extends React.Component {
     return editing ? (
       <span>
         <form onSubmit={this._onSubmit} className={styles.inlineForm}>
+          {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
           <input autoFocus
                  type="text"
                  value={value}
