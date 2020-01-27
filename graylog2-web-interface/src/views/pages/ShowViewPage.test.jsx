@@ -111,4 +111,14 @@ describe('ShowViewPage', () => {
 
     expect(viewLoader).toHaveBeenCalled();
   });
+  it('calls ViewLoader again if view id prop changes', () => {
+    const viewLoader = jest.fn(() => Promise.resolve());
+    const wrapper = mount(<SimpleShowViewPage viewLoader={viewLoader} />);
+
+    expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
+
+    wrapper.setProps({ params: { viewId: 'bar' } });
+
+    expect(viewLoader).toHaveBeenCalledWith('bar', [], [], {}, expect.anything(), expect.anything());
+  });
 });
