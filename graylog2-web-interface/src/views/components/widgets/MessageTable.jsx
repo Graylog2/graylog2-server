@@ -90,6 +90,25 @@ const Table = styled.table`
   tr.message-detail-row div[class*="col-"] {
     padding-right: 0;
   }
+
+  @media print {
+    font-size: 14px;
+    padding-left: 0;
+    min-width: 50%;
+
+    th {
+        font-weight: bold !important;
+        font-size: inherit !important;
+    }
+
+    th,
+    td {
+        border: 1px #ccc solid !important;
+        left: 0;
+        padding: 5px;
+        position: static;
+    }
+  }
 `;
 
 const TableHead = styled.thead`
