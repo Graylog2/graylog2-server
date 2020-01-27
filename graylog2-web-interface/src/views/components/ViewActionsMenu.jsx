@@ -2,14 +2,18 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import { withRouter } from 'react-router';
 
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import PermissionsMixin from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 
+import onSaveView from 'views/logic/views/OnSaveViewAction';
+import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';
 import DebugOverlay from 'views/components/DebugOverlay';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
@@ -28,7 +32,7 @@ const _isAllowedToEdit = (view: View, currentUser) => isPermitted(currentUser.pe
 
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
 
-const ViewActionsMenu = ({ view, isNewView, metadata, onSaveView, onSaveAsView, currentUser }) => {
+const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => {
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
@@ -39,22 +43,28 @@ const ViewActionsMenu = ({ view, isNewView, metadata, onSaveView, onSaveAsView, 
   const debugOverlay = AppConfig.gl2DevMode() && (
     <React.Fragment>
       <MenuItem divider />
-      <MenuItem onSelect={() => setDebugOpen(true)}>Debug</MenuItem>
+      <MenuItem onSelect={() => setDebugOpen(true)}>
+        <Icon name="code" /> Debug
+      </MenuItem>
     </React.Fragment>
   );
   return (
-    <React.Fragment>
-      <DropdownButton title="Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
-        <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>Edit</MenuItem>
-        <MenuItem onSelect={() => onSaveView(view)}
-                  disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>
-          Save
+    <ButtonGroup>
+      <Button onClick={() => onSaveView(view)}
+              disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>
+        <Icon name="save" /> Save
+      </Button>
+      <Button onClick={() => setSaveAsViewOpen(true)} disabled={hasUndeclaredParameters}>
+        <Icon name="copy" /> Save as
+      </Button>
+      <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
+        <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
+          <Icon name="edit" /> Edit
         </MenuItem>
-        <MenuItem onSelect={() => setSaveAsViewOpen(true)} disabled={hasUndeclaredParameters}>Save as</MenuItem>
-        <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>Share</MenuItem>
-
+        <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
+          <Icon name="share-alt" /> Share
+        </MenuItem>
         {debugOverlay}
-
         <IfDashboard>
           <MenuItem divider />
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />
@@ -64,19 +74,19 @@ const ViewActionsMenu = ({ view, isNewView, metadata, onSaveView, onSaveAsView, 
       {saveAsViewOpen && (
         <ViewPropertiesModal view={view.toBuilder().newId().build()}
                              title="Save new dashboard"
-                             onSave={onSaveAsView}
+                             onSave={newView => onSaveAsView(newView, router)}
                              show
                              onClose={() => setSaveAsViewOpen(false)} />
       )}
       {editViewOpen && (
         <ViewPropertiesModal view={view}
                              title="Editing dashboard"
-                             onSave={onSaveView}
+                             onSave={updatedView => onSaveView(updatedView, router)}
                              show
                              onClose={() => setEditViewOpen(false)} />
       )}
       {shareViewOpen && <ShareViewModal view={view} show onClose={() => setShareViewOpen(false)} />}
-    </React.Fragment>
+    </ButtonGroup>
   );
 };
 
@@ -86,8 +96,7 @@ ViewActionsMenu.propTypes = {
       permissions: PropTypes.arrayOf(PropTypes.string),
     }),
   }),
-  onSaveView: PropTypes.func.isRequired,
-  onSaveAsView: PropTypes.func.isRequired,
+  router: PropTypes.any.isRequired,
   metadata: PropTypes.shape({
     undeclared: ImmutablePropTypes.Set,
   }).isRequired,
@@ -104,7 +113,7 @@ ViewActionsMenu.defaultProps = {
 };
 
 export default connect(
-  ViewActionsMenu,
+  withRouter(ViewActionsMenu),
   { metadata: SearchMetadataStore, view: ViewStore, currentUser: CurrentUserStore },
   ({ view: { view, isNew }, currentUser: { currentUser }, ...rest }) => ({ currentUser, view, isNewView: isNew, ...rest }),
 );
