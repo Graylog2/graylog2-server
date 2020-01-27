@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
@@ -135,9 +136,11 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             messages = messageProcessor.process(messages);
         }
         for (Message message : messages) {
-            // Set the message ID once all message processors have finished
-            // See documentation of Message.FIELD_GL2_MESSAGE_ID for details
-            message.addField(Message.FIELD_GL2_MESSAGE_ID, ulid.nextULID());
+            if (!message.hasField(Message.FIELD_GL2_MESSAGE_ID) || isNullOrEmpty(message.getFieldAs(String.class, Message.FIELD_GL2_MESSAGE_ID))) {
+                // Set the message ID once all message processors have finished
+                // See documentation of Message.FIELD_GL2_MESSAGE_ID for details
+                message.addField(Message.FIELD_GL2_MESSAGE_ID, ulid.nextULID(message.getTimestamp().getMillis()));
+            }
 
             // The processing time should only be set once all message processors have finished
             message.setProcessingTime(Tools.nowUTC());
