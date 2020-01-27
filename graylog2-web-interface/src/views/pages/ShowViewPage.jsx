@@ -73,9 +73,16 @@ class ShowViewPage extends React.Component<Props, State> {
     return this.loadView(viewId);
   };
 
+  componentDidUpdate({ params: { viewId: lastViewId } }) {
+    const { params: { viewId } } = this.props;
+    if (viewId !== lastViewId) {
+      this.loadView(viewId);
+    }
+  }
+
   loadNewView = () => {
     return history.push('/search');
-  }
+  };
 
   loadView = (viewId: string): Promise<?View> => {
     const { location, loadingViewHooks, executingViewHooks, viewLoader } = this.props;
