@@ -46,7 +46,7 @@ type Props = {
   config: MessagesWidgetConfig,
   data: { messages: Array<Object>, total: number, id: string },
   selectedFields?: {},
-  effectiveTimerange: TimeRange,
+  searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
   setLoadingState: (loading: boolean) => void,
   currentView: {
     activeQuery: string,
@@ -66,11 +66,7 @@ class MessageList extends React.Component<Props, State> {
       total: PropTypes.number.isRequired,
       id: PropTypes.string.isRequired,
     }).isRequired,
-    effectiveTimerange: PropTypes.shape({
-      from: PropTypes.string.isRequired,
-      to: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-    }).isRequired,
+    searchTypes: PropTypes.object.isRequired,
     selectedFields: PropTypes.object,
     setLoadingState: PropTypes.func.isRequired,
     currentView: PropTypes.object.isRequired,
@@ -101,7 +97,8 @@ class MessageList extends React.Component<Props, State> {
 
   _handlePageChange = (pageNo: number) => {
     // execute search with new offset
-    const { pageSize, data: { id: searchTypeId }, effectiveTimerange, setLoadingState } = this.props;
+    const { pageSize, searchTypes, data: { id: searchTypeId }, setLoadingState } = this.props;
+    const { effectiveTimerange } = searchTypes[searchTypeId];
     const searchTypePayload = { [searchTypeId]: { limit: pageSize, offset: pageSize * (pageNo - 1) } };
     RefreshActions.disable();
     setLoadingState(true);
@@ -164,6 +161,6 @@ export default connect(MessageList,
     {},
     props,
     {
-      effectiveTimerange: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'effectiveTimerange']),
+      searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']),
     },
   ));
