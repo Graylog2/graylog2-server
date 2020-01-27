@@ -121,4 +121,16 @@ describe('ShowViewPage', () => {
 
     expect(viewLoader).toHaveBeenCalledWith('bar', [], [], {}, expect.anything(), expect.anything());
   });
+  it('does not call ViewLoader again if view id prop does not change', () => {
+    const viewLoader = jest.fn(() => Promise.resolve());
+    const wrapper = mount(<SimpleShowViewPage viewLoader={viewLoader} />);
+
+    expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
+
+    viewLoader.mockClear();
+
+    wrapper.setProps({ params: { viewId: 'foo' } });
+
+    expect(viewLoader).not.toHaveBeenCalled();
+  });
 });
