@@ -354,7 +354,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted.migratedDashboardIds()).containsExactly("5ddf8ed5b2d44b2e04472992");
-        assertThat(migrationCompleted.widgetMigrationIds()).hasSize(16);
+        assertThat(migrationCompleted.widgetMigrationIds()).hasSize(19);
 
         verify(viewService, times(1)).save(any());
         verify(searchService, times(1)).save(any());

@@ -39,7 +39,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-@JsonIgnoreProperties({"rangeType", "relative", "from", "to", "keyword"})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class FieldChartConfig extends WidgetConfigBase implements WidgetConfigWithQueryAndStreams {
     public abstract String valuetype();
 
