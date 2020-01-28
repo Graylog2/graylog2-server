@@ -1,4 +1,4 @@
-import Version from './Version';
+import Version from 'util/Version';
 
 class DocsHelper {
   PAGES = {
