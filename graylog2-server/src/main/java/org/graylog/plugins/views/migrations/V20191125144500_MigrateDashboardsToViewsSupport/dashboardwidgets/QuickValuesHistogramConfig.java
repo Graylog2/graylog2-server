@@ -18,6 +18,7 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 
 @AutoValue
 @JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implements WidgetConfigWithQueryAndStreams {
     private static final String BAR_VISUALIZATION = "bar";
 
