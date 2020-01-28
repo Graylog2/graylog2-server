@@ -138,7 +138,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
     const { view } = ViewStore.getInitialState();
 
     bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
-  }, [pathname, search]);
+  }, [query]);
 
   useStyle();
 
