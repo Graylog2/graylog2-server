@@ -1,0 +1,437 @@
+{
+  "dashboards": [
+    {
+      "_id" : { "$oid": "5ddf8ed5b2d44b2e04472992" },
+      "creator_user_id" : "admin",
+      "description" : "This dashboard does have widgets which contain unknown attributes.",
+      "created_at" : { "$date": "2019-11-28T09:09:41.688Z" },
+      "title" : "Widgets with superfluous attributes.",
+      "positions": {
+        "5a34d186-2823-4acc-8f1c-f66332865ff4" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 1,
+          "height" : 1
+        },
+        "fc9c5600-a771-4e86-974d-2f6e25a7bfa8" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 5,
+          "height" : 1
+        },
+        "7146f193-a481-4a99-bbea-4a8d74be43d2" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 6,
+          "height" : 2
+        },
+        "9dfcf2a5-c6b8-480f-b35b-ee2c12126c95" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 8,
+          "height" : 2
+        },
+        "b898e3e6-5fc4-4bbd-abb2-91237c47d300" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 2,
+          "height" : 1
+        },
+        "1482035e-4bb7-4064-b313-ba184d8b3cca" : {
+          "width" : 4,
+          "col" : 5,
+          "row" : 8,
+          "height" : 2
+        },
+        "bbd3a980-8547-48fb-b61f-2cb09486120a" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 3,
+          "height" : 2
+        },
+        "704deed7-07ad-46fd-8b5e-67b041582eb7" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 1,
+          "height" : 1
+        },
+        "4ce93e89-4771-4ce2-8b59-6dc058cbfd3b" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 10,
+          "height" : 3
+        },
+        "5f2d78cb-8b5a-43a7-ae60-2f88f1572c50" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 2,
+          "height" : 1
+        },
+        "e7f07f85-689a-4ef3-8c6f-cd297af3973f" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 5,
+          "height" : 1
+        },
+        "0f349fbb-04c9-4303-bdc3-137e39d3af8c" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 2,
+          "height" : 1
+        },
+        "cdf3de92-7c0c-4ef1-a533-67ded72eaf15" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 5,
+          "height" : 1
+        },
+        "568c005a-11ec-4be9-acd7-b2aa509c07e0" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 1,
+          "height" : 2
+        },
+        "b959fa46-524c-4009-a493-7db87d8532ba" : {
+          "width" : 4,
+          "col" : 5,
+          "row" : 6,
+          "height" : 2
+        },
+        "eb75eb75-0403-4b2c-ba3a-0772b5c4f99a" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 1,
+          "height" : 1
+        }
+      },
+      "widgets" : [
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Uncached Requests",
+          "id" : "5a34d186-2823-4acc-8f1c-f66332865ff4",
+          "type" : "SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "NOT CacheCacheStatus:hit",
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Uncached Bandwidth (bytes)",
+          "id" : "fc9c5600-a771-4e86-974d-2f6e25a7bfa8",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseBytes",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "NOT CacheCacheStatus:hit",
+            "stats_function" : "count",
+            "lower_is_better" : false,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests by Hostname",
+          "id" : "7146f193-a481-4a99-bbea-4a8d74be43d2",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeRequestHost",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "limit" : 5,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests by Protocol",
+          "id" : "9dfcf2a5-c6b8-480f-b35b-ee2c12126c95",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestProtocol",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "limit" : 5,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Response Time - Deviation (ms)",
+          "id" : "b898e3e6-5fc4-4bbd-abb2-91237c47d300",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "OriginResponseTimeMillis",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "std_deviation",
+            "lower_is_better" : false,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Request by Method",
+          "id" : "1482035e-4bb7-4064-b313-ba184d8b3cca",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestMethod",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "limit" : 5,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Response Time (ms)",
+          "id" : "bbd3a980-8547-48fb-b61f-2cb09486120a",
+          "type" : "FIELD_CHART",
+          "config" : {
+            "valuetype" : "count",
+            "renderer" : "area",
+            "interpolation" : "linear",
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "rangeType" : "relative",
+            "field" : "OriginResponseTimeMillis",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "interval" : "minute",
+            "relative" : 900,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests",
+          "id" : "704deed7-07ad-46fd-8b5e-67b041582eb7",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheCacheStatus",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "CacheCacheStatus:hit",
+            "stats_function" : "cardinality",
+            "lower_is_better" : false,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Cached URIs",
+          "id" : "4ce93e89-4771-4ce2-8b59-6dc058cbfd3b",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestURI",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50,
+            "interval": "minute",
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Response Time - Average (ms)",
+          "id" : "5f2d78cb-8b5a-43a7-ae60-2f88f1572c50",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "OriginResponseTimeMillis",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "mean",
+            "lower_is_better" : false,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Bandwidth (bytes)",
+          "id" : "e7f07f85-689a-4ef3-8c6f-cd297af3973f",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheResponseBytes",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "CacheCacheStatus:hit",
+            "stats_function" : "count",
+            "lower_is_better" : false,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Response Time - Max (ms)",
+          "id" : "0f349fbb-04c9-4303-bdc3-137e39d3af8c",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "OriginResponseTimeMillis",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "max",
+            "lower_is_better" : false,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Request Bandwidth (bytes)",
+          "id" : "cdf3de92-7c0c-4ef1-a533-67ded72eaf15",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseBytes",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "count",
+            "lower_is_better" : false,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Status Ratio",
+          "id" : "568c005a-11ec-4be9-acd7-b2aa509c07e0",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheCacheStatus",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50,
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests by Content Type",
+          "id" : "b959fa46-524c-4009-a493-7db87d8532ba",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseContentType",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "limit" : 5
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Requests",
+          "id" : "eb75eb75-0403-4b2c-ba3a-0772b5c4f99a",
+          "type" : "SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "unknown_attribute": 42
+          }
+        }
+      ]
+    }
+  ]
+}
