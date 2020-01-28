@@ -1939,15 +1939,6 @@ const globalStyles = css`
     margin-top: 15px;
   }
 
-  ul.streams li.stream .streamrules-list {
-    margin: 0;
-    padding: 0;
-  }
-
-  ul.streams li.stream .streamrules-list li {
-    margin-bottom: 3px;
-  }
-
   .stream-stopped {
     position: relative;
     top: -3px;
@@ -2449,10 +2440,6 @@ const globalStyles = css`
     font-size: 11px;
   }
 
-  .stream-rules-link {
-    margin-left: 5px;
-  }
-
   .modal-body .form-group {
     margin-bottom: 5px;
   }
@@ -2494,11 +2481,6 @@ const globalStyles = css`
 
   .stream-loader {
     margin-top: 5px;
-  }
-
-  .streamrules-list {
-    margin: 0;
-    padding: 0;
   }
 
   #field-statistics table {

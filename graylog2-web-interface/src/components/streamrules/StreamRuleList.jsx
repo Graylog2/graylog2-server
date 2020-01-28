@@ -3,10 +3,14 @@ import React from 'react';
 
 import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
+import { ListGroup } from 'components/graylog';
 
 class StreamRuleList extends React.Component {
   static propTypes = {
-    matchData: PropTypes.object,
+    matchData: PropTypes.shape({
+      matches: PropTypes.bool,
+      rules: PropTypes.object,
+    }),
     onSubmit: PropTypes.func,
     onDelete: PropTypes.func,
     permissions: PropTypes.array.isRequired,
@@ -52,9 +56,9 @@ class StreamRuleList extends React.Component {
       const streamRules = this._formatStreamRules(stream.rules);
 
       return (
-        <ul className="streamrules-list">
+        <ListGroup componentClass="ul">
           {streamRules}
-        </ul>
+        </ListGroup>
       );
     }
 

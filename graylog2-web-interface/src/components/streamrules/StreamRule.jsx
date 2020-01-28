@@ -1,11 +1,13 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import { isEmpty } from 'lodash';
+import styled from 'styled-components';
 
 import { Icon } from 'components/common';
-import { Button } from 'components/graylog';
+import { Button, ListGroupItem } from 'components/graylog';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
-import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
+import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 
 import StoreProvider from 'injection/StoreProvider';
 
@@ -14,7 +16,11 @@ import UserNotification from 'util/UserNotification';
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 const { isPermitted } = PermissionsMixin;
 
-const StreamRule = ({ permissions, stream, streamRule, streamRuleTypes, onSubmit, onDelete }) => {
+const ActionButtonsWrap = styled.span`
+  margin-right: 6px;
+`;
+
+const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleTypes, onSubmit, onDelete }) => {
   const streamRuleFormRef = useRef();
 
   const _onEdit = (event) => {
@@ -48,26 +54,27 @@ const StreamRule = ({ permissions, stream, streamRule, streamRuleTypes, onSubmit
 
   const _formatActionItems = () => {
     return (
-      <span>
+      <ActionButtonsWrap>
         <Button bsStyle="link"
-                onClick={_onDelete}
-                style={{ marginRight: 5, padding: 5 }}>
+                bsSize="xsmall"
+                onClick={_onDelete}>
           <Icon name="trash-o" />
         </Button>
         <Button bsStyle="link"
-                onClick={_onEdit}
-                style={{ marginRight: 5, padding: 5 }}>
+                bsSize="xsmall"
+                onClick={_onEdit}>
           <Icon name="edit" />
         </Button>
-      </span>
+      </ActionButtonsWrap>
     );
   };
 
+  const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger');
   const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
   const description = streamRule.description ? <small>{' '}({streamRule.description})</small> : null;
 
   return (
-    <li>
+    <ListGroupItem bsStyle={!isEmpty(matchData) && matchDataStyle()}>
       {actionItems}
       <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} />
       <StreamRuleForm ref={streamRuleFormRef}
@@ -76,11 +83,15 @@ const StreamRule = ({ permissions, stream, streamRule, streamRuleTypes, onSubmit
                       title="Edit Stream Rule"
                       onSubmit={_onSubmit} />
       {description}
-    </li>
+    </ListGroupItem>
   );
 };
 
 StreamRule.propTypes = {
+  matchData: PropTypes.shape({
+    matches: PropTypes.bool,
+    rules: PropTypes.object,
+  }),
   onDelete: PropTypes.func,
   onSubmit: PropTypes.func,
   permissions: PropTypes.array.isRequired,
@@ -90,6 +101,7 @@ StreamRule.propTypes = {
 };
 
 StreamRule.defaultProps = {
+  matchData: {},
   onSubmit: () => {},
   onDelete: () => {},
 };
