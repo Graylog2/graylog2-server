@@ -21,6 +21,7 @@ import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.migrations.V20181220133700_AddViewsAdminRole;
+import org.graylog.plugins.views.migrations.V20190127111728_MigrateWidgetFormatSettings;
 import org.graylog.plugins.views.migrations.V20190304102700_MigrateMessageListStructure;
 import org.graylog.plugins.views.migrations.V20190805115800_RemoveDashboardStateFromViews;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.V20191125144500_MigrateDashboardsToViews;
@@ -143,6 +144,7 @@ public class ViewsBindings extends ViewsModule {
         addMigration(V20191204000000_RemoveLegacyViewsPermissions.class);
         addMigration(V20191125144500_MigrateDashboardsToViews.class);
         addMigration(V20191203120602_MigrateSavedSearchesToViews.class);
+        addMigration(V20190127111728_MigrateWidgetFormatSettings.class);
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 

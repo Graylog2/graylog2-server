@@ -21,28 +21,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
-import java.util.Collections;
-import java.util.List;
-
 @AutoValue
-@JsonDeserialize(builder = WidgetFormattingSettings.Builder.class)
-public abstract class WidgetFormattingSettings {
-    private static final String FIELD_CHART_COLORS = "chart_colors";
+@JsonDeserialize(builder = ChartColorMapping.Builder.class)
+public abstract class ChartColorMapping {
+   private static final String FIELD_NAME = "field_name";
+    private static final String FIELD_CHART_COLOR = "chart_color";
 
-    @JsonProperty(FIELD_CHART_COLORS)
-    public abstract List<ChartColorMapping> chartColors();
+    @JsonProperty(FIELD_NAME)
+    public abstract String fieldName();
+
+    @JsonProperty(FIELD_CHART_COLOR)
+    public abstract ChartColor chartColor();
 
     @AutoValue.Builder
     public static abstract class Builder {
-        @JsonProperty(FIELD_CHART_COLORS)
-        public abstract Builder chartColors(List<ChartColorMapping> chartColors);
+        @JsonProperty(FIELD_NAME)
+        public abstract Builder fieldName(String widgetId);
 
-        public abstract WidgetFormattingSettings build();
+        @JsonProperty(FIELD_CHART_COLOR)
+        public abstract Builder chartColor(ChartColor chartColor);
+
+        public abstract ChartColorMapping build();
 
         @JsonCreator
         static Builder builder() {
-            return new AutoValue_WidgetFormattingSettings.Builder()
-                    .chartColors(Collections.emptyList());
+            return new AutoValue_ChartColorMapping.Builder();
         }
     }
 }
