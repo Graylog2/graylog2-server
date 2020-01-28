@@ -7,6 +7,24 @@
       "created_at" : { "$date": "2019-11-28T09:09:41.688Z" },
       "title" : "Widgets with superfluous attributes.",
       "positions": {
+        "e444b1fd-71ff-405d-a158-d6a4a6395c24": {
+          "width" : 1,
+          "col" : 1,
+          "row" : 1,
+          "height" : 1
+        },
+        "8a598222-1aef-4684-bb03-c768c29c37fa": {
+          "width" : 3,
+          "col" : 1,
+          "row" : 16,
+          "height" : 4
+        },
+        "f6e9d960-9cc8-4d16-b3c8-770501b2709f": {
+          "width" : 1,
+          "col" : 1,
+          "row" : 1,
+          "height" : 1
+        },
         "5a34d186-2823-4acc-8f1c-f66332865ff4" : {
           "width" : 2,
           "col" : 5,
@@ -106,11 +124,74 @@
       },
       "widgets" : [
         {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Map",
+          "id": "8a598222-1aef-4684-bb03-c768c29c37fa",
+          "type": "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "foo_location",
+            "query": "",
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Stacked Field graph",
+          "id": "f6e9d960-9cc8-4d16-b3c8-770501b2709f",
+          "type": "STACKED_CHART",
+          "config": {
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "renderer": "bar",
+            "interpolation": "linear",
+            "series": [
+              {
+                "query": "",
+                "field": "dns_client",
+                "statistical_function": "count",
+                "unknown_attribute": 42
+              },
+              {
+                "query": "",
+                "field": "nf_bytes",
+                "statistical_function": "count",
+                "unknown_attribute": 42
+              }
+            ],
+            "unknown_attribute": 42
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Histogram",
+          "id": "e444b1fd-71ff-405d-a158-d6a4a6395c24",
+          "type": "SEARCH_RESULT_CHART",
+          "config": {
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "query": "",
+            "unknown_attribute": 42
+          }
+        },
+        {
           "creator_user_id" : "admin",
           "cache_time" : 10,
           "description" : "Uncached Requests",
           "id" : "5a34d186-2823-4acc-8f1c-f66332865ff4",
-          "type" : "SEARCH_RESULT_COUNT",
+          "type" : "STREAM_SEARCH_RESULT_COUNT",
           "config" : {
             "timerange" : {
               "type" : "relative",
