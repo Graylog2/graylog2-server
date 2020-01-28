@@ -6,12 +6,12 @@ import { Overlay, Transition } from 'react-overlays';
 
 import styles from './OverlayDropdown.css';
 
-const StyledList = styled.ul(({ show, minWidth }) => `
+const StyledList = styled.ul(({ show }) => `
   padding-left: 5px;
   padding-right: 5px;
   color: #666666;
   z-index: 1050;
-  min-width: ${minWidth};
+  min-width: 'max-content';
   display: ${show ? 'block' : 'none'};
 `);
 
@@ -23,7 +23,7 @@ const oppositePlacement = {
 const FilterProps = ({ children, style }) => React.Children.map(children,
   child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }));
 
-const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggle, minDropdownWidth }) => {
+const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggle }) => {
   const [currentPlacement, setCurrentPlacement] = useState(placement);
   const toggleTarget = React.createRef();
 
@@ -57,7 +57,6 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
                  onEntering={handleOverlayEntering}>
           <FilterProps>
             <StyledList className="dropdown-menu"
-                        minWidth={minDropdownWidth}
                         show={show}>
               {children}
             </StyledList>
@@ -76,13 +75,11 @@ OverlayDropdown.propTypes = {
   placement: PropTypes.string,
   show: PropTypes.bool.isRequired,
   toggle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
-  minDropdownWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 OverlayDropdown.defaultProps = {
   menuContainer: document.body,
   placement: 'bottom',
-  minDropdownWidth: 225,
 };
 
 export default OverlayDropdown;

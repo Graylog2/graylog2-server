@@ -159,7 +159,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -355,7 +354,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -563,7 +561,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -762,7 +759,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -979,7 +975,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -1190,7 +1185,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -1392,7 +1386,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -1609,7 +1602,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -1820,7 +1812,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
@@ -2022,7 +2013,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   >
                     <OverlayDropdown
                       menuContainer={<body />}
-                      minDropdownWidth={225}
                       onToggle={[Function]}
                       placement="right"
                       show={false}
