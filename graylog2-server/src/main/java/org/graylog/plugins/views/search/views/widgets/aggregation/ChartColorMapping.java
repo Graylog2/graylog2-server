@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-@JsonDeserialize(builder = ChartColorSetting.Builder.class)
-public abstract class ChartColorSetting {
+@JsonDeserialize(builder = ChartColorMapping.Builder.class)
+public abstract class ChartColorMapping {
    private static final String FIELD_NAME = "field_name";
     private static final String FIELD_CHART_COLOR = "chart_color";
 
@@ -41,11 +41,11 @@ public abstract class ChartColorSetting {
         @JsonProperty(FIELD_CHART_COLOR)
         public abstract Builder chartColor(ChartColor chartColor);
 
-        public abstract ChartColorSetting build();
+        public abstract ChartColorMapping build();
 
         @JsonCreator
         static Builder builder() {
-            return new AutoValue_ChartColorSetting.Builder();
+            return new AutoValue_ChartColorMapping.Builder();
         }
     }
 }

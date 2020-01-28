@@ -30,19 +30,19 @@ public abstract class WidgetFormattingSettings {
     private static final String FIELD_CHART_COLORS = "chart_colors";
 
     @JsonProperty(FIELD_CHART_COLORS)
-    public abstract List<ChartColorSetting> chartColorSettings();
+    public abstract List<ChartColorMapping> chartColors();
 
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_CHART_COLORS)
-        public abstract Builder chartColorSettings(List<ChartColorSetting> chartColorSettings);
+        public abstract Builder chartColors(List<ChartColorMapping> chartColors);
 
         public abstract WidgetFormattingSettings build();
 
         @JsonCreator
         static Builder builder() {
             return new AutoValue_WidgetFormattingSettings.Builder()
-                    .chartColorSettings(Collections.emptyList());
+                    .chartColors(Collections.emptyList());
         }
     }
 }
