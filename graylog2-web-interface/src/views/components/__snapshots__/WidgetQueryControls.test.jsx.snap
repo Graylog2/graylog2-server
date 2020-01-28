@@ -182,7 +182,7 @@ exports[`WidgetQueryControls should do something 1`] = `
         class="pull-right search-help"
       >
         <a
-          href="http://docs.graylog.org/en/1.0/pages/queries.html"
+          href="http://docs.graylog.org/en/MAJOR_AND_MINOR_VERSION_MOCK/pages/queries.html"
           target="_blank"
           title="Search query syntax documentation"
         >
