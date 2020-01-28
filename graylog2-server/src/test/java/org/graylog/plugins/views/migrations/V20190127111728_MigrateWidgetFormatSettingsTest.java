@@ -55,7 +55,7 @@ public class V20190127111728_MigrateWidgetFormatSettingsTest {
 
     @Test
     @MongoDBFixtures("V20190127111728_MigrateWidgetFormatSettings.json")
-    public void testMigration() {
+    public void testMigrationWithOneChartColorMapping() {
         final BasicDBObject dbQuery1 = new BasicDBObject();
         dbQuery1.put("_id", new ObjectId("5e2ee372b22d7970576b2eb3"));
         final MongoCollection<Document> collection = mongoDB.mongoConnection()
@@ -81,5 +81,72 @@ public class V20190127111728_MigrateWidgetFormatSettingsTest {
         final Document chartColor = chartColors.get(0);
         assertThat(chartColor.getString("field_name")).isEqualTo("count()");
         assertThat(chartColor.getString("chart_color")).isEqualTo("#e91e63");
+    }
+
+    @Test
+    @MongoDBFixtures("V20190127111728_MigrateWidgetFormatSettings_without_color_mapping.json")
+    public void testMigrationWithoutChartColorMapping() {
+        final BasicDBObject dbQuery1 = new BasicDBObject();
+        dbQuery1.put("_id", new ObjectId("5e2ee372b22d7970576b2eb3"));
+        final MongoCollection<Document> collection = mongoDB.mongoConnection()
+                .getMongoDatabase()
+                .getCollection("views");
+        migration.upgrade();
+        final FindIterable<Document> views = collection.find(dbQuery1);
+        final Document view1 = views.first();
+
+        @SuppressWarnings("unchecked")
+        final List<Document> widgets1 = (List) view1.get("state", Document.class).get("2c67cc0f-c62e-47c1-8b70-e3198925e6bc", Document.class).get("widgets");
+        assertThat(widgets1.size()).isEqualTo(2);
+        Set<Document> aggregationWidgets =widgets1.stream().filter(w -> w.getString("type")
+                .equals("aggregation")).collect(Collectors.toSet());
+        assertThat(aggregationWidgets.size()).isEqualTo(1);
+        final Document aggregationWidget = aggregationWidgets.iterator().next();
+        final Document config = aggregationWidget.get("config", Document.class);
+        final Document formattingSettings = config.get("formatting_settings", Document.class);
+
+        assertThat(formattingSettings.get("chart_colors")).isNull();
+    }
+
+    @Test
+    @MongoDBFixtures("V20190127111728_MigrateWidgetFormatSettings_withMultipleColorMappings.json")
+    public void testMigrationWithMultipleChartColorMapping() {
+        final BasicDBObject dbQuery1 = new BasicDBObject();
+        dbQuery1.put("_id", new ObjectId("5e2ee372b22d7970576b2eb3"));
+        final MongoCollection<Document> collection = mongoDB.mongoConnection()
+                .getMongoDatabase()
+                .getCollection("views");
+        migration.upgrade();
+        final FindIterable<Document> views = collection.find(dbQuery1);
+        final Document view1 = views.first();
+
+        @SuppressWarnings("unchecked")
+        final List<Document> widgets1 = (List) view1.get("state", Document.class).get("2c67cc0f-c62e-47c1-8b70-e3198925e6bc", Document.class).get("widgets");
+        assertThat(widgets1.size()).isEqualTo(2);
+        Set<Document> aggregationWidgets =widgets1.stream().filter(w -> w.getString("type")
+                .equals("aggregation")).collect(Collectors.toSet());
+        assertThat(aggregationWidgets.size()).isEqualTo(1);
+        final Document aggregationWidget = aggregationWidgets.iterator().next();
+        final Document config = aggregationWidget.get("config", Document.class);
+        final Document formattingSettings = config.get("formatting_settings", Document.class);
+
+        @SuppressWarnings("unchecked")
+        final List<Document> chartColors = (List) formattingSettings.get("chart_colors", List.class);
+        assertThat(chartColors.size()).isEqualTo(4);
+        final Document chartColor1 = chartColors.get(0);
+        assertThat(chartColor1.getString("field_name")).isEqualTo("count()");
+        assertThat(chartColor1.getString("chart_color")).isEqualTo("#e91e63");
+
+        final Document chartColor2 = chartColors.get(1);
+        assertThat(chartColor2.getString("field_name")).isEqualTo("avg(fields)");
+        assertThat(chartColor2.getString("chart_color")).isEqualTo("#e81e63");
+
+        final Document chartColor3 = chartColors.get(2);
+        assertThat(chartColor3.getString("field_name")).isEqualTo("mean(man)");
+        assertThat(chartColor3.getString("chart_color")).isEqualTo("#e91f63");
+
+        final Document chartColor4 = chartColors.get(3);
+        assertThat(chartColor4.getString("field_name")).isEqualTo("total(win)");
+        assertThat(chartColor4.getString("chart_color")).isEqualTo("#e91fff");
     }
 }
