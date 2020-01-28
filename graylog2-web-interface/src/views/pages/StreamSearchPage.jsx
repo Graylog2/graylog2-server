@@ -81,7 +81,8 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
   const loadEmptyView = (): Promise<?View> => {
     return loadNewView({}).then(() => {
       const { pathname, search } = router.getCurrentLocation();
-      syncWithQueryParameters(pathname, search);
+      const currentQuery = `${pathname}${search}`;
+      syncWithQueryParameters(currentQuery);
     });
   };
 
