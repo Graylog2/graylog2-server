@@ -30,7 +30,8 @@
     "setupFiles": [
       "jest-localstorage-mock",
       "<rootDir>/test/setup-jest.jsx",
-      "<rootDir>/test/mock-FetchProvider.js"
+      "<rootDir>/test/mock-FetchProvider.js",
+      "<rootDir>/test/mock-Version.js"
     ],
     "setupFilesAfterEnv": [
       "jest-enzyme"
