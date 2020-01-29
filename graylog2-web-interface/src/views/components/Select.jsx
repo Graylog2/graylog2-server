@@ -99,7 +99,7 @@ const Select = ({ components, styles, ...rest }: Props) => {
   const _components = Object.assign({
     Menu,
     MultiValueRemove,
-    MultiValue: components.MultiValue || ValueWithTitle
+    MultiValue: components.MultiValue || ValueWithTitle,
   }, components);
   const _styles = Object.assign({
     menu: menuStyle,
