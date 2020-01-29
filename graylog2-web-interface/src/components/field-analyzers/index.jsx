@@ -13,18 +13,6 @@ const pluginManifest = new PluginManifest({}, {
       displayPriority: 2,
     },
     {
-      refId: 'fieldQuickValuesComponent',
-      displayName: 'Quick values',
-      component: FieldQuickValues,
-      displayPriority: 1,
-    },
-    {
-      refId: 'fieldGraphsComponent',
-      displayName: 'Generate chart',
-      component: FieldGraphs,
-      displayPriority: 0,
-    },
-    {
       refId: 'fieldAnalyzerMapComponent',
       displayName: 'World Map',
       component: FieldAnalyzerMapComponent,
