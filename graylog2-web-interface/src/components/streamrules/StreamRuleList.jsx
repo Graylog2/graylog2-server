@@ -3,7 +3,7 @@ import React from 'react';
 
 import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
-import { ListGroup } from 'components/graylog';
+import { ListGroup, ListGroupItem } from 'components/graylog';
 
 class StreamRuleList extends React.Component {
   static propTypes = {
@@ -46,7 +46,7 @@ class StreamRuleList extends React.Component {
                     streamRuleTypes={streamRuleTypes} />
       ));
     }
-    return <li>No rules defined.</li>;
+    return <ListGroupItem>No rules defined.</ListGroupItem>;
   };
 
   render() {
