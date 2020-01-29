@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import styled from 'styled-components';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
@@ -17,6 +18,10 @@ type Props = {|
   type: FieldType,
 |};
 
+const ValueActionTitle = styled.span`
+  white-space: nowrap;
+`;
+
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
 const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
@@ -29,7 +34,9 @@ const Value = ({ children, field, value, queryId, render = defaultRenderer, type
       {interactive => ((interactive && queryId)
         ? (
           <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
-            {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
+            <ValueActionTitle>
+              {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
+            </ValueActionTitle>
           </ValueActions>
         )
         : <span><TypeSpecificValue field={field} value={value} type={type} /></span>)}
