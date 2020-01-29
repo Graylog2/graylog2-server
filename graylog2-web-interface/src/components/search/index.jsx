@@ -1,4 +1,3 @@
-export { default as DecoratorSidebar } from './DecoratorSidebar';
 export { default as FieldAnalyzersSidebar } from './FieldAnalyzersSidebar';
 export { default as LegacyHistogram } from './LegacyHistogram';
 export { default as MessageDetail } from './MessageDetail';
