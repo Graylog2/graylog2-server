@@ -4,7 +4,6 @@ export { default as MessageFields } from './MessageFields';
 export { default as MessageShow } from './MessageShow';
 export { default as MessageTableEntry } from './MessageTableEntry';
 export { default as SearchBar } from './SearchBar';
-export { default as SearchResult } from './SearchResult';
 export { default as SearchSidebar } from './SearchSidebar';
 export { default as ShowQueryModal } from './ShowQueryModal';
 export { default as SidebarMessageField } from './SidebarMessageField';
