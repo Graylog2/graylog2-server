@@ -102,8 +102,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     @Override
     protected void doStart() {
 
-        dnsClient = new DnsClient();
-        dnsClient.start(config.serverIps(), config.requestTimeout());
+        dnsClient = new DnsClient(config.requestTimeout());
+        dnsClient.start(config.serverIps());
     }
 
     @Override
