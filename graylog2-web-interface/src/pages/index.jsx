@@ -52,7 +52,6 @@ const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
 const ShowAlertPage = loadAsync(() => import('./ShowAlertPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
-const ShowDashboardPage = loadAsync(() => import('./ShowDashboardPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
 const ShowMetricsPage = loadAsync(() => import('./ShowMetricsPage'));
 const ShowNodePage = loadAsync(() => import('./ShowNodePage'));
@@ -130,7 +129,6 @@ export {
   RulesPage,
   ShowAlertPage,
   ShowContentPackPage,
-  ShowDashboardPage,
   ShowMessagePage,
   ShowMetricsPage,
   ShowNodePage,
