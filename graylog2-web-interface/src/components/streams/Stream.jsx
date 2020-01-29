@@ -45,6 +45,7 @@ const Stream = createReactClass({
 
 
   _onDelete(stream) {
+    // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
@@ -54,8 +55,10 @@ const Stream = createReactClass({
   },
 
   _onResume() {
+    const { stream } = this.props;
+
     this.setState({ loading: true });
-    StreamsStore.resume(this.props.stream.id, response => response)
+    StreamsStore.resume(stream.id, response => response)
       .finally(() => this.setState({ loading: false }));
   },
 
@@ -74,9 +77,12 @@ const Stream = createReactClass({
   },
 
   _onPause() {
-    if (window.confirm(`Do you really want to pause stream '${this.props.stream.title}'?`)) {
+    const { stream } = this.props;
+
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
       this.setState({ loading: true });
-      StreamsStore.pause(this.props.stream.id, response => response)
+      StreamsStore.pause(stream.id, response => response)
         .finally(() => this.setState({ loading: false }));
     }
   },
@@ -86,11 +92,13 @@ const Stream = createReactClass({
   },
 
   _onSaveStreamRule(streamRuleId, streamRule) {
-    StreamRulesStore.create(this.props.stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
+    const { stream } = this.props;
+    StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
   },
 
   render() {
-    const { stream, permissions, streamRuleTypes } = this.props;
+    const { indexSets, stream, permissions, streamRuleTypes, user } = this.props;
+    const { loading } = this.state;
 
     const isDefaultStream = stream.is_default;
     const defaultStreamTooltip = isDefaultStream
@@ -131,8 +139,8 @@ const Stream = createReactClass({
             <Button bsStyle="success"
                     className="toggle-stream-button"
                     onClick={this._onResume}
-                    disabled={isDefaultStream || this.state.loading}>
-              {this.state.loading ? 'Starting...' : 'Start Stream'}
+                    disabled={isDefaultStream || loading}>
+              {loading ? 'Starting...' : 'Start Stream'}
             </Button>
           </OverlayElement>
         );
@@ -142,8 +150,8 @@ const Stream = createReactClass({
             <Button bsStyle="primary"
                     className="toggle-stream-button"
                     onClick={this._onPause}
-                    disabled={isDefaultStream || this.state.loading}>
-              {this.state.loading ? 'Pausing...' : 'Pause Stream'}
+                    disabled={isDefaultStream || loading}>
+              {loading ? 'Pausing...' : 'Pause Stream'}
             </Button>
           </OverlayElement>
         );
@@ -157,17 +165,17 @@ const Stream = createReactClass({
       <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
         <StreamControls stream={stream}
                         permissions={permissions}
-                        user={this.props.user}
+                        user={user}
                         onDelete={this._onDelete}
                         onUpdate={this._onUpdate}
                         onClone={this._onClone}
                         onQuickAdd={this._onQuickAdd}
-                        indexSets={this.props.indexSets}
+                        indexSets={indexSets}
                         isDefaultStream={isDefaultStream} />
       </OverlayElement>
     );
 
-    const indexSet = this.props.indexSets.find(is => is.id === stream.index_set_id) || this.props.indexSets.find(is => is.is_default);
+    const indexSet = indexSets.find(is => is.id === stream.index_set_id) || indexSets.find(is => is.is_default);
     const indexSetDetails = this.isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
 
     return (
