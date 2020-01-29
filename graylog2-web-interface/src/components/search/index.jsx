@@ -8,7 +8,6 @@ export { default as DecoratorList } from './DecoratorList';
 export { default as DecoratorSidebar } from './DecoratorSidebar';
 export { default as FieldAnalyzersSidebar } from './FieldAnalyzersSidebar';
 export { default as LegacyHistogram } from './LegacyHistogram';
-export { default as MalformedSearchQuery } from './MalformedSearchQuery';
 export { default as MessageDetail } from './MessageDetail';
 export { default as MessageFieldDescription } from './MessageFieldDescription';
 export { default as MessageFieldExtractorActions } from './MessageFieldExtractorActions';
