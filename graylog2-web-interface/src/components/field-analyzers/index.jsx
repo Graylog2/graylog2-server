@@ -1,9 +1,7 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import FieldAnalyzerMapComponent from 'components/maps/field-analyzers/FieldAnalyzerMapComponent';
 import FieldStatistics from './FieldStatistics';
-import FieldQuickValues from './FieldQuickValues';
 
-export { default as FieldQuickValues } from './FieldQuickValues';
 export { default as FieldStatistics } from './FieldStatistics';
 
 const pluginManifest = new PluginManifest({}, {
