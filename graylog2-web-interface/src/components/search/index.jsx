@@ -1,5 +1,4 @@
 export { default as AddDecoratorButton } from './AddDecoratorButton';
-export { default as AddSearchCountToDashboard } from './AddSearchCountToDashboard';
 export { default as ChangedMessageField } from './ChangedMessageField';
 export { default as DecoratedMessageFieldMarker } from './DecoratedMessageFieldMarker';
 export { default as DecoratedSidebarMessageField } from './DecoratedSidebarMessageField';
