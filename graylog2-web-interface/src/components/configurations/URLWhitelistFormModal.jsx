@@ -63,9 +63,11 @@ class URLWhitelistFormModal extends React.Component {
       event.preventDefault();
       event.stopPropagation();
     }
+    const { onUpdate } = this.props;
     const { config, isValid } = this.state;
     if (isValid) {
       this._updateConfig(URL_WHITELIST_CONFIG, config).then(() => {
+        onUpdate();
         this._closeModal();
       });
     }
@@ -125,12 +127,14 @@ class URLWhitelistFormModal extends React.Component {
 URLWhitelistFormModal.propTypes = {
   config: PropTypes.object.isRequired,
   newUrlEntry: PropTypes.string,
+  onUpdate: PropTypes.func,
   configuration: PropTypes.object,
   currentUser: PropTypes.object.isRequired,
 };
 
 URLWhitelistFormModal.defaultProps = {
   newUrlEntry: '',
+  onUpdate: () => {},
   configuration: {},
 };
 
