@@ -46,19 +46,19 @@ describe('Create a new dashboard', () => {
   afterEach(cleanup);
 
   it('using Dashboards Page', async () => {
-    const { getByText, getAllByText } = render(<AppRouter />);
+    const { getByTestId, getAllByText } = render(<AppRouter />);
     history.push(Routes.DASHBOARDS);
 
     const button = await waitForElement(() => getAllByText('Create new dashboard')[0]);
     fireEvent.click(button);
-    await waitForElement(() => getByText(/This dashboard has no widgets yet/));
+    await waitForElement(() => getByTestId('search-results'));
   });
 
   it('by going to the new dashboards endpoint', async () => {
-    const { getByText } = render(<AppRouter />);
+    const { getByTestId } = render(<AppRouter />);
 
     history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
 
-    await waitForElement(() => getByText(/This dashboard has no widgets yet/));
+    await waitForElement(() => getByTestId('search-results'));
   });
 });

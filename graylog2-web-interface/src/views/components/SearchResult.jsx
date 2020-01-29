@@ -59,7 +59,7 @@ const SearchResult = React.memo(({ fieldTypes, queryId, searches, viewState }: P
   ) : <Spinner />;
 
   return (
-    <Row>
+    <Row data-testid="search-results">
       <Col>
         {content}
         <SearchLoadingIndicator />
