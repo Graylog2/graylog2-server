@@ -21,7 +21,6 @@ export { default as RefreshControls } from './RefreshControls';
 export { default as ResultTable } from './ResultTable';
 export { default as SavedSearchControls } from './SavedSearchControls';
 export { default as SearchBar } from './SearchBar';
-export { default as SearchExecutionError } from './SearchExecutionError';
 export { default as SearchResult } from './SearchResult';
 export { default as SearchSidebar } from './SearchSidebar';
 export { default as ShowQueryModal } from './ShowQueryModal';
