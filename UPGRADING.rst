@@ -54,7 +54,6 @@ The Graylog servers can now be restarted with the 3.2.0 version.
 Known Bugs and Limitations
 ==========================
 
-  * Content Packs containing old Dashbords can not be installed in Graylog 3.2.
   * Some functionality of the search has been removed, namely:
     * Retrieving the full query that is sent to Elasticsearch.
     * Retrieving the list of terms a message field value was indexed with.
