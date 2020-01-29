@@ -5,7 +5,6 @@ import FieldQuickValues from './FieldQuickValues';
 
 export { default as FieldQuickValues } from './FieldQuickValues';
 export { default as FieldStatistics } from './FieldStatistics';
-export { default as LegacyFieldGraph } from './LegacyFieldGraph';
 
 const pluginManifest = new PluginManifest({}, {
   fieldAnalyzers: [
