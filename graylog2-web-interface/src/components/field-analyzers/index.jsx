@@ -2,9 +2,7 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import FieldAnalyzerMapComponent from 'components/maps/field-analyzers/FieldAnalyzerMapComponent';
 import FieldStatistics from './FieldStatistics';
 import FieldQuickValues from './FieldQuickValues';
-import FieldGraphs from './FieldGraphs';
 
-export { default as FieldGraphs } from './FieldGraphs';
 export { default as FieldQuickValues } from './FieldQuickValues';
 export { default as FieldStatistics } from './FieldStatistics';
 export { default as LegacyFieldGraph } from './LegacyFieldGraph';
