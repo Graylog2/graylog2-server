@@ -51,7 +51,7 @@ describe('Create a new dashboard', () => {
 
     const button = await waitForElement(() => getAllByText('Create new dashboard')[0]);
     fireEvent.click(button);
-    await waitForElement(() => getByText(/This dashboard has no widgets yet/));
+    await waitForElement(() => getByText(/This dashboard has no widgets yet/), { timeout: 15000 });
   });
 
   it('by going to the new dashboards endpoint', async () => {
@@ -59,6 +59,6 @@ describe('Create a new dashboard', () => {
 
     history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
 
-    await waitForElement(() => getByText(/This dashboard has no widgets yet/));
+    await waitForElement(() => getByText(/This dashboard has no widgets yet/), { timeout: 15000 });
   });
 });
