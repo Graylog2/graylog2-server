@@ -159,7 +159,7 @@ const valueContainer = base => ({
   padding: '2px 12px',
 });
 
-const _components = {
+const _components: { [string]: React.ComponentType<any> } = {
   DropdownIndicator,
   MultiValueRemove,
   IndicatorSeparator,
@@ -183,7 +183,7 @@ type Props = {
   allowCreate?: boolean,
   autoFocus?: boolean,
   clearable?: boolean,
-  components: ?{string: React.Node},
+  components: ?{| [string]: React.ComponentType<any> |},
   delimiter?: string,
   disabled?: boolean,
   displayKey?: string,
@@ -202,7 +202,7 @@ type Props = {
 };
 
 type State = {
-  customComponents?: { [string]: React.Element<any> },
+  customComponents?: {| [string]: React.ComponentType<any> |},
   value: any,
 };
 
@@ -393,6 +393,11 @@ class Select extends React.Component<Props, State> {
     const stringify = option => option[matchProp];
     const customFilter = matchProp === 'any' ? createFilter() : createFilter({ stringify });
 
+    const mergedComponents: { [string]: React.ComponentType<any> } = {
+      ..._components,
+      ...components,
+      ...customComponents,
+    };
     return (
       <SelectComponent {...rest}
                        onChange={onReactSelectChange || this._onChange}
@@ -402,11 +407,7 @@ class Select extends React.Component<Props, State> {
                        getOptionLabel={option => option[displayKey]}
                        getOptionValue={option => option[valueKey]}
                        filterOption={customFilter}
-                       components={{
-                         ..._components,
-                         ...components,
-                         ...customComponents,
-                       }}
+                       components={mergedComponents}
                        isOptionDisabled={option => !!option.disabled}
                        styles={{
                          ..._styles(this.props),
