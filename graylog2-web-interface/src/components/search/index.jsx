@@ -27,4 +27,3 @@ export { default as SearchSidebar } from './SearchSidebar';
 export { default as ShowQueryModal } from './ShowQueryModal';
 export { default as SidebarMessageField } from './SidebarMessageField';
 export { default as SurroundingSearchButton } from './SurroundingSearchButton';
-export { default as QueryInput } from './QueryInput';
