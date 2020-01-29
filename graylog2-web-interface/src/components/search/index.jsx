@@ -1,4 +1,3 @@
-export { default as DecoratedSidebarMessageField } from './DecoratedSidebarMessageField';
 export { default as Decorator } from './Decorator';
 export { default as DecoratorList } from './DecoratorList';
 export { default as DecoratorSidebar } from './DecoratorSidebar';
