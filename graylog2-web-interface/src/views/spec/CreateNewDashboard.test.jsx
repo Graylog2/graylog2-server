@@ -43,6 +43,10 @@ describe('Create a new dashboard', () => {
     PluginStore.register(new PluginManifest({}, viewsBindings));
   });
 
+  beforeEach(() => {
+    jest.setTimeout(30000);
+  });
+
   afterEach(cleanup);
 
   it('using Dashboards Page', async () => {
