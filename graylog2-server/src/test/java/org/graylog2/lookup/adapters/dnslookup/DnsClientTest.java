@@ -27,7 +27,7 @@ public class DnsClientTest {
     @Test
     public void testReverseIpFormat() {
 
-        DnsClient dnsClient = new DnsClient();
+        DnsClient dnsClient = new DnsClient(5000);
 
         // Test IPv4 reverse format.
         assertEquals("40.30.20.10.in-addr.arpa.", dnsClient.getInverseAddressFormat("10.20.30.40"));

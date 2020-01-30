@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -64,6 +66,7 @@ public class DnsClient {
     private static final Logger LOG = LoggerFactory.getLogger(DnsClient.class);
 
     private static final int DEFAULT_DNS_PORT = 53;
+    private static final int DEFAULT_REQUEST_TIMEOUT_INCREMENT = 100;
     private static final Pattern VALID_HOSTNAME_PATTERN = Pattern.compile("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$");
 
     // Use fully qualified reverse lookup domain names (with dot at end).
@@ -75,11 +78,41 @@ public class DnsClient {
 
     // Used to convert binary IPv6 address to hex.
     private static final char[] HEX_CHARS_ARRAY = "0123456789ABCDEF".toCharArray();
+    private final long queryTimeout;
+    private final long requestTimeout;
 
     private NioEventLoopGroup nettyEventLoop;
     private DnsNameResolver resolver;
 
-    public void start(String dnsServerIps, long requestTimeout) {
+    /**
+     * Creates a new DNS client with the given query timeout. The request timeout will be the query timeout plus
+     * the {@link #DEFAULT_REQUEST_TIMEOUT_INCREMENT}.
+     *
+     * @param queryTimeout the query timeout
+     * @see #DnsClient(long, long)
+     */
+    public DnsClient(long queryTimeout) {
+        this(queryTimeout, queryTimeout + DEFAULT_REQUEST_TIMEOUT_INCREMENT);
+    }
+
+    /**
+     * Creates a new DNS client with the given query and request timeout. The query timeout is the maximum time to
+     * wait for a DNS response from a DNS server. The request timeout is the maximum time to wait for the DNS request
+     * completion. The request timeout should always be higher than the query timeout.
+     *
+     * Background: The request timeout is used to avoid blocking a thread by waiting for the DNS resolve future to
+     * complete. This can happen when the {@link DnsNameResolver} is closed, and the event loop is shut down while
+     * a resolver request is still running.
+     *
+     * @param queryTimeout   the query timeout
+     * @param requestTimeout the request timeout
+     */
+    public DnsClient(long queryTimeout, long requestTimeout) {
+        this.queryTimeout = queryTimeout;
+        this.requestTimeout = requestTimeout;
+    }
+
+    public void start(String dnsServerIps) {
 
         LOG.debug("Attempting to start DNS client");
         final List<InetSocketAddress> iNetDnsServerIps = parseServerIpAddresses(dnsServerIps);
@@ -87,7 +120,7 @@ public class DnsClient {
         nettyEventLoop = new NioEventLoopGroup();
 
         final DnsNameResolverBuilder dnsNameResolverBuilder = new DnsNameResolverBuilder(nettyEventLoop.next());
-        dnsNameResolverBuilder.channelType(NioDatagramChannel.class).queryTimeoutMillis(requestTimeout);
+        dnsNameResolverBuilder.channelType(NioDatagramChannel.class).queryTimeoutMillis(queryTimeout);
 
         // Specify custom DNS servers if provided. If not, use those specified in local network adapter settings.
         if (CollectionUtils.isNotEmpty(iNetDnsServerIps)) {
@@ -129,6 +162,9 @@ public class DnsClient {
             return;
         }
 
+        // Make sure to close the resolver before shutting down the event loop
+        resolver.close();
+
         // Shutdown event loop (required by Netty).
         final Future<?> shutdownFuture = nettyEventLoop.shutdownGracefully();
         shutdownFuture.addListener(future -> LOG.debug("DNS client shutdown successful"));
@@ -161,10 +197,14 @@ public class DnsClient {
 
         /* The DnsNameResolver.resolveAll(DnsQuestion) method handles all redirects through CNAME records to
          * ultimately resolve a list of IP addresses with TTL values. */
-        return resolver.resolveAll(aRecordDnsQuestion).sync().get().stream()
-                       .map(dnsRecord -> decodeDnsRecord(dnsRecord, includeIpVersion))
-                       .filter(Objects::nonNull) // Removes any entries which the IP address could not be extracted for.
-                       .collect(Collectors.toList());
+        try {
+            return resolver.resolveAll(aRecordDnsQuestion).get(requestTimeout, TimeUnit.MILLISECONDS).stream()
+                           .map(dnsRecord -> decodeDnsRecord(dnsRecord, includeIpVersion))
+                           .filter(Objects::nonNull) // Removes any entries which the IP address could not be extracted for.
+                           .collect(Collectors.toList());
+        } catch (TimeoutException e) {
+            throw new ExecutionException("Resolver future didn't return a result in " + requestTimeout + " ms", e);
+        }
     }
 
     /**
@@ -232,7 +272,7 @@ public class DnsClient {
 
         DnsResponse content = null;
         try {
-            content = resolver.query(new DefaultDnsQuestion(inverseAddressFormat, DnsRecordType.PTR)).sync().get().content();
+            content = resolver.query(new DefaultDnsQuestion(inverseAddressFormat, DnsRecordType.PTR)).get(requestTimeout, TimeUnit.MILLISECONDS).content();
             for (int i = 0; i < content.count(DnsSection.ANSWER); i++) {
 
                 // Return the first PTR record, because there should be only one as per
@@ -259,6 +299,8 @@ public class DnsClient {
                                            .build();
                 }
             }
+        } catch (TimeoutException e) {
+            throw new ExecutionException("Resolver future didn't return a result in " + requestTimeout + " ms", e);
         } finally {
             if (content != null) {
                 // Must manually release references on content object since the DnsResponse class extends ReferenceCounted
@@ -316,7 +358,7 @@ public class DnsClient {
 
         DnsResponse content = null;
         try {
-            content = resolver.query(new DefaultDnsQuestion(hostName, DnsRecordType.TXT)).sync().get().content();
+            content = resolver.query(new DefaultDnsQuestion(hostName, DnsRecordType.TXT)).get(requestTimeout, TimeUnit.MILLISECONDS).content();
             int count = content.count(DnsSection.ANSWER);
             final ArrayList<TxtDnsAnswer> txtRecords = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
@@ -340,6 +382,8 @@ public class DnsClient {
             }
 
             return txtRecords;
+        } catch (TimeoutException e) {
+            throw new ExecutionException("Resolver future didn't return a result in " + requestTimeout + " ms", e);
         } finally {
             if (content != null) {
                 // Must manually release references on content object since the DnsResponse class extends ReferenceCounted
