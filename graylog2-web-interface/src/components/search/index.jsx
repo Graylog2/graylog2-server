@@ -1,5 +1,6 @@
 export { default as MessageDetail } from './MessageDetail';
 export { default as MessageFieldExtractorActions } from './MessageFieldExtractorActions';
+export { default as MessageField } from './MessageField';
 export { default as MessageFields } from './MessageFields';
 export { default as MessageShow } from './MessageShow';
 export { default as MessageTableEntry } from './MessageTableEntry';
