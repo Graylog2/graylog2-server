@@ -58,7 +58,6 @@ const actions = {
   SingleNode: () => require('actions/nodes/SingleNodeActions'),
   Streams: () => require('actions/streams/StreamsActions'),
   SystemJobs: () => require('actions/systemjobs/SystemJobsActions'),
-  Widgets: () => require('actions/widgets/WidgetsActions'),
 };
 
 const stores = {
@@ -144,7 +143,6 @@ const stores = {
   Tools: () => require('stores/tools/ToolsStore'),
   UniversalSearch: () => require('stores/search/UniversalSearchStore'),
   Users: () => require('stores/users/UsersStore'),
-  Widgets: () => require('stores/widgets/WidgetsStore'),
 };
 /* eslint-enable import/no-require, global-require */
 
