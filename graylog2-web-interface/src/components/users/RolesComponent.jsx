@@ -1,6 +1,4 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import Immutable from 'immutable';
 
 import { Button, Col, Row } from 'components/graylog';
@@ -10,47 +8,42 @@ import EditRole from 'components/users/EditRole';
 import PageHeader from 'components/common/PageHeader';
 
 import CombinedProvider from 'injection/CombinedProvider';
+import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
+import connect from 'stores/connect';
 
 const { StreamsStore } = CombinedProvider.get('Streams');
-const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 const { RolesStore } = CombinedProvider.get('Roles');
 
-
-export default createReactClass({
-  displayName: 'RolesComponent',
-  mixins: [Reflux.connect(DashboardsStore, 'dashboards')],
-
-  getInitialState() {
-    return {
-      roles: Immutable.Set(),
-      rolesLoaded: false,
-      editRole: null,
-      streams: Immutable.List(),
-    };
-  },
+class RolesComponent extends React.Component {
+  state = {
+    roles: Immutable.Set(),
+    rolesLoaded: false,
+    editRole: null,
+    streams: Immutable.List(),
+  };
 
   componentDidMount() {
     this.loadRoles();
     StreamsStore.load(streams => this.setState({ streams: Immutable.List(streams) }));
-    DashboardsActions.list();
-  },
+    DashboardsActions.search('', 1, 32768);
+  }
 
-  loadRoles() {
+  loadRoles = () => {
     const promise = RolesStore.loadRoles();
     promise.then((roles) => {
       this.setState({ roles: Immutable.Set(roles), rolesLoaded: true });
     });
-  },
+  };
 
-  _showCreateRole() {
+  _showCreateRole = () => {
     this.setState({ showEditRole: true });
-  },
+  };
 
-  _showEditRole(role) {
+  _showEditRole = (role) => {
     this.setState({ showEditRole: true, editRole: role });
-  },
+  };
 
-  _deleteRole(role) {
+  _deleteRole = (role) => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete role ${role.name}?`)) {
       RolesStore.getMembers(role.name).then((membership) => {
@@ -61,42 +54,44 @@ export default createReactClass({
         }
       });
     }
-  },
+  };
 
-  _saveRole(initialName, role) {
+  _saveRole = (initialName, role) => {
     if (initialName === null) {
       RolesStore.createRole(role).then(this._clearEditRole).then(this.loadRoles);
     } else {
       RolesStore.updateRole(initialName, role).then(this._clearEditRole).then(this.loadRoles);
     }
-  },
+  };
 
-  _clearEditRole() {
+  _clearEditRole = () => {
     this.setState({ showEditRole: false, editRole: null });
-  },
+  };
 
   render() {
     let content = null;
-    if (!this.state.rolesLoaded) {
+    const { rolesLoaded, showEditRole, editRole, streams, roles } = this.state;
+    if (!rolesLoaded) {
       content = <span>Loading roles...</span>;
-    } else if (this.state.showEditRole) {
+    } else if (showEditRole) {
+      const { dashboards } = this.props;
       content = (
-        <EditRole initialRole={this.state.editRole}
-                  streams={this.state.streams}
-                  dashboards={this.state.dashboards.dashboards}
+        <EditRole initialRole={editRole}
+                  streams={streams}
+                  dashboards={dashboards.list}
                   onSave={this._saveRole}
                   cancelEdit={this._clearEditRole} />
       );
     } else {
       content = (
-        <RoleList roles={this.state.roles}
+        <RoleList roles={roles}
                   showEditRole={this._showEditRole}
                   deleteRole={this._deleteRole} />
       );
     }
 
     let actionButton;
-    if (!this.state.showEditRole) {
+    if (!showEditRole) {
       actionButton = <Button bsStyle="success" onClick={this._showCreateRole}>Add new role</Button>;
     }
     return (
@@ -116,5 +111,7 @@ export default createReactClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
+
+export default connect(RolesComponent, { dashboards: DashboardsStore });
