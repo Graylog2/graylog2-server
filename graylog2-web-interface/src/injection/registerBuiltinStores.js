@@ -131,7 +131,6 @@ const stores = {
   SidecarsAdministration: () => require('stores/sidecars/SidecarsAdministrationStore'),
   Simulator: () => require('stores/simulator/SimulatorStore'),
   SingleNode: () => require('stores/nodes/SingleNodeStore'),
-  Sources: () => require('stores/sources/SourcesStore'),
   Startpage: () => require('stores/users/StartpageStore'),
   StreamRules: () => require('stores/streams/StreamRulesStore'),
   Streams: () => require('stores/streams/StreamsStore'),
