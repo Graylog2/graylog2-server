@@ -84,6 +84,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                 <RefreshControls />
               </Col>
             </Row>
+
             <Row className="no-bm">
               <Col md={9} xs={8}>
                 <div className="pull-right search-help">
@@ -98,11 +99,12 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                             onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
                             onExecute={performSearch} />
               </Col>
-              <Col md={3} xs={4}>
+              <Col md={3} xs={4} className="pull-right">
                 <BookmarkControls />
               </Col>
             </Row>
           </form>
+
         </Col>
       </Row>
     </ScrollToHint>
