@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search;
 
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ public class SearchDomain {
         this.viewPermissions = viewPermissions;
     }
 
-    public Optional<Search> getForUser(String id, User user, Predicate<String> viewReadPermission) {
+    public Optional<Search> getForUser(String id, User user, Predicate<ViewDTO> viewReadPermission) {
         final Optional<Search> search = dbService.get(id);
 
         search.ifPresent(s -> checkPermission(user, viewReadPermission, s));
@@ -44,22 +45,22 @@ public class SearchDomain {
         return search;
     }
 
-    private void checkPermission(User user, Predicate<String> viewReadPermission, Search s) {
+    private void checkPermission(User user, Predicate<ViewDTO> viewReadPermission, Search s) {
         if (!hasReadPermissionFor(user, viewReadPermission, s))
-            throw new PermissionException("User " + user + " does not have permission to load search " + s.id());
+            throw new PermissionException("User " + user.getName() + " does not have permission to load search " + s.id());
     }
 
-    public List<Search> getAllForUser(User user, Predicate<String> viewReadPermission) {
+    public List<Search> getAllForUser(User user, Predicate<ViewDTO> viewReadPermission) {
         return dbService.streamAll()
                 .filter(s -> hasReadPermissionFor(user, viewReadPermission, s))
                 .collect(Collectors.toList());
     }
 
-    private boolean hasReadPermissionFor(User user, Predicate<String> viewReadPermission, Search search) {
+    private boolean hasReadPermissionFor(User user, Predicate<ViewDTO> viewReadPermission, Search search) {
         return isOwned(search, user) || hasPermissionFromViews(search, user, viewReadPermission);
     }
 
-    private boolean hasPermissionFromViews(Search search, User user, Predicate<String> hasViewReadPermission) {
+    private boolean hasPermissionFromViews(Search search, User user, Predicate<ViewDTO> hasViewReadPermission) {
         return viewPermissions.isSearchPermitted(search.id(), user, hasViewReadPermission);
     }
 
