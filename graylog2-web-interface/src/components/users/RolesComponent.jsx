@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 
 import { Button, Col, Row } from 'components/graylog';
@@ -15,6 +16,12 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 const { RolesStore } = CombinedProvider.get('Roles');
 
 class RolesComponent extends React.Component {
+  static propTypes = {
+    dashboards: PropTypes.shape({
+      list: PropTypes.array,
+    }).isRequired,
+  };
+
   state = {
     roles: Immutable.Set(),
     rolesLoaded: false,
