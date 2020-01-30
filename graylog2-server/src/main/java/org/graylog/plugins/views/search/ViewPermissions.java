@@ -16,12 +16,14 @@
  */
 package org.graylog.plugins.views.search;
 
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -39,13 +41,14 @@ class ViewPermissions {
         this.isViewSharedForUser = isViewSharedForUser;
     }
 
-    boolean isSearchPermitted(String id, User user, Predicate<String> viewReadPermission) {
-        final Set<String> viewIds = idsFrom(viewService.forSearch(id));
+    boolean isSearchPermitted(String id, User user, Predicate<ViewDTO> viewReadPermission) {
+        final Collection<ViewDTO> views = viewService.forSearch(id);
+        final Set<String> viewIds = idsFrom(views);
 
-        if (viewIds.isEmpty())
+        if (views.isEmpty())
             return false;
 
-        return hasSharedView(user, viewIds) || hasDirectReadPermissionForAny(viewIds, viewReadPermission);
+        return hasSharedView(user, viewIds) || hasDirectReadPermissionForAny(views, viewReadPermission);
     }
 
     private boolean hasSharedView(User user, Set<String> viewIds) {
@@ -53,7 +56,7 @@ class ViewPermissions {
                 .anyMatch(vs -> isViewSharedForUser.isAllowedToSee(user, vs));
     }
 
-    private boolean hasDirectReadPermissionForAny(Set<String> viewIds, Predicate<String> viewReadPermission) {
-        return viewIds.stream().anyMatch(viewReadPermission);
+    private boolean hasDirectReadPermissionForAny(Collection<ViewDTO> views, Predicate<ViewDTO> viewReadPermission) {
+        return views.stream().anyMatch(viewReadPermission);
     }
 }
