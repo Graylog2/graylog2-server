@@ -4,6 +4,8 @@ import React from 'react';
 import { Button } from 'components/graylog';
 
 class AssignOutputDropdown extends React.Component {
+  PLACEHOLDER = 'placeholder';
+
   static propTypes = {
     outputs: PropTypes.array.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -12,8 +14,6 @@ class AssignOutputDropdown extends React.Component {
   state = {
     selectedOutput: this.PLACEHOLDER,
   };
-
-  PLACEHOLDER = 'placeholder';
 
   _formatOutput = (output) => {
     return <option key={output.id} value={output.id}>{output.title}</option>;
