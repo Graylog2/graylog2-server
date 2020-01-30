@@ -42,5 +42,9 @@ public class ExceptionUtilsTest {
             assertThat(m).isNotBlank();
             assertThat(m).isEqualTo("cause1.");
         });
+        assertThat(ExceptionUtils.getRootCauseOrMessage(new Exception("cause1", new Exception("")))).satisfies(m -> {
+            assertThat(m).isNotBlank();
+            assertThat(m).isEqualTo("cause1.");
+        });
     }
 }

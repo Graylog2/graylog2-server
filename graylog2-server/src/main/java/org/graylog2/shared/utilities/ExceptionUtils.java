@@ -16,17 +16,22 @@
  */
 package org.graylog2.shared.utilities;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.net.UnknownHostException;
 
 public class ExceptionUtils {
 
     public static Throwable getRootCause(Throwable t) {
+        return getRootCause(t, false);
+    }
+    public static Throwable getRootCause(Throwable t, boolean causeNeedsMessage) {
         if (t == null) {
             return null;
         }
         Throwable rootCause = t;
         Throwable cause = rootCause.getCause();
-        while (cause != null && cause != rootCause) {
+        while (cause != null && (!causeNeedsMessage || StringUtils.isNotBlank(cause.getMessage())) && cause != rootCause) {
             rootCause = cause;
             cause = cause.getCause();
         }
@@ -61,7 +66,7 @@ public class ExceptionUtils {
         return formatMessageCause(getRootCause(t));
     }
     public static String getRootCauseOrMessage(Throwable t) {
-        final Throwable rootCause = getRootCause(t);
+        final Throwable rootCause = getRootCause(t, true);
         return formatMessageCause(rootCause != null ? rootCause : t);
     }
 }
