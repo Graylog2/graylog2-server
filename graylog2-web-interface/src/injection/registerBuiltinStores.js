@@ -89,7 +89,6 @@ const stores = {
   EventNotifications: () => require('stores/event-notifications/EventNotificationsStore'),
   Events: () => require('stores/events/EventsStore'),
   Extractors: () => require('stores/extractors/ExtractorsStore'),
-  FieldGraphs: () => require('stores/field-analyzers/FieldGraphsStore'),
   FieldQuickValues: () => require('stores/field-analyzers/FieldQuickValuesStore'),
   Fields: () => require('stores/fields/FieldsStore'),
   FieldStatistics: () => require('stores/field-analyzers/FieldStatisticsStore'),
