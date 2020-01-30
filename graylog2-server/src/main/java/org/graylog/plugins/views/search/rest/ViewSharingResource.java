@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.UserShortSummary;
 import org.graylog.plugins.views.search.views.sharing.ViewSharing;
@@ -29,6 +30,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
@@ -73,7 +75,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_SHARING_CREATE)
     public ViewSharing create(@ApiParam(name="id") @PathParam("id") @NotEmpty String id, ViewSharing viewSharing) {
         ensureUserIsPermittedForView(id);
-        checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
+        ensureUserIsPermittedToEditView(id);
         return viewSharingService.create(viewSharing);
     }
 
@@ -82,7 +84,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_SHARING_DELETE)
     public ViewSharing delete(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         ensureUserIsPermittedForView(id);
-        checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
+        ensureUserIsPermittedToEditView(id);
         return viewSharingService.remove(id).orElse(null);
     }
 
@@ -99,7 +101,26 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
     }
 
     private void ensureUserIsPermittedForView(String viewId) {
-        viewService.get(viewId).orElseThrow(NotFoundException::new);
-        checkPermission(ViewsRestPermissions.VIEW_READ, viewId);
+        final ViewDTO view = viewService.get(viewId).orElseThrow(NotFoundException::new);
+        if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
+            checkAnyPermission(new String[]{
+                    RestPermissions.DASHBOARDS_READ,
+                    ViewsRestPermissions.VIEW_READ
+            }, viewId);
+        } else {
+            checkPermission(ViewsRestPermissions.VIEW_READ, viewId);
+        }
+    }
+
+    private void ensureUserIsPermittedToEditView(String viewId) {
+        final ViewDTO view = viewService.get(viewId).orElseThrow(NotFoundException::new);
+        if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
+            checkAnyPermission(new String[]{
+                    RestPermissions.DASHBOARDS_EDIT,
+                    ViewsRestPermissions.VIEW_EDIT
+            }, viewId);
+        } else {
+            checkPermission(ViewsRestPermissions.VIEW_EDIT, viewId);
+        }
     }
 }
