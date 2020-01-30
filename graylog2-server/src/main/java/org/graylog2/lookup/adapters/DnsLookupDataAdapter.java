@@ -192,7 +192,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (UnknownHostException e) {
             return LookupResult.empty(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
         } catch (Exception e) {
-            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key, e.toString());
+            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key, ExceptionUtils.getRootCauseOrMessage(e));
             errorCounter.inc();
             return getEmptyResult();
         }
@@ -218,7 +218,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (UnknownHostException e) {
             return getEmptyResult(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
         } catch (Exception e) {
-            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key, ExceptionUtils.getRootCauseOrMessage(e));
             errorCounter.inc();
             return getErrorResult();
         }
@@ -298,7 +298,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
             return builder.build();
         } catch (Exception e) {
-            LOG.error("Could not resolve [A/AAAA] records for hostname [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not resolve [A/AAAA] records for hostname [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseOrMessage(e));
             errorCounter.inc();
             return getErrorResult();
         }
@@ -310,7 +310,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         try {
             dnsResponse = dnsClient.reverseLookup(key.toString());
         } catch (Exception e) {
-            LOG.error("Could not perform reverse DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not perform reverse DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseOrMessage(e));
             errorCounter.inc();
             return getErrorResult();
         }
@@ -351,7 +351,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         try {
             txtDnsAnswers = dnsClient.txtLookup(key.toString());
         } catch (Exception e) {
-            LOG.error("Could not perform TXT DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not perform TXT DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseOrMessage(e));
             errorCounter.inc();
             return getErrorResult();
         }
