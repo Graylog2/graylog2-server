@@ -1,6 +1,6 @@
 // @flow strict
 import React, { useRef, useMemo } from 'react';
-import type { Node, ElementType } from 'react';
+import type { Node, ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import ReactSelect, { components as Components } from 'react-select';
@@ -64,7 +64,7 @@ const valueContainer = base => ({
 });
 
 type Props = {
-  components: { [string]: ElementType },
+  components: { [string]: ComponentType<any> },
   styles: { [string]: any }
 };
 
@@ -96,21 +96,19 @@ const Select = ({ components, styles, ...rest }: Props) => {
   const selectRef = useRef(null);
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
   const menuStyle = useMemo(() => menu(selectRef), [selectRef]);
-  const _components = {
+  const _components = Object.assign({
     Menu,
     MultiValueRemove,
     MultiValue: components.MultiValue || ValueWithTitle,
-    ...components,
-  };
-  const _styles = {
+  }, components);
+  const _styles = Object.assign({
     menu: menuStyle,
     multiValue,
     multiValueLabel,
     multiValueRemove,
     option,
     valueContainer,
-    ...styles,
-  };
+  }, styles);
   return <ReactSelect {...rest} components={_components} styles={_styles} tabSelectsValue={false} ref={selectRef} />;
 };
 

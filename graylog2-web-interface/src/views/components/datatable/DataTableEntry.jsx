@@ -58,7 +58,7 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   ));
   const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
     const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
-    const [k, v] = translatedPath;
+    const [k, v]: Array<string> = translatedPath;
     const parentValuePath = [...valuePath, { [k]: v }];
     return series.map(({ effectiveName, function: fn }) => {
       const fullPath = [].concat(translatedPath, [effectiveName]);

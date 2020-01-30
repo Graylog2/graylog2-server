@@ -17,7 +17,7 @@ const _placeholderNode = (placeholder) => {
   return node;
 };
 
-type Props = {
+type Props = {|
   disabled: boolean,
   value: string,
   completers: Array<Completer>,
@@ -26,7 +26,7 @@ type Props = {
   onChange: (string) => Promise<string>,
   onExecute: (string) => void,
   placeholder: string,
-};
+|};
 
 type State = {
   value: string,
