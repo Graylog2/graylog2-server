@@ -192,7 +192,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (UnknownHostException e) {
             return LookupResult.empty(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
         } catch (Exception e) {
-            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key, e.toString());
             errorCounter.inc();
             return getEmptyResult();
         }
