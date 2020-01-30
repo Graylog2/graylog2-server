@@ -84,6 +84,7 @@ public class QualifyingViewsServiceTest {
         final Search search = mock(Search.class);
         final String searchId = "streamWithParameter";
         when(view1.id()).thenReturn(viewId);
+        when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(view1.searchId()).thenReturn(searchId);
         when(view1.title()).thenReturn("My View");
         when(view1.summary()).thenReturn("My Summary");
@@ -112,10 +113,12 @@ public class QualifyingViewsServiceTest {
         final Search search2 = mock(Search.class);
         final String search1Id = "streamWithParameter";
         when(view1.id()).thenReturn(viewId);
+        when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(view1.searchId()).thenReturn(search1Id);
         when(view1.title()).thenReturn("My View");
         when(view1.summary()).thenReturn("My Summary");
         when(view1.description()).thenReturn("My Description");
+        when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(search1.id()).thenReturn(search1Id);
         when(search1.parameters()).thenReturn(ImmutableSet.of(ValueParameter.any("foobar")));
         when(search2.parameters()).thenReturn(ImmutableSet.of());

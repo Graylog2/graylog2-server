@@ -38,6 +38,7 @@ import org.graylog.plugins.views.search.SearchMetadata;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -146,8 +147,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
     }
 
-    private boolean hasViewReadPermission(String viewId) {
-        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId);
+    private boolean hasViewReadPermission(ViewDTO view) {
+        final String viewId = view.id();
+        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
+                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
     }
 
     @GET
