@@ -60,4 +60,8 @@ public class ExceptionUtils {
     public static String getRootCauseMessage(Throwable t) {
         return formatMessageCause(getRootCause(t));
     }
+    public static String getRootCauseOrMessage(Throwable t) {
+        final Throwable rootCause = getRootCause(t);
+        return formatMessageCause(rootCause != null ? rootCause : t);
+    }
 }
