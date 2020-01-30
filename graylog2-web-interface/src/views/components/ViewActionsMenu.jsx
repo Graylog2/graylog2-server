@@ -1,3 +1,4 @@
+
 // @flow strict
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -28,7 +29,8 @@ import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
 
-const _isAllowedToEdit = (view: View, currentUser) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)]);
+const _isAllowedToEdit = (view: View, currentUser) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)])
+  || (view.type === View.Type.Dashboard && isPermitted(currentUser.permissions, [`dashboards:read:${view.id}`]));
 
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
 
