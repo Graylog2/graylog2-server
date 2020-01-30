@@ -4632,7 +4632,7 @@ d3-timer@1:
   resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-1.0.9.tgz#f7bb8c0d597d792ff7131e1c24a36dd471a471ba"
   integrity sha512-rT34J5HnQUHhcLvhSB9GjCkN0Ddd5Y8nCwDBG2u6wQEeYxT/Lf51fTFFkldeib/sE/J0clIe0pnCfs6g/lRbyg==
 
-d3@3.5.17, d3@^3, d3@^3.5.12, d3@^3.5.16, d3@~3.5.0:
+d3@3.5.17, d3@^3, d3@^3.5.12, d3@~3.5.0:
   version "3.5.17"
   resolved "https://registry.yarnpkg.com/d3/-/d3-3.5.17.tgz#bc46748004378b21a360c9fc7cf5231790762fb8"
   integrity sha1-vEZ0gAQ3iyGjYMn8fPUjF5B2L7g=
@@ -7448,7 +7448,7 @@ gray-matter@^3.0.8:
   dependencies:
     "@babel/preset-env" "7.6.3"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-3.3.0-SNAPSHOT-0dab63ea-886f-48ed-b626-f519c320d9fe-1580828866270/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v4/npm-graylog-web-plugin-3.3.0-SNAPSHOT-497b46be-6e42-4f9f-b1ab-aab57238e972-1580378277465/node_modules/eslint-config-graylog"
     html-webpack-plugin "3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"
@@ -13745,12 +13745,10 @@ retry@^0.12.0:
   resolved "https://registry.yarnpkg.com/retry/-/retry-0.12.0.tgz#1b42a6266a21f07421d1b0b54b7dc167b01c013b"
   integrity sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs=
 
-rickshaw@^1.5.1:
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/rickshaw/-/rickshaw-1.6.5.tgz#dcea9438c3d48dd2dc58cb05b4e9d9ddeedd4d9d"
-  integrity sha1-3OqUOMPUjdLcWMsFtOnZ3e7dTZ0=
-  dependencies:
-    d3 "^3.5.16"
+rewrite-imports@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/rewrite-imports/-/rewrite-imports-1.2.0.tgz#091b05aa0a358e54b6582205b6feeb73977bd8fb"
+  integrity sha512-oVoZ3QImciK+S7I89vPyxDgohkwhJyWLP5EKcMvF2NOhaFkmdKFiJMJzTM35VeNV1gQfGvv9Cve6sMq5E7unHg==
 
 right-align@^0.1.1:
   version "0.1.3"
