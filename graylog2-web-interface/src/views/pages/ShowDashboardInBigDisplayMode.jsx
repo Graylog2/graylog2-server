@@ -43,7 +43,7 @@ const BodyPositioningWrapper = styled.div`
   padding: 10px;
 `;
 
-const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, activeQuery } }: Props) => {
+const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, activeQuery } = {} }: Props) => {
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
   useEffect(() => {
