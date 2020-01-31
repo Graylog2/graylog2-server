@@ -35,15 +35,6 @@ const Nav = styled(BootstrapNav)(() => {
           }
         }
       }
-
-      .open > a {
-        &,
-        &:hover,
-        &:focus {
-        background-color: ${util.colorLevel(teinte.secondary.due, -3)};
-          border-color: ${borderColor};
-        }
-      }
     }
 
     &.nav-pills {
