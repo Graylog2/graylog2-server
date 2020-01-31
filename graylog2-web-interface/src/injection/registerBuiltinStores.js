@@ -83,7 +83,6 @@ const stores = {
   EventNotifications: () => require('stores/event-notifications/EventNotificationsStore'),
   Events: () => require('stores/events/EventsStore'),
   Extractors: () => require('stores/extractors/ExtractorsStore'),
-  Fields: () => require('stores/fields/FieldsStore'),
   Focus: () => require('stores/tools/FocusStore'),
   GettingStarted: () => require('stores/gettingstarted/GettingStartedStore'),
   GlobalThroughput: () => require('stores/metrics/GlobalThroughputStore'),
