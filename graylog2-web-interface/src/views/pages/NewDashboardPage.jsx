@@ -18,6 +18,7 @@ type Props = {
     state?: {
       view?: View | ViewJson,
     },
+    query: { [string]: any }
   };
   loadingViewHooks: Array<ViewHook>,
   executingViewHooks: Array<ViewHook>,
@@ -31,7 +32,7 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
     const { state = {} } = location;
     const { view: searchView } = state;
     if (searchView && searchView.search) {
-      const query = location;
+      const { query } = location;
       /* $FlowFixMe the searchView.search is guard enough and instanceof does not work here */
       const dashboardView = viewTransformer(searchView);
       const loadPromise = ViewActions.load(dashboardView, true).then(() => dashboardView);
