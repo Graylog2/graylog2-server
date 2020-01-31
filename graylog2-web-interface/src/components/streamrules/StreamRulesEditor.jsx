@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 
@@ -23,13 +23,13 @@ const StreamAlertHeader = styled.h4`
   margin: 0 0 12px;
 `;
 
-const MatchIcon = styled(Icon)(({ empty, matches }) => {
+const MatchIcon = styled(({ empty, matches, ...props }) => {
   const matchColor = matches ? '#00AE42' : '#AD0707';
 
-  return css`
-  color: ${empty ? '#0063BE' : matchColor};
-  margin-right: 3px;
-`;
+  return (<Icon {...props} />)`
+    color: ${empty ? '#0063BE' : matchColor};
+    margin-right: 3px;
+  `;
 });
 
 const StyledSpinner = styled(Spinner)`

@@ -72,9 +72,10 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
   const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger');
   const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
   const description = streamRule.description ? <small>{' '}({streamRule.description})</small> : null;
+  const listGroupStyle = !isEmpty(matchData) ? matchDataStyle() : null;
 
   return (
-    <ListGroupItem bsStyle={!isEmpty(matchData) && matchDataStyle()}>
+    <ListGroupItem bsStyle={listGroupStyle}>
       {actionItems}
       <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} />
       <StreamRuleForm ref={streamRuleFormRef}

@@ -66,7 +66,7 @@ const StreamMetaData = ({ isDefaultStream, stream, streamRuleTypes, permissions 
 StreamMetaData.propTypes = {
   isDefaultStream: PropTypes.bool,
   stream: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     is_default: PropTypes.bool,
     rules: PropTypes.array,
     matching_type: PropTypes.string,
