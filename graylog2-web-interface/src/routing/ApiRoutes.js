@@ -227,6 +227,7 @@ const ApiRoutes = {
     substringTest: () => { return { url: '/tools/substring_tester' }; },
     containsStringTest: () => { return { url: '/tools/contains_string_tester' }; },
     lookupTableTest: () => { return { url: '/tools/lookup_table_tester' }; },
+    UrlWhitelistCheck: () => { return { url: '/system/urlwhitelist/check' }; },
   },
   UniversalSearchApiController: {
     _streamFilter(streamId) {

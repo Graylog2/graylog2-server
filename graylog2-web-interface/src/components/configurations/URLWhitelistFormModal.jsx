@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
-import { isEqual } from 'lodash';
 import connect from 'stores/connect';
 import { IfPermitted } from 'components/common';
 import { Button } from 'components/graylog';
@@ -24,7 +23,6 @@ class URLWhitelistFormModal extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        initialConfig: { entries: [], disabled: false },
         config: { entries: [], disabled: false },
         isValid: false,
       };
@@ -80,9 +78,7 @@ class URLWhitelistFormModal extends React.Component {
 
 
   _resetConfig = () => {
-    const { config } = this.props;
-    const updatedState = { ...this.state, config };
-    this.setState(updatedState);
+
   }
 
   _updateConfig = (configType, config) => {
@@ -99,7 +95,7 @@ class URLWhitelistFormModal extends React.Component {
     const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
     if (urlwhitelistConfig) {
       const { newUrlEntry } = this.props;
-      const initialConfig = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: 'literal' }], disabled: urlwhitelistConfig.disabled };
+      const initialConfig = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: null }], disabled: urlwhitelistConfig.disabled };
       const { entries, disabled } = initialConfig;
       const { isValid } = this.state;
       return (
@@ -125,7 +121,6 @@ class URLWhitelistFormModal extends React.Component {
 }
 
 URLWhitelistFormModal.propTypes = {
-  config: PropTypes.object.isRequired,
   newUrlEntry: PropTypes.string,
   onUpdate: PropTypes.func,
   configuration: PropTypes.object,
