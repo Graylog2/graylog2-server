@@ -345,7 +345,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
               class="list-group"
             >
               <button
-                class="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
                 type="button"
               >
                 test-0
