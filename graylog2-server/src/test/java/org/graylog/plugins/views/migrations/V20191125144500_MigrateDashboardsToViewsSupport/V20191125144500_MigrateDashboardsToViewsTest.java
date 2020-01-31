@@ -44,11 +44,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -367,11 +370,44 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted.migratedDashboardIds()).containsExactly("5ddf8ed5b2d44b2e04472992");
-        assertThat(migrationCompleted.widgetMigrationIds()).hasSize(2);
+        assertThat(migrationCompleted.widgetMigrationIds()).hasSize(6);
 
-        verify(viewService, times(1)).save(any());
+        final ArgumentCaptor<View> viewCaptor = ArgumentCaptor.forClass(View.class);
+        verify(viewService, times(1)).save(viewCaptor.capture());
         verify(searchService, times(1)).save(any());
+        final Set<ViewWidget> widgets = viewCaptor.getValue().state().get("0000016e-b690-427d-0000-016eb690426f").widgets();
+        final Function<String, Set<ViewWidget>> findNewWidgets = (String widgetId) -> {
+            final Set<String> newWidgetIds = migrationCompleted.widgetMigrationIds().get(widgetId);
+            return widgets.stream().filter(widget -> newWidgetIds.contains(widget.id())).collect(Collectors.toSet());
+        };
+
+        final List<ViewWidget> widgetWithoutAttributes = new ArrayList<>(findNewWidgets.apply("4ce93e89-4771-4ce2-8b59-6dc058cbfd3b"));
+        assertThat(widgetWithoutAttributes).hasSize(1);
+        assertThat(((AggregationWidget)widgetWithoutAttributes.get(0)).config().visualization()).isEqualTo("table");
+
+        final List<ViewWidget> widgetWithOnlyShowPieChartIsFalse = new ArrayList<>(findNewWidgets.apply("5c12c588-be0c-436b-b999-ee18378efd45"));
+        assertThat(widgetWithOnlyShowPieChartIsFalse).hasSize(1);
+        assertThat(((AggregationWidget)widgetWithOnlyShowPieChartIsFalse.get(0)).config().visualization()).isEqualTo("table");
+
+        final List<ViewWidget> widgetWithOnlyShowDataTableIsFalse = new ArrayList<>(findNewWidgets.apply("e6a16d9a-23c0-4b7f-93b5-d790b5d64672"));
+        assertThat(widgetWithOnlyShowDataTableIsFalse).hasSize(1);
+        assertThat(((AggregationWidget)widgetWithOnlyShowDataTableIsFalse.get(0)).config().visualization()).isEqualTo("table");
+
+        final List<ViewWidget> widgetWithBothAttributesPresentButFalse = new ArrayList<>(findNewWidgets.apply("568c005a-11ec-4be9-acd7-b2aa509c07e0"));
+        assertThat(widgetWithBothAttributesPresentButFalse).hasSize(1);
+        assertThat(((AggregationWidget)widgetWithBothAttributesPresentButFalse.get(0)).config().visualization()).isEqualTo("table");
+
+        final List<ViewWidget> widgetWithPieChartPresentAndTrue = new ArrayList<>(findNewWidgets.apply("2e3c5e76-bbfd-4ac3-a27b-7491a5cbf59a"));
+        assertThat(widgetWithPieChartPresentAndTrue).hasSize(1);
+        assertThat(((AggregationWidget)widgetWithPieChartPresentAndTrue.get(0)).config().visualization()).isEqualTo("pie");
+
+        final List<ViewWidget> widgetWithBothPieChartAndDataTablePresentAndTrue = new ArrayList<>(findNewWidgets.apply("26a0a3e1-718f-4bfe-90a2-cb441390152d"));
+        assertThat(widgetWithBothPieChartAndDataTablePresentAndTrue).hasSize(2);
+        assertThat(widgetWithBothPieChartAndDataTablePresentAndTrue)
+                .extracting(viewWidget -> ((AggregationWidget)viewWidget).config().visualization())
+                .containsExactlyInAnyOrder("table", "pie");
     }
+
 
     private void assertSearchesWritten(int count, String expectedEntities) throws Exception {
         final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
