@@ -1,53 +1,58 @@
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Col, Row } from 'components/graylog';
 
-import StoreProvider from 'injection/StoreProvider';
-
-import ActionsProvider from 'injection/ActionsProvider';
+import connect from 'stores/connect';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import { Spinner } from 'components/common';
 import { SystemJobsList } from 'components/systemjobs';
 
-const SystemJobsStore = StoreProvider.getStore('SystemJobs');
-const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
+const { SystemJobsStore, SystemJobsActions } = CombinedProvider.get('SystemJobs');
 
-const SystemJobsComponent = createReactClass({
-  displayName: 'SystemJobsComponent',
-  mixins: [Reflux.connect(SystemJobsStore)],
-
-  componentDidMount() {
+const SystemJobsComponent = ({ jobs }) => {
+  useEffect(() => {
     SystemJobsActions.list();
+    const interval = setInterval(SystemJobsActions.list, 2000);
 
-    this.interval = setInterval(SystemJobsActions.list, 2000);
-  },
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  },
-
-  render() {
-    if (!this.state.jobs) {
-      return <Spinner />;
-    }
-    const jobs = Object.keys(this.state.jobs)
-      .map(nodeId => (this.state.jobs[nodeId] ? this.state.jobs[nodeId].jobs : []))
-      .reduce((a, b) => a.concat(b));
-    return (
-      <Row className="content">
-        <Col md={12}>
-          <h2>System jobs</h2>
-          <p className="description">
+  if (!jobs) {
+    return <Spinner />;
+  }
+  const jobList = Object.keys(jobs)
+    .map(nodeId => (jobs[nodeId] ? jobs[nodeId].jobs : []))
+    .reduce((a, b) => a.concat(b), []);
+  return (
+    <Row className="content">
+      <Col md={12}>
+        <h2>System jobs</h2>
+        <p className="description">
             A system job is a long-running task a graylog-server node executes for maintenance reasons. Some jobs
             provide progress information or can be stopped.
-          </p>
+        </p>
 
-          <SystemJobsList jobs={jobs} />
-        </Col>
-      </Row>
-    );
-  },
-});
+        <SystemJobsList jobs={jobList} />
+      </Col>
+    </Row>
+  );
+};
 
-export default SystemJobsComponent;
+SystemJobsComponent.propTypes = {
+  jobs: PropTypes.objectOf(
+    PropTypes.shape({
+      jobs: PropTypes.array,
+    }),
+  ),
+};
+
+SystemJobsComponent.defaultProps = {
+  jobs: undefined,
+};
+
+export default connect(SystemJobsComponent,
+  { systemJobsStore: SystemJobsStore },
+  ({ systemJobsStore }) => ({ jobs: systemJobsStore.jobs }));
