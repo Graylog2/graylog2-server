@@ -579,7 +579,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "hdNTyr",
+                                          "lastClassName": "deAIE",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -587,12 +587,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "#FFF",
                                             ";border-color:",
                                             "#DCE1E5",
-                                            ";&:focus{border-color:",
-                                            "#6DC6E7",
-                                            ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                            "rgba(109,198,231,0.4)",
-                                            ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                             "#b8b8b8",
+                                            ";}&:focus{border-color:",
+                                            "#6DC6E7",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
                                             ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -619,7 +619,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 hdNTyr"
+                                      className="FormControl-sc-1amoaox-0 deAIE"
                                       componentClass="input"
                                       defaultValue="testam"
                                       inputRef={[Function]}
@@ -631,7 +631,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
                                         defaultValue="testam"
                                         id="title-input0"
                                         label=""
@@ -746,7 +746,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "hdNTyr",
+                                          "lastClassName": "deAIE",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -754,12 +754,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "#FFF",
                                             ";border-color:",
                                             "#DCE1E5",
-                                            ";&:focus{border-color:",
-                                            "#6DC6E7",
-                                            ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                            "rgba(109,198,231,0.4)",
-                                            ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                             "#b8b8b8",
+                                            ";}&:focus{border-color:",
+                                            "#6DC6E7",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
                                             ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -786,7 +786,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 hdNTyr"
+                                      className="FormControl-sc-1amoaox-0 deAIE"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -798,7 +798,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input0"
                                         label=""
@@ -2532,7 +2532,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "hdNTyr",
+                                          "lastClassName": "deAIE",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -2540,12 +2540,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "#FFF",
                                             ";border-color:",
                                             "#DCE1E5",
-                                            ";&:focus{border-color:",
-                                            "#6DC6E7",
-                                            ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                            "rgba(109,198,231,0.4)",
-                                            ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                             "#b8b8b8",
+                                            ";}&:focus{border-color:",
+                                            "#6DC6E7",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
                                             ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -2572,7 +2572,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 hdNTyr"
+                                      className="FormControl-sc-1amoaox-0 deAIE"
                                       componentClass="input"
                                       defaultValue="test"
                                       inputRef={[Function]}
@@ -2584,7 +2584,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
                                         defaultValue="test"
                                         id="title-input1"
                                         label=""
@@ -2699,7 +2699,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "hdNTyr",
+                                          "lastClassName": "deAIE",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -2707,12 +2707,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "#FFF",
                                             ";border-color:",
                                             "#DCE1E5",
-                                            ";&:focus{border-color:",
-                                            "#6DC6E7",
-                                            ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                            "rgba(109,198,231,0.4)",
-                                            ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                             "#b8b8b8",
+                                            ";}&:focus{border-color:",
+                                            "#6DC6E7",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
                                             ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -2739,7 +2739,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 hdNTyr"
+                                      className="FormControl-sc-1amoaox-0 deAIE"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -2751,7 +2751,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input1"
                                         label=""
@@ -4485,7 +4485,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "hdNTyr",
+                                          "lastClassName": "deAIE",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -4493,12 +4493,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "#FFF",
                                             ";border-color:",
                                             "#DCE1E5",
-                                            ";&:focus{border-color:",
-                                            "#6DC6E7",
-                                            ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                            "rgba(109,198,231,0.4)",
-                                            ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                             "#b8b8b8",
+                                            ";}&:focus{border-color:",
+                                            "#6DC6E7",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
                                             ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -4525,7 +4525,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 hdNTyr"
+                                      className="FormControl-sc-1amoaox-0 deAIE"
                                       componentClass="input"
                                       defaultValue="test"
                                       inputRef={[Function]}
@@ -4537,7 +4537,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
                                         defaultValue="test"
                                         id="title-input2"
                                         label=""
@@ -4652,7 +4652,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "hdNTyr",
+                                          "lastClassName": "deAIE",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -4660,12 +4660,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "#FFF",
                                             ";border-color:",
                                             "#DCE1E5",
-                                            ";&:focus{border-color:",
-                                            "#6DC6E7",
-                                            ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                            "rgba(109,198,231,0.4)",
-                                            ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                             "#b8b8b8",
+                                            ";}&:focus{border-color:",
+                                            "#6DC6E7",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
                                             ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -4692,7 +4692,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 hdNTyr"
+                                      className="FormControl-sc-1amoaox-0 deAIE"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -4704,7 +4704,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input2"
                                         label=""
