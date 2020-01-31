@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-
-import { Input } from 'components/bootstrap';
 import URLWhitelistInput from 'components/configurations/URLWhitelistInput';
 import FormsUtils from 'util/FormsUtils';
 
