@@ -24,11 +24,12 @@ const mockView = View.create()
   .search(Search.builder().build())
   .build();
 
-jest.mock('views/stores/ViewStore', () => ({ ViewActions: { create: jest.fn(() => Promise.resolve({ view: mockView })) } }));
 jest.mock('react-router', () => ({ withRouter: x => x }));
-jest.mock('views/stores/SearchExecutionStateStore', () => MockStore());
-jest.mock('views/stores/SearchStore', () => MockStore());
 jest.mock('./ExtendedSearchPage', () => mockExtendedSearchPage);
+jest.mock('views/stores/SearchStore', () => MockStore());
+jest.mock('views/stores/ViewStore', () => ({
+  ViewActions: { create: jest.fn(() => Promise.resolve({ view: mockView })) },
+}));
 jest.mock('views/hooks/SyncWithQueryParameters', () => ({
   syncWithQueryParameters: jest.fn(),
 }));
