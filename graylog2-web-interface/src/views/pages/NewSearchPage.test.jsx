@@ -5,7 +5,6 @@ import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTesting
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 
-
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -86,7 +85,7 @@ describe('NewSearchPage', () => {
       await wait(() => expect(createViewAction).toHaveBeenCalledWith(View.Type.Search));
     });
 
-    it('should process hooks with provided url query params', async () => {
+    it('should process hooks with provided location query', async () => {
       const processHooksAction = asMock(processHooks);
 
       render(<NewSearchPage route={{}}
@@ -187,7 +186,6 @@ describe('NewSearchPage', () => {
                                                   location={mockLocation} />);
       const viewCreateButton = await waitForElement(() => getByText('Load new view'));
       fireEvent.click(viewCreateButton);
-
 
       await wait(() => expect(syncWithQueryParamsAction).toBeCalledTimes(1));
       await wait(() => expect(syncWithQueryParamsAction).toHaveBeenCalledWith('/search?q=&rangetype=relative&relative=300'));

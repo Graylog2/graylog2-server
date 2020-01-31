@@ -40,7 +40,6 @@ type State = {
   loaded: boolean,
 };
 
-
 class ShowViewPage extends React.Component<Props, State> {
   static propTypes = {
     location: PropTypes.shape({
