@@ -25,16 +25,12 @@ const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" 
 const SERVER_PING_TIMEOUT = 20000;
 
 export const AppFacade = ({ currentUser, server, sessionId }) => {
-  let interval;
   let Page;
 
   useEffect(() => {
-    interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
+    const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (!server.up) {
