@@ -81,7 +81,6 @@ const stores = {
   EventNotifications: () => require('stores/event-notifications/EventNotificationsStore'),
   Events: () => require('stores/events/EventsStore'),
   Extractors: () => require('stores/extractors/ExtractorsStore'),
-  Focus: () => require('stores/tools/FocusStore'),
   GettingStarted: () => require('stores/gettingstarted/GettingStartedStore'),
   GlobalThroughput: () => require('stores/metrics/GlobalThroughputStore'),
   GrokPatterns: () => require('stores/grok-patterns/GrokPatternsStore'),
