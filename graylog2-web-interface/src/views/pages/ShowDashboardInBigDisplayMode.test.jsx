@@ -37,7 +37,7 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()], 'listen'),
 }));
 
-describe('ShowDashboardInBigDisplayMode', () => {
+describe('ShowDashboardInBigDisplayMode should', () => {
   const mockLocation = {
     query: {
       interval: '30', refresh: '10',
@@ -49,7 +49,7 @@ describe('ShowDashboardInBigDisplayMode', () => {
     jest.clearAllMocks();
   });
 
-  it('sets refresh interval correctly based on location query', async () => {
+  it('set refresh interval correctly based on location query', async () => {
     render(<ShowDashboardInBigDisplayMode route={{}}
                                           params={{ viewId: mockView.id }}
                                           location={mockLocation} />);
@@ -57,14 +57,14 @@ describe('ShowDashboardInBigDisplayMode', () => {
     await wait(() => expect(RefreshActions.setInterval).toHaveBeenCalledWith(10000));
   });
 
-  it('should enable refresh actions', async () => {
+  it('enable refresh actions', async () => {
     render(<ShowDashboardInBigDisplayMode route={{}}
                                           params={{ viewId: mockView.id }}
                                           location={mockLocation} />);
     await wait(() => expect(RefreshActions.enable).toHaveBeenCalledTimes(1));
   });
 
-  it('should set new refresh interval when location query refresh param changes', async () => {
+  it('set new refresh interval when location query refresh param changes', async () => {
     const { rerender } = render(<ShowDashboardInBigDisplayMode route={{}}
                                                                params={{ viewId: mockView.id }}
                                                                location={mockLocation} />);
@@ -76,7 +76,7 @@ describe('ShowDashboardInBigDisplayMode', () => {
     await wait(() => expect(RefreshActions.setInterval).toHaveBeenCalledWith(20000));
   });
 
-  it('should not change RefreshActions when query refresh param did not changes', async () => {
+  it('not change RefreshActions when query refresh param did not changed', async () => {
     const { rerender } = render(<ShowDashboardInBigDisplayMode route={{}}
                                                                params={{ viewId: mockView.id }}
                                                                location={mockLocation} />);
@@ -86,6 +86,14 @@ describe('ShowDashboardInBigDisplayMode', () => {
 
     await wait(() => expect(RefreshActions.setInterval).toHaveBeenCalledTimes(1));
     await wait(() => expect(RefreshActions.enable).toHaveBeenCalledTimes(1));
+  });
+
+  it('disable refresh actions on unmount', async () => {
+    const { unmount } = render(<ShowDashboardInBigDisplayMode route={{}}
+                                                              params={{ viewId: mockView.id }}
+                                                              location={mockLocation} />);
+    unmount();
+    await wait(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
   });
 
   // it('should display view title', async () => {
