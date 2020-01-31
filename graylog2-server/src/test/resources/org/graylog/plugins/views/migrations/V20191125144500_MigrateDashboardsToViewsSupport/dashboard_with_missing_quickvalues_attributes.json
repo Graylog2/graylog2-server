@@ -8,16 +8,28 @@
       "title" : "Widgets with missing attributes.",
       "positions": {
         "4ce93e89-4771-4ce2-8b59-6dc058cbfd3b" : {
-          "width" : 8,
+          "width" : 4,
           "col" : 1,
-          "row" : 10,
+          "row" : 1,
           "height" : 3
         },
         "568c005a-11ec-4be9-acd7-b2aa509c07e0" : {
-          "width" : 2,
-          "col" : 7,
-          "row" : 1,
-          "height" : 2
+          "width" : 4,
+          "col" : 1,
+          "row" : 4,
+          "height" : 3
+        },
+        "e6a16d9a-23c0-4b7f-93b5-d790b5d64672" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 7,
+          "height" : 4
+        },
+        "5c12c588-be0c-436b-b999-ee18378efd45" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 10,
+          "height" : 4
         }
       },
       "widgets" : [
@@ -39,8 +51,49 @@
             "sort_order" : "desc",
             "stacked_fields" : "",
             "data_table_limit" : 50,
-            "interval": "minute",
-            "unknown_attribute": 42
+            "interval": "minute"
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Status Ratio",
+          "id" : "5c12c588-be0c-436b-b999-ee18378efd45",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheCacheStatus",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Status Ratio",
+          "id" : "e6a16d9a-23c0-4b7f-93b5-d790b5d64672",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheCacheStatus",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "limit" : 5,
+            "show_data_table" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
           }
         },
         {
@@ -62,8 +115,50 @@
             "show_pie_chart" : false,
             "sort_order" : "desc",
             "stacked_fields" : "",
-            "data_table_limit" : 50,
-            "unknown_attribute": 42
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Status Ratio",
+          "id" : "2e3c5e76-bbfd-4ac3-a27b-7491a5cbf59a",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheCacheStatus",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "limit" : 5,
+            "show_pie_chart" : true,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Status Ratio",
+          "id" : "26a0a3e1-718f-4bfe-90a2-cb441390152d",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheCacheStatus",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "limit" : 5,
+            "show_data_table" : true,
+            "show_pie_chart" : true,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
           }
         }
       ]
