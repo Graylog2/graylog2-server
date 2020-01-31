@@ -777,57 +777,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                             >
                                               <ListGroupItem
                                                 className="listGroupHeader"
-<<<<<<< HEAD
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                               >
                                                 <StyledComponent
                                                   className="listGroupHeader"
@@ -839,33 +788,46 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -879,28 +841,15 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <Input
                                                         addonAfter={null}
@@ -987,90 +936,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         <div
                                                                           className="checkbox"
                                                                         >
-<<<<<<< HEAD
-                                                                          <input
-                                                                            checked={false}
-                                                                            disabled={false}
-                                                                            label="Select all"
-                                                                            name="select-all-checkbox"
-                                                                            onChange={[Function]}
-                                                                            placeholder=""
-                                                                            type="checkbox"
-                                                                          />
-                                                                          Select all
-                                                                        </label>
-                                                                      </div>
-                                                                    </Checkbox>
-                                                                  </div>
-                                                                </InputWrapper>
-                                                              </div>
-                                                            </FormGroup>
-                                                          </StyledComponent>
-                                                        </FormGroup__StyledFormGroup>
-                                                      </Component>
-                                                    </Input>
-                                                  </span>
-                                                </ListGroupItem>
-                                              </StyledComponent>
-                                            </ListGroupItem>
-                                          </ForwardRef>
-                                        </ControlledTableListHeader>
-                                        <ControlledTableListItem
-                                          key="item-01"
-                                        >
-                                          <ForwardRef>
-                                            <ListGroupItem>
-                                              <StyledComponent
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                                                           <label
                                                                             title=""
                                                                           >
@@ -1115,33 +980,46 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -1155,28 +1033,15 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <div
                                                         className="itemWrapper "
@@ -1427,95 +1292,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           <div
                                                                             className="checkbox"
                                                                           >
-<<<<<<< HEAD
-                                                                            <input
-                                                                              checked={false}
-                                                                              disabled={false}
-                                                                              label=""
-                                                                              name="id-checkbox"
-                                                                              onChange={[Function]}
-                                                                              placeholder=""
-                                                                              type="checkbox"
-                                                                            />
-                                                                          </label>
-                                                                        </div>
-                                                                      </Checkbox>
-                                                                    </div>
-                                                                  </InputWrapper>
-                                                                </div>
-                                                              </FormGroup>
-                                                            </StyledComponent>
-                                                          </FormGroup__StyledFormGroup>
-                                                        </Component>
-                                                      </Input>
-                                                      <span
-                                                        className="description"
-                                                      >
-                                                        stream1
-                                                      </span>
-                                                    </div>
-                                                  </span>
-                                                </ListGroupItem>
-                                              </StyledComponent>
-                                            </ListGroupItem>
-                                          </ForwardRef>
-                                        </ControlledTableListItem>
-                                        <ControlledTableListItem
-                                          key="item-02"
-                                        >
-                                          <ForwardRef>
-                                            <ListGroupItem>
-                                              <StyledComponent
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                                                             <label
                                                                               title=""
                                                                             >
@@ -1565,33 +1341,46 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -1605,28 +1394,15 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <div
                                                         className="itemWrapper "
@@ -2452,249 +2228,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                             >
                                               <ListGroupItem
                                                 className="listGroupHeader"
-<<<<<<< HEAD
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-                                                      ],
-                                                    },
-                                                    "displayName": "ListGroupItem",
-                                                    "foldedComponentIds": Array [],
-                                                    "render": [Function],
-                                                    "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
-                                                    "target": [Function],
-                                                    "toString": [Function],
-                                                    "warnTooManyClasses": [Function],
-                                                    "withComponent": [Function],
-                                                  }
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-                                                  >
-                                                    <Input
-                                                      addonAfter={null}
-                                                      bsStyle={null}
-                                                      buttonAfter={null}
-                                                      checked={false}
-                                                      disabled={false}
-                                                      help=""
-                                                      id="select-all-checkbox"
-                                                      label="Select all"
-                                                      onChange={[Function]}
-                                                      placeholder=""
-                                                      type="checkbox"
-                                                      wrapperClassName="form-group-inline"
-                                                    >
-                                                      <Component
-                                                        controlId="select-all-checkbox"
-                                                        validationState={null}
-                                                      >
-                                                        <FormGroup__StyledFormGroup
-                                                          controlId="select-all-checkbox"
-                                                          validationState={null}
-                                                        >
-                                                          <StyledComponent
-                                                            controlId="select-all-checkbox"
-                                                            forwardedComponent={
-                                                              Object {
-                                                                "$$typeof": Symbol(react.forward_ref),
-                                                                "SIZES": Array [
-                                                                  "large",
-                                                                  "small",
-                                                                ],
-                                                                "attrs": Array [],
-                                                                "componentStyle": ComponentStyle {
-                                                                  "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                  "isStatic": false,
-                                                                  "lastClassName": "ekazNr",
-                                                                  "rules": Array [
-                                                                    [Function],
-                                                                    ";",
-                                                                  ],
-                                                                },
-                                                                "displayName": "FormGroup__StyledFormGroup",
-                                                                "foldedComponentIds": Array [],
-                                                                "render": [Function],
-                                                                "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                "target": [Function],
-                                                                "toString": [Function],
-                                                                "warnTooManyClasses": [Function],
-                                                                "withComponent": [Function],
-                                                              }
-                                                            }
-                                                            forwardedRef={null}
-                                                            validationState={null}
-                                                          >
-                                                            <FormGroup
-                                                              bsClass="form-group"
-                                                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
-                                                              controlId="select-all-checkbox"
-                                                              validationState={null}
-                                                            >
-                                                              <div
-                                                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
-                                                              >
-                                                                <InputWrapper
-                                                                  className="form-group-inline"
-                                                                >
-                                                                  <div
-                                                                    className="form-group-inline"
-                                                                  >
-                                                                    <Checkbox
-                                                                      bsClass="checkbox"
-                                                                      checked={false}
-                                                                      disabled={false}
-                                                                      inline={false}
-                                                                      inputRef={[Function]}
-                                                                      label="Select all"
-                                                                      name="select-all-checkbox"
-                                                                      onChange={[Function]}
-                                                                      placeholder=""
-                                                                      title=""
-                                                                      type="checkbox"
-                                                                    >
-                                                                      <div
-                                                                        className="checkbox"
-                                                                      >
-                                                                        <label
-                                                                          title=""
-                                                                        >
-                                                                          <input
-                                                                            checked={false}
-                                                                            disabled={false}
-                                                                            label="Select all"
-                                                                            name="select-all-checkbox"
-                                                                            onChange={[Function]}
-                                                                            placeholder=""
-                                                                            type="checkbox"
-                                                                          />
-                                                                          Select all
-                                                                        </label>
-                                                                      </div>
-                                                                    </Checkbox>
-                                                                  </div>
-                                                                </InputWrapper>
-                                                              </div>
-                                                            </FormGroup>
-                                                          </StyledComponent>
-                                                        </FormGroup__StyledFormGroup>
-                                                      </Component>
-                                                    </Input>
-                                                  </span>
-                                                </ListGroupItem>
-                                              </StyledComponent>
-                                            </ListGroupItem>
-                                          </ForwardRef>
-                                        </ControlledTableListHeader>
-                                        <ControlledTableListItem
-                                          key="item-01"
-                                        >
-                                          <ForwardRef>
-                                            <ListGroupItem>
-                                              <StyledComponent
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                               >
                                                 <StyledComponent
                                                   className="listGroupHeader"
@@ -2706,33 +2239,46 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -2746,28 +2292,15 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <Input
                                                         addonAfter={null}
@@ -2878,75 +2411,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           </FormGroup__StyledFormGroup>
                                                         </Component>
                                                       </Input>
-<<<<<<< HEAD
-                                                      <span
-                                                        className="description"
-                                                      >
-                                                        dashboard1
-                                                      </span>
-                                                    </div>
-                                                  </span>
-                                                </ListGroupItem>
-                                              </StyledComponent>
-                                            </ListGroupItem>
-                                          </ForwardRef>
-                                        </ControlledTableListItem>
-                                        <ControlledTableListItem
-                                          key="item-02"
-                                        >
-                                          <ForwardRef>
-                                            <ListGroupItem>
-                                              <StyledComponent
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                                     </span>
                                                   </ListGroupItem>
                                                 </StyledComponent>
@@ -2967,33 +2431,46 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -3007,28 +2484,15 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <div
                                                         className="itemWrapper "
@@ -3333,27 +2797,41 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -3371,11 +2849,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
                                                   >
                                                     <span
-                                                      className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <div
                                                         className="itemWrapper "
@@ -4467,57 +3945,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                             >
                                               <ListGroupItem
                                                 className="listGroupHeader"
-<<<<<<< HEAD
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                               >
                                                 <StyledComponent
                                                   className="listGroupHeader"
@@ -4529,33 +3956,46 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -4569,28 +4009,15 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <Input
                                                         addonAfter={null}
@@ -4677,90 +4104,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         <div
                                                                           className="checkbox"
                                                                         >
-<<<<<<< HEAD
-                                                                          <input
-                                                                            checked={false}
-                                                                            disabled={false}
-                                                                            label="Select all"
-                                                                            name="select-all-checkbox"
-                                                                            onChange={[Function]}
-                                                                            placeholder=""
-                                                                            type="checkbox"
-                                                                          />
-                                                                          Select all
-                                                                        </label>
-                                                                      </div>
-                                                                    </Checkbox>
-                                                                  </div>
-                                                                </InputWrapper>
-                                                              </div>
-                                                            </FormGroup>
-                                                          </StyledComponent>
-                                                        </FormGroup__StyledFormGroup>
-                                                      </Component>
-                                                    </Input>
-                                                  </span>
-                                                </ListGroupItem>
-                                              </StyledComponent>
-                                            </ListGroupItem>
-                                          </ForwardRef>
-                                        </ControlledTableListHeader>
-                                        <ControlledTableListItem
-                                          key="item-01"
-                                        >
-                                          <ForwardRef>
-                                            <ListGroupItem>
-                                              <StyledComponent
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                                                           <label
                                                                             title=""
                                                                           >
@@ -4805,33 +4148,46 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -4845,28 +4201,15 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <div
                                                         className="itemWrapper "
@@ -5117,95 +4460,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           <div
                                                                             className="checkbox"
                                                                           >
-<<<<<<< HEAD
-                                                                            <input
-                                                                              checked={false}
-                                                                              disabled={false}
-                                                                              label=""
-                                                                              name="id-checkbox"
-                                                                              onChange={[Function]}
-                                                                              placeholder=""
-                                                                              type="checkbox"
-                                                                            />
-                                                                          </label>
-                                                                        </div>
-                                                                      </Checkbox>
-                                                                    </div>
-                                                                  </InputWrapper>
-                                                                </div>
-                                                              </FormGroup>
-                                                            </StyledComponent>
-                                                          </FormGroup__StyledFormGroup>
-                                                        </Component>
-                                                      </Input>
-                                                      <span
-                                                        className="description"
-                                                      >
-                                                        stream1
-                                                      </span>
-                                                    </div>
-                                                  </span>
-                                                </ListGroupItem>
-                                              </StyledComponent>
-                                            </ListGroupItem>
-                                          </ForwardRef>
-                                        </ControlledTableListItem>
-                                        <ControlledTableListItem
-                                          key="item-02"
-                                        >
-                                          <ForwardRef>
-                                            <ListGroupItem>
-                                              <StyledComponent
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                                                             <label
                                                                               title=""
                                                                             >
@@ -5255,33 +4509,46 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -5295,28 +4562,15 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <div
                                                         className="itemWrapper "
@@ -6142,249 +5396,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                             >
                                               <ListGroupItem
                                                 className="listGroupHeader"
-<<<<<<< HEAD
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-                                                      ],
-                                                    },
-                                                    "displayName": "ListGroupItem",
-                                                    "foldedComponentIds": Array [],
-                                                    "render": [Function],
-                                                    "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
-                                                    "target": [Function],
-                                                    "toString": [Function],
-                                                    "warnTooManyClasses": [Function],
-                                                    "withComponent": [Function],
-                                                  }
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-                                                  >
-                                                    <Input
-                                                      addonAfter={null}
-                                                      bsStyle={null}
-                                                      buttonAfter={null}
-                                                      checked={false}
-                                                      disabled={false}
-                                                      help=""
-                                                      id="select-all-checkbox"
-                                                      label="Select all"
-                                                      onChange={[Function]}
-                                                      placeholder=""
-                                                      type="checkbox"
-                                                      wrapperClassName="form-group-inline"
-                                                    >
-                                                      <Component
-                                                        controlId="select-all-checkbox"
-                                                        validationState={null}
-                                                      >
-                                                        <FormGroup__StyledFormGroup
-                                                          controlId="select-all-checkbox"
-                                                          validationState={null}
-                                                        >
-                                                          <StyledComponent
-                                                            controlId="select-all-checkbox"
-                                                            forwardedComponent={
-                                                              Object {
-                                                                "$$typeof": Symbol(react.forward_ref),
-                                                                "SIZES": Array [
-                                                                  "large",
-                                                                  "small",
-                                                                ],
-                                                                "attrs": Array [],
-                                                                "componentStyle": ComponentStyle {
-                                                                  "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                  "isStatic": false,
-                                                                  "lastClassName": "ekazNr",
-                                                                  "rules": Array [
-                                                                    [Function],
-                                                                    ";",
-                                                                  ],
-                                                                },
-                                                                "displayName": "FormGroup__StyledFormGroup",
-                                                                "foldedComponentIds": Array [],
-                                                                "render": [Function],
-                                                                "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                "target": [Function],
-                                                                "toString": [Function],
-                                                                "warnTooManyClasses": [Function],
-                                                                "withComponent": [Function],
-                                                              }
-                                                            }
-                                                            forwardedRef={null}
-                                                            validationState={null}
-                                                          >
-                                                            <FormGroup
-                                                              bsClass="form-group"
-                                                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
-                                                              controlId="select-all-checkbox"
-                                                              validationState={null}
-                                                            >
-                                                              <div
-                                                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
-                                                              >
-                                                                <InputWrapper
-                                                                  className="form-group-inline"
-                                                                >
-                                                                  <div
-                                                                    className="form-group-inline"
-                                                                  >
-                                                                    <Checkbox
-                                                                      bsClass="checkbox"
-                                                                      checked={false}
-                                                                      disabled={false}
-                                                                      inline={false}
-                                                                      inputRef={[Function]}
-                                                                      label="Select all"
-                                                                      name="select-all-checkbox"
-                                                                      onChange={[Function]}
-                                                                      placeholder=""
-                                                                      title=""
-                                                                      type="checkbox"
-                                                                    >
-                                                                      <div
-                                                                        className="checkbox"
-                                                                      >
-                                                                        <label
-                                                                          title=""
-                                                                        >
-                                                                          <input
-                                                                            checked={false}
-                                                                            disabled={false}
-                                                                            label="Select all"
-                                                                            name="select-all-checkbox"
-                                                                            onChange={[Function]}
-                                                                            placeholder=""
-                                                                            type="checkbox"
-                                                                          />
-                                                                          Select all
-                                                                        </label>
-                                                                      </div>
-                                                                    </Checkbox>
-                                                                  </div>
-                                                                </InputWrapper>
-                                                              </div>
-                                                            </FormGroup>
-                                                          </StyledComponent>
-                                                        </FormGroup__StyledFormGroup>
-                                                      </Component>
-                                                    </Input>
-                                                  </span>
-                                                </ListGroupItem>
-                                              </StyledComponent>
-                                            </ListGroupItem>
-                                          </ForwardRef>
-                                        </ControlledTableListHeader>
-                                        <ControlledTableListItem
-                                          key="item-01"
-                                        >
-                                          <ForwardRef>
-                                            <ListGroupItem>
-                                              <StyledComponent
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                               >
                                                 <StyledComponent
                                                   className="listGroupHeader"
@@ -6396,33 +5407,46 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -6436,28 +5460,15 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <Input
                                                         addonAfter={null}
@@ -6593,27 +5604,41 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -6631,11 +5656,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
                                                   >
                                                     <span
-                                                      className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <div
                                                         className="itemWrapper "
@@ -6886,95 +5911,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           <div
                                                                             className="checkbox"
                                                                           >
-<<<<<<< HEAD
-                                                                            <input
-                                                                              checked={false}
-                                                                              disabled={false}
-                                                                              label=""
-                                                                              name="id-checkbox"
-                                                                              onChange={[Function]}
-                                                                              placeholder=""
-                                                                              type="checkbox"
-                                                                            />
-                                                                          </label>
-                                                                        </div>
-                                                                      </Checkbox>
-                                                                    </div>
-                                                                  </InputWrapper>
-                                                                </div>
-                                                              </FormGroup>
-                                                            </StyledComponent>
-                                                          </FormGroup__StyledFormGroup>
-                                                        </Component>
-                                                      </Input>
-                                                      <span
-                                                        className="description"
-                                                      >
-                                                        dashboard1
-                                                      </span>
-                                                    </div>
-                                                  </span>
-                                                </ListGroupItem>
-                                              </StyledComponent>
-                                            </ListGroupItem>
-                                          </ForwardRef>
-                                        </ControlledTableListItem>
-                                        <ControlledTableListItem
-                                          key="item-02"
-                                        >
-                                          <ForwardRef>
-                                            <ListGroupItem>
-                                              <StyledComponent
-                                                forwardedComponent={
-                                                  Object {
-                                                    "$$typeof": Symbol(react.forward_ref),
-                                                    "STYLES": Array [
-                                                      "success",
-                                                      "warning",
-                                                      "danger",
-                                                      "info",
-                                                    ],
-                                                    "attrs": Array [],
-                                                    "componentStyle": ComponentStyle {
-                                                      "componentId": "ListGroupItem-sc-1ky0joo-0",
-                                                      "isStatic": false,
-                                                      "lastClassName": "jNPkhE",
-                                                      "rules": Array [
-                                                        "background-color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#DCE1E5",
-                                                        ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                                        "#6c6c6c",
-                                                        ";background-color:",
-                                                        "#F1F2F2",
-                                                        ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#6c6c6c",
-                                                        ";}}&.active,&.active:hover,&.active:focus{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                                        "#faf3f7",
-                                                        ";}}a&,button&{color:",
-                                                        "#1F1F1F",
-                                                        ";.list-group-item-heading{color:",
-                                                        "#1F1F1F",
-                                                        ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                                        "#F1F2F2",
-                                                        ";color:",
-                                                        "#9E1F63",
-                                                        ";&.active{color:",
-                                                        "#FFF",
-                                                        ";border-color:",
-                                                        "#9E1F63",
-                                                        ";background-color:",
-                                                        "#9E1F63",
-                                                        ";}}}",
-                                                        [Function],
-=======
                                                                             <label
                                                                               title=""
                                                                             >
@@ -7024,33 +5960,46 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         "warning",
                                                         "danger",
                                                         "info",
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                       ],
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igGIXt",
+                                                        "lastClassName": "jNPkhE",
                                                         "rules": Array [
-                                                          "&.list-group-item-action{color:",
-                                                          "#1F1F1F",
-                                                          ";&:hover,&:focus{color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#F1F2F2",
-                                                          ";}&:active{color:",
-                                                          "#424344",
-                                                          ";background-color:",
-                                                          "#DCE1E5",
-                                                          ";}}&.list-group-item{background-color:",
+                                                          "background-color:",
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&.disabled,&:disabled{color:",
-                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
+                                                          "#6c6c6c",
                                                           ";background-color:",
+                                                          "#F1F2F2",
+                                                          ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#6c6c6c",
+                                                          ";}}&.active,&.active:hover,&.active:focus{color:",
                                                           "#FFF",
-                                                          ";}}",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
+                                                          "#faf3f7",
+                                                          ";}}a&,button&{color:",
+                                                          "#1F1F1F",
+                                                          ";.list-group-item-heading{color:",
+                                                          "#1F1F1F",
+                                                          ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
+                                                          "#F1F2F2",
+                                                          ";color:",
+                                                          "#9E1F63",
+                                                          ";&.active{color:",
+                                                          "#FFF",
+                                                          ";border-color:",
+                                                          "#9E1F63",
+                                                          ";background-color:",
+                                                          "#9E1F63",
+                                                          ";}}}",
                                                           [Function],
                                                         ],
                                                       },
@@ -7064,28 +6013,15 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "withComponent": [Function],
                                                     }
                                                   }
-<<<<<<< HEAD
-                                                }
-                                                forwardedRef={null}
-                                              >
-                                                <ListGroupItem
-                                                  bsClass="list-group-item"
-                                                  className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
-                                                  listItem={false}
-                                                >
-                                                  <span
-                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
-=======
                                                   forwardedRef={null}
                                                 >
                                                   <ListGroupItem
                                                     bsClass="list-group-item"
-                                                    className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                                                    className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
                                                     listItem={false}
->>>>>>> 4d5cc1e8b... Updating tests and snapshots
                                                   >
                                                     <span
-                                                      className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                                                      className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
                                                     >
                                                       <div
                                                         className="itemWrapper "
