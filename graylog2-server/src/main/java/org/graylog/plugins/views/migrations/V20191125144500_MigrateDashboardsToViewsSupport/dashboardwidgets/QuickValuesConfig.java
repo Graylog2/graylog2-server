@@ -47,6 +47,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @AutoValue
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -173,8 +175,8 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
             @JsonProperty("query") String query,
             @JsonProperty("timerange") TimeRange timerange,
             @JsonProperty("field") String field,
-            @JsonProperty("show_data_table") Boolean showDataTable,
-            @JsonProperty("show_pie_chart") Boolean showPieChart,
+            @JsonProperty("show_data_table") @Nullable Boolean showDataTable,
+            @JsonProperty("show_pie_chart") @Nullable Boolean showPieChart,
             @JsonProperty("limit") Integer limit,
             @JsonProperty("data_table_limit") Integer dataTableLimit,
             @JsonProperty("sort_order") String sortOrder,
@@ -186,8 +188,10 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
                 query,
                 Optional.ofNullable(streamId),
                 field,
-                showDataTable,
-                showPieChart,
+                (showDataTable == null || !showDataTable) && (showPieChart == null || !showPieChart)
+                        ? true
+                        : firstNonNull(showDataTable, false),
+                firstNonNull(showPieChart, false),
                 Optional.ofNullable(limit),
                 Optional.ofNullable(dataTableLimit),
                 Optional.ofNullable(sortOrder),
