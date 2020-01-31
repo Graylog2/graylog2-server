@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, wait } from '@testing-library/react';
+import { render, cleanup, wait } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import MockQuery from 'views/logic/queries/Query';
