@@ -57,6 +57,11 @@ public class WidgetConfig {
         throw new ContentPackException("Could not find key " + key + " in config.");
     }
 
+    public Optional<Boolean> getOptionalBoolean(String key) {
+        final Boolean value = (Boolean)config.get(key);
+        return Optional.ofNullable(value);
+    }
+
     public int getInteger(String key) {
         Object value = config.get(key);
         if (value != null) {

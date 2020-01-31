@@ -41,7 +41,6 @@ import org.graylog2.contentpacks.model.entities.DashboardWidgetEntity;
 import org.graylog2.contentpacks.model.entities.WidgetConfig;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -253,8 +252,8 @@ public class DashboardWidgetConverter {
         final List<WidgetEntity> result = new ArrayList<>(2);
         final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder();
 
-        final boolean showChart = config.getBoolean("show_pie_chart");
-        final boolean showTable = config.getBoolean("show_data_table");
+        final boolean showChart = config.getOptionalBoolean("show_pie_chart").orElse(false);
+        final boolean showTable = config.getOptionalBoolean("show_data_table").orElse(!showChart);
         final String field = config.getString("field");
         final String stackedFields = config.getOptionalString("stacked_fields").orElse("");
         final Integer limit = config.getOptionalInteger("limit").orElse(5);
