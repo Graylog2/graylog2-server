@@ -106,7 +106,6 @@ const stores = {
   LookupTableCaches: () => require('stores/lookup-tables/LookupTableCachesStore'),
   LookupTableDataAdapters: () => require('stores/lookup-tables/LookupTableDataAdaptersStore'),
   MessageCounts: () => require('stores/messages/MessageCountsStore'),
-  MessageFields: () => require('stores/messages/MessageFieldsStore'),
   Messages: () => require('stores/messages/MessagesStore'),
   Metrics: () => require('stores/metrics/MetricsStore'),
   Nodes: () => require('stores/nodes/NodesStore'),
