@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';
+import URLWhitelistInput from 'components/configurations/URLWhitelistInput';
 import FormsUtils from 'util/FormsUtils';
 
 class HttpNotificationForm extends React.Component {
@@ -12,9 +13,7 @@ class HttpNotificationForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  static defaultConfig = {
-    url: '',
-  };
+  ;
 
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
@@ -28,20 +27,20 @@ class HttpNotificationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
+  static defaultConfig = {
+    url: '',
+  }
+
   render() {
     const { config, validation } = this.props;
 
     return (
       <React.Fragment>
-        <Input id="notification-http-url"
-               name="url"
-               label="URL"
-               type="text"
-               bsStyle={validation.errors.url ? 'error' : null}
-               help={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
-               value={config.url || ''}
-               onChange={this.handleChange}
-               required />
+        <URLWhitelistInput label="URL"
+                           handleFormEvent={this.handleChange}
+                           validationState={validation.errors.url ? 'error' : null}
+                           validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
+                           url={config.url} />
       </React.Fragment>
     );
   }
