@@ -38,9 +38,9 @@ describe('Views bindings value actions', () => {
       expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }))
         .toEqual(true);
     });
-    it('should be disabled for fields with type number', () => {
+    it('should be enabled for fields with type number', () => {
       expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.INT() }))
-        .toEqual(false);
+        .toEqual(true);
     });
     it('should be enabled for compound fields', () => {
       expect(isEnabled({
