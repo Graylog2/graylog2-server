@@ -36,12 +36,6 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
     ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
   ),
 }));
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(
-    ['listen', () => jest.fn()],
-    ['getInitialState', () => MockQuery.builder().build()],
-  ),
-}));
 
 describe('ShowDashboardInBigDisplayMode should', () => {
   const mockLocation = {
