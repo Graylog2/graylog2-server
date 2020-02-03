@@ -26,17 +26,19 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
   const ref = useRef();
 
   const checkIsWhitelisted = () => {
-    const promise = ToolsStore.urlWhiteListCheck(url);
-    promise.then((result) => {
-      if (!result.is_whitelisted && validationState === null) {
-        setCurrentValidationState('error');
-        setOwnValidationMessage(`URL ${url} is not whitelisted.`);
-      } else {
-        setOwnValidationMessage(validationMessage);
-        setCurrentValidationState(validationState);
-      }
-      setIsWhitelisted(result.is_whitelisted);
-    });
+    if (url) {
+      const promise = ToolsStore.urlWhiteListCheck(url);
+      promise.then((result) => {
+        if (!result.is_whitelisted && validationState === null) {
+          setCurrentValidationState('error');
+          setOwnValidationMessage(`URL ${url} is not whitelisted.`);
+        } else {
+          setOwnValidationMessage(validationMessage);
+          setCurrentValidationState(validationState);
+        }
+        setIsWhitelisted(result.is_whitelisted);
+      });
+    }
   };
 
   const onUpdate = () => {
