@@ -12,7 +12,6 @@ import 'opensans-npm-webfont';
 import 'stylesheets/bootstrap-submenus.less';
 import 'toastr/toastr.less';
 import 'rickshaw/rickshaw.css';
-import 'stylesheets/graylog2.less';
 
 const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
