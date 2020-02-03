@@ -23,14 +23,14 @@ const StreamAlertHeader = styled.h4`
   margin: 0 0 12px;
 `;
 
-const MatchIcon = styled(({ empty, matches, ...props }) => {
-  const matchColor = matches ? '#00AE42' : '#AD0707';
+const matchColor = matches => (matches ? '#00AE42' : '#AD0707');
 
-  return (<Icon {...props} />)`
-    color: ${empty ? '#0063BE' : matchColor};
-    margin-right: 3px;
-  `;
-});
+const MatchIcon = styled(({ empty, matches, ...props }) => <Icon {...props} />)(
+  ({ empty, matches }) => ({
+    color: empty ? '#0063BE' : matchColor(matches),
+    marginRight: '3px',
+  }),
+);
 
 const StyledSpinner = styled(Spinner)`
   margin-left: 10px;
