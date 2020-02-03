@@ -31,7 +31,7 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.plugin.streams.Stream;
 
 public class NotificationTestData {
-    public static final String TEST_NOTIFICATION_ID = "1234";
+    public static final String TEST_NOTIFICATION_ID = "this-is-a-test-notification";
 
     static EventNotificationContext getDummyContext(NotificationDto notificationDto, String userName) {
         final EventDto eventDto = EventDto.builder()
