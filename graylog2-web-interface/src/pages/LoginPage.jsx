@@ -1,19 +1,21 @@
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DocumentTitle, Icon } from 'components/common';
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert } from 'components/graylog';
 import LoginForm from 'components/login/LoginForm';
+import LoginBox from 'components/login/LoginBox';
+
+import AuthThemeStyles from 'theme/styles/authStyles';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import LoadingPage from './LoadingPage';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 
@@ -29,7 +31,6 @@ const LoginPage = createReactClass({
 
   componentDidMount() {
     disconnectedStyle.use();
-    authStyle.use();
     SessionActions.validate().then((response) => {
       this.setState({ didValidateSession: true });
       return response;
@@ -38,7 +39,6 @@ const LoginPage = createReactClass({
 
   componentWillUnmount() {
     disconnectedStyle.unuse();
-    authStyle.unuse();
   },
 
   handleErrorChange(nextError) {
@@ -86,18 +86,13 @@ const LoginPage = createReactClass({
     const alert = this.formatLastError(lastError);
     return (
       <DocumentTitle title="Sign in">
-        <div>
-          <div className="container" id="login-box">
-            <Row>
-              <Col md={4} mdOffset={4} xs={6} xsOffset={3} id="login-box-content" className="well">
-                <legend><Icon name="group" /> Welcome to Graylog</legend>
-                {alert}
+        <AuthThemeStyles />
+        <LoginBox>
+          <legend><Icon name="group" /> Welcome to Graylog</legend>
+          {alert}
 
-                {this.renderLoginForm()}
-              </Col>
-            </Row>
-          </div>
-        </div>
+          {this.renderLoginForm()}
+        </LoginBox>
       </DocumentTitle>
     );
   },

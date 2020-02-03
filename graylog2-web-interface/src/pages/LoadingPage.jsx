@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Row } from 'components/graylog';
 import { DocumentTitle, Spinner, Icon } from 'components/common';
+import LoginBox from 'components/login/LoginBox';
+import AuthThemeStyles from 'theme/styles/authStyles';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
-import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 class LoadingPage extends React.Component {
   static propTypes = {
@@ -18,27 +19,24 @@ class LoadingPage extends React.Component {
 
   componentDidMount() {
     disconnectedStyle.use();
-    authStyle.use();
   }
 
   componentWillUnmount() {
     disconnectedStyle.unuse();
-    authStyle.unuse();
   }
 
   render() {
+    const { text } = this.props;
+
     return (
       <DocumentTitle title="Loading...">
-        <div className="container" id="login-box">
-          <Row>
-            <Col md={4} mdOffset={4} className="well" id="login-box-content">
-              <legend><Icon name="group" /> Welcome to Graylog</legend>
-              <p className="loading-text">
-                <Spinner text={this.props.text} />
-              </p>
-            </Col>
-          </Row>
-        </div>
+        <AuthThemeStyles />
+        <LoginBox>
+          <legend><Icon name="group" /> Welcome to Graylog</legend>
+          <p className="loading-text">
+            <Spinner text={text} />
+          </p>
+        </LoginBox>
       </DocumentTitle>
     );
   }
