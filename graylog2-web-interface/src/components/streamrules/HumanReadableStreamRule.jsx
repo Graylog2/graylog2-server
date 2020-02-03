@@ -2,16 +2,16 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 class HumanReadableStreamRule extends React.Component {
-  static propTypes = {
-    streamRule: PropTypes.object.isRequired,
-    streamRuleTypes: PropTypes.array.isRequired,
-  };
-
   EMPTY_TAG = '<empty>';
 
   FIELD_PRESENCE_RULE_TYPE = 5;
 
   ALWAYS_MATCH_RULE_TYPE = 7;
+
+  static propTypes = {
+    streamRule: PropTypes.object.isRequired,
+    streamRuleTypes: PropTypes.array.isRequired,
+  };
 
   _getTypeForInteger = (type, streamRuleTypes) => {
     if (streamRuleTypes) {
@@ -41,8 +41,8 @@ class HumanReadableStreamRule extends React.Component {
   };
 
   render() {
-    const { streamRule } = this.props;
-    const streamRuleType = this._getTypeForInteger(streamRule.type, this.props.streamRuleTypes);
+    const { streamRule, streamRuleTypes } = this.props;
+    const streamRuleType = this._getTypeForInteger(streamRule.type, streamRuleTypes);
     const negation = (streamRule.inverted ? 'not ' : null);
     const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
     if (String(streamRule.type) === String(this.ALWAYS_MATCH_RULE_TYPE)) {
@@ -51,7 +51,9 @@ class HumanReadableStreamRule extends React.Component {
       );
     }
     return (
-      <span>Field <em>{this._formatRuleField(streamRule)}</em> must {negation}{longDesc} <em>{this._formatRuleValue(streamRule)}</em></span>
+      <span>
+        <em>{this._formatRuleField(streamRule)}</em> <strong>must {negation}</strong>{longDesc} <em>{this._formatRuleValue(streamRule)}</em>
+      </span>
     );
   }
 }

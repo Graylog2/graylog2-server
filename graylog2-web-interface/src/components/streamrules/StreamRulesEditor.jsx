@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 
-import { Alert, Button } from 'components/graylog';
+import { Button, Col, Panel, Row } from 'components/graylog';
 import { Icon } from 'components/common';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
@@ -17,14 +18,35 @@ import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
+const StreamAlertHeader = styled.h4`
+  font-weight: bold;
+  margin: 0 0 12px;
+`;
+
+const matchColor = matches => (matches ? '#00AE42' : '#AD0707');
+
+const MatchIcon = styled(({ empty, matches, ...props }) => <Icon {...props} />)(
+  ({ empty, matches }) => ({
+    color: empty ? '#0063BE' : matchColor(matches),
+    marginRight: '3px',
+  }),
+);
+
+const StyledSpinner = styled(Spinner)`
+  margin-left: 10px;
+`;
+
 class StreamRulesEditor extends React.Component {
-  static propTypes() {
-    return {
-      currentUser: PropTypes.object.isRequired,
-      streamId: PropTypes.string.isRequired,
-      messageId: PropTypes.string,
-      index: PropTypes.string,
-    };
+  static propTypes = {
+    currentUser: PropTypes.object.isRequired,
+    streamId: PropTypes.string.isRequired,
+    messageId: PropTypes.string,
+    index: PropTypes.string,
+  }
+
+  static defaultProps = {
+    messageId: '',
+    index: '',
   }
 
   state = {};
@@ -43,7 +65,9 @@ class StreamRulesEditor extends React.Component {
   onMessageLoaded = (message) => {
     this.setState({ message: message });
     if (message !== undefined) {
-      StreamsStore.testMatch(this.props.streamId, { message: message.fields }, (resultData) => {
+      const { streamId } = this.props;
+
+      StreamsStore.testMatch(streamId, { message: message.fields }, (resultData) => {
         this.setState({ matchData: resultData });
       });
     } else {
@@ -52,21 +76,25 @@ class StreamRulesEditor extends React.Component {
   };
 
   loadData = () => {
+    const { streamId } = this.props;
+    const { message } = this.state;
+
     StreamRulesStore.types().then((types) => {
       this.setState({ streamRuleTypes: types });
     });
 
-    StreamsStore.get(this.props.streamId, (stream) => {
+    StreamsStore.get(streamId, (stream) => {
       this.setState({ stream: stream });
     });
 
-    if (this.state.message) {
-      this.onMessageLoaded(this.state.message);
+    if (message) {
+      this.onMessageLoaded(message);
     }
   };
 
   _onStreamRuleFormSubmit = (streamRuleId, data) => {
-    StreamRulesStore.create(this.props.streamId, data, () => {});
+    const { streamId } = this.props;
+    StreamRulesStore.create(streamId, data, () => {});
   };
 
   _onAddStreamRule = (event) => {
@@ -79,83 +107,87 @@ class StreamRulesEditor extends React.Component {
   };
 
   _explainMatchResult = () => {
-    if (this.state.matchData) {
-      if (this.state.matchData.matches) {
+    const { matchData } = this.state;
+
+    if (matchData) {
+      if (matchData.matches) {
         return (
-          <span>
-            <Icon name="check" style={{ color: 'green' }} /> This message would be routed to this stream.
-          </span>
+          <>
+            <MatchIcon matches name="check" /> This message would be routed to this stream!
+          </>
         );
       }
       return (
-        <span>
-          <Icon name="remove" style={{ color: 'red' }} /> This message would not be routed to this stream.
-        </span>
+        <>
+          <MatchIcon name="remove" /> This message would not be routed to this stream.
+        </>
       );
     }
-    return ('Please load a message to check if it would match against these rules and therefore be routed into this stream.');
+
+    return (
+      <>
+        <MatchIcon empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it would match against these rules.
+      </>
+    );
   };
 
   render() {
-    const styles = (this.state.matchData ? this._getListClassName(this.state.matchData) : 'info');
-    if (this.state.stream && this.state.streamRuleTypes) {
+    const { matchData, stream, streamRuleTypes } = this.state;
+    const { currentUser, messageId, index } = this.props;
+    const styles = (matchData ? this._getListClassName(matchData) : 'info');
+
+    if (stream && streamRuleTypes) {
       return (
-        <div className="row content">
-          <div className="col-md-12 streamrule-sample-message">
-            <h2>
-              1. Load a message to test rules
-            </h2>
+        <Row className="content">
+          <Col md={12} className="streamrule-sample-message">
+            <h2>1. Load a message to test rules</h2>
 
             <div className="stream-loader">
-              <LoaderTabs messageId={this.props.messageId} index={this.props.index} onMessageLoaded={this.onMessageLoaded} />
-            </div>
-
-            <div className="spinner" style={{ display: 'none' }}><h2><Icon name="spinner" spin /> &nbsp;Loading message
-            </h2>
-            </div>
-
-            <div className="sample-message-display" style={{ display: 'none', marginTop: '5px' }}>
-              <strong>Next step:</strong>
-              Add/delete/modify stream rules in step 2 and see if the example message would have been
-              routed into the stream or not. Use the button on the right to add a stream rule.
+              <LoaderTabs messageId={messageId}
+                          index={index}
+                          onMessageLoaded={this.onMessageLoaded} />
             </div>
 
             <hr />
 
             <div className="buttons pull-right">
-              <button className="btn btn-success show-stream-rule" onClick={this._onAddStreamRule}>
+              <Button bsStyle="success"
+                      className="show-stream-rule"
+                      onClick={this._onAddStreamRule}>
                 Add stream rule
-              </button>
+              </Button>
               <StreamRuleForm ref={(newStreamRuleForm) => { this.newStreamRuleForm = newStreamRuleForm; }}
                               title="New Stream Rule"
-                              streamRuleTypes={this.state.streamRuleTypes}
+                              streamRuleTypes={streamRuleTypes}
                               onSubmit={this._onStreamRuleFormSubmit} />
             </div>
 
-            <h2>
-              2. Manage stream rules
-            </h2>
+            <h2>2. Manage stream rules</h2>
 
-            {this._explainMatchResult()}
+            <MatchingTypeSwitcher stream={stream} onChange={this.loadData} />
+            <Panel bsStyle={styles}>
+              <StreamAlertHeader>{this._explainMatchResult()}</StreamAlertHeader>
+              <StreamRuleList stream={stream}
+                              streamRuleTypes={streamRuleTypes}
+                              permissions={currentUser.permissions}
+                              matchData={matchData} />
+            </Panel>
 
-            <MatchingTypeSwitcher stream={this.state.stream} onChange={this.loadData} />
-            <Alert bsStyle={styles}>
-              <StreamRuleList stream={this.state.stream}
-                              streamRuleTypes={this.state.streamRuleTypes}
-                              permissions={this.props.currentUser.permissions}
-                              matchData={this.state.matchData} />
-            </Alert>
-
-            <p style={{ marginTop: '10px' }}>
+            <p>
               <LinkContainer to={Routes.STREAMS}>
-                <Button bsStyle="success">I'm done!</Button>
+                <Button bsStyle="success">I&apos;m done!</Button>
               </LinkContainer>
             </p>
-          </div>
-        </div>
+          </Col>
+        </Row>
       );
     }
-    return (<div className="row content"><div style={{ marginLeft: 10 }}><Spinner /></div></div>);
+
+    return (
+      <Row className="content">
+        <StyledSpinner />
+      </Row>
+    );
   }
 }
 

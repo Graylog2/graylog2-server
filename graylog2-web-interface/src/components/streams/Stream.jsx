@@ -5,8 +5,7 @@ import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { Button, Tooltip } from 'components/graylog';
-import { OverlayElement, Pluralize, Icon } from 'components/common';
-import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
+import { OverlayElement, Icon } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -14,7 +13,7 @@ import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
 
-import StreamThroughput from './StreamThroughput';
+import StreamMetaData from './StreamMetaData';
 import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
 
@@ -44,30 +43,9 @@ const Stream = createReactClass({
     };
   },
 
-  _formatNumberOfStreamRules(stream) {
-    if (stream.is_default) {
-      return 'The default stream contains all messages.';
-    }
-    if (stream.rules.length === 0) {
-      return 'No configured rules.';
-    }
-
-    let verbalMatchingType;
-    switch (stream.matching_type) {
-      case 'OR': verbalMatchingType = 'at least one'; break;
-      default:
-      case 'AND': verbalMatchingType = 'all'; break;
-    }
-
-    return (
-      <span>
-        Must match {verbalMatchingType} of the {stream.rules.length} configured stream{' '}
-        <Pluralize value={stream.rules.length} plural="rules" singular="rule" />.
-      </span>
-    );
-  },
 
   _onDelete(stream) {
+    // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
@@ -77,8 +55,10 @@ const Stream = createReactClass({
   },
 
   _onResume() {
+    const { stream } = this.props;
+
     this.setState({ loading: true });
-    StreamsStore.resume(this.props.stream.id, response => response)
+    StreamsStore.resume(stream.id, response => response)
       .finally(() => this.setState({ loading: false }));
   },
 
@@ -97,9 +77,12 @@ const Stream = createReactClass({
   },
 
   _onPause() {
-    if (window.confirm(`Do you really want to pause stream '${this.props.stream.title}'?`)) {
+    const { stream } = this.props;
+
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
       this.setState({ loading: true });
-      StreamsStore.pause(this.props.stream.id, response => response)
+      StreamsStore.pause(stream.id, response => response)
         .finally(() => this.setState({ loading: false }));
     }
   },
@@ -109,12 +92,13 @@ const Stream = createReactClass({
   },
 
   _onSaveStreamRule(streamRuleId, streamRule) {
-    StreamRulesStore.create(this.props.stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
+    const { stream } = this.props;
+    StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
   },
 
   render() {
-    const { stream } = this.props;
-    const { permissions } = this.props;
+    const { indexSets, stream, permissions, streamRuleTypes, user } = this.props;
+    const { loading } = this.state;
 
     const isDefaultStream = stream.is_default;
     const defaultStreamTooltip = isDefaultStream
@@ -155,8 +139,8 @@ const Stream = createReactClass({
             <Button bsStyle="success"
                     className="toggle-stream-button"
                     onClick={this._onResume}
-                    disabled={isDefaultStream || this.state.loading}>
-              {this.state.loading ? 'Starting...' : 'Start Stream'}
+                    disabled={isDefaultStream || loading}>
+              {loading ? 'Starting...' : 'Start Stream'}
             </Button>
           </OverlayElement>
         );
@@ -166,8 +150,8 @@ const Stream = createReactClass({
             <Button bsStyle="primary"
                     className="toggle-stream-button"
                     onClick={this._onPause}
-                    disabled={isDefaultStream || this.state.loading}>
-              {this.state.loading ? 'Pausing...' : 'Pause Stream'}
+                    disabled={isDefaultStream || loading}>
+              {loading ? 'Pausing...' : 'Pause Stream'}
             </Button>
           </OverlayElement>
         );
@@ -177,28 +161,21 @@ const Stream = createReactClass({
     const createdFromContentPack = (stream.content_pack
       ? <Icon name="cube" title="Created from content pack" /> : null);
 
-    const streamRuleList = isDefaultStream ? null
-      : (
-        <CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
-                                   stream={stream}
-                                   streamRuleTypes={this.props.streamRuleTypes}
-                                   permissions={this.props.permissions} />
-      );
     const streamControls = (
       <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
         <StreamControls stream={stream}
-                        permissions={this.props.permissions}
-                        user={this.props.user}
+                        permissions={permissions}
+                        user={user}
                         onDelete={this._onDelete}
                         onUpdate={this._onUpdate}
                         onClone={this._onClone}
                         onQuickAdd={this._onQuickAdd}
-                        indexSets={this.props.indexSets}
+                        indexSets={indexSets}
                         isDefaultStream={isDefaultStream} />
       </OverlayElement>
     );
 
-    const indexSet = this.props.indexSets.find(is => is.id === stream.index_set_id) || this.props.indexSets.find(is => is.is_default);
+    const indexSet = indexSets.find(is => is.id === stream.index_set_id) || indexSets.find(is => is.is_default);
     const indexSetDetails = this.isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
 
     return (
@@ -224,15 +201,15 @@ const Stream = createReactClass({
 
             {stream.description}
           </div>
-          <div className="stream-metadata">
-            <StreamThroughput streamId={stream.id} />. {this._formatNumberOfStreamRules(stream)}
-            {streamRuleList}
-          </div>
+          <StreamMetaData stream={stream}
+                          streamRuleTypes={streamRuleTypes}
+                          permissions={permissions}
+                          isDefaultStream={isDefaultStream} />
         </div>
         <StreamRuleForm ref={(quickAddStreamRuleForm) => { this.quickAddStreamRuleForm = quickAddStreamRuleForm; }}
                         title="New Stream Rule"
                         onSubmit={this._onSaveStreamRule}
-                        streamRuleTypes={this.props.streamRuleTypes} />
+                        streamRuleTypes={streamRuleTypes} />
       </li>
     );
   },
