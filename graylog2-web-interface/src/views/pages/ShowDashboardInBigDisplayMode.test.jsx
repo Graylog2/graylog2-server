@@ -3,7 +3,6 @@ import * as React from 'react';
 import { render, cleanup, wait, waitForElement } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
-import MockQuery from 'views/logic/queries/Query';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import View from 'views/logic/views/View';
 
