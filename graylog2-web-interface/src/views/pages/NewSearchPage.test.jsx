@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
 
+import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
@@ -57,39 +57,34 @@ describe('NewSearchPage', () => {
       relative: '300',
     },
   };
+  const SimpleNewSearchPage = props => <NewSearchPage route={{}} router={mockRouter} location={{}} {...props} />;
+
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
   });
 
   it('should render minimal', async () => {
-    const { getByText } = render(<NewSearchPage route={{}} router={mockRouter} location={{}} />);
+    const { getByText } = render(<SimpleNewSearchPage />);
     await waitForElement(() => getByText('Extended search page'));
   });
 
   it('should show spinner while loading view', () => {
-    const { getByText } = render(<NewSearchPage route={{}} router={mockRouter} location={{}} />);
+    const { getByText } = render(<SimpleNewSearchPage />);
     expect(getByText('Loading...')).not.toBeNull();
   });
 
   describe('mounting', () => {
     it('should create new view with type search', async () => {
-      const createViewAction = asMock(ViewActions.create);
+      render(<SimpleNewSearchPage />);
 
-      render(<NewSearchPage route={{}}
-                            router={mockRouter}
-                            location={{}} />);
-
-      await wait(() => expect(createViewAction).toBeCalledTimes(1));
-      await wait(() => expect(createViewAction).toHaveBeenCalledWith(View.Type.Search));
+      await wait(() => expect(ViewActions.create).toBeCalledTimes(1));
+      await wait(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search));
     });
 
     it('should process hooks with provided location query', async () => {
       const processHooksAction = asMock(processHooks);
-
-      render(<NewSearchPage route={{}}
-                            router={mockRouter}
-                            location={mockLocation} />);
+      render(<SimpleNewSearchPage location={mockLocation} />);
 
       await wait(() => expect(processHooksAction).toBeCalledTimes(1));
       await wait(() => expect(processHooksAction.mock.calls[0][3]).toStrictEqual({ q: '', rangetype: 'relative', relative: '300' }));
@@ -98,78 +93,56 @@ describe('NewSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      mockExtendedSearchPage.mockImplementation(() => (
+      mockExtendedSearchPage.mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
           {loadView => <button type="button" onClick={() => loadView && loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
       ));
-      const viewGetAction = asMock(ViewManagementActions.get);
 
-      const { getByText } = render(<NewSearchPage route={{}}
-                                                  router={mockRouter}
-                                                  location={{}} />);
+      const { getByText } = render(<SimpleNewSearchPage />);
       const viewLoadButton = await waitForElement(() => getByText('Load view'));
       fireEvent.click(viewLoadButton);
 
-      await wait(() => expect(viewGetAction).toHaveBeenCalledTimes(1));
-      await wait(() => expect(viewGetAction).toHaveBeenCalledWith('special-view-id'));
+      await wait(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
+      await wait(() => expect(ViewManagementActions.get).toHaveBeenCalledWith('special-view-id'));
     });
   });
 
   describe('loading new empty view', () => {
-    it('should be supported', async () => {
-      const createViewAction = asMock(ViewActions.create);
-      mockExtendedSearchPage.mockImplementation(() => (
+    beforeEach(() => {
+      mockExtendedSearchPage.mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
           {loadNewView => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>
       ));
+    });
 
-      const { getByText } = render(<NewSearchPage route={{}}
-                                                  router={mockRouter}
-                                                  location={{}} />);
+    it('should be supported', async () => {
+      const { getByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await waitForElement(() => getByText('Load new view'));
       fireEvent.click(viewCreateButton);
 
-      await wait(() => expect(createViewAction).toBeCalledTimes(2));
-      await wait(() => expect(createViewAction).toHaveBeenCalledWith(View.Type.Search));
+      await wait(() => expect(ViewActions.create).toBeCalledTimes(2));
+      await wait(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search));
     });
 
     it('should process hooks with empty query', async () => {
       const processHooksAction = asMock(processHooks);
-      mockExtendedSearchPage.mockImplementation(() => (
-        <NewViewLoaderContext.Consumer>
-          {loadNewView => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
-        </NewViewLoaderContext.Consumer>
-      ));
-
-      const { getByText } = render(<NewSearchPage route={{}}
-                                                  router={mockRouter}
-                                                  location={mockLocation} />);
+      const { getByText } = render(<SimpleNewSearchPage location={mockLocation} />);
       const viewCreateButton = await waitForElement(() => getByText('Load new view'));
       fireEvent.click(viewCreateButton);
-
 
       await wait(() => expect(processHooksAction).toBeCalledTimes(2));
       await wait(() => expect(processHooksAction.mock.calls[1][3]).toStrictEqual({}));
     });
 
     it('should sync query params with current url', async () => {
-      const syncWithQueryParamsAction = asMock(syncWithQueryParameters);
-      mockExtendedSearchPage.mockImplementation(() => (
-        <NewViewLoaderContext.Consumer>
-          {loadNewView => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
-        </NewViewLoaderContext.Consumer>
-      ));
-
-      const { getByText } = render(<NewSearchPage route={{}}
-                                                  router={mockRouter}
-                                                  location={mockLocation} />);
+      const { getByText } = render(<SimpleNewSearchPage location={mockLocation} />);
       const viewCreateButton = await waitForElement(() => getByText('Load new view'));
       fireEvent.click(viewCreateButton);
 
-      await wait(() => expect(syncWithQueryParamsAction).toBeCalledTimes(1));
-      await wait(() => expect(syncWithQueryParamsAction).toHaveBeenCalledWith('/search?q=&rangetype=relative&relative=300'));
+      await wait(() => expect(syncWithQueryParameters).toBeCalledTimes(1));
+      await wait(() => expect(syncWithQueryParameters).toHaveBeenCalledWith('/search?q=&rangetype=relative&relative=300'));
     });
   });
 });
