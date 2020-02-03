@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
-import { darken } from 'polished';
 
 import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
