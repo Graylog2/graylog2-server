@@ -7,7 +7,6 @@
 
 :local(.scrollContainer) {
     overflow: auto;
-    height: 100%;
 }
 
 :local(.leftAligned) {
