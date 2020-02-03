@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
@@ -25,7 +24,7 @@ const mockView = View.create()
 
 jest.mock('react-router', () => ({ withRouter: x => x }));
 jest.mock('./ExtendedSearchPage', () => mockExtendedSearchPage);
-jest.mock('views/stores/SearchStore', () => MockStore());
+jest.mock('views/stores/SearchStore', () => {});
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: { create: jest.fn(() => Promise.resolve({ view: mockView })) },
 }));
@@ -115,24 +114,6 @@ describe('NewSearchPage', () => {
       await wait(() => expect(viewGetAction).toHaveBeenCalledTimes(1));
       await wait(() => expect(viewGetAction).toHaveBeenCalledWith('special-view-id'));
     });
-
-    // it('should show error message when loading fails', async () => {
-    //   const hookComponent = <div>The hook component</div>;
-    //   ViewManagementActions.get = mockAction(jest.fn(() => Promise.reject(hookComponent)));
-    //   mockExtendedSearchPage.mockImplementation(() => (
-    //     <ViewLoaderContext.Consumer>
-    //       {loadView => loadView && <button type="button" onClick={() => loadView('special-view-id')}>Load view</button>}
-    //     </ViewLoaderContext.Consumer>
-    //   ));
-
-    //   const { getByText } = render(<NewSearchPage route={{}}
-    //                                               router={mockRouter}
-    //                                               location={{}} />);
-    //   const viewLoadButton = await waitForElement(() => getByText('Load view'));
-    //   fireEvent.click(viewLoadButton);
-
-    //   await waitForElement(() => getByText('The hook component'));
-    // });
   });
 
   describe('loading new empty view', () => {
