@@ -36,30 +36,32 @@ const StreamMetaData = ({ isDefaultStream, stream, streamRuleTypes, permissions 
   };
 
   return (
-    <StreamMetaDataWrapper>
-      <StreamThroughput streamId={stream.id} />.
+    <>
+      <StreamMetaDataWrapper>
+        <StreamThroughput streamId={stream.id} />.
 
-      <span>
+        <span>
         &nbsp;Must match {verbalMatchingType} of the {stream.rules.length} configured stream&nbsp;
-        <Pluralize value={stream.rules.length} plural="rules" singular="rule" />.
-      </span>
+          <Pluralize value={stream.rules.length} plural="rules" singular="rule" />.
+        </span>
 
-      {!isDefaultStream && (
-        <>
+        {!isDefaultStream && (
           <Button bsStyle="link"
                   bsSize="xsmall"
                   onClick={_onHandleToggle}>
             {toggleText} stream rules
           </Button>
+        )}
+      </StreamMetaDataWrapper>
 
-          <CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
-                                     stream={stream}
-                                     streamRuleTypes={streamRuleTypes}
-                                     permissions={permissions}
-                                     expanded={expanded} />
-        </>
+      {!isDefaultStream && (
+        <CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
+                                   stream={stream}
+                                   streamRuleTypes={streamRuleTypes}
+                                   permissions={permissions}
+                                   expanded={expanded} />
       )}
-    </StreamMetaDataWrapper>
+    </>
   );
 };
 
