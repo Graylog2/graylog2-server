@@ -97,7 +97,7 @@ describe('StreamSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      mockExtendedSearchPage.mockImplementation(() => (
+      mockExtendedSearchPage.mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
           {loadView => <button type="button" onClick={() => loadView && loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
