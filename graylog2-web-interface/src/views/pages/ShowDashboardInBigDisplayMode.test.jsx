@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, wait } from 'wrappedTestingLibrary';
+import { render, cleanup, wait, waitForElement } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import MockQuery from 'views/logic/queries/Query';
@@ -15,7 +15,7 @@ const mockView = View.builder()
   .title('view title')
   .build();
 
-jest.mock('stores/connect', () => x => x);
+
 jest.mock('react-router', () => ({ withRouter: x => x }));
 jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
@@ -26,15 +26,21 @@ jest.mock('views/stores/RefreshStore', () => ({
 }));
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
-    'listen',
+    ['listen', () => jest.fn()],
     ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
   ),
 }));
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateStore: { listen: jest.fn() },
+  SearchExecutionStateStore: MockStore(
+    ['listen', () => jest.fn()],
+    ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
+  ),
 }));
 jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()], 'listen'),
+  CurrentQueryStore: MockStore(
+    ['listen', () => jest.fn()],
+    ['getInitialState', () => MockQuery.builder().build()],
+  ),
 }));
 
 describe('ShowDashboardInBigDisplayMode should', () => {
@@ -96,11 +102,11 @@ describe('ShowDashboardInBigDisplayMode should', () => {
     await wait(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
   });
 
-  // it('should display view title', async () => {
-  //   const { getByText } = render(<ShowDashboardInBigDisplayMode route={{}}
-  //                                                               params={{ viewId: mockView.id }}
-  //                                                               location={mockLocation} />);
+  it('should display view title', async () => {
+    const { getByText } = render(<ShowDashboardInBigDisplayMode route={{}}
+                                                                params={{ viewId: mockView.id }}
+                                                                location={mockLocation} />);
 
-  //   await waitForElement(() => getByText('view title'));
-  // });
+    await waitForElement(() => getByText('view title'));
+  });
 });
