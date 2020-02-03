@@ -30,7 +30,9 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.plugin.streams.Stream;
 
-class NotificationTestData {
+public class NotificationTestData {
+    public static final String TEST_NOTIFICATION_ID = "1234";
+
     static EventNotificationContext getDummyContext(NotificationDto notificationDto, String userName) {
         final EventDto eventDto = EventDto.builder()
                 .alert(true)
@@ -51,7 +53,7 @@ class NotificationTestData {
 
         final EventDefinitionDto eventDefinitionDto = EventDefinitionDto.builder()
                 .alert(true)
-                .id("1234")
+                .id(TEST_NOTIFICATION_ID)
                 .title("Event Definition Test Title")
                 .description("Event Definition Test Description")
                 .config(new EventProcessorConfig() {
@@ -90,7 +92,7 @@ class NotificationTestData {
                 ).build();
 
         return EventNotificationContext.builder()
-                .notificationId("1234")
+                .notificationId(TEST_NOTIFICATION_ID)
                 .notificationConfig(notificationDto.config())
                 .event(eventDto)
                 .eventDefinition(eventDefinitionDto)
