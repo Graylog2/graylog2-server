@@ -3,6 +3,7 @@
 exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] = `
 <div>
   <div
+<<<<<<< HEAD
     class="container"
   >
     <div
@@ -13,6 +14,14 @@ exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] 
       >
         <div />
       </div>
+=======
+    class="container LoginBox__LoginBoxWrapper-sc-1uryto7-0 izDTki"
+  >
+    <div
+      class="LoginBox__LoginContainer-sc-1uryto7-1 idwsAA"
+    >
+      <div />
+>>>>>>> 7832e41ae1... Removing auth.less
     </div>
   </div>
 </div>
