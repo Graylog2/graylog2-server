@@ -47,7 +47,8 @@ public abstract class AbsoluteTimeRangeQuery extends Query {
             @JsonProperty("query") String query,
             @JsonProperty("from") DateTime from,
             @JsonProperty("to") DateTime to,
-            @JsonProperty("streamId") @Nullable String streamId
+            @JsonProperty("streamId") @Nullable String streamId,
+            @JsonProperty("interval") @Nullable String ignored
     ) {
         return new AutoValue_AbsoluteTimeRangeQuery(rangeType, Optional.ofNullable(fields), query, Optional.ofNullable(streamId), from, to);
     }
