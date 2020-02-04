@@ -28,12 +28,8 @@ import java.util.Optional;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class KeywordTimeRangeQuery implements Query {
+public abstract class KeywordTimeRangeQuery extends Query {
     public static final String type = "keyword";
-
-    public abstract String rangeType();
-    public abstract String fields();
-    public abstract String query();
 
     public abstract String keyword();
 
@@ -45,11 +41,11 @@ public abstract class KeywordTimeRangeQuery implements Query {
     @JsonCreator
     static KeywordTimeRangeQuery create(
             @JsonProperty("rangeType") String rangeType,
-            @JsonProperty("fields") String fields,
+            @JsonProperty("fields") @Nullable String fields,
             @JsonProperty("query") String query,
             @JsonProperty("keyword") String keyword,
             @JsonProperty("streamId") @Nullable String streamId
     ) {
-        return new AutoValue_KeywordTimeRangeQuery(Optional.ofNullable(streamId), rangeType, fields, query, keyword);
+        return new AutoValue_KeywordTimeRangeQuery(rangeType, Optional.ofNullable(fields), query, Optional.ofNullable(streamId), keyword);
     }
 }

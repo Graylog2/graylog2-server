@@ -52,9 +52,10 @@
             "config": {
               "fields": [
                 "timestamp",
-                "source"
+                "source",
+                "otherfield"
               ],
-              "show_message_row": true
+              "show_message_row": false
             },
             "type": "messages",
             "query": null,
