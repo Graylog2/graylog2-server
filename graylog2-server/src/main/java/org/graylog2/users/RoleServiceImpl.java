@@ -25,6 +25,7 @@ import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoDBUpsertRetryer;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.security.Permissions;
@@ -33,7 +34,6 @@ import org.graylog2.shared.users.Roles;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,8 +188,8 @@ public class RoleServiceImpl implements RoleService {
         if (!violations.isEmpty()) {
             throw new ValidationException("Validation failed.", violations.toString());
         }
-        final WriteResult<RoleImpl, ObjectId> writeResult = dbCollection.save(role);
-        return writeResult.getSavedObject();
+        return MongoDBUpsertRetryer.run(() ->
+                dbCollection.findAndModify(is(NAME_LOWER, role.nameLower()), null, null, false, role, true, true));
     }
 
     @Override
