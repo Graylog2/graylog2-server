@@ -6,6 +6,7 @@ import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import 'bootstrap/less/bootstrap.less';
 import 'opensans-npm-webfont';
@@ -43,7 +44,10 @@ export const AppFacade = ({ currentUser, server, sessionId }) => {
 
   return (
     <GraylogThemeProvider>
-      {Page}
+      <>
+        <GlobalThemeStyles />
+        {Page}
+      </>
     </GraylogThemeProvider>
   );
 };
