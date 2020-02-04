@@ -34,18 +34,18 @@ import java.util.stream.Collectors;
         @JsonSubTypes.Type(value = KeywordTimeRangeQuery.class, name = KeywordTimeRangeQuery.type),
         @JsonSubTypes.Type(value = RelativeTimeRangeQuery.class, name = RelativeTimeRangeQuery.type)
 })
-public interface Query {
-    String TIMESTAMP_FIELD = "timestamp";
-    List<String> DEFAULT_FIELDS = ImmutableList.of(TIMESTAMP_FIELD, "source", "message");
+public abstract class Query {
+    private final String TIMESTAMP_FIELD = "timestamp";
+    private final List<String> DEFAULT_FIELDS = ImmutableList.of(TIMESTAMP_FIELD, "source", "message");
 
-    String rangeType();
-    Optional<String> fields();
-    String query();
-    Optional<String> streamId();
+    abstract String rangeType();
+    abstract Optional<String> fields();
+    public abstract String query();
+    public abstract Optional<String> streamId();
 
-    TimeRange toTimeRange();
+    public abstract TimeRange toTimeRange();
 
-    default MessagesWidget toMessagesWidget(String messageListId) {
+    public MessagesWidget toMessagesWidget(String messageListId) {
         final List<String> usedFieldsWithoutMessage = fieldsList().stream()
                 .filter(field -> !field.equals("message"))
                 .collect(Collectors.toList());
@@ -54,7 +54,7 @@ public interface Query {
         return MessagesWidget.create(messageListId, usedFieldsWithoutMessage, showMessageRow);
     }
 
-    default List<String> addTimestampFieldIfMissing(List<String> fields) {
+    private List<String> addTimestampFieldIfMissing(List<String> fields) {
         if (!fields.contains(TIMESTAMP_FIELD)) {
             final List<String> fieldsWithTimestamp = new ArrayList<>(fields.size() + 1);
             fieldsWithTimestamp.add(TIMESTAMP_FIELD);
@@ -64,7 +64,7 @@ public interface Query {
         return fields;
     }
 
-    default List<String> fieldsList() {
+    private List<String> fieldsList() {
         //noinspection UnstableApiUsage
         return fields()
                 .filter(fields -> !fields.trim().isEmpty())

@@ -29,7 +29,7 @@ import java.util.Optional;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class AbsoluteTimeRangeQuery implements Query {
+public abstract class AbsoluteTimeRangeQuery extends Query {
     public static final String type = "absolute";
 
     public abstract DateTime from();

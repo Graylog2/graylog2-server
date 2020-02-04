@@ -28,7 +28,7 @@ import java.util.Optional;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class RelativeTimeRangeQuery implements Query {
+public abstract class RelativeTimeRangeQuery extends Query {
     public static final String type = "relative";
 
     public abstract int relative();
