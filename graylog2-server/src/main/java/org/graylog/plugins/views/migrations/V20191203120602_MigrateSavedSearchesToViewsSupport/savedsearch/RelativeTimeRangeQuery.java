@@ -44,7 +44,8 @@ public abstract class RelativeTimeRangeQuery extends Query {
             @JsonProperty("fields") @Nullable String fields,
             @JsonProperty("query") String query,
             @JsonProperty("relative") int relative,
-            @JsonProperty("streamId") @Nullable String streamId
+            @JsonProperty("streamId") @Nullable String streamId,
+            @JsonProperty("interval") @Nullable String ignored
     ) {
         return new AutoValue_RelativeTimeRangeQuery(rangeType, Optional.ofNullable(fields), query, Optional.ofNullable(streamId), relative);
     }
