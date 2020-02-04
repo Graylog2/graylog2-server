@@ -54,19 +54,22 @@ public interface Query {
         return MessagesWidget.create(messageListId, usedFieldsWithoutMessage, showMessageRow);
     }
 
+    default List<String> addTimestampFieldIfMissing(List<String> fields) {
+        if (!fields.contains(TIMESTAMP_FIELD)) {
+            final List<String> fieldsWithTimestamp = new ArrayList<>(fields.size() + 1);
+            fieldsWithTimestamp.add(TIMESTAMP_FIELD);
+            fieldsWithTimestamp.addAll(fields);
+            return fieldsWithTimestamp;
+        }
+        return fields;
+    }
+
     default List<String> fieldsList() {
+        //noinspection UnstableApiUsage
         return fields()
                 .filter(fields -> !fields.trim().isEmpty())
                 .map(fields -> Splitter.on(",").splitToList(fields))
-                .map(fields -> {
-                    if (!fields.contains(TIMESTAMP_FIELD)) {
-                        final List<String> fieldsWithTimestamp = new ArrayList<>(fields.size() + 1);
-                        fieldsWithTimestamp.add(TIMESTAMP_FIELD);
-                        fieldsWithTimestamp.addAll(fields);
-                        return fieldsWithTimestamp;
-                    }
-                    return fields;
-                })
+                .map(this::addTimestampFieldIfMissing)
                 .orElse(DEFAULT_FIELDS);
     }
 }
