@@ -1,66 +1,167 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackEntityConfig /> should render with a entity 1`] = `
-<div>
+<ContentPackEntityConfig
+  appliedParameter={
+    Array [
+      Object {
+        "configKey": "descr",
+        "paramName": "descrParam",
+      },
+    ]
+  }
+  entity={
+    Object {
+      "data": Object {
+        "descr": Object {
+          "@type": "string",
+          "@value": "hans",
+        },
+        "title": Object {
+          "@type": "string",
+          "@value": "franz",
+        },
+      },
+    }
+  }
+  parameters={
+    Array [
+      Object {
+        "name": "descrParam",
+        "title": "A descr Parameter",
+        "type": "string",
+      },
+    ]
+  }
+>
   <div>
-    <div
-      className="row "
+    <DataTable
+      className=""
+      dataRowFormatter={[Function]}
+      displayKey="value"
+      filterBy=""
+      filterKeys={Array []}
+      filterLabel="Filter"
+      filterSuggestions={Array []}
+      headerCellFormatter={[Function]}
+      headers={
+        Array [
+          "Config Key",
+          "Type",
+          "Value",
+        ]
+      }
+      id="entiy-config-list"
+      noDataText="No data available."
+      rowClassName=""
+      rows={
+        Array [
+          "descr",
+          "title",
+        ]
+      }
+      useResponsiveTable={true}
     >
-      <div
-        className="col-md-12"
-      >
+      <div>
         <div
-          className="data-table table-responsive"
-          id="entiy-config-list"
+          className="row "
         >
-          <table
-            className="table "
+          <div
+            className="col-md-12"
           >
-            <thead>
-              <tr>
-                <th>
-                  Config Key
-                </th>
-                <th>
-                  Type
-                </th>
-                <th>
-                  Value
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  descr
-                </td>
-                <td>
-                  <b>
-                    parameter (string)
-                  </b>
-                </td>
-                <td>
-                  <b>
-                    descrParam
-                  </b>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  title
-                </td>
-                <td>
-                  string
-                </td>
-                <td>
-                  franz
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <div
+              className="data-table table-responsive"
+              id="entiy-config-list"
+            >
+              <table
+                className="table "
+              >
+                <thead>
+                  <tr>
+                    <DataTableElement
+                      element="Config Key"
+                      formatter={[Function]}
+                      index={0}
+                      key="header-0"
+                    >
+                      <th>
+                        Config Key
+                      </th>
+                    </DataTableElement>
+                    <DataTableElement
+                      element="Type"
+                      formatter={[Function]}
+                      index={1}
+                      key="header-1"
+                    >
+                      <th>
+                        Type
+                      </th>
+                    </DataTableElement>
+                    <DataTableElement
+                      element="Value"
+                      formatter={[Function]}
+                      index={2}
+                      key="header-2"
+                    >
+                      <th>
+                        Value
+                      </th>
+                    </DataTableElement>
+                  </tr>
+                </thead>
+                <tbody>
+                  <DataTableElement
+                    element="descr"
+                    formatter={[Function]}
+                    index={0}
+                    key="row-0"
+                  >
+                    <tr
+                      key="descr"
+                    >
+                      <td>
+                        descr
+                      </td>
+                      <td>
+                        <b>
+                          parameter (string)
+                        </b>
+                      </td>
+                      <td>
+                        <b>
+                          descrParam
+                        </b>
+                      </td>
+                    </tr>
+                  </DataTableElement>
+                  <DataTableElement
+                    element="title"
+                    formatter={[Function]}
+                    index={1}
+                    key="row-1"
+                  >
+                    <tr
+                      key="title"
+                    >
+                      <td>
+                        title
+                      </td>
+                      <td>
+                        string
+                      </td>
+                      <td>
+                        franz
+                      </td>
+                    </tr>
+                  </DataTableElement>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </DataTable>
   </div>
-</div>
+</ContentPackEntityConfig>
 `;

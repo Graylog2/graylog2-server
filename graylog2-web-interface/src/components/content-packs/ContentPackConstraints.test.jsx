@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
@@ -14,8 +14,8 @@ describe('<ContentPackConstraints />', () => {
       type: 'plugin-version',
       version: '>=3.0.0-alpha.2',
     }];
-    const wrapper = renderer.create(<ContentPackConstraints constraints={constraints} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackConstraints constraints={constraints} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with new constraints with forced fulfillment', () => {
@@ -27,8 +27,8 @@ describe('<ContentPackConstraints />', () => {
       type: 'plugin-version',
       version: '>=3.0.0-alpha.2',
     }];
-    const wrapper = renderer.create(<ContentPackConstraints constraints={constraints} isFulfilled />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackConstraints constraints={constraints} isFulfilled />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with created constraints', () => {
@@ -47,7 +47,7 @@ describe('<ContentPackConstraints />', () => {
         },
         fulfilled: false,
       }];
-    const wrapper = renderer.create(<ContentPackConstraints constraints={constraints} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackConstraints constraints={constraints} />);
+    expect(wrapper).toMatchSnapshot();
   });
 });

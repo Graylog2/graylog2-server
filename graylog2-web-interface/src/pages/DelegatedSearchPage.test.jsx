@@ -6,7 +6,7 @@ jest.mock('c3', () => ({ default: jest.fn() }))
 
 /* eslint-disable import/first */
 import React from 'react';
-import ShallowRenderer from 'react-test-renderer/shallow';
+import { shallow } from 'wrappedEnzyme';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import DelegatedSearchPage from 'pages/DelegatedSearchPage';
@@ -14,13 +14,11 @@ import DelegatedSearchPage from 'pages/DelegatedSearchPage';
 
 
 test('Renders SearchPage by default', () => {
-  const renderer = new ShallowRenderer();
-  const tree = renderer.render(<DelegatedSearchPage location={{}} searchConfig={{}} />);
+  const tree = shallow(<DelegatedSearchPage location={{}} searchConfig={{}} />);
   expect(tree).toMatchSnapshot();
 });
 
 test('Renders other component if registered', () => {
-  const renderer = new ShallowRenderer();
   const SimpleComponent = () => <div>Hello!</div>;
 
   PluginStore.register(new PluginManifest({}, {
@@ -29,7 +27,7 @@ test('Renders other component if registered', () => {
     },
   }));
 
-  const tree = renderer.render(<DelegatedSearchPage />);
+  const tree = shallow(<DelegatedSearchPage />);
 
   expect(tree).toMatchSnapshot();
 });

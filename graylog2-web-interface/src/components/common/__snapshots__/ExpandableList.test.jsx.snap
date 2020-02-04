@@ -1,121 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ExpandableList /> should render with a Item 1`] = `
-<ul
-  className="list"
->
-  <li
-    className="listItemPadding"
+<ExpandableList>
+  <ul
+    className="list"
   >
-    <div
-      className="listItemContainer"
+    <ExpandableListItem
+      checked={false}
+      expandable={true}
+      expanded={false}
+      header="Wheel of time"
+      indetermined={false}
+      onChange={[MockFunction]}
+      padded={true}
+      selectable={true}
+      stayExpanded={false}
     >
-      <label
-        className="checkbox-inline"
-        title=""
-      >
-        <input
-          checked={false}
-          disabled={false}
-          type="checkbox"
-        />
-      </label>
-      <div
-        className="expandBoxContainer"
+      <li
+        className="listItemPadding"
       >
         <div
-          className="fa-stack expandBox"
-          onClick={[Function]}
-          role="button"
-          tabIndex={0}
+          className="listItemContainer"
         >
-          <i
-            className="fa fa-circle-thin fa-stack-1x iconBackground"
-          />
-          <i
-            className="fa fa-angle-up fa-stack-1x"
-          />
-        </div>
-      </div>
-      <span
-        className="header"
-      >
-        <span
-          onClick={[Function]}
-          role="button"
-          tabIndex={0}
-        >
-          Wheel of time
-        </span>
-      </span>
-    </div>
-    <div
-      className="expandableContent"
-    />
-  </li>
-</ul>
-`;
-
-exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
-<ul
-  className="list"
->
-  <li
-    className="listItemPadding"
-  >
-    <div
-      className="listItemContainer"
-    >
-      <label
-        className="checkbox-inline"
-        title=""
-      >
-        <input
-          checked={false}
-          disabled={false}
-          type="checkbox"
-        />
-      </label>
-      <div
-        className="expandBoxContainer"
-      >
-        <div
-          className="fa-stack expandBox"
-          onClick={[Function]}
-          role="button"
-          tabIndex={0}
-        >
-          <i
-            className="fa fa-circle-thin fa-stack-1x iconBackground"
-          />
-          <i
-            className="fa fa-angle-down fa-stack-1x"
-          />
-        </div>
-      </div>
-      <span
-        className="header"
-      >
-        <span
-          onClick={[Function]}
-          role="button"
-          tabIndex={0}
-        >
-          Wheel of time
-        </span>
-      </span>
-    </div>
-    <div
-      className="expandableContent"
-    >
-      <ul
-        className="list"
-      >
-        <li
-          className="listItemPadding"
-        >
-          <div
-            className="listItemContainer"
+          <Checkbox
+            bsClass="checkbox"
+            checked={false}
+            disabled={false}
+            inline={true}
+            inputRef={[Function]}
+            onChange={[MockFunction]}
+            title=""
           >
             <label
               className="checkbox-inline"
@@ -124,50 +38,267 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
               <input
                 checked={false}
                 disabled={false}
+                onChange={[MockFunction]}
                 type="checkbox"
               />
             </label>
+          </Checkbox>
+          <div
+            className="expandBoxContainer"
+          >
             <div
-              className="expandBoxContainer"
+              className="fa-stack expandBox"
+              onClick={[Function]}
+              role="button"
+              tabIndex={0}
             >
-              <div
-                className="fa-stack expandBox"
-                onClick={[Function]}
-                role="button"
-                tabIndex={0}
+              <ForwardRef
+                className="fa-stack-1x iconBackground"
+                fixedWidth={false}
+                inverse={false}
+                name="circle-thin"
+                pulse={false}
+                spin={false}
               >
                 <i
                   className="fa fa-circle-thin fa-stack-1x iconBackground"
                 />
+              </ForwardRef>
+              <ForwardRef
+                className="fa-stack-1x"
+                fixedWidth={false}
+                inverse={false}
+                name="angle-up"
+                pulse={false}
+                spin={false}
+              >
                 <i
                   className="fa fa-angle-up fa-stack-1x"
                 />
-              </div>
+              </ForwardRef>
             </div>
-            <span
-              className="header"
-            >
-              <span
-                onClick={[Function]}
-                role="button"
-                tabIndex={0}
-              >
-                Edmonds Field
-              </span>
-            </span>
           </div>
+          <span
+            className="header"
+          >
+            <span
+              onClick={[Function]}
+              role="button"
+              tabIndex={0}
+            >
+              Wheel of time
+            </span>
+          </span>
+        </div>
+        <div
+          className="expandableContent"
+        />
+      </li>
+    </ExpandableListItem>
+  </ul>
+</ExpandableList>
+`;
+
+exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
+<ExpandableList>
+  <ul
+    className="list"
+  >
+    <ExpandableListItem
+      checked={false}
+      expandable={true}
+      expanded={true}
+      header="Wheel of time"
+      indetermined={false}
+      onChange={[MockFunction]}
+      padded={true}
+      selectable={true}
+      stayExpanded={false}
+    >
+      <li
+        className="listItemPadding"
+      >
+        <div
+          className="listItemContainer"
+        >
+          <Checkbox
+            bsClass="checkbox"
+            checked={false}
+            disabled={false}
+            inline={true}
+            inputRef={[Function]}
+            onChange={[MockFunction]}
+            title=""
+          >
+            <label
+              className="checkbox-inline"
+              title=""
+            >
+              <input
+                checked={false}
+                disabled={false}
+                onChange={[MockFunction]}
+                type="checkbox"
+              />
+            </label>
+          </Checkbox>
           <div
-            className="expandableContent"
-          />
-        </li>
-      </ul>
-    </div>
-  </li>
-</ul>
+            className="expandBoxContainer"
+          >
+            <div
+              className="fa-stack expandBox"
+              onClick={[Function]}
+              role="button"
+              tabIndex={0}
+            >
+              <ForwardRef
+                className="fa-stack-1x iconBackground"
+                fixedWidth={false}
+                inverse={false}
+                name="circle-thin"
+                pulse={false}
+                spin={false}
+              >
+                <i
+                  className="fa fa-circle-thin fa-stack-1x iconBackground"
+                />
+              </ForwardRef>
+              <ForwardRef
+                className="fa-stack-1x"
+                fixedWidth={false}
+                inverse={false}
+                name="angle-down"
+                pulse={false}
+                spin={false}
+              >
+                <i
+                  className="fa fa-angle-down fa-stack-1x"
+                />
+              </ForwardRef>
+            </div>
+          </div>
+          <span
+            className="header"
+          >
+            <span
+              onClick={[Function]}
+              role="button"
+              tabIndex={0}
+            >
+              Wheel of time
+            </span>
+          </span>
+        </div>
+        <div
+          className="expandableContent"
+        >
+          <ExpandableList>
+            <ul
+              className="list"
+            >
+              <ExpandableListItem
+                checked={false}
+                expandable={true}
+                expanded={false}
+                header="Edmonds Field"
+                indetermined={false}
+                onChange={[MockFunction]}
+                padded={true}
+                selectable={true}
+                stayExpanded={false}
+              >
+                <li
+                  className="listItemPadding"
+                >
+                  <div
+                    className="listItemContainer"
+                  >
+                    <Checkbox
+                      bsClass="checkbox"
+                      checked={false}
+                      disabled={false}
+                      inline={true}
+                      inputRef={[Function]}
+                      onChange={[MockFunction]}
+                      title=""
+                    >
+                      <label
+                        className="checkbox-inline"
+                        title=""
+                      >
+                        <input
+                          checked={false}
+                          disabled={false}
+                          onChange={[MockFunction]}
+                          type="checkbox"
+                        />
+                      </label>
+                    </Checkbox>
+                    <div
+                      className="expandBoxContainer"
+                    >
+                      <div
+                        className="fa-stack expandBox"
+                        onClick={[Function]}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        <ForwardRef
+                          className="fa-stack-1x iconBackground"
+                          fixedWidth={false}
+                          inverse={false}
+                          name="circle-thin"
+                          pulse={false}
+                          spin={false}
+                        >
+                          <i
+                            className="fa fa-circle-thin fa-stack-1x iconBackground"
+                          />
+                        </ForwardRef>
+                        <ForwardRef
+                          className="fa-stack-1x"
+                          fixedWidth={false}
+                          inverse={false}
+                          name="angle-up"
+                          pulse={false}
+                          spin={false}
+                        >
+                          <i
+                            className="fa fa-angle-up fa-stack-1x"
+                          />
+                        </ForwardRef>
+                      </div>
+                    </div>
+                    <span
+                      className="header"
+                    >
+                      <span
+                        onClick={[Function]}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        Edmonds Field
+                      </span>
+                    </span>
+                  </div>
+                  <div
+                    className="expandableContent"
+                  />
+                </li>
+              </ExpandableListItem>
+            </ul>
+          </ExpandableList>
+        </div>
+      </li>
+    </ExpandableListItem>
+  </ul>
+</ExpandableList>
 `;
 
 exports[`<ExpandableList /> should render with no children 1`] = `
-<ul
-  className="list"
-/>
+<ExpandableList>
+  <ul
+    className="list"
+  />
+</ExpandableList>
 `;

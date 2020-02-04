@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 
@@ -32,8 +32,8 @@ describe('<DataAdapterCreate />', () => {
   it('should render with empty parameters', () => {
     const callback = () => {};
     const types = {};
-    const wrapper = renderer.create(<DataAdapterCreate saved={callback} types={types} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render for types with defined frontend components', () => {
@@ -43,8 +43,8 @@ describe('<DataAdapterCreate />', () => {
         type: 'someType',
       },
     };
-    const wrapper = renderer.create(<DataAdapterCreate saved={callback} types={types} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   describe('with mocked console.error', () => {
@@ -65,8 +65,8 @@ describe('<DataAdapterCreate />', () => {
           type: 'unknownType',
         },
       };
-      const wrapper = renderer.create(<DataAdapterCreate saved={callback} types={types} />);
-      expect(wrapper.toJSON()).toMatchSnapshot();
+      const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+      expect(wrapper).toMatchSnapshot();
       expect(console.error.mock.calls.length).toBe(1);
     });
   });

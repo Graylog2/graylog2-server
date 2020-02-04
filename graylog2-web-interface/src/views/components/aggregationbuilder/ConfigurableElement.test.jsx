@@ -1,5 +1,4 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
 import { mount, shallow } from 'wrappedEnzyme';
 
 import ConfigurableElement from './ConfigurableElement';
@@ -7,7 +6,7 @@ import ConfigurableElement from './ConfigurableElement';
 describe('ConfigurableElement', () => {
   it('renders something for minimal props', () => {
     const onChange = jest.fn();
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <ConfigurableElement title="Configuring Something"
                            onChange={onChange}
                            value={{ label: 42, value: 42 }}
@@ -15,7 +14,7 @@ describe('ConfigurableElement', () => {
         Hello World!
       </ConfigurableElement>,
     );
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders the given value', () => {

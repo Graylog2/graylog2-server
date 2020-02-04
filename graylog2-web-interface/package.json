@@ -177,7 +177,6 @@
     "puppeteer": "^1.14.0",
     "react-select-event": "^3.0.0",
     "react-styleguidist": "^10.6.1",
-    "react-test-renderer": "^16.9.0",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
     "ts-jest": "^24.0.2",

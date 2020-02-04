@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import jQuery from 'jquery';
-import { configure } from 'enzyme';
+import { configure } from 'wrappedEnzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import registerBuiltinStores from 'injection/registerBuiltinStores';
 import { format } from 'util';
