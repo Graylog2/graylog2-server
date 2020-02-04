@@ -19,13 +19,14 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.MessagesWidget;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.TimeRange;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
+import java.util.stream.Collectors;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "rangeType", visible = true)
 @JsonSubTypes({
@@ -34,16 +35,38 @@ import static com.google.common.base.Strings.isNullOrEmpty;
         @JsonSubTypes.Type(value = RelativeTimeRangeQuery.class, name = RelativeTimeRangeQuery.type)
 })
 public interface Query {
+    String TIMESTAMP_FIELD = "timestamp";
+    List<String> DEFAULT_FIELDS = ImmutableList.of(TIMESTAMP_FIELD, "source", "message");
+
     String rangeType();
-    String fields();
+    Optional<String> fields();
     String query();
     Optional<String> streamId();
 
     TimeRange toTimeRange();
 
+    default MessagesWidget toMessagesWidget(String messageListId) {
+        final List<String> usedFieldsWithoutMessage = fieldsList().stream()
+                .filter(field -> !field.equals("message"))
+                .collect(Collectors.toList());
+        final boolean showMessageRow = fieldsList().contains("message");
+
+        return MessagesWidget.create(messageListId, usedFieldsWithoutMessage, showMessageRow);
+    }
+
     default List<String> fieldsList() {
-        return isNullOrEmpty(fields())
-                ? Collections.emptyList()
-                : Splitter.on(",").splitToList(fields());
+        return fields()
+                .filter(fields -> !fields.trim().isEmpty())
+                .map(fields -> Splitter.on(",").splitToList(fields))
+                .map(fields -> {
+                    if (!fields.contains(TIMESTAMP_FIELD)) {
+                        final List<String> fieldsWithTimestamp = new ArrayList<>(fields.size() + 1);
+                        fieldsWithTimestamp.add(TIMESTAMP_FIELD);
+                        fieldsWithTimestamp.addAll(fields);
+                        return fieldsWithTimestamp;
+                    }
+                    return fields;
+                })
+                .orElse(DEFAULT_FIELDS);
     }
 }
