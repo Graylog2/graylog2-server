@@ -47,7 +47,7 @@ public abstract class AbsoluteTimeRangeQuery implements Query {
     @JsonCreator
     static AbsoluteTimeRangeQuery create(
             @JsonProperty("rangeType") String rangeType,
-            @JsonProperty("fields") String fields,
+            @JsonProperty("fields") @Nullable String fields,
             @JsonProperty("query") String query,
             @JsonProperty("from") DateTime from,
             @JsonProperty("to") DateTime to,

@@ -45,7 +45,7 @@ public abstract class KeywordTimeRangeQuery implements Query {
     @JsonCreator
     static KeywordTimeRangeQuery create(
             @JsonProperty("rangeType") String rangeType,
-            @JsonProperty("fields") String fields,
+            @JsonProperty("fields") @Nullable String fields,
             @JsonProperty("query") String query,
             @JsonProperty("keyword") String keyword,
             @JsonProperty("streamId") @Nullable String streamId

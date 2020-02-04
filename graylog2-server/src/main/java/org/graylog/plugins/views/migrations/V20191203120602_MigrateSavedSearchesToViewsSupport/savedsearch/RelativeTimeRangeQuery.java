@@ -44,7 +44,7 @@ public abstract class RelativeTimeRangeQuery implements Query {
     @JsonCreator
     static RelativeTimeRangeQuery create(
             @JsonProperty("rangeType") String rangeType,
-            @JsonProperty("fields") String fields,
+            @JsonProperty("fields") @Nullable String fields,
             @JsonProperty("query") String query,
             @JsonProperty("relative") int relative,
             @JsonProperty("streamId") @Nullable String streamId
