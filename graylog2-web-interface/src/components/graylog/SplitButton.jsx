@@ -17,4 +17,5 @@ const SplitButton = styled(BootstrapSplitButton)`
   }
 `;
 
+/** @component */
 export default SplitButton;

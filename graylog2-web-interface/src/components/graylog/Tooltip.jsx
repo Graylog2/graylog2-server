@@ -33,4 +33,5 @@ const Tooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 `);
 
+/** @component */
 export default Tooltip;
