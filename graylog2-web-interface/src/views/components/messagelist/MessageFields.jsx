@@ -1,13 +1,26 @@
 // @flow strict
 import * as React from 'react';
+import styled from 'styled-components';
 
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { StyledComponent } from 'styled-components';
 
-import styles from './MessageFields.css';
 import CustomHighlighting from './CustomHighlighting';
+
+const Fields: StyledComponent<{}, {}, HTMLDListElement> = styled.dl`
+  color: #666;
+
+  dd {
+    font-family: monospace;
+  }
+
+  dd:not(:last-child) {
+      border-bottom: 1px solid #ececec;
+  }
+`;
 
 type Props = {
   message: {
@@ -36,9 +49,9 @@ const MessageFields = ({ message, fields }: Props) => {
     });
 
   return (
-    <dl className={`message-details message-details-fields ${styles.messageFields}`}>
+    <Fields className="message-details message-details-fields">
       {renderedFields}
-    </dl>
+    </Fields>
   );
 };
 

@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 
 type Props = {
-  timestamp: string,
+  timestamp: ?Array<React.Node>,
   receivedBy: React.Node,
   index: string,
   streams: Immutable.Set<React.Node>,

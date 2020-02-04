@@ -8,11 +8,12 @@ import Field from 'views/components/Field';
 import Value from 'views/components/Value';
 import { ViewStore } from 'views/stores/ViewStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import { Message as MessagePropType } from './MessagePropTypes';
+import type { Message } from './Types';
 
 import CustomPropTypes from '../CustomPropTypes';
 import DecoratedValue from './decoration/DecoratedValue';
 import InteractiveContext from '../contexts/InteractiveContext';
-import type { Message } from './Types';
 
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
@@ -72,7 +73,7 @@ MessageField.propTypes = {
   currentView: CustomPropTypes.CurrentView.isRequired,
   fieldName: PropTypes.string.isRequired,
   fieldType: CustomPropTypes.FieldType.isRequired,
-  message: PropTypes.object.isRequired,
+  message: MessagePropType.isRequired,
   value: PropTypes.any.isRequired,
 };
 

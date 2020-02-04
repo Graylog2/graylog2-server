@@ -2,6 +2,7 @@
 import React, { useContext, useEffect } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
+import styled from 'styled-components';
 
 import expandRows from 'views/logic/ExpandRows';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -17,6 +18,57 @@ import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+
+const MessageContainer = styled.div`
+  padding-right: 13px;
+  width: 100%;
+`;
+
+const Table = styled.table`
+  position: relative;
+  font-size: 11px;
+  margin-top: 15px;
+  margin-bottom: 60px;
+  border-collapse: collapse;
+  padding-left: 13px;
+  width: 100%;
+  word-break: break-all;
+
+
+  thead > tr {
+    color: #fff;
+  }
+
+  td, th {
+    position: relative;
+    left: 13px;
+  }
+
+  > thead th {
+    border: 0;
+    font-size: 11px;
+    font-weight: normal;
+    background-color: #222;
+    white-space: nowrap;
+  }
+
+  tr {
+    border: 0 !important;
+  }
+
+  tbody.message-group {
+    border-top: 0;
+  }
+
+  tbody.message-group-toggled {
+    border-left: 7px solid #16ace3;
+  }
+
+  tbody.message-highlight {
+    border-left: 7px solid #8dc63f;
+  }
+`;
+
 
 type Props = {
   config: AggregationWidgetConfig,
@@ -100,8 +152,8 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   return (
     <div className={styles.container}>
       <div className={styles.scrollContainer}>
-        <div className="messages-container">
-          <table className="table table-condensed messages">
+        <MessageContainer>
+          <Table className="table table-condensed">
             <thead>
               <Headers activeQuery={currentView.activeQuery}
                        actualColumnPivotFields={actualColumnPivotFields}
@@ -112,8 +164,8 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
                        series={series} />
             </thead>
             {formattedRows}
-          </table>
-        </div>
+          </Table>
+        </MessageContainer>
       </div>
     </div>
   );

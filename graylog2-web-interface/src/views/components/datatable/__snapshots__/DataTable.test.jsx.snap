@@ -8,10 +8,10 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
     className="scrollContainer"
   >
     <div
-      className="messages-container"
+      className="DataTable__MessageContainer-sc-1lznsxb-0 kfUpZT"
     >
       <table
-        className="table table-condensed messages"
+        className="table table-condensed DataTable__Table-sc-1lznsxb-1 colYnb"
       >
         <thead>
           <tr>
@@ -133,10 +133,10 @@ exports[`DataTable should render with empty data 1`] = `
     className="scrollContainer"
   >
     <div
-      className="messages-container"
+      className="DataTable__MessageContainer-sc-1lznsxb-0 kfUpZT"
     >
       <table
-        className="table table-condensed messages"
+        className="table table-condensed DataTable__Table-sc-1lznsxb-1 colYnb"
       >
         <thead>
           <tr />
@@ -155,10 +155,10 @@ exports[`DataTable should render with filled data with rollup 1`] = `
     className="scrollContainer"
   >
     <div
-      className="messages-container"
+      className="DataTable__MessageContainer-sc-1lznsxb-0 kfUpZT"
     >
       <table
-        className="table table-condensed messages"
+        className="table table-condensed DataTable__Table-sc-1lznsxb-1 colYnb"
       >
         <thead>
           <tr>
@@ -300,10 +300,10 @@ exports[`DataTable should render with filled data without rollup 1`] = `
     className="scrollContainer"
   >
     <div
-      className="messages-container"
+      className="DataTable__MessageContainer-sc-1lznsxb-0 kfUpZT"
     >
       <table
-        className="table table-condensed messages"
+        className="table table-condensed DataTable__Table-sc-1lznsxb-1 colYnb"
       >
         <thead>
           <tr>
