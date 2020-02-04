@@ -1,0 +1,101 @@
+package org.graylog.plugins.views.migrations;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.mongodb.client.model.Filters.exists;
+import static com.mongodb.client.model.Filters.not;
+
+public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20200204122000_MigrateUntypedViewsToDashboards.class);
+    private static final String FIELD_ID = "_id";
+    private static final String FIELD_TYPE = "type";
+    private static final String FIELD_FILTER = "filter";
+    private static final String TYPE_DASHBOARD = "DASHBOARD";
+    private static final String FIELD_QUERY = "query";
+    private final MongoCollection<Document> viewsCollection;
+    private final ClusterConfigService clusterConfigService;
+
+    @Inject
+    public V20200204122000_MigrateUntypedViewsToDashboards(final MongoConnection mongoConnection,
+                                                           final ClusterConfigService clusterConfigService) {
+        this.viewsCollection = mongoConnection.getMongoDatabase().getCollection("views");
+        this.clusterConfigService = clusterConfigService;
+    }
+
+    @Override
+    public ZonedDateTime createdAt() {
+        return ZonedDateTime.parse("2020-02-04T12:20:00Z");
+    }
+
+    private Document createBackendQuery(String filter) {
+        return new Document(ImmutableMap.of(
+                "type", "elasticsearch",
+                "query_string", filter
+        ));
+    }
+
+    @Override
+    public void upgrade() {
+        if (clusterConfigService.get(MigrationCompleted.class) != null) {
+            LOG.debug("Migration already completed.");
+            return;
+        }
+
+        final List<String> viewIds = new ArrayList<>();
+        final FindIterable<Document> documents = viewsCollection.find(not(exists(FIELD_TYPE)));
+        for (final Document view : documents) {
+            final Document states = view.get("state", Document.class);
+            view.put(FIELD_TYPE, TYPE_DASHBOARD);
+            states.forEach((String id, Object obj) -> {
+                final Document state = (Document) obj;
+                if (state.get("widgets") instanceof List) {
+                    @SuppressWarnings("unchecked") final List<Document> widgets = (List) state.get("widgets");
+                    for (final Document widget : widgets) {
+                        if (widget.get(FIELD_FILTER) != null && widget.get(FIELD_FILTER) instanceof String) {
+                            final String filter = widget.getString(FIELD_FILTER);
+                            widget.remove(FIELD_FILTER);
+                            widget.put(FIELD_QUERY, createBackendQuery(filter));
+                        }
+                    }
+                }
+            });
+            final ObjectId viewId = view.getObjectId(FIELD_ID);
+            viewsCollection.updateOne(new BasicDBObject(FIELD_ID, viewId), new Document("$set", view));
+            viewIds.add(viewId.toString());
+        }
+        clusterConfigService.write(MigrationCompleted.create(viewIds));
+    }
+
+    @JsonAutoDetect
+    @AutoValue
+    @WithBeanGetter
+    public static abstract class MigrationCompleted {
+        @JsonProperty("viewIds")
+        public abstract List<String> viewIds();
+
+        @JsonCreator
+        public static MigrationCompleted create(@JsonProperty("viewIds") final List<String> viewIds) {
+            return new AutoValue_V20200204122000_MigrateUntypedViewsToDashboards_MigrationCompleted(viewIds);
+        }
+    }
+}
