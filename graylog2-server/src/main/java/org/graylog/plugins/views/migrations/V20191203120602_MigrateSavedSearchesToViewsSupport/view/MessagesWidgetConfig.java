@@ -29,11 +29,9 @@ public abstract class MessagesWidgetConfig {
     public abstract List<String> fields();
 
     @JsonProperty("show_message_row")
-    public boolean showMessageRow() {
-        return true;
-    }
+    public abstract boolean showMessageRow();
 
-    public static MessagesWidgetConfig create(List<String> fields) {
-        return new AutoValue_MessagesWidgetConfig(fields);
+    public static MessagesWidgetConfig create(List<String> fields, boolean showMessageRow) {
+        return new AutoValue_MessagesWidgetConfig(fields, showMessageRow);
     }
 }

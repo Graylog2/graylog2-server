@@ -71,7 +71,7 @@ public abstract class MessagesWidget implements ViewWidget {
         return Collections.singleton(MessagesSearchType.create(randomUUIDProvider.get()));
     }
 
-    public static MessagesWidget create(String id, List<String> fields) {
-        return new AutoValue_MessagesWidget(id, MessagesWidgetConfig.create(fields));
+    public static MessagesWidget create(String id, List<String> fields, boolean showMessageRow) {
+        return new AutoValue_MessagesWidget(id, MessagesWidgetConfig.create(fields, showMessageRow));
     }
 }
