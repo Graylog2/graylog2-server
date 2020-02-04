@@ -32,10 +32,6 @@ import java.util.Optional;
 public abstract class AbsoluteTimeRangeQuery implements Query {
     public static final String type = "absolute";
 
-    public abstract String rangeType();
-    public abstract String fields();
-    public abstract String query();
-
     public abstract DateTime from();
     public abstract DateTime to();
 
@@ -53,6 +49,6 @@ public abstract class AbsoluteTimeRangeQuery implements Query {
             @JsonProperty("to") DateTime to,
             @JsonProperty("streamId") @Nullable String streamId
     ) {
-        return new AutoValue_AbsoluteTimeRangeQuery(Optional.ofNullable(streamId), rangeType, fields, query, from, to);
+        return new AutoValue_AbsoluteTimeRangeQuery(rangeType, Optional.ofNullable(fields), query, Optional.ofNullable(streamId), from, to);
     }
 }
