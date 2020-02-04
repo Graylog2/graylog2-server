@@ -1,57 +1,12 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
+import bgImage from 'images/auth/loginbg.jpg';
 
-const DisconnectedThemeStyles = createGlobalStyle`
+const DisconnectedThemeStyles = createGlobalStyle(({ theme }) => css`
   body {
     /* we love science */
-    background: url('images/auth/loginbg.jpg') no-repeat center center fixed;
+    background: url(${bgImage}) no-repeat center center fixed ${theme.color.secondary.due};
     background-size: cover;
   }
-
-  #disconnected-box {
-      margin-top: 120px;
-  }
-
-  #disconnected-box-content {
-      background-color: #fff;
-      -moz-box-shadow: 0 0 5px #888;
-      -webkit-box-shadow: 0 0 5px#888;
-      box-shadow: 0 0 40px #000;
-  }
-
-  .never-seen-warning {
-      margin-top: 4px;
-      margin-left: 10px;
-  }
-
-  .via-node-headline {
-      margin-left: 20px;
-  }
-
-  .via-node-headline:hover {
-      cursor: pointer;
-  }
-
-  .discovered-node-link {
-      margin-left: 20px;
-  }
-
-  .discovered-node-link:hover {
-      cursor: pointer;
-  }
-
-  #nodes-box {
-      margin-top: 10px;
-  }
-
-  hr {
-      margin-top: 10px;
-      margin-bottom: 10px;
-  }
-
-  .loading-text {
-      font-size: 14px;
-  }
-
-`;
+`);
 
 export default DisconnectedThemeStyles;
