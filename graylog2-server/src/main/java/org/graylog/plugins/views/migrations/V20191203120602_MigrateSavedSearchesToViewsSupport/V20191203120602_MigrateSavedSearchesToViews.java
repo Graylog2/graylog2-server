@@ -28,7 +28,6 @@ import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearches
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.SearchService;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.SearchType;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.AggregationWidget;
-import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.MessagesWidget;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.Position;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.RandomObjectIdProvider;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.RandomUUIDProvider;
@@ -114,7 +113,7 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
         final String messageListId = randomUUIDProvider.get();
         final Set<ViewWidget> widgets = ImmutableSet.of(
                 AggregationWidget.create(histogramId),
-                MessagesWidget.create(messageListId, savedSearch.query().fieldsList())
+                savedSearch.query().toMessagesWidget(messageListId)
         );
         final Map<String, Set<String>> widgetMapping = new HashMap<>(widgets.size());
 
