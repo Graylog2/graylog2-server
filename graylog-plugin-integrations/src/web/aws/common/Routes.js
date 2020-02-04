@@ -33,6 +33,14 @@ const ApiRoutes = {
   },
 };
 
+const DocsRoutes = {
+  INTEGRATIONS: {
+    AWS: {
+      AWS_KINESIS_CLOUDWATCH_INPUTS: 'integrations/inputs/aws_kinesis_cloudwatch_input.html#aws-kinesis-cloudwatch-input',
+    },
+  },
+};
+
 export default Routes;
 
-export { ApiRoutes };
+export { ApiRoutes, DocsRoutes };

@@ -11,10 +11,10 @@ import { SidebarContext } from 'aws/context/Sidebar';
 import useFetch from 'aws/common/hooks/useFetch';
 import FormWrap from 'aws/common/FormWrap';
 import ValidatedInput from 'aws/common/ValidatedInput';
-import Routes, { ApiRoutes } from 'aws/common/Routes';
+import { ApiRoutes, DocsRoutes } from 'aws/common/Routes';
 import { renderOptions } from 'aws/common/Options';
-
 import formValidation from 'aws/utils/formValidation';
+import DocumentationLink from 'components/support/DocumentationLink';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 
@@ -96,9 +96,9 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
                       Below is a list of all Kinesis streams found within the specified AWS account.
                     </p>
                     <p>
-                      Please select the stream you would like to read messages from, or follow the directions set up&nbsp;
-                      <a href={Routes.INTEGRATIONS.AWS.CLOUDWATCH.step('kinesis-setup')}>CloudWatch Log Subscription</a>,
-                      which can forward messages into a new Kinesis stream.
+                      Please select the stream you would like to read messages from, or follow the&nbsp;
+                      <DocumentationLink page={DocsRoutes.INTEGRATIONS.AWS.AWS_KINESIS_CLOUDWATCH_INPUTS} text="AWS Kinesis/CloudWatch Input " />
+                         documentation for more details on this set up.
                     </p>
                   </>
                 )}>
