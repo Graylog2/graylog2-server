@@ -1,0 +1,53 @@
+[ {
+  "id" : "5de0e98900002a0017000001",
+  "queries" : [ {
+    "id" : "0000016e-b690-4273-0000-016eb690426f",
+    "timerange" : {
+      "type" : "absolute",
+      "from" : "2019-12-02T13:18:28.000Z",
+      "to" : "2019-12-03T13:18:29.000Z"
+    },
+    "query" : {
+      "type" : "elasticsearch",
+      "query_string" : "source:sophon"
+    },
+    "search_types" : [ {
+      "id" : "0000016e-b690-4272-0000-016eb690426f",
+      "name" : null,
+      "type" : "messages",
+      "limit" : 150,
+      "offset" : 0,
+      "query" : null,
+      "timerange" : null,
+      "streams" : [ ]
+    }, {
+      "id" : "0000016e-b690-4271-0000-016eb690426f",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "name" : "chart",
+      "type" : "pivot",
+      "query" : null,
+      "sort" : [ ],
+      "filter" : null,
+      "timerange" : null,
+      "rollup" : true,
+      "streams" : [ ],
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ ]
+    } ]
+  } ],
+  "parameters" : [ ],
+  "owner" : "admin",
+  "created_at" : "2019-12-03T13:18:47.602Z",
+  "requires" : { }
+} ]
