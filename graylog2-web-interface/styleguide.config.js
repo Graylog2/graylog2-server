@@ -81,7 +81,7 @@ module.exports = {
       content: 'docs/util-objects.md',
     },
   ],
-  usageMode: 'expand',
+  usageMode: 'collapse',
   styleguideComponents: {
     Wrapper: path.join(__dirname, 'src/theme/GraylogThemeContext'),
   },

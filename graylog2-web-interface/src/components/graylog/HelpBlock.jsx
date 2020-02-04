@@ -12,4 +12,5 @@ const HelpBlock = styled(BootstrapHelpBlock)`
   color: ${lighten(0.50, teinte.primary.tre)};
 `;
 
+/** @component */
 export default HelpBlock;

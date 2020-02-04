@@ -11,4 +11,5 @@ const ControlLabel = styled(BootstrapControlLabel)`
   display: inline-block;
 `;
 
+/** @component */
 export default ControlLabel;

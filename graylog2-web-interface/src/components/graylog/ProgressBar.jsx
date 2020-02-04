@@ -1,5 +1,6 @@
+import React from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { ProgressBar } from 'react-bootstrap';
+import { ProgressBar as BootstrapProgressBar } from 'react-bootstrap';
 import { css } from 'styled-components';
 import { transparentize } from 'polished';
 
@@ -45,4 +46,7 @@ export const progressBarStyles = css`
   }
 `;
 
+const ProgressBar = () => <BootstrapProgressBar />;
+
+/** @component */
 export default ProgressBar;

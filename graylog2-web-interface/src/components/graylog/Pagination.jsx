@@ -47,4 +47,5 @@ const Pagination = styled(BootstrapPagination)`
   }
 `;
 
+/** @component */
 export default Pagination;

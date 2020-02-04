@@ -9,4 +9,5 @@ const Well = styled(BootstrapWell)`
   border-color: ${teinte.secondary.tre};
 `;
 
+/** @component */
 export default Well;

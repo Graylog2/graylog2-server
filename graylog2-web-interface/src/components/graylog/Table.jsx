@@ -104,4 +104,5 @@ const Table = styled(BootstrapTable)`
   ${variantRowStyles()}
 `;
 
+/** @component */
 export default Table;

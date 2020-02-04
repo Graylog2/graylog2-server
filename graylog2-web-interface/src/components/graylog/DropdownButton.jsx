@@ -11,4 +11,5 @@ const DropdownButton = styled(BootstrapDropdownButton)`
   ${menuItemStyles({ sibling: true })};
 `;
 
+/** @component */
 export default DropdownButton;

@@ -8,4 +8,5 @@ const Tabs = styled(BootstrapTabs)`
   ${navTabsStyles()};
 `;
 
+/** @component */
 export default Tabs;

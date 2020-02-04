@@ -20,4 +20,5 @@ const Modal = styled(BootstrapModal)`
   }
 `;
 
+/** @component */
 export default Modal;

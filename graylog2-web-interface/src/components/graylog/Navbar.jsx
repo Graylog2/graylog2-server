@@ -261,4 +261,5 @@ const Navbar = styled(BootstrapNavbar)`
   }
 `;
 
+/** @component */
 export default Navbar;

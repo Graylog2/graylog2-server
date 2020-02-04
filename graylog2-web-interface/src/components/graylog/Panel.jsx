@@ -61,4 +61,5 @@ const StyledPanel = styled(BootstrapPanel)`
   ${bsStyleThemeVariant(panelVariantStyles)}
 `;
 
+/** @component */
 export default StyledPanel;
