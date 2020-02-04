@@ -200,16 +200,16 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
     }
 
     @Test
-    @MongoDBFixtures("sample_saved_search_with_missing_fields.json")
+    @MongoDBFixtures("sample_saved_search_without_message_row.json")
     public void migrateSavedSearchWithoutMessageRow() throws Exception {
         this.migration.upgrade();
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted.savedSearchIds())
-                .containsExactly(new AbstractMap.SimpleEntry<>("5de660b7b2d44b5813c1d7f6", "5de0e98900002a0017000002"));
+                .containsExactly(new AbstractMap.SimpleEntry<>("5c7e5499f38ed7e1d8d6a613", "5de0e98900002a0017000002"));
 
-        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_with_missing_fields-expected_views.json"));
-        assertSearchServiceCreated(1, resourceFile("sample_saved_search_with_missing_fields-expected_searches.json"));
+        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_without_message_row-expected_views.json"));
+        assertSearchServiceCreated(1, resourceFile("sample_saved_search_without_message_row-expected_searches.json"));
     }
 
     private void assertViewServiceCreatedViews(int count, String viewsCollection) throws Exception {
