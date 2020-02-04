@@ -44,7 +44,8 @@ public abstract class KeywordTimeRangeQuery extends Query {
             @JsonProperty("fields") @Nullable String fields,
             @JsonProperty("query") String query,
             @JsonProperty("keyword") String keyword,
-            @JsonProperty("streamId") @Nullable String streamId
+            @JsonProperty("streamId") @Nullable String streamId,
+            @JsonProperty("interval") @Nullable String ignored
     ) {
         return new AutoValue_KeywordTimeRangeQuery(rangeType, Optional.ofNullable(fields), query, Optional.ofNullable(streamId), keyword);
     }

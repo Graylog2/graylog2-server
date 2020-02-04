@@ -212,13 +212,52 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
         assertSearchServiceCreated(1, resourceFile("sample_saved_search_without_message_row-expected_searches.json"));
     }
 
+    @Test
+    @MongoDBFixtures("sample_saved_search_relative_with_interval_field.json")
+    public void migrateSavedSearchRelativeWithIntervalField() throws Exception {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.savedSearchIds())
+                .containsExactly(new AbstractMap.SimpleEntry<>("5c7e5499f38ed7e1d8d6a613", "5de0e98900002a0017000002"));
+
+        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_relative_with_interval_field-expected_views.json"));
+        assertSearchServiceCreated(1, resourceFile("sample_saved_search_relative_with_interval_field-expected_searches.json"));
+    }
+
+    @Test
+    @MongoDBFixtures("sample_saved_search_absolute_with_interval_field.json")
+    public void migrateSavedSearchAbsoluteWithIntervalField() throws Exception {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.savedSearchIds())
+                .containsExactly(new AbstractMap.SimpleEntry<>("5de660b7b2d44b5813c1d7f6", "5de0e98900002a0017000002"));
+
+        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_absolute_with_interval_field-expected_views.json"));
+        assertSearchServiceCreated(1, resourceFile("sample_saved_search_absolute_with_interval_field-expected_searches.json"));
+    }
+
+    @Test
+    @MongoDBFixtures("sample_saved_search_keyword_with_interval_field.json")
+    public void migrateSavedSearchKeywordWithIntervalField() throws Exception {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.savedSearchIds())
+                .containsExactly(new AbstractMap.SimpleEntry<>("5de660c6b2d44b5813c1d806", "5de0e98900002a0017000002"));
+
+        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_keyword_with_interval_field-expected_views.json"));
+        assertSearchServiceCreated(1, resourceFile("sample_saved_search_keyword_with_interval_field-expected_searches.json"));
+    }
+
     private void assertViewServiceCreatedViews(int count, String viewsCollection) throws Exception {
         final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
         verify(viewService, times(count)).save(newViewsCaptor.capture());
         final List<View> newViews = newViewsCaptor.getAllValues();
         assertThat(newViews).hasSize(count);
 
-        JSONAssert.assertEquals(toJSON(newViews), viewsCollection, true);
+        JSONAssert.assertEquals(viewsCollection, toJSON(newViews), true);
     }
 
     private void assertSearchServiceCreated(int count, String searchCollection) throws Exception {
