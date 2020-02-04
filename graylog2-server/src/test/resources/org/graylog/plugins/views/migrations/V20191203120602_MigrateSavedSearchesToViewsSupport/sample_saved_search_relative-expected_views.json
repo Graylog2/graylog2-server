@@ -51,7 +51,7 @@
             "id": "0000016e-b690-4270-0000-016eb690426f",
             "config": {
               "fields": [
-                "message",
+                "timestamp",
                 "source"
               ],
               "show_message_row": true
