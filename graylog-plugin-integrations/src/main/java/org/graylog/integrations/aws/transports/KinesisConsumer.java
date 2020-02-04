@@ -4,7 +4,7 @@ package org.graylog.integrations.aws.transports;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.integrations.aws.AWSAuthProvider;
+import org.graylog.integrations.aws.AWSAuthFactory;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
@@ -76,8 +76,8 @@ public class KinesisConsumer implements Runnable {
     public void run() {
 
         LOG.debug("Starting the Kinesis Consumer.");
-        AwsCredentialsProvider credentialsProvider = new AWSAuthProvider(request.region(), request.awsAccessKeyId(),
-                                                                         request.awsSecretAccessKey(), request.assumeRoleArn());
+        AwsCredentialsProvider credentialsProvider = AWSAuthFactory.create(request.region(), request.awsAccessKeyId(),
+                                                                           request.awsSecretAccessKey(), request.assumeRoleArn());
 
         final Region region = Region.of(request.region());
 

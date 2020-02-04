@@ -56,8 +56,8 @@ public class AWSClientBuilderUtil {
         AWSClientBuilderUtil.initializeBuilder(clientBuilder,
                                                request.cloudwatchEndpoint(),
                                                Region.of(request.region()),
-                                               new AWSAuthProvider(request.region(), request.awsAccessKeyId(),
-                                                                   request.awsSecretAccessKey(), request.assumeRoleArn()));
+                                               AWSAuthFactory.create(request.region(), request.awsAccessKeyId(),
+                                                                     request.awsSecretAccessKey(), request.assumeRoleArn()));
 
         return clientBuilder.build();
     }
@@ -74,8 +74,8 @@ public class AWSClientBuilderUtil {
         AWSClientBuilderUtil.initializeBuilder(clientBuilder,
                                                request.kinesisEndpoint(),
                                                Region.of(request.region()),
-                                               new AWSAuthProvider(request.region(), request.awsAccessKeyId(),
-                                                                   request.awsSecretAccessKey(), request.assumeRoleArn()));
+                                               AWSAuthFactory.create(request.region(), request.awsAccessKeyId(),
+                                                                     request.awsSecretAccessKey(), request.assumeRoleArn()));
 
         return clientBuilder.build();
     }
@@ -92,9 +92,9 @@ public class AWSClientBuilderUtil {
         AWSClientBuilderUtil.initializeBuilder(clientBuilder,
                                                request.iamEndpoint(),
                                                Region.AWS_GLOBAL, // Always specify the global region for the IAM client.
-                                               new AWSAuthProvider(request.region(), // The AWSAuthProvider must still use the user-specified region, since a role might need to be assumed in that region.
-                                                                   request.awsAccessKeyId(),
-                                                                   request.awsSecretAccessKey(), request.assumeRoleArn()));
+                                               AWSAuthFactory.create(request.region(), // The AWSAuthProvider must still use the user-specified region, since a role might need to be assumed in that region.
+                                                                     request.awsAccessKeyId(),
+                                                                     request.awsSecretAccessKey(), request.assumeRoleArn()));
         return clientBuilder.build();
     }
 }

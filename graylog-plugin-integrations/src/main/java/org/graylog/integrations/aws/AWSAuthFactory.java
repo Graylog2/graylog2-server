@@ -3,7 +3,6 @@ package org.graylog.integrations.aws;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -17,27 +16,21 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-/**
- * Resolves the appropriate AWS authorization provider.
- *
- * If an {@code accessKey} and {@code secretKey} are provided, they will be used explicitly.
- * If not, the default DefaultCredentialsProvider will be used instead. This will resolve the role/policy
- * using Java props, environment variables, EC2 instance roles etc. See the {@link DefaultCredentialsProvider}
- * Javadoc for more information.
- */
-public class AWSAuthProvider implements AwsCredentialsProvider {
-    private static final Logger LOG = LoggerFactory.getLogger(AWSAuthProvider.class);
+public class AWSAuthFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(AWSAuthFactory.class);
 
-    private AwsCredentials credentials;
-
-    public AWSAuthProvider(@Nullable String stsRegion, @Nullable String accessKey, @Nullable String secretKey, @Nullable String assumeRoleArn) {
-        this.credentials = this.resolveAuthentication(accessKey, secretKey, stsRegion, assumeRoleArn);
-    }
-
-    private AwsCredentials resolveAuthentication(@Nullable String accessKey,
-                                                 @Nullable String secretKey,
-                                                 @Nullable String stsRegion,
-                                                 @Nullable String assumeRoleArn) {
+    /**
+     * Resolves the appropriate AWS authorization provider based on the input.
+     *
+     * If an {@code accessKey} and {@code secretKey} are provided, they will be used explicitly.
+     * If not, the default DefaultCredentialsProvider will be used instead. This will resolve the role/policy
+     * using Java props, environment variables, EC2 instance roles etc. See the {@link DefaultCredentialsProvider}
+     * Javadoc for more information.
+     */
+    public static AwsCredentialsProvider create(@Nullable String accessKey,
+                                                @Nullable String secretKey,
+                                                @Nullable String stsRegion,
+                                                @Nullable String assumeRoleArn) {
         AwsCredentialsProvider awsCredentials;
         if (!isNullOrEmpty(accessKey) && !isNullOrEmpty(secretKey)) {
             LOG.debug("Using explicitly provided key and secret.");
@@ -50,11 +43,10 @@ public class AWSAuthProvider implements AwsCredentialsProvider {
         // Apply the Assume Role ARN Authorization if specified. All AWSCredentialsProviders support this.
         if (!isNullOrEmpty(assumeRoleArn) && !isNullOrEmpty(stsRegion)) {
             LOG.debug("Creating cross account assume role credentials");
-            return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey)
-                    .resolveCredentials();
+            return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey);
         }
 
-        return awsCredentials.resolveCredentials();
+        return awsCredentials;
     }
 
     /**
@@ -63,8 +55,8 @@ public class AWSAuthProvider implements AwsCredentialsProvider {
      * Note: In order to assume a role, a role must be provided to the AWS STS client a role that has the "sts:AssumeRole"
      * permission, which provides authorization for a role to be assumed.
      */
-    private AwsCredentialsProvider buildStsCredentialsProvider(AwsCredentialsProvider awsCredentials, String stsRegion,
-                                                               String assumeRoleArn, @Nullable String accessKey) {
+    private static AwsCredentialsProvider buildStsCredentialsProvider(AwsCredentialsProvider awsCredentials, String stsRegion,
+                                                                      String assumeRoleArn, @Nullable String accessKey) {
 
         StsClient stsClient = StsClient.builder().region(Region.of(stsRegion)).credentialsProvider(awsCredentials).build();
 
@@ -86,10 +78,5 @@ public class AWSAuthProvider implements AwsCredentialsProvider {
                                                                                           .build())
                                                .stsClient(stsClient)
                                                .build();
-    }
-
-    @Override
-    public AwsCredentials resolveCredentials() {
-        return credentials;
     }
 }
