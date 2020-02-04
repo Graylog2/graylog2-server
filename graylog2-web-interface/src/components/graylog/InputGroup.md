@@ -1,7 +1,6 @@
 ```js
 import { FormControl, FormGroup, InputGroup, Button, DropdownButton, MenuItem } from 'components/graylog';
 import Icon from 'components/common/Icon';
-
 class FormExample extends React.Component {
   constructor(props, context) {
     super(props, context);

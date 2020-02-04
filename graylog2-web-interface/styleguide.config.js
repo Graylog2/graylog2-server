@@ -23,6 +23,23 @@ module.exports = {
       content: 'docs/styleguide.md',
     },
     {
+      name: 'Theming Details',
+      sections: [
+        {
+          name: 'ThemeProvider',
+          content: 'src/theme/docs/ThemeProvider.md',
+        },
+        {
+          name: 'Colors',
+          content: 'src/theme/docs/Colors.md',
+        },
+        {
+          name: 'Color Utilities',
+          content: 'src/theme/docs/Utilities.md',
+        },
+      ],
+    },
+    {
       name: 'Documentation',
       content: 'docs/documentation.md',
     },
