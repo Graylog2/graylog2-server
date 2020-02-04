@@ -31,9 +31,6 @@ import java.util.Optional;
 public abstract class RelativeTimeRangeQuery implements Query {
     public static final String type = "relative";
 
-    public abstract String rangeType();
-    public abstract String fields();
-    public abstract String query();
     public abstract int relative();
 
     @Override
@@ -49,6 +46,6 @@ public abstract class RelativeTimeRangeQuery implements Query {
             @JsonProperty("relative") int relative,
             @JsonProperty("streamId") @Nullable String streamId
     ) {
-        return new AutoValue_RelativeTimeRangeQuery(Optional.ofNullable(streamId), rangeType, fields, query, relative);
+        return new AutoValue_RelativeTimeRangeQuery(rangeType, Optional.ofNullable(fields), query, Optional.ofNullable(streamId), relative);
     }
 }

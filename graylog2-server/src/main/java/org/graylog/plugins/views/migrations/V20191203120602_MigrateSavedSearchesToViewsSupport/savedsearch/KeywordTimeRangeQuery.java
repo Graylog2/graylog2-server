@@ -31,10 +31,6 @@ import java.util.Optional;
 public abstract class KeywordTimeRangeQuery implements Query {
     public static final String type = "keyword";
 
-    public abstract String rangeType();
-    public abstract String fields();
-    public abstract String query();
-
     public abstract String keyword();
 
     @Override
@@ -50,6 +46,6 @@ public abstract class KeywordTimeRangeQuery implements Query {
             @JsonProperty("keyword") String keyword,
             @JsonProperty("streamId") @Nullable String streamId
     ) {
-        return new AutoValue_KeywordTimeRangeQuery(Optional.ofNullable(streamId), rangeType, fields, query, keyword);
+        return new AutoValue_KeywordTimeRangeQuery(rangeType, Optional.ofNullable(fields), query, Optional.ofNullable(streamId), keyword);
     }
 }
