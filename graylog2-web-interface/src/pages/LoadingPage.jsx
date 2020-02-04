@@ -4,9 +4,7 @@ import React from 'react';
 import { DocumentTitle, Spinner, Icon } from 'components/common';
 import LoginBox from 'components/login/LoginBox';
 import AuthThemeStyles from 'theme/styles/authStyles';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
+import DisconnectedThemeStyles from 'theme/styles/disconnectedStyles';
 
 class LoadingPage extends React.Component {
   static propTypes = {
@@ -17,19 +15,12 @@ class LoadingPage extends React.Component {
     text: 'Loading, please wait...',
   };
 
-  componentDidMount() {
-    disconnectedStyle.use();
-  }
-
-  componentWillUnmount() {
-    disconnectedStyle.unuse();
-  }
-
   render() {
     const { text } = this.props;
 
     return (
       <DocumentTitle title="Loading...">
+        <DisconnectedThemeStyles />
         <AuthThemeStyles />
         <LoginBox>
           <legend><Icon name="group" /> Welcome to Graylog</legend>

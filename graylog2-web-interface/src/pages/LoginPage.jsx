@@ -10,12 +10,10 @@ import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
 
 import AuthThemeStyles from 'theme/styles/authStyles';
+import DisconnectedThemeStyles from 'theme/styles/disconnectedStyles';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import LoadingPage from './LoadingPage';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 
@@ -30,15 +28,10 @@ const LoginPage = createReactClass({
   },
 
   componentDidMount() {
-    disconnectedStyle.use();
     SessionActions.validate().then((response) => {
       this.setState({ didValidateSession: true });
       return response;
     });
-  },
-
-  componentWillUnmount() {
-    disconnectedStyle.unuse();
   },
 
   handleErrorChange(nextError) {
@@ -86,6 +79,7 @@ const LoginPage = createReactClass({
     const alert = this.formatLastError(lastError);
     return (
       <DocumentTitle title="Sign in">
+        <DisconnectedThemeStyles />
         <AuthThemeStyles />
         <LoginBox>
           <legend><Icon name="group" /> Welcome to Graylog</legend>

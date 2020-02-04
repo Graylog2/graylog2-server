@@ -1,13 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
+import DisconnectedThemeStyles from 'theme/styles/disconnectedStyles';
 
 import URLUtils from 'util/URLUtils';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 
 class ServerUnavailablePage extends React.Component {
   static propTypes = {
@@ -22,14 +21,6 @@ class ServerUnavailablePage extends React.Component {
   state = {
     showDetails: false,
   };
-
-  componentDidMount() {
-    disconnectedStyle.use();
-  }
-
-  componentWillUnmount() {
-    disconnectedStyle.unuse();
-  }
 
   _toggleDetails = () => {
     this.setState({ showDetails: !this.state.showDetails });
@@ -96,6 +87,7 @@ class ServerUnavailablePage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Server unavailable">
+        <DisconnectedThemeStyles />
         <Modal show>
           <Modal.Header>
             <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
