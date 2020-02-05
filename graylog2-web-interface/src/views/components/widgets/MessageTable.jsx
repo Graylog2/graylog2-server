@@ -18,7 +18,7 @@ import Field from 'views/components/Field';
 const Table = styled.table`
   position: relative;
   font-size: 11px;
-  margin-top: 15px;
+  margin-top: 0;
   margin-bottom: 60px;
   border-collapse: collapse;
   padding-left: 13px;
@@ -113,17 +113,16 @@ const Table = styled.table`
 `;
 
 const TableHead = styled.thead`
-  &&,
-  th {
-    background-color: #eee;
-    color: #333;
-  }
+  background-color: #eee;
+  color: #333;
 
   th {
     border: 0;
     font-size: 11px;
     font-weight: normal;
     white-space: nowrap;
+    background-color: #eee;
+    color: #333;
   }
 `;
 
@@ -205,7 +204,7 @@ class MessageTable extends React.Component<Props, State> {
     const selectedFields = this._getSelectedFields();
     return (
       <div className="table-responsive">
-        <Table className="table table-condensed" style={{ marginTop: 0 }}>
+        <Table className="table table-condensed">
           <TableHead>
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
@@ -239,7 +238,6 @@ class MessageTable extends React.Component<Props, State> {
           })}
         </Table>
       </div>
-
     );
   }
 }

@@ -4,6 +4,7 @@ import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -30,6 +31,8 @@ const MessageTableEntry = () => (
 );
 
 jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
+jest.mock('./MessageTable', () => mockComponent('MessageTableMock'));
+// jest.mock('./MessageTable', () => ({}));
 jest.mock('stores/search/SearchStore', () => MockStore('searchSurroundingMessages'));
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(

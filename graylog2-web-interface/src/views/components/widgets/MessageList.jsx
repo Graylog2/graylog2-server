@@ -137,6 +137,7 @@ class MessageList extends React.Component<Props, State> {
     const { currentPage, errors } = this.state;
     const hasError = !isEmpty(errors);
     const listKey = this._getListKey();
+
     return (
       <Wrapper>
         <PaginatedList onChange={this._handlePageChange}
@@ -144,8 +145,14 @@ class MessageList extends React.Component<Props, State> {
                        showPageSizeSelect={false}
                        totalItems={totalMessages}
                        pageSize={pageSize}>
-          {!hasError && <MessageTable messages={messages} fields={fields} config={config} selectedFields={selectedFields} activeQueryId={activeQueryId} key={listKey} />}
-          {hasError && (<ErrorWidget errors={errors} />)}
+          {!hasError ? (
+            <MessageTable messages={messages}
+                          fields={fields}
+                          config={config}
+                          selectedFields={selectedFields}
+                          activeQueryId={activeQueryId}
+                          key={listKey} />
+          ) : <ErrorWidget errors={errors} />}
         </PaginatedList>
       </Wrapper>
     );
