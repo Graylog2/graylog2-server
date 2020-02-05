@@ -91,6 +91,19 @@ public abstract class ServerBootstrap extends CmdLineTool {
         if (!isNoPidFile()) {
             savePidFile(getPidFile());
         }
+        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
+        setNettyNativeDefaults();
+    }
+
+    private void setNettyNativeDefaults() {
+        // Give netty a better spot than /tmp to unpack its tcnative libraries
+        if (System.getProperty("io.netty.native.workdir") == null) {
+            System.setProperty("io.netty.native.workdir", configuration.getNativeLibDir().toAbsolutePath().toString());
+        }
+        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
+        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
+            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
+        }
     }
 
     @Override
