@@ -119,7 +119,8 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
 
         final ArgumentCaptor<String> retainedIndexName = ArgumentCaptor.forClass(String.class);
         verify(retentionStrategy, times(2)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getAllValues()).contains("index1", "index2");
+        // Ensure that the oldest indices come first
+        assertThat(retainedIndexName.getAllValues()).containsExactly("index1", "index2");
 
         verify(activityWriter, times(3)).write(any(Activity.class));
     }
