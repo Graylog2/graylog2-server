@@ -82,30 +82,43 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
         final List<String> viewIds = new ArrayList<>();
         final FindIterable<Document> documents = viewsCollection.find(not(exists(FIELD_TYPE)));
         for (final Document view : documents) {
-            final Document states = view.get("state", Document.class);
             view.put(FIELD_TYPE, TYPE_DASHBOARD);
-            states.forEach((String id, Object obj) -> {
-                if (obj == null) {
-                    return;
-                }
-                final Document state = (Document) obj;
-                if (state.get("widgets") instanceof List) {
-                    @SuppressWarnings("unchecked") final List<Document> widgets = (List)state.get("widgets");
-                    for (final Document widget : widgets) {
-                        if (widget.get(FIELD_FILTER) != null && widget.get(FIELD_FILTER) instanceof String) {
-                            final String filter = widget.getString(FIELD_FILTER);
-                            widget.remove(FIELD_FILTER);
-                            final String newWidgetQuery = concatenateQueryIfExists(widget, filter);
-                            widget.put(FIELD_QUERY, createBackendQuery(newWidgetQuery));
-                        }
-                    }
-                }
-            });
+            migrateViewStates(view);
+
             final ObjectId viewId = view.getObjectId(FIELD_ID);
             viewsCollection.updateOne(new BasicDBObject(FIELD_ID, viewId), new Document("$set", view));
             viewIds.add(viewId.toString());
         }
         clusterConfigService.write(MigrationCompleted.create(viewIds));
+    }
+
+    private void migrateViewStates(Document view) {
+        final Document states = view.get("state", Document.class);
+        states.forEach((String id, Object obj) -> {
+            migrateSingleViewState(obj);
+        });
+    }
+
+    private void migrateSingleViewState(Object obj) {
+        if (obj == null) {
+            return;
+        }
+        final Document state = (Document) obj;
+        if (state.get("widgets") instanceof List) {
+            @SuppressWarnings("unchecked") final List<Document> widgets = (List)state.get("widgets");
+            for (final Document widget : widgets) {
+                mergeFilterIntoQueryIfPresent(widget);
+            }
+        }
+    }
+
+    private void mergeFilterIntoQueryIfPresent(Document widget) {
+        if (widget.get(FIELD_FILTER) != null && widget.get(FIELD_FILTER) instanceof String) {
+            final String filter = widget.getString(FIELD_FILTER);
+            widget.remove(FIELD_FILTER);
+            final String newWidgetQuery = concatenateQueryIfExists(widget, filter);
+            widget.put(FIELD_QUERY, createBackendQuery(newWidgetQuery));
+        }
     }
 
     private String concatenateQueryIfExists(Document widget, String filter) {
