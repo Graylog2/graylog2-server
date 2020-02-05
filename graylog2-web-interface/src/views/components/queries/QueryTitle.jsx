@@ -45,10 +45,7 @@ class QueryTitle extends React.Component<Props, State> {
     onClose();
   };
 
-  _onDuplicate = (id: QueryId) => {
-    QueriesActions.duplicate(id)
-      .then(newQuery => ViewActions.selectQuery(newQuery.id));
-  };
+  _onDuplicate = (id: QueryId) => QueriesActions.duplicate(id);
 
   render() {
     const { editing, title } = this.state;
