@@ -3,7 +3,6 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import mockAction from 'helpers/mocking/MockAction';
-import asMock from 'helpers/mocking/AsMock';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import Query from 'views/logic/queries/Query';
