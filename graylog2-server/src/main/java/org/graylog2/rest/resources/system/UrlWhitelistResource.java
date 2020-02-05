@@ -27,8 +27,11 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.models.system.urlwhitelist.WhitelistCheckRequest;
 import org.graylog2.rest.models.system.urlwhitelist.WhitelistCheckResponse;
+import org.graylog2.rest.models.system.urlwhitelist.WhitelistRegexGenerationRequest;
+import org.graylog2.rest.models.system.urlwhitelist.WhitelistRegexGenerationResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.urlwhitelist.RegexHelper;
 import org.graylog2.system.urlwhitelist.UrlWhitelist;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
@@ -51,10 +54,12 @@ import javax.ws.rs.core.Response;
 public class UrlWhitelistResource extends RestResource {
 
     private final UrlWhitelistService urlWhitelistService;
+    private final RegexHelper regexHelper;
 
     @Inject
-    public UrlWhitelistResource(final UrlWhitelistService urlWhitelistService) {
+    public UrlWhitelistResource(final UrlWhitelistService urlWhitelistService, RegexHelper regexHelper) {
         this.urlWhitelistService = urlWhitelistService;
+        this.regexHelper = regexHelper;
     }
 
     @GET
@@ -84,9 +89,27 @@ public class UrlWhitelistResource extends RestResource {
     @NoAuditEvent("Validation only")
     @Consumes(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.URL_WHITELIST_READ)
-    public WhitelistCheckResponse check(@ApiParam(name = "url", required = true)
+    public WhitelistCheckResponse check(@ApiParam(name = "JSON body", required = true)
                              @Valid @NotNull final WhitelistCheckRequest checkRequest) {
         final boolean isWhitelisted = urlWhitelistService.isWhitelisted(checkRequest.url());
         return WhitelistCheckResponse.create(checkRequest.url(), isWhitelisted);
+    }
+
+    @POST
+    @Path("/generate_regex")
+    @Timed
+    @ApiOperation(value = "Generates a regex that can be used as a value for a whitelist entry.")
+    @NoAuditEvent("Utility function only.")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public WhitelistRegexGenerationResponse generateRegex(@ApiParam(name = "JSON body", required = true)
+    @Valid @NotNull final WhitelistRegexGenerationRequest generationRequest) {
+        final String regex;
+        if (generationRequest.placeholder() == null) {
+            regex = regexHelper.createRegexForUrl(generationRequest.urlTemplate());
+        } else {
+            regex = regexHelper.createRegexForUrlTemplate(generationRequest.urlTemplate(),
+                    generationRequest.placeholder());
+        }
+        return WhitelistRegexGenerationResponse.create(regex);
     }
 }
