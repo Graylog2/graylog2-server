@@ -27,9 +27,9 @@ public class AWSAuthFactory {
      * using Java props, environment variables, EC2 instance roles etc. See the {@link DefaultCredentialsProvider}
      * Javadoc for more information.
      */
-    public static AwsCredentialsProvider create(@Nullable String accessKey,
+    public static AwsCredentialsProvider create(@Nullable String stsRegion,
+                                                @Nullable String accessKey,
                                                 @Nullable String secretKey,
-                                                @Nullable String stsRegion,
                                                 @Nullable String assumeRoleArn) {
         AwsCredentialsProvider awsCredentials;
         if (!isNullOrEmpty(accessKey) && !isNullOrEmpty(secretKey)) {
