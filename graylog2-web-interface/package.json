@@ -91,7 +91,7 @@
     "plotly.js": "^1.48.1",
     "polished": "^3.4.1",
     "qs": "^6.3.0",
-    "react-ace-builds": "^7.2.4",
+    "react-ace-builds": "^7.3.1",
     "react-color": "^2.14.0",
     "react-day-picker": "^5.0.0",
     "react-dnd": "^7.0.2",
