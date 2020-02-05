@@ -121,10 +121,14 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
         }
     }
 
+    private String concatenateQueries(String query1, String query2) {
+        return query1 + " AND " + query2;
+    }
+
     private String concatenateQueryIfExists(Document widget, String filter) {
         final Optional<String> currentWidgetQuery = extractWidgetQuery(widget);
         return currentWidgetQuery
-                .map(widgetQuery -> widgetQuery + " AND " + filter)
+                .map(widgetQuery -> concatenateQueries(widgetQuery, filter))
                 .orElse(filter);
     }
 
