@@ -49,7 +49,8 @@ describe('QueryTitle', () => {
       });
     });
 
-    it('selects new query after duplicating it', () => {
+    it('does not explicitly select new query after duplicating it', () => {
+      // Selecting the new query after duplication has become unnecessary, as `ViewStore#createQuery` does it already
       const wrapper = mount(
         <QueryTitle active
                     id="deadbeef"
@@ -61,8 +62,7 @@ describe('QueryTitle', () => {
       const duplicate = findAction(wrapper, 'Duplicate');
 
       return duplicate().then(() => {
-        expect(ViewActions.selectQuery).toHaveBeenCalled();
-        expect(asMock(ViewActions.selectQuery).mock.calls[0][0]).not.toBeNull();
+        expect(ViewActions.selectQuery).not.toHaveBeenCalled();
       });
     });
   });
