@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
+import styled from 'styled-components';
+
 
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
@@ -14,6 +16,10 @@ const SearchStore = StoreProvider.getStore('Search');
 const MessagesStore = StoreProvider.getStore('Messages');
 const MessagesActions = ActionsProvider.getActions('Messages');
 
+const MessageTerms = styled.span`
+  margin-right: 8px;
+  font-family: monospace;
+`;
 
 class MessageFieldDescription extends React.Component {
   static propTypes = {
@@ -52,7 +58,7 @@ class MessageFieldDescription extends React.Component {
   _getFormattedTerms = () => {
     const termsMarkup = [];
     this.state.messageTerms.forEach((term, idx) => {
-      termsMarkup.push(<span key={idx} className="message-terms">{term}</span>);
+      termsMarkup.push(<MessageTerms key={idx}>{term}</MessageTerms>);
     });
 
     return termsMarkup;

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Grid, Row, Col, Button } from 'components/graylog';
 import { Spinner, Icon } from 'components/common';
@@ -15,11 +15,11 @@ const FullHeightContainer = styled.div`
   margin-right: -15px;
 `;
 
-const GettingStartedFrame = styled.iframe`
-  height: 100%;
+const GettingStartedIframe = styled.iframe(({ hidden }) => css`
   width: 100%;
-  display: ${props => (props.guideLoaded ? 'block' : 'none')};
-`;
+  display: ${hidden ? 'none' : 'block'};
+  min-height: calc(100vh - 100px);
+`);
 
 const DismissButton = styled(Button)`
   margin-right: 5px;
@@ -147,14 +147,14 @@ class GettingStarted extends React.Component {
       gettingStartedContent = (
         <>
           {spinner}
-          <GettingStartedFrame src={url}
-                               guideLoaded={guideLoaded}
-                               id="getting-started-frame"
-                               frameBorder="0"
-                               scrolling="yes"
-                               title="getting-started-content">
+          <GettingStartedIframe src={url}
+                                hidden={!guideLoaded}
+                                id="getting-started-frame"
+                                frameBorder="0"
+                                scrolling="yes"
+                                title="getting-started-content">
             <p>Sorry, no iframes</p>
-          </GettingStartedFrame>
+          </GettingStartedIframe>
         </>
       );
     }

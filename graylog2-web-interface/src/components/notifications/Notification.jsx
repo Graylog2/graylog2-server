@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Alert, Button } from 'components/graylog';
 import { Timestamp, Icon } from 'components/common';
@@ -9,6 +10,27 @@ import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const NotificationsActions = ActionsProvider.getActions('Notifications');
+
+const StyledAlert = styled(Alert)`
+  margin-top: 10px;
+
+  i {
+    color: #000;
+  }
+
+  form {
+    margin-bottom: 0px;
+  }
+`;
+
+const NotificationHead = styled.h3`
+  margin-bottom: 5px;
+`;
+
+const NotificationTimestamp = styled.span`
+  margin-left: 3px;
+  font-size: 10px;
+`;
 
 class Notification extends React.Component {
   static propTypes = {
@@ -25,21 +47,21 @@ class Notification extends React.Component {
     const { notification } = this.props;
     const notificationView = NotificationsFactory.getForNotification(notification);
     return (
-      <Alert bsStyle="danger" className="notification">
+      <StyledAlert bsStyle="danger">
         <Button className="close delete-notification" onClick={this._onClose}>&times;</Button>
 
-        <h3 className="notification-head">
+        <NotificationHead>
           <Icon name="bolt" />{' '}
           {notificationView.title}{' '}
 
-          <span className="notification-timestamp">
+          <NotificationTimestamp>
             (triggered <Timestamp dateTime={notification.timestamp} relative />)
-          </span>
-        </h3>
+          </NotificationTimestamp>
+        </NotificationHead>
         <div className="notification-description">
           {notificationView.description}
         </div>
-      </Alert>
+      </StyledAlert>
     );
   }
 }
