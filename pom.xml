@@ -163,7 +163,8 @@
         <equalsverifier.version>3.0</equalsverifier.version>
         <fongo.version>2.2.0-RC2</fongo.version>
         <jukito.version>1.5</jukito.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13</junit.version>
+        <junit-jupiter.version>5.6.0</junit-jupiter.version>
         <mockito.version>2.23.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>2.9.0</restassured.version>
