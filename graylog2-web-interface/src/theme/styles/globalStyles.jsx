@@ -943,21 +943,6 @@ const globalStyles = css`
     margin-right: 1px;
   }
 
-  .messages th i.sort-order-desc {
-    position: relative;
-    top: -1px;
-  }
-
-  .messages th i.sort-order-item {
-    margin-right: 2px;
-    color: #222; /* same color as .messsages th cannot display: none it because it would push the table columns out on hover :( */
-  }
-
-  .messages th i.sort-order-active,
-  .messages th:hover i.sort-order-item {
-    color: #fff;
-  }
-
   .add-alert-type {
     margin-bottom: 0px;
   }
@@ -973,7 +958,9 @@ const globalStyles = css`
     margin-left: 10px;
   }
 
-  .alert-type-form input[type=number], .alert-type-form input[type=text], .alert-type-form select {
+  .alert-type-form input[type=number],
+  .alert-type-form input[type=text],
+  .alert-type-form select {
     padding: 0 0 0 5px;
     height: 25px;
     vertical-align: baseline;
@@ -987,7 +974,6 @@ const globalStyles = css`
   .alert-type-form input.alert-type-title {
     width: 300px;
   }
-
 
   .add-alert-destination-type {
     margin-bottom: 0px;
@@ -1047,7 +1033,8 @@ const globalStyles = css`
     margin-bottom: 7px;
   }
 
-  .streameditpermissions, .dashboardeditpermissions {
+  .streameditpermissions,
+  .dashboardeditpermissions {
     margin-top: 10px;
   }
 
@@ -1541,111 +1528,6 @@ const globalStyles = css`
 
   .search-results-table > div {
     border-left: 1px solid #D1D1D1;
-  }
-
-  .messages-container {
-    padding-right: 13px;
-    width: 100%;
-  }
-
-  table.messages {
-    position: relative;
-    font-size: 11px;
-    margin-top: 15px;
-    margin-bottom: 60px;
-    border-collapse: collapse;
-    padding-left: 13px;
-    width: 100%;
-    word-break: break-all;
-  }
-
-  table.messages thead > tr {
-    color: #fff;
-  }
-
-  table.messages td, table.messages th {
-    position: relative;
-    left: 13px;
-  }
-
-  table.messages > thead th {
-    border: 0;
-    font-size: 11px;
-    font-weight: normal;
-    background-color: #222;
-    white-space: nowrap;
-  }
-
-  table.messages tr {
-    border: 0 !important;
-  }
-
-  table.messages tbody.message-group {
-    border-top: 0;
-  }
-
-  table.messages tbody.message-group-toggled {
-    border-left: 7px solid #16ace3;
-  }
-
-  table.messages tbody.message-highlight {
-    border-left: 7px solid #8dc63f;
-  }
-
-  table.messages tr.fields-row {
-    cursor: pointer;
-  }
-
-  table.messages tr.fields-row td {
-    padding-top: 10px;
-  }
-
-  table.messages tr.message-row td {
-    border-top: 0;
-    padding-top: 0;
-    padding-bottom: 5px;
-    font-family: monospace;
-    color: #16ace3;
-  }
-
-  table.messages tr.message-row {
-    margin-bottom: 5px;
-    cursor: pointer;
-  }
-
-  table.messages tr.message-row .message-wrapper {
-    line-height: 1.5em;
-    white-space: pre-line;
-    max-height: 6em; /* show 4 lines: line-height * 4 */
-    overflow: hidden;
-  }
-
-  table.messages tr.message-row .message-wrapper:after {
-    content: "";
-    text-align: right;
-    position: absolute;
-    width: 99%;
-    left: 5px;
-    top: 4.5em;
-    height: 1.5em;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
-  }
-
-  table.messages tr.message-detail-row {
-    display: none;
-  }
-
-  table.messages tr.message-detail-row td {
-    padding-top: 5px;
-    border-top: 0;
-  }
-
-  table.messages tr.message-detail-row .row {
-    margin-right: 0;
-  }
-
-  table.messages tr.message-detail-row div[class*="col-"] {
-    padding-right: 0;
   }
 
   .message-details-title {
