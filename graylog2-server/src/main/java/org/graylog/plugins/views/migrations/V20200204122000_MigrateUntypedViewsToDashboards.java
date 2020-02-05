@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Filters.not;
@@ -32,6 +33,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
     private static final String FIELD_FILTER = "filter";
     private static final String TYPE_DASHBOARD = "DASHBOARD";
     private static final String FIELD_QUERY = "query";
+    private static final String FIELD_QUERY_STRING = "query_string";
     private final MongoCollection<Document> viewsCollection;
     private final ClusterConfigService clusterConfigService;
 
@@ -50,7 +52,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
     private Document createBackendQuery(String filter) {
         return new Document(ImmutableMap.of(
                 "type", "elasticsearch",
-                "query_string", filter
+                FIELD_QUERY_STRING, filter
         ));
     }
 
@@ -67,14 +69,18 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
             final Document states = view.get("state", Document.class);
             view.put(FIELD_TYPE, TYPE_DASHBOARD);
             states.forEach((String id, Object obj) -> {
+                if (obj == null) {
+                    return;
+                }
                 final Document state = (Document) obj;
                 if (state.get("widgets") instanceof List) {
-                    @SuppressWarnings("unchecked") final List<Document> widgets = (List) state.get("widgets");
+                    @SuppressWarnings("unchecked") final List<Document> widgets = (List)state.get("widgets");
                     for (final Document widget : widgets) {
                         if (widget.get(FIELD_FILTER) != null && widget.get(FIELD_FILTER) instanceof String) {
                             final String filter = widget.getString(FIELD_FILTER);
                             widget.remove(FIELD_FILTER);
-                            widget.put(FIELD_QUERY, createBackendQuery(filter));
+                            final String newWidgetQuery = concatenateQueryIfExists(widget, filter);
+                            widget.put(FIELD_QUERY, createBackendQuery(newWidgetQuery));
                         }
                     }
                 }
@@ -84,6 +90,24 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
             viewIds.add(viewId.toString());
         }
         clusterConfigService.write(MigrationCompleted.create(viewIds));
+    }
+
+    private String concatenateQueryIfExists(Document widget, String filter) {
+        final Optional<String> currentWidgetQuery = extractWidgetQuery(widget);
+        return currentWidgetQuery
+                .map(widgetQuery -> widgetQuery + " AND " + filter)
+                .orElse(filter);
+    }
+
+    private Optional<String> extractWidgetQuery(Document widget) {
+        if (!widget.containsKey(FIELD_QUERY)) {
+            return Optional.empty();
+        }
+        final Document query = (Document)widget.get(FIELD_QUERY);
+        if (!query.containsKey(FIELD_QUERY_STRING) || !(query.get(FIELD_QUERY_STRING) instanceof String)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(query.getString(FIELD_QUERY_STRING));
     }
 
     @JsonAutoDetect
