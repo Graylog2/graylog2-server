@@ -96,6 +96,17 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     }
 
     @Test
+    @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query.json")
+    public void migratesWidgetFiltersToWidgetQueriesAndConcatenatesToExistingQuery() throws Exception {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
+
+        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query-after.json"));
+    }
+
+    @Test
     @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets.json")
     public void migratesUntypedViewWithNoWidgets() throws Exception {
         this.migration.upgrade();
