@@ -190,11 +190,6 @@ const globalStyles = css`
     margin-top: 10px;
   }
 
-  .notification-badge-link:hover {
-    border: 0px !important;
-    text-decoration: none !important;
-  }
-
   .row {
     margin-bottom: 15px;
   }
@@ -208,10 +203,6 @@ const globalStyles = css`
     margin-top: 5px;
   }
 
-  .system-messages {
-    font-size: 12px;
-  }
-
   .rickshaw_graph .x_tick {
     position: relative;
     top: 38px;
@@ -221,17 +212,12 @@ const globalStyles = css`
     font-weight: bold;
   }
 
-
   .input-new {
     margin-bottom: 8px;
   }
 
   .alert-bar {
     margin: 10px -20px 0;
-  }
-
-  .system-messages a {
-    color: #000;
   }
 
   .xtrc-new-example {
