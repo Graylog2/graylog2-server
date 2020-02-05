@@ -10,7 +10,6 @@ export {
   Dropdown,
   Form,
   Grid,
-  ListGroup,
   MenuItem,
   NavItem,
   OverlayTrigger,
