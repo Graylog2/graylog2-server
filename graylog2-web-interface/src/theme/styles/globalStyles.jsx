@@ -464,35 +464,6 @@ const globalStyles = css`
     color: #a0a0a0
   }
 
-  .field-graph-container {
-    padding-bottom: 35px;
-  }
-
-  .field-graph-container .dropdown-menu a.selected {
-    font-weight: bold;
-  }
-
-  .field-graph-container .type-description {
-    color: #bbb;
-    font-size: 11px;
-  }
-
-  .field-graph-container .field-graph-components {
-    margin-top: 10px;
-    margin-right: 12px;
-  }
-
-  .field-graph-container .field-graph {
-    margin-left: 40px;
-    margin-bottom: 25px;
-  }
-
-  .field-graph-container .field-graph-y-axis {
-    float: left;
-    height: 200px;
-    width: 40px;
-  }
-
   #field-graphs .spinner {
     margin-bottom: 10px;
     text-align: center;
@@ -956,29 +927,6 @@ const globalStyles = css`
   .field-graph-query {
     font-family: monospace;
     color: #9da096;
-  }
-
-  .field-graph-container .reposition-handle {
-    cursor: move;
-  }
-
-  .field-graph-container .merge-hint {
-    text-align: center;
-    position: relative;
-    top: -115px;
-    margin-bottom: -21px;
-    display: none;
-    z-index: 2000;
-  }
-
-  .field-graph-container .merge-hint span {
-    padding: 15px 50px;
-    font-size: 15px;
-    color: #fff;
-  }
-
-  .field-graph-container .merge-drop-ready {
-    background-color: #000;
   }
 
   .parse-error {
