@@ -3,6 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
+import styled from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -15,6 +16,16 @@ import UserNotification from 'util/UserNotification';
 
 const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
 const RefreshStore = StoreProvider.getStore('Refresh');
+
+const FieldStatisticsWrap = styled.div`
+  table {
+    margin-top: 10px;
+  }
+
+  th {
+    cursor: pointer;
+  }
+`;
 
 const FieldStatistics = createReactClass({
   displayName: 'FieldStatistics',
@@ -235,9 +246,9 @@ const FieldStatistics = createReactClass({
     }
 
     return (
-      <div id="field-statistics">
+      <FieldStatisticsWrap>
         {content}
-      </div>
+      </FieldStatisticsWrap>
     );
   },
 });

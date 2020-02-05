@@ -2,8 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Col, Row } from 'components/graylog';
+import styled from 'styled-components';
 
+import { Col, Row } from 'components/graylog';
 import { LoadingIndicator } from 'components/common';
 import { LegacyHistogram, NoSearchResults, ResultTable, SearchSidebar } from 'components/search';
 
@@ -13,6 +14,43 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import {} from 'components/field-analyzers';
 
 const SearchStore = StoreProvider.getStore('Search'); // Make sure to load all field analyzer plugins!
+
+const StyledSidebar = styled(Col)`
+  padding-left: 0;
+
+  @media (max-height: 991px) {
+    padding-right: 0;
+  }
+
+  @media (min-width: 991px) {
+    padding-right: 15px;
+  }
+
+  .affix {
+    @media (max-width: 991px) {
+      position: relative;
+    }
+
+    @media (min-width: 991px) {
+      top: 45px;
+      z-index: 1000;
+      position: fixed;
+    }
+  }
+
+  .actions {
+    margin-top: 10px;
+  }
+
+  .actions > div {
+    margin: 5px 5px 0 0;
+  }
+
+  hr {
+    margin-top: 15px;
+    margin-bottom: 10px;
+  }
+`;
 
 class SearchResult extends React.Component {
   static propTypes = {
@@ -187,7 +225,7 @@ class SearchResult extends React.Component {
 
     return (
       <Row id="main-content-search">
-        <Col md={3} sm={12} id="sidebar">
+        <StyledSidebar md={3} sm={12}>
           <SearchSidebar result={this.props.result}
                          builtQuery={this.props.builtQuery}
                          selectedFields={this.state.selectedFields}
@@ -206,7 +244,7 @@ class SearchResult extends React.Component {
                          permissions={this.props.permissions}
                          loadingSearch={this.props.loadingSearch}
                          searchConfig={this.props.searchConfig} />
-        </Col>
+        </StyledSidebar>
         <Col md={9} sm={12} id="main-content-sidebar">
           {this._fieldAnalyzerComponents(analyzer => this._shouldRenderAboveHistogram(analyzer))}
 

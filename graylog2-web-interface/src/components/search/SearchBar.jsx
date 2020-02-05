@@ -6,6 +6,7 @@ import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import URI from 'urijs';
+import styled from 'styled-components';
 
 import { Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -26,6 +27,56 @@ import moment from 'moment';
 const SearchStore = StoreProvider.getStore('Search');
 const ToolsStore = StoreProvider.getStore('Tools');
 const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
+
+const UniversalForm = styled.form`
+  margin-bottom: 0;
+
+  #search-container {
+    margin-left: 5px;
+  }
+
+  button {
+    font-size: 13px;
+
+    &.btn-sm {
+      font-size: 12px;
+    }
+  }
+
+  div .query {
+    margin-left: 45px;
+    margin-right: 25px;
+  }
+
+  .query input {
+    font-family: monospace;
+    font-size: 13px;
+    width: 100%;
+    border: 0px;
+    background-color: #fff;
+    box-shadow: none;
+    color: inherit;
+    transition: none;
+    outline: none;
+    padding: 0;
+    margin-left: 5px;
+    margin-bottom: 5px;
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .twitter-typeahead {
+    width: 100%;
+  }
+
+  .tt-menu {
+    height: auto;
+    overflow: visible;
+    width: 100%;
+  }
+`;
 
 const SearchBar = createReactClass({
   displayName: 'SearchBar',
@@ -419,8 +470,7 @@ const SearchBar = createReactClass({
         <div className="col-md-12" id="universalsearch-container">
           <div className="row no-bm">
             <div ref={(universalSearch) => { this.universalSearch = universalSearch; }} className="col-md-12" id="universalsearch">
-              <form ref={(searchForm) => { this.searchForm = searchForm; }}
-                    className="universalsearch-form"
+              <UniversalForm ref={(searchForm) => { this.searchForm = searchForm; }}
                     action={SearchStore.searchBaseLocation('index')}
                     method="GET"
                     onSubmit={this._performSearch}>
@@ -494,7 +544,7 @@ const SearchBar = createReactClass({
                            placeholder="Type your search query here and press enter. (&quot;not found&quot; AND http) OR http_response_code:[400 TO 404]" />
                   </div>
                 </div>
-              </form>
+              </UniversalForm>
             </div>
           </div>
         </div>

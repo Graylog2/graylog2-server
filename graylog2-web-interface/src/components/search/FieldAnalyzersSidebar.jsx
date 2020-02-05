@@ -1,9 +1,56 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import styled from 'styled-components';
+
 import { Input } from 'components/bootstrap';
 
 import { DecoratedSidebarMessageField, SidebarMessageField } from 'components/search';
+
+const SearchResultsFields = styled.ul`
+  margin-top: 3px;
+  padding-left: 0;
+
+  li {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    padding: 2px 0;
+  }
+
+  label {
+    font-size: 12px;
+    display: inline;
+    position: relative;
+    top: 3px;
+    font-weight: normal !important;
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .checkbox {
+    margin: 0;
+  }
+
+  input[type=checkbox] {
+    position: relative;
+    right: 4px;
+  }
+
+  .dropdown .caret {
+    display: none;
+  }
+
+  button.dropdown-toggle {
+    padding: 0;
+  }
+
+  .fa-cog {
+    position: relative;
+    top: 3px;
+  }
+`;
 
 class FieldAnalyzersSidebar extends React.Component {
   static propTypes = {
@@ -171,9 +218,9 @@ class FieldAnalyzersSidebar extends React.Component {
                  value={this.state.fieldFilter} />
         </div>
         <div ref={(fields) => { this.fields = fields; }} style={{ maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll' }}>
-          <ul className="search-result-fields">
+          <SearchResultsFields>
             {messageFields}
-          </ul>
+          </SearchResultsFields>
         </div>
         <div ref={(footer) => { this.footer = footer; }} style={{ marginTop: 13, marginBottom: 0 }}>
           List{' '}

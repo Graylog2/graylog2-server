@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
+import styled from 'styled-components';
+
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import { Icon } from 'components/common';
@@ -13,6 +15,11 @@ import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import resultHistogram from 'legacy/result-histogram';
 
 const SearchStore = StoreProvider.getStore('Search');
+
+const ResultGraphContainer = styled.div`
+  margin-right: 12px;
+  margin-bottom: 25px;
+`;
 
 // Hue-manatee. We tried to be sorry, but aren't.
 const LegacyHistogram = createReactClass({
@@ -121,13 +128,13 @@ const LegacyHistogram = createReactClass({
 
         {resolutionSelector}
 
-        <div id="result-graph-container">
+        <ResultGraphContainer>
           <div id="y_axis" />
           <div id="result-graph"
                data-from={this._getFirstHistogramValue()}
                data-to={this.props.histogram.histogram_boundaries.to} />
           <div id="result-graph-timeline" />
-        </div>
+        </ResultGraphContainer>
 
       </div>
     );

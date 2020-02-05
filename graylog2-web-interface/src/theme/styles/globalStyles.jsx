@@ -93,13 +93,6 @@ const globalStyles = css`
     background-position: 0;
   }
 
-  #footer {
-    text-align: center;
-    font-size: 11px;
-    color: #aaa;
-    margin-bottom: 15px;
-  }
-
   .modal-title {
     font-size: 21px;
   }
@@ -113,7 +106,7 @@ const globalStyles = css`
   }
 
   .modal-backdrop {
-    height: 100000%;  // yes, really. this fixes the backdrop being cut off when the page is scrolled.
+    height: 100000%;  /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
     z-index: 1030;
   }
 
@@ -190,43 +183,6 @@ const globalStyles = css`
     margin-top: 15px;
   }
 
-  #sidebar {
-    padding-left: 0;
-
-    @media (max-height: 991px) {
-      padding-right: 0;
-    }
-
-    @media (min-width: 991px) {
-      padding-right: 15px;
-    }
-  }
-
-  #sidebar .affix {
-    @media (max-width: 991px) {
-      position: relative;
-    }
-
-    @media (min-width: 991px) {
-      top: 45px;
-      z-index: 1000;
-      position: fixed;
-    }
-  }
-
-  #sidebar .actions {
-    margin-top: 10px;
-  }
-
-  #sidebar .actions>div {
-    margin: 5px 5px 0 0;
-  }
-
-  #sidebar hr {
-    margin-top: 15px;
-    margin-bottom: 10px;
-  }
-
   #main-row {
     margin-bottom: 0px;
   }
@@ -241,7 +197,7 @@ const globalStyles = css`
     padding: 5px 25px;
   }
 
-  // This is rendered inside a #main-content, and we need to compensate the margin-top to make it look nicer
+  /* // This is rendered inside a #main-content, and we need to compensate the margin-top to make it look nicer */
   #main-content-search {
     margin-bottom: 0;
     margin-top: -15px;
@@ -253,73 +209,9 @@ const globalStyles = css`
     margin-top: 15px;
   }
 
-  .universalsearch-timerange-selector {
-    font-size: 12px;
-  }
-
-  .universalsearch-timerange-selector label {
-    font-size: 12px;
-    margin-left: 5px !important;
-  }
-
-  .universalsearch-timerange-selector .radio input {
-    margin-left: -17px;
-    position: relative;
-    top: -2px;
-  }
-
-  .universalsearch-form {
-    margin-bottom: 0;
-  }
-
-  .universalsearch-form #search-container {
-    margin-left: 5px;
-  }
-
-  .universalsearch-form button {
-    font-size: 13px;
-  }
-
-  .universalsearch-form button.btn-sm {
-    font-size: 12px;
-  }
-
-  .universalsearch-form div .query {
-    margin-left: 45px;
-    margin-right: 25px;
-  }
-
-  .universalsearch-form .query input {
-    font-family: monospace;
-    font-size: 13px;
-    width: 100%;
-    border: 0px;
-    background-color: #fff;
-    box-shadow: none;
-    color: inherit;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    -webkit-transition: none;
-    -moz-transition: none;
-    transition: none;
-    outline: none;
-    padding: 0;
-    margin-left: 5px;
-    margin-bottom: 5px;
-  }
-
-  .universalsearch-form .form-group {
-    margin-bottom: 0;
-  }
-
   a.fields-set-chooser {
     margin-right: 2px;
     margin-left: 2px;
-  }
-
-  #result-graph-container {
-    margin-right: 12px;
-    margin-bottom: 25px;
   }
 
   #result-graph {
@@ -335,46 +227,6 @@ const globalStyles = css`
     float: left;
     height: 200px;
     width: 40px;
-  }
-
-  .search-result-fields {
-    margin-top: 3px;
-    padding-left: 0;
-  }
-
-  .search-result-fields li {
-    margin-top: 1px;
-    margin-bottom: 1px;
-    padding: 2px 0;
-  }
-
-  .search-result-fields label {
-    font-size: 12px;
-    display: inline;
-    position: relative;
-    top: 3px;
-    font-weight: normal !important;
-  }
-
-  .search-result-fields .form-group {
-    margin-bottom: 0;
-  }
-
-  .search-result-fields .checkbox {
-    margin: 0;
-  }
-
-  .search-result-fields input[type=checkbox] {
-    position: relative;
-    right: 4px;
-  }
-
-  .search-result-fields .dropdown .caret {
-    display: none;
-  }
-
-  .search-result-fields button.dropdown-toggle {
-    padding: 0;
   }
 
   .message-terms {
@@ -476,13 +328,6 @@ const globalStyles = css`
     padding: 3px 11px;
   }
 
-  .node-row {
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 8px;
-    margin-top: 15px;
-    margin-bottom: 0px;
-  }
-
   .change-message-processing {
     position: relative;
     top: -1px;
@@ -491,10 +336,6 @@ const globalStyles = css`
   .es-cluster-status {
     margin-top: 10px;
     margin-bottom: 5px;
-  }
-
-  .node-row .hostname {
-    font-size: 12px;
   }
 
   .rickshaw_graph .x_tick {
@@ -519,49 +360,12 @@ const globalStyles = css`
     font-weight: bold;
   }
 
-  .search-result-fields .fa-cog {
-    position: relative;
-    top: 3px;
-  }
-
   .modal form {
     margin-bottom: 0;
   }
 
-  s
   .input-list h2 {
     margin-bottom: 5px;
-  }
-
-  .node-row {
-    margin-bottom: 8px;
-    margin-top: 0px;
-  }
-
-  .node-row .well {
-    margin-bottom: 0px;
-    margin-top: 3px;
-    font-family: monospace;
-    font-size: 11px;
-  }
-
-  .node-row-info {
-    position: relative;
-    top: 2px;
-  }
-
-  .node-row-info form {
-    display: inline;
-  }
-
-  .node-row-info .text {
-    position: relative;
-    top: 3px;
-  }
-
-  .node-row-info-negative-correction {
-    position: relative;
-    top: -15px;
   }
 
   .input-list .alert {
@@ -627,64 +431,10 @@ const globalStyles = css`
     margin-top: 5px;
   }
 
-  .node-row .xtrc-converters {
-    margin-top: 10px;
-  }
-
-  .node-row .xtrc-config li {
-    margin-left: 10px;
-  }
-
-  .node-row .xtrc-converters li {
-    margin-left: 10px;
-  }
-
-  .node-row .xtrc-converter-config li {
-    margin-left: 20px;
-  }
-
   .u-light {
     border-bottom: 1px dotted #bbb;
     margin-bottom: 5px;
     padding-bottom: 5px;
-  }
-
-  .xtrc-metrics {
-    margin-top: 7px;
-    margin-left: 5px;
-  }
-
-  .xtrc-metrics .span4 {
-    margin-left: 0px;
-  }
-
-  .xtrc-metrics h3 .unit {
-    font-size: 11px;
-  }
-
-  .xtrc-metrics dl {
-    margin-top: 3px;
-    margin-bottom: 0px;
-  }
-
-  .xtrc-metrics dt {
-    float: left;
-  }
-
-  .xtrc-metrics dd {
-    margin-left: 130px;
-  }
-
-  .xtrc-exception-bubble {
-    position: relative;
-    top: -7px;
-    margin-left: 2px;
-    cursor: pointer;
-  }
-
-  .extractor-condition-summary {
-    margin-left: 5px;
-    margin-top: 10px;
   }
 
   .success-match {
@@ -723,25 +473,6 @@ const globalStyles = css`
     margin-top: 10px;
   }
 
-  .analyzer-content dl {
-    margin-top: 10px;
-    margin-bottom: 5px;
-    border-left: 3px solid #eee;
-    padding-left: 7px;
-    padding-top: 1px;
-    padding-bottom: 1px;
-  }
-
-  .analyzer-content dt {
-    float: left;
-    height: 25px;
-  }
-
-  .analyzer-content dd {
-    margin-left: 120px;
-    height: 25px;
-  }
-
   .analyze-field .statistics .wrong-type {
     margin-top: 5px;
     color: #bbb;
@@ -761,12 +492,6 @@ const globalStyles = css`
   .timerange-selector select {
     margin-bottom: 0;
   }
-
-  //#relative-timerange-selector {
-  //  font-size: 12px;
-  //  line-height: 15px;
-  //  height: 25px;
-  //}
 
   .timerange-chooser {
     float: left;
@@ -864,10 +589,8 @@ const globalStyles = css`
     z-index: 2000;
     width: 200px;
     text-align: center;
-    -webkit-border-radius: 10px 10px 10px 10px;
-    -moz-border-radius: 10px 10px 10px 10px;
     cursor: pointer;
-    border-radius: 10px 10px 10px 10px;
+    border-radius: 10px;
   }
 
   .graph-range-selector {
@@ -907,9 +630,6 @@ const globalStyles = css`
     color: #a0a0a0
   }
 
-  .input-io .total {
-    color: #b8b8b8;
-  }
 
   .input-list .static-fields {
     margin-top: 10px;
@@ -1582,11 +1302,11 @@ const globalStyles = css`
   }
 
   .zeroclipboard-is-hover {
-    // via .btn-default:hover from bootstrap
+    /* // via .btn-default:hover from bootstrap */
     color: #333;
     background-color: #d7d9d9;
     border-color: #c3c8c8;
-    // bootstrap copy end
+    /* // bootstrap copy end */
     cursor: move;
   }
 
@@ -1608,9 +1328,6 @@ const globalStyles = css`
     cursor: help
   }
 
-  .node-row .dropdown-menu a.selected {
-    font-weight: bold;
-  }
 
   #result-graph-timeline .annotation .content {
     left: -120px;
@@ -2037,7 +1754,7 @@ const globalStyles = css`
   }
 
   #message-table-paginator-bottom .affix {
-    z-index: 3; // show on top of .pagination .active links
+    z-index: 3; /* show on top of .pagination .active links */
     bottom: 1px;
   }
 
@@ -2227,9 +1944,7 @@ const globalStyles = css`
     top: -10px;
   }
   .greyed-out {
-    filter:alpha(opacity=50); /* IE */
-    opacity: 0.5; /* Safari, Opera */
-    -moz-opacity:0.50; /* FireFox */
+    opacity: 0.5;
     z-index: 20;
   }
 
@@ -2343,32 +2058,6 @@ const globalStyles = css`
     font-size: 13px;
   }
 
-  .input-io .value {
-    font-family: monospace;
-  }
-
-  .input-io .persec {
-    margin-left: 3px;
-  }
-
-  .input-io .channel-direction {
-    position: relative;
-    left: -1px;
-  }
-
-  .input-io .channel-direction-down {
-    position: relative;
-    top: 1px;
-  }
-
-  .input-io .channel-direction-up {
-    position: relative;
-    top: -1px;
-  }
-
-  #field-statistics th {
-    cursor: pointer;
-  }
 
   .alert-type-form {
     line-height: 26px;
@@ -2428,10 +2117,10 @@ const globalStyles = css`
   }
 
   .triggered-alerts .page-size {
-    margin-top: -23px; // Height of the header
+    margin-top: -23px; /* Height of the header */
   }
 
-  // Ensure that the stream start/pause buttons have the same size.
+  /* // Ensure that the stream start/pause buttons have the same size. */
   .toggle-stream-button {
     width: 8.5em;
   }
@@ -2481,10 +2170,6 @@ const globalStyles = css`
 
   .stream-loader {
     margin-top: 5px;
-  }
-
-  #field-statistics table {
-    margin-top: 10px;
   }
 
   .quickvalues-visualization {
@@ -2558,29 +2243,6 @@ const globalStyles = css`
     content: "×";
   }
 
-  .streamrule-connector-type-form label {
-    font-size: 12px;
-  }
-
-  .streamrule-connector-type-form {
-    margin-top: 10px;
-    margin-bottom: 13px;
-  }
-
-  .streamrule-connector-type-form .form-group {
-    margin-bottom: 5px;
-  }
-
-  .streamrule-connector-type-form .radio {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
-  .streamrule-connector-type-form input[type=radio] {
-    margin-top: 2px;
-    margin-bottom: 2px;
-  }
-
   #react-gettingstarted {
     margin-left: -19px;
     margin-right: -19px;
@@ -2589,39 +2251,6 @@ const globalStyles = css`
 
   #react-gettingstarted iframe {
     height: 1000px;
-  }
-
-  .sortable-list-cursor {
-    cursor: move;
-  }
-  .sortable-list {
-    .dragging {
-      opacity: 0.5;
-    }
-    .over {
-      border: 1px dashed #8c8e86;
-    }
-
-    .sortable-list-item:first-child .list-group-item {
-      border-top-right-radius: 4px;
-      border-top-left-radius: 4px;
-    }
-
-    .sortable-list-item:last-child .list-group-item {
-      border-bottom-right-radius: 4px;
-      border-bottom-left-radius: 4px;
-      margin-bottom: 0;
-    }
-
-    .list-group-item:first-child {
-      border-top-right-radius: 0;
-      border-top-left-radius: 0;
-    }
-
-    .list-group-item:last-child {
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
-    }
   }
 
   .field-analyzer {
