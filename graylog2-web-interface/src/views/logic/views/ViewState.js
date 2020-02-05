@@ -80,7 +80,7 @@ export default class ViewState {
     return this._value.widgetPositions;
   }
 
-  get staticMessageListId() : ?string {
+  get staticMessageListId(): ?string {
     return this._value.staticMessageListId;
   }
 
