@@ -5,6 +5,8 @@ import com.google.common.graph.Traverser;
 import org.bson.Document;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -37,17 +39,19 @@ class Query {
         return this.queryDocument.getString(FIELD_ID);
     }
 
-    private Set<Document> searchTypesByIds(Set<String> searchTypeIds) {
-        @SuppressWarnings("unchecked") final Set<Document> searchTypes = queryDocument.get(FIELD_SEARCH_TYPES, Set.class);
-        if (searchTypes == null) {
+    private Set<SearchType> searchTypesByIds(Set<String> searchTypeIds) {
+        @SuppressWarnings("rawtypes") final List rawSearchTypes = queryDocument.get(FIELD_SEARCH_TYPES, List.class);
+        if (rawSearchTypes == null) {
             return Collections.emptySet();
         }
+        @SuppressWarnings("unchecked") final Set<Document> searchTypes = new HashSet<>((List<Document>)rawSearchTypes);
 
         return searchTypes.stream()
                 .filter(searchType -> {
                     final String searchTypeId = searchType.getString(FIELD_SEARCH_TYPE_ID);
                     return searchTypeId != null && searchTypeIds.contains(searchTypeId);
                 })
+                .map(SearchType::new)
                 .collect(Collectors.toSet());
     }
 
@@ -107,5 +111,9 @@ class Query {
                 "type", "relative",
                 "range", 300
         )));
+    }
+
+    void mergeWidgetSettingsIntoSearchTypes(Widget widget, Set<String> searchTypeIds) {
+        searchTypesByIds(searchTypeIds).forEach(searchType -> searchType.syncWithWidget(widget));
     }
 }
