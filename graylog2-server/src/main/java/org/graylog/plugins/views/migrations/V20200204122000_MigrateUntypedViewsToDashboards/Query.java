@@ -101,7 +101,7 @@ class Query {
     }
 
     public void clearUnwantedProperties() {
-        this.queryDocument.put(FIELD_FILTER, new Document());
+        this.queryDocument.remove(FIELD_FILTER);
         this.queryDocument.put(FIELD_QUERY, new BackendQuery(""));
         this.queryDocument.put(FIELD_TIMERANGE, new Document(ImmutableMap.of(
                 "type", "relative",
