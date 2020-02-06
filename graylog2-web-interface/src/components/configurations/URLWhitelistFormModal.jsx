@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
@@ -8,17 +9,38 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import CombinedProvider from 'injection/CombinedProvider';
 import PermissionsMixin from 'util/PermissionsMixin';
+import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
+type State = {
+  config: WhiteListConfig,
+  isValid: boolean
+};
 
-class URLWhitelistFormModal extends React.Component {
-    configModal = null;
+type Props = {
+  newUrlEntry: string,
+  onUpdate: () => void,
+  configuration: {},
+  currentUser: {permissions: Array<string>},
+  formType: string,
+};
+
+
+class URLWhitelistFormModal extends React.Component<Props, State> {
+    configModal: ?BootstrapModalForm;
 
     inputs = {};
+
+    static defaultProps = {
+      newUrlEntry: '',
+      onUpdate: () => {},
+      configuration: {},
+      formType: '',
+    }
 
     constructor(props) {
       super(props);
@@ -36,7 +58,7 @@ class URLWhitelistFormModal extends React.Component {
     }
 
 
-  _getConfig = (configType) => {
+  _getConfig = (configType: string) => {
     const { configuration } = this.props;
     if (configuration && configuration[configType]) {
       return configuration[configType];
@@ -126,13 +148,6 @@ URLWhitelistFormModal.propTypes = {
   configuration: PropTypes.object,
   currentUser: PropTypes.object.isRequired,
   formType: PropTypes.string,
-};
-
-URLWhitelistFormModal.defaultProps = {
-  newUrlEntry: {},
-  onUpdate: () => {},
-  configuration: {},
-  formType: '',
 };
 
 export default connect(URLWhitelistFormModal, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({

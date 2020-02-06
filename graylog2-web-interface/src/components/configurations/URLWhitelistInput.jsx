@@ -1,3 +1,4 @@
+// @flow
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Input } from 'components/bootstrap';
@@ -7,13 +8,22 @@ import URLUtils from 'util/URLUtils';
 import UIUtils from 'util/UIUtils';
 
 const ToolsStore = StoreProvider.getStore('Tools');
-
-const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validationState, url, labelClassName, wrapperClassName, formType }) => {
+type Props = {
+  label: string,
+  handleFormEvent: (event: SyntheticInputEvent<EventTarget>) => void,
+  validationMessage: string,
+  validationState: string,
+  url: string,
+  labelClassName: string,
+  wrapperClassName: string,
+  formType: string
+}
+const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validationState, url, labelClassName, wrapperClassName, formType }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
 
-  const suggestRegexWhitelistUrl = (typedUrl, type) => {
+  const suggestRegexWhitelistUrl = (typedUrl: string, type: string): string | Promise<any> => {
     // eslint-disable-next-line no-template-curly-in-string
     const keyWildcard = '${key}';
     return type && type === 'regex' && URLUtils.isValidURL(typedUrl) ? ToolsStore.urlWhiteListGenerateRegex(typedUrl, keyWildcard) : typedUrl;
@@ -58,7 +68,7 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
     checkIsWhitelisted();
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event: SyntheticInputEvent<EventTarget>) => {
     handleFormEvent(event);
   };
 
