@@ -107,6 +107,8 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         this.migration.upgrade();
 
         verify(clusterConfigService, never()).write(any());
+        verify(this.viewsCollection, never()).updateOne(any(), any());
+        verify(this.searchesCollection, never()).updateOne(any(), any());
     }
 
     @Test
@@ -141,7 +143,8 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets-after.json"));
+        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets-views_after.json"));
+        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets-searches_after.json"));
     }
 
     @Test
@@ -153,6 +156,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         assertThat(migrationCompleted.viewIds()).isEmpty();
 
         verify(this.viewsCollection, never()).updateOne(any(), any());
+        verify(this.searchesCollection, never()).updateOne(any(), any());
     }
 
     @Test
