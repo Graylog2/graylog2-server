@@ -52,6 +52,16 @@ const URLUtils = {
     const browser = this.parser.getBrowser();
     return browser.name !== 'IE' && browser.name !== 'Edge';
   },
-};
+  isValidURL(str) {
+    let isValid = true;
+    try {
+      // eslint-disable-next-line no-unused-vars
+      const test = new URL(str);
+    } catch (e) {
+      isValid = false;
+    }
+    return isValid;
+  },
 
+};
 export default URLUtils;

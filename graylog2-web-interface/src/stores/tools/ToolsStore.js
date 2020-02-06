@@ -82,6 +82,20 @@ const ToolsStore = Reflux.createStore({
 
     return promise;
   },
+  urlWhiteListGenerateRegex(urlTemplate: string, placeholder: string): Promise<Object> {
+    const { url } = ApiRoutes.ToolsApiController.urlWhitelistGenerateRegex();
+    const promise = fetch('POST', URLUtils.qualifyUrl(url), {
+      url_template: urlTemplate,
+      placeholder,
+    });
+
+    promise.catch((errorThrown) => {
+      UserNotification.error(`Details: ${errorThrown}`,
+        'Could not generate regex.');
+    });
+
+    return promise;
+  },
   testRegex(regex: string, string: string): Promise<Object> {
     const { url } = ApiRoutes.ToolsApiController.regexTest();
     const promise = fetch('POST', URLUtils.qualifyUrl(url), {

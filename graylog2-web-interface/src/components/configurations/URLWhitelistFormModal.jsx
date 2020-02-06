@@ -94,8 +94,8 @@ class URLWhitelistFormModal extends React.Component {
   render() {
     const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
     if (urlwhitelistConfig) {
-      const { newUrlEntry } = this.props;
-      const initialConfig = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: null }], disabled: urlwhitelistConfig.disabled };
+      const { newUrlEntry, formType } = this.props;
+      const initialConfig = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: formType || 'literal' }], disabled: urlwhitelistConfig.disabled };
       const { entries, disabled } = initialConfig;
       const { isValid } = this.state;
       return (
@@ -111,7 +111,7 @@ class URLWhitelistFormModal extends React.Component {
                               submitButtonDisabled={!isValid}
                               submitButtonText="Save">
             <h3>Whitelist URLs</h3>
-            <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={this._update} />
+            <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={this._update} newUrlEntry={newUrlEntry} />
           </BootstrapModalForm>
         </>
       );
@@ -121,16 +121,18 @@ class URLWhitelistFormModal extends React.Component {
 }
 
 URLWhitelistFormModal.propTypes = {
-  newUrlEntry: PropTypes.string,
+  newUrlEntry: PropTypes.object,
   onUpdate: PropTypes.func,
   configuration: PropTypes.object,
   currentUser: PropTypes.object.isRequired,
+  formType: PropTypes.string,
 };
 
 URLWhitelistFormModal.defaultProps = {
-  newUrlEntry: '',
+  newUrlEntry: {},
   onUpdate: () => {},
   configuration: {},
+  formType: '',
 };
 
 export default connect(URLWhitelistFormModal, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({

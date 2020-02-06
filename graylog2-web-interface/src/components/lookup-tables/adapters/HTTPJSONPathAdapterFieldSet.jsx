@@ -35,7 +35,8 @@ class HTTPJSONPathAdapterFieldSet extends React.Component {
                            validationState={validationState('url')}
                            url={config.url}
                            labelClassName="col-sm-3"
-                           wrapperClassName="col-sm-9" />
+                           wrapperClassName="col-sm-9"
+                           formType="regex" />
         <Input type="text"
                id="single_value_jsonpath"
                name="single_value_jsonpath"
