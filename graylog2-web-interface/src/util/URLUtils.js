@@ -41,11 +41,13 @@ const URLUtils = {
   },
   concatURLPath(...allArgs) {
     const args = Array(allArgs.length);
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < allArgs.length; i++) {
       args[i] = allArgs[i];
     }
 
     const joinedPath = `/${args.join('/')}`;
+    // eslint-disable-next-line no-useless-escape
     return joinedPath.replace(/[\/]+/g, '/');
   },
   areCredentialsInURLSupported() {
