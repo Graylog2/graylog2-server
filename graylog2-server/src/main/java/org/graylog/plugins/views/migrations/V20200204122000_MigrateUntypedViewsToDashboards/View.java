@@ -10,6 +10,8 @@ class View {
     private static final String FIELD_ID = "_id";
     private static final String FIELD_SEARCH_ID = "search_id";
     private static final String FIELD_STATES = "state";
+    private static final String FIELD_TYPE = "type";
+    private static final String TYPE_DASHBOARD = "DASHBOARD";
 
     private final Document viewDocument;
 
@@ -31,5 +33,13 @@ class View {
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> new ViewState((Document)entry.getValue())));
 
+    }
+
+    void makeDashboard() {
+        viewDocument.put(FIELD_TYPE, TYPE_DASHBOARD);
+    }
+
+    Document viewDocument() {
+        return this.viewDocument;
     }
 }
