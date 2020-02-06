@@ -101,5 +101,69 @@
       "owner" : "admin",
       "created_at" : { "$date": "2019-03-14T14:09:59.807Z" }
     }
+  ],
+  "searches": [
+    {
+      "_id" : { "$oid": "5c90baa29f9eba845f5df821" },
+      "queries" : [
+        {
+          "id" : "f2e97976-7922-494c-be72-9dcb8937d571",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 300
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : ""
+          },
+          "search_types" : [
+            {
+              "id" : "f05861d0-20ea-4294-a4b6-785c54aa4e7b",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "9c66f71e-fec9-48be-9496-20ad982c07a5",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "nf_dst_address_country_code",
+                  "limit" : 15
+                },
+                {
+                  "type" : "values",
+                  "field" : "nf_dst_address_city_name",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "nf_proto_name",
+                  "limit" : 15
+                }
+              ],
+              "filter" : {
+                "type" : "query_string",
+                "query" : "NOT nf_dst_address_city_name:\"N/A\""
+              }
+            }
+          ]
+        }
+      ],
+      "parameters" : [],
+      "owner" : "admin",
+      "created_at" : { "$date": "2019-03-19T09:47:15.008Z" }
+    }
   ]
 }

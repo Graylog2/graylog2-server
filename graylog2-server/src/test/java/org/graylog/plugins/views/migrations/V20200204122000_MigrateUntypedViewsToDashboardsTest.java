@@ -19,7 +19,9 @@ package org.graylog.plugins.views.migrations;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.V20200204122000_MigrateUntypedViewsToDashboards;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.MongoConnection;
@@ -29,7 +31,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -47,7 +48,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.MigrationCompleted;
+import static org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.V20200204122000_MigrateUntypedViewsToDashboards.MigrationCompleted;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -57,6 +58,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
+    private static final String COLLECTION_VIEWS = "views";
+    private static final String COLLECTION_SEARCHES = "searches";
+
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
     @Rule
@@ -69,12 +73,16 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
 
     private Migration migration;
     private MongoCollection<Document> viewsCollection;
+    private MongoCollection<Document> searchesCollection;
 
     @Before
     public void setUp() throws Exception {
-        this.viewsCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection("views"));
-        final MongoConnection mongoConnection = mock(MongoConnection.class, Answers.RETURNS_DEEP_STUBS);
-        when(mongoConnection.getMongoDatabase().getCollection("views")).thenReturn(viewsCollection);
+        this.viewsCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_VIEWS));
+        this.searchesCollection = mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_SEARCHES);
+        final MongoConnection mongoConnection = mock(MongoConnection.class);
+        when(mongoConnection.getMongoDatabase()).thenReturn(mock(MongoDatabase.class));
+        when(mongoConnection.getMongoDatabase().getCollection(COLLECTION_VIEWS)).thenReturn(viewsCollection);
+        when(mongoConnection.getMongoDatabase().getCollection(COLLECTION_SEARCHES)).thenReturn(searchesCollection);
         this.migration = new V20200204122000_MigrateUntypedViewsToDashboards(mongoConnection, clusterConfigService);
     }
 
