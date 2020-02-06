@@ -25,6 +25,11 @@
               "id": "dd775da9-91c6-4cf4-a16e-6bd34082de73",
               "type": "aggregation",
               "query": { "type": "elasticsearch", "query_string": "NOT nf_dst_address_city_name:\"N/A\""},
+              "streams": [],
+              "timerange": {
+                "type": "relative",
+                "range": 300
+              },
               "config": {
                 "row_pivots": [
                   {
@@ -65,6 +70,11 @@
             {
               "id": "e5ae3a26-c3ff-48aa-8800-6ded89a112a0",
               "type": "messages",
+              "streams": [],
+              "timerange": {
+                "type": "relative",
+                "range": 300
+              },
               "config": {
                 "fields": [
                   "timestamp",

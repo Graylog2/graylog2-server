@@ -28,6 +28,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,7 +79,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     @Before
     public void setUp() throws Exception {
         this.viewsCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_VIEWS));
-        this.searchesCollection = mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_SEARCHES);
+        this.searchesCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_SEARCHES));
         final MongoConnection mongoConnection = mock(MongoConnection.class);
         when(mongoConnection.getMongoDatabase()).thenReturn(mock(MongoDatabase.class));
         when(mongoConnection.getMongoDatabase().getCollection(COLLECTION_VIEWS)).thenReturn(viewsCollection);
@@ -116,7 +117,8 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter-after.json"));
+        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter-views_after.json"));
+        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter-searches_after.json"));
     }
 
     @Test
@@ -127,7 +129,8 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query-after.json"));
+        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query-views_after.json"));
+        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query-searches_after.json"));
     }
 
     @Test
@@ -160,16 +163,25 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/mixed_typed_and_untyped_views-after.json"));
+        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/mixed_typed_and_untyped_views-views_after.json"));
+        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/mixed_typed_and_untyped_views-searches_after.json"));
     }
 
     private void assertSavedViews(int count, String viewsCollection) throws Exception {
-        final ArgumentCaptor<Document> newViewsCaptor = ArgumentCaptor.forClass(Document.class);
-        verify(this.viewsCollection, times(count)).updateOne(any(), newViewsCaptor.capture());
-        final List<Document> newViews = newViewsCaptor.getAllValues();
-        assertThat(newViews).hasSize(count);
+        assertEntityCollection(count, viewsCollection, this.viewsCollection);
+    }
 
-        JSONAssert.assertEquals(viewsCollection, toJSON(newViews), true);
+    private void assertSavedSearches(int count, String searchesCollection) throws Exception {
+        assertEntityCollection(count, searchesCollection, this.searchesCollection);
+    }
+
+    private void assertEntityCollection(int count, String expectedCollection, MongoCollection<Document> actualCollection) throws Exception {
+        final ArgumentCaptor<Document> newEntitiesCaptor = ArgumentCaptor.forClass(Document.class);
+        verify(actualCollection, times(count)).updateOne(any(), newEntitiesCaptor.capture());
+        final List<Document> newEntities = newEntitiesCaptor.getAllValues();
+        assertThat(newEntities).hasSize(count);
+
+        JSONAssert.assertEquals(expectedCollection, toJSON(newEntities), true);
     }
 
     private MigrationCompleted captureMigrationCompleted() {
@@ -185,6 +197,9 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     private String resourceFile(String filename) {
         try {
             final URL resource = this.getClass().getResource(filename);
+            if (resource == null) {
+                Assert.fail("Unable to find resource file for test: " + filename);
+            }
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);
             return new String(bytes, StandardCharsets.UTF_8);
