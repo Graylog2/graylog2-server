@@ -17,10 +17,11 @@ class Search {
     }
 
     Optional<Query> queryById(String queryId) {
-        @SuppressWarnings("unchecked") final Set<Document> queries = new HashSet<Document>(searchDocument.get(FIELD_QUERIES, List.class));
-        if (queries == null) {
+        @SuppressWarnings("rawtypes") final List rawQueriesList = searchDocument.get(FIELD_QUERIES, List.class);
+        if (rawQueriesList == null) {
             return Optional.empty();
         }
+        @SuppressWarnings("unchecked") final Set<Document> queries = new HashSet<Document>(rawQueriesList);
         return queries.stream()
                 .filter(q -> queryId.equals(q.getString(FIELD_QUERY_ID)))
                 .findFirst()
