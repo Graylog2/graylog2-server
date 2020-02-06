@@ -1,5 +1,6 @@
 package org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Traverser;
 import org.bson.Document;
 
@@ -14,6 +15,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.stream.Collectors.toSet;
 
 class Query {
+    private static final String FIELD_ID = "id";
     private static final String FIELD_FILTER = "filter";
     private static final String FIELD_SEARCH_TYPE_ID = "id";
     private static final String FIELD_SEARCH_TYPES = "search_types";
@@ -29,6 +31,10 @@ class Query {
 
     Query(Document queryDocument) {
         this.queryDocument = queryDocument;
+    }
+
+    String id() {
+        return this.queryDocument.getString(FIELD_ID);
     }
 
     private Set<Document> searchTypesByIds(Set<String> searchTypeIds) {
@@ -80,7 +86,7 @@ class Query {
         return filter.getString(FIELD_STREAM_ID);
     }
 
-    Set<String> streamIds() {
+    Set<String> streams() {
         final Document optionalFilter = this.queryDocument.get(FIELD_FILTER, Document.class);
         return Optional.ofNullable(optionalFilter)
                 .map(filter -> {
@@ -92,5 +98,14 @@ class Query {
                             .collect(toSet());
                 })
                 .orElseGet(Collections::emptySet);
+    }
+
+    public void clearUnwantedProperties() {
+        this.queryDocument.put(FIELD_FILTER, new Document());
+        this.queryDocument.put(FIELD_QUERY, new BackendQuery(""));
+        this.queryDocument.put(FIELD_TIMERANGE, new Document(ImmutableMap.of(
+                "type", "relative",
+                "range", 300
+        )));
     }
 }

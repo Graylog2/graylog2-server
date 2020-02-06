@@ -48,7 +48,6 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
     private static final String COLLECTION_SEARCHES = "searches";
     private static final String FIELD_ID = "_id";
     private static final String FIELD_TYPE = "type";
-    private static final String TYPE_DASHBOARD = "DASHBOARD";
     private final MongoCollection<Document> viewsCollection;
     private final MongoCollection<Document> searchesCollections;
     private final ClusterConfigService clusterConfigService;
@@ -85,10 +84,12 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
             }
             final Optional<Search> optionalSearch = findSearch(searchId);
             optionalSearch.ifPresent(search -> {
-                viewDocument.put(FIELD_TYPE, TYPE_DASHBOARD);
+                view.makeDashboard();
                 migrateViewStates(view, search);
+                migrateQueries(search);
 
-                viewsCollection.updateOne(new BasicDBObject(FIELD_ID, viewId), new Document("$set", viewDocument));
+                updateView(view, viewId);
+                updateSearch(search, searchId);
                 viewIds.add(viewId.toString());
             });
             if (!optionalSearch.isPresent()) {
@@ -96,6 +97,14 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
             }
         }
         clusterConfigService.write(MigrationCompleted.create(viewIds));
+    }
+
+    private void updateSearch(Search search, String searchId) {
+        searchesCollections.updateOne(new BasicDBObject(FIELD_ID, new ObjectId(searchId)), new Document("$set", search.searchDocument()));
+    }
+
+    private void updateView(View view, ObjectId viewId) {
+        viewsCollection.updateOne(new BasicDBObject(FIELD_ID, viewId), new Document("$set", view.viewDocument()));
     }
 
     private Optional<Search> findSearch(String searchId) {
@@ -118,10 +127,14 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
     }
 
     private void migrateSingleViewState(ViewState viewState, Query query) {
-        for (final Widget widget : viewState.widgets()) {
+        viewState.widgets().forEach(widget -> {
             widget.mergeFilterIntoQueryIfPresent();
             widget.mergeQuerySpecsIntoWidget(query);
-        }
+        });
+    }
+
+    private void migrateQueries(Search search) {
+        search.queries().forEach(Query::clearUnwantedProperties);
     }
 
     @JsonAutoDetect
