@@ -116,8 +116,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     public void migratesWidgetFiltersToWidgetQueries() throws Exception {
         this.migration.upgrade();
 
-        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
+        assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
         assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter-views_after.json"));
         assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter-searches_after.json"));
@@ -128,8 +127,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     public void migratesWidgetFiltersToWidgetQueriesAndConcatenatesToExistingQuery() throws Exception {
         this.migration.upgrade();
 
-        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
+        assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
         assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query-views_after.json"));
         assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query-searches_after.json"));
@@ -140,8 +138,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     public void migratesUntypedViewWithNoWidgets() throws Exception {
         this.migration.upgrade();
 
-        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
+        assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
         assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets-views_after.json"));
         assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets-searches_after.json"));
@@ -164,11 +161,26 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     public void migratesOnlyUntypedViewsIfMixedOnesArePresent() throws Exception {
         this.migration.upgrade();
 
-        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.viewIds()).containsExactly("5c8a613a844d02001a1fd2f4");
+        assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
         assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/mixed_typed_and_untyped_views-views_after.json"));
         assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/mixed_typed_and_untyped_views-searches_after.json"));
+    }
+
+    @Test
+    @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/query_with_query_string.json")
+    public void migratesQueryStringFromQueryIntoWidgetsAndSearchTypes() throws Exception {
+        this.migration.upgrade();
+
+        assertViewsMigrated("5c8a613a844d02001a1fd2f4");
+
+        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/query_with_query_string-views_after.json"));
+        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/query_with_query_string-searches_after.json"));
+    }
+
+    private void assertViewsMigrated(String... viewId) {
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.viewIds()).containsExactlyInAnyOrder(viewId);
     }
 
     private void assertSavedViews(int count, String viewsCollection) throws Exception {
