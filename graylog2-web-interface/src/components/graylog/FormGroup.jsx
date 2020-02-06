@@ -63,10 +63,12 @@ const createCss = (validationState) => {
       }
 
       /** NOTE: InputGroup is memoized so reference it with .type */
-      ${InputGroup.type} .input-group-addon {
-        color: ${text};
-        background-color: ${background};
-        border-color: ${border};
+      ${InputGroup.type} {
+        .input-group-addon {
+          color: ${text};
+          background-color: ${background};
+          border-color: ${border};
+        }
       }
 
       .form-control-feedback {
