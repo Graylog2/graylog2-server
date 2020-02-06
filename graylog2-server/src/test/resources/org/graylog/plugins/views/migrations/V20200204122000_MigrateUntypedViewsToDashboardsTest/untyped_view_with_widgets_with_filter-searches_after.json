@@ -18,10 +18,24 @@
               "id" : "f05861d0-20ea-4294-a4b6-785c54aa4e7b",
               "limit" : 150,
               "offset" : 0,
+              "streams": [],
+              "timerange": {
+                "type": "relative",
+                "range": 300
+              },
               "type" : "messages"
             },
             {
               "id" : "9c66f71e-fec9-48be-9496-20ad982c07a5",
+              "streams": [],
+              "timerange": {
+                "type": "relative",
+                "range": 300
+              },
+              "query": {
+                "type": "elasticsearch",
+                "query_string": "NOT nf_dst_address_city_name:\"N/A\""
+              },
               "series" : [
                 {
                   "type" : "count",
@@ -49,11 +63,7 @@
                   "field" : "nf_proto_name",
                   "limit" : 15
                 }
-              ],
-              "filter" : {
-                "type" : "query_string",
-                "query" : "NOT nf_dst_address_city_name:\"N/A\""
-              }
+              ]
             }
           ]
         }
