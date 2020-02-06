@@ -18,7 +18,9 @@ const labelStyles = (hex) => {
 
 const Label = forwardRef(({ bsStyle, ...props }, ref) => {
   const StyledLabel = useMemo(
-    () => styled(BootstrapLabel)`${bsStyleThemeVariant(labelStyles)}`,
+    () => styled(BootstrapLabel)`
+      ${bsStyleThemeVariant(labelStyles)}
+    `,
     [bsStyle],
   );
 

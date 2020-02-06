@@ -48,7 +48,7 @@ const createCss = (validationState) => {
       &.radio label,
       &.checkbox label,
       &.radio-inline label,
-      &.checkbox-inline label  {
+      &.checkbox-inline label {
         color: ${text};
       }
 
@@ -58,7 +58,7 @@ const createCss = (validationState) => {
 
         &:focus {
           border-color: ${darken(0.10, border)};
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px ${lighten(0.20, border)};
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px ${lighten(0.20, border)};
         }
       }
 

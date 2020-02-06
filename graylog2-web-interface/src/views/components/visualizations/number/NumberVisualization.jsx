@@ -21,8 +21,8 @@ const GridContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 4fr 1fr;
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
   height: 100%;
   width: 100%;
 `;
@@ -31,8 +31,8 @@ const SingleItemGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
   height: 100%;
   width: 100%;
 `;

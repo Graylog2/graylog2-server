@@ -8,17 +8,21 @@ const Tooltip = styled(BootstrapTooltip)`
   &.top .tooltip-arrow {
     bottom: 0;
   }
+
   &.top .tooltip-arrow,
   &.top-left .tooltip-arrow,
   &.top-right .tooltip-arrow {
     border-top-color: ${teinte.primary.tre};
   }
+
   &.right .tooltip-arrow {
     border-right-color: ${teinte.primary.tre};
   }
+
   &.left .tooltip-arrow {
     border-left-color: ${teinte.primary.tre};
   }
+
   &.bottom .tooltip-arrow,
   &.bottom-left .tooltip-arrow,
   &.bottom-right .tooltip-arrow {

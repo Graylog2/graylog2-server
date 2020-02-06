@@ -8,4 +8,4 @@
 
 git diff --name-only --diff-filter=ACMR origin/master...|grep -E '^graylog2-web-interface/(.*).js(x)?$'|sed s,graylog2-web-interface/,,g|xargs yarn lint:path
 
-git diff --name-only --diff-filter=ACMR origin/master...|grep -E '^graylog2-web-interface/(.*).js(x)?$'|sed s,graylog2-web-interface/,,g|xargs yarn lint:styles
+git diff --name-only --diff-filter=ACMR origin/master...|grep -E '^graylog2-web-interface/(.*).js(x)?$'|sed s,graylog2-web-interface/,,g|xargs yarn lint:styles:path

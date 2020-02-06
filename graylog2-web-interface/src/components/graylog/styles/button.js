@@ -48,28 +48,33 @@ const buttonStyles = ({ bsStyle }) => {
       border-color: ${defaultBorder};
       color: ${defaultColor};
       transition: background-color 150ms ease-in-out,
-                  border 150ms ease-in-out,
-                  color 150ms ease-in-out;
+        border 150ms ease-in-out,
+        color 150ms ease-in-out;
+
       :hover {
         background-color: ${shouldMix(0.05, defaultBackground)};
         border-color: ${shouldMix(0.05, defaultBorder)};
         color: ${shouldMix(0.05, defaultColor)};
       }
+
       &.active {
         background-color: ${activeBackground};
         border-color: ${activeBorder};
         color: ${activeColor};
+
         :hover {
           background-color: ${shouldMix(0.05, activeBackground)};
           border-color: ${shouldMix(0.05, activeBorder)};
           color: ${shouldMix(0.05, activeColor)};
         }
       }
+
       &[disabled],
       &.disabled {
         background-color: ${disabledBackground};
         border-color: ${disabledBorder};
         color: ${disabledColor};
+
         :hover {
           background-color: ${shouldMix(-0.05, disabledBackground)};
           border-color: ${shouldMix(-0.05, disabledBorder)};

@@ -61,7 +61,6 @@ const SearchArea = styled.div`
   grid-column-start: 2;
   grid-column-end: 4;
   padding: 15px;
-
   z-index: 1;
 `;
 

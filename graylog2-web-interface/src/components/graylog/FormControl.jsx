@@ -19,8 +19,8 @@ const FormControl = memo(styled(BootstrapFormControl)`
 
   &:focus {
     border-color: ${teinte.tertiary.due};
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
-                0 0 8px ${transparentize(0.6, teinte.tertiary.due)};
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+      0 0 8px ${transparentize(0.6, teinte.tertiary.due)};
   }
 
   &[disabled],

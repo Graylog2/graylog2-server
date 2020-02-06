@@ -20,8 +20,10 @@ const ControlsContainer = styled.div`
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
+
   > .btn-group {
     max-width: calc(100% - 34px);
+
     .btn:first-child {
       max-width: 100%;
     }
@@ -51,7 +53,7 @@ class RefreshControls extends React.Component<Props> {
     refreshConfig: PropTypes.object.isRequired,
   };
 
-  static INTERVAL_OPTIONS : Array<[string, number]> = [
+  static INTERVAL_OPTIONS: Array<[string, number]> = [
     ['1 Second', 1000],
     ['2 Seconds', 2000],
     ['5 Seconds', 5000],

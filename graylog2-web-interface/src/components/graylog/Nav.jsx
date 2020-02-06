@@ -22,7 +22,7 @@ const Nav = styled(BootstrapNav)(() => {
         > a {
           &:hover,
           &:focus {
-          background-color: ${util.colorLevel(teinte.secondary.due, -3)};
+            background-color: ${util.colorLevel(teinte.secondary.due, -3)};
           }
         }
 

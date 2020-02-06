@@ -14,8 +14,8 @@ export const Title: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div
   position: relative;
   color: ${isSelected ? '#FF3633' : 'inherit'};
   background: ${isSelected ? '#393939' : 'tranparent'};
-  
   ${((isSelected && expandRight) && css`
+
     &::after {
       content: ' ';
       display: block;
@@ -51,13 +51,12 @@ export const Content: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.d
   box-shadow:
       inset 0px 13px 5px -10px #CCC,
       inset 0px -13px 5px -10px #CCC;
-  
+
   ${(isSelected ? css`
     padding: 20px;
   ` : css`
     max-height: 0;
   `)}
-  
   ${(isSelected && expandRight) && css`
     position: absolute !important;
     top: 0;

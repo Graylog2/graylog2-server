@@ -9,7 +9,9 @@ import { propTypes, defaultProps } from './props/button';
 const Button = forwardRef((props, ref) => {
   const { active, bsStyle, disabled } = props;
   const StyledButton = useMemo(
-    () => styled(BootstrapButton)`${buttonStyles(props)}`,
+    () => styled(BootstrapButton)`
+      ${buttonStyles(props)}
+    `,
     [active, bsStyle, disabled],
   );
 

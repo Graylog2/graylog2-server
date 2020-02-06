@@ -12,6 +12,7 @@ const Navbar = styled(BootstrapNavbar)`
 
     .navbar-brand {
       color: ${teinte.tertiary.uno};
+
       &:hover,
       &:focus {
         color: ${darken(0.1, teinte.tertiary.uno)};
@@ -34,6 +35,7 @@ const Navbar = styled(BootstrapNavbar)`
           background-color: transparent;
         }
       }
+
       > .active > a {
         &,
         &:hover,
@@ -42,6 +44,7 @@ const Navbar = styled(BootstrapNavbar)`
           background-color: ${darken(0.065, teinte.secondary.due)};
         }
       }
+
       > .disabled > a {
         &,
         &:hover,
@@ -65,12 +68,14 @@ const Navbar = styled(BootstrapNavbar)`
           > li > a,
           > li > .btn-link {
             color: ${teinte.tertiary.uno};
+
             &:hover,
             &:focus {
               color: ${darken(0.25, teinte.tertiary.uno)};
               background-color: transparent;
             }
           }
+
           > .active > a {
             &,
             &:hover,
@@ -79,6 +84,7 @@ const Navbar = styled(BootstrapNavbar)`
               background-color: ${darken(0.065, teinte.secondary.due)};
             }
           }
+
           > .disabled > a {
             &,
             &:hover,
@@ -93,10 +99,12 @@ const Navbar = styled(BootstrapNavbar)`
 
     .navbar-toggle {
       border-color: ${teinte.secondary.tre};
+
       &:hover,
       &:focus {
         background-color: ${teinte.secondary.tre};
       }
+
       .icon-bar {
         background-color: ${darken(0.25, teinte.secondary.tre)};
       }
@@ -109,6 +117,7 @@ const Navbar = styled(BootstrapNavbar)`
 
     .navbar-link {
       color: ${teinte.tertiary.uno};
+
       &:hover {
         color: ${darken(0.25, teinte.tertiary.uno)};
       }
@@ -116,10 +125,12 @@ const Navbar = styled(BootstrapNavbar)`
 
     .btn-link {
       color: ${teinte.tertiary.uno};
+
       &:hover,
       &:focus {
         color: ${darken(0.25, teinte.tertiary.uno)};
       }
+
       &[disabled],
       fieldset[disabled] & {
         &:hover,
@@ -136,6 +147,7 @@ const Navbar = styled(BootstrapNavbar)`
 
     .navbar-brand {
       color: ${lighten(0.15, teinte.tertiary.uno)};
+
       &:hover,
       &:focus {
         color: ${teinte.primary.due};
@@ -158,6 +170,7 @@ const Navbar = styled(BootstrapNavbar)`
           background-color: transparent;
         }
       }
+
       > .active > a {
         &,
         &:hover,
@@ -166,6 +179,7 @@ const Navbar = styled(BootstrapNavbar)`
           background-color: ${lighten(0.20, teinte.primary.tre)};
         }
       }
+
       > .disabled > a {
         &,
         &:hover,
@@ -189,18 +203,22 @@ const Navbar = styled(BootstrapNavbar)`
           > .dropdown-header {
             border-color: ${darken(0.10, teinte.primary.tre)};
           }
+
           .divider {
             background-color: ${lighten(0.20, teinte.primary.tre)};
           }
+
           > li > a,
           > li > .btn-link {
             color: ${teinte.secondary.due};
+
             &:hover,
             &:focus {
               color: ${teinte.tertiary.due};
               background-color: transparent;
             }
           }
+
           > .active > a {
             &,
             &:hover,
@@ -209,6 +227,7 @@ const Navbar = styled(BootstrapNavbar)`
               background-color: ${lighten(0.20, teinte.primary.tre)};
             }
           }
+
           > .disabled > a {
             &,
             &:hover,
@@ -223,10 +242,12 @@ const Navbar = styled(BootstrapNavbar)`
 
     .navbar-toggle {
       border-color: ${lighten(0.35, teinte.primary.tre)};
+
       &:hover,
       &:focus {
         background-color: ${lighten(0.35, teinte.primary.tre)};
       }
+
       .icon-bar {
         background-color: ${teinte.primary.due};
       }
@@ -239,6 +260,7 @@ const Navbar = styled(BootstrapNavbar)`
 
     .navbar-link {
       color: ${lighten(0.15, teinte.tertiary.uno)};
+
       &:hover {
         color: ${teinte.primary.due};
       }
@@ -246,10 +268,12 @@ const Navbar = styled(BootstrapNavbar)`
 
     .btn-link {
       color: ${lighten(0.15, teinte.tertiary.uno)};
+
       &:hover,
       &:focus {
         color: ${teinte.primary.due};
       }
+
       &[disabled],
       fieldset[disabled] & {
         &:hover,

@@ -32,6 +32,7 @@ const listGroupItemStyles = (hex, variant) => {
           color: ${textColor};
           background-color: ${darken(0.2, backgroundColor)};
         }
+
         &.active,
         &.active:hover,
         &.active:focus {

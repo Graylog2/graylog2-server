@@ -27,8 +27,8 @@ type Props = {
 };
 
 const DecoratedField = styled.small`
-    color: #AAA;
-    font-weight: normal;
+  color: #aaa;
+  font-weight: normal;
 `;
 
 const MessageField = ({ fieldName, fieldType, message, value, currentView }: Props) => {

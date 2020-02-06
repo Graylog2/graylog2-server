@@ -10,7 +10,9 @@ import badgeStyles from './styles/badge';
 const Badge = forwardRef((props, ref) => {
   const { bsStyle } = props;
   const StyledBadge = useMemo(
-    () => styled(BootstrapBadge)`${badgeStyles(props)}`,
+    () => styled(BootstrapBadge)`
+      ${badgeStyles(props)}
+    `,
     [bsStyle],
   );
 

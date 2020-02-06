@@ -58,7 +58,9 @@ const variantRowStyles = () => {
     `;
   });
 
-  return css`${styles}`;
+  return css`
+    ${styles}
+  `;
 };
 
 const Table = styled(BootstrapTable)`
@@ -72,6 +74,7 @@ const Table = styled(BootstrapTable)`
   &.table > tfoot > tr > td {
     border-top-color: ${teinte.secondary.tre};
   }
+
   &.table > thead > tr > th {
     border-bottom-color: ${teinte.secondary.tre};
   }
@@ -79,12 +82,15 @@ const Table = styled(BootstrapTable)`
   &.table > tbody + tbody {
     border-top-color: ${teinte.secondary.tre};
   }
+
   .table .table {
     background-color: ${teinte.primary.due};
   }
+
   &.table-bordered {
     border-color: ${util.colorLevel(teinte.secondary.tre, -2)};
   }
+
   &.table-bordered > thead > tr > th,
   &.table-bordered > tbody > tr > th,
   &.table-bordered > tfoot > tr > th,
@@ -97,6 +103,7 @@ const Table = styled(BootstrapTable)`
   &.table-striped > tbody > tr:nth-of-type(odd) {
     background-color: ${util.colorLevel(teinte.secondary.tre, -10)};
   }
+
   &.table-hover > tbody > tr:hover {
     background-color: ${util.colorLevel(teinte.secondary.tre, -9)};
   }
