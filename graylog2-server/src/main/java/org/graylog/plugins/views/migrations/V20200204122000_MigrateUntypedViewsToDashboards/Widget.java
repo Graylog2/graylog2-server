@@ -4,8 +4,6 @@ import org.bson.Document;
 import org.elasticsearch.common.util.set.Sets;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,6 +13,7 @@ class Widget {
     private static final String FIELD_QUERY_STRING = "query_string";
     private static final String FIELD_TIMERANGE = "timerange";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_ID = "id";
 
     private final Document widgetDocument;
 
@@ -53,6 +52,10 @@ class Widget {
         widgetDocument.put(FIELD_QUERY, createBackendQuery(newWidgetQuery));
     }
 
+    Optional<Document> query() {
+        return Optional.ofNullable(widgetDocument.get(FIELD_QUERY, Document.class));
+    }
+
     private void setTimerange(Document timerange) {
         widgetDocument.put(FIELD_TIMERANGE, timerange);
     }
@@ -65,14 +68,11 @@ class Widget {
         return Optional.ofNullable(widgetDocument.getString(FIELD_FILTER));
     }
 
-    private Optional<Document> timerange() { return Optional.ofNullable(widgetDocument.get(FIELD_TIMERANGE, Document.class)); }
+    Optional<Document> timerange() { return Optional.ofNullable(widgetDocument.get(FIELD_TIMERANGE, Document.class)); }
 
-    private Set<String> streams() {
-        final List<String> rawStreams = widgetDocument.get(FIELD_STREAMS, List.class);
-        if (rawStreams == null) {
-            return Collections.emptySet();
-        }
-        return new HashSet<>(rawStreams);
+    Set<String> streams() {
+        @SuppressWarnings("unchecked") final Set<String> streams = widgetDocument.get(FIELD_STREAMS, Set.class);
+        return streams == null ? Collections.emptySet() : streams;
     }
 
     private String concatenateQueries(String query1, String query2) {
@@ -99,5 +99,9 @@ class Widget {
 
     private Document createBackendQuery(String filter) {
         return new BackendQuery(filter);
+    }
+
+    String id() {
+        return this.widgetDocument.getString(FIELD_ID);
     }
 }

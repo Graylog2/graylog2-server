@@ -3,6 +3,7 @@ package org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViews
 import org.bson.Document;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,12 +26,16 @@ class ViewState {
         return Collections.emptyList();
     }
 
-    private Set<String> searchTypeIdsForWidgetId(String widgetId) {
+    Set<String> searchTypeIdsForWidgetId(String widgetId) {
         final Document widgetMapping = viewStateDocument.get(FIELD_WIDGET_MAPPING, Document.class);
         if (widgetMapping == null) {
             return Collections.emptySet();
         }
-        @SuppressWarnings("unchecked") final Set<String> result = widgetMapping.get(widgetId, Set.class);
+        @SuppressWarnings("rawtypes") final List rawWidgetsList = widgetMapping.get(widgetId, List.class);
+        if (rawWidgetsList == null) {
+            return Collections.emptySet();
+        }
+        @SuppressWarnings("unchecked") final Set<String> result = new HashSet<>((List<String>)rawWidgetsList);
         return result;
     }
 }

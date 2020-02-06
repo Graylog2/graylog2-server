@@ -130,6 +130,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboards extends Migration {
         viewState.widgets().forEach(widget -> {
             widget.mergeFilterIntoQueryIfPresent();
             widget.mergeQuerySpecsIntoWidget(query);
+            query.mergeWidgetSettingsIntoSearchTypes(widget, viewState.searchTypeIdsForWidgetId(widget.id()));
         });
     }
 
