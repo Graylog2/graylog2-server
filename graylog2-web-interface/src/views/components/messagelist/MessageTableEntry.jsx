@@ -10,7 +10,6 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import MessageDetail from './MessageDetail';
