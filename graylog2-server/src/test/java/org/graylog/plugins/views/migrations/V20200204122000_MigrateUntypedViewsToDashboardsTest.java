@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.V20200204122000_MigrateUntypedViewsToDashboards;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -107,6 +108,8 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         this.migration.upgrade();
 
         verify(clusterConfigService, never()).write(any());
+        verify(this.viewsCollection, never()).find(any(Bson.class));
+        verify(this.searchesCollection, never()).find(any(Bson.class));
         verify(this.viewsCollection, never()).updateOne(any(), any());
         verify(this.searchesCollection, never()).updateOne(any(), any());
     }
