@@ -155,6 +155,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
         assertThat(migrationCompleted.viewIds()).isEmpty();
 
+        verify(this.viewsCollection, times(1)).find(any(Bson.class));
         verify(this.viewsCollection, never()).updateOne(any(), any());
         verify(this.searchesCollection, never()).updateOne(any(), any());
     }
