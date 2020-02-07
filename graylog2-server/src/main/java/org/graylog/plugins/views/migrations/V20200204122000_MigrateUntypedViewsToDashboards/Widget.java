@@ -40,8 +40,7 @@ class Widget {
     void mergeFilterIntoQueryIfPresent() {
         filter().ifPresent(filter -> {
             widgetDocument.remove(FIELD_FILTER);
-            final String newWidgetQuery = concatenateQueryIfExists(filter);
-            setQueryString(newWidgetQuery);
+            mergeQueryString(filter);
         });
     }
 
