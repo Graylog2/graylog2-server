@@ -29,6 +29,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -187,21 +188,31 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         assertThat(migrationCompleted.viewIds()).containsExactlyInAnyOrder(viewId);
     }
 
-    private void assertSavedViews(int count, String viewsCollection) throws Exception {
+    private void assertSavedViews(int count, String viewsCollection) {
         assertEntityCollection(count, viewsCollection, this.viewsCollection);
     }
 
-    private void assertSavedSearches(int count, String searchesCollection) throws Exception {
+    private void assertSavedSearches(int count, String searchesCollection) {
         assertEntityCollection(count, searchesCollection, this.searchesCollection);
     }
 
-    private void assertEntityCollection(int count, String expectedCollection, MongoCollection<Document> actualCollection) throws Exception {
+    private void assertEntityCollection(int count, String expectedCollection, MongoCollection<Document> actualCollection) {
         final ArgumentCaptor<Document> newEntitiesCaptor = ArgumentCaptor.forClass(Document.class);
         verify(actualCollection, times(count)).updateOne(any(), newEntitiesCaptor.capture());
         final List<Document> newEntities = newEntitiesCaptor.getAllValues();
         assertThat(newEntities).hasSize(count);
 
-        JSONAssert.assertEquals(expectedCollection, toJSON(newEntities), true);
+        uncheckedJSONAssertEquals(expectedCollection, newEntities);
+    }
+
+    private void uncheckedJSONAssertEquals(String expectedCollection, List<Document> actualEntities) {
+        try {
+            JSONAssert.assertEquals(expectedCollection, toJSON(actualEntities), true);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error occurred while parsing entities generated from test. ", e);
+        } catch (JSONException e) {
+            throw new RuntimeException("Error occurred while parsing test fixtures.", e);
+        }
     }
 
     private MigrationCompleted captureMigrationCompleted() {
