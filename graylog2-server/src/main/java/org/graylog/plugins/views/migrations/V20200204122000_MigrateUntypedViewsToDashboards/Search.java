@@ -18,9 +18,9 @@ package org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViews
 
 import org.bson.Document;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +33,7 @@ class Search {
 
     Search(Document searchDocument) {
         this.searchDocument = searchDocument;
-        @SuppressWarnings("rawtypes") final List rawQueriesList = searchDocument.get(FIELD_QUERIES, List.class);
+        @SuppressWarnings("unchecked") final Collection<Document> rawQueriesList = searchDocument.get(FIELD_QUERIES, Collection.class);
         if (rawQueriesList == null) {
             this.queries = Collections.emptySet();
         } else {

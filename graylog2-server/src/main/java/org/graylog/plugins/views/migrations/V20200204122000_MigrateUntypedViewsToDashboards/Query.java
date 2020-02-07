@@ -20,16 +20,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Traverser;
 import org.bson.Document;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.stream.Collectors.toSet;
 
 class Query {
@@ -56,11 +55,11 @@ class Query {
     }
 
     private Set<SearchType> searchTypesForIds(Set<String> searchTypeIds) {
-        @SuppressWarnings("rawtypes") final List rawSearchTypes = queryDocument.get(FIELD_SEARCH_TYPES, List.class);
+        @SuppressWarnings("unchecked") final Collection<Document> rawSearchTypes = queryDocument.get(FIELD_SEARCH_TYPES, Collection.class);
         if (rawSearchTypes == null) {
             return Collections.emptySet();
         }
-        @SuppressWarnings("unchecked") final Set<Document> searchTypes = new HashSet<>((List<Document>)rawSearchTypes);
+        final Set<Document> searchTypes = new HashSet<>(rawSearchTypes);
 
         return searchTypes.stream()
                 .filter(searchType -> {
@@ -91,8 +90,8 @@ class Query {
     }
 
     private Set<Document> subFiltersOfFilter(Document filter) {
-        final Set<Document> subfilters = filter.get(FIELD_SUB_FILTERS, Set.class);
-        return firstNonNull(subfilters, Collections.emptySet());
+        @SuppressWarnings("unchecked") final Collection<Document> subfilters = filter.get(FIELD_SUB_FILTERS, Collection.class);
+        return subfilters == null ? Collections.emptySet() : new HashSet<>(subfilters);
     }
 
     private boolean isStreamFilter(Document filter) {

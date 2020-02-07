@@ -19,7 +19,9 @@ package org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViews
 import org.bson.Document;
 import org.elasticsearch.common.util.set.Sets;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -86,8 +88,8 @@ class Widget {
     Optional<Document> timerange() { return Optional.ofNullable(widgetDocument.get(FIELD_TIMERANGE, Document.class)); }
 
     Set<String> streams() {
-        @SuppressWarnings("unchecked") final Set<String> streams = widgetDocument.get(FIELD_STREAMS, Set.class);
-        return streams == null ? Collections.emptySet() : streams;
+        @SuppressWarnings("unchecked") final Collection<String> streams = widgetDocument.get(FIELD_STREAMS, Collection.class);
+        return streams == null ? Collections.emptySet() : new HashSet<>(streams);
     }
 
     private String concatenateQueries(String query1, String query2) {
