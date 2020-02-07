@@ -24,6 +24,7 @@ import ExtendedSearchPage from './ExtendedSearchPage';
 
 jest.mock('react-router', () => ({ withRouter: x => x }));
 jest.mock('components/layout/Footer', () => <div />);
+jest.mock('util/History', () => ({ push: jest.fn() }));
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
     ['listen', () => jest.fn()],
