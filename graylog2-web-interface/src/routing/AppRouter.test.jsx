@@ -27,8 +27,6 @@ jest.mock('injection/CombinedProvider', () => {
 // To prevent exceptions from getting swallwoed
 jest.mock('./AppErrorBoundary', () => mockComponent('AppErrorBoundary'));
 
-jest.mock('components/search/SearchBar', () => mockComponent('SearchBar'));
-
 describe('AppRouter', () => {
   it('routes to Getting Started Page for `/` or empty location', () => {
     const wrapper = mount(<AppRouter />);

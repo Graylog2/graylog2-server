@@ -73,7 +73,6 @@ jest.mock('views/stores/RefreshStore', () => ({
     disable: jest.fn(),
   },
 }));
-jest.mock('legacy/result-histogram', () => 'Histogram');
 jest.mock('views/components/messagelist');
 
 describe('MessageList', () => {

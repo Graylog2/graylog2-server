@@ -11,7 +11,6 @@ const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotific
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
-const DashboardsPage = loadAsync(() => import('./DashboardsPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
@@ -53,7 +52,6 @@ const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
 const ShowAlertPage = loadAsync(() => import('./ShowAlertPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
-const ShowDashboardPage = loadAsync(() => import('./ShowDashboardPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
 const ShowMetricsPage = loadAsync(() => import('./ShowMetricsPage'));
 const ShowNodePage = loadAsync(() => import('./ShowNodePage'));
@@ -70,7 +68,6 @@ const StartPage = loadAsync(() => import('./StartPage'));
 const StreamAlertsOverviewPage = loadAsync(() => import('pages/StreamAlertsOverviewPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
 const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
-const StreamSearchPage = loadAsync(() => import('./StreamSearchPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
 const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
@@ -90,7 +87,6 @@ export {
   CreateContentPackPage,
   CreateExtractorsPage,
   CreateUsersPage,
-  DashboardsPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
@@ -133,7 +129,6 @@ export {
   RulesPage,
   ShowAlertPage,
   ShowContentPackPage,
-  ShowDashboardPage,
   ShowMessagePage,
   ShowMetricsPage,
   ShowNodePage,
@@ -150,7 +145,6 @@ export {
   StreamAlertsOverviewPage,
   StreamEditPage,
   StreamOutputsPage,
-  StreamSearchPage,
   StreamsPage,
   SystemOutputsPage,
   SystemOverviewPage,
