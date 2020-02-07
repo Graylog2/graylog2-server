@@ -55,7 +55,7 @@ class Query {
         return this.queryDocument.getString(FIELD_ID);
     }
 
-    private Set<SearchType> searchTypesByIds(Set<String> searchTypeIds) {
+    private Set<SearchType> searchTypesForIds(Set<String> searchTypeIds) {
         @SuppressWarnings("rawtypes") final List rawSearchTypes = queryDocument.get(FIELD_SEARCH_TYPES, List.class);
         if (rawSearchTypes == null) {
             return Collections.emptySet();
@@ -130,6 +130,6 @@ class Query {
     }
 
     void mergeWidgetSettingsIntoSearchTypes(Widget widget, Set<String> searchTypeIds) {
-        searchTypesByIds(searchTypeIds).forEach(searchType -> searchType.syncWithWidget(widget));
+        searchTypesForIds(searchTypeIds).forEach(searchType -> searchType.syncWithWidget(widget));
     }
 }
