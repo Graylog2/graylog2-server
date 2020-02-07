@@ -26,7 +26,7 @@ const extractTimerangeParams = (timerange) => {
   }
 };
 
-export const syncWithQueryParameters = (query: string) => {
+export const syncWithQueryParameters = (query: string, action: (string) => mixed = history.push) => {
   const { view } = ViewStore.getInitialState() || {};
   if (view && view.type === View.Type.Search) {
     const { queries } = view.search;
@@ -45,14 +45,14 @@ export const syncWithQueryParameters = (query: string) => {
         .reduce((prev, [key, value]) => prev.setSearch(key, value), baseUri)
         .toString();
       if (query !== uri) {
-        history.push(uri);
+        action(uri);
       }
     }
   }
 };
 
 export const useSyncWithQueryParameters = (query: string) => {
-  useEffect(() => syncWithQueryParameters(query), []);
+  useEffect(() => syncWithQueryParameters(query, history.replace), []);
   useActionListeners(
     [QueriesActions.query.completed, QueriesActions.timerange.completed],
     () => syncWithQueryParameters(query),
