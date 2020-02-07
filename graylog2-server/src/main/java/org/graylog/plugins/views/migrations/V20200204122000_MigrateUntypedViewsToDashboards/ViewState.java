@@ -18,6 +18,7 @@ package org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViews
 
 import org.bson.Document;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,7 @@ class ViewState {
 
     List<Widget> widgets() {
         if (viewStateDocument.get("widgets") instanceof List) {
-            @SuppressWarnings("unchecked") final List<Document> widgetList = viewStateDocument.get("widgets", List.class);
+            @SuppressWarnings("unchecked") final Collection<Document> widgetList = viewStateDocument.get("widgets", Collection.class);
             return widgetList.stream()
                     .map(Widget::new)
                     .collect(Collectors.toList());
@@ -47,11 +48,10 @@ class ViewState {
         if (widgetMapping == null) {
             return Collections.emptySet();
         }
-        @SuppressWarnings("rawtypes") final List rawWidgetsList = widgetMapping.get(widgetId, List.class);
+        @SuppressWarnings("unchecked") final Collection<String> rawWidgetsList = widgetMapping.get(widgetId, Collection.class);
         if (rawWidgetsList == null) {
             return Collections.emptySet();
         }
-        @SuppressWarnings("unchecked") final Set<String> result = new HashSet<>((List<String>)rawWidgetsList);
-        return result;
+        return new HashSet<>(rawWidgetsList);
     }
 }
