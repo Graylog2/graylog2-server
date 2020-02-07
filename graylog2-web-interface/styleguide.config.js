@@ -9,7 +9,6 @@ module.exports = {
     'opensans-npm-webfont',
     'stylesheets/bootstrap-submenus.less',
     'toastr/toastr.less',
-    'rickshaw/rickshaw.css',
     'stylesheets/typeahead.less',
     'injection/builtins.js',
   ],
