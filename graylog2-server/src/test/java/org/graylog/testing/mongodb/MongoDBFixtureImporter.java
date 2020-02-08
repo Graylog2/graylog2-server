@@ -105,7 +105,11 @@ class MongoDBFixtureImporter {
         if (Paths.get(resourceName).isAbsolute()) {
             return Resources.getResource(resourceName);
         } else {
-            return Resources.getResource(contextClass, resourceName);
+            try {
+                return Resources.getResource(contextClass, resourceName);
+            } catch (IllegalArgumentException e) {
+                return Resources.getResource(resourceName);
+            }
         }
     }
 
