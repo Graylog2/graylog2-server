@@ -56,7 +56,7 @@ public class SidecarCollectorConfigurationFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_configurations.json")
+    @MongoDBFixtures("SidecarCollectorConfigurationFacadeTest.json")
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b17e1a53f3ab8204eea1051", ModelTypes.SIDECAR_COLLECTOR_CONFIGURATION_V1);
         final EntityDescriptor collectorDescriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);

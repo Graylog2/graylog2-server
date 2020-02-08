@@ -101,7 +101,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_data_adapters.json")
+    @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void exportEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
@@ -144,7 +144,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_data_adapters.json")
+    @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
@@ -166,7 +166,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_data_adapters.json")
+    @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void findExistingWithNoExistingEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
@@ -183,7 +183,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_data_adapters.json")
+    @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void delete() {
         final Optional<DataAdapterDto> dataAdapterDto = dataAdapterService.get("5adf24a04b900a0fdb4e52c8");
 
@@ -195,7 +195,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_data_adapters.json")
+    @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
@@ -203,7 +203,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_data_adapters.json")
+    @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("5adf24a04b900a0fdb4e52c8"))
@@ -237,7 +237,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_data_adapters.json")
+    @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
                 .id(ModelId.of("5adf24a04b900a0fdb4e52c8"))
@@ -250,7 +250,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_data_adapters.json")
+    @MongoDBFixtures("LookupDataAdapterFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);

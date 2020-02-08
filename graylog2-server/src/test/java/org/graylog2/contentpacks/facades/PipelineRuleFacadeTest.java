@@ -98,7 +98,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
+    @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
@@ -115,7 +115,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
+    @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void delete() throws NotFoundException {
         final RuleDao ruleDao = ruleService.loadByName("debug");
         assertThat(ruleService.loadAll()).hasSize(2);
@@ -127,7 +127,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
+    @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("debug"))
@@ -147,7 +147,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
+    @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void findExistingWithDifferentSource() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("debug"))
@@ -163,7 +163,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
+    @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("debug"))
@@ -178,7 +178,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
+    @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
@@ -201,7 +201,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
+    @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("5adf25034b900a0fdb4e5338"))
@@ -219,7 +219,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_rules.json")
+    @MongoDBFixtures("PipelineRuleFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);

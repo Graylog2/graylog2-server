@@ -174,7 +174,7 @@ public class StreamCatalogTest {
 
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/streams.json")
+    @MongoDBFixtures("StreamCatalogTest.json")
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("000000000000000000000001"))
@@ -192,7 +192,7 @@ public class StreamCatalogTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/streams.json")
+    @MongoDBFixtures("StreamCatalogTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
         final EntityDescriptor outputDescriptor = EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1);

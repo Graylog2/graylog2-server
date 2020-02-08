@@ -61,7 +61,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
+    @MongoDBFixtures("SidecarCollectorFacadeTest.json")
     public void exportNativeEntity() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
         final EntityDescriptor descriptor = EntityDescriptor.create(collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1);
@@ -85,7 +85,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
+    @MongoDBFixtures("SidecarCollectorFacadeTest.json")
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
@@ -137,7 +137,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
+    @MongoDBFixtures("SidecarCollectorFacadeTest.json")
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
@@ -164,7 +164,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
+    @MongoDBFixtures("SidecarCollectorFacadeTest.json")
     public void delete() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
 
@@ -174,7 +174,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
+    @MongoDBFixtures("SidecarCollectorFacadeTest.json")
     public void createExcerpt() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
         final EntityExcerpt excerpt = facade.createExcerpt(collector);
@@ -185,7 +185,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
+    @MongoDBFixtures("SidecarCollectorFacadeTest.json")
     public void listEntityExcerpts() {
         final Set<EntityExcerpt> entityExcerpts = facade.listEntityExcerpts();
         assertThat(entityExcerpts).containsOnly(
@@ -208,7 +208,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
+    @MongoDBFixtures("SidecarCollectorFacadeTest.json")
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
@@ -216,7 +216,7 @@ public class SidecarCollectorFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/sidecar_collectors.json")
+    @MongoDBFixtures("SidecarCollectorFacadeTest.json")
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))

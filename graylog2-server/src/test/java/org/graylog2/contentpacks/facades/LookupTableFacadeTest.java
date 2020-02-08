@@ -121,7 +121,7 @@ public class LookupTableFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_tables.json")
+    @MongoDBFixtures("LookupTableFacadeTest.json")
     public void exportNativeEntity() {
         final EntityDescriptor tableDescriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE_V1);
         final EntityDescriptor adapterDescriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
@@ -204,7 +204,7 @@ public class LookupTableFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_tables.json")
+    @MongoDBFixtures("LookupTableFacadeTest.json")
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
@@ -236,7 +236,7 @@ public class LookupTableFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures({"org/graylog2/contentpacks/lut_caches.json", "org/graylog2/contentpacks/lut_data_adapters.json","org/graylog2/contentpacks/lut_tables.json"})
+    @MongoDBFixtures({"LookupCacheFacadeTest.json", "LookupDataAdapterFacadeTest.json", "LookupTableFacadeTest.json"})
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("5adf24dd4b900a0fdb4e530d"))
@@ -283,7 +283,7 @@ public class LookupTableFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures({"org/graylog2/contentpacks/lut_caches.json", "org/graylog2/contentpacks/lut_data_adapters.json","org/graylog2/contentpacks/lut_tables.json"})
+    @MongoDBFixtures({"LookupCacheFacadeTest.json", "LookupDataAdapterFacadeTest.json", "LookupTableFacadeTest.json"})
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE_V1);
 
@@ -297,7 +297,7 @@ public class LookupTableFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_tables.json")
+    @MongoDBFixtures("LookupTableFacadeTest.json")
     public void findExistingWithNoExistingEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
@@ -319,7 +319,7 @@ public class LookupTableFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_tables.json")
+    @MongoDBFixtures("LookupTableFacadeTest.json")
     public void delete() {
         final Optional<LookupTableDto> lookupTableDto = lookupTableService.get("5adf24dd4b900a0fdb4e530d");
 
@@ -352,7 +352,7 @@ public class LookupTableFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_tables.json")
+    @MongoDBFixtures("LookupTableFacadeTest.json")
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
                 .id(ModelId.of("5adf24dd4b900a0fdb4e530d"))
@@ -365,7 +365,7 @@ public class LookupTableFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/lut_tables.json")
+    @MongoDBFixtures("LookupTableFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor tableDescriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE_V1);
         final EntityDescriptor adapterDescriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);

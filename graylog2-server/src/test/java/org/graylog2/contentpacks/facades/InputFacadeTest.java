@@ -71,7 +71,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -190,7 +189,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void exportEntity() {
         final ModelId id = ModelId.of("5acc84f84b900a4ff290d9a7");
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.INPUT_V1);
@@ -260,7 +259,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("5adf25294b900a0fdb4e5365"))
@@ -291,7 +290,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
@@ -313,7 +312,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void findExisting() {
         final Map<String, Object> configuration = new HashMap<>();
         configuration.put("override_source", null);
@@ -337,7 +336,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5acc84f84b900a4ff290d9a7", ModelTypes.INPUT_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
@@ -345,7 +344,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveEntity() {
         final Map<String, Object> configuration = new HashMap<>();
         configuration.put("override_source", null);
@@ -370,7 +369,7 @@ public class InputFacadeTest {
 
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void delete() throws NotFoundException {
         final Input input = inputService.find("5acc84f84b900a4ff290d9a7");
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
@@ -384,7 +383,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveNativeEntityGrokPattern() throws NotFoundException {
         final Input input = inputService.find("5ae2ebbeef27464477f0fd8b");
         EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
@@ -394,7 +393,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveNativeEntityLookupTable() throws NotFoundException {
         when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
@@ -419,7 +418,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveForInstallationLookupTable() throws NotFoundException {
         when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
@@ -507,7 +506,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/inputs.json")
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveForInstallationGrokPattern() throws NotFoundException {
         final Input input = inputService.find("5ae2ebbeef27464477f0fd8b");
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));

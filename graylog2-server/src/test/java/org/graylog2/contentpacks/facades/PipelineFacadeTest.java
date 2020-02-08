@@ -137,7 +137,7 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_pipelines.json")
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
@@ -157,7 +157,7 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_pipelines_default_stream.json")
+    @MongoDBFixtures("PipelineFacadeTest/pipelines_default_stream.json")
     public void exportNativeEntityWithDefaultStream() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor defaultStreamDescriptor = EntityDescriptor.create(Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM_V1);
@@ -234,7 +234,7 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_pipelines.json")
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void delete() throws NotFoundException {
         final PipelineDao pipelineDao = pipelineService.load("5a85c4854b900afd5d662be3");
 
@@ -247,7 +247,7 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_pipelines.json")
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
@@ -264,7 +264,7 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_pipelines.json")
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void resolveEntityDescriptor() {
         final Stage stage = Stage.builder()
                 .stage(0)
@@ -309,7 +309,7 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_pipelines.json")
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
                 .id(ModelId.of("5a85c4854b900afd5d662be3"))
@@ -322,7 +322,7 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_pipelines.json")
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
@@ -343,7 +343,7 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @MongoDBFixtures("org/graylog2/contentpacks/pipeline_processor_pipelines.json")
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void resolve() {
         final Stage stage = Stage.builder()
                 .stage(0)
