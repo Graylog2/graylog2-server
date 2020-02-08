@@ -18,6 +18,7 @@ package org.graylog.plugins.views.migrations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -111,8 +112,8 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         verify(clusterConfigService, never()).write(any());
         verify(this.viewsCollection, never()).find(any(Bson.class));
         verify(this.searchesCollection, never()).find(any(Bson.class));
-        verify(this.viewsCollection, never()).updateOne(any(), any());
-        verify(this.searchesCollection, never()).updateOne(any(), any());
+        verify(this.viewsCollection, never()).updateOne(any(BasicDBObject.class), any(Document.class));
+        verify(this.searchesCollection, never()).updateOne(any(BasicDBObject.class), any(Document.class));
     }
 
     @Test
@@ -157,8 +158,8 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         assertThat(migrationCompleted.viewIds()).isEmpty();
 
         verify(this.viewsCollection, times(1)).find(any(Bson.class));
-        verify(this.viewsCollection, never()).updateOne(any(), any());
-        verify(this.searchesCollection, never()).updateOne(any(), any());
+        verify(this.viewsCollection, never()).updateOne(any(BasicDBObject.class), any(Document.class));
+        verify(this.searchesCollection, never()).updateOne(any(BasicDBObject.class), any(Document.class));
     }
 
     @Test
