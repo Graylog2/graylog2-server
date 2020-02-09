@@ -122,6 +122,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-legacy</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.mongojack</groupId>
             <artifactId>mongojack</artifactId>
         </dependency>
