@@ -6,6 +6,7 @@ import { Pagination as DeprecatedPagination } from '@react-bootstrap/pagination'
 import { css } from 'styled-components';
 import { darken } from 'polished';
 
+import { DEPRECATION_NOTICE } from 'util/constants';
 import teinte from 'theme/teinte';
 
 export const paginationStyles = css(({ theme }) => css`
@@ -65,7 +66,7 @@ const Pagination = ({
   if (activePage || maxButtons || prev || next || first || last) {
     useEffect(() => {
       /* eslint-disable-next-line no-console */
-      console.warn('Graylog Notice: ', 'You have used a deprecated `Pagination` prop, please check the documentation to use the latest `Pagination`.');
+      console.warn(DEPRECATION_NOTICE, 'You have used a deprecated `Pagination` prop, please check the documentation to use the latest `Pagination`.');
     }, []);
 
     return (
