@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 import { Panel as BootstrapPanel } from 'react-bootstrap';
 import { adjustHue, darken } from 'polished';
 
+import { DEPRECATION_NOTICE } from 'util/constants';
 import { teinte, util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
@@ -154,7 +155,7 @@ const Panel = ({
     /** NOTE: Deprecated & should be removed in 4.0 */
     useEffect(() => {
       /* eslint-disable-next-line no-console */
-      console.warn('Graylog Notice: ', 'You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
+      console.warn(DEPRECATION_NOTICE, 'You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
     }, []);
 
     return (

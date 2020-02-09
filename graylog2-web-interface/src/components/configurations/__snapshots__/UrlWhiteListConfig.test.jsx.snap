@@ -402,9 +402,8 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
                 autoFocus={true}
                 backdrop="static"
                 backdropClassName="modal-backdrop"
-                backdropTransitionTimeout={150}
+                backdropTransition={[Function]}
                 containerClassName="modal-open"
-                dialogTransitionTimeout={300}
                 enforceFocus={true}
                 keyboard={true}
                 manager={
@@ -422,6 +421,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
                 onEntering={[Function]}
                 onExited={[Function]}
                 onHide={[Function]}
+                onMouseUp={[Function]}
                 renderBackdrop={[Function]}
                 restoreFocus={true}
                 show={false}

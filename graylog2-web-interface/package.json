@@ -29,7 +29,7 @@
     ],
     "setupFiles": [
       "jest-localstorage-mock",
-      "<rootDir>/test/setup-jest.jsx",
+      "<rootDir>/test/setup-jest.js",
       "<rootDir>/test/mock-FetchProvider.js",
       "<rootDir>/test/mock-Version.js"
     ],

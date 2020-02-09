@@ -33,7 +33,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           true,
         ],
       ],
-      "results": undefined,
+      "results": Array [
+        Object {
+          "type": "return",
+          "value": undefined,
+        },
+      ],
     }
   }
   urls={
