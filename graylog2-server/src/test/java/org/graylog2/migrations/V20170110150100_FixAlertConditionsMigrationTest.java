@@ -162,7 +162,7 @@ public class V20170110150100_FixAlertConditionsMigrationTest {
 
         migration.upgrade();
 
-        verify(collection, never()).updateOne(any(), (Bson) any());
+        verify(collection, never()).updateOne(any(), any(Bson.class));
         verify(clusterConfigService, never()).write(any(MigrationCompleted.class));
     }
 
