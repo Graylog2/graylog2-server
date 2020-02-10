@@ -27,7 +27,6 @@ import org.graylog.plugins.views.migrations.V20190805115800_RemoveDashboardState
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.V20191125144500_MigrateDashboardsToViews;
 import org.graylog.plugins.views.migrations.V20191204000000_RemoveLegacyViewsPermissions;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.V20191203120602_MigrateSavedSearchesToViews;
-import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.V20200204122000_MigrateUntypedViewsToDashboards;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.views.search.ValueParameter;
@@ -146,7 +145,6 @@ public class ViewsBindings extends ViewsModule {
         addMigration(V20191125144500_MigrateDashboardsToViews.class);
         addMigration(V20191203120602_MigrateSavedSearchesToViews.class);
         addMigration(V20190127111728_MigrateWidgetFormatSettings.class);
-        addMigration(V20200204122000_MigrateUntypedViewsToDashboards.class);
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 
