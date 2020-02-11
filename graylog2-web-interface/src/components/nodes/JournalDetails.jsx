@@ -130,8 +130,10 @@ const JournalDetails = createReactClass({
         <Col md={6} className="journal-details-usage">
           <h3>Utilization</h3>
 
-          <ProgressBar now={metrics.utilizationRatio * 100}
-                       label={NumberUtils.formatPercentage(metrics.utilizationRatio)} />
+          <ProgressBar bars={[{
+            value: metrics.utilizationRatio * 100,
+            label: NumberUtils.formatPercentage(metrics.utilizationRatio),
+          }]} />
 
           {overcommittedWarning}
 

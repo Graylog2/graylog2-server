@@ -2,15 +2,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { ProgressBar } from 'components/graylog';
 
+import { ProgressBar } from 'components/graylog';
 import { Spinner } from 'components/common';
 
 import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
@@ -41,55 +40,61 @@ const JvmHeapUsage = createReactClass({
 
   _extractMetricValues() {
     const { nodeId } = this.props;
-    const nodeMetrics = this.state.metrics[nodeId];
-    const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
+    const { metrics } = this.state;
 
-    metrics.usedPercentage = metrics.maxMemory === 0 ? 0 : (metrics.usedMemory / metrics.maxMemory) * 100;
-    metrics.committedPercentage = metrics.maxMemory === 0 ? 0 : (metrics.committedMemory / metrics.maxMemory) * 100;
+    if (metrics && metrics[nodeId]) {
+      const extractedMetric = MetricsExtractor.getValuesForNode(metrics[nodeId], this.metricNames);
 
-    return metrics;
+      if (extractedMetric.maxMemory) {
+        extractedMetric.usedPercentage = extractedMetric.maxMemory === 0 ? 0 : (extractedMetric.usedMemory / extractedMetric.maxMemory) * 100;
+        extractedMetric.committedPercentage = extractedMetric.maxMemory === 0 ? 0 : (extractedMetric.committedMemory / extractedMetric.maxMemory) * 100;
+
+        return extractedMetric;
+      }
+
+      return {
+        usedPercentage: 0,
+        committedPercentage: 0,
+      };
+    }
+
+    return {};
   },
 
   render() {
-    let progressBar;
-    let detail;
+    let progressBars = [{ value: 0 }];
+    let detail = <p><Spinner text="Loading heap usage information..." /></p>;
+    const { nodeId } = this.props;
+    const extractedMetrics = this._extractMetricValues();
 
-    if (this.state.metrics) {
-      const metrics = this._extractMetricValues();
-
-      if (Object.keys(metrics).length === 0) {
-        progressBar = <div className="progress" />;
+    if (extractedMetrics.usedPercentage || extractedMetrics.committedPercentage) {
+      if (Object.keys(extractedMetrics).length === 0) {
         detail = <p>Heap information unavailable.</p>;
       } else {
-        progressBar = (
-          <ProgressBar>
-            <ProgressBar className="used-memory" now={metrics.usedPercentage} />
-            <ProgressBar className="committed-memory" now={metrics.committedPercentage - metrics.usedPercentage} />
-          </ProgressBar>
-        );
+        progressBars = [
+          { value: extractedMetrics.usedPercentage, bsStyle: 'primary' },
+          { value: extractedMetrics.committedPercentage - extractedMetrics.usedPercentage, bsStyle: 'warning' },
+        ];
 
         detail = (
           <p>
             The JVM is using{' '}
             <span className="blob used-memory" />
-            <strong> {NumberUtils.formatBytes(metrics.usedMemory)}</strong>
+            <strong> {NumberUtils.formatBytes(extractedMetrics.usedMemory)}</strong>
             {' '}of{' '}
             <span className="blob committed-memory" />
-            <strong> {NumberUtils.formatBytes(metrics.committedMemory)}</strong>
+            <strong> {NumberUtils.formatBytes(extractedMetrics.committedMemory)}</strong>
             {' '}heap space and will not attempt to use more than{' '}
             <span className="blob max-memory" style={{ border: '1px solid #ccc' }} />
-            <strong> {NumberUtils.formatBytes(metrics.maxMemory)}</strong>
+            <strong> {NumberUtils.formatBytes(extractedMetrics.maxMemory)}</strong>
           </p>
         );
       }
-    } else {
-      progressBar = <ProgressBar />;
-      detail = <p><Spinner text="Loading heap usage information..." /></p>;
     }
 
     return (
-      <div className="graylog-node-heap" data-node-id={this.props.nodeId}>
-        {progressBar}
+      <div className="graylog-node-heap" data-node-id={nodeId}>
+        <ProgressBar bars={progressBars} />
 
         {detail}
       </div>

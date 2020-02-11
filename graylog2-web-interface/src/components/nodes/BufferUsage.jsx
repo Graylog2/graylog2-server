@@ -64,6 +64,8 @@ const BufferUsage = createReactClass({
     const usagePercentage = ((!isNaN(usage) && !isNaN(size)) ? usage / size : 0);
     const percentLabel = NumberUtils.formatPercentage(usagePercentage);
 
+    console.log('usagePercentage * 100', usagePercentage * 100);
+
     return (
       <div>
         <LinkContainer to={Routes.filtered_metrics(nodeId, this._metricFilter())}>
@@ -71,9 +73,11 @@ const BufferUsage = createReactClass({
         </LinkContainer>
         <h3>{title}</h3>
         <div className="node-buffer-usage">
-          <ProgressBar now={usagePercentage * 100}
-                       bsStyle="warning"
-                       label={percentLabel} />
+          <ProgressBar bars={[{
+            value: usagePercentage * 100,
+            bsStyle: 'warning',
+            label: percentLabel,
+          }]} />
         </div>
         <span><strong>{usage} messages</strong> in {title.toLowerCase()}, {percentLabel} utilized.</span>
       </div>
