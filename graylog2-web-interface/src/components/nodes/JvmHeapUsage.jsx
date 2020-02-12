@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
@@ -65,17 +66,21 @@ const JvmHeapUsage = createReactClass({
   mixins: [Reflux.connect(MetricsStore)],
 
   componentWillMount() {
+    const { nodeId } = this.props;
+
     this.metricNames = {
       usedMemory: 'jvm.memory.heap.used',
       committedMemory: 'jvm.memory.heap.committed',
       maxMemory: 'jvm.memory.heap.max',
     };
 
-    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
   },
 
   componentWillUnmount() {
-    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+    const { nodeId } = this.props;
+
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
   },
 
   _extractMetricValues() {

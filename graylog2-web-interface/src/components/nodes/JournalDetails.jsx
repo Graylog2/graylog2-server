@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
@@ -50,20 +51,27 @@ const JournalDetails = createReactClass({
   },
 
   componentDidMount() {
-    JournalStore.get(this.props.nodeId).then((journalInformation) => {
+    const { nodeId } = this.props;
+
+    JournalStore.get(nodeId).then((journalInformation) => {
       this.setState({ journalInformation: journalInformation }, this._listenToMetrics);
     });
   },
 
   componentWillUnmount() {
+    const { nodeId } = this.props;
+
     if (this.metricNames) {
-      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
     }
   },
 
   _listenToMetrics() {
+    const { nodeId } = this.props;
+    const { journalInformation } = this.state;
+
     // only listen for updates if the journal is actually turned on
-    if (this.state.journalInformation.enabled) {
+    if (journalInformation.enabled) {
       this.metricNames = {
         append: 'org.graylog2.journal.append.1-sec-rate',
         read: 'org.graylog2.journal.read.1-sec-rate',
@@ -72,12 +80,14 @@ const JournalDetails = createReactClass({
         utilizationRatio: 'org.graylog2.journal.utilization-ratio',
         oldestSegment: 'org.graylog2.journal.oldest-segment',
       };
-      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
+      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
     }
   },
 
   _isLoading() {
-    return !(this.state.metrics && this.state.journalInformation);
+    const { journalInformation, metrics } = this.state;
+
+    return !(metrics && journalInformation);
   },
 
   render() {
@@ -86,7 +96,8 @@ const JournalDetails = createReactClass({
     }
 
     const { nodeId } = this.props;
-    const nodeMetrics = this.state.metrics[nodeId];
+    const { metrics: metricsState } = this.state;
+    const nodeMetrics = metricsState[nodeId];
     const { journalInformation } = this.state;
 
     if (!journalInformation.enabled) {
