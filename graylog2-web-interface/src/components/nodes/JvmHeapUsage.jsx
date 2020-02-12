@@ -102,31 +102,32 @@ const JvmHeapUsage = createReactClass({
   },
 
   render() {
-    let progressBars = [{ value: 0 }];
-    let detail = <p><Spinner text="Loading heap usage information..." /></p>;
     const { nodeId } = this.props;
     const extractedMetrics = this._extractMetricValues();
+    const { usedPercentage, committedPercentage, usedMemory, committedMemory, maxMemory } = extractedMetrics;
+    let progressBarConfig = [{ value: 0 }];
+    let detail = <p><Spinner text="Loading heap usage information..." /></p>;
 
-    if (extractedMetrics.usedPercentage || extractedMetrics.committedPercentage) {
+    if (usedPercentage || committedPercentage) {
       if (Object.keys(extractedMetrics).length === 0) {
         detail = <p>Heap information unavailable.</p>;
       } else {
-        progressBars = [
-          { value: extractedMetrics.usedPercentage, bsStyle: 'primary' },
-          { value: extractedMetrics.committedPercentage - extractedMetrics.usedPercentage, bsStyle: 'warning' },
+        progressBarConfig = [
+          { value: usedPercentage, bsStyle: 'primary' },
+          { value: committedPercentage - usedPercentage, bsStyle: 'warning' },
         ];
 
         detail = (
           <p>
             The JVM is using{' '}
             <Blob className="used-memory" />
-            <strong> {NumberUtils.formatBytes(extractedMetrics.usedMemory)}</strong>
+            <strong> {NumberUtils.formatBytes(usedMemory)}</strong>
             {' '}of{' '}
             <Blob className="committed-memory" />
-            <strong> {NumberUtils.formatBytes(extractedMetrics.committedMemory)}</strong>
+            <strong> {NumberUtils.formatBytes(committedMemory)}</strong>
             {' '}heap space and will not attempt to use more than{' '}
             <Blob className="max-memory" />
-            <strong> {NumberUtils.formatBytes(extractedMetrics.maxMemory)}</strong>
+            <strong> {NumberUtils.formatBytes(maxMemory)}</strong>
           </p>
         );
       }
@@ -134,7 +135,7 @@ const JvmHeapUsage = createReactClass({
 
     return (
       <NodeHeap data-node-id={nodeId}>
-        <StyledProgressBar bars={progressBars} />
+        <StyledProgressBar bars={progressBarConfig} />
 
         {detail}
       </NodeHeap>

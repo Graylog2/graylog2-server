@@ -5,8 +5,7 @@ import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import styled from 'styled-components';
 
-import { Button } from 'components/graylog';
-import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
+import { Button, ProgressBar } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
@@ -23,10 +22,6 @@ const NodeBufferUsage = styled.div`
 
 const StyledProgressBar = styled(ProgressBar)`
   margin-bottom: 5px;
-
-  ${Bar} {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
-  }
 `;
 
 const BufferUsage = createReactClass({

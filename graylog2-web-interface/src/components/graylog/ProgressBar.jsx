@@ -56,6 +56,7 @@ const ProgressWrap = styled.div`
   align-items: center;
 `;
 
+// Stripping away the unnecessary props that render as HTML attributes
 const Bar = styled(({ animated, bsStyle, striped, value, ...rest }) => <div {...rest} />)(props => css`
   height: 100%;
   font-size: 12px;
