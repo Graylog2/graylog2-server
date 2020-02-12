@@ -6,7 +6,7 @@ import Reflux from 'reflux';
 import styled from 'styled-components';
 import { darken } from 'polished';
 
-import { ProgressBar } from 'components/graylog';
+import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
 import { Spinner } from 'components/common';
 
 import NumberUtils from 'util/NumberUtils';
@@ -54,6 +54,10 @@ const Blob = styled.span`
 const StyledProgressBar = styled(ProgressBar)`
   height: 25px;
   margin-bottom: 5px;
+
+  ${Bar} {
+    line-height: 25px;
+  }
 `;
 
 const JvmHeapUsage = createReactClass({
@@ -89,10 +93,11 @@ const JvmHeapUsage = createReactClass({
 
     if (metrics && metrics[nodeId]) {
       const extractedMetric = MetricsExtractor.getValuesForNode(metrics[nodeId], this.metricNames);
+      const { maxMemory, usedMemory, committedMemory } = extractedMetric;
 
-      if (extractedMetric.maxMemory) {
-        extractedMetric.usedPercentage = extractedMetric.maxMemory === 0 ? 0 : (extractedMetric.usedMemory / extractedMetric.maxMemory) * 100;
-        extractedMetric.committedPercentage = extractedMetric.maxMemory === 0 ? 0 : (extractedMetric.committedMemory / extractedMetric.maxMemory) * 100;
+      if (maxMemory) {
+        extractedMetric.usedPercentage = maxMemory === 0 ? 0 : Math.ceil((usedMemory / maxMemory) * 100);
+        extractedMetric.committedPercentage = maxMemory === 0 ? 0 : Math.ceil((committedMemory / maxMemory) * 100);
 
         return extractedMetric;
       }
