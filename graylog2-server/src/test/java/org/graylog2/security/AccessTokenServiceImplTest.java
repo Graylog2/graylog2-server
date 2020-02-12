@@ -16,53 +16,45 @@
  */
 package org.graylog2.security;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
-import org.graylog2.database.MongoConnectionRule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class AccessTokenServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private AccessTokenService accessTokenService;
 
     @Before
     public void setupService () {
-        this.accessTokenService = new AccessTokenServiceImpl(mongoRule.getMongoConnection());
+        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection());
     }
 
     @After
     public void tearDown() {
-        mongoRule.getMongoConnection().getMongoDatabase().drop();
+        mongodb.mongoConnection().getMongoDatabase().drop();
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testLoadNoToken() throws Exception {
         final AccessToken accessToken = accessTokenService.load("foobar");
         assertNull("No token should have been returned", accessToken);
     }
 
     @Test
-    @UsingDataSet(locations = "accessTokensSingleToken.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("accessTokensSingleToken.json")
     public void testLoadSingleToken() throws Exception {
         final AccessToken accessToken = accessTokenService.load("foobar");
         assertNotNull("Matching token should have been returned", accessToken);
@@ -73,7 +65,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "accessTokensMultipleTokens.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("accessTokensMultipleTokens.json")
     public void testLoadAll() throws Exception {
         final List<AccessToken> tokens = accessTokenService.loadAll("admin");
 
@@ -82,7 +74,6 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testCreate() throws Exception {
         final String username = "admin";
         final String tokenname = "web";
@@ -98,7 +89,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "accessTokensSingleToken.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("accessTokensSingleToken.json")
     public void testTouch() throws Exception {
         final AccessToken token = accessTokenService.load("foobar");
         final DateTime initialLastAccess = token.getLastAccess();
@@ -109,7 +100,6 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testSave() throws Exception {
         final String username = "admin";
         final String tokenname = "web";
@@ -133,7 +123,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    @UsingDataSet(locations = "accessTokensMultipleIdenticalTokens.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("accessTokensMultipleIdenticalTokens.json")
     public void testExceptionForMultipleTokens() throws Exception {
         accessTokenService.load("foobar");
     }

@@ -17,13 +17,11 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
@@ -32,7 +30,6 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -41,17 +38,14 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.List;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class StreamServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -74,12 +68,11 @@ public class StreamServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        this.streamService = new StreamServiceImpl(mongoRule.getMongoConnection(), streamRuleService, alertService,
+        this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService, alertService,
             outputService, indexSetService, factory, notificationService, new ClusterEventBus(), alarmCallbackConfigurationService);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void loadAllWithConfiguredAlertConditionsShouldNotFailWhenNoStreamsArePresent() {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
@@ -89,7 +82,7 @@ public class StreamServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "someStreamsWithoutAlertConditions.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
     public void loadAllWithConfiguredAlertConditionsShouldReturnNoStreams() {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
@@ -98,7 +91,7 @@ public class StreamServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = {"someStreamsWithoutAlertConditions.json", "someStreamsWithAlertConditions.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures({"someStreamsWithoutAlertConditions.json", "someStreamsWithAlertConditions.json"})
     public void loadAllWithConfiguredAlertConditionsShouldReturnStreams() {
         final List<Stream> alertableStreams = this.streamService.loadAllWithConfiguredAlertConditions();
 
@@ -108,7 +101,7 @@ public class StreamServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "someStreamsWithAlertConditions.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("someStreamsWithAlertConditions.json")
     public void loadByIds() {
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a537197af2"))).hasSize(1);
         assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a5deadbeef"))).isEmpty();
@@ -116,7 +109,7 @@ public class StreamServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "someStreamsWithoutAlertConditions.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
     public void addOutputs() throws NotFoundException {
         final ObjectId streamId = new ObjectId("5628f4503b0c5756a8eebc4d");
         final ObjectId output1Id = new ObjectId("5628f4503b00deadbeef0001");

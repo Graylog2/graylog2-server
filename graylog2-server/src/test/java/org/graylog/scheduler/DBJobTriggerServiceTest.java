@@ -19,21 +19,18 @@ package org.graylog.scheduler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -46,7 +43,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,13 +54,11 @@ import static org.mockito.Mockito.when;
 public class DBJobTriggerServiceTest {
     private static final String NODE_ID = "node-1";
 
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
     @Mock
     private NodeId nodeId;
@@ -84,11 +78,11 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
         mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbJobTriggerService = new DBJobTriggerService(mongoRule.getMongoConnection(), mapperProvider, nodeId, clock);
+        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock);
     }
 
     @Test
-    @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("job-triggers.json")
     public void loadPersistedTriggers() {
         // Sort by ID to make sure we have a defined order
         final List<JobTriggerDto> all = dbJobTriggerService.all()
@@ -180,7 +174,7 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("job-triggers.json")
     public void getForJob() {
         assertThatCode(() -> dbJobTriggerService.getForJob(null))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -207,7 +201,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void createTrigger() {
         final JobTriggerDto trigger = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
@@ -227,7 +220,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void createTriggerWithID() {
         final JobTriggerDto trigger = JobTriggerDto.Builder.create(clock)
                 .id("5b983c77d06b3f114bf130e2")
@@ -244,7 +236,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void updateTrigger() {
         final JobTriggerDto originalTrigger = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
@@ -304,7 +295,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void nextRunnableTriggerWithPausedCompletedAndErrorStatus() {
         // No triggers yet
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
@@ -363,7 +353,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void nextRunnableTrigger() {
         // No triggers yet
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
@@ -478,11 +467,11 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("job-triggers.json")
     public void nextRunnableTriggerWithEndTime() {
         // Set clock to base date used in the fixture file
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongoRule.getMongoConnection(), mapperProvider, nodeId, clock);
+        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock);
 
         // No triggers yet because 54e3deadbeefdeadbeef0002 is already locked and RUNNING
         assertThat(service.nextRunnableTrigger()).isEmpty();
@@ -507,7 +496,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void releaseTrigger() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
@@ -547,7 +535,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void releaseTriggerWithoutNextTime() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
@@ -584,7 +571,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void releaseTriggerWithStatus() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
@@ -620,7 +606,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void releaseTriggerWithInvalidArguments() {
 
         assertThatCode(() -> dbJobTriggerService.releaseTrigger(null, null))
@@ -637,7 +622,6 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void setTriggerError() {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
@@ -670,7 +654,7 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("job-triggers.json")
     public void delete() {
         assertThat(dbJobTriggerService.delete("54e3deadbeefdeadbeef0000")).isTrue();
         assertThat(dbJobTriggerService.delete("54e3deadbeefdeadbeef9999")).isFalse();
@@ -685,7 +669,7 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("job-triggers.json")
     public void deleteCompleted() {
         assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isEqualTo(1);
         assertThat(dbJobTriggerService.get("54e3deadbeefdeadbeef0003").isPresent()).isFalse();
@@ -694,7 +678,7 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("job-triggers.json")
     public void deleteCompletedTooNew() {
         final JobTriggerDto trigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0003").orElseThrow(AssertionError::new);
         // sets updated_at to recent timestamp
@@ -704,7 +688,7 @@ public class DBJobTriggerServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "stale-job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("stale-job-triggers.json")
     public void forceReleaseOwnedTriggers() {
         final Set<String> triggerIds = dbJobTriggerService.all().stream()
             .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))

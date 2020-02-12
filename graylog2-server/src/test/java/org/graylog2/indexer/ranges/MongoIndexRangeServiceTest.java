@@ -18,14 +18,12 @@ package org.graylog2.indexer.ranges;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.assertj.jodatime.api.Assertions;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -39,7 +37,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -50,17 +47,14 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class MongoIndexRangeServiceTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -77,11 +71,11 @@ public class MongoIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         localEventBus = new EventBus("local-event-bus");
-        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, indexSetRegistry, new NullAuditEventSender(), mock(NodeId.class), localEventBus);
+        indexRangeService = new MongoIndexRangeService(mongodb.mongoConnection(), objectMapperProvider, indices, indexSetRegistry, new NullAuditEventSender(), mock(NodeId.class), localEventBus);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void getReturnsExistingIndexRange() throws Exception {
         IndexRange indexRange = indexRangeService.get("graylog_1");
 
@@ -93,7 +87,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-    @UsingDataSet(locations = "MongoIndexRangeServiceTest-LegacyIndexRanges.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest-LegacyIndexRanges.json")
     public void getIgnoresLegacyIndexRange() throws Exception {
         indexRangeService.get("graylog_0");
     }
@@ -111,7 +105,7 @@ public class MongoIndexRangeServiceTest {
      * </pre>
      */
     @Test
-    @UsingDataSet(locations = "MongoIndexRangeServiceTest-distinct.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest-distinct.json")
     public void findReturnsIndexRangesWithinGivenRange() throws Exception {
         final DateTime begin = new DateTime(2015, 1, 2, 12, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 4, 12, 0, DateTimeZone.UTC);
@@ -125,7 +119,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "MongoIndexRangeServiceTest-LegacyIndexRanges.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest-LegacyIndexRanges.json")
     public void findIgnoresLegacyIndexRanges() throws Exception {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 2, 1, 0, 0, DateTimeZone.UTC);
@@ -137,7 +131,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void findReturnsNothingBeforeBegin() throws Exception {
         final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2016, 1, 2, 0, 0, DateTimeZone.UTC);
@@ -147,19 +141,19 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void findAllReturnsAllIndexRanges() throws Exception {
         assertThat(indexRangeService.findAll()).hasSize(2);
     }
 
     @Test
-    @UsingDataSet(locations = "MongoIndexRangeServiceTest-LegacyIndexRanges.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest-LegacyIndexRanges.json")
     public void findAllReturnsAllIgnoresLegacyIndexRanges() throws Exception {
         assertThat(indexRangeService.findAll()).hasSize(1);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void calculateRangeReturnsIndexRange() throws Exception {
         final String index = "graylog";
         final DateTime min = new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC);
@@ -183,7 +177,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "MongoIndexRangeServiceTest-EmptyCollection.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest-EmptyCollection.json")
     public void testCalculateRangeWithEmptyIndex() throws Exception {
         final String index = "graylog";
         when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.EMPTY);
@@ -203,7 +197,6 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void savePersistsIndexRange() throws Exception {
         final String indexName = "graylog";
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
@@ -222,7 +215,6 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void saveOverwritesExistingIndexRange() throws Exception {
         final String indexName = "graylog";
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
@@ -243,7 +235,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void remove() throws Exception {
         assertThat(indexRangeService.findAll()).hasSize(2);
 
@@ -254,7 +246,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void testHandleIndexDeletion() throws Exception {
         when(indexSetRegistry.isManagedIndex("graylog_1")).thenReturn(true);
 
@@ -266,7 +258,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void testHandleIndexClosing() throws Exception {
         when(indexSetRegistry.isManagedIndex("graylog_1")).thenReturn(true);
 
@@ -278,7 +270,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void testHandleIndexReopening() throws Exception {
         final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2016, 1, 15, 0, 0, DateTimeZone.UTC);
@@ -295,7 +287,7 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("MongoIndexRangeServiceTest.json")
     public void testHandleIndexReopeningWhenNotManaged() throws Exception {
         final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2016, 1, 15, 0, 0, DateTimeZone.UTC);

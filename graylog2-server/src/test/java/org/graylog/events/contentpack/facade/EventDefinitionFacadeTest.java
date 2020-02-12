@@ -22,9 +22,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
@@ -51,6 +48,8 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -62,14 +61,12 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -83,19 +80,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionFacadeTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ObjectMapper objectMapper = new ObjectMapperProvider().get();
-
-    @Rule
-    public  MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
     private EventDefinitionFacade facade;
 
@@ -129,7 +122,7 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        eventDefinitionService = new DBEventDefinitionService(mongoRule.getMongoConnection(), mapperProvider, stateService);
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService);
         eventDefinitionHandler = new EventDefinitionHandler(
             eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
@@ -137,7 +130,7 @@ public class EventDefinitionFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void exportEntity() {
         final ModelId id = ModelId.of("5d4032513d2746703d1467f6");
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.EVENT_DEFINITION_V1);
@@ -232,7 +225,7 @@ public class EventDefinitionFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void loadNativeEntity() {
         final NativeEntityDescriptor nativeEntityDescriptor = NativeEntityDescriptor
                 .create(ModelId.of("content-pack-id"),
@@ -248,7 +241,7 @@ public class EventDefinitionFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void createExcerpt() {
         final Optional<EventDefinitionDto> eventDefinitionDto = eventDefinitionService.get(
                 "5d4032513d2746703d1467f6");
@@ -260,7 +253,7 @@ public class EventDefinitionFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void listExcerpts() {
         final Set<EntityExcerpt> excerpts = facade.listEntityExcerpts();
         final EntityExcerpt excerpt = excerpts.iterator().next();
@@ -270,7 +263,7 @@ public class EventDefinitionFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void delete() {
         long countBefore = eventDefinitionService.streamAll().count();
         assertThat(countBefore).isEqualTo(1);
@@ -285,7 +278,7 @@ public class EventDefinitionFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void resolveNativeEntity() {
         EntityDescriptor eventDescriptor = EntityDescriptor
                 .create("5d4032513d2746703d1467f6", ModelTypes.EVENT_DEFINITION_V1);
@@ -299,7 +292,7 @@ public class EventDefinitionFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void resolveForInstallation() {
         EntityV1 eventEntityV1 = createTestEntity();
 

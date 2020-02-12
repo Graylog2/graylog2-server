@@ -23,9 +23,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
@@ -47,6 +44,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationCon
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -66,7 +65,6 @@ import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -74,7 +72,6 @@ import org.graylog2.streams.StreamImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -85,14 +82,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ViewFacadeTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -136,15 +130,15 @@ public class ViewFacadeTest {
         objectMapper.registerSubtypes(MessageList.class);
         objectMapper.registerSubtypes(Pivot.class);
         objectMapper.registerSubtypes(EventList.class);
-        searchDbService = new TestSearchDBService(mongoRule.getMongoConnection(),
+        searchDbService = new TestSearchDBService(mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper));
-        viewService = new TestViewService(mongoRule.getMongoConnection(),
+        viewService = new TestViewService(mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper), null);
         facade = new SearchFacade(objectMapper, searchDbService, viewService);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldCreateAViewEntity() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
@@ -173,7 +167,7 @@ public class ViewFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldCreateAEntityExcerpt() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
@@ -186,7 +180,7 @@ public class ViewFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldListEntityExcerptsForAllViewsInDB() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
@@ -203,7 +197,7 @@ public class ViewFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldRemoveAViewByDTO() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
@@ -213,7 +207,7 @@ public class ViewFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldCreateADTOFromAnEntity() throws Exception {
         final StreamImpl stream = new StreamImpl(Collections.emptyMap());
         final Entity viewEntity = createViewEntity();
@@ -237,7 +231,7 @@ public class ViewFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldResolveDependencyForInstallation() throws Exception {
         Entity streamEntity = createStreamEntity();
         Entity entity = createViewEntity();
@@ -250,7 +244,7 @@ public class ViewFacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ViewFacadeTest.json")
     public void itShouldResolveDependencyForCreation() {
         final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_V1);
         final EntityDescriptor viewEntityDescriptor = EntityDescriptor.create(viewId, ModelTypes.SEARCH_V1);

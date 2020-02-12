@@ -20,9 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
@@ -45,6 +42,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramC
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardWidgetConverter;
@@ -57,35 +56,29 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamImpl;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DashboardV1FacadeTest {
 
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -131,9 +124,9 @@ public class DashboardV1FacadeTest {
         objectMapper.registerSubtypes(new NamedType(StreamFilter.class, StreamFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(QueryStringFilter.class, QueryStringFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(AutoIntervalDTO.class, AutoIntervalDTO.type));
-        searchDbService = new ViewFacadeTest.TestSearchDBService(mongoRule.getMongoConnection(),
+        searchDbService = new ViewFacadeTest.TestSearchDBService(mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper));
-        viewService = new ViewFacadeTest.TestViewService(mongoRule.getMongoConnection(),
+        viewService = new ViewFacadeTest.TestViewService(mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper), null);
         final DashboardWidgetConverter dashboardWidgetConverter = new DashboardWidgetConverter();
         final EntityConverter entityConverter = new EntityConverter(dashboardWidgetConverter);
@@ -156,7 +149,7 @@ public class DashboardV1FacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DashboardV1FacadeTest.json")
     public void viewDOTShouldHaveGeneralInformation() {
         assertThat(viewDTO).isNotNull();
         assertThat(viewDTO.title()).matches("ContentPack Dashboard");
@@ -165,7 +158,7 @@ public class DashboardV1FacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DashboardV1FacadeTest.json")
     public void viewDTOShouldHaveACorrectViewState() {
         assertThat(viewDTO.type()).isEqualByComparingTo(ViewDTO.Type.DASHBOARD);
         assertThat(viewDTO.state()).isNotNull();
@@ -180,7 +173,7 @@ public class DashboardV1FacadeTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DashboardV1FacadeTest.json")
     public void viewDTOShouldHaveACorrectSearch() throws NotFoundException {
         Optional<Search> optionalSearch = searchDbService.get(viewDTO.searchId());
         Search search = optionalSearch.orElseThrow(NotFoundException::new);

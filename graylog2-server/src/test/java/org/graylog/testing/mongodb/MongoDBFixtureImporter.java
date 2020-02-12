@@ -102,11 +102,13 @@ class MongoDBFixtureImporter {
     }
 
     private static URL toResource(final String resourceName, final Class<?> contextClass) {
-        if (Paths.get(resourceName).isAbsolute()) {
-            return Resources.getResource(resourceName);
-        } else {
-            return Resources.getResource(contextClass, resourceName);
+        if (! Paths.get(resourceName).isAbsolute()) {
+            try {
+                return Resources.getResource(contextClass, resourceName);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
+        return Resources.getResource(resourceName);
     }
 
     private void importResource(URL resource, MongoDatabase database) {
