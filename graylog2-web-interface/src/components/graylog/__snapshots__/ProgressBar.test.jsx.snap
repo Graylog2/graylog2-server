@@ -1,0 +1,122 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ProgressBar /> properly renders with animated 1`] = `
+<div>
+  <div
+    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    role="progressbar"
+  >
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="45"
+      class="ProgressBar__Bar-fsyx32-1 jjqBtG"
+    />
+  </div>
+</div>
+`;
+
+exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
+<div>
+  <div
+    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    role="progressbar"
+  >
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="67"
+      class="ProgressBar__Bar-fsyx32-1 hmulOj"
+    />
+  </div>
+</div>
+`;
+
+exports[`<ProgressBar /> properly renders with label 1`] = `
+<div>
+  <div
+    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    role="progressbar"
+  >
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="23"
+      aria-valuetext="Example ProgressBar"
+      class="ProgressBar__Bar-fsyx32-1 bDRkHI"
+    >
+      Example ProgressBar
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
+<div>
+  <div
+    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    role="progressbar"
+  >
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="35"
+      class="ProgressBar__Bar-fsyx32-1 iqjhqx"
+    />
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="55"
+      class="ProgressBar__Bar-fsyx32-1 fcStCI"
+    />
+  </div>
+</div>
+`;
+
+exports[`<ProgressBar /> properly renders with no props 1`] = `
+<div>
+  <div
+    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    role="progressbar"
+  >
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="0"
+      class="ProgressBar__Bar-fsyx32-1 kUsvMb"
+    />
+  </div>
+</div>
+`;
+
+exports[`<ProgressBar /> properly renders with one bar 1`] = `
+<div>
+  <div
+    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    role="progressbar"
+  >
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="35"
+      class="ProgressBar__Bar-fsyx32-1 iqjhqx"
+    />
+  </div>
+</div>
+`;
+
+exports[`<ProgressBar /> properly renders with striped 1`] = `
+<div>
+  <div
+    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    role="progressbar"
+  >
+    <div
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="56"
+      class="ProgressBar__Bar-fsyx32-1 Llvxl"
+    />
+  </div>
+</div>
+`;

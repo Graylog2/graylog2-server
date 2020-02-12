@@ -18,11 +18,6 @@ const defaultBar = {
 const defaultStripColor = transparentize(0.75, teinte.primary.due);
 const boxShadowColor = transparentize(0.9, teinte.primary.tre);
 
-const progressBarVariants = color => css`
-  background-color: ${color};
-  color: ${util.readableColor(color)};
-`;
-
 const animatedStripes = keyframes`
   from {
     background-position: 40px 0;
@@ -33,7 +28,23 @@ const animatedStripes = keyframes`
   }
 `;
 
-export const Bar = styled(({ animated, striped, value, ...rest }) => <div {...rest} />)(props => css`
+const progressBarVariants = color => css`
+  background-color: ${color};
+  color: ${util.readableColor(color)};
+`;
+
+const ProgressWrap = styled.div`
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: ${teinte.secondary.due};
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px ${boxShadowColor};
+  display: flex;
+  align-items: center;
+`;
+
+const Bar = styled(({ animated, bsStyle, striped, value, ...rest }) => <div {...rest} />)(props => css`
   height: 100%;
   font-size: 12px;
   line-height: 20px;
@@ -62,21 +73,10 @@ export const Bar = styled(({ animated, striped, value, ...rest }) => <div {...re
   ${bsStyleThemeVariant(progressBarVariants)}
 `);
 
-const ProgressWrap = styled.div`
-  height: 20px;
-  margin-bottom: 20px;
-  overflow: hidden;
-  background-color: ${teinte.secondary.due};
-  border-radius: 4px;
-  box-shadow: inset 0 1px 2px ${boxShadowColor};
-  display: flex;
-  align-items: center;
-`;
-
 const ProgressBar = ({ bars, className }) => {
   return (
     <ProgressWrap role="progressbar" className={className}>
-      {bars.map((bar) => {
+      {bars.map((bar, index) => {
         const { label, ...rest } = bar;
 
         return (
@@ -84,6 +84,7 @@ const ProgressBar = ({ bars, className }) => {
                aria-valuemin="0"
                aria-valuemax="100"
                aria-valuetext={label}
+               key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
                {...defaultBar}
                {...rest}>
             {label}
@@ -106,8 +107,9 @@ ProgressBar.propTypes = {
 };
 
 ProgressBar.defaultProps = {
-  bars: defaultBar,
+  bars: [defaultBar],
   className: undefined,
 };
 
 export default ProgressBar;
+export { Bar };
