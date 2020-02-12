@@ -37,8 +37,10 @@ import org.graylog2.contentpacks.model.parameters.StringParameter;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
+import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
 import java.net.URI;
@@ -136,6 +138,9 @@ public class ContentPackTest {
         assertThat(entityDataNode.path("string").path("@value").asText()).isEqualTo("foobar");
     }
 
+    public void assertJSONEqual(String s1, String s2) throws JSONException {
+        JSONAssert.assertEquals(s1, s2, false);
+    }
     @Test
     public void shouldDeserializeSerializedContentPack() throws Exception {
         final ContentPack contentPack = createTestContentPack();
@@ -145,7 +150,7 @@ public class ContentPackTest {
         String expectedJSON = String.join("", Files.readAllLines(path)).replace("\n", "").replace("\r", "");
 
         final String jsonTxt = objectMapper.writeValueAsString(contentPack);
-        assertThat(jsonTxt).isEqualTo(expectedJSON);
+        assertJSONEqual(jsonTxt, expectedJSON);
 
         final ContentPack readContentPack = objectMapper.readValue(jsonTxt, ContentPack.class);
         assertThat(readContentPack.id()).isEqualTo(contentPack.id());
