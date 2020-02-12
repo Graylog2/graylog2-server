@@ -3,8 +3,10 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
-import { ProgressBar, Button } from 'components/graylog';
+import { Button } from 'components/graylog';
+import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
@@ -13,6 +15,19 @@ import { Spinner } from 'components/common';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
+
+const NodeBufferUsage = styled.div`
+  margin-top: 10px;
+  margin-bottom: 7px;
+`;
+
+const StyledProgressBar = styled(ProgressBar)`
+  margin-bottom: 5px;
+
+  ${Bar} {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
+  }
+`;
 
 const BufferUsage = createReactClass({
   displayName: 'BufferUsage',
@@ -64,21 +79,19 @@ const BufferUsage = createReactClass({
     const usagePercentage = ((!isNaN(usage) && !isNaN(size)) ? usage / size : 0);
     const percentLabel = NumberUtils.formatPercentage(usagePercentage);
 
-    console.log('usagePercentage * 100', usagePercentage * 100);
-
     return (
       <div>
         <LinkContainer to={Routes.filtered_metrics(nodeId, this._metricFilter())}>
           <Button bsSize="xsmall" className="pull-right">Metrics</Button>
         </LinkContainer>
         <h3>{title}</h3>
-        <div className="node-buffer-usage">
-          <ProgressBar bars={[{
+        <NodeBufferUsage>
+          <StyledProgressBar bars={[{
             value: usagePercentage * 100,
             bsStyle: 'warning',
             label: percentLabel,
           }]} />
-        </div>
+        </NodeBufferUsage>
         <span><strong>{usage} messages</strong> in {title.toLowerCase()}, {percentLabel} utilized.</span>
       </div>
     );

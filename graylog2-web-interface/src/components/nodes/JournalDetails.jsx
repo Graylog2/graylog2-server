@@ -6,8 +6,10 @@ import { Link } from 'react-router';
 import numeral from 'numeral';
 import moment from 'moment';
 import {} from 'moment-duration-format';
+import styled from 'styled-components';
 
-import { ProgressBar, Row, Col, Alert } from 'components/graylog';
+import { Row, Col, Alert } from 'components/graylog';
+import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -22,6 +24,15 @@ import Routes from 'routing/Routes';
 const MetricsActions = ActionsProvider.getActions('Metrics');
 const MetricsStore = StoreProvider.getStore('Metrics');
 const JournalStore = StoreProvider.getStore('Journal');
+
+const JournalUsageProgressBar = styled(ProgressBar)`
+  margin-bottom: 5px;
+  margin-top: 10px;
+
+  ${Bar} {
+    min-width: 3em;
+  }
+`;
 
 const JournalDetails = createReactClass({
   displayName: 'JournalDetails',
@@ -127,10 +138,10 @@ const JournalDetails = createReactClass({
             </dd>
           </dl>
         </Col>
-        <Col md={6} className="journal-details-usage">
+        <Col md={6}>
           <h3>Utilization</h3>
 
-          <ProgressBar bars={[{
+          <JournalUsageProgressBar bars={[{
             value: metrics.utilizationRatio * 100,
             label: NumberUtils.formatPercentage(metrics.utilizationRatio),
           }]} />

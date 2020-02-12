@@ -33,29 +33,33 @@ const animatedStripes = keyframes`
   }
 `;
 
-const StyledProgressBar = styled.div(({ animated, striped, value }) => css`
-  &&.progress-bar {
-    width: ${value}%;
-    ${bsStyleThemeVariant(progressBarVariants)}
-
-    ${(animated || striped) && css`
-      background-image: linear-gradient(
-        45deg,
-        ${defaultStripColor} 25%,
-        transparent 25%,
-        transparent 50%,
-        ${defaultStripColor} 50%,
-        ${defaultStripColor} 75%,
-        transparent 75%,
-        transparent
-      );
-      background-size: 40px 40px;
-    `}
-
-    ${animated && css`
-      animation: ${animatedStripes} 2s linear infinite;
-    `}
-  }
+export const Bar = styled(({ animated, striped, value, ...rest }) => <div {...rest} />)(props => css`
+  height: 100%;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 ${boxShadowColor};
+  transition: width 500ms ease-in-out;
+  width: ${props.value}%;
+  max-width: 100%;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
+  ${(props.animated || props.striped) && css`
+    background-image: linear-gradient(
+      45deg,
+      ${defaultStripColor} 25%,
+      transparent 25%,
+      transparent 50%,
+      ${defaultStripColor} 50%,
+      ${defaultStripColor} 75%,
+      transparent 75%,
+      transparent
+    );
+    background-size: 40px 40px;
+  `}
+  ${props.animated && css`
+    animation: ${animatedStripes} 2s linear infinite;
+  `}
+  ${bsStyleThemeVariant(progressBarVariants)}
 `);
 
 const ProgressWrap = styled.div`
@@ -67,48 +71,25 @@ const ProgressWrap = styled.div`
   box-shadow: inset 0 1px 2px ${boxShadowColor};
   display: flex;
   align-items: center;
-
-  .progress-bar {
-    height: 100%;
-    font-size: 12px;
-    line-height: 20px;
-    text-align: center;
-    box-shadow: inset 0 -1px 0 ${boxShadowColor};
-    width: 0;
-    transition: width 500ms ease-in-out;
-  }
 `;
 
-const ProgressBar = ({ bars }) => {
+const ProgressBar = ({ bars, className }) => {
   return (
-    <ProgressWrap role="progressbar">
-      {
-        typeof bars === 'number'
-          ? (
-            <StyledProgressBar aria-valuenow={bars.value}
-                               aria-valuemin="0"
-                               aria-valuemax="100"
-                               className="progress-bar"
-                               {...defaultBar}
-                               {...bars}>
-              {bars.label}
-            </StyledProgressBar>
-          )
-          : bars.map((bar) => {
-            return (
-              <StyledProgressBar aria-valuenow={bar.value}
-                                 aria-valuemin="0"
-                                 aria-valuemax="100"
-                                 className="progress-bar"
-                                 key={`progress-bar-${bar.value}-${bar.bsStyle}`}
-                                 {...defaultBar}
-                                 {...bar}>
+    <ProgressWrap role="progressbar" className={className}>
+      {bars.map((bar) => {
+        const { label, ...rest } = bar;
 
-                {bar.label}
-              </StyledProgressBar>
-            );
-          })
-      }
+        return (
+          <Bar aria-valuenow={rest.value}
+               aria-valuemin="0"
+               aria-valuemax="100"
+               aria-valuetext={label}
+               {...defaultBar}
+               {...rest}>
+            {label}
+          </Bar>
+        );
+      })}
     </ProgressWrap>
   );
 };
@@ -121,10 +102,12 @@ ProgressBar.propTypes = {
     striped: PropTypes.bool,
     value: PropTypes.number,
   })),
+  className: PropTypes.string,
 };
 
 ProgressBar.defaultProps = {
   bars: defaultBar,
+  className: undefined,
 };
 
 export default ProgressBar;

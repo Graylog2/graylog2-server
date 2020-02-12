@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import styled from 'styled-components';
+import { darken } from 'polished';
 
 import { ProgressBar } from 'components/graylog';
 import { Spinner } from 'components/common';
@@ -11,9 +13,47 @@ import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
+import teinte from 'theme/teinte';
+
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
+
+const NodeHeap = styled.div`
+  margin-top: 10px;
+
+  p {
+    margin-bottom: 0px;
+  }
+`;
+
+const Blob = styled.span`
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-left: 2px;
+  border: 1px solid;
+
+  &.used-memory {
+    background-color: ${teinte.tertiary.quattro};
+    border-color: ${darken(0.1, teinte.tertiary.quattro)};
+  }
+
+  &.committed-memory {
+    background-color: ${teinte.tertiary.sei};
+    border-color: ${darken(0.1, teinte.tertiary.sei)};
+  }
+
+  &.max-memory {
+    background-color: ${teinte.secondary.due};
+    border-color: ${darken(0.1, teinte.secondary.due)};
+  }
+`;
+
+const StyledProgressBar = styled(ProgressBar)`
+  height: 25px;
+  margin-bottom: 5px;
+`;
 
 const JvmHeapUsage = createReactClass({
   displayName: 'JvmHeapUsage',
@@ -79,13 +119,13 @@ const JvmHeapUsage = createReactClass({
         detail = (
           <p>
             The JVM is using{' '}
-            <span className="blob used-memory" />
+            <Blob className="used-memory" />
             <strong> {NumberUtils.formatBytes(extractedMetrics.usedMemory)}</strong>
             {' '}of{' '}
-            <span className="blob committed-memory" />
+            <Blob className="committed-memory" />
             <strong> {NumberUtils.formatBytes(extractedMetrics.committedMemory)}</strong>
             {' '}heap space and will not attempt to use more than{' '}
-            <span className="blob max-memory" style={{ border: '1px solid #ccc' }} />
+            <Blob className="max-memory" />
             <strong> {NumberUtils.formatBytes(extractedMetrics.maxMemory)}</strong>
           </p>
         );
@@ -93,11 +133,11 @@ const JvmHeapUsage = createReactClass({
     }
 
     return (
-      <div className="graylog-node-heap" data-node-id={nodeId}>
-        <ProgressBar bars={progressBars} />
+      <NodeHeap data-node-id={nodeId}>
+        <StyledProgressBar bars={progressBars} />
 
         {detail}
-      </div>
+      </NodeHeap>
     );
   },
 });

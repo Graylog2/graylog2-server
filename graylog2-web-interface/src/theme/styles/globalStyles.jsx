@@ -1260,20 +1260,6 @@ const globalStyles = css`
     margin-left: 6px;
   }
 
-  .node-buffer-usage {
-    margin-top: 10px;
-    margin-bottom: 7px;
-  }
-
-  .node-buffer-usage .progress-bar,
-  .journal-details-usage .progress-bar {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
-
-    span {
-      margin-left: 1px;
-    }
-  }
-
   .system-system dt {
     float: left;
   }
@@ -1970,22 +1956,6 @@ const globalStyles = css`
     margin-left: 180px;
   }
 
-  .graylog-node .graylog-node-heap {
-    margin-top: 10px;
-  }
-
-  .graylog-node .graylog-node-heap .progress {
-    height: 25px;
-    margin-bottom: 5px;
-  }
-
-  span.blob {
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    margin-left: 2px;
-  }
-
   #message-table-paginator-top {
     width: 90%;
   }
@@ -2230,40 +2200,6 @@ const globalStyles = css`
 
   div.row-sm {
     margin-bottom: 5px;
-  }
-
-  .graylog-node-heap .progress,
-  .node-buffer-usage .progress,
-  .journal-details-usage .progress {
-    margin-bottom: 5px;
-  }
-
-  .journal-details-usage .progress {
-    margin-top: 10px;
-  }
-
-  .journal-details-usage .progress .progress-bar {
-    min-width: 3em;
-  }
-
-  .progress-bar {
-    max-width: 100%;
-  }
-
-  .graylog-node-heap p {
-    margin-bottom: 0px;
-  }
-
-  .graylog-node-heap .used-memory {
-    background-color: #9e1f63 !important;
-  }
-
-  .graylog-node-heap .committed-memory {
-    background-color: #f7941e !important;
-  }
-
-  .graylog-node-heap .max-memory {
-    background-color: #f5f5f5 !important;
   }
 
   dl.system-system, dl.system-rest {
