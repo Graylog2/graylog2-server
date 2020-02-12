@@ -36,16 +36,21 @@ import kafka.consumer.TopicFilter;
 import kafka.consumer.Whitelist;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.internals.NoOpConsumerRebalanceListener;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
@@ -58,8 +63,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -68,13 +74,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class KafkaTransport extends ThrottleableTransport {
+    public static final String CK_LEGACY = "legacy_mode";
     public static final String CK_FETCH_MIN_BYTES = "fetch_min_bytes";
     public static final String CK_FETCH_WAIT_MAX = "fetch_wait_max";
     public static final String CK_ZOOKEEPER = "zookeeper";
+    public static final String CK_BOOTSTRAP = "bootstrap_server";
     public static final String CK_TOPIC_FILTER = "topic_filter";
     public static final String CK_THREADS = "threads";
     public static final String CK_OFFSET_RESET = "offset_reset";
@@ -82,8 +92,8 @@ public class KafkaTransport extends ThrottleableTransport {
 
     // See https://kafka.apache.org/090/documentation.html for available values for "auto.offset.reset".
     private static final ImmutableMap<String, String> OFFSET_RESET_VALUES = ImmutableMap.of(
-            "largest", "Automatically reset the offset to the largest offset",
-            "smallest", "Automatically reset the offset to the smallest offset"
+            "largest", "Automatically reset the offset to the latest offset", // "largest" OR "latest"
+            "smallest", "Automatically reset the offset to the earliest offset" // "smallest" OR "earliest"
     );
 
     private static final String DEFAULT_OFFSET_RESET = "largest";
@@ -173,17 +183,117 @@ public class KafkaTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void doLaunch(final MessageInput input) throws MisfireException {
-        serverStatus.awaitRunning(new Runnable() {
-            @Override
-            public void run() {
-                lifecycleStateChange(Lifecycle.RUNNING);
-            }
-        });
+    public void doLaunch(final MessageInput input) {
+        final boolean legacyMode = configuration.getBoolean(CK_LEGACY, true);
+        if (legacyMode) {
+            Objects.requireNonNull(configuration.getString(CK_ZOOKEEPER), "ZooKeeper configuration setting cannot be empty.");
+        } else {
+            Objects.requireNonNull(configuration.getString(CK_BOOTSTRAP), "Bootstrap server configuration setting cannot be enpty.");
+        }
 
+        serverStatus.awaitRunning(() -> lifecycleStateChange(Lifecycle.RUNNING));
         // listen for lifecycle changes
         serverEventBus.register(this);
 
+        if (legacyMode) {
+            doLaunchLegacy(input);
+        } else {
+            doLaunchConsumer(input);
+        }
+        scheduler.scheduleAtFixedRate(() -> lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0)), 1, 1, TimeUnit.SECONDS);
+    }
+
+    private void doLaunchConsumer(final MessageInput input) {
+        final Properties props = new Properties();
+
+        props.put("group.id", configuration.getString(CK_GROUP_ID, DEFAULT_GROUP_ID));
+        props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
+        props.put("fetch.max.wait.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
+        //noinspection ConstantConditions
+        props.put("bootstrap.servers", configuration.getString(CK_BOOTSTRAP));
+        // Map largest -> latest, smallest -> earliest
+        final String resetValue = configuration.getString(CK_OFFSET_RESET, DEFAULT_OFFSET_RESET);
+        props.put("auto.offset.reset", resetValue.equals("largest") ? "latest" : "earliest");
+        // Default auto commit interval is 60 seconds. Reduce to 1 second to minimize message duplication
+        // if something breaks.
+        props.put("auto.commit.interval.ms", "1000");
+        props.put(org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
+        props.put(org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
+
+        final int numThreads = configuration.getInt(CK_THREADS);
+        final ExecutorService executor = executorService(numThreads);
+        // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
+        // and then shutting down the connection.
+        // this is to avoid yanking away the connection from the consumer runnables
+        stopLatch = new CountDownLatch(numThreads);
+
+        IntStream.range(0, numThreads).forEach(i -> {
+            executor.submit(() -> {
+                final Properties nprops = (Properties) props.clone();
+                nprops.put("client.id", "gl2-" + nodeId + "-" + input.getId() + "-" + i);
+                final KafkaConsumer<byte[], byte[]> consumer;
+                try {
+                    consumer = new KafkaConsumer<>(nprops);
+                    //noinspection ConstantConditions
+                    consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)), new NoOpConsumerRebalanceListener());
+                } catch (Exception e) {
+                    LOG.warn("Could not create KafkaConsumer", e);
+                    throw e;
+                }
+
+                while (!stopped) {
+                    final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(1000);
+                    final Iterator<ConsumerRecord<byte[], byte[]>> consumerIterator = consumerRecords.iterator();
+                    try {
+                        // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
+                        // noinspection WhileLoopReplaceableByForEach
+                        while (consumerIterator.hasNext()) {
+                            if (paused) {
+                                // we try not to spin here, so we wait until the lifecycle goes back to running.
+                                LOG.debug("Message processing is paused, blocking until message processing is turned back on.");
+                                Uninterruptibles.awaitUninterruptibly(pausedLatch);
+                            }
+                            // check for being stopped before actually getting the message, otherwise we could end up losing that message
+                            if (stopped) {
+                                break;
+                            }
+                            if (isThrottled()) {
+                                blockUntilUnthrottled();
+                            }
+
+                            // process the message, this will immediately mark the message as having been processed. this gets tricky
+                            // if we get an exception about processing it down below.
+                            // final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
+
+                            final byte[] bytes = consumerIterator.next().value();
+
+                            // it is possible that the message is null
+                            if (bytes == null) {
+                                continue;
+                            }
+
+                            totalBytesRead.addAndGet(bytes.length);
+                            lastSecBytesReadTmp.addAndGet(bytes.length);
+
+                            final RawMessage rawMessage = new RawMessage(bytes);
+
+                            // TODO implement throttling
+                            input.processRawMessage(rawMessage);
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Kafka error in consumer thread.", e);
+                    }
+                }
+                // explicitly commit our offsets when stopping.
+                // this might trigger a couple of times, but it won't hurt
+                consumer.commitAsync();
+                stopLatch.countDown();
+                consumer.close();
+            });
+        });
+    }
+
+    private void doLaunchLegacy(final MessageInput input) {
         final Properties props = new Properties();
 
         props.put("group.id", configuration.getString(CK_GROUP_ID, DEFAULT_GROUP_ID));
@@ -274,12 +384,6 @@ public class KafkaTransport extends ThrottleableTransport {
                 }
             });
         }
-        scheduler.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0));
-            }
-        }, 1, 1, TimeUnit.SECONDS);
     }
 
     private ExecutorService executorService(int numThreads) {
@@ -340,13 +444,24 @@ public class KafkaTransport extends ThrottleableTransport {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest cr = super.getRequestedConfiguration();
 
+            cr.addField(new BooleanField(CK_LEGACY,
+                    "Legacy mode",
+                    true,
+                    "Use old ZooKeeper-based consumer API. Needed for Kafka clusters < 0.9" //TODO double check
+            ));
             cr.addField(new TextField(
                     CK_ZOOKEEPER,
                     "ZooKeeper address",
                     "127.0.0.1:2181",
-                    "Host and port of the ZooKeeper that is managing your Kafka cluster.",
+                    "Host and port of the ZooKeeper that is managing your Kafka cluster. Ignored in consumer API mode (non-legacy).",
                     ConfigurationField.Optional.NOT_OPTIONAL));
-
+            cr.addField(new TextField(
+                    CK_BOOTSTRAP,
+                    "Bootstrap Servers",
+                    "127.0.0.1:9092",
+                    "Comma separated list of one or more Kafka brokers. (Format: \"host1:port1,host2:port2\")." +
+                            "Not used in legacy mode.",
+                    ConfigurationField.Optional.OPTIONAL));
             cr.addField(new TextField(
                     CK_TOPIC_FILTER,
                     "Topic filter regex",
@@ -380,7 +495,7 @@ public class KafkaTransport extends ThrottleableTransport {
                     "Auto offset reset",
                     DEFAULT_OFFSET_RESET,
                     OFFSET_RESET_VALUES,
-                    "What to do when there is no initial offset in ZooKeeper or if an offset is out of range",
+                    "What to do when there is no initial offset in Kafka or if an offset is out of range",
                     ConfigurationField.Optional.OPTIONAL));
 
             cr.addField(new TextField(
@@ -394,3 +509,4 @@ public class KafkaTransport extends ThrottleableTransport {
         }
     }
 }
+
