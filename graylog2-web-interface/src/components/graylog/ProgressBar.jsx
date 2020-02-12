@@ -88,12 +88,13 @@ const Bar = styled(({ animated, bsStyle, striped, value, ...rest }) => <div {...
 
 const ProgressBar = ({ bars, className }: Props) => {
   return (
-    <ProgressWrap role="progressbar" className={className}>
+    <ProgressWrap className={className}>
       {bars.map((bar, index) => {
         const { label, ...rest } = bar;
 
         return (
-          <Bar aria-valuenow={rest.value}
+          <Bar role="progressbar"
+               aria-valuenow={rest.value}
                aria-valuemin="0"
                aria-valuemax="100"
                aria-valuetext={label}
