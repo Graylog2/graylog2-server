@@ -19,7 +19,7 @@ type Props = {
   className: string,
 };
 
-const defaultBar = {
+const DEFAULT_BAR = {
   animated: false,
   bsStyle: 'info',
   label: undefined,
@@ -97,7 +97,7 @@ const ProgressBar = ({ bars, className }: Props) => {
                aria-valuemax="100"
                aria-valuetext={label}
                key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
-               {...defaultBar}
+               {...DEFAULT_BAR}
                {...rest}>
             {label}
           </Bar>
@@ -119,7 +119,7 @@ ProgressBar.propTypes = {
 };
 
 ProgressBar.defaultProps = {
-  bars: [defaultBar],
+  bars: [DEFAULT_BAR],
   className: undefined,
 };
 
