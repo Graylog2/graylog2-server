@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.migrations;
+package org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.V20200204122000_MigrateUntypedViewsToDashboards;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.MongoConnection;
@@ -116,40 +115,40 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     }
 
     @Test
-    @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter.json")
+    @MongoDBFixtures("untyped_view_with_widgets_with_filter.json")
     public void migratesWidgetFiltersToWidgetQueries() throws Exception {
         this.migration.upgrade();
 
         assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter-views_after.json"));
-        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter-searches_after.json"));
+        assertSavedViews(1, resourceFile("untyped_view_with_widgets_with_filter-views_after.json"));
+        assertSavedSearches(1, resourceFile("untyped_view_with_widgets_with_filter-searches_after.json"));
     }
 
     @Test
-    @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query.json")
+    @MongoDBFixtures("untyped_view_with_widgets_with_filter_and_query.json")
     public void migratesWidgetFiltersToWidgetQueriesAndConcatenatesToExistingQuery() throws Exception {
         this.migration.upgrade();
 
         assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query-views_after.json"));
-        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_widgets_with_filter_and_query-searches_after.json"));
+        assertSavedViews(1, resourceFile("untyped_view_with_widgets_with_filter_and_query-views_after.json"));
+        assertSavedSearches(1, resourceFile("untyped_view_with_widgets_with_filter_and_query-searches_after.json"));
     }
 
     @Test
-    @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets.json")
+    @MongoDBFixtures("untyped_view_with_no_widgets.json")
     public void migratesUntypedViewWithNoWidgets() throws Exception {
         this.migration.upgrade();
 
         assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets-views_after.json"));
-        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/untyped_view_with_no_widgets-searches_after.json"));
+        assertSavedViews(1, resourceFile("untyped_view_with_no_widgets-views_after.json"));
+        assertSavedSearches(1, resourceFile("untyped_view_with_no_widgets-searches_after.json"));
     }
 
     @Test
-    @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/typed_views.json")
+    @MongoDBFixtures("typed_views.json")
     public void doesNotChangeTypedViews() throws Exception {
         this.migration.upgrade();
 
@@ -162,25 +161,25 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     }
 
     @Test
-    @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/mixed_typed_and_untyped_views.json")
+    @MongoDBFixtures("mixed_typed_and_untyped_views.json")
     public void migratesOnlyUntypedViewsIfMixedOnesArePresent() throws Exception {
         this.migration.upgrade();
 
         assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/mixed_typed_and_untyped_views-views_after.json"));
-        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/mixed_typed_and_untyped_views-searches_after.json"));
+        assertSavedViews(1, resourceFile("mixed_typed_and_untyped_views-views_after.json"));
+        assertSavedSearches(1, resourceFile("mixed_typed_and_untyped_views-searches_after.json"));
     }
 
     @Test
-    @MongoDBFixtures("V20200204122000_MigrateUntypedViewsToDashboardsTest/query_with_query_string.json")
+    @MongoDBFixtures("query_with_query_string.json")
     public void migratesQueryStringFromQueryIntoWidgetsAndSearchTypes() throws Exception {
         this.migration.upgrade();
 
         assertViewsMigrated("5c8a613a844d02001a1fd2f4");
 
-        assertSavedViews(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/query_with_query_string-views_after.json"));
-        assertSavedSearches(1, resourceFile("V20200204122000_MigrateUntypedViewsToDashboardsTest/query_with_query_string-searches_after.json"));
+        assertSavedViews(1, resourceFile("query_with_query_string-views_after.json"));
+        assertSavedSearches(1, resourceFile("query_with_query_string-searches_after.json"));
     }
 
     private void assertViewsMigrated(String... viewId) {

@@ -102,7 +102,7 @@ class MongoDBFixtureImporter {
     }
 
     private static URL toResource(final String resourceName, final Class<?> contextClass) {
-        if (Paths.get(resourceName).isAbsolute()) {
+        if (Paths.get(resourceName).getNameCount() > 1) {
             return Resources.getResource(resourceName);
         } else {
             return Resources.getResource(contextClass, resourceName);
