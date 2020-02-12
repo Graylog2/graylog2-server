@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, keyframes } from 'styled-components';
 import { transparentize } from 'polished';
@@ -6,6 +7,17 @@ import { transparentize } from 'polished';
 import { util } from 'theme';
 import teinte from 'theme/teinte';
 import bsStyleThemeVariant from './variants/bsStyle';
+
+type Props = {
+  bars: {
+    animated: boolean,
+    bsStyle: string,
+    label: string,
+    striped: boolean,
+    value: number,
+   },
+  className: string,
+};
 
 const defaultBar = {
   animated: false,
@@ -73,7 +85,7 @@ const Bar = styled(({ animated, bsStyle, striped, value, ...rest }) => <div {...
   ${bsStyleThemeVariant(progressBarVariants)}
 `);
 
-const ProgressBar = ({ bars, className }) => {
+const ProgressBar = ({ bars, className }: Props) => {
   return (
     <ProgressWrap role="progressbar" className={className}>
       {bars.map((bar, index) => {
