@@ -144,7 +144,7 @@ class MessageTable extends React.Component<Props, State> {
     fields: CustomPropTypes.FieldListType.isRequired,
     messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedFields: PropTypes.object,
-  }
+  };
 
   static defaultProps = {
     selectedFields: Immutable.Set(),
@@ -164,7 +164,7 @@ class MessageTable extends React.Component<Props, State> {
   };
 
   _fieldTypeFor = (fieldName: string, fields: Immutable.List) => {
-    return (fields.find(f => f.name === fieldName) || { type: FieldType.Unknown }).type;
+    return ((fields && fields.find(f => f.name === fieldName)) || { type: FieldType.Unknown }).type;
   };
 
   _getFormattedMessages = (): Array<Object> => {
