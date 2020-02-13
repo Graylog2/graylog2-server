@@ -60,7 +60,7 @@ public class IpfixUdpInput extends MessageInput {
 
         @Inject
         public Descriptor() {
-            super(NAME, false, "https://github.com/Graylog2/graylog-plugin-netflow");
+            super(NAME, false, "https://docs.graylog.org/en/latest/pages/integrations/inputs/ipfix_input.html");
         }
     }
 
