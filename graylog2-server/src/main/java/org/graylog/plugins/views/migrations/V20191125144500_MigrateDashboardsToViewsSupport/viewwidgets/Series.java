@@ -28,7 +28,7 @@ public abstract class Series {
     private static final String FIELD_CONFIG = "config";
     private static final String FIELD_FUNCTION = "function";
 
-    private static final Pattern destructuringPattern = Pattern.compile("(\\w+)\\((\\w+)?\\)");
+    private static final Pattern destructuringPattern = Pattern.compile("(\\w+)\\(([\\w@-]+)?\\)");
 
     @JsonProperty(FIELD_CONFIG)
     public abstract SeriesConfig config();
