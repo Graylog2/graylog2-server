@@ -9,7 +9,7 @@ import { util } from 'theme';
 import teinte from 'theme/teinte';
 import bsStyleThemeVariant from './variants/bsStyle';
 
-type Props = {
+type ProgressBarProps = {
   bars: Array<{
     animated: boolean,
     bsStyle: string,
@@ -18,6 +18,12 @@ type Props = {
     value: number,
   }>,
   className: string,
+};
+
+type BarProps = {
+  animated: boolean,
+  striped: boolean,
+  value: number,
 };
 
 const DEFAULT_BAR = {
@@ -46,7 +52,7 @@ const progressBarVariants = color => css`
   color: ${util.readableColor(color)};
 `;
 
-const ProgressWrap: StyledComponent<{}, {}, *> = styled.div`
+const ProgressWrap: StyledComponent<{}, void, *> = styled.div`
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
@@ -57,16 +63,7 @@ const ProgressWrap: StyledComponent<{}, {}, *> = styled.div`
   align-items: center;
 `;
 
-// Stripping away the unnecessary props that render as HTML attributes
-// $FlowFixMe https://github.com/flow-typed/flow-typed/issues/3666#issuecomment-585677981
-type BarProps = {
-  animated: boolean,
-  bsStyle: string,
-  striped: boolean,
-  value: number,
-}
-const BarDiv: React.ComponentType<BarProps> = ({ animated, bsStyle, striped, value, ...rest }) => <div {...rest} />;
-const Bar: StyledComponent<{}, void, *> = styled(BarDiv)((props) => {
+const Bar: StyledComponent<BarProps, void, *> = styled.div(({ animated, striped, value }) => {
   return css`
     height: 100%;
     font-size: 12px;
@@ -74,10 +71,10 @@ const Bar: StyledComponent<{}, void, *> = styled(BarDiv)((props) => {
     text-align: center;
     box-shadow: inset 0 -1px 0 ${boxShadowColor};
     transition: width 500ms ease-in-out;
-    width: ${props.value}%;
+    width: ${value}%;
     max-width: 100%;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
-    ${(props.animated || props.striped) && css`
+    ${(animated || striped) && css`
       background-image: linear-gradient(
         45deg,
         ${defaultStripColor} 25%,
@@ -90,14 +87,14 @@ const Bar: StyledComponent<{}, void, *> = styled(BarDiv)((props) => {
       );
       background-size: 40px 40px;
     `}
-    ${props.animated && css`
+    ${animated && css`
       animation: ${animatedStripes} 2s linear infinite;
     `}
     ${bsStyleThemeVariant(progressBarVariants)}
   `;
 });
 
-const ProgressBar = ({ bars, className }: Props) => {
+const ProgressBar = ({ bars, className }: ProgressBarProps) => {
   return (
     <ProgressWrap className={className}>
       {bars.map((bar, index) => {
