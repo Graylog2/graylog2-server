@@ -3,16 +3,15 @@ src
 
 [ignore]
 .*/build/.*
+.*/node_modules/*
 .*/target/.*
-.*json$
-.*/node_modules/.*
 
 [libs]
 flow-typed
 
 [strict]
 untyped-type-import
-unnecessary-invariant 
+unnecessary-invariant
 sketchy-number
 
 [options]
@@ -23,4 +22,3 @@ module.name_mapper='^!style/useable!.*\.css$' -> '<PROJECT_ROOT>/src/flow/css-us
 module.name_mapper='.*\.css$' -> '<PROJECT_ROOT>/src/flow/css-modules.js'
 
 [untyped]
-

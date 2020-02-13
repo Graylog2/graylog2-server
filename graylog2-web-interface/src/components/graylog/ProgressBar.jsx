@@ -1,7 +1,7 @@
-// @flow strict
+// @flow
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css, keyframes, type StyledComponent } from 'styled-components';
 import { transparentize } from 'polished';
 
 import { util } from 'theme';
@@ -9,13 +9,13 @@ import teinte from 'theme/teinte';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 type Props = {
-  bars: {
+  bars: Array<{
     animated: boolean,
     bsStyle: string,
     label: string,
     striped: boolean,
     value: number,
-   },
+  }>,
   className: string,
 };
 
@@ -45,7 +45,7 @@ const progressBarVariants = color => css`
   color: ${util.readableColor(color)};
 `;
 
-const ProgressWrap = styled.div`
+const ProgressWrap: StyledComponent<{}, {}, *> = styled.div`
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
@@ -57,50 +57,54 @@ const ProgressWrap = styled.div`
 `;
 
 // Stripping away the unnecessary props that render as HTML attributes
-const Bar = styled(({ animated, bsStyle, striped, value, ...rest }) => <div {...rest} />)(props => css`
-  height: 100%;
-  font-size: 12px;
-  line-height: 20px;
-  text-align: center;
-  box-shadow: inset 0 -1px 0 ${boxShadowColor};
-  transition: width 500ms ease-in-out;
-  width: ${props.value}%;
-  max-width: 100%;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
-  ${(props.animated || props.striped) && css`
-    background-image: linear-gradient(
-      45deg,
-      ${defaultStripColor} 25%,
-      transparent 25%,
-      transparent 50%,
-      ${defaultStripColor} 50%,
-      ${defaultStripColor} 75%,
-      transparent 75%,
-      transparent
-    );
-    background-size: 40px 40px;
-  `}
-  ${props.animated && css`
-    animation: ${animatedStripes} 2s linear infinite;
-  `}
-  ${bsStyleThemeVariant(progressBarVariants)}
-`);
+const Bar: StyledComponent<{}, {}, *> = styled(({ animated, bsStyle, striped, value, ...rest }) => <div {...rest} />)((props) => {
+  return css`
+    height: 100%;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    box-shadow: inset 0 -1px 0 ${boxShadowColor};
+    transition: width 500ms ease-in-out;
+    width: ${props.value}%;
+    max-width: 100%;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
+    ${(props.animated || props.striped) && css`
+      background-image: linear-gradient(
+        45deg,
+        ${defaultStripColor} 25%,
+        transparent 25%,
+        transparent 50%,
+        ${defaultStripColor} 50%,
+        ${defaultStripColor} 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 40px 40px;
+    `}
+    ${props.animated && css`
+      animation: ${animatedStripes} 2s linear infinite;
+    `}
+    ${bsStyleThemeVariant(progressBarVariants)}
+  `;
+});
 
 const ProgressBar = ({ bars, className }: Props) => {
   return (
     <ProgressWrap className={className}>
       {bars.map((bar, index) => {
-        const { label, ...rest } = bar;
+        const { label, animated, bsStyle, striped, value } = bar;
 
         return (
           <Bar role="progressbar"
-               aria-valuenow={rest.value}
+               aria-valuenow={value}
                aria-valuemin="0"
                aria-valuemax="100"
                aria-valuetext={label}
                key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
-               {...DEFAULT_BAR}
-               {...rest}>
+               animated={animated}
+               bsStyle={bsStyle}
+               striped={striped}
+               value={value}>
             {label}
           </Bar>
         );
