@@ -9,8 +9,9 @@ exports[`<ProgressBar /> properly renders with animated 1`] = `
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="45"
-      class="ProgressBar__Bar-fsyx32-1 jjqBtG"
+      class="ProgressBar__Bar-fsyx32-1 ifNlYY"
       role="progressbar"
+      value="45"
     />
   </div>
 </div>
@@ -27,6 +28,7 @@ exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
       aria-valuenow="67"
       class="ProgressBar__Bar-fsyx32-1 hmulOj"
       role="progressbar"
+      value="67"
     />
   </div>
 </div>
@@ -42,8 +44,9 @@ exports[`<ProgressBar /> properly renders with label 1`] = `
       aria-valuemin="0"
       aria-valuenow="23"
       aria-valuetext="Example ProgressBar"
-      class="ProgressBar__Bar-fsyx32-1 bDRkHI"
+      class="ProgressBar__Bar-fsyx32-1 fCNhAs"
       role="progressbar"
+      value="23"
     >
       Example ProgressBar
     </div>
@@ -60,15 +63,17 @@ exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="35"
-      class="ProgressBar__Bar-fsyx32-1 iqjhqx"
+      class="ProgressBar__Bar-fsyx32-1 cJAaYy"
       role="progressbar"
+      value="35"
     />
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="55"
-      class="ProgressBar__Bar-fsyx32-1 fcStCI"
+      class="ProgressBar__Bar-fsyx32-1 hIhmCC"
       role="progressbar"
+      value="55"
     />
   </div>
 </div>
@@ -85,6 +90,7 @@ exports[`<ProgressBar /> properly renders with no props 1`] = `
       aria-valuenow="0"
       class="ProgressBar__Bar-fsyx32-1 kUsvMb"
       role="progressbar"
+      value="0"
     />
   </div>
 </div>
@@ -99,8 +105,9 @@ exports[`<ProgressBar /> properly renders with one bar 1`] = `
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="35"
-      class="ProgressBar__Bar-fsyx32-1 iqjhqx"
+      class="ProgressBar__Bar-fsyx32-1 cJAaYy"
       role="progressbar"
+      value="35"
     />
   </div>
 </div>
@@ -115,8 +122,9 @@ exports[`<ProgressBar /> properly renders with striped 1`] = `
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="56"
-      class="ProgressBar__Bar-fsyx32-1 Llvxl"
+      class="ProgressBar__Bar-fsyx32-1 cGkszn"
       role="progressbar"
+      value="56"
     />
   </div>
 </div>
