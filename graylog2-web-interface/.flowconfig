@@ -3,11 +3,7 @@ src
 
 [ignore]
 .*/build/.*
-.*/node_modules/@choojs/*
-.*/node_modules/@mapbox/*
-.*/node_modules/findup/*
-.*/node_modules/immutable/*
-.*/node_modules/react-select/*
+.*/node_modules/*
 .*/target/.*
 
 [libs]

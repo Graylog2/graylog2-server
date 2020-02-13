@@ -59,7 +59,14 @@ const ProgressWrap: StyledComponent<{}, {}, *> = styled.div`
 
 // Stripping away the unnecessary props that render as HTML attributes
 // $FlowFixMe https://github.com/flow-typed/flow-typed/issues/3666#issuecomment-585677981
-const Bar: StyledComponent<{}, {}, *> = styled(({ animated, bsStyle, striped, value, ...rest }) => <div {...rest} />)((props) => {
+type BarProps = {
+  animated: boolean,
+  bsStyle: string,
+  striped: boolean,
+  value: number,
+}
+const BarDiv: React.ComponentType<BarProps> = ({ animated, bsStyle, striped, value, ...rest }) => <div {...rest} />;
+const Bar: StyledComponent<{}, void, *> = styled(BarDiv)((props) => {
   return css`
     height: 100%;
     font-size: 12px;
