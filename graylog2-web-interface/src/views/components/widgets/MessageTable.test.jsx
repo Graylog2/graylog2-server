@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 
+import suppressConsole from 'helpers/suppressConsole';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
@@ -45,5 +46,19 @@ describe('MessageTable', () => {
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
     expect(td.text()).toContain('frank.txt');
+  });
+
+  it('renders a table entry for messages, even if fields are `undefined`', () => {
+    // Suppressing console to disable props warning because of `fields` being `undefined`.
+    suppressConsole(() => {
+      const wrapper = mount(<MessageTable messages={messages}
+                                          activeQueryId={activeQueryId}
+                                          // $FlowFixMe: violating contract on purpose
+                                          fields={undefined}
+                                          selectedFields={{}}
+                                          config={config} />);
+      const messageTableEntry = wrapper.find('MessageTableEntry');
+      expect(messageTableEntry).not.toBeEmptyRender();
+    });
   });
 });
