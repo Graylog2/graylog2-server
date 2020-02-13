@@ -277,7 +277,6 @@ public class KafkaTransport extends ThrottleableTransport {
 
                             final RawMessage rawMessage = new RawMessage(bytes);
 
-                            // TODO implement throttling
                             input.processRawMessage(rawMessage);
                         }
                     } catch (Exception e) {
@@ -367,7 +366,6 @@ public class KafkaTransport extends ThrottleableTransport {
 
                                 final RawMessage rawMessage = new RawMessage(bytes);
 
-                                // TODO implement throttling
                                 input.processRawMessage(rawMessage);
                             }
                         } catch (ConsumerTimeoutException e) {
