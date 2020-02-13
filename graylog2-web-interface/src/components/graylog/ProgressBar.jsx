@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, keyframes, type StyledComponent } from 'styled-components';
+// $FlowFixMe removing in future iteration
 import { transparentize } from 'polished';
 
 import { util } from 'theme';
@@ -57,6 +58,7 @@ const ProgressWrap: StyledComponent<{}, {}, *> = styled.div`
 `;
 
 // Stripping away the unnecessary props that render as HTML attributes
+// $FlowFixMe https://github.com/flow-typed/flow-typed/issues/3666#issuecomment-585677981
 const Bar: StyledComponent<{}, {}, *> = styled(({ animated, bsStyle, striped, value, ...rest }) => <div {...rest} />)((props) => {
   return css`
     height: 100%;
