@@ -445,21 +445,24 @@ public class KafkaTransport extends ThrottleableTransport {
             cr.addField(new BooleanField(CK_LEGACY,
                     "Legacy mode",
                     true,
-                    "Use old ZooKeeper-based consumer API. Needed for Kafka clusters < 0.9" //TODO double check
+                    "Use old ZooKeeper-based consumer API. Needed for Kafka clusters < 0.9",
+                    10
             ));
-            cr.addField(new TextField(
-                    CK_ZOOKEEPER,
-                    "ZooKeeper address",
-                    "127.0.0.1:2181",
-                    "Host and port of the ZooKeeper that is managing your Kafka cluster. Ignored in consumer API mode (non-legacy).",
-                    ConfigurationField.Optional.NOT_OPTIONAL));
             cr.addField(new TextField(
                     CK_BOOTSTRAP,
                     "Bootstrap Servers",
                     "127.0.0.1:9092",
                     "Comma separated list of one or more Kafka brokers. (Format: \"host1:port1,host2:port2\")." +
                             "Not used in legacy mode.",
-                    ConfigurationField.Optional.OPTIONAL));
+                    ConfigurationField.Optional.OPTIONAL,
+                    11));
+            cr.addField(new TextField(
+                    CK_ZOOKEEPER,
+                    "ZooKeeper address",
+                    "127.0.0.1:2181",
+                    "Host and port of the ZooKeeper that is managing your Kafka cluster. Ignored in consumer API mode (non-legacy).",
+                    ConfigurationField.Optional.OPTIONAL,
+                    12));
             cr.addField(new TextField(
                     CK_TOPIC_FILTER,
                     "Topic filter regex",

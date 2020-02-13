@@ -42,4 +42,8 @@ public interface ConfigurationField {
     List<String> getAttributes();
 
     Map<String, Map<String, String>> getAdditionalInformation();
+
+    default int getPosition() {
+        return 100;
+    }
 }

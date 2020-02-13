@@ -81,9 +81,16 @@ class ConfigurationForm extends React.Component {
     };
   };
 
-  _sortByOptionality = (x1, x2) => {
+  _sortByPosOrOptionality = (x1, x2) => {
     const { configFields } = this.state;
-    let diff = configFields[x1.name].is_optional - configFields[x2.name].is_optional;
+    const DEFAULT_POSITION = 100;
+    const x1pos = configFields[x1.name].position || DEFAULT_POSITION;
+    const x2pos = configFields[x2.name].position || DEFAULT_POSITION;
+
+    let diff = x1pos - x2pos;
+    if (!diff) {
+      diff = configFields[x1.name].is_optional - configFields[x2.name].is_optional;
+    }
 
     if (!diff) {
       // Sort equal fields stably
@@ -163,7 +170,7 @@ class ConfigurationForm extends React.Component {
     const { configFields } = this.state;
     const configFieldKeys = $.map(configFields, (field, name) => name)
       .map((name, pos) => ({ name: name, pos: pos }))
-      .sort(this._sortByOptionality);
+      .sort(this._sortByPosOrOptionality);
 
     const renderedConfigFields = configFieldKeys.map((key) => {
       const configField = this._renderConfigField(configFields[key.name], key.name, shouldAutoFocus);

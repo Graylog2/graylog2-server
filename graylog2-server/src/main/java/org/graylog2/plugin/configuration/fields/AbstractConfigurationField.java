@@ -26,6 +26,8 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     protected final String humanName;
     protected final String description;
     protected final ConfigurationField.Optional optional;
+    protected int position;
+    final int DEFAULT_POSITION = 100;
 
     public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional1) {
         this.field_type = field_type;
@@ -33,6 +35,11 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
         this.humanName = humanName;
         this.description = description;
         this.optional = optional1;
+        this.position = DEFAULT_POSITION;
+    }
+    public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional1, int position) {
+        this(field_type, name, humanName,description,optional1);
+        this.position = position;
     }
 
     @Override
@@ -68,5 +75,10 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     @Override
     public Map<String, Map<String, String>> getAdditionalInformation() {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public int getPosition() {
+        return position;
     }
 }
