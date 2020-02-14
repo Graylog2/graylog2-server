@@ -122,7 +122,7 @@
         <jdot.version>1.0</jdot.version>
         <jersey.version>2.25.1</jersey.version>
         <jmte.version>5.0.0</jmte.version>
-        <joda-time.version>2.10</joda-time.version>
+        <joda-time.version>2.10.5</joda-time.version>
         <jool.version>0.9.14</jool.version>
         <json-path.version>2.4.0</json-path.version>
         <kafka.version>0.9.0.1</kafka.version>
