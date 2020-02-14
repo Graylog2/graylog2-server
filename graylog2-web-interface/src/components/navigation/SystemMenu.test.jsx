@@ -44,15 +44,17 @@ describe('SystemMenu', () => {
     permissions                    | count | links
     ${[]}                          | ${3}  | ${['Overview', 'Nodes', 'Enterprise']}
     ${['clusterconfigentry:read']} | ${4}  | ${['Configurations']}
-    ${['inputs:read']}             | ${4}  | ${['Inputs']}
+    ${['inputs:read']}             | ${5}  | ${['Inputs']}
     ${['outputs:read']}            | ${4}  | ${['Outputs']}
     ${['indices:read']}            | ${4}  | ${['Indices']}
     ${['loggers:read']}            | ${4}  | ${['Logging']}
     ${['users:list']}              | ${4}  | ${['Authentication']}
     ${['roles:read']}              | ${4}  | ${['Authentication']}
-    ${['dashboards:create', 'inputs:create', 'streams:create']} | ${5}  | ${['Content Packs']}
-    ${['inputs:edit']}             | ${6}  | ${['Grok Patterns', 'Lookup Tables', 'Sidecars']}
-    ${['inputs:create']}           | ${4}  | ${['Pipelines']}
+    ${['contentpack:read']}        | ${4}  | ${['Content Packs']}
+    ${['inputs:read']}             | ${5}  | ${['Grok Patterns']}
+    ${['lookuptables:read']}       | ${4}  | ${['Lookup Tables']}
+    ${['sidecars:read', 'sidecar_collectors:read', 'sidecar_collector_configurations:read']}>       | ${4}  | ${['Sidecars']}
+    ${['pipeline:read', 'pipeline_rule:read']} | ${4}  | ${['Pipelines']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
   describe('uses items from plugins:', () => {

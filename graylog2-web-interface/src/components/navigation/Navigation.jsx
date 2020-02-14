@@ -118,9 +118,11 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
             )
           }
 
-          <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-            <GlobalThroughput />
-          </LinkContainer>
+          <IfPermitted permissions={['throughput:read']}>
+            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+              <GlobalThroughput />
+            </LinkContainer>
+          </IfPermitted>
           <ScratchpadToggle />
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
           <UserMenu fullName={fullName} loginName={loginName} />

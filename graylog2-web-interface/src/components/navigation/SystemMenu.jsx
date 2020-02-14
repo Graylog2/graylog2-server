@@ -102,20 +102,20 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['users:list', 'roles:read']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} description="Authentication" />
       </IfPermitted>
-      <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
+      <IfPermitted permissions={['contentpack:read']}>
         <NavigationLink path={Routes.SYSTEM.CONTENTPACKS.LIST} description="Content Packs" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['inputs:read']}>
         <NavigationLink path={Routes.SYSTEM.GROKPATTERNS} description="Grok Patterns" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['lookuptables:read']}>
         <NavigationLink path={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} description="Lookup Tables" />
       </IfPermitted>
-      <IfPermitted permissions={['inputs:create']}>
+      <IfPermitted permissions={['pipeline:read', 'pipeline_rule:read']}>
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
       <NavigationLink path={Routes.SYSTEM.ENTERPRISE} description="Enterprise" />
-      <IfPermitted permissions={['inputs:edit']}>
+      <IfPermitted permissions={['sidecars:read', 'sidecar_collectors:read', 'sidecar_collector_configurations:read']}>
         <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
       </IfPermitted>
       {pluginSystemNavigations}

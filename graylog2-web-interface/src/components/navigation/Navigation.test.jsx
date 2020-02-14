@@ -57,8 +57,20 @@ describe('Navigation', () => {
     it('contains help menu', () => {
       expect(wrapper.find('HelpMenu')).toExist();
     });
-    it('contains global throughput', () => {
-      expect(wrapper.find('GlobalThroughput')).toExist();
+    describe('rendering global throughput', () => {
+      it('contains global throughput with the throughput:read role', () => {
+        const permissions = ['throughput:read'];
+        currentUser.permissions = permissions;
+        wrapper = mount(<Navigation permissions={permissions}
+                                    fullName="Sam Lowry"
+                                    location={{ pathname: '/' }}
+                                    loginName="slowry" />);
+
+        expect(wrapper.find('GlobalThroughput')).toExist();
+      });
+      it('does not contains global throughput without the proper roles', () => {
+        expect(wrapper.find('GlobalThroughput')).not.toExist();
+      });
     });
     it('contains notification badge', () => {
       expect(wrapper.find('NotificationBadge')).toExist();
@@ -150,8 +162,8 @@ describe('Navigation', () => {
     };
     it.each`
     permissions                    | count | links
-    ${[]}                          | ${4}  | ${['Streams', 'Alerts', 'Dashboards']}
-    ${['searches:absolute', 'searches:relative', 'searches:keyword']} | ${5}  | ${['Search']}
+    ${[]}                          | ${3}  | ${['Streams', 'Alerts', 'Dashboards']}
+    ${['searches:absolute', 'searches:relative', 'searches:keyword']} | ${4}  | ${['Search']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
 });
