@@ -40,9 +40,9 @@ const EditContentPackPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
-    const { contentPackRevisions } = this.state;
 
-    ContentPacksActions.get(params.contentPackId).then(() => {
+    ContentPacksActions.get(params.contentPackId).then((result) => {
+      const { contentPackRevisions } = result;
       const originContentPackRev = params.contentPackRev;
       const newContentPack = contentPackRevisions.createNewVersionFromRev(originContentPackRev);
       this.setState({ contentPack: newContentPack, contentPackEntities: cloneDeep(newContentPack.entities) });
