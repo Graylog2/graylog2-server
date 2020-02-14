@@ -22,6 +22,7 @@ import org.graylog2.streams.matchers.ContainsMatcher;
 import org.graylog2.streams.matchers.ExactMatcher;
 import org.graylog2.streams.matchers.FieldPresenceMatcher;
 import org.graylog2.streams.matchers.GreaterMatcher;
+import org.graylog2.streams.matchers.MatchInput;
 import org.graylog2.streams.matchers.RegexMatcher;
 import org.graylog2.streams.matchers.SmallerMatcher;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
@@ -43,6 +44,8 @@ public class StreamRuleMatcherFactory {
                 return new ContainsMatcher();
             case ALWAYS_MATCH:
                 return new AlwaysMatcher();
+            case MATCH_INPUT:
+                return new MatchInput();
             default:
                 throw new InvalidStreamRuleTypeException();
         }
