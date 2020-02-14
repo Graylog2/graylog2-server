@@ -167,7 +167,7 @@
         <mockito.version>2.23.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>2.9.0</restassured.version>
-        <system-rules.version>1.18.0</system-rules.version>
+        <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.12.5</testcontainers.version>
 
         <!-- Nodejs dependencies -->
