@@ -17,31 +17,44 @@
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets;
 
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.SeriesSpec;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-class SeriesTest {
+@RunWith(Parameterized.class)
+public class SeriesTest {
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "simple",
-            "mixedCasING",
-            "with_underscore",
-            "_leadingunderscore",
-            "trailingunderscore_",
-            "with-dash",
-            "-leadingdash",
-            "trailingdash-",
-            "with@at",
-            "@leadingat",
-            "trailingat_",
-            "-@_"
-    })
-    void canDestructureAllValidFieldNames(String fieldName) {
+    private final String fieldName;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                {"simple"},
+                {"mixedCasING"},
+                {"with_underscore"},
+                {"_leadingunderscore"},
+                {"trailingunderscore_"},
+                {"with-dash"},
+                {"-leadingdash"},
+                {"trailingdash-"},
+                {"with@at"},
+                {"@leadingat"},
+                {"trailingat_"},
+                {"-@_"}
+        });
+    }
+
+    public SeriesTest(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    @Test
+    public void canDestructureAllValidFieldNames() {
 
         Series sut = Series.builder().function("avg(" + fieldName + ")").build();
 
