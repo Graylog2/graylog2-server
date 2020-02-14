@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { type StyledComponent, css } from 'styled-components';
 import numeral from 'numeral';
 
 import { teinte, util } from 'theme';
@@ -18,7 +18,7 @@ type Props = {
   trendPreference: TrendPreference,
 };
 
-const Background: React.AbstractComponent<{trend: ?string}> = styled.div(({ trend }) => {
+const Background: StyledComponent<{trend: ?string}, {}, HTMLDivElement> = styled.div(({ trend }) => {
   const bgColor = trend && trend === TREND_GOOD ? teinte.tertiary.tre : teinte.tertiary.quattro;
 
   return css`
