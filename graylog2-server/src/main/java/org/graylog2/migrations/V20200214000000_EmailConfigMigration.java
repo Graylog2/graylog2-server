@@ -24,14 +24,14 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
-public class V20190823000000_EmailConfigMigration extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20190823000000_EmailConfigMigration.class);
+public class V20200214000000_EmailConfigMigration extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20200214000000_EmailConfigMigration.class);
 
     private org.graylog2.configuration.EmailConfiguration oldEmailConfiguration;
     private EmailConfigurationService emailConfigurationService;
 
     @Inject
-    public V20190823000000_EmailConfigMigration(org.graylog2.configuration.EmailConfiguration oldEmailConfiguration,
+    public V20200214000000_EmailConfigMigration(org.graylog2.configuration.EmailConfiguration oldEmailConfiguration,
                                                 EmailConfigurationService emailConfigurationService) {
         this.oldEmailConfiguration = oldEmailConfiguration;
         this.emailConfigurationService = emailConfigurationService;
@@ -39,7 +39,7 @@ public class V20190823000000_EmailConfigMigration extends Migration {
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2019-08-23T00:00:00Z");
+        return ZonedDateTime.parse("2020-02-14T00:00:00Z");
     }
 
     @Override
