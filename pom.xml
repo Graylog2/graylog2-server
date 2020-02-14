@@ -151,7 +151,7 @@
         <ulid.version>8.2.0</ulid.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
-        <zkclient.version>0.7</zkclient.version>
+        <zkclient.version>0.11</zkclient.version>
         <zookeeper.version>3.5.6</zookeeper.version>
 
         <!-- Test dependencies -->
