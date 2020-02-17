@@ -42,8 +42,8 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
       } else {
         setOwnValidationMessage(validationMessage);
         setCurrentValidationState(validationState);
-        setIsWhitelisted(result.is_whitelisted);
       }
+      setIsWhitelisted(result.is_whitelisted);
     });
   };
 
@@ -76,7 +76,9 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
     checkIsWhitelisted();
   }, [url, validationState]);
 
+
   const addButton = isError() && !isWhitelisted ? <URLWhitelistFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} formType={formType} /> : '';
+  const helpMessage = <>{ownValidationMessage} {addButton}</>;
   return (
     <Input type="text"
            id="url"
@@ -86,7 +88,7 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
            autoFocus
            required
            onChange={handleChange}
-           help={[ownValidationMessage, addButton]}
+           help={helpMessage}
            bsStyle={currentValidationState}
            value={url}
            labelClassName={labelClassName}
