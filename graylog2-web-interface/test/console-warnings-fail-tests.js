@@ -8,6 +8,7 @@ const oldConsoleError = console.error;
 const ignoredWarnings = [
   'react-async-component-lifecycle-hooks',
   'react-unsafe-component-lifecycles',
+  'Graylog Deprecation Notice:',
 ];
 
 const ignoreWarning = args => (!args[0] || ignoredWarnings.filter(warning => args[0].includes(warning)).length > 0);
