@@ -2,6 +2,7 @@
 import React from 'react';
 import Routes from 'routing/Routes';
 import * as Permissions from 'views/Permissions';
+import { get } from 'lodash';
 
 import { MessageListHandler } from 'views/logic/searchtypes';
 import { MessageList } from 'views/components/widgets';
@@ -131,7 +132,7 @@ export default {
       defaultWidth: 6,
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
-      needsControlledHeight: false,
+      needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<*>) => data[0],
       searchTypes: MessageConfigGenerator,
       titleGenerator: () => 'Untitled Message Table',
@@ -143,7 +144,13 @@ export default {
       defaultWidth: 4,
       visualizationComponent: AggregationBuilder,
       editComponent: AggregationControls,
-      needsControlledHeight: true,
+      needsControlledHeight: (widget: Widget) => {
+        const widgetVisualization = get(widget, 'config.visualization');
+        const flexibleHeightWidgets = [
+          DataTable.type,
+        ];
+        return !flexibleHeightWidgets.find(visualization => visualization === widgetVisualization);
+      },
       searchResultTransformer: PivotTransformer,
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget: Widget) => {
@@ -159,7 +166,7 @@ export default {
     {
       type: 'default',
       visualizationComponent: UnknownWidget,
-      needsControlledHeight: true,
+      needsControlledHeight: () => true,
       editComponent: UnknownWidget,
       searchTypes: () => [],
     },
