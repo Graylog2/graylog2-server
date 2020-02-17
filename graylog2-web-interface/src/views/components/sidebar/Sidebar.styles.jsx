@@ -1,9 +1,8 @@
-import * as React from 'react';
-import styled from 'styled-components';
-
+// @flow strict
+import styled, { type StyledComponent } from 'styled-components';
 import { Title as NavItemTitle } from './NavItem.styles';
 
-export const Container: React.ComponentType<{ open: boolean }> = styled.div`
+export const Container: StyledComponent<{ open: boolean }, {}, HTMLDivElement> = styled.div`
   grid-area: sidebar;
   z-index: 3;
   background: #393939;
@@ -17,7 +16,7 @@ export const Container: React.ComponentType<{ open: boolean }> = styled.div`
   box-shadow: 3px 0 3px rgba(0, 0, 0, .25);
 `;
 
-export const ContentOverlay = styled.div`
+export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   position: fixed;
   top: 0;
   bottom: 0;
@@ -26,28 +25,30 @@ export const ContentOverlay = styled.div`
   background: rgba(3, 3, 3, 0.25);
 `;
 
-export const SidebarHeader: React.ComponentType<{open: boolean, hasTitle: boolean}> = styled(NavItemTitle)(({ open, hasTitle }) => {
-  let justifyContent = 'center';
-  if (open && hasTitle) justifyContent = 'space-between';
-  if (open && !hasTitle) justifyContent = 'flex-end';
-  return `justify-content: ${justifyContent}`;
-});
+export const SidebarHeader: StyledComponent<{open: boolean, hasTitle: boolean}, {}, React.ComponentType> = styled(NavItemTitle)`
+  ${(({ open, hasTitle }) => {
+    let justifyContent = 'center';
+    if (open && hasTitle) justifyContent = 'space-between';
+    if (open && !hasTitle) justifyContent = 'flex-end';
+    return `justify-content: ${justifyContent}`;
+  })}
+`;
 
-export const Headline = styled.h3`
+export const Headline: StyledComponent<{}, {}, HTMLHeadingElement> = styled.h3`
   color: inherit;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-export const ToggleIcon = styled.div`
+export const ToggleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   width: 25px;
   text-align: center;
   font-size: 20px;
   cursor: pointer;
 `;
 
-export const HorizontalRuler = styled.div`
+export const HorizontalRuler: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   width: 100%;
   padding: 0 10px;
   margin: 5px 0 10px 0;

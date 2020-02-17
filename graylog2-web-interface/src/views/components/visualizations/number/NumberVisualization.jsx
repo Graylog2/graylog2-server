@@ -1,6 +1,6 @@
 // @flow strict
-import React, { type AbstractComponent, useContext, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import React, { useContext, useEffect, useRef } from 'react';
+import styled, { type StyledComponent } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -17,7 +17,7 @@ import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
 import type { CurrentViewType } from '../../CustomPropTypes';
 
-const GridContainer: AbstractComponent<{}> = styled.div`
+const GridContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 4fr 1fr;

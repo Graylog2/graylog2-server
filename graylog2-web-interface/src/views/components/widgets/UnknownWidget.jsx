@@ -1,8 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import { Icon } from 'components/common';
 import ClipboardButton from 'components/common/ClipboardButton';

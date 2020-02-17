@@ -1,13 +1,12 @@
 // @flow strict
-import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { type StyledComponent, css } from 'styled-components';
 
 type StyleProps = {
   isSelected: boolean,
   expandRight: boolean,
 };
 
-export const Title: React.ComponentType<StyleProps> = styled.div(({ isSelected, expandRight }) => css`
+export const Title: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div(({ isSelected, expandRight }) => css`
   padding: 9px 10px;
   display: flex;
   align-items: center;
@@ -31,7 +30,7 @@ export const Title: React.ComponentType<StyleProps> = styled.div(({ isSelected, 
   `)}
 `);
 
-export const TitleText: React.ComponentType<{}> = styled.div`
+export const TitleText: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   font-size: 16px;
   display: inline;
   margin-left: 10px;
@@ -39,14 +38,14 @@ export const TitleText: React.ComponentType<{}> = styled.div`
   white-space: nowrap;
 `;
 
-export const TitleIcon: React.ComponentType<{}> = styled.div`
+export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   width: 25px;
   text-align: center;
   font-size: 20px;
   cursor: pointer;
 `;
 
-export const Content: React.ComponentType<StyleProps> = styled.div(({ isSelected, expandRight }) => css`
+export const Content: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div(({ isSelected, expandRight }) => css`
   color: #666666;
   background: #FFFFFF;
   box-shadow:
