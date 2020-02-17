@@ -116,7 +116,7 @@ export default {
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: AppWithExtendedSearchBar },
     { path: showSearchPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
-    { path: Routes.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
+    { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
