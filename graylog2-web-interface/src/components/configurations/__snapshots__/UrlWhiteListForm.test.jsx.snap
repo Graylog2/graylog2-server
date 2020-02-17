@@ -3,6 +3,7 @@
 exports[`UrlWhitelistForm render the UrlWhitelistForm component should create new instance 1`] = `
 <UrlWhiteListForm
   disabled={false}
+  newUrlEntry=""
   onUpdate={
     [MockFunction] {
       "calls": Array [
