@@ -11,8 +11,6 @@ class HttpNotificationForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  ;
-
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
     const nextConfig = lodash.cloneDeep(config);

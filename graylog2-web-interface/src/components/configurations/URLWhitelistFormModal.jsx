@@ -31,7 +31,7 @@ type Props = {
 
 
 class URLWhitelistFormModal extends React.Component<Props, State> {
-    configModal: ?BootstrapModalForm;
+    configModal: ?BootstrapModalForm = React.createRef();
 
     inputs = {};
 
@@ -48,6 +48,7 @@ class URLWhitelistFormModal extends React.Component<Props, State> {
         config: { entries: [], disabled: false },
         isValid: false,
       };
+      this.configModal = React.createRef();
     }
 
     componentDidMount() {
@@ -68,13 +69,13 @@ class URLWhitelistFormModal extends React.Component<Props, State> {
 
   _openModal = () => {
     if (this.configModal) {
-      this.configModal.open();
+      this.configModal.current.open();
     }
   }
 
   _closeModal = () => {
     if (this.configModal) {
-      this.configModal.close();
+      this.configModal.current.close();
     }
   }
 
@@ -125,7 +126,7 @@ class URLWhitelistFormModal extends React.Component<Props, State> {
           <IfPermitted permissions="urlwhitelist:write">
             <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Add to URL Whitelist</Button>
           </IfPermitted>
-          <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
+          <BootstrapModalForm ref={this.configModal}
                               bsSize="lg"
                               title="Update Whitelist Configuration"
                               onSubmitForm={this._saveConfig}
