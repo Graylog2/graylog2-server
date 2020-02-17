@@ -24,7 +24,7 @@ const NodeHeap = styled.div`
   margin-top: 10px;
 
   p {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
 `;
 

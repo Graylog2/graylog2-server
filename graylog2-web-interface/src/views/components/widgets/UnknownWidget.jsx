@@ -9,15 +9,14 @@ import ClipboardButton from 'components/common/ClipboardButton';
 import type { WidgetProps } from './Widget';
 
 const Container: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const IconContainer = styled.div`
-    margin-right: 15px;
-    margin: 3px 15px 0 0;
+  margin: 3px 15px 0 0;
 `;
 
 const Description = styled.div`
@@ -26,7 +25,8 @@ const Description = styled.div`
 
 const Row = styled.div`
   margin-bottom: 5px;
-  :last-child {
+
+  &:last-child {
     margin-bottom: 0;
   }
 `;
