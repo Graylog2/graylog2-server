@@ -1,13 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
 import numeral from 'numeral';
 import moment from 'moment';
 import {} from 'moment-duration-format';
+import styled from 'styled-components';
 
-import { ProgressBar, Row, Col, Alert } from 'components/graylog';
+import { Row, Col, Alert } from 'components/graylog';
+import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -22,6 +25,15 @@ import Routes from 'routing/Routes';
 const MetricsActions = ActionsProvider.getActions('Metrics');
 const MetricsStore = StoreProvider.getStore('Metrics');
 const JournalStore = StoreProvider.getStore('Journal');
+
+const JournalUsageProgressBar = styled(ProgressBar)`
+  margin-bottom: 5px;
+  margin-top: 10px;
+
+  ${Bar} {
+    min-width: 3em;
+  }
+`;
 
 const JournalDetails = createReactClass({
   displayName: 'JournalDetails',
@@ -39,20 +51,27 @@ const JournalDetails = createReactClass({
   },
 
   componentDidMount() {
-    JournalStore.get(this.props.nodeId).then((journalInformation) => {
+    const { nodeId } = this.props;
+
+    JournalStore.get(nodeId).then((journalInformation) => {
       this.setState({ journalInformation: journalInformation }, this._listenToMetrics);
     });
   },
 
   componentWillUnmount() {
+    const { nodeId } = this.props;
+
     if (this.metricNames) {
-      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
     }
   },
 
   _listenToMetrics() {
+    const { nodeId } = this.props;
+    const { journalInformation } = this.state;
+
     // only listen for updates if the journal is actually turned on
-    if (this.state.journalInformation.enabled) {
+    if (journalInformation.enabled) {
       this.metricNames = {
         append: 'org.graylog2.journal.append.1-sec-rate',
         read: 'org.graylog2.journal.read.1-sec-rate',
@@ -61,12 +80,14 @@ const JournalDetails = createReactClass({
         utilizationRatio: 'org.graylog2.journal.utilization-ratio',
         oldestSegment: 'org.graylog2.journal.oldest-segment',
       };
-      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
+      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
     }
   },
 
   _isLoading() {
-    return !(this.state.metrics && this.state.journalInformation);
+    const { journalInformation, metrics } = this.state;
+
+    return !(metrics && journalInformation);
   },
 
   render() {
@@ -75,7 +96,8 @@ const JournalDetails = createReactClass({
     }
 
     const { nodeId } = this.props;
-    const nodeMetrics = this.state.metrics[nodeId];
+    const { metrics: metricsState } = this.state;
+    const nodeMetrics = metricsState[nodeId];
     const { journalInformation } = this.state;
 
     if (!journalInformation.enabled) {
@@ -127,11 +149,13 @@ const JournalDetails = createReactClass({
             </dd>
           </dl>
         </Col>
-        <Col md={6} className="journal-details-usage">
+        <Col md={6}>
           <h3>Utilization</h3>
 
-          <ProgressBar now={metrics.utilizationRatio * 100}
-                       label={NumberUtils.formatPercentage(metrics.utilizationRatio)} />
+          <JournalUsageProgressBar bars={[{
+            value: metrics.utilizationRatio * 100,
+            label: NumberUtils.formatPercentage(metrics.utilizationRatio),
+          }]} />
 
           {overcommittedWarning}
 

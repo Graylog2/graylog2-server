@@ -113,7 +113,7 @@ const globalStyles = css`
   }
 
   .modal-backdrop {
-    height: 100000%;  // yes, really. this fixes the backdrop being cut off when the page is scrolled.
+    height: 100000%;  /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
     z-index: 1030;
   }
 
@@ -241,7 +241,7 @@ const globalStyles = css`
     padding: 5px 25px;
   }
 
-  // This is rendered inside a #main-content, and we need to compensate the margin-top to make it look nicer
+  /* This is rendered inside a #main-content, and we need to compensate the margin-top to make it look nicer */
   #main-content-search {
     margin-bottom: 0;
     margin-top: -15px;
@@ -391,11 +391,6 @@ const globalStyles = css`
     border-bottom: 1px solid #ccc;
   }
 
-  .systemjob .progress {
-    margin-top: 2px;
-    margin-bottom: 5px;
-  }
-
   .systemjob .finished {
     display: none;
     position: relative;
@@ -495,11 +490,6 @@ const globalStyles = css`
 
   .node-row .hostname {
     font-size: 12px;
-  }
-
-  .rickshaw_graph .x_tick {
-    position: relative;
-    top: 38px;
   }
 
   .graph-resolution-selector {
@@ -762,12 +752,6 @@ const globalStyles = css`
     margin-bottom: 0;
   }
 
-  //#relative-timerange-selector {
-  //  font-size: 12px;
-  //  line-height: 15px;
-  //  height: 25px;
-  //}
-
   .timerange-chooser {
     float: left;
     margin-right: 5px;
@@ -880,31 +864,11 @@ const globalStyles = css`
     pointer-events: none;
   }
 
-  .rickshaw_graph:active,
-  .rickshaw_graph:focus,
-  .rickshaw_graph *:active,
-  .rickshaw_graph *:focus {
-    cursor: crosshair !important;
-  }
-
-  .rickshaw_graph .detail .x_label {
-    display: none
-  }
-
-  .rickshaw_graph .detail .item {
-    line-height: 1.4;
-    padding: 0.5em
-  }
-
   .detail_swatch {
     display: inline-block;
     width: 10px;
     height: 10px;
     margin: 0 4px 0 0
-  }
-
-  .rickshaw_graph .detail .date {
-    color: #a0a0a0
   }
 
   .input-io .total {
@@ -1296,19 +1260,6 @@ const globalStyles = css`
     margin-left: 6px;
   }
 
-  .node-buffer-usage {
-    margin-top: 10px;
-    margin-bottom: 7px;
-  }
-
-  .node-buffer-usage .progress-bar, .journal-details-usage .progress-bar {
-    text-shadow: 0 1px 2px rgba(0,0,0,0.4), 2px -1px 3px rgba(255,255,255,0.5);
-
-    span {
-      margin-left: 1px;
-    }
-  }
-
   .system-system dt {
     float: left;
   }
@@ -1399,7 +1350,8 @@ const globalStyles = css`
     font-size: 14px;
   }
 
-  .dynatable-search input, .dynatable-per-page select {
+  .dynatable-search input,
+  .dynatable-per-page select {
     position: relative;
     top: 3px;
     margin-left: 3px;
@@ -1486,7 +1438,9 @@ const globalStyles = css`
     margin-left: 10px;
   }
 
-  .alert-type-form input[type=number], .alert-type-form input[type=text], .alert-type-form select {
+  .alert-type-form input[type=number],
+  .alert-type-form input[type=text],
+  .alert-type-form select {
     padding: 0 0 0 5px;
     height: 25px;
     vertical-align: baseline;
@@ -1560,7 +1514,8 @@ const globalStyles = css`
     margin-bottom: 7px;
   }
 
-  .streameditpermissions, .dashboardeditpermissions {
+  .streameditpermissions,
+  .dashboardeditpermissions {
     margin-top: 10px;
   }
 
@@ -1582,11 +1537,11 @@ const globalStyles = css`
   }
 
   .zeroclipboard-is-hover {
-    // via .btn-default:hover from bootstrap
+    /* via .btn-default:hover from bootstrap */
     color: #333;
     background-color: #d7d9d9;
     border-color: #c3c8c8;
-    // bootstrap copy end
+    /* bootstrap copy end */
     cursor: move;
   }
 
@@ -2001,22 +1956,6 @@ const globalStyles = css`
     margin-left: 180px;
   }
 
-  .graylog-node .graylog-node-heap {
-    margin-top: 10px;
-  }
-
-  .graylog-node .graylog-node-heap .progress {
-    height: 25px;
-    margin-bottom: 5px;
-  }
-
-  span.blob {
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    margin-left: 2px;
-  }
-
   #message-table-paginator-top {
     width: 90%;
   }
@@ -2037,7 +1976,7 @@ const globalStyles = css`
   }
 
   #message-table-paginator-bottom .affix {
-    z-index: 3; // show on top of .pagination .active links
+    z-index: 3; /* show on top of .pagination .active links */
     bottom: 1px;
   }
 
@@ -2263,38 +2202,6 @@ const globalStyles = css`
     margin-bottom: 5px;
   }
 
-  .graylog-node-heap .progress, .node-buffer-usage .progress, .journal-details-usage .progress {
-    margin-bottom: 5px;
-  }
-
-  .journal-details-usage .progress {
-    margin-top: 10px;
-  }
-
-  .journal-details-usage .progress .progress-bar {
-    min-width: 3em;
-  }
-
-  .progress-bar {
-    max-width: 100%;
-  }
-
-  .graylog-node-heap p {
-    margin-bottom: 0px;
-  }
-
-  .graylog-node-heap .used-memory {
-    background-color: #9e1f63;
-  }
-
-  .graylog-node-heap .committed-memory {
-    background-color: #f7941e;
-  }
-
-  .graylog-node-heap .max-memory {
-    background-color: #f5f5f5;
-  }
-
   dl.system-system, dl.system-rest {
     margin-top: 5px;
     margin-bottom: 0px;
@@ -2428,10 +2335,10 @@ const globalStyles = css`
   }
 
   .triggered-alerts .page-size {
-    margin-top: -23px; // Height of the header
+    margin-top: -23px; /* Height of the header */
   }
 
-  // Ensure that the stream start/pause buttons have the same size.
+  /* Ensure that the stream start/pause buttons have the same size. */
   .toggle-stream-button {
     width: 8.5em;
   }

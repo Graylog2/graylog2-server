@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
-import { ProgressBar, Button } from 'components/graylog';
+import { Button, ProgressBar } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
@@ -13,6 +15,15 @@ import { Spinner } from 'components/common';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
+
+const NodeBufferUsage = styled.div`
+  margin-top: 10px;
+  margin-bottom: 7px;
+`;
+
+const StyledProgressBar = styled(ProgressBar)`
+  margin-bottom: 5px;
+`;
 
 const BufferUsage = createReactClass({
   displayName: 'BufferUsage',
@@ -70,11 +81,13 @@ const BufferUsage = createReactClass({
           <Button bsSize="xsmall" className="pull-right">Metrics</Button>
         </LinkContainer>
         <h3>{title}</h3>
-        <div className="node-buffer-usage">
-          <ProgressBar now={usagePercentage * 100}
-                       bsStyle="warning"
-                       label={percentLabel} />
-        </div>
+        <NodeBufferUsage>
+          <StyledProgressBar bars={[{
+            value: usagePercentage * 100,
+            bsStyle: 'warning',
+            label: percentLabel,
+          }]} />
+        </NodeBufferUsage>
         <span><strong>{usage} messages</strong> in {title.toLowerCase()}, {percentLabel} utilized.</span>
       </div>
     );
