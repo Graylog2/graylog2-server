@@ -10,7 +10,10 @@ const SplitButton = styled(BootstrapSplitButton)`
 
   ~ .btn.dropdown-toggle {
     ${props => buttonStyles(props)};
-    ${menuItemStyles({ sibling: true })};
+
+    & ~ {
+      ${menuItemStyles}
+    }
   }
 `;
 

@@ -1528,12 +1528,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -1554,7 +1553,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -1574,7 +1573,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-1"
                                       pullRight={true}
                                       title="More Actions"
@@ -1607,7 +1606,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-1"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -1623,7 +1622,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-1"
                                                   onClick={[Function]}
@@ -1633,7 +1632,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-1"
                                                     onClick={[Function]}
@@ -2414,12 +2413,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -2440,7 +2438,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -2460,7 +2458,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-2"
                                       pullRight={true}
                                       title="More Actions"
@@ -2493,7 +2491,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-2"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -2509,7 +2507,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-2"
                                                   onClick={[Function]}
@@ -2519,7 +2517,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-2"
                                                     onClick={[Function]}
@@ -3232,12 +3230,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -3258,7 +3255,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -3278,7 +3275,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-3"
                                       pullRight={true}
                                       title="More Actions"
@@ -3311,7 +3308,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-3"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -3327,7 +3324,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-3"
                                                   onClick={[Function]}
@@ -3337,7 +3334,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-3"
                                                     onClick={[Function]}
@@ -4049,12 +4046,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -4075,7 +4071,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -4095,7 +4091,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-4"
                                       pullRight={true}
                                       title="More Actions"
@@ -4128,7 +4124,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-4"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -4144,7 +4140,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-4"
                                                   onClick={[Function]}
@@ -4154,7 +4150,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-4"
                                                     onClick={[Function]}
@@ -4867,12 +4863,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -4893,7 +4888,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -4913,7 +4908,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-5"
                                       pullRight={true}
                                       title="More Actions"
@@ -4946,7 +4941,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-5"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -4962,7 +4957,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-5"
                                                   onClick={[Function]}
@@ -4972,7 +4967,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-5"
                                                     onClick={[Function]}
@@ -5685,12 +5680,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -5711,7 +5705,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -5731,7 +5725,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-6"
                                       pullRight={true}
                                       title="More Actions"
@@ -5764,7 +5758,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-6"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -5780,7 +5774,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-6"
                                                   onClick={[Function]}
@@ -5790,7 +5784,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-6"
                                                     onClick={[Function]}
@@ -6503,12 +6497,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -6529,7 +6522,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -6549,7 +6542,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-7"
                                       pullRight={true}
                                       title="More Actions"
@@ -6582,7 +6575,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-7"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -6598,7 +6591,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-7"
                                                   onClick={[Function]}
@@ -6608,7 +6601,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-7"
                                                     onClick={[Function]}
@@ -7321,12 +7314,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -7347,7 +7339,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -7367,7 +7359,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-8"
                                       pullRight={true}
                                       title="More Actions"
@@ -7400,7 +7392,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-8"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -7416,7 +7408,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-8"
                                                   onClick={[Function]}
@@ -7426,7 +7418,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-8"
                                                     onClick={[Function]}
@@ -8138,12 +8130,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -8164,7 +8155,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -8184,7 +8175,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-9"
                                       pullRight={true}
                                       title="More Actions"
@@ -8217,7 +8208,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-9"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -8233,7 +8224,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-9"
                                                   onClick={[Function]}
@@ -8243,7 +8234,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-9"
                                                     onClick={[Function]}
@@ -8956,12 +8947,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "DropdownButton-sc-1343dcx-0",
                                           "isStatic": false,
-                                          "lastClassName": "jgZJTb",
+                                          "lastClassName": "eTmTdM",
                                           "rules": Array [
                                             [Function],
-                                            ";",
-                                            "& ~",
-                                            " .dropdown-menu{> li > a{color:",
+                                            ";& ~{",
+                                            ".dropdown-menu{> li > a{color:",
                                             "#1F1F1F",
                                             ";:hover,:focus{color:",
                                             "#484848",
@@ -8982,7 +8972,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             ";color:",
                                             "#b0b0b0",
                                             ";}}}",
-                                            ";",
+                                            "}",
                                           ],
                                         },
                                         "displayName": "DropdownButton",
@@ -9002,7 +8992,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                       id="more-actions-10"
                                       pullRight={true}
                                       title="More Actions"
@@ -9035,7 +9025,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 bsClass="dropdown-toggle"
                                                 bsRole="toggle"
                                                 bsSize="small"
-                                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                                className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                                 id="more-actions-10"
                                                 key=".0"
                                                 onClick={[Function]}
@@ -9051,7 +9041,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="btn"
                                                   bsSize="small"
                                                   bsStyle="default"
-                                                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                                  className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                                   disabled={false}
                                                   id="more-actions-10"
                                                   onClick={[Function]}
@@ -9061,7 +9051,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   <button
                                                     aria-expanded={false}
                                                     aria-haspopup={true}
-                                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-sm btn-default"
                                                     disabled={false}
                                                     id="more-actions-10"
                                                     onClick={[Function]}

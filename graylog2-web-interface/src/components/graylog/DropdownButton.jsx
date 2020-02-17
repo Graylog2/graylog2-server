@@ -7,7 +7,10 @@ import buttonStyles from './styles/button';
 
 const DropdownButton = styled(BootstrapDropdownButton)`
   ${props => buttonStyles(props)};
-  ${menuItemStyles({ sibling: true })};
+
+  & ~ {
+    ${menuItemStyles}
+  }
 `;
 
 export default DropdownButton;
