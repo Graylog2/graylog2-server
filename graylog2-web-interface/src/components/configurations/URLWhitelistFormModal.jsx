@@ -143,7 +143,7 @@ class URLWhitelistFormModal extends React.Component<Props, State> {
 }
 
 URLWhitelistFormModal.propTypes = {
-  newUrlEntry: PropTypes.object,
+  newUrlEntry: PropTypes.string,
   onUpdate: PropTypes.func,
   configuration: PropTypes.object,
   currentUser: PropTypes.object.isRequired,
