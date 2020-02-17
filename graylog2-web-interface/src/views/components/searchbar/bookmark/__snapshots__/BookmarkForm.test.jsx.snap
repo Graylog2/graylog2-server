@@ -35,7 +35,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                   "componentStyle": ComponentStyle {
                     "componentId": "Popover-wd1j0g-0",
                     "isStatic": true,
-                    "lastClassName": "huANrm",
+                    "lastClassName": "dQcVSD",
                     "rules": Array [
                       "&&{background-color:",
                       "#FFF",
@@ -43,19 +43,19 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                       "rgba(31,31,31,0.2)",
                       ";&.top > .arrow{border-top-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-top-color:",
+                      ";&::after{border-top-color:",
                       "#FFF",
                       ";}}&.right > .arrow{border-right-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-right-color:",
+                      ";&::after{border-right-color:",
                       "#FFF",
                       ";}}&.bottom > .arrow{border-bottom-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-bottom-color:",
+                      ";&::after{border-bottom-color:",
                       "#FFF",
                       ";}}&.left > .arrow{border-left-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-left-color:",
+                      ";&::after{border-left-color:",
                       "#FFF",
                       ";}}}.popover-title{background-color:",
                       "#f7f7f7",
@@ -78,13 +78,13 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
             >
               <Popover
                 bsClass="popover"
-                className="Popover-wd1j0g-0 huANrm"
+                className="Popover-wd1j0g-0 dQcVSD"
                 id="bookmark-popover"
                 placement="right"
                 title="Name of search"
               >
                 <div
-                  className="Popover-wd1j0g-0 huANrm popover right"
+                  className="Popover-wd1j0g-0 dQcVSD popover right"
                   id="bookmark-popover"
                   role="tooltip"
                   style={
@@ -219,7 +219,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "deAIE",
+                                          "lastClassName": "iHrYrm",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -231,7 +231,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                             "#b8b8b8",
                                             ";}&:focus{border-color:",
                                             "#6DC6E7",
-                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                             "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
@@ -256,7 +256,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 deAIE"
+                                      className="FormControl-sc-1amoaox-0 iHrYrm"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -264,7 +264,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
@@ -479,7 +479,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                   "componentStyle": ComponentStyle {
                     "componentId": "Popover-wd1j0g-0",
                     "isStatic": true,
-                    "lastClassName": "huANrm",
+                    "lastClassName": "dQcVSD",
                     "rules": Array [
                       "&&{background-color:",
                       "#FFF",
@@ -487,19 +487,19 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                       "rgba(31,31,31,0.2)",
                       ";&.top > .arrow{border-top-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-top-color:",
+                      ";&::after{border-top-color:",
                       "#FFF",
                       ";}}&.right > .arrow{border-right-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-right-color:",
+                      ";&::after{border-right-color:",
                       "#FFF",
                       ";}}&.bottom > .arrow{border-bottom-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-bottom-color:",
+                      ";&::after{border-bottom-color:",
                       "#FFF",
                       ";}}&.left > .arrow{border-left-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-left-color:",
+                      ";&::after{border-left-color:",
                       "#FFF",
                       ";}}}.popover-title{background-color:",
                       "#f7f7f7",
@@ -522,13 +522,13 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
             >
               <Popover
                 bsClass="popover"
-                className="Popover-wd1j0g-0 huANrm"
+                className="Popover-wd1j0g-0 dQcVSD"
                 id="bookmark-popover"
                 placement="right"
                 title="Name of search"
               >
                 <div
-                  className="Popover-wd1j0g-0 huANrm popover right"
+                  className="Popover-wd1j0g-0 dQcVSD popover right"
                   id="bookmark-popover"
                   role="tooltip"
                   style={
@@ -663,7 +663,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "deAIE",
+                                          "lastClassName": "iHrYrm",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -675,7 +675,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                             "#b8b8b8",
                                             ";}&:focus{border-color:",
                                             "#6DC6E7",
-                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                             "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
@@ -700,7 +700,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 deAIE"
+                                      className="FormControl-sc-1amoaox-0 iHrYrm"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -708,7 +708,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
@@ -1000,7 +1000,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                   "componentStyle": ComponentStyle {
                     "componentId": "Popover-wd1j0g-0",
                     "isStatic": true,
-                    "lastClassName": "huANrm",
+                    "lastClassName": "dQcVSD",
                     "rules": Array [
                       "&&{background-color:",
                       "#FFF",
@@ -1008,19 +1008,19 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                       "rgba(31,31,31,0.2)",
                       ";&.top > .arrow{border-top-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-top-color:",
+                      ";&::after{border-top-color:",
                       "#FFF",
                       ";}}&.right > .arrow{border-right-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-right-color:",
+                      ";&::after{border-right-color:",
                       "#FFF",
                       ";}}&.bottom > .arrow{border-bottom-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-bottom-color:",
+                      ";&::after{border-bottom-color:",
                       "#FFF",
                       ";}}&.left > .arrow{border-left-color:",
                       "rgba(31,31,31,0.25)",
-                      ";&:after{border-left-color:",
+                      ";&::after{border-left-color:",
                       "#FFF",
                       ";}}}.popover-title{background-color:",
                       "#f7f7f7",
@@ -1043,13 +1043,13 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
             >
               <Popover
                 bsClass="popover"
-                className="Popover-wd1j0g-0 huANrm"
+                className="Popover-wd1j0g-0 dQcVSD"
                 id="bookmark-popover"
                 placement="right"
                 title="Name of search"
               >
                 <div
-                  className="Popover-wd1j0g-0 huANrm popover right"
+                  className="Popover-wd1j0g-0 dQcVSD popover right"
                   id="bookmark-popover"
                   role="tooltip"
                   style={
@@ -1184,7 +1184,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": true,
-                                          "lastClassName": "deAIE",
+                                          "lastClassName": "iHrYrm",
                                           "rules": Array [
                                             "color:",
                                             "#1F1F1F",
@@ -1196,7 +1196,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                             "#b8b8b8",
                                             ";}&:focus{border-color:",
                                             "#6DC6E7",
-                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                             "rgba(109,198,231,0.4)",
                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                             "#DCE1E5",
@@ -1221,7 +1221,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 deAIE"
+                                      className="FormControl-sc-1amoaox-0 iHrYrm"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -1229,7 +1229,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"

@@ -104,7 +104,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": true,
-                          "lastClassName": "deAIE",
+                          "lastClassName": "iHrYrm",
                           "rules": Array [
                             "color:",
                             "#1F1F1F",
@@ -116,7 +116,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             "#b8b8b8",
                             ";}&:focus{border-color:",
                             "#6DC6E7",
-                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                             "rgba(109,198,231,0.4)",
                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                             "#DCE1E5",
@@ -142,7 +142,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 deAIE"
+                      className="FormControl-sc-1amoaox-0 iHrYrm"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -151,7 +151,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -456,7 +456,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": true,
-                                                  "lastClassName": "deAIE",
+                                                  "lastClassName": "iHrYrm",
                                                   "rules": Array [
                                                     "color:",
                                                     "#1F1F1F",
@@ -468,7 +468,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                                     "#b8b8b8",
                                                     ";}&:focus{border-color:",
                                                     "#6DC6E7",
-                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                                     "rgba(109,198,231,0.4)",
                                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                     "#DCE1E5",
@@ -494,7 +494,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 deAIE"
+                                              className="FormControl-sc-1amoaox-0 iHrYrm"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -503,7 +503,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -1060,7 +1060,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": true,
-                          "lastClassName": "deAIE",
+                          "lastClassName": "iHrYrm",
                           "rules": Array [
                             "color:",
                             "#1F1F1F",
@@ -1072,7 +1072,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             "#b8b8b8",
                             ";}&:focus{border-color:",
                             "#6DC6E7",
-                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                             "rgba(109,198,231,0.4)",
                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                             "#DCE1E5",
@@ -1098,7 +1098,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 deAIE"
+                      className="FormControl-sc-1amoaox-0 iHrYrm"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -1107,7 +1107,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -1434,7 +1434,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": true,
-                                                  "lastClassName": "deAIE",
+                                                  "lastClassName": "iHrYrm",
                                                   "rules": Array [
                                                     "color:",
                                                     "#1F1F1F",
@@ -1446,7 +1446,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                                     "#b8b8b8",
                                                     ";}&:focus{border-color:",
                                                     "#6DC6E7",
-                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                                     "rgba(109,198,231,0.4)",
                                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                     "#DCE1E5",
@@ -1472,7 +1472,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 deAIE"
+                                              className="FormControl-sc-1amoaox-0 iHrYrm"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -1481,7 +1481,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"

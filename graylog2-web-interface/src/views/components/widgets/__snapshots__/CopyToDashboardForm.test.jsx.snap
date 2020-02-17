@@ -90,7 +90,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 deAIE form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 iHrYrm form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -307,7 +307,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 deAIE form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 iHrYrm form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"

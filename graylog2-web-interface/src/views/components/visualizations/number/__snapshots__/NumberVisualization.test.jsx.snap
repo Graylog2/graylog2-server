@@ -58,9 +58,9 @@ exports[`NumberVisualization should render a number visualization 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "NumberVisualization__SingleItemGrid-lb6dwm-1",
             "isStatic": true,
-            "lastClassName": "ioFQRZ",
+            "lastClassName": "bAvNbr",
             "rules": Array [
-              "display:grid;grid-template-columns:1fr;grid-template-rows:1fr;grid-column-gap:0px;grid-row-gap:0px;height:100%;width:100%;",
+              "display:grid;grid-template-columns:1fr;grid-template-rows:1fr;grid-column-gap:0;grid-row-gap:0;height:100%;width:100%;",
             ],
           },
           "displayName": "NumberVisualization__SingleItemGrid",
@@ -76,7 +76,7 @@ exports[`NumberVisualization should render a number visualization 1`] = `
       forwardedRef={null}
     >
       <div
-        className="NumberVisualization__SingleItemGrid-lb6dwm-1 ioFQRZ"
+        className="NumberVisualization__SingleItemGrid-lb6dwm-1 bAvNbr"
       >
         <NumberVisualization__NumberBox>
           <StyledComponent

@@ -467,7 +467,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         "componentStyle": ComponentStyle {
                                                                           "componentId": "FormControl-sc-1amoaox-0",
                                                                           "isStatic": true,
-                                                                          "lastClassName": "deAIE",
+                                                                          "lastClassName": "iHrYrm",
                                                                           "rules": Array [
                                                                             "color:",
                                                                             "#1F1F1F",
@@ -479,7 +479,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             "#b8b8b8",
                                                                             ";}&:focus{border-color:",
                                                                             "#6DC6E7",
-                                                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                                                             "rgba(109,198,231,0.4)",
                                                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                                             "#DCE1E5",
@@ -505,7 +505,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   >
                                                                     <FormControl
                                                                       bsClass="form-control"
-                                                                      className="FormControl-sc-1amoaox-0 deAIE"
+                                                                      className="FormControl-sc-1amoaox-0 iHrYrm"
                                                                       componentClass="input"
                                                                       inputRef={[Function]}
                                                                       label="Filter Streams"
@@ -514,7 +514,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                       type="text"
                                                                     >
                                                                       <input
-                                                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                                         id="filter-streams-data-filter"
                                                                         label="Filter Streams"
                                                                         name="filter-streams-data-filter"
@@ -1918,7 +1918,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         "componentStyle": ComponentStyle {
                                                                           "componentId": "FormControl-sc-1amoaox-0",
                                                                           "isStatic": true,
-                                                                          "lastClassName": "deAIE",
+                                                                          "lastClassName": "iHrYrm",
                                                                           "rules": Array [
                                                                             "color:",
                                                                             "#1F1F1F",
@@ -1930,7 +1930,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             "#b8b8b8",
                                                                             ";}&:focus{border-color:",
                                                                             "#6DC6E7",
-                                                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                                                             "rgba(109,198,231,0.4)",
                                                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                                             "#DCE1E5",
@@ -1956,7 +1956,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   >
                                                                     <FormControl
                                                                       bsClass="form-control"
-                                                                      className="FormControl-sc-1amoaox-0 deAIE"
+                                                                      className="FormControl-sc-1amoaox-0 iHrYrm"
                                                                       componentClass="input"
                                                                       inputRef={[Function]}
                                                                       label="Filter Dashboards"
@@ -1965,7 +1965,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                       type="text"
                                                                     >
                                                                       <input
-                                                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                                         id="filter-dashboards-data-filter"
                                                                         label="Filter Dashboards"
                                                                         name="filter-dashboards-data-filter"
@@ -3612,7 +3612,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         "componentStyle": ComponentStyle {
                                                                           "componentId": "FormControl-sc-1amoaox-0",
                                                                           "isStatic": true,
-                                                                          "lastClassName": "deAIE",
+                                                                          "lastClassName": "iHrYrm",
                                                                           "rules": Array [
                                                                             "color:",
                                                                             "#1F1F1F",
@@ -3624,7 +3624,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             "#b8b8b8",
                                                                             ";}&:focus{border-color:",
                                                                             "#6DC6E7",
-                                                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                                                             "rgba(109,198,231,0.4)",
                                                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                                             "#DCE1E5",
@@ -3650,7 +3650,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   >
                                                                     <FormControl
                                                                       bsClass="form-control"
-                                                                      className="FormControl-sc-1amoaox-0 deAIE"
+                                                                      className="FormControl-sc-1amoaox-0 iHrYrm"
                                                                       componentClass="input"
                                                                       inputRef={[Function]}
                                                                       label="Filter Streams"
@@ -3659,7 +3659,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                       type="text"
                                                                     >
                                                                       <input
-                                                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                                         id="filter-streams-data-filter"
                                                                         label="Filter Streams"
                                                                         name="filter-streams-data-filter"
@@ -5063,7 +5063,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         "componentStyle": ComponentStyle {
                                                                           "componentId": "FormControl-sc-1amoaox-0",
                                                                           "isStatic": true,
-                                                                          "lastClassName": "deAIE",
+                                                                          "lastClassName": "iHrYrm",
                                                                           "rules": Array [
                                                                             "color:",
                                                                             "#1F1F1F",
@@ -5075,7 +5075,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             "#b8b8b8",
                                                                             ";}&:focus{border-color:",
                                                                             "#6DC6E7",
-                                                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                                                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
                                                                             "rgba(109,198,231,0.4)",
                                                                             ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                                             "#DCE1E5",
@@ -5101,7 +5101,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   >
                                                                     <FormControl
                                                                       bsClass="form-control"
-                                                                      className="FormControl-sc-1amoaox-0 deAIE"
+                                                                      className="FormControl-sc-1amoaox-0 iHrYrm"
                                                                       componentClass="input"
                                                                       inputRef={[Function]}
                                                                       label="Filter Dashboards"
@@ -5110,7 +5110,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                       type="text"
                                                                     >
                                                                       <input
-                                                                        className="FormControl-sc-1amoaox-0 deAIE form-control"
+                                                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                                         id="filter-dashboards-data-filter"
                                                                         label="Filter Dashboards"
                                                                         name="filter-dashboards-data-filter"
