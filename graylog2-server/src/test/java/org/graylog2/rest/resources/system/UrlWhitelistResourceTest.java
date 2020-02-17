@@ -43,14 +43,22 @@ public class UrlWhitelistResourceTest {
         final WhitelistRegexGenerationRequest request =
                 WhitelistRegexGenerationRequest.create("https://example.com/api/lookup?key=${key}", "${key}");
         final WhitelistRegexGenerationResponse response = urlWhitelistResource.generateRegex(request);
-        assertThat(response.regex()).isNotBlank();
+        assertThat(response.regex()).isEqualTo("^\\Qhttps://example.com/api/lookup?key=\\E.*?$");
     }
 
     @Test
-    public void generateRegexForUrl() {
+    public void generateRegexForTemplate_noPlaceholder() {
         final WhitelistRegexGenerationRequest request =
                 WhitelistRegexGenerationRequest.create("https://example.com/api/lookup", null);
         final WhitelistRegexGenerationResponse response = urlWhitelistResource.generateRegex(request);
-        assertThat(response.regex()).isNotBlank();
+        assertThat(response.regex()).isEqualTo("^\\Qhttps://example.com/api/lookup\\E$");
+    }
+
+    @Test
+    public void generateRegexForTemplate_emptyPlaceholder() {
+        final WhitelistRegexGenerationRequest request =
+                WhitelistRegexGenerationRequest.create("https://example.com/api/lookup", "");
+        final WhitelistRegexGenerationResponse response = urlWhitelistResource.generateRegex(request);
+        assertThat(response.regex()).isEqualTo("^\\Qhttps://example.com/api/lookup\\E$");
     }
 }
