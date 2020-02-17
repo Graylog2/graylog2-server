@@ -16,12 +16,9 @@
  */
 package org.graylog2.alarmcallbacks;
 
-import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
-import com.lordofthejars.nosqlunit.annotation.IgnorePropertyValue;
-import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.alerts.Alert;
 import org.graylog2.database.MongoDBServiceTest;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -39,17 +36,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@CustomComparisonStrategy(comparisonStrategy = MongoFlexibleComparisonStrategy.class)
 public class AlarmCallbackHistoryServiceImplTest extends MongoDBServiceTest {
+    private static final String collectionName = "alarmcallbackhistory";
+
+    private static final String ALERT_ID = "alertId";
+    private static final String ALERT_CONDITION_ID = "alertConditionId";
+    private static final String CFG_ID = "fooid";
+    private static final String CFG_STREAM_ID = "streamId";
+    private static final String CFG_USER = "foouser";
+    private static final String CFG_TYPE = "tld.domain.footype";
+    private static final String CFG_CREATED_AT = "2015-07-20T09:49:02.503Z";
+
     private AlarmCallbackHistoryService alarmCallbackHistoryService;
 
     @Before
     public void setUpService() throws Exception {
-        this.alarmCallbackHistoryService = new AlarmCallbackHistoryServiceImpl(mongoRule.getMongoConnection(), mapperProvider);
+        this.alarmCallbackHistoryService = new AlarmCallbackHistoryServiceImpl(mongodb.mongoConnection(), mapperProvider);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testGetForAlertIdShouldReturnEmptyListWhenCollectionIsEmpty() throws Exception {
         final String nonExistentAlertId = "nonexistent";
 
@@ -59,7 +64,7 @@ public class AlarmCallbackHistoryServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet
+    @MongoDBFixtures("AlarmCallbackHistoryServiceImplTestGetPerAlertIdShouldReturnPopulatedListForExistingAlert.json")
     public void testGetPerAlertIdShouldReturnPopulatedListForExistingAlert() throws Exception {
         final String existingAlertId = "55ae105afbeaf123a6ddfc1b";
 
@@ -116,11 +121,8 @@ public class AlarmCallbackHistoryServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    @ShouldMatchDataSet
-    @IgnorePropertyValue(properties = { "created_at", "_id"})
     public void testSaveForDummySuccess() throws Exception {
-        final Date createdAt = DateTime.parse("2015-07-20T09:49:02.503Z").toDate();
+        final Date createdAt = DateTime.parse(CFG_CREATED_AT).toDate();
         final AlarmCallbackConfiguration alarmCallbackConfiguration = mockAlarmCallbackConfiguration(createdAt);
 
         final Alert alert = mockAlert();
@@ -134,14 +136,24 @@ public class AlarmCallbackHistoryServiceImplTest extends MongoDBServiceTest {
         );
 
         this.alarmCallbackHistoryService.save(success);
+
+        MongoCollection<Document> collection = mongodb.mongoConnection().getMongoDatabase().getCollection(collectionName);
+        Document document = collection.find().first();
+        Document configuration = document.get("alarmcallbackconfiguration", Document.class);
+        Document result = document.get("result", Document.class);
+
+        assertThat(document.get("alert_id")).isEqualTo(ALERT_ID);
+        assertThat(document.get("alertcondition_id")).isEqualTo(ALERT_CONDITION_ID);
+        assertThat(configuration.get("id")).isEqualTo(CFG_ID);
+        assertThat(configuration.get("type")).isEqualTo(CFG_TYPE);
+        assertThat(configuration.get("stream_id")).isEqualTo(CFG_STREAM_ID);
+        assertThat(configuration.get("creator_user_id")).isEqualTo(CFG_USER);
+        assertThat(result.get("type")).isEqualTo("success");
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    @ShouldMatchDataSet
-    @IgnorePropertyValue(properties = { "created_at", "_id"})
     public void testSaveForDummyError() throws Exception {
-        final Date createdAt = DateTime.parse("2015-07-20T09:49:02.503Z").toDate();
+        final Date createdAt = DateTime.parse(CFG_CREATED_AT).toDate();
         final AlarmCallbackConfiguration alarmCallbackConfiguration = mockAlarmCallbackConfiguration(createdAt);
 
         final Alert alert = mockAlert();
@@ -158,6 +170,20 @@ public class AlarmCallbackHistoryServiceImplTest extends MongoDBServiceTest {
         );
 
         this.alarmCallbackHistoryService.save(error);
+
+        MongoCollection<Document> collection = mongodb.mongoConnection().getMongoDatabase().getCollection(collectionName);
+        Document document = collection.find().first();
+        Document configuration = document.get("alarmcallbackconfiguration", Document.class);
+        Document result = document.get("result", Document.class);
+
+        assertThat(document.get("alert_id")).isEqualTo(ALERT_ID);
+        assertThat(document.get("alertcondition_id")).isEqualTo(ALERT_CONDITION_ID);
+        assertThat(configuration.get("id")).isEqualTo(CFG_ID);
+        assertThat(configuration.get("type")).isEqualTo(CFG_TYPE);
+        assertThat(configuration.get("stream_id")).isEqualTo(CFG_STREAM_ID);
+        assertThat(configuration.get("creator_user_id")).isEqualTo(CFG_USER);
+        assertThat(result.get("type")).isEqualTo("error");
+        assertThat(result.get("error")).isEqualTo(errorMessage);
     }
 
     private void verifyAlarmCallbackHistory(AlarmCallbackHistory alarmCallbackHistory, Alert alert, AlertCondition alertCondition) {
@@ -187,12 +213,12 @@ public class AlarmCallbackHistoryServiceImplTest extends MongoDBServiceTest {
 
     private AlarmCallbackConfiguration mockAlarmCallbackConfiguration(Date createdDate) {
         final AlarmCallbackConfiguration alarmCallbackConfiguration = mock(AlarmCallbackConfiguration.class);
-        when(alarmCallbackConfiguration.getId()).thenReturn("fooid");
+        when(alarmCallbackConfiguration.getId()).thenReturn(CFG_ID);
         when(alarmCallbackConfiguration.getCreatedAt()).thenReturn(createdDate);
-        when(alarmCallbackConfiguration.getStreamId()).thenReturn("streamId");
-        when(alarmCallbackConfiguration.getCreatorUserId()).thenReturn("foouser");
+        when(alarmCallbackConfiguration.getStreamId()).thenReturn(CFG_STREAM_ID);
+        when(alarmCallbackConfiguration.getCreatorUserId()).thenReturn(CFG_USER);
         when(alarmCallbackConfiguration.getConfiguration()).thenReturn(new HashMap<String, Object>());
-        when(alarmCallbackConfiguration.getType()).thenReturn("tld.domain.footype");
+        when(alarmCallbackConfiguration.getType()).thenReturn(CFG_TYPE);
         return alarmCallbackConfiguration;
     }
 }

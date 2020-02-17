@@ -17,31 +17,25 @@
 package org.graylog.plugins.sidecar.collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
-import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
-import org.graylog.plugins.sidecar.database.MongoConnectionRule;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-@CustomComparisonStrategy(comparisonStrategy = MongoFlexibleComparisonStrategy.class)
 public class ConfigurationServiceTest {
     private final String FILEBEAT_CONF_ID = "5b8fe5f97ad37b17a44e2a34";
 
@@ -53,11 +47,8 @@ public class ConfigurationServiceTest {
 
     @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ConfigurationService configurationService;
     private ConfigurationVariableService configurationVariableService;
@@ -78,8 +69,8 @@ public class ConfigurationServiceTest {
         when(sidecar.nodeName()).thenReturn("mockymock");
         when(sidecar.nodeDetails()).thenReturn(nodeDetails);
 
-        this.configurationVariableService = new ConfigurationVariableService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider);
-        this.configurationService = new ConfigurationService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider, configurationVariableService);
+        this.configurationVariableService = new ConfigurationVariableService(mongodb.mongoConnection(), mongoJackObjectMapperProvider);
+        this.configurationService = new ConfigurationService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, configurationVariableService);
     }
 
     @Test

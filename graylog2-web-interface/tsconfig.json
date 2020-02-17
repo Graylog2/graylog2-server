@@ -3,7 +3,7 @@
     "target": "es5",
     "sourceMap" : true,
     "lib": ["es5", "es6", "dom"],
-    "types": []
+    "types": ["node"]
   },
   "include": [
     "src/**/*.ts",

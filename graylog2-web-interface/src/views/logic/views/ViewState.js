@@ -80,7 +80,7 @@ export default class ViewState {
     return this._value.widgetPositions;
   }
 
-  get staticMessageListId() : ?string {
+  get staticMessageListId(): ?string {
     return this._value.staticMessageListId;
   }
 
@@ -91,7 +91,7 @@ export default class ViewState {
       widgetIdTranslation[widget.id] = newWidget.id;
       return newWidget;
     });
-    const newWidgetTitles = this.titles.get(TitleTypes.Widget).mapEntries(([key, value]) => [widgetIdTranslation[key], value]);
+    const newWidgetTitles = this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]);
     const newTitles = this.titles
       .set(TitleTypes.Widget, newWidgetTitles)
       .updateIn([TitleTypes.Tab, 'title'], value => (value ? `${value} (Copy)` : value));

@@ -11,7 +11,6 @@ import 'bootstrap/less/bootstrap.less';
 import 'opensans-npm-webfont';
 import 'stylesheets/bootstrap-submenus.less';
 import 'toastr/toastr.less';
-import 'rickshaw/rickshaw.css';
 
 const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');

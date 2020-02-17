@@ -20,9 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.conditions.Expression;
@@ -33,15 +30,15 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -55,11 +52,9 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AggregationEventProcessorConfigTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -77,12 +72,12 @@ public class AggregationEventProcessorConfigTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbService = new DBEventDefinitionService(mongoRule.getMongoConnection(), mapperProvider, stateService);
+        this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService);
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     }
 
     @Test
-    @UsingDataSet(locations = "aggregation-processors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("aggregation-processors.json")
     public void toJobSchedulerConfig() {
         final EventDefinitionDto dto = dbService.get("54e3deadbeefdeadbeefaffe").orElse(null);
 
@@ -238,7 +233,7 @@ public class AggregationEventProcessorConfigTest {
     }
 
     @Test
-    @UsingDataSet(locations = "aggregation-processors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("aggregation-processors.json")
     public void requiredPermissions() {
         assertThat(dbService.get("54e3deadbeefdeadbeefaffe")).get().satisfies(definition -> {
             assertThat(definition.config().requiredPermissions()).containsOnly("streams:read:stream-a", "streams:read:stream-b");
@@ -246,7 +241,7 @@ public class AggregationEventProcessorConfigTest {
     }
 
     @Test
-    @UsingDataSet(locations = "aggregation-processors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("aggregation-processors.json")
     public void requiredPermissionsWithEmptyStreams() {
         assertThat(dbService.get("54e3deadbeefdeadbeefafff")).get().satisfies(definition -> {
             assertThat(definition.config().requiredPermissions()).containsOnly("streams:read");

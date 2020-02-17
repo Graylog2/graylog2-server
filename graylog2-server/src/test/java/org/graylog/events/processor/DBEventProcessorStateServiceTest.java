@@ -17,15 +17,13 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.ClassRule;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
@@ -33,24 +31,25 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Optional;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DBEventProcessorStateServiceTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
     private MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-    private DBEventProcessorStateService stateService = new DBEventProcessorStateService(mongoRule.getMongoConnection(), objectMapperProvider);
+    private DBEventProcessorStateService stateService;
+
+    @Before
+    public void setUp() {
+        stateService = new DBEventProcessorStateService(mongodb.mongoConnection(), objectMapperProvider);
+    }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void persistence() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final DateTime min = now.minusHours(1);
@@ -92,7 +91,7 @@ public class DBEventProcessorStateServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "event-processor-state.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("event-processor-state.json")
     public void loading() {
         final Optional<EventProcessorStateDto> stateDto = stateService.findByEventDefinitionId("54e3deadbeefdeadbeefaff3");
 
@@ -105,7 +104,7 @@ public class DBEventProcessorStateServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "event-processor-state.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("event-processor-state.json")
     public void findByEventProcessorId() {
         assertThat(stateService.findByEventDefinitionId("54e3deadbeefdeadbeefaff3")).isPresent();
 
@@ -121,7 +120,7 @@ public class DBEventProcessorStateServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "event-processor-state.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("event-processor-state.json")
     public void findByEventProcessorsAndMaxTimestamp() {
         assertThat(stateService.findByEventDefinitionId("54e3deadbeefdeadbeefaff3")).isPresent().get().satisfies(dto -> {
             final DateTime maxTs = dto.maxProcessedTimestamp();
@@ -149,7 +148,6 @@ public class DBEventProcessorStateServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void setState() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
 
@@ -178,7 +176,6 @@ public class DBEventProcessorStateServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void setStateKeepsMinMaxTimestamp() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final DateTime min = now.minusHours(1);
@@ -249,7 +246,7 @@ public class DBEventProcessorStateServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "event-processor-state.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("event-processor-state.json")
     public void deleteByEventProcessorId() {
         assertThat(stateService.deleteByEventDefinitionId("54e3deadbeefdeadbeefaff3")).isEqualTo(1);
         assertThat(stateService.deleteByEventDefinitionId("nope")).isEqualTo(0);

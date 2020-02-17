@@ -94,7 +94,7 @@ public class MongoDBInstanceTestIT {
     }
 
     @Test
-    @MongoDBFixtures("mongodb-fixtures/mongodb-base-test-it.json")
+    @MongoDBFixtures("MongoDBBaseTestIT.json")
     public void globalFixturesWork() {
         assertThat(collection1.count()).isEqualTo(2);
         assertThat(collection1.find(Filters.eq("hello", "world")).first().get("_id"))

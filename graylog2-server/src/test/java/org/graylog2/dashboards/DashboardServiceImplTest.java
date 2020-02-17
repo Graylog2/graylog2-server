@@ -18,18 +18,15 @@ package org.graylog2.dashboards;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -39,17 +36,14 @@ import org.mockito.junit.MockitoRule;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class DashboardServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -64,14 +58,13 @@ public class DashboardServiceImplTest {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final EventBus serverEventBus = new EventBus("server-event-bus");
         dashboardService = new DashboardServiceImpl(
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 dashboardWidgetCreator,
                 clusterEventBus,
                 serverEventBus);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testCreate() {
         final String title = "Dashboard Title";
         final String description = "This is the dashboard description";
@@ -88,13 +81,12 @@ public class DashboardServiceImplTest {
     }
 
     @Test(expected = NotFoundException.class)
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testLoadNonExistentDashboard() throws NotFoundException {
         this.dashboardService.load("54e3deadbeefdeadbeefaffe");
     }
 
     @Test
-    @UsingDataSet(locations = "singleDashboard.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("singleDashboard.json")
     public void testLoad() throws NotFoundException {
         final String exampleDashboardId = "54e3deadbeefdeadbeefaffe";
 
@@ -105,7 +97,7 @@ public class DashboardServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "singleDashboard.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("singleDashboard.json")
     public void testAll() {
         final List<Dashboard> dashboards = dashboardService.all();
         final Dashboard dashboard = dashboards.get(0);
@@ -115,7 +107,7 @@ public class DashboardServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("DashboardServiceImplTest.json")
     public void testLoadByIds() {
         assertThat(dashboardService.loadByIds(ImmutableSet.of())).isEmpty();
         assertThat(dashboardService.loadByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
@@ -125,13 +117,12 @@ public class DashboardServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "singleDashboard.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("singleDashboard.json")
     public void testCountSingleDashboard() throws Exception {
         assertEquals(1, this.dashboardService.count());
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testCountEmptyCollection() throws Exception {
         assertEquals(0, this.dashboardService.count());
     }

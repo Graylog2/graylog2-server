@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -92,7 +93,9 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         orderedIndices
             .stream()
             .skip(orderedIndices.size() - removeCount)
-            .forEach(indexName -> {
+             // reverse order to archive oldest index first
+            .collect(Collectors.toCollection(LinkedList::new)).descendingIterator()
+            .forEachRemaining(indexName -> {
                 final String strategyName = this.getClass().getCanonicalName();
                 final String msg = "Running retention strategy [" + strategyName + "] for index <" + indexName + ">";
                 LOG.info(msg);

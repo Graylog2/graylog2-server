@@ -16,16 +16,13 @@
  */
 package org.graylog2.cluster;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.DBCollection;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,20 +31,16 @@ import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 public class NodeServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private static final URI TRANSPORT_URI = URI.create("http://10.0.0.1:12900");
     private static final String LOCAL_CANONICAL_HOSTNAME = Tools.getLocalCanonicalHostname();
     private static final String NODE_ID = "28164cbe-4ad9-4c9c-a76e-088655aa7889";
-
-    @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -63,11 +56,11 @@ public class NodeServiceImplTest {
     public void setUp() throws Exception {
         when(nodeId.toString()).thenReturn(NODE_ID);
 
-        this.nodeService = new NodeServiceImpl(mongoRule.getMongoConnection(), configuration);
+        this.nodeService = new NodeServiceImpl(mongodb.mongoConnection(), configuration);
     }
 
     @Test
-    @UsingDataSet(locations = "NodeServiceImplTest-empty.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("NodeServiceImplTest-empty.json")
     public void testRegisterServer() throws Exception {
         assertThat(nodeService.allActive())
                 .describedAs("The collection should be empty")
@@ -84,7 +77,7 @@ public class NodeServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "NodeServiceImplTest-one-node.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("NodeServiceImplTest-one-node.json")
     public void testRegisterServerWithExistingNode() throws Exception {
         final Node node1 = nodeService.byNodeId(nodeId);
 
@@ -95,7 +88,7 @@ public class NodeServiceImplTest {
         nodeService.registerServer(nodeId.toString(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
 
         @SuppressWarnings("deprecation")
-        final DBCollection collection = mongoRule.getMongoConnection().getDatabase().getCollection("nodes");
+        final DBCollection collection = mongodb.mongoConnection().getDatabase().getCollection("nodes");
 
         assertThat(collection.count())
                 .describedAs("There should only be one node")

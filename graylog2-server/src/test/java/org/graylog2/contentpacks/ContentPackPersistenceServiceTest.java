@@ -18,17 +18,14 @@ package org.graylog2.contentpacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -36,15 +33,11 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContentPackPersistenceServiceTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("content_packs");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ContentPackPersistenceService contentPackPersistenceService;
 
@@ -55,11 +48,11 @@ public class ContentPackPersistenceServiceTest {
 
         contentPackPersistenceService = new ContentPackPersistenceService(
                 mongoJackObjectMapperProvider,
-                mongoRule.getMongoConnection());
+                mongodb.mongoConnection());
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void loadAll() {
         final Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
 
@@ -68,7 +61,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void loadAllLatest() {
         final Set<ContentPack> contentPacks = contentPackPersistenceService.loadAllLatest();
 
@@ -78,7 +71,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void findAllById() {
         final Set<ContentPack> contentPacks = contentPackPersistenceService.findAllById(ModelId.of("dcd74ede-6832-4ef7-9f69-deadbeef0000"));
 
@@ -88,7 +81,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void findAllByIdWithInvalidId() {
         final Set<ContentPack> contentPacks = contentPackPersistenceService.findAllById(ModelId.of("does-not-exist"));
 
@@ -96,7 +89,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void findByIdAndRevision() {
         final Optional<ContentPack> contentPack = contentPackPersistenceService.findByIdAndRevision(ModelId.of("dcd74ede-6832-4ef7-9f69-deadbeef0000"), 2);
 
@@ -107,7 +100,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void findByIdAndRevisionWithInvalidId() {
         final Optional<ContentPack> contentPack = contentPackPersistenceService.findByIdAndRevision(ModelId.of("does-not-exist"), 2);
 
@@ -115,7 +108,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void findByIdAndRevisionWithInvalidRevision() {
         final Optional<ContentPack> contentPack = contentPackPersistenceService.findByIdAndRevision(ModelId.of("dcd74ede-6832-4ef7-9f69-deadbeef0000"), 42);
 
@@ -123,7 +116,6 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void insert() {
         final ContentPackV1 contentPack = ContentPackV1.builder()
                 .id(ModelId.of("id"))
@@ -144,7 +136,6 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void insertDuplicate() {
         final ContentPackV1 contentPack = ContentPackV1.builder()
                 .id(ModelId.of("id"))
@@ -164,7 +155,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void deleteById() {
         final int deletedContentPacks = contentPackPersistenceService.deleteById(ModelId.of("dcd74ede-6832-4ef7-9f69-deadbeef0000"));
         final Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
@@ -176,7 +167,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void deleteByIdWithInvalidId() {
         final int deletedContentPacks = contentPackPersistenceService.deleteById(ModelId.of("does-not-exist"));
         final Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
@@ -187,7 +178,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void deleteByIdAndRevision() {
         final int deletedContentPacks = contentPackPersistenceService.deleteByIdAndRevision(ModelId.of("dcd74ede-6832-4ef7-9f69-deadbeef0000"), 2);
         final Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
@@ -199,7 +190,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void deleteByIdAndRevisionWithInvalidId() {
         final int deletedContentPacks = contentPackPersistenceService.deleteByIdAndRevision(ModelId.of("does-not-exist"), 2);
         final Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
@@ -209,7 +200,7 @@ public class ContentPackPersistenceServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("ContentPackPersistenceServiceTest.json")
     public void deleteByIdAndRevisionWithInvalidRevision() {
         final int deletedContentPacks = contentPackPersistenceService.deleteByIdAndRevision(ModelId.of("dcd74ede-6832-4ef7-9f69-deadbeef0000"), 42);
         final Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();

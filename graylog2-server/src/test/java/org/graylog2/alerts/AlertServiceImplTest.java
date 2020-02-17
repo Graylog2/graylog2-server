@@ -18,8 +18,7 @@
 package org.graylog2.alerts;
 
 import com.google.common.collect.ImmutableList;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.alarmcallbacks.AlarmCallbackHistory;
 import org.graylog2.alarmcallbacks.AlarmCallbackHistoryService;
 import org.graylog2.database.MongoDBServiceTest;
@@ -52,25 +51,25 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     @Before
     public void setUpService() throws Exception {
         this.alarmCallbackHistoryService = mock(AlarmCallbackHistoryService.class);
-        this.alertService = new AlertServiceImpl(mongoRule.getMongoConnection(), mapperProvider, alertConditionFactory, alarmCallbackHistoryService);
+        this.alertService = new AlertServiceImpl(mongodb.mongoConnection(), mapperProvider, alertConditionFactory, alarmCallbackHistoryService);
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void loadRecentOfStreamQueriesByDate() throws Exception {
         final List<Alert> alerts = alertService.loadRecentOfStream(STREAM_ID, new DateTime(0L, DateTimeZone.UTC), 300);
         assertThat(alerts.size()).isEqualTo(2);
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void loadRecentOfStreamLimitResults() throws Exception {
         final List<Alert> alerts = alertService.loadRecentOfStream(STREAM_ID, new DateTime(0L, DateTimeZone.UTC), 1);
         assertThat(alerts.size()).isEqualTo(1);
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void loadRecentOfStreamsIsEmptyIfNoStreams() throws Exception {
         final List<Alert> alerts = alertService.loadRecentOfStreams(
                 ImmutableList.of(),
@@ -80,7 +79,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void loadRecentOfStreamsFiltersByStream() throws Exception {
         final List<Alert> alerts = alertService.loadRecentOfStreams(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14f"),
@@ -92,7 +91,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void loadRecentOfStreamsLimitsResults() throws Exception {
         final List<Alert> alerts = alertService.loadRecentOfStreams(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
@@ -102,19 +101,19 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "unresolved-alert.json")
+    @MongoDBFixtures("unresolved-alert.json")
     public void resolvedSecondsAgoOnExistingUnresolvedAlert() throws Exception {
         assertThat(alertService.resolvedSecondsAgo(STREAM_ID, CONDITION_ID)).isEqualTo(-1);
     }
 
     @Test
-    @UsingDataSet(locations = "non-interval-alert.json")
+    @MongoDBFixtures("non-interval-alert.json")
     public void resolvedSecondsAgoOnExistingNonIntervalAlert() throws Exception {
         assertThat(alertService.resolvedSecondsAgo(STREAM_ID, CONDITION_ID)).isEqualTo(-1);
     }
 
     @Test
-    @UsingDataSet(locations = "resolved-alert.json")
+    @MongoDBFixtures("resolved-alert.json")
     public void resolvedSecondsAgoOnExistingResolvedAlert() throws Exception {
         final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
         final int expectedResult = Seconds.secondsBetween(alert.getResolvedAt(), Tools.nowUTC()).getSeconds();
@@ -123,14 +122,14 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void listForStreamIdFilterByStream() throws Exception {
         final List<Alert> alerts = alertService.listForStreamId(STREAM_ID, 0, 4);
         assertThat(alerts.size()).isEqualTo(2);
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void listForStreamIdSkips() throws Exception {
         final List<Alert> allAlerts = alertService.listForStreamId(STREAM_ID, 0, 4);
         final List<Alert> alerts = alertService.listForStreamId(STREAM_ID, 1, 4);
@@ -139,14 +138,14 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void listForStreamIdLimits() throws Exception {
         final List<Alert> alerts = alertService.listForStreamId(STREAM_ID, 0, 1);
         assertThat(alerts.size()).isEqualTo(1);
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void listForStreamIdsFilterByStream() throws Exception {
         final List<Alert> alerts = alertService.listForStreamIds(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14f"),
@@ -158,7 +157,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void listForStreamIdsSkips() throws Exception {
         final List<Alert> allAlerts = alertService.listForStreamIds(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
@@ -177,7 +176,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void listForStreamIdsLimits() throws Exception {
         final List<Alert> alerts = alertService.listForStreamIds(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
@@ -189,7 +188,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "multiple-alerts.json")
+    @MongoDBFixtures("multiple-alerts.json")
     public void listForStreamIdsFilterByState() throws Exception {
         final List<Alert> resolvedAlerts = alertService.listForStreamIds(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
@@ -209,13 +208,12 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void resolvedSecondsAgoOnNonExistingAlert() throws Exception {
         assertThat(alertService.resolvedSecondsAgo(STREAM_ID, CONDITION_ID)).isEqualTo(-1);
     }
 
     @Test
-    @UsingDataSet(locations = "unresolved-alert.json")
+    @MongoDBFixtures("unresolved-alert.json")
     public void resolveUnresolvedAlert() throws Exception {
         final Alert originalAlert = alertService.load(ALERT_ID, STREAM_ID);
         assertThat(originalAlert.getResolvedAt()).isNull();
@@ -225,7 +223,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "resolved-alert.json")
+    @MongoDBFixtures("resolved-alert.json")
     public void resolveNoopInResolvedAlert() throws Exception {
         final Alert originalAlert = alertService.load(ALERT_ID, STREAM_ID);
         assertThat(originalAlert.getResolvedAt()).isNotNull();
@@ -234,14 +232,13 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void resolveNoopIfNoAlert() throws Exception {
         final Alert alert = alertService.resolveAlert(null);
         assertThat(alert).isNull();
     }
 
     @Test
-    @UsingDataSet(locations = "non-interval-alert.json")
+    @MongoDBFixtures("non-interval-alert.json")
     public void resolveNoopIfNonIntervalAlert() throws Exception {
         final Alert originalAlert = alertService.load(ALERT_ID, STREAM_ID);
         final Alert alert = alertService.resolveAlert(originalAlert);
@@ -250,28 +247,28 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "resolved-alert.json")
+    @MongoDBFixtures("resolved-alert.json")
     public void resolvedAlertIsResolved() throws Exception {
         final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
         assertThat(alertService.isResolved(alert)).isTrue();
     }
 
     @Test
-    @UsingDataSet(locations = "non-interval-alert.json")
+    @MongoDBFixtures("non-interval-alert.json")
     public void nonIntervalAlertIsResolved() throws Exception {
         final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
         assertThat(alertService.isResolved(alert)).isTrue();
     }
 
     @Test
-    @UsingDataSet(locations = "unresolved-alert.json")
+    @MongoDBFixtures("unresolved-alert.json")
     public void unresolvedAlertIsUnresolved() throws Exception {
         final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
         assertThat(alertService.isResolved(alert)).isFalse();
     }
 
     @Test
-    @UsingDataSet(locations = "non-interval-alert.json")
+    @MongoDBFixtures("non-interval-alert.json")
     public void nonIntervalAlertShouldNotRepeatNotifications() throws Exception {
         final AlertCondition alertCondition = mock(AlertCondition.class);
         when(alertCondition.shouldRepeatNotifications()).thenReturn(true);
@@ -280,7 +277,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "unresolved-alert.json")
+    @MongoDBFixtures("unresolved-alert.json")
     public void shouldNotRepeatNotificationsWhenOptionIsDisabled() throws Exception {
         final AlertCondition alertCondition = mock(AlertCondition.class);
         when(alertCondition.shouldRepeatNotifications()).thenReturn(false);
@@ -289,7 +286,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "unresolved-alert.json")
+    @MongoDBFixtures("unresolved-alert.json")
     public void repeatNotificationsOptionShouldComplyWithGracePeriod() throws Exception {
         final AlertCondition alertCondition = mock(AlertCondition.class);
         when(alertCondition.getGrace()).thenReturn(15);
@@ -311,7 +308,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "unresolved-alert.json")
+    @MongoDBFixtures("unresolved-alert.json")
     public void shouldRepeatNotificationsWhenOptionIsEnabled() throws Exception {
         final AlertCondition alertCondition = mock(AlertCondition.class);
         when(alertCondition.shouldRepeatNotifications()).thenReturn(true);

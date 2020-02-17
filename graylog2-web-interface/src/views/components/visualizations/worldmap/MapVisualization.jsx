@@ -4,7 +4,8 @@ import React from 'react';
 import { CircleMarker, Map, Popup, TileLayer } from 'react-leaflet';
 import chroma from 'chroma-js';
 import { flatten } from 'lodash';
-import style from 'components/maps/widgets/MapVisualization.css';
+
+import style from './MapVisualization.css';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import leafletStyles from '!style/useable!css!leaflet/dist/leaflet.css';

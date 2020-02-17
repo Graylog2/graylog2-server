@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -33,7 +33,7 @@ type State = {
   config: AggregationWidgetConfig,
 };
 
-const Container: React.ComponentType<{}> = styled.div`
+const Container: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   display: grid;
   grid-template-rows: auto minmax(auto, 1fr);
   height: 100%;

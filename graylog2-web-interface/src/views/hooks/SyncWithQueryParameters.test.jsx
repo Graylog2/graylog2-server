@@ -13,7 +13,7 @@ jest.mock('views/stores/ViewStore', () => ({
     getInitialState: jest.fn(),
   },
 }));
-jest.mock('util/History', () => ({ push: jest.fn() }));
+jest.mock('util/History', () => ({ push: jest.fn(), replace: jest.fn() }));
 
 describe('SyncWithQueryParameters', () => {
   it('does not do anything if no view is loaded', () => {
@@ -103,6 +103,13 @@ describe('SyncWithQueryParameters', () => {
 
       expect(history.push)
         .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes');
+    });
+    it('by calling the provided action', () => {
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view });
+
+      syncWithQueryParameters('/search', history.replace);
+
+      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
     });
   });
 });

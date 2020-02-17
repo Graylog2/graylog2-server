@@ -16,19 +16,16 @@
  */
 package org.graylog.plugins.views.migrations;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog2.database.MongoConnectionRule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -38,15 +35,12 @@ import org.mockito.junit.MockitoRule;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class V20190304102700_MigrateMessageListStructureTest {
 
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private Migration migration;
 
@@ -57,7 +51,7 @@ public class V20190304102700_MigrateMessageListStructureTest {
 
     @Before
     public void setUp() throws Exception {
-        migration = new V20190304102700_MigrateMessageListStructure(mongoRule.getMongoConnection(), clusterConfigService);
+        migration = new V20190304102700_MigrateMessageListStructure(mongodb.mongoConnection(), clusterConfigService);
     }
 
     @Test
@@ -67,11 +61,11 @@ public class V20190304102700_MigrateMessageListStructureTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("V20190304102700_MigrateMessageListStructureTest.json")
     public void testMigratingViewStructure() {
         final BasicDBObject dbQuery1 = new BasicDBObject();
         dbQuery1.put("_id", new ObjectId("58458e442f857c314491344e"));
-        final MongoCollection<Document> collection = mongoRule.getMongoConnection()
+        final MongoCollection<Document> collection = mongodb.mongoConnection()
                 .getMongoDatabase()
                 .getCollection("views");
 

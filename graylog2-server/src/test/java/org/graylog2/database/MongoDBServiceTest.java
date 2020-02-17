@@ -17,20 +17,15 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.ClassRule;
 import org.junit.Rule;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 
 public class MongoDBServiceTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     protected final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
