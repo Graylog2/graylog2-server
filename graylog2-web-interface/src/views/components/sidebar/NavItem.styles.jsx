@@ -46,12 +46,11 @@ export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
 `;
 
 export const Content: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div(({ isSelected, expandRight }) => css`
-  color: #666666;
-  background: #FFFFFF;
+  color: #666;
+  background: #fff;
   box-shadow:
-      inset 0px 13px 5px -10px #CCC,
-      inset 0px -13px 5px -10px #CCC;
-
+    inset 0 13px 5px -10px #ccc,
+    inset 0 -13px 5px -10px #ccc;
   ${(isSelected ? css`
     padding: 20px;
   ` : css`

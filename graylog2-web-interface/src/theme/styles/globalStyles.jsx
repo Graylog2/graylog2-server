@@ -1549,7 +1549,6 @@ const globalStyles = css`
     color: #333;
     background-color: #d7d9d9;
     border-color: #c3c8c8;
-    /* bootstrap copy end */
     cursor: move;
   }
 
@@ -2213,7 +2212,8 @@ const globalStyles = css`
     margin-bottom: 5px;
   }
 
-  dl.system-system, dl.system-rest {
+  dl.system-system,
+  dl.system-rest {
     margin-top: 5px;
     margin-bottom: 0;
   }

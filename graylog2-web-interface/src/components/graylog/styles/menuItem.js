@@ -7,7 +7,8 @@ const menuItemStyles = (options = {}) => {
   const { sibling = false } = options;
 
   return css`
-    ${sibling && '& ~'} .dropdown-menu {
+    /* stylelint-disable-next-line rule-empty-line-before, declaration-block-semicolon-newline-after */
+    ${sibling ? '& ~ ' : null}.dropdown-menu {
       > li > a {
         color: ${teinte.primary.tre};
 
