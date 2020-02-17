@@ -408,6 +408,19 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
                 .containsExactlyInAnyOrder("table", "pie");
     }
 
+    @Test
+    @MongoDBFixtures("quickvalues_widget_with_sort_order.json")
+    public void migratesAQuickValuesWidgetWithSortOrder() throws Exception {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.migratedDashboardIds()).containsExactly("5b3b76caadbe1d0001417041");
+        assertThat(migrationCompleted.widgetMigrationIds()).hasSize(2);
+
+        assertViewsWritten(1, resourceFile("quickvalues_widget_with_sort_order-expected_views.json"));
+        assertSearchesWritten(1, resourceFile("quickvalues_widget_with_sort_order-expected_searches.json"));
+    }
+
 
     private void assertSearchesWritten(int count, String expectedEntities) throws Exception {
         final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
@@ -415,7 +428,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         final List<Search> newSearches = newSearchesCaptor.getAllValues();
         assertThat(newSearches).hasSize(count);
 
-        JSONAssert.assertEquals(toJSON(newSearches), expectedEntities, false);
+        JSONAssert.assertEquals(expectedEntities, toJSON(newSearches), false);
     }
 
     private void assertViewsWritten(int count, String expectedEntities) throws Exception {
@@ -424,7 +437,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         final List<View> newViews = newViewsCaptor.getAllValues();
         assertThat(newViews).hasSize(count);
 
-        JSONAssert.assertEquals(toJSON(newViews), expectedEntities, false);
+        JSONAssert.assertEquals(expectedEntities, toJSON(newViews), false);
     }
 
     private MigrationCompleted captureMigrationCompleted() {
