@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
+import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -57,10 +58,9 @@ public class IpfixUdpInput extends MessageInput {
     }
 
     public static class Descriptor extends MessageInput.Descriptor {
-
         @Inject
         public Descriptor() {
-            super(NAME, false, "https://docs.graylog.org/en/latest/pages/integrations/inputs/ipfix_input.html");
+            super(NAME, false, DocsHelper.PAGE_SENDING_IPFIXPATH.toString());
         }
     }
 
