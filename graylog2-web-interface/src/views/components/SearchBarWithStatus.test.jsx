@@ -2,7 +2,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import SearchMetadata from 'views/logic/search/SearchMetadata';
