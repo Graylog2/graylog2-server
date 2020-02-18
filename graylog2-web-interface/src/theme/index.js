@@ -1,3 +1,4 @@
+// @flow
 import teinte from './teinte';
 import breakpoints from './breakpoints';
 import util from './util';
@@ -11,6 +12,14 @@ const theme = {
 };
 
 const themeModes = ['teinte', 'noire'];
+
+export type ThemeInterface = {
+  color: {
+    primary: { [string]: string },
+    secondary: { [string]: string },
+    tertiary: { [string]: string },
+   },
+};
 
 export default theme;
 

@@ -5,7 +5,7 @@ import styled, { css, keyframes, type StyledComponent } from 'styled-components'
 // $FlowFixMe removing in future iteration
 import { transparentize } from 'polished';
 
-import { util } from 'theme';
+import { util, type ThemeInterface } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 type ProgressBarProps = {
@@ -52,7 +52,7 @@ const progressBarVariants = color => css`
   color: ${util.readableColor(color)};
 `;
 
-const ProgressWrap: StyledComponent<{}, void, *> = styled.div(({ theme }) => css`
+const ProgressWrap: StyledComponent<{}, ThemeInterface, *> = styled.div(({ theme }) => css`
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
@@ -63,7 +63,7 @@ const ProgressWrap: StyledComponent<{}, void, *> = styled.div(({ theme }) => css
   align-items: center;
 `);
 
-const Bar: StyledComponent<BarProps, void, *> = styled.div(({ animated, striped, theme, value }) => {
+const Bar: StyledComponent<BarProps, ThemeInterface, *> = styled.div(({ animated, striped, theme, value }) => {
   const defaultStripColor = transparentize(0.75, theme.color.primary.due);
 
   return css`

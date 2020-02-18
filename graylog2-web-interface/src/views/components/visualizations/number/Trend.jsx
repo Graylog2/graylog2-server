@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled, { type StyledComponent, css } from 'styled-components';
 import numeral from 'numeral';
 
-import { util } from 'theme';
+import { util, type ThemeInterface } from 'theme';
 
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -18,7 +18,7 @@ type Props = {
   trendPreference: TrendPreference,
 };
 
-const Background: StyledComponent<{trend: ?string}, {}, HTMLDivElement> = styled.div(({ theme, trend }) => {
+const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
   const bgColor = trend && trend === TREND_GOOD ? theme.color.tertiary.tre : theme.color.tertiary.quattro;
 
   return css`
