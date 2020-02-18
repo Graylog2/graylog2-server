@@ -11,8 +11,8 @@ import type { Completer } from '../SearchBarAutocompletions';
 const _fieldResult = (field: FieldTypeMapping, score: number = 1): CompletionResult => {
   const { name, type } = field;
   return {
-    name: name,
-    value: name,
+    name,
+    value: `${name}:`,
     score,
     meta: type.type,
   };
