@@ -10,7 +10,6 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import MessageDetail from './MessageDetail';
@@ -61,7 +60,7 @@ const isDecoratedField = (field, decorationStats) => decorationStats
 
 const fieldType = (fieldName, { decoration_stats: decorationStats }, fields) => (isDecoratedField(fieldName, decorationStats)
   ? FieldType.Decorated
-  : fields.find(t => t.name === fieldName, undefined, FieldTypeMapping.create(fieldName, FieldType.Unknown)).type);
+  : ((fields && fields.find(f => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
 const MessageTableEntry = ({
   disableSurroundingSearch,
