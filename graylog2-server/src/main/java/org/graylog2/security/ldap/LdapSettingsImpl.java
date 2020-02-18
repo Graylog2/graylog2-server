@@ -19,7 +19,6 @@ package org.graylog2.security.ldap;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
@@ -48,6 +47,7 @@ import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -401,7 +401,9 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
         final Set<String> additionalGroups = getAdditionalDefaultGroupIds();
         try {
             final Map<String, Role> idToRole = roleService.loadAllIdMap();
-            return Sets.newHashSet(Collections2.transform(additionalGroups, Roles.roleIdToNameFunction(idToRole)));
+            return Collections2.transform(additionalGroups, Roles.roleIdToNameFunction(idToRole)).stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
         } catch (NotFoundException e) {
             LOG.error("Unable to load role mapping");
             return Collections.emptySet();
@@ -421,7 +423,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
             if (groupNames == null) return;
 
             final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), Roles.roleToNameFunction());
-            final List<String> groupIds = Lists.newArrayList(Collections2.transform(groupNames, new Function<String, String>() {
+            final List<String> groupIds = Collections2.transform(groupNames, new Function<String, String>() {
                 @Nullable
                 @Override
                 public String apply(@Nullable String groupName) {
@@ -430,7 +432,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
                     }
                     return nameToRole.get(groupName).getId();
                 }
-            }));
+            }).stream().filter(Objects::nonNull).collect(Collectors.toList());
             fields.put(ADDITIONAL_DEFAULT_GROUPS, groupIds);
         } catch (NotFoundException e) {
             LOG.error("Unable to convert group names to ids", e);
