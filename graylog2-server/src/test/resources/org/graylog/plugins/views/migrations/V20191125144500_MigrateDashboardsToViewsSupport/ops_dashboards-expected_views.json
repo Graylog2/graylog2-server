@@ -52,7 +52,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientIpGeoCityCode",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -90,7 +90,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestURI",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -196,7 +196,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientIpGeoCountry",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -299,7 +299,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestUserAgent",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -473,7 +473,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientIpGeoCityCode",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -511,7 +511,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientDeviceType",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -619,7 +619,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestReferer",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -657,7 +657,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestURI",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -695,7 +695,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestProtocol",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -795,7 +795,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestMethod",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -833,7 +833,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "EdgeResponseContentType",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -902,7 +902,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientIpGeoCountry",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1086,7 +1086,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ThreatType",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1124,7 +1124,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientIpGeoCityCode",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1227,7 +1227,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ThreatType",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1265,7 +1265,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientIpGeoCountry",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1383,7 +1383,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestUserAgent",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1421,7 +1421,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientIP",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1702,7 +1702,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "OriginResponseStatusClass",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "pie",
@@ -1740,7 +1740,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "OriginResponseStatusClass",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1871,7 +1871,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "EdgeResponseStatusClass",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "pie",
@@ -1909,7 +1909,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "EdgeResponseStatusClass",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1947,7 +1947,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestURI",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -1985,7 +1985,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestURI",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -2235,7 +2235,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "ClientRequestURI",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",
@@ -2273,7 +2273,7 @@
           } ],
           "sort" : [ {
             "type" : "series",
-            "field" : "CacheCacheStatus",
+            "field" : "count()",
             "direction" : "Descending"
           } ],
           "visualization" : "table",

@@ -1,0 +1,104 @@
+[
+  {
+    "id": "5de0e98900002a0017000001",
+    "queries": [
+      {
+        "id": "0000016e-b690-4273-0000-016eb690426f",
+        "timerange": {
+          "type": "relative",
+          "range": 300
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": ""
+        },
+        "search_types": [
+          {
+            "id": "0000016e-b690-4271-0000-016eb690426f",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": ""
+            },
+            "streams": [
+              "5b3b7403adbe1d0001416d1d"
+            ],
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "count()",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "filter": null,
+            "row_groups": [
+              {
+                "field": "request",
+                "limit": 500,
+                "type": "values"
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "id": "0000016e-b690-4272-0000-016eb690426f",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "query": {
+              "type": "elasticsearch",
+              "query_string": ""
+            },
+            "streams": [
+              "5b3b7403adbe1d0001416d1d"
+            ],
+            "name": "chart",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()",
+                "field": null
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "count()",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "filter": null,
+            "row_groups": [
+              {
+                "field": "request",
+                "limit": 500,
+                "type": "values"
+              }
+            ],
+            "column_groups": []
+          }
+        ]
+      }
+    ],
+    "parameters": [],
+    "owner": "admin",
+    "created_at": "2018-07-03T13:14:50.346Z",
+    "requires": {}
+  }
+]

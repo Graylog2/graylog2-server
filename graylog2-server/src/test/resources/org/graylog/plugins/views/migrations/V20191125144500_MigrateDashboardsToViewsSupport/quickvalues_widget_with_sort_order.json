@@ -1,0 +1,75 @@
+{
+  "dashboards": [
+    {
+      "_id": {
+        "$oid": "5b3b76caadbe1d0001417041"
+      },
+      "creator_user_id": "admin",
+      "description": "All HTTP access log data",
+      "created_at": {
+        "$date": "2018-07-03T13:14:50.346Z"
+      },
+      "positions": {
+        "48a82963-5c44-496e-aeae-cbf972c79e2f": {
+          "width": 4,
+          "col": 1,
+          "row": 7,
+          "height": 6
+        },
+        "9aac59bd-da65-46fe-b5b3-1df84a177dc0": {
+          "width": 4,
+          "col": 1,
+          "row": 13,
+          "height": 6
+        }
+      },
+      "title": "HTTP Access Logs",
+      "widgets": [
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Bottom 10 Requests (24h)",
+          "id": "9aac59bd-da65-46fe-b5b3-1df84a177dc0",
+          "type": "QUICKVALUES",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "field": "request",
+            "stream_id": "5b3b7403adbe1d0001416d1d",
+            "query": "",
+            "show_data_table": true,
+            "limit": 10,
+            "show_pie_chart": false,
+            "sort_order": "asc",
+            "stacked_fields": "",
+            "data_table_limit": 500
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Top 10 Requests (24h)",
+          "id": "48a82963-5c44-496e-aeae-cbf972c79e2f",
+          "type": "QUICKVALUES",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "field": "request",
+            "stream_id": "5b3b7403adbe1d0001416d1d",
+            "query": "",
+            "show_data_table": true,
+            "limit": 10,
+            "show_pie_chart": false,
+            "sort_order": "desc",
+            "stacked_fields": "",
+            "data_table_limit": 500
+          }
+        }
+      ]
+    }
+  ]
+}
