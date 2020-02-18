@@ -8,14 +8,21 @@ import type { FieldTypesStoreState } from 'views/stores/FieldTypesStore';
 import type { CompletionResult, Token } from '../ace-types';
 import type { Completer } from '../SearchBarAutocompletions';
 
-const _fieldResult = (field: FieldTypeMapping, score: number = 1): CompletionResult => {
+const _fieldResult = (field: FieldTypeMapping, score: number = 1, valuePosition: boolean = false): CompletionResult => {
   const { name, type } = field;
   return {
     name,
-    value: `${name}:`,
+    value: `${name}${valuePosition ? '' : ':'}`,
     score,
     meta: type.type,
   };
+};
+
+const existsOperator = {
+  name: '_exists_',
+  type: {
+    type: 'operator',
+  },
 };
 
 const _matchesFieldName = (prefix) => {
@@ -50,7 +57,7 @@ class FieldNameCompletion implements Completer {
   };
 
   getCompletions = (currentToken: ?Token, lastToken: ?Token, prefix: string) => {
-    if (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':')) {
+    if (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':') && lastToken.value !== `${existsOperator.name}:`) {
       return [];
     }
     if (currentToken && currentToken.type === 'string') {
@@ -60,12 +67,14 @@ class FieldNameCompletion implements Completer {
     const { all, queryFields } = this.fields;
     const currentQueryFields = queryFields.get(this.activeQuery, Immutable.Set());
 
+    const valuePosition = (lastToken && lastToken.value === `${existsOperator.name}:`) === true;
+
     const currentQueryFieldNames = currentQueryFields.map(fieldMapping => fieldMapping.name);
     const allButInCurrent = all.filter(field => !currentQueryFieldNames.includes(field.name));
-    const currentQuery = currentQueryFields.filter(matchesFieldName)
-      .map(field => _fieldResult(field, 10 + matchesFieldName(field)));
+    const currentQuery = [existsOperator, ...currentQueryFields].filter(matchesFieldName)
+      .map(field => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
     const allFields = allButInCurrent.filter(matchesFieldName)
-      .map(field => _fieldResult(field, 1 + matchesFieldName(field)))
+      .map(field => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
       .map(result => ({ ...result, meta: `${result.meta} (not in streams)` }));
     return [...currentQuery, ...allFields];
   }
