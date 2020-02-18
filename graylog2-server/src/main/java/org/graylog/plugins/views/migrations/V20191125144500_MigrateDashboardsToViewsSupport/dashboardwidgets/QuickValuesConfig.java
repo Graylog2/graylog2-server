@@ -94,7 +94,7 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
     }
 
     private SortConfig sort() {
-        return SeriesSortConfig.create(field(), order());
+        return SeriesSortConfig.create(series().function(), order());
     }
 
     @Override

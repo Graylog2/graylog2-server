@@ -29,7 +29,7 @@
       } ],
       "sort" : [ {
         "type" : "series",
-        "field" : "facility",
+        "field" : "count()",
         "direction" : "Descending"
       } ],
       "rollup" : true,
@@ -60,7 +60,7 @@
       } ],
       "sort" : [ {
         "type" : "series",
-        "field" : "facility",
+        "field" : "count()",
         "direction" : "Descending"
       } ],
       "rollup" : true,
