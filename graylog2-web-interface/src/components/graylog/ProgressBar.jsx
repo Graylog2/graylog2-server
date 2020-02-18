@@ -34,7 +34,7 @@ const DEFAULT_BAR = {
 };
 
 const boxShadow = meta => css`
-  box-shadow: ${meta} ${transparentize(0.9, props => props.theme.color.primary.tre)};
+  box-shadow: ${meta} ${props => transparentize(0.9, props.theme.color.primary.tre)};
 `;
 
 const animatedStripes = keyframes`
