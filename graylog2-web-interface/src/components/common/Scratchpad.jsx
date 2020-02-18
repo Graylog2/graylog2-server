@@ -33,8 +33,8 @@ const Textarea = styled.textarea(props => css`
   flex: 1;
   margin-bottom: 15px;
   border: 1px solid ${props.copied ? teinte.tertiary.tre : teinte.secondary.tre};
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
-              0 0 8px ${rgba(props.copied ? teinte.tertiary.tre : teinte.secondary.tre, 0.6)};
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px ${rgba(props.copied ? teinte.tertiary.tre : teinte.secondary.tre, 0.6)};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   font-size: 14px;

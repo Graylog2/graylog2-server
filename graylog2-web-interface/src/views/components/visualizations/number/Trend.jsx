@@ -23,7 +23,6 @@ const Background: StyledComponent<{trend: ?string}, {}, HTMLDivElement> = styled
 
   return css`
     text-align: right;
-
     ${trend && css`
       background-color: ${bgColor};
       color: ${util.contrastingColor(bgColor)};

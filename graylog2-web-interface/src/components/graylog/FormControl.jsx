@@ -11,15 +11,16 @@ const FormControl = memo(styled(BootstrapFormControl)`
   background-color: ${teinte.primary.due};
   border-color: ${teinte.secondary.tre};
 
-  &:focus {
-    border-color: ${teinte.tertiary.due};
-    box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px ${transparentize(0.6, teinte.tertiary.due)});
+  &::-moz-placeholder,
+  &::-webkit-input-placeholder,
+  &:-ms-input-placeholder {
+    color: ${lighten(0.6, teinte.primary.tre)};
   }
 
-  &::-moz-placeholder,
-  &:-ms-input-placeholder,
-  &::-webkit-input-placeholder {
-    color: ${lighten(0.6, teinte.primary.tre)};
+  &:focus {
+    border-color: ${teinte.tertiary.due};
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+      0 0 8px ${transparentize(0.6, teinte.tertiary.due)};
   }
 
   &[disabled],

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import menuItemStyles from './styles/menuItem';
 
 const NavDropdown = styled(BootstrapNavDropdown)`
-  ${menuItemStyles()};
+  ${menuItemStyles}
 `;
 
 export default NavDropdown;

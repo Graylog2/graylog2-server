@@ -3,11 +3,8 @@ import { css } from 'styled-components';
 import teinte from 'theme/teinte';
 import { util } from 'theme';
 
-const menuItemStyles = (options = {}) => {
-  const { sibling = false } = options;
-
-  return css`
-  ${sibling && '& ~'} .dropdown-menu {
+const menuItemStyles = css`
+  .dropdown-menu {
     > li > a {
       color: ${teinte.primary.tre};
 
@@ -40,6 +37,5 @@ const menuItemStyles = (options = {}) => {
     }
   }
 `;
-};
 
 export default menuItemStyles;

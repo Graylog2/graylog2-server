@@ -7,14 +7,14 @@ import teinte from 'theme/teinte';
 
 const borderColor = transparentize(0.8, teinte.primary.tre);
 const Popover = styled(BoostrapPopover)`
-  & {
+  && {
     background-color: ${teinte.primary.due};
     border-color: ${borderColor};
 
     &.top > .arrow {
       border-top-color: ${opacify(0.05, borderColor)};
 
-      &:after {
+      &::after {
         border-top-color: ${teinte.primary.due};
       }
     }
@@ -22,7 +22,7 @@ const Popover = styled(BoostrapPopover)`
     &.right > .arrow {
       border-right-color: ${opacify(0.05, borderColor)};
 
-      &:after {
+      &::after {
         border-right-color: ${teinte.primary.due};
       }
     }
@@ -30,7 +30,7 @@ const Popover = styled(BoostrapPopover)`
     &.bottom > .arrow {
       border-bottom-color: ${opacify(0.05, borderColor)};
 
-      &:after {
+      &::after {
         border-bottom-color: ${teinte.primary.due};
       }
     }
@@ -38,7 +38,7 @@ const Popover = styled(BoostrapPopover)`
     &.left > .arrow {
       border-left-color: ${opacify(0.05, borderColor)};
 
-      &:after {
+      &::after {
         border-left-color: ${teinte.primary.due};
       }
     }

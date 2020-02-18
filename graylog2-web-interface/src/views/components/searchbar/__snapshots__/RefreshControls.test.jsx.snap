@@ -181,12 +181,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -207,7 +206,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -229,7 +228,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -259,7 +258,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -274,7 +273,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -284,7 +283,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}
@@ -784,12 +783,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -810,7 +808,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -832,7 +830,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -862,7 +860,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -877,7 +875,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -887,7 +885,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}
@@ -1398,12 +1396,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -1424,7 +1421,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -1457,7 +1454,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -1498,7 +1495,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -1513,7 +1510,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -1523,7 +1520,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}
@@ -2047,12 +2044,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -2073,7 +2069,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -2106,7 +2102,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -2147,7 +2143,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -2162,7 +2158,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -2172,7 +2168,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}
@@ -2696,12 +2692,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -2722,7 +2717,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -2755,7 +2750,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -2796,7 +2791,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -2811,7 +2806,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -2821,7 +2816,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}
@@ -3345,12 +3340,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -3371,7 +3365,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -3404,7 +3398,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -3445,7 +3439,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -3460,7 +3454,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -3470,7 +3464,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}
@@ -3994,12 +3988,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -4020,7 +4013,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -4053,7 +4046,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -4094,7 +4087,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -4109,7 +4102,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -4119,7 +4112,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}
@@ -4643,12 +4636,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -4669,7 +4661,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -4702,7 +4694,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -4743,7 +4735,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -4758,7 +4750,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -4768,7 +4760,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}
@@ -5292,12 +5284,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           "componentStyle": ComponentStyle {
                             "componentId": "DropdownButton-sc-1343dcx-0",
                             "isStatic": false,
-                            "lastClassName": "jgZJTb",
+                            "lastClassName": "eTmTdM",
                             "rules": Array [
                               [Function],
-                              ";",
-                              "& ~",
-                              " .dropdown-menu{> li > a{color:",
+                              ";& ~{",
+                              ".dropdown-menu{> li > a{color:",
                               "#1F1F1F",
                               ";:hover,:focus{color:",
                               "#484848",
@@ -5318,7 +5309,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               ";color:",
                               "#b0b0b0",
                               ";}}}",
-                              ";",
+                              "}",
                             ],
                           },
                           "displayName": "DropdownButton",
@@ -5351,7 +5342,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <DropdownButton
-                        className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                        className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
                           <ForwardRef(RefreshControls__ButtonLabel)>
@@ -5392,7 +5383,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <DropdownToggle
                                   bsClass="dropdown-toggle"
                                   bsRole="toggle"
-                                  className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                  className="DropdownButton-sc-1343dcx-0 eTmTdM"
                                   id="refresh-options-dropdown"
                                   key=".0"
                                   onClick={[Function]}
@@ -5407,7 +5398,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                    className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle"
                                     disabled={false}
                                     id="refresh-options-dropdown"
                                     onClick={[Function]}
@@ -5417,7 +5408,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                     <button
                                       aria-expanded={false}
                                       aria-haspopup={true}
-                                      className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-default"
+                                      className="DropdownButton-sc-1343dcx-0 eTmTdM dropdown-toggle btn btn-default"
                                       disabled={false}
                                       id="refresh-options-dropdown"
                                       onClick={[Function]}

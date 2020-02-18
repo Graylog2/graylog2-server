@@ -21,11 +21,13 @@ const panelVariantStyles = (hex) => {
       + .panel-collapse > .panel-body {
         border-top-color: ${borderColor};
       }
+
       .badge {
         color: ${backgroundColor};
         background-color: ${hex};
       }
     }
+
     & > .panel-footer {
       + .panel-collapse > .panel-body {
         border-bottom-color: ${borderColor};
@@ -36,7 +38,6 @@ const panelVariantStyles = (hex) => {
 
 const StyledPanel = styled(BootstrapPanel)`
   background-color: ${teinte.primary.due};
-
 
   .panel-footer {
     background-color: ${teinte.secondary.tre};

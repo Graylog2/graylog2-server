@@ -148,7 +148,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Nav-dzawzr-0",
                         "isStatic": false,
-                        "lastClassName": "dfydXw",
+                        "lastClassName": "cUmrKl",
                         "rules": Array [
                           [Function],
                         ],
@@ -172,7 +172,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     activeKey="selection"
                     bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 dfydXw"
+                    className="Nav-dzawzr-0 cUmrKl"
                     justified={false}
                     onSelect={[Function]}
                     pullLeft={false}
@@ -180,7 +180,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     stacked={true}
                   >
                     <ul
-                      className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
+                      className="Nav-dzawzr-0 cUmrKl nav nav-pills nav-stacked"
                       role={null}
                     >
                       <NavItem
@@ -660,7 +660,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -668,12 +668,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -702,7 +702,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -715,7 +715,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -912,7 +912,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -920,12 +920,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -954,7 +954,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -967,7 +967,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -1162,7 +1162,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -1170,12 +1170,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -1203,7 +1203,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -1215,7 +1215,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -1411,7 +1411,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -1419,12 +1419,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -1453,7 +1453,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -1466,7 +1466,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -1661,7 +1661,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -1669,12 +1669,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -1702,7 +1702,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -1714,7 +1714,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -2560,7 +2560,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Nav-dzawzr-0",
                         "isStatic": false,
-                        "lastClassName": "dfydXw",
+                        "lastClassName": "cUmrKl",
                         "rules": Array [
                           [Function],
                         ],
@@ -2584,7 +2584,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     activeKey="selection"
                     bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 dfydXw"
+                    className="Nav-dzawzr-0 cUmrKl"
                     justified={false}
                     onSelect={[Function]}
                     pullLeft={false}
@@ -2592,7 +2592,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     stacked={true}
                   >
                     <ul
-                      className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
+                      className="Nav-dzawzr-0 cUmrKl nav nav-pills nav-stacked"
                       role={null}
                     >
                       <NavItem
@@ -3107,7 +3107,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -3115,12 +3115,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -3149,7 +3149,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -3162,7 +3162,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Content Pack the movie"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -3359,7 +3359,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -3367,12 +3367,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -3401,7 +3401,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -3414,7 +3414,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="A old content pack"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -3609,7 +3609,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -3617,12 +3617,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -3650,7 +3650,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -3662,7 +3662,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="## No one dares"
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -3858,7 +3858,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -3866,12 +3866,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -3900,7 +3900,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -3913,7 +3913,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Beinstein"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -4108,7 +4108,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "lastClassName": "iHrYrm",
                                                         "rules": Array [
                                                           "color:",
                                                           "#1F1F1F",
@@ -4116,12 +4116,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                           "#FFF",
                                                           ";border-color:",
                                                           "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                           "#b8b8b8",
+                                                          ";}&:focus{border-color:",
+                                                          "#6DC6E7",
+                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                                          "rgba(109,198,231,0.4)",
                                                           ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                           "#DCE1E5",
                                                           ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -4149,7 +4149,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -4161,7 +4161,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="http://beinstein.com"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}

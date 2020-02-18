@@ -1,7 +1,7 @@
 ### Default
 
 ```js
-import {NavItem} from 'components/graylog';
+import { NavItem } from 'components/graylog';
 
 <Nav bsStyle="pills" activeKey={1}>
   <NavItem eventKey={1} href="#">
@@ -18,7 +18,7 @@ import {NavItem} from 'components/graylog';
 ### Tabs w/ Dropdown
 
 ```js
-import {NavItem, NavDropdown, MenuItem} from 'components/graylog';
+import { NavItem, NavDropdown, MenuItem } from 'components/graylog';
 
 <Nav bsStyle="tabs" activeKey="1" onSelect={k => this.handleSelect(k)}>
   <NavItem eventKey="1" href="/home">
@@ -43,7 +43,7 @@ import {NavItem, NavDropdown, MenuItem} from 'components/graylog';
 ### Stacked
 
 ```js
-import {NavItem, NavDropdown, MenuItem} from 'components/graylog';
+import { NavItem, NavDropdown, MenuItem } from 'components/graylog';
 
 <Nav bsStyle="pills" stacked activeKey={1}>
   <NavItem eventKey={1} href="/home">
@@ -61,7 +61,7 @@ import {NavItem, NavDropdown, MenuItem} from 'components/graylog';
 ### Justified
 
 ```js
-import {NavItem} from 'components/graylog';
+import { NavItem } from 'components/graylog';
 
 <Nav
   bsStyle="tabs"

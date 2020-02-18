@@ -29,9 +29,9 @@ const InteractableModalWrapper = styled.div`
 `;
 
 const StyledRnd = styled(Rnd)`
-  box-shadow: 0 0 9px rgba(31, 31, 31, .25),
-              0 0 6px rgba(31, 31, 31, .25),
-              0 0 3px rgba(31, 31, 31, .25);
+  box-shadow: 0 0 9px rgba(31, 31, 31, 0.25),
+    0 0 6px rgba(31, 31, 31, 0.25),
+    0 0 3px rgba(31, 31, 31, 0.25);
   background-color: ${lighten(0.15, teinte.primary.tre)};
   border-radius: 3px;
   flex-direction: column;

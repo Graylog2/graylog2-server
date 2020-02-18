@@ -161,7 +161,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -169,12 +169,12 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -203,7 +203,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Title"
@@ -216,7 +216,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                               value=""
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="title"
                                 label="Title"
                                 maxLength={250}
@@ -413,7 +413,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -421,12 +421,12 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -455,7 +455,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Name"
@@ -468,7 +468,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                               value=""
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="name"
                                 label="Name"
                                 maxLength={250}
@@ -665,7 +665,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -673,12 +673,12 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -707,7 +707,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Description"
@@ -720,7 +720,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                               value=""
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="description"
                                 label="Description"
                                 maxLength={250}
@@ -918,7 +918,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -926,12 +926,12 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -959,7 +959,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="select"
                               disabled={false}
                               inputRef={[Function]}
@@ -972,7 +972,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                               value="string"
                             >
                               <select
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 disabled={false}
                                 id="type"
                                 label="Value Type"
@@ -1188,7 +1188,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -1196,12 +1196,12 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -1229,7 +1229,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Default value"
@@ -1241,7 +1241,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                               value=""
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="default_value"
                                 label="Default value"
                                 maxLength={250}
@@ -1478,7 +1478,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -1486,12 +1486,12 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -1520,7 +1520,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Title"
@@ -1533,7 +1533,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                               value="A parameter title"
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="title"
                                 label="Title"
                                 maxLength={250}
@@ -1730,7 +1730,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -1738,12 +1738,12 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -1772,7 +1772,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Name"
@@ -1785,7 +1785,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                               value="A parameter name"
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="name"
                                 label="Name"
                                 maxLength={250}
@@ -1982,7 +1982,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -1990,12 +1990,12 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -2024,7 +2024,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Description"
@@ -2037,7 +2037,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                               value="A parameter descriptions"
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="description"
                                 label="Description"
                                 maxLength={250}
@@ -2235,7 +2235,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -2243,12 +2243,12 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -2276,7 +2276,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="select"
                               disabled={true}
                               inputRef={[Function]}
@@ -2289,7 +2289,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                               value="string"
                             >
                               <select
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 disabled={true}
                                 id="type"
                                 label="Value Type"
@@ -2505,7 +2505,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -2513,12 +2513,12 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -2546,7 +2546,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Default value"
@@ -2558,7 +2558,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                               value="test"
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="default_value"
                                 label="Default value"
                                 maxLength={250}
@@ -2776,7 +2776,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -2784,12 +2784,12 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -2818,7 +2818,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Title"
@@ -2831,7 +2831,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                               value=""
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="title"
                                 label="Title"
                                 maxLength={250}
@@ -3028,7 +3028,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -3036,12 +3036,12 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -3070,7 +3070,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Name"
@@ -3083,7 +3083,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                               value=""
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="name"
                                 label="Name"
                                 maxLength={250}
@@ -3280,7 +3280,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -3288,12 +3288,12 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -3322,7 +3322,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Description"
@@ -3335,7 +3335,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                               value=""
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="description"
                                 label="Description"
                                 maxLength={250}
@@ -3533,7 +3533,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -3541,12 +3541,12 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -3574,7 +3574,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="select"
                               disabled={false}
                               inputRef={[Function]}
@@ -3587,7 +3587,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                               value="string"
                             >
                               <select
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 disabled={false}
                                 id="type"
                                 label="Value Type"
@@ -3803,7 +3803,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": true,
-                                  "lastClassName": "hdNTyr",
+                                  "lastClassName": "iHrYrm",
                                   "rules": Array [
                                     "color:",
                                     "#1F1F1F",
@@ -3811,12 +3811,12 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                                     "#FFF",
                                     ";border-color:",
                                     "#DCE1E5",
-                                    ";&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                     "#b8b8b8",
+                                    ";}&:focus{border-color:",
+                                    "#6DC6E7",
+                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
+                                    "rgba(109,198,231,0.4)",
                                     ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                     "#DCE1E5",
                                     ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -3844,7 +3844,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                              className="FormControl-sc-1amoaox-0 iHrYrm"
                               componentClass="input"
                               inputRef={[Function]}
                               label="Default value"
@@ -3856,7 +3856,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                               value=""
                             >
                               <input
-                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
                                 id="default_value"
                                 label="Default value"
                                 maxLength={250}

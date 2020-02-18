@@ -1,0 +1,12 @@
+{
+  "processors": ["stylelint-processor-styled-components"],
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-styled-components"
+  ],
+  "rules": {
+    "no-descending-specificity": null,
+    "declaration-colon-space-after": "always-single-line",
+    "declaration-colon-newline-after": null,
+  }
+}

@@ -32,7 +32,9 @@ const alertStyles = (hex) => {
 
 const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
   const StyledAlert = useMemo(
-    () => styled(BootstrapAlert)`${bsStyleThemeVariant(alertStyles, {}, styleVariants)}`,
+    () => styled(BootstrapAlert)`
+      ${bsStyleThemeVariant(alertStyles, {}, styleVariants)}
+    `,
     [bsStyle],
   );
 
