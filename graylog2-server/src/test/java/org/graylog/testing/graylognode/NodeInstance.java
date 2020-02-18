@@ -20,7 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
+
+import java.nio.file.Paths;
 
 public class NodeInstance {
 
@@ -40,18 +41,20 @@ public class NodeInstance {
 
 
     public GenericContainer buildContainer() {
-        ImageFromDockerfile image = new ImageFromDockerfile()
-                .withDockerfileFromBuilder(this::ngnixBuilder);
+        final String unpackedTarballDir = "/tmp/opt-graylog";
 
-        return new GenericContainer(image).withExposedPorts(80);
-    }
+        final ImageFromDockerfile image = new ImageFromDockerfile()
+                .withFileFromClasspath("Dockerfile", "org/graylog/testing/graylognode/Dockerfile")
+                .withFileFromClasspath("docker-entrypoint.sh", "org/graylog/testing/graylognode/docker-entrypoint.sh")
+                .withFileFromClasspath("graylog.conf", "org/graylog/testing/graylognode/config/graylog.conf")
+                .withFileFromClasspath("log4j2.xml", "org/graylog/testing/graylognode/config/log4j2.xml")
+                //TODO: manually assembled for now
+                // - how do we prepare the graylog directory?
+                // - how do we find the latest jars?
+                .withFileFromPath(".", Paths.get(unpackedTarballDir))
+                ;
 
-    public String ngnixBuilder(DockerfileBuilder builder) {
-        return builder
-                .from("alpine:3.2")
-                .run("apk add --update nginx")
-                .cmd("nginx", "-g", "daemon off;")
-                .build();
+        return new GenericContainer<>(image).withExposedPorts(80);
     }
 
     public void stop() {

@@ -1,61 +1,5 @@
-# -------------------------------------------------------------------------------------------------
-#
-# layer for download and verifying
-FROM debian:stretch-slim as graylog-downloader
-
-ARG VCS_REF
-ARG GRAYLOG_VERSION
-
-WORKDIR /tmp
-
-# hadolint ignore=DL3008,DL3015
-RUN \
-  apt-get update  > /dev/null && \
-  apt-get install --assume-yes \
-    ca-certificates \
-    curl > /dev/null
-
-RUN \
-  curl \
-    --silent \
-    --location \
-    --retry 3 \
-    --output "/tmp/graylog-${GRAYLOG_VERSION}.tgz" \
-    "https://packages.graylog2.org/releases/graylog/graylog-${GRAYLOG_VERSION}.tgz"
-
-RUN \
-  curl \
-    --silent \
-    --location \
-    --retry 3 \
-    --output "/tmp/graylog-${GRAYLOG_VERSION}.tgz.sha256.txt" \
-    "https://packages.graylog2.org/releases/graylog/graylog-${GRAYLOG_VERSION}.tgz.sha256.txt"
-
-RUN \
-  sha256sum --check "graylog-${GRAYLOG_VERSION}.tgz.sha256.txt"
-
-RUN \
-  mkdir /opt/graylog && \
-  tar --extract --gzip --file "/tmp/graylog-${GRAYLOG_VERSION}.tgz" --strip-components=1 --directory /opt/graylog
-
-RUN \
-  install \
-    --directory \
-    --mode=0750 \
-    /opt/graylog/data \
-    /opt/graylog/data/journal \
-    /opt/graylog/data/log \
-    /opt/graylog/data/config \
-    /opt/graylog/data/plugin \
-    /opt/graylog/data/data
-
-# -------------------------------------------------------------------------------------------------
-#
-# final layer
-# use the smallest debain with headless openjdk and copying files from download layers
 FROM openjdk:8-jre-slim
 
-ARG VCS_REF
 ARG GRAYLOG_VERSION
 ARG BUILD_DATE
 ARG GRAYLOG_HOME=/usr/share/graylog
@@ -64,8 +8,9 @@ ARG GRAYLOG_UID=1100
 ARG GRAYLOG_GROUP=graylog
 ARG GRAYLOG_GID=1100
 
-COPY --from=graylog-downloader /opt/graylog ${GRAYLOG_HOME}
-COPY config ${GRAYLOG_HOME}/data/config
+COPY . ${GRAYLOG_HOME}
+COPY graylog.conf ${GRAYLOG_HOME}/data/config
+COPY log4j2.xml ${GRAYLOG_HOME}/data/config
 
 WORKDIR ${GRAYLOG_HOME}
 
@@ -120,32 +65,12 @@ RUN \
 
 
 COPY docker-entrypoint.sh /
-COPY health_check.sh /
+RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 9000
 USER ${GRAYLOG_USER}
 VOLUME ${GRAYLOG_HOME}/data
+
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 CMD ["graylog"]
 
-# add healthcheck
-HEALTHCHECK \
-  --interval=10s \
-  --timeout=2s \
-  --retries=12 \
-  CMD /health_check.sh
-
-# -------------------------------------------------------------------------------------------------
-
-LABEL maintainer="Graylog, Inc. <hello@graylog.com>" \
-      org.label-schema.name="Graylog Docker Image" \
-      org.label-schema.description="Official Graylog Docker image" \
-      org.label-schema.url="https://www.graylog.org/" \
-      org.label-schema.vcs-ref=${VCS_REF} \
-      org.label-schema.vcs-url="https://github.com/Graylog2/graylog-docker" \
-      org.label-schema.vendor="Graylog, Inc." \
-      org.label-schema.version=${GRAYLOG_VERSION} \
-      org.label-schema.schema-version="1.0" \
-      org.label-schema.build-date=${BUILD_DATE} \
-      com.microscaling.docker.dockerfile="/Dockerfile" \
-      com.microscaling.license="Apache 2.0"
