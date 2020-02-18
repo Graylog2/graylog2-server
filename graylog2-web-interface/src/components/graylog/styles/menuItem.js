@@ -1,41 +1,40 @@
 import { css } from 'styled-components';
 
-import teinte from 'theme/teinte';
 import { util } from 'theme';
 
-const menuItemStyles = css`
+const menuItemStyles = css(({ theme }) => css`
   .dropdown-menu {
     > li > a {
-      color: ${teinte.primary.tre};
+      color: ${theme.color.primary.tre};
 
       :hover,
       :focus {
-        color: ${util.contrastingColor(teinte.secondary.due)};
-        background-color: ${teinte.secondary.due};
+        color: ${util.contrastingColor(theme.color.secondary.due)};
+        background-color: ${theme.color.secondary.due};
       }
     }
 
     > .active > a {
-      background-color: ${teinte.tertiary.due};
-      color: ${util.contrastingColor(teinte.tertiary.due)};
+      background-color: ${theme.color.tertiary.due};
+      color: ${util.contrastingColor(theme.color.tertiary.due)};
 
       :hover,
       :focus {
-        background-color: ${teinte.tertiary.uno};
-        color: ${util.contrastingColor(teinte.tertiary.uno)};
+        background-color: ${theme.color.tertiary.uno};
+        color: ${util.contrastingColor(theme.color.tertiary.uno)};
       }
     }
 
     > .disabled > a {
-      color: ${util.contrastingColor(teinte.primary.tre, 'AA')};
+      color: ${util.contrastingColor(theme.color.primary.tre, 'AA')};
 
       :hover,
       :focus {
-        background-color: ${teinte.secondary.due};
-        color: ${util.contrastingColor(teinte.primary.tre, 'AAA')};
+        background-color: ${theme.color.secondary.due};
+        color: ${util.contrastingColor(theme.color.primary.tre, 'AAA')};
       }
     }
   }
-`;
+`);
 
 export default menuItemStyles;

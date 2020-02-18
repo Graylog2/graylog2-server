@@ -6,7 +6,6 @@ import styled, { css, keyframes, type StyledComponent } from 'styled-components'
 import { transparentize } from 'polished';
 
 import { util } from 'theme';
-import teinte from 'theme/teinte';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 type ProgressBarProps = {
@@ -34,8 +33,9 @@ const DEFAULT_BAR = {
   value: 0,
 };
 
-const defaultStripColor = transparentize(0.75, teinte.primary.due);
-const boxShadowColor = transparentize(0.9, teinte.primary.tre);
+const boxShadow = meta => css(({ theme }) => css`
+  box-shadow: ${meta} ${transparentize(0.9, theme.color.primary.tre)};
+`);
 
 const animatedStripes = keyframes`
   from {
@@ -52,24 +52,26 @@ const progressBarVariants = color => css`
   color: ${util.readableColor(color)};
 `;
 
-const ProgressWrap: StyledComponent<{}, void, *> = styled.div`
+const ProgressWrap: StyledComponent<{}, void, *> = styled.div(({ theme }) => css`
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
-  background-color: ${teinte.secondary.due};
+  background-color: ${theme.color.secondary.due};
   border-radius: 4px;
-  box-shadow: inset 0 1px 2px ${boxShadowColor};
+  ${boxShadow('inset 0 1px 2px')};
   display: flex;
   align-items: center;
-`;
+`);
 
-const Bar: StyledComponent<BarProps, void, *> = styled.div(({ animated, striped, value }) => {
+const Bar: StyledComponent<BarProps, void, *> = styled.div(({ animated, striped, theme, value }) => {
+  const defaultStripColor = transparentize(0.75, theme.color.primary.due);
+
   return css`
     height: 100%;
     font-size: 12px;
     line-height: 20px;
     text-align: center;
-    box-shadow: inset 0 -1px 0 ${boxShadowColor};
+    ${boxShadow('inset 0 -1px 0')};
     transition: width 500ms ease-in-out;
     width: ${value}%;
     max-width: 100%;

@@ -63,7 +63,7 @@ const variantRowStyles = () => {
   `;
 };
 
-const Table = styled(BootstrapTable)`
+const Table = styled(BootstrapTable)(({ theme }) => css`
   background-color: transparent;
 
   &.table > thead > tr > th,
@@ -72,23 +72,23 @@ const Table = styled(BootstrapTable)`
   &.table > thead > tr > td,
   &.table > tbody > tr > td,
   &.table > tfoot > tr > td {
-    border-top-color: ${teinte.secondary.tre};
+    border-top-color: ${theme.color.secondary.tre};
   }
 
   &.table > thead > tr > th {
-    border-bottom-color: ${teinte.secondary.tre};
+    border-bottom-color: ${theme.color.secondary.tre};
   }
 
   &.table > tbody + tbody {
-    border-top-color: ${teinte.secondary.tre};
+    border-top-color: ${theme.color.secondary.tre};
   }
 
   .table .table {
-    background-color: ${teinte.primary.due};
+    background-color: ${theme.color.primary.due};
   }
 
   &.table-bordered {
-    border-color: ${util.colorLevel(teinte.secondary.tre, -2)};
+    border-color: ${util.colorLevel(theme.color.secondary.tre, -2)};
   }
 
   &.table-bordered > thead > tr > th,
@@ -97,18 +97,18 @@ const Table = styled(BootstrapTable)`
   &.table-bordered > thead > tr > td,
   &.table-bordered > tbody > tr > td,
   &.table-bordered > tfoot > tr > td {
-    border-color: ${util.colorLevel(teinte.secondary.tre, -2)};
+    border-color: ${util.colorLevel(theme.color.secondary.tre, -2)};
   }
 
   &.table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: ${util.colorLevel(teinte.secondary.tre, -10)};
+    background-color: ${util.colorLevel(theme.color.secondary.tre, -10)};
   }
 
   &.table-hover > tbody > tr:hover {
-    background-color: ${util.colorLevel(teinte.secondary.tre, -9)};
+    background-color: ${util.colorLevel(theme.color.secondary.tre, -9)};
   }
 
   ${variantRowStyles()}
-`;
+`);
 
 export default Table;

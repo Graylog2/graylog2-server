@@ -195,7 +195,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "iHrYrm",
+                                          "lastClassName": "eOArng",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -218,7 +218,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 iHrYrm"
+                                      className="FormControl-sc-1amoaox-0 eOArng"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -226,7 +226,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                        className="FormControl-sc-1amoaox-0 eOArng form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
@@ -601,7 +601,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "iHrYrm",
+                                          "lastClassName": "eOArng",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -624,7 +624,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 iHrYrm"
+                                      className="FormControl-sc-1amoaox-0 eOArng"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -632,7 +632,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                        className="FormControl-sc-1amoaox-0 eOArng form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
@@ -1084,7 +1084,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "iHrYrm",
+                                          "lastClassName": "eOArng",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1107,7 +1107,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 iHrYrm"
+                                      className="FormControl-sc-1amoaox-0 eOArng"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -1115,7 +1115,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                        className="FormControl-sc-1amoaox-0 eOArng form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
