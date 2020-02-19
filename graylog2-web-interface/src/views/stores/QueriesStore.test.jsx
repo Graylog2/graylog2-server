@@ -44,7 +44,7 @@ describe('QueriesStore', () => {
     const queries = [query1];
     const callback = asMock(ViewStore).listen.mock.calls[0][0];
     const unsubscribe = QueriesStore.listen((newQueries) => {
-      expect(newQueries).toEqual(new Immutable.OrderedMap<QueryId, Query>({ query1 }));
+      expect(newQueries).toEqual(Immutable.OrderedMap<QueryId, Query>({ query1 }));
       done();
     });
     callback({
