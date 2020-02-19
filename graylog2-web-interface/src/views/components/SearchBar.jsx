@@ -35,7 +35,7 @@ type Props = {
   },
   disableSearch: boolean,
   onExecute: () => void,
-  queryFilters: Immutable.Map,
+  queryFilters: Immutable.Map<any, any>,
 };
 
 const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
