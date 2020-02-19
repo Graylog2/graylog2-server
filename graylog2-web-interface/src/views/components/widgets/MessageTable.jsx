@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 
@@ -128,13 +129,13 @@ const TableHead = styled.thead`
 `;
 
 type State = {
-  expandedMessages: Immutable.Set,
+  expandedMessages: Immutable.Set<string>,
 }
 
 type Props = {
-  fields: {},
+  fields: Array<string>,
   config: MessagesWidgetConfig,
-  selectedFields?: {},
+  selectedFields?: Immutable.Set<string>,
   activeQueryId: string,
   messages: Array<Object>
 };
@@ -149,7 +150,7 @@ class MessageTable extends React.Component<Props, State> {
   };
 
   static defaultProps = {
-    selectedFields: Immutable.Set(),
+    selectedFields: Immutable.Set<string>(),
   };
 
   state = {
@@ -165,7 +166,7 @@ class MessageTable extends React.Component<Props, State> {
     return {};
   };
 
-  _fieldTypeFor = (fieldName: string, fields: Immutable.List) => {
+  _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => {
     return ((fields && fields.find(f => f.name === fieldName)) || { type: FieldType.Unknown }).type;
   };
 
@@ -183,7 +184,7 @@ class MessageTable extends React.Component<Props, State> {
 
   _getSelectedFields = () => {
     const { selectedFields, config } = this.props;
-    return Immutable.OrderedSet(config ? config.fields : selectedFields);
+    return Immutable.OrderedSet<string>(config ? config.fields : selectedFields);
   };
 
   _toggleMessageDetail = (id: string) => {
