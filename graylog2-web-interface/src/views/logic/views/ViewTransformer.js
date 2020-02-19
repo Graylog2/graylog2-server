@@ -10,10 +10,10 @@ import ViewState from './ViewState';
 
 const ViewTransformer = (searchView: View): View => {
   const queryMap: Map<QueryId, Query> = Map(searchView.search.queries.map(q => [q.id, q]));
-  const newViewStateMap: ViewStateMap = (searchView.state || Map.of()).map((viewState: ViewState, queryId: string) => {
-    const { timerange, query, filter = List.of() } = queryMap.get(queryId);
+  const newViewStateMap: ViewStateMap = (searchView.state || Map()).map((viewState: ViewState, queryId: string) => {
+    const { timerange, query, filter = Map() } = queryMap.get(queryId);
 
-    const streams = filter.get('filters', List.of())
+    const streams = (filter ? filter.get('filters', List()) : List())
       .filter(value => Map.isMap(value) && value.get('type') === 'stream')
       .map(value => value.get('id'))
       .toList()
