@@ -61,4 +61,17 @@ describe('MessageTable', () => {
       expect(messageTableEntry).not.toBeEmptyRender();
     });
   });
+
+  it('renders config fields in table head with correct order', () => {
+    const configFields = ['gl2_receive_timestamp', 'user_id', 'gl2_source_input', 'gl2_message_id', 'ingest_time', 'http_method', 'action', 'source', 'ingest_time_hour', 'ingest_time_epoch'];
+    const configWithFields = MessagesWidgetConfig.builder().fields(configFields).build();
+    const wrapper = mount(<MessageTable messages={messages}
+                                        activeQueryId={activeQueryId}
+                                        fields={Immutable.List(fields)}
+                                        selectedFields={{}}
+                                        config={configWithFields} />);
+
+    const tableHead = wrapper.find('thead');
+    expect(tableHead).toMatchSnapshot();
+  });
 });
