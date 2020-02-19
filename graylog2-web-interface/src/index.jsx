@@ -19,7 +19,9 @@ Reflux.setPromiseFactory(handlers => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
-    <GraylogThemeProvider><AppFacade /></GraylogThemeProvider>,
+    <GraylogThemeProvider>
+      <AppFacade />
+    </GraylogThemeProvider>,
     appContainer,
   );
 }
