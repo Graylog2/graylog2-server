@@ -183,11 +183,7 @@ class MessageTable extends React.Component<Props, State> {
 
   _getSelectedFields = () => {
     const { selectedFields, config } = this.props;
-    let fieldSelection = selectedFields;
-    if (config) {
-      fieldSelection = config.fields;
-    }
-    return Immutable.OrderedSet(fieldSelection);
+    return Immutable.OrderedSet(config ? config.fields : selectedFields);
   };
 
   _toggleMessageDetail = (id: string) => {
