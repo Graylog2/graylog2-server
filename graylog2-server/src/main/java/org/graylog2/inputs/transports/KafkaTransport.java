@@ -20,6 +20,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -65,7 +66,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Named;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -186,9 +186,15 @@ public class KafkaTransport extends ThrottleableTransport {
     public void doLaunch(final MessageInput input) {
         final boolean legacyMode = configuration.getBoolean(CK_LEGACY, true);
         if (legacyMode) {
-            Objects.requireNonNull(configuration.getString(CK_ZOOKEEPER), "ZooKeeper configuration setting cannot be empty.");
+            final String zooKeper = configuration.getString(CK_ZOOKEEPER);
+            if (Strings.isNullOrEmpty(zooKeper)) {
+                throw new IllegalArgumentException("ZooKeeper configuration setting cannot be empty");
+            }
         } else {
-            Objects.requireNonNull(configuration.getString(CK_BOOTSTRAP), "Bootstrap server configuration setting cannot be enpty.");
+            final String bootStrap = configuration.getString(CK_BOOTSTRAP);
+            if (Strings.isNullOrEmpty(bootStrap)) {
+                throw new IllegalArgumentException("Bootstrap server configuration setting cannot be empty");
+            }
         }
 
         serverStatus.awaitRunning(() -> lifecycleStateChange(Lifecycle.RUNNING));
@@ -458,9 +464,9 @@ public class KafkaTransport extends ThrottleableTransport {
                     11));
             cr.addField(new TextField(
                     CK_ZOOKEEPER,
-                    "ZooKeeper address",
+                    "ZooKeeper address (legacy mode only)",
                     "127.0.0.1:2181",
-                    "Host and port of the ZooKeeper that is managing your Kafka cluster. Ignored in consumer API mode (non-legacy).",
+                    "Host and port of the ZooKeeper that is managing your Kafka cluster. Not used in consumer API (non-legacy) mode.",
                     ConfigurationField.Optional.OPTIONAL,
                     12));
             cr.addField(new TextField(
