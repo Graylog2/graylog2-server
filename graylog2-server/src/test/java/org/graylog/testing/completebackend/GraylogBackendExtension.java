@@ -17,39 +17,49 @@
 package org.graylog.testing.completebackend;
 
 import org.graylog.testing.graylognode.NodeInstance;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Network;
 
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
 
-public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
+public class GraylogBackendExtension implements BeforeEachCallback, BeforeAllCallback, AfterAllCallback, ParameterResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
     private static final Namespace NAMESPACE = Namespace.create(GraylogBackendExtension.class);
 
 
-    private final NodeInstance node = new NodeInstance();
+    private MongoDBInstance mongodb;
+    private NodeInstance node;
 
 
     @Override
     public void beforeAll(ExtensionContext context) {
         LOG.warn("before");
+
+        Network network = Network.SHARED;
+
+        mongodb = MongoDBInstance.createWithDefaults(network, MongoDBInstance.Lifecycle.CLASS);
+        mongodb.startContainer();
+
+        node = new NodeInstance(mongodb.internalUri(), network);
+
         node.start();
 
         GraylogBackend backend = new GraylogBackend();
         backend.port = node.getPort();
         backend.address = node.getApiAddress();
 
-
         context.getStore(NAMESPACE).put(context.getRequiredTestClass().getName(), backend);
-
     }
 
     @Override
@@ -59,13 +69,17 @@ public class GraylogBackendExtension implements BeforeAllCallback, AfterAllCallb
     }
 
     @Override
+    public void beforeEach(ExtensionContext context) {
+        mongodb.dropDatabase();
+    }
+
+    @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return parameterContext.getParameter().getType().equals(GraylogBackend.class);
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-
         return extensionContext.getStore(NAMESPACE).get(extensionContext.getRequiredTestClass().getName());
     }
 }

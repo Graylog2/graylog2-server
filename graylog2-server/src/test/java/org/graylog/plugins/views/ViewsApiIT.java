@@ -18,10 +18,13 @@ package org.graylog.plugins.views;
 
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static com.jayway.restassured.RestAssured.when;
 
+
+@Disabled
 @ApiIntegrationTest
 class ViewsApiIT {
 

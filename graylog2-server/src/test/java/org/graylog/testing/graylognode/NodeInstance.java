@@ -19,6 +19,7 @@ package org.graylog.testing.graylognode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.nio.file.Paths;
@@ -29,8 +30,8 @@ public class NodeInstance {
 
     private final GenericContainer container;
 
-    public NodeInstance() {
-        this.container = buildContainer();
+    public NodeInstance(String mongoDbUri, Network network) {
+        this.container = buildContainer(mongoDbUri, network);
     }
 
     public void start() {
@@ -40,7 +41,7 @@ public class NodeInstance {
     }
 
 
-    public GenericContainer buildContainer() {
+    private GenericContainer buildContainer(String mongoDbUri, Network network) {
         final String unpackedTarballDir = "/tmp/opt-graylog";
 
         final ImageFromDockerfile image = new ImageFromDockerfile()
@@ -51,10 +52,13 @@ public class NodeInstance {
                 //TODO: manually assembled for now
                 // - how do we prepare the graylog directory?
                 // - how do we find the latest jars?
-                .withFileFromPath(".", Paths.get(unpackedTarballDir))
-                ;
+                .withFileFromPath(".", Paths.get(unpackedTarballDir));
 
-        return new GenericContainer<>(image).withExposedPorts(80);
+        return new GenericContainer<>(image)
+                .withExposedPorts(80)
+                .withNetwork(network)
+                .withEnv("GRAYLOG_MONGODB_URI", mongoDbUri)
+                ;
     }
 
     public void stop() {
