@@ -71,7 +71,7 @@ describe('MessageTable', () => {
                                         selectedFields={{}}
                                         config={configWithFields} />);
 
-    const tableHead = wrapper.find('thead');
-    expect(tableHead).toMatchSnapshot();
+    const tableHeadFields = wrapper.find('Field').map(field => field.text());
+    expect(tableHeadFields).toEqual(configFields);
   });
 });
