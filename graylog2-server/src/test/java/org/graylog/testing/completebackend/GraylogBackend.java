@@ -16,7 +16,69 @@
  */
 package org.graylog.testing.completebackend;
 
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog.testing.graylognode.NodeInstance;
+import org.graylog.testing.mongodb.MongoDBInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Network;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+
 public class GraylogBackend {
-    public int port;
-    public String address;
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
+    private final ElasticsearchInstance es;
+    private final MongoDBInstance mongodb;
+    private final NodeInstance node;
+
+    // Assuming that parallel start works, because
+    // - mongodb and es are independent
+    // - node will retry connections to mongodb and es until they are there
+    public static GraylogBackend createStarted() {
+        Network network = Network.newNetwork();
+
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+
+        FutureTask<ElasticsearchInstance> esTask = runTask(executor, () -> ElasticsearchInstance.create(network));
+        FutureTask<MongoDBInstance> mongodbTask = runTask(executor, () -> MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS));
+        FutureTask<NodeInstance> nodeTask = runTask(executor, () -> NodeInstance.createStarted(network, MongoDBInstance.internalUri(), ElasticsearchInstance.internalUri()));
+
+        try {
+            return new GraylogBackend(esTask.get(), mongodbTask.get(), nodeTask.get());
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Container creation aborted", e);
+            throw new RuntimeException(e);
+        } finally {
+            executor.shutdown();
+        }
+    }
+
+    private static <T> FutureTask<T> runTask(ExecutorService executor, Callable<T> callable) {
+        FutureTask<T> task = new FutureTask<>(callable);
+        executor.execute(task);
+        return task;
+    }
+
+    private GraylogBackend(ElasticsearchInstance es, MongoDBInstance mongodb, NodeInstance node) {
+        this.es = es;
+        this.mongodb = mongodb;
+        this.node = node;
+    }
+
+    public void shutDown() {
+        node.stop();
+    }
+
+    public void purgeData() {
+        mongodb.dropDatabase();
+        es.cleanUp();
+    }
+
+    public String apiAddress() {
+        return node.getApiAddress();
+    }
 }

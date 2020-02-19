@@ -17,9 +17,6 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
-import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog.testing.graylognode.NodeInstance;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -29,13 +26,7 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.Network;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace;
@@ -46,22 +37,14 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
     private static final Namespace NAMESPACE = Namespace.create(GraylogBackendExtension.class);
 
-
-    private ElasticsearchInstance es;
-    private MongoDBInstance mongodb;
-    private NodeInstance node;
-
+    private GraylogBackend backend;
 
     @Override
     public void beforeAll(ExtensionContext context) {
 
         Stopwatch sw = Stopwatch.createStarted();
 
-        startContainers();
-
-        GraylogBackend backend = new GraylogBackend();
-        backend.port = node.getPort();
-        backend.address = node.getApiAddress();
+        backend = GraylogBackend.createStarted();
 
         context.getStore(NAMESPACE).put(context.getRequiredTestClass().getName(), backend);
 
@@ -70,46 +53,14 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
         LOG.info("Containers started after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
     }
 
-    // Assuming that parallel start works, because
-    // - mongodb and es are independent
-    // - node will retry connections to mongodb and es until they are there
-    public void startContainers() {
-        Network network = Network.newNetwork();
-
-        ExecutorService executor = Executors.newFixedThreadPool(3);
-
-        FutureTask<ElasticsearchInstance> esTask = runTask(executor, () -> ElasticsearchInstance.create(network));
-        FutureTask<MongoDBInstance> mongodbTask = runTask(executor, () -> MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS));
-        FutureTask<NodeInstance> nodeTask = runTask(executor, () -> NodeInstance.createStarted(network, MongoDBInstance.internalUri(), ElasticsearchInstance.internalUri()));
-
-        try {
-            es = esTask.get();
-            mongodb = mongodbTask.get();
-            node = nodeTask.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Container creation aborted", e);
-            throw new RuntimeException(e);
-        } finally {
-            executor.shutdown();
-        }
-    }
-
-    public <T> FutureTask<T> runTask(ExecutorService executor, Callable<T> callable) {
-        FutureTask<T> task = new FutureTask<>(callable);
-        executor.execute(task);
-        return task;
-    }
-
     @Override
     public void afterAll(ExtensionContext context) {
-        LOG.warn("after");
-        node.stop();
+        backend.shutDown();
     }
 
     @Override
     public void afterEach(ExtensionContext context) {
-        mongodb.dropDatabase();
-        es.cleanUp();
+        backend.purgeData();
     }
 
     @Override

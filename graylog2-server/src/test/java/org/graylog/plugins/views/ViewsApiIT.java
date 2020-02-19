@@ -18,13 +18,11 @@ package org.graylog.plugins.views;
 
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static com.jayway.restassured.RestAssured.when;
 
 
-@Disabled
 @ApiIntegrationTest
 class ViewsApiIT {
 
@@ -37,7 +35,7 @@ class ViewsApiIT {
     @Test
     void canReachApi() {
         when()
-                .get(sut.address)
+                .get(sut.apiAddress())
                 .then()
                 .statusCode(200);
     }
