@@ -591,6 +591,7 @@ declare module 'immutable' {
 
   // OrderedSets have nothing that Sets do not have. We do not need to override constructor & other statics
   declare class OrderedSet<T> extends Set<T> {
+    static<T>(iterable?: ESIterable<T>): OrderedSet<T>;
     static isOrderedSet(maybeOrderedSet: any): boolean;
   }
 
