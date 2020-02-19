@@ -83,11 +83,11 @@ describe('QueriesStore', () => {
         .catch(error => expect(error).toEqual(new Error('Invalid time range type: invalid')));
     });
     it('does not do anything if type stays the same', () => QueriesActions.rangeType('query1', 'relative')
-      .then(newQueries => expect(newQueries).toEqual(new Immutable.OrderedMap<QueryId, Query>({ query1 }))));
+      .then(newQueries => expect(newQueries).toEqual(Immutable.OrderedMap<QueryId, Query>({ query1 }))));
     it('translates current relative time range parameters to absolute ones when switching to absolute',
       () => QueriesActions.rangeType('query1', 'absolute')
         .then(newQueries => expect(newQueries)
-          .toEqual(new Immutable.OrderedMap<QueryId, Query>({
+          .toEqual(Immutable.OrderedMap<QueryId, Query>({
             query1: query1.toBuilder()
               .timerange({
                 type: 'absolute',
@@ -99,7 +99,7 @@ describe('QueriesStore', () => {
     it('translates current relative time range parameters to keyword when switching to keyword',
       () => QueriesActions.rangeType('query1', 'keyword')
         .then(newQueries => expect(newQueries)
-          .toEqual(new Immutable.OrderedMap<QueryId, Query>({
+          .toEqual(Immutable.OrderedMap<QueryId, Query>({
             query1: query1.toBuilder()
               .timerange({
                 type: 'keyword',

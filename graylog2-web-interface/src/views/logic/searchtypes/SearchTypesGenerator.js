@@ -35,7 +35,7 @@ export default (widgets: Array<Widget>): ResultType => {
       }
       const { defaults = {} } = typeDefinition || {};
       const { config, widgetId, ...rest } = searchType;
-      return new Immutable.Map(defaults)
+      return Immutable.Map(defaults)
         .merge(rest)
         .merge(config)
         .merge(
