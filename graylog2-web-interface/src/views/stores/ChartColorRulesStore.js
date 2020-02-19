@@ -57,8 +57,7 @@ const ChartColorRulesStore = singletonStore(
           return Object.entries(chartColors).map(([key, value]) => ({ widgetId, name: key, color: value }));
         }
         return null;
-      }).filter(rules => (rules !== null))
-        .reduce((prev, cur) => [...prev, ...cur], []);
+      }).reduce((prev, cur) => (cur === null ? prev : [...prev, ...cur]), []);
 
       if (!isEqual(this.state, newRules)) {
         this.state = newRules;
