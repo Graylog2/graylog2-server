@@ -181,10 +181,7 @@ class MessageTable extends React.Component<Props, State> {
 
   _getSelectedFields = () => {
     const { selectedFields, config } = this.props;
-    if (config) {
-      return Immutable.Set(config.fields);
-    }
-    return selectedFields;
+    return Immutable.OrderedSet(config ? config.fields : selectedFields);
   };
 
   _toggleMessageDetail = (id: string) => {
@@ -204,13 +201,12 @@ class MessageTable extends React.Component<Props, State> {
     const { fields, activeQueryId, config } = this.props;
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
-    const selectedColumns = Immutable.OrderedSet(selectedFields);
     return (
       <div className="table-responsive">
         <Table className="table table-condensed" style={{ marginTop: 0 }}>
           <TableHead>
             <tr>
-              {selectedColumns.toSeq().map((selectedFieldName) => {
+              {selectedFields.toSeq().map((selectedFieldName) => {
                 return (
                   <th key={selectedFieldName}
                       style={this._columnStyle(selectedFieldName)}>
@@ -231,7 +227,7 @@ class MessageTable extends React.Component<Props, State> {
                                    disableSurroundingSearch
                                    message={message}
                                    showMessageRow={config && config.showMessageRow}
-                                   selectedFields={selectedColumns}
+                                   selectedFields={selectedFields}
                                    expanded={expandedMessages.contains(messageKey)}
                                    toggleDetail={this._toggleMessageDetail}
                                    highlight
