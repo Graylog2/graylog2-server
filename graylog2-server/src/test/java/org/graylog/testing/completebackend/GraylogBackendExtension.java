@@ -16,11 +16,12 @@
  */
 package org.graylog.testing.completebackend;
 
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -32,12 +33,13 @@ import org.testcontainers.containers.Network;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
 
-public class GraylogBackendExtension implements BeforeEachCallback, BeforeAllCallback, AfterAllCallback, ParameterResolver {
+public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCallback, AfterAllCallback, ParameterResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
     private static final Namespace NAMESPACE = Namespace.create(GraylogBackendExtension.class);
 
 
+    private ElasticsearchInstance es;
     private MongoDBInstance mongodb;
     private NodeInstance node;
 
@@ -46,12 +48,14 @@ public class GraylogBackendExtension implements BeforeEachCallback, BeforeAllCal
     public void beforeAll(ExtensionContext context) {
         LOG.warn("before");
 
-        Network network = Network.SHARED;
+        Network network = Network.newNetwork();
+
+        es = ElasticsearchInstance.create(network);
 
         mongodb = MongoDBInstance.createWithDefaults(network, MongoDBInstance.Lifecycle.CLASS);
         mongodb.startContainer();
 
-        node = new NodeInstance(mongodb.internalUri(), network);
+        node = new NodeInstance(network, mongodb.internalUri(), es.internalUri());
 
         node.start();
 
@@ -69,8 +73,9 @@ public class GraylogBackendExtension implements BeforeEachCallback, BeforeAllCal
     }
 
     @Override
-    public void beforeEach(ExtensionContext context) {
+    public void afterEach(ExtensionContext context) {
         mongodb.dropDatabase();
+        es.cleanUp();
     }
 
     @Override

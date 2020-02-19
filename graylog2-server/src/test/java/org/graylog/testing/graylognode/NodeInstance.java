@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.nio.file.Paths;
@@ -30,8 +31,8 @@ public class NodeInstance {
 
     private final GenericContainer container;
 
-    public NodeInstance(String mongoDbUri, Network network) {
-        this.container = buildContainer(mongoDbUri, network);
+    public NodeInstance(Network network, String mongoDbUri, String elasticsearchUri) {
+        this.container = buildContainer(network, mongoDbUri, elasticsearchUri);
     }
 
     public void start() {
@@ -41,7 +42,7 @@ public class NodeInstance {
     }
 
 
-    private GenericContainer buildContainer(String mongoDbUri, Network network) {
+    private GenericContainer buildContainer(Network network, String mongoDbUri, String elasticsearchUri) {
         final String unpackedTarballDir = "/tmp/opt-graylog";
 
         final ImageFromDockerfile image = new ImageFromDockerfile()
@@ -58,6 +59,8 @@ public class NodeInstance {
                 .withExposedPorts(80)
                 .withNetwork(network)
                 .withEnv("GRAYLOG_MONGODB_URI", mongoDbUri)
+                .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", elasticsearchUri)
+                .waitingFor(Wait.forHttp("/api"))
                 ;
     }
 
