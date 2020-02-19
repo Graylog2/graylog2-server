@@ -19,7 +19,6 @@ package org.graylog.testing.elasticsearch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.client.JestClient;
 import io.searchbox.cluster.State;
@@ -38,7 +37,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Iterators.toArray;
 
@@ -60,25 +58,21 @@ public class ElasticsearchInstance extends ExternalResource {
     private static final int ES_PORT = 9200;
     private static final String NETWORK_ALIAS = "elasticsearch";
 
-    private final ElasticsearchContainer container;
     private JestClient jestClient;
     private Client client;
     private FixtureImporter fixtureImporter = new FixtureImporter();
     private final Version version;
 
     public static ElasticsearchInstance create() {
-
-        return create(chooseVersion(), Network.newNetwork());
-    }
-
-    private static String chooseVersion() {
-        return PropertyLoader
-                .loadProperties(PROPERTIES_RESOURCE_NAME)
-                .getProperty("version", DEFAULT_VERSION);
+        return create(Network.newNetwork());
     }
 
     public static ElasticsearchInstance create(Network network) {
-        return create(chooseVersion(), network);
+        String version = PropertyLoader
+                .loadProperties(PROPERTIES_RESOURCE_NAME)
+                .getProperty("version", DEFAULT_VERSION);
+
+        return create(version, network);
     }
 
     public static ElasticsearchInstance create(String versionString, Network network) {
@@ -101,20 +95,25 @@ public class ElasticsearchInstance extends ExternalResource {
 
     private ElasticsearchInstance(String image, Version version, Network network) {
         this.version = version;
-        this.container = createContainer(image, version, network);
+
+        ElasticsearchContainer container = createContainer(image, version, network);
+
+        jestClient = jestClientFrom(container);
+
+        client = new Client(jestClient);
     }
 
-    private static ElasticsearchContainer createContainer(String image, Version version, Network network) {
+    private ElasticsearchContainer createContainer(String image, Version version, Network network) {
         if (!containersByVersion.containsKey(version)) {
-            containersByVersion.put(version, startNewContainerInstance(image, network));
+            ElasticsearchContainer container = buildContainer(image, network);
+            container.start();
+            containersByVersion.put(version, container);
         }
         return containersByVersion.get(version);
     }
 
-    private static ElasticsearchContainer startNewContainerInstance(String image, Network network) {
-        final Stopwatch sw = Stopwatch.createStarted();
-
-        final ElasticsearchContainer container = new ElasticsearchContainer(image)
+    private ElasticsearchContainer buildContainer(String image, Network network) {
+        return new ElasticsearchContainer(image)
                 .withReuse(true)
                 .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
                 .withEnv("discovery.type", "single-node")
@@ -122,14 +121,10 @@ public class ElasticsearchInstance extends ExternalResource {
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
-        container.start();
-        LOG.debug("Started container {} in {}ms", container.getContainerInfo().getName(), sw.elapsed(TimeUnit.MILLISECONDS));
-        return container;
     }
 
-    @Override
-    protected void before() {
-        jestClient = new JestClientProvider(
+    private JestClient jestClientFrom(ElasticsearchContainer container) {
+        return new JestClientProvider(
                 ImmutableList.of(URI.create("http://" + container.getHttpHostAddress())),
                 Duration.seconds(60),
                 Duration.seconds(60),
@@ -144,8 +139,6 @@ public class ElasticsearchInstance extends ExternalResource {
                 false,
                 new ObjectMapperProvider().get()
         ).get();
-
-        client = new Client(jestClient);
     }
 
     @Override
