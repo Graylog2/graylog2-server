@@ -1,5 +1,5 @@
 // @flow strict
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import VisualizationConfig from './VisualizationConfig';
 

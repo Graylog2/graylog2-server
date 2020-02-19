@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import 'helpers/mocking/react-dom_mock';
 
