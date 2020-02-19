@@ -550,6 +550,7 @@ declare module 'immutable' {
     static<K, V>(iterable?: ESIterable<[K, V]>): OrderedMap<K, V>;
 
     static isOrderedMap(maybeOrderedMap: any): boolean;
+    set<K_, V_>(key: K_, value: V_): OrderedMap<K | K_, V | V_>;
   }
 
   declare class Set<T> extends SetCollection<T> {
