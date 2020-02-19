@@ -5,8 +5,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Promise from 'bluebird';
 import Reflux from 'reflux';
-import AppFacade from 'routing/AppFacade';
 
+import AppFacade from 'routing/AppFacade';
+import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import ViewsBindings from 'views/bindings';
@@ -18,7 +19,7 @@ Reflux.setPromiseFactory(handlers => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
-    <AppFacade />,
+    <GraylogThemeProvider><AppFacade /></GraylogThemeProvider>,
     appContainer,
   );
 }
