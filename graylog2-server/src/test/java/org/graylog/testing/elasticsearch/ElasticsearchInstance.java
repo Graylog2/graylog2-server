@@ -158,7 +158,7 @@ public class ElasticsearchInstance extends ExternalResource {
         return toArray(result.get("metadata").get(templates).fieldNames(), String.class);
     }
 
-    public String internalUri() {
+    public static String internalUri() {
         return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, ES_PORT);
     }
 

@@ -50,28 +50,26 @@ import static java.util.Objects.requireNonNull;
 public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     public enum Lifecycle {
         METHOD, CLASS;
-    }
 
+    }
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBInstance.class);
+
     private static final String DEFAULT_IMAGE = "mongo";
     private static final String DEFAULT_VERSION = "3.6";
     private static final String DEFAULT_DATABASE_NAME = "graylog";
     private static final String DEFAULT_INSTANCE_NAME = "default";
-
     private static final int MONGODB_PORT = 27017;
-    ;
-    private static final String NETWORK_ALIAS = "mongodb";
 
+    private static final String NETWORK_ALIAS = "mongodb";
     private static final ConcurrentMap<String, GenericContainer> CACHED_CONTAINER = new ConcurrentHashMap<>();
 
     private final String instanceName;
+
     private final Lifecycle lifecycle;
-    private final String databaseName;
     private final GenericContainer container;
-
     private MongoConnection mongoConnection;
-    private MongoDBFixtureImporter fixtureImporter;
 
+    private MongoDBFixtureImporter fixtureImporter;
     /**
      * Creates a new MongoDB instance for every test method.
      *
@@ -91,13 +89,18 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     public static MongoDBInstance createWithDefaults(Network network, Lifecycle lifecycle) {
-        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, DEFAULT_VERSION, DEFAULT_DATABASE_NAME, network);
+        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, DEFAULT_VERSION, network);
     }
 
-    private MongoDBInstance(String instanceName, Lifecycle lifecycle, String version, String databaseName, Network network) {
+    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle) {
+        MongoDBInstance mongoDb = createWithDefaults(network, lifecycle);
+        mongoDb.startContainer();
+        return mongoDb;
+    }
+
+    private MongoDBInstance(String instanceName, Lifecycle lifecycle, String version, Network network) {
         this.instanceName = instanceName;
         this.lifecycle = lifecycle;
-        this.databaseName = databaseName;
 
         switch (lifecycle) {
             case CLASS:
@@ -151,19 +154,10 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     /**
-     * Returns the database name.
-     *
-     * @return the database name
-     */
-    public String databaseName() {
-        return databaseName;
-    }
-
-    /**
      * Drops the configured database.
      */
     public void dropDatabase() {
-        LOG.debug("Dropping database {}", databaseName());
+        LOG.debug("Dropping database {}", DEFAULT_DATABASE_NAME);
         mongoConnection().getMongoDatabase().drop();
     }
 
@@ -194,12 +188,12 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         return uriWithHostAndPort(ipAddress(), port());
     }
 
-    public String internalUri() {
+    public static String internalUri() {
         return uriWithHostAndPort(NETWORK_ALIAS, MONGODB_PORT);
     }
 
-    private String uriWithHostAndPort(String hostname, int port) {
-        return String.format(Locale.US, "mongodb://%s:%d/%s", hostname, port, databaseName());
+    private static String uriWithHostAndPort(String hostname, int port) {
+        return String.format(Locale.US, "mongodb://%s:%d/%s", hostname, port, DEFAULT_DATABASE_NAME);
     }
 
     @Override

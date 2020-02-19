@@ -31,16 +31,15 @@ public class NodeInstance {
 
     private final GenericContainer container;
 
+    public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri) {
+        NodeInstance instance = new NodeInstance(network, mongoDbUri, elasticsearchUri);
+        instance.container.start();
+        return instance;
+    }
+
     public NodeInstance(Network network, String mongoDbUri, String elasticsearchUri) {
         this.container = buildContainer(network, mongoDbUri, elasticsearchUri);
     }
-
-    public void start() {
-        container.start();
-
-        LOG.warn("container port is {}", container.getFirstMappedPort());
-    }
-
 
     private GenericContainer buildContainer(Network network, String mongoDbUri, String elasticsearchUri) {
         final String unpackedTarballDir = "/tmp/opt-graylog";
@@ -56,7 +55,7 @@ public class NodeInstance {
                 .withFileFromPath(".", Paths.get(unpackedTarballDir));
 
         return new GenericContainer<>(image)
-                .withExposedPorts(80)
+                .withExposedPorts(9000)
                 .withNetwork(network)
                 .withEnv("GRAYLOG_MONGODB_URI", mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", elasticsearchUri)
