@@ -65,14 +65,6 @@ module.exports = {
           name: 'Configuration Forms',
           components: 'src/components/configurationforms/[A-Z]*.jsx',
         },
-        {
-          name: 'Inputs',
-          components: 'src/components/inputs/[A-Z]*.jsx',
-        },
-        {
-          name: 'Visualizations',
-          components: 'src/components/visualizations/[A-Z]*.jsx',
-        },
       ],
     },
     {
