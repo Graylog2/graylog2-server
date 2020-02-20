@@ -100,9 +100,12 @@ export default class Query {
   toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
     // eslint-disable-next-line no-use-before-define
-    return Query.builder().id(id).query(query).timerange(timerange)
-      .filter(filter)
+    const builder = Query.builder()
+      .id(id)
+      .query(query)
+      .timerange(timerange)
       .searchTypes(searchTypes);
+    return filter ? builder.filter(filter) : builder;
   }
 
   equals(other: any): boolean {
