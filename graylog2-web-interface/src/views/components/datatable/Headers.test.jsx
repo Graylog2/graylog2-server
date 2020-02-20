@@ -7,9 +7,9 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
 import Headers from './Headers';
-import SeriesConfig from '../../logic/aggregationbuilder/SeriesConfig';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
 jest.mock('logic/datetimes/DateTime', () => 'DateTime');
