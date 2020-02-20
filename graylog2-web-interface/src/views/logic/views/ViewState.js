@@ -181,8 +181,8 @@ class Builder {
     return new Builder(this.value.set('titles', fromJS(value)));
   }
 
-  widgets(value: List<Widget>): Builder {
-    return new Builder(this.value.set('widgets', value));
+  widgets(value: (List<Widget> | Array<Widget>)): Builder {
+    return new Builder(this.value.set('widgets', List(value)));
   }
 
   widgetMapping(value: WidgetMapping): Builder {
