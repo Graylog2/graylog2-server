@@ -33,7 +33,7 @@ class HttpNotificationForm extends React.Component {
     return (
       <React.Fragment>
         <URLWhitelistInput label="URL"
-                           handleFormEvent={this.handleChange}
+                           onChange={this.handleChange}
                            validationState={validation.errors.url ? 'error' : null}
                            validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
                            url={config.url} />

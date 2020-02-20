@@ -26,7 +26,7 @@ type Props = {
   onUpdate: () => void,
   configuration: {},
   currentUser: {permissions: Array<string>},
-  formType: string,
+  urlType: string,
 };
 
 
@@ -39,7 +39,7 @@ class URLWhitelistFormModal extends React.Component<Props, State> {
       newUrlEntry: '',
       onUpdate: () => {},
       configuration: {},
-      formType: '',
+      urlType: '',
     }
 
     constructor(props) {
@@ -117,8 +117,8 @@ class URLWhitelistFormModal extends React.Component<Props, State> {
   render() {
     const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
     if (urlwhitelistConfig) {
-      const { newUrlEntry, formType } = this.props;
-      const initialConfig = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: formType || 'literal' }], disabled: urlwhitelistConfig.disabled };
+      const { newUrlEntry, urlType } = this.props;
+      const initialConfig = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: urlType || 'literal' }], disabled: urlwhitelistConfig.disabled };
       const { entries, disabled } = initialConfig;
       const { isValid } = this.state;
       return (
@@ -148,7 +148,7 @@ URLWhitelistFormModal.propTypes = {
   onUpdate: PropTypes.func,
   configuration: PropTypes.object,
   currentUser: PropTypes.object.isRequired,
-  formType: PropTypes.string,
+  urlType: PropTypes.string,
 };
 
 export default connect(URLWhitelistFormModal, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({

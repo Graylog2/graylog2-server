@@ -57,8 +57,8 @@ const URLUtils = {
   isValidURL(str) {
     let isValid = true;
     try {
-      // eslint-disable-next-line no-unused-vars
-      const test = new URL(str);
+      // eslint-disable-next-line
+      new URL(str);
     } catch (e) {
       isValid = false;
     }

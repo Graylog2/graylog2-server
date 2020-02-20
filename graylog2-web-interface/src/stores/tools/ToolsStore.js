@@ -70,7 +70,7 @@ const ToolsStore = Reflux.createStore({
     return promise;
   },
   urlWhiteListCheck(urlToCheck: string): Promise<Object> {
-    const { url } = ApiRoutes.ToolsApiController.UrlWhitelistCheck();
+    const { url } = ApiRoutes.ToolsApiController.urlWhitelistCheck();
     const promise = fetch('POST', URLUtils.qualifyUrl(url), {
       url: urlToCheck,
     });

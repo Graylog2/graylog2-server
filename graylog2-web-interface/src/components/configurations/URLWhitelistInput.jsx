@@ -5,20 +5,20 @@ import { Input } from 'components/bootstrap';
 import URLWhitelistFormModal from 'components/configurations/URLWhitelistFormModal';
 import StoreProvider from 'injection/StoreProvider';
 import URLUtils from 'util/URLUtils';
-import UIUtils from 'util/UIUtils';
+import FormsUtils from 'util/FormsUtils';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 type Props = {
   label: string,
-  handleFormEvent: (event: SyntheticInputEvent<EventTarget>) => void,
+  onChange: (event: SyntheticInputEvent<EventTarget>) => void,
   validationMessage: string,
   validationState: string,
   url: string,
   labelClassName: string,
   wrapperClassName: string,
-  formType: string
+  urlType: string
 }
-const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validationState, url, labelClassName, wrapperClassName, formType }: Props) => {
+const URLWhitelistInput = ({ label, onChange, validationMessage, validationState, url, labelClassName, wrapperClassName, urlType }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -38,7 +38,7 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
     promise.then((result) => {
       if (!result.is_whitelisted && validationState === null) {
         setCurrentValidationState('error');
-        setOwnValidationMessage(`URL ${suggestedUrl} is not whitelisted or not valid URL.`);
+        setOwnValidationMessage(`URL ${url} is not whitelisted or not valid URL.`);
       } else {
         setOwnValidationMessage(validationMessage);
         setCurrentValidationState(validationState);
@@ -49,7 +49,7 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
 
   const checkIsWhitelisted = () => {
     if (url) {
-      const suggestion = suggestRegexWhitelistUrl(url, formType);
+      const suggestion = suggestRegexWhitelistUrl(url, urlType);
       if (typeof suggestion === 'object') {
         suggestion.then((result) => {
           setSuggestedUrl(result.regex);
@@ -62,14 +62,9 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
     }
   };
 
-
   const onUpdate = () => {
-    UIUtils.triggerInput(ref.current);
+    FormsUtils.triggerInput(ref.current);
     checkIsWhitelisted();
-  };
-
-  const handleChange = (event: SyntheticInputEvent<EventTarget>) => {
-    handleFormEvent(event);
   };
 
   useEffect(() => {
@@ -77,8 +72,8 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
   }, [url, validationState]);
 
 
-  const addButton = isError() && !isWhitelisted ? <URLWhitelistFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} formType={formType} /> : '';
-  const helpMessage = <>{ownValidationMessage} {addButton}</>;
+  const addButton = isError() && !isWhitelisted ? <URLWhitelistFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
+  const helpMessage = <>{validationState === null ? ownValidationMessage : validationMessage} {addButton}</>;
   return (
     <Input type="text"
            id="url"
@@ -87,7 +82,7 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
            ref={ref}
            autoFocus
            required
-           onChange={handleChange}
+           onChange={onChange}
            help={helpMessage}
            bsStyle={currentValidationState}
            value={url}
@@ -98,7 +93,7 @@ const URLWhitelistInput = ({ label, handleFormEvent, validationMessage, validati
 
 URLWhitelistInput.propTypes = {
   label: PropTypes.string.isRequired,
-  handleFormEvent: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
   validationState: PropTypes.string,
   validationMessage: PropTypes.oneOfType([
     PropTypes.object,
@@ -107,7 +102,7 @@ URLWhitelistInput.propTypes = {
   url: PropTypes.string,
   labelClassName: PropTypes.string,
   wrapperClassName: PropTypes.string,
-  formType: PropTypes.string,
+  urlType: PropTypes.string,
 };
 
 URLWhitelistInput.defaultProps = {
@@ -116,7 +111,7 @@ URLWhitelistInput.defaultProps = {
   validationMessage: '',
   labelClassName: '',
   wrapperClassName: '',
-  formType: '',
+  urlType: '',
 };
 
 export default URLWhitelistInput;

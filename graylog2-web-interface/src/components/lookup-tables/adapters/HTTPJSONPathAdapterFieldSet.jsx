@@ -30,13 +30,13 @@ class HTTPJSONPathAdapterFieldSet extends React.Component {
     return (
       <fieldset>
         <URLWhitelistInput label="Lookup URL"
-                           handleFormEvent={handleFormEvent}
+                           onChange={handleFormEvent}
                            validationMessage={validationMessage('url', 'The URL for the lookup. (this is a template - see documentation)')}
                            validationState={validationState('url')}
                            url={config.url}
                            labelClassName="col-sm-3"
                            wrapperClassName="col-sm-9"
-                           formType="regex" />
+                           urlType="regex" />
         <Input type="text"
                id="single_value_jsonpath"
                name="single_value_jsonpath"

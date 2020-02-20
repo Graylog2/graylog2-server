@@ -22,16 +22,6 @@ const UIUtils = {
 
     return rect.top > 0 && rect.bottom > 0;
   },
-  triggerInput(urlInput) {
-    const { input } = urlInput;
-    const tracker = input._valueTracker;
-    const event = new Event('change', { bubbles: true });
-    event.simulated = true;
-    if (tracker) {
-      tracker.setValue('');
-    }
-    input.dispatchEvent(event);
-  },
 };
 
 export default UIUtils;

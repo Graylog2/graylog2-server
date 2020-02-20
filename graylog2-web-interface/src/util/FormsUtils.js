@@ -14,6 +14,16 @@ const FormUtils = {
         return input.value;
     }
   },
+  triggerInput(urlInput) {
+    const { input } = urlInput;
+    const tracker = input._valueTracker;
+    const event = new Event('change', { bubbles: true });
+    event.simulated = true;
+    if (tracker) {
+      tracker.setValue('');
+    }
+    input.dispatchEvent(event);
+  },
 };
 
 export default FormUtils;

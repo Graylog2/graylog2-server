@@ -7,7 +7,6 @@ import Input from 'components/bootstrap/Input';
 import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
 import FormUtils from 'util/FormsUtils';
-import UIUtils from 'util/UIUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -134,7 +133,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newUrlEntry }: Props) => {
           <td>
             <Input type="text"
                    id={`title-input${idx}`}
-                   ref={(elem) => { inputs[`title${idx}`] = elem; return true; }}
+                   ref={(elem) => { inputs[`title${idx}`] = elem; }}
                    help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'Required field' : null}
                    name="title"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
@@ -145,7 +144,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newUrlEntry }: Props) => {
           <td>
             <Input type="text"
                    id={`value-input${idx}`}
-                   ref={(elem) => { inputs[`value${idx}`] = elem; return true; }}
+                   ref={(elem) => { inputs[`value${idx}`] = elem; }}
                    help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? _getErrorMessage(url.type) : null}
                    name="value"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
@@ -182,7 +181,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newUrlEntry }: Props) => {
 
   useEffect(() => {
     if (newUrlEntry) {
-      UIUtils.triggerInput(inputs[`value${config.entries.length - 1}`]);
+      FormUtils.triggerInput(inputs[`value${config.entries.length - 1}`]);
     }
   }, [newUrlEntry]);
 
