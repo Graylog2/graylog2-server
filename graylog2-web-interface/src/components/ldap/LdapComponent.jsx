@@ -18,6 +18,16 @@ import LdapComponentStyle from './LdapComponent.css';
 const { RolesStore } = CombinedProvider.get('Roles');
 const { LdapActions } = CombinedProvider.get('Ldap');
 
+const GroupMappingLink = ({ text, onClick }) => {
+  return (
+    <Button bsStyle="link" bsSize="xs" className="btn-text" onClick={onClick}>{text}</Button>
+  );
+};
+GroupMappingLink.propTypes = {
+  text: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
+
 const HelperText = {
   activeDirectory: {
     SYSTEM_USERNAME: (
@@ -63,7 +73,7 @@ const HelperText = {
       <span>
         The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br />
         You can assign additional permissions by{' '}
-        <Button bsStyle="link" bsSize="xs" className="btn-text" onClick={onClickHandler}>mapping Active Directory groups to Graylog roles</Button>,{' '}
+        <GroupMappingLink text="mapping Active Directory groups to Graylog roles" onClick={onClickHandler} />,{' '}
         or you can assign additional Graylog roles to Active Directory users below.
       </span>
     ),
@@ -117,7 +127,7 @@ const HelperText = {
       <span>
         The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br />
         You can assign additional permissions by{' '}
-        <Button bsStyle="link" bsSize="xs" className="btn-text" onClick={onClickHandler}>mapping LDAP groups to Graylog roles</Button>,{' '}
+        <GroupMappingLink text="mapping LDAP groups to Graylog roles" onClick={onClickHandler} />,{' '}
         or you can assign additional Graylog roles to LDAP users below.
       </span>
     ),
@@ -472,6 +482,13 @@ class LdapComponent extends React.Component {
               <Row className="row-sm">
                 <Col sm={12}>
                   <legend>4. Group Mapping <small>(optional)</small></legend>
+                </Col>
+                <Col md={9} mdOffset={3}>
+                  <Panel bsStyle="warning">
+                    Take some time to review the{' '}
+                    <GroupMappingLink text={`${isAD ? 'AD' : 'LDAP'} group mapping`} onClick={this._onShowGroups} />{' '}
+                    after making changes in this section.
+                  </Panel>
                 </Col>
               </Row>
               <Input type="text"
