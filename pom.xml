@@ -152,7 +152,7 @@
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.11</zkclient.version>
-        <zookeeper.version>3.5.6</zookeeper.version>
+        <zookeeper.version>3.5.7</zookeeper.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
