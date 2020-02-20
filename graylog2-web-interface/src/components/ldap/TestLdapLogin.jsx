@@ -127,8 +127,8 @@ const TestLdapLogin = createReactClass({
 
     const attributes = Object.keys(loginStatus.result.entry).map((key) => {
       return [
-        <dt>{key}</dt>,
-        <dd>{loginStatus.result.entry[key]}</dd>,
+        <dt key={`${key}-dt`}>{key}</dt>,
+        <dd key={`${key}-dd`}>{loginStatus.result.entry[key]}</dd>,
       ];
     });
     const formattedEntry = (attributes.length > 0 ? <dl>{attributes}</dl>
