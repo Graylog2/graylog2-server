@@ -33,7 +33,7 @@ type InternalState = {
   requires: Requirements,
 };
 
-export type WidgetMapping = Immutable.Map<string, string>;
+export type WidgetMapping = Immutable.Map<string, Immutable.Set<String>>;
 export type ViewJson = {
   id: string,
   type: ViewType,
