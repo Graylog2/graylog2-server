@@ -40,7 +40,7 @@ describe('AddToQueryHandler', () => {
     const query = Query.builder()
       .query({ type: 'elasticsearch', query_string: '' })
       .build();
-    queries = Immutable.Map({ queryId: query });
+    queries = Immutable.OrderedMap({ queryId: query });
 
     const addToQueryHandler = new AddToQueryHandler();
 
@@ -59,7 +59,7 @@ describe('AddToQueryHandler', () => {
     const query = Query.builder()
       .query({ type: 'elasticsearch', query_string: '' })
       .build();
-    queries = Immutable.Map({ queryId: query });
+    queries = Immutable.OrderedMap({ queryId: query });
 
     const addToQueryHandler = new AddToQueryHandler();
 
@@ -67,7 +67,7 @@ describe('AddToQueryHandler', () => {
       .query({ type: 'elasticsearch', query_string: 'foo:23' })
       .build();
 
-    queriesStoreListen(Immutable.Map({ anotherQueryId: newQuery }));
+    queriesStoreListen(Immutable.OrderedMap({ anotherQueryId: newQuery }));
 
     return addToQueryHandler.handle({ queryId: 'anotherQueryId', field: 'bar', value: 42, type: new FieldType('keyword', [], []), contexts: { view } })
       .then(() => {
