@@ -68,7 +68,7 @@ describe('CurrentViewStateStore', () => {
       .height(5)
       .width(6)
       .build();
-    const expectedWidgets = [oldViewState.widgets[0], MessagesWidget.builder().id('feed').build()];
+    const expectedWidgets = [oldViewState.widgets.get(0), MessagesWidget.builder().id('feed').build()];
     const expectedWidgetPosition = { [oldWidgetId]: newWidgetPositionDead, feed: newWidgetPositionFeed };
     const expectedViewState = viewState.toBuilder()
       .widgetPositions(expectedWidgetPosition)

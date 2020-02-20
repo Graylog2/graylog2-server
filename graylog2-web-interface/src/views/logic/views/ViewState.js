@@ -1,6 +1,5 @@
 // @flow strict
-
-import { List, Map, Collection, fromJS, is } from 'immutable';
+import { List, Map, fromJS, is } from 'immutable';
 
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -10,7 +9,7 @@ import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
 
 type FieldNameList = Array<string>;
-type WidgetMapping = Map<string, Collection<string>>;
+type WidgetMapping = Map<string, Set<string>>;
 type State = {
   fields: FieldNameList,
   formatting: FormattingSettings,
@@ -44,14 +43,14 @@ export default class ViewState {
     widgetPositions: { [string]: WidgetPosition },
     formatting: FormattingSettings,
     staticMessageListId?: string) {
-    this._value = { fields, titles, widgets, widgetMapping, widgetPositions, formatting, staticMessageListId };
+    this._value = { fields, titles, widgets: List(widgets), widgetMapping, widgetPositions, formatting, staticMessageListId };
   }
 
   static create(): ViewState {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
       .widgets(List())
-      .widgetPositions({})
+      .widgetPositions(Map())
       .titles(Map())
       .build();
   }
@@ -91,7 +90,7 @@ export default class ViewState {
       widgetIdTranslation[widget.id] = newWidget.id;
       return newWidget;
     });
-    const newWidgetTitles = this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]);
+    const newWidgetTitles = Map(this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]));
     const newTitles = this.titles
       .set(TitleTypes.Widget, newWidgetTitles)
       .updateIn([TitleTypes.Tab, 'title'], value => (value ? `${value} (Copy)` : value));
@@ -106,8 +105,9 @@ export default class ViewState {
 
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
+    const value: Object = this._value;
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Map(this._value));
+    return new Builder(Map(value));
   }
 
   equals(other: any) {
@@ -150,7 +150,7 @@ export default class ViewState {
       .widgets(List(widgets.map(w => Widget.fromJSON(w))))
       .widgetMapping(fromJS(widget_mapping))
       .fields(selected_fields)
-      .widgetPositions(Map(positions).map(v => WidgetPosition.fromJSON(v)).toObject())
+      .widgetPositions(Map(positions).map(v => WidgetPosition.fromJSON(v)))
       .formatting(formatting ? FormattingSettings.fromJSON(formatting) : FormattingSettings.empty())
       .build();
   }
@@ -190,7 +190,7 @@ class Builder {
   }
 
   widgetPositions(value: Map<string, WidgetPosition>): Builder {
-    return new Builder(this.value.set('widgetPositions', value));
+    return new Builder(this.value.set('widgetPositions', Map(value)));
   }
 
   build(): ViewState {

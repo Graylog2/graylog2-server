@@ -44,7 +44,7 @@ export default class MessagesWidgetConfig extends WidgetConfig {
 
   toBuilder() {
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map(this._value));
+    return new Builder(Immutable.Map<string, any>(this._value));
   }
 
   toJSON() {
