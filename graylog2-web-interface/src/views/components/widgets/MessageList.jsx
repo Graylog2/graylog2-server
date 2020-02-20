@@ -22,6 +22,7 @@ import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
+import type { FieldTypeMappingsList } from '../../stores/FieldTypesStore';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 
@@ -41,7 +42,7 @@ type State = {
 }
 
 type Props = {
-  fields: Array<string>,
+  fields: FieldTypeMappingsList,
   pageSize: number,
   config: MessagesWidgetConfig,
   data: { messages: Array<Object>, total: number, id: string },
