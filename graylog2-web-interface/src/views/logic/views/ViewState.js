@@ -7,9 +7,9 @@ import TitleTypes from 'views/stores/TitleTypes';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
+import type { WidgetMapping } from './types';
 
 type FieldNameList = Array<string>;
-type WidgetMapping = Map<string, Set<string>>;
 type State = {
   fields: FieldNameList,
   formatting: FormattingSettings,

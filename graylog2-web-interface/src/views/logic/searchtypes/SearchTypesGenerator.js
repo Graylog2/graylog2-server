@@ -5,7 +5,7 @@ import Widget from 'views/logic/widgets/Widget';
 
 import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
-import type { WidgetMapping } from '../views/View';
+import type { WidgetMapping } from '../views/types';
 
 const filterForWidget = widget => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 

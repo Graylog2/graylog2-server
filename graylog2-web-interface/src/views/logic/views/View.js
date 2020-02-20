@@ -5,6 +5,7 @@ import ObjectID from 'bson-objectid';
 import ViewState from './ViewState';
 import Search from '../search/Search';
 import type { QueryId } from '../queries/Query';
+import type { WidgetMapping } from './types';
 
 export type Properties = Immutable.List<any>;
 
@@ -33,7 +34,6 @@ type InternalState = {
   requires: Requirements,
 };
 
-export type WidgetMapping = Immutable.Map<string, Immutable.Set<String>>;
 export type ViewJson = {
   id: string,
   type: ViewType,
