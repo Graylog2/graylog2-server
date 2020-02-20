@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
-import URLWhitelistInput from 'components/configurations/URLWhitelistInput';
+import URLWhitelistInput from 'components/common/URLWhitelistInput';
 import { KeyValueTable } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 

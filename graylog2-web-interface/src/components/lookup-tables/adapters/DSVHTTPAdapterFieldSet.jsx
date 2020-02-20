@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Input } from 'components/bootstrap';
-import URLWhitelistInput from 'components/configurations/URLWhitelistInput';
+import URLWhitelistInput from 'components/common/URLWhitelistInput';
 
 const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMessage, config }) => {
   return (
