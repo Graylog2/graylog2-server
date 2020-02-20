@@ -84,7 +84,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
 };
 
 class ConfigBuilder {
-  value: Set;
+  value: Set<any>;
 
   constructor(values: Array<any>) {
     this.value = Set.of(...values);
@@ -95,7 +95,7 @@ class ConfigBuilder {
     return this;
   }
 
-  build() {
+  build(): Array<any> {
     return this.value.toArray();
   }
 
