@@ -36,15 +36,15 @@ const _streamFilters = (selectedStreams: Array<string>): Array<{ type: string, i
   return selectedStreams.map(stream => ({ type: 'stream', id: stream }));
 };
 
-export const filtersForQuery = (streams: ?Array<string>) => {
+export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {
   if (!streams || streams.length === 0) {
     return null;
   }
   const streamFilters = _streamFilters(streams);
-  return {
+  return Immutable.Map({
     type: 'or',
     filters: streamFilters,
-  };
+  });
 };
 
 export type QueryString = ElasticsearchQueryString;
