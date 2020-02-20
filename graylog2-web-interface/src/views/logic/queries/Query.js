@@ -51,21 +51,21 @@ export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 
-export type RelativeTimeRange = {
+export type RelativeTimeRange = {|
   type: 'relative',
   range: number,
-};
+|};
 
-export type AbsoluteTimeRange = {
+export type AbsoluteTimeRange = {|
   type: 'absolute',
   from: string,
   to: string,
-};
+|};
 
-export type KeywordTimeRange = {
+export type KeywordTimeRange = {|
   type: 'keyword',
   keyword: string,
-};
+|};
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
