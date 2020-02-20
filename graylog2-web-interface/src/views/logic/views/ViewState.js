@@ -16,7 +16,7 @@ type State = {
   titles: TitlesMap,
   widgets: List<Widget>,
   widgetMapping: WidgetMapping,
-  widgetPositions: { [string]: WidgetPosition },
+  widgetPositions: Map<string, WidgetPosition>,
   staticMessageListId?: string,
 };
 
@@ -43,7 +43,7 @@ export default class ViewState {
     widgetPositions: { [string]: WidgetPosition },
     formatting: FormattingSettings,
     staticMessageListId?: string) {
-    this._value = { fields, titles, widgets: List(widgets), widgetMapping, widgetPositions, formatting, staticMessageListId };
+    this._value = { fields, titles, widgets: List(widgets), widgetMapping, widgetPositions: Map(widgetPositions), formatting, staticMessageListId };
   }
 
   static create(): ViewState {
@@ -76,7 +76,7 @@ export default class ViewState {
   }
 
   get widgetPositions(): { [string]: WidgetPosition } {
-    return this._value.widgetPositions;
+    return this._value.widgetPositions.toJS();
   }
 
   get staticMessageListId(): ?string {
