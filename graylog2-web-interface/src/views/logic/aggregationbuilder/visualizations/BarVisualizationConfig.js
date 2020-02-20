@@ -49,10 +49,11 @@ export default class BarVisualizationConfig extends VisualizationConfig {
   }
 }
 
+type InternalBuilderState = Immutable.Map<string, any>;
 class Builder {
-  value: Immutable.Map<BarVisualizationConfigType>;
+  value: InternalBuilderState;
 
-  constructor(value: BarVisualizationConfigType = Immutable.Map()) {
+  constructor(value: InternalBuilderState = Immutable.Map()) {
     this.value = value;
   }
 
