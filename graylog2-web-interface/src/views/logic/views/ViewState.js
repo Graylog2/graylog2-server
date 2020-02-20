@@ -189,7 +189,7 @@ class Builder {
     return new Builder(this.value.set('widgetMapping', value));
   }
 
-  widgetPositions(value: Map<string, WidgetPosition>): Builder {
+  widgetPositions(value: (Map<string, WidgetPosition> | { [string]: WidgetPosition })): Builder {
     return new Builder(this.value.set('widgetPositions', Map(value)));
   }
 
