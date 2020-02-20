@@ -145,7 +145,7 @@
         <shiro.version>1.5.0</shiro.version>
         <sigar.version>1.6.4</sigar.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <streamex.version>0.6.8</streamex.version>
+        <streamex.version>0.7.2</streamex.version>
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.60</syslog4j.version>
         <ulid.version>8.2.0</ulid.version>
