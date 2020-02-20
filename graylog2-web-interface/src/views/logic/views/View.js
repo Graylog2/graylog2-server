@@ -241,8 +241,8 @@ class Builder {
     return new Builder(this.value.set('properties', value));
   }
 
-  state(value: ViewStateMap): Builder {
-    return new Builder(this.value.set('state', Immutable.fromJS(value)));
+  state(value: (ViewStateMap | { [QueryId]: ViewState })): Builder {
+    return new Builder(this.value.set('state', Immutable.Map(value)));
   }
 
   createdAt(value: Date): Builder {
