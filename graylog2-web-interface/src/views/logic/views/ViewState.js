@@ -8,6 +8,7 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
 import type { WidgetMapping } from './types';
+import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 
 type FieldNameList = Array<string>;
 type State = {
@@ -24,12 +25,11 @@ type BuilderState = Map<string, any>;
 
 export type ViewStateJson = {
   formatting?: FormattingSettingsJSON,
-  positions: { [string]: WidgetPosition },
+  positions: { [string]: WidgetPositionJSON },
   selected_fields: FieldNameList,
   titles: TitlesMap,
   widgets: Array<any>,
   widget_mapping: WidgetMapping,
-  positions: { [string]: WidgetPosition },
   staticMessageListId?: string,
 };
 
@@ -143,14 +143,13 @@ export default class ViewState {
   }
 
   static fromJSON(value: ViewStateJson): ViewState {
-    // eslint-disable-next-line camelcase
-    const { selected_fields, titles, widgets, widget_mapping, positions, formatting } = value;
+    const { selected_fields: selectedFields, titles, widgets, widget_mapping: widgetMapping, positions, formatting } = value;
     return ViewState.builder()
       .titles(fromJS(titles))
       .widgets(List(widgets.map(w => Widget.fromJSON(w))))
-      .widgetMapping(fromJS(widget_mapping))
-      .fields(selected_fields)
-      .widgetPositions(Map(positions).map(v => WidgetPosition.fromJSON(v)))
+      .widgetMapping(fromJS(widgetMapping))
+      .fields(selectedFields)
+      .widgetPositions(Map(positions).map(WidgetPosition.fromJSON))
       .formatting(formatting ? FormattingSettings.fromJSON(formatting) : FormattingSettings.empty())
       .build();
   }
