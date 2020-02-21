@@ -120,7 +120,7 @@ class LdapGroupsComponent extends React.Component {
 
     if (groups.size === 0 && mapping.size === 0) {
       return (
-        <Panel header="No LDAP/Active Directory groups found" bsStyle="info">
+        <Panel header="No LDAP groups found" bsStyle="info">
           <p>Please verify that your LDAP group mapping settings are correct.</p>
           <Button bsSize="sm" onClick={this._onShowConfig}>Open LDAP settings</Button>
         </Panel>
@@ -138,17 +138,21 @@ class LdapGroupsComponent extends React.Component {
       <form className="form-horizontal" onSubmit={this._saveMapping}>
         <Row>
           <Col md={12}>
-            <StyledLegend>Group mapping from LDAP/Active Directory</StyledLegend>
-            <p>Assign Graylog roles to LDAP/Active Directory groups.</p>
+            <StyledLegend>Group mapping from LDAP</StyledLegend>
             {currentLdapSearchGroups.size === 0
-              ? 'No LDAP/Active Directory groups found, please verify your LDAP group mapping settings.'
-              : this._renderGroupMappingInputs(currentLdapSearchGroups, options)}
+              ? <p>No LDAP groups found, please verify your LDAP group mapping settings.</p>
+              : (
+                <>
+                  <p>Assign Graylog roles to LDAP groups.</p>
+                  {this._renderGroupMappingInputs(currentLdapSearchGroups, options)}
+                </>
+              )}
 
             {previousMappings.size > 0 && (
               <>
                 <StyledLegend>Previously configured group mapping</StyledLegend>
                 <p>
-                  Some LDAP/Active Directory groups not matching your current settings were previously assigned Graylog
+                  Some LDAP groups not matching your current settings were previously assigned Graylog
                   roles. <strong>This mapping is still active for users logging into Graylog until you remove it.</strong>
                 </p>
                 {this._renderGroupMappingInputs(previousMappings, options)}
