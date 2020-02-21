@@ -1,6 +1,6 @@
 // @flow strict
 /* eslint-disable no-console */
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars, import/default
 import unused from './console-warnings-fail-tests';
 
 describe('console-warnings-fail-tests', () => {
