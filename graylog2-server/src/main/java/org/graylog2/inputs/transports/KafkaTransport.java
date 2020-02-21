@@ -37,6 +37,7 @@ import kafka.consumer.TopicFilter;
 import kafka.consumer.Whitelist;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -106,6 +107,7 @@ public class KafkaTransport extends ThrottleableTransport {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTransport.class);
 
     private final Configuration configuration;
+    private final org.graylog2.Configuration graylogConfiguration;
     private final MetricRegistry localRegistry;
     private final NodeId nodeId;
     private final EventBus serverEventBus;
@@ -125,6 +127,7 @@ public class KafkaTransport extends ThrottleableTransport {
 
     @AssistedInject
     public KafkaTransport(@Assisted Configuration configuration,
+                          org.graylog2.Configuration graylogConfiguration,
                           LocalMetricRegistry localRegistry,
                           NodeId nodeId,
                           EventBus serverEventBus,
@@ -132,6 +135,7 @@ public class KafkaTransport extends ThrottleableTransport {
                           @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         super(serverEventBus, configuration);
         this.configuration = configuration;
+        this.graylogConfiguration = graylogConfiguration;
         this.localRegistry = localRegistry;
         this.nodeId = nodeId;
         this.serverEventBus = serverEventBus;
@@ -230,6 +234,9 @@ public class KafkaTransport extends ThrottleableTransport {
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
 
+        if (!graylogConfiguration.getEnabledTlsProtocols().isEmpty()) {
+            props.put("ssl.enabled.protocols", StringUtils.join(graylogConfiguration.getEnabledTlsProtocols(), ","));
+        }
         insertCustomProperties(props);
 
         final int numThreads = configuration.getInt(CK_THREADS);
