@@ -1,5 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
+import * as Immutable from 'immutable';
 
 import Search from 'views/logic/search/Search';
 import SearchResult from 'views/logic/SearchResult';
@@ -30,7 +31,7 @@ type SearchActionsType = RefluxActions<{
   executeWithCurrentState: () => Promise<SearchExecutionResult>,
   refresh: () => Promise<void>,
   get: (SearchId) => Promise<SearchJson>,
-  parameters: (Array<Parameter>) => Promise<View>,
+  parameters: ((Array<Parameter> | Immutable.List<Parameter>)) => Promise<View>,
 }>;
 
 const SearchActions: SearchActionsType = singletonActions(
