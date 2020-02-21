@@ -4,12 +4,11 @@ import { List, Map, fromJS, is } from 'immutable';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
-import type { TitlesMap } from 'views/stores/TitleTypes';
+import type { TitlesMap, TitleType } from 'views/stores/TitleTypes';
+import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
 import type { WidgetMapping } from './types';
-import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
-import type { TitleType } from '../../stores/TitleTypes';
 
 type FieldNameList = Array<string>;
 type State = {
