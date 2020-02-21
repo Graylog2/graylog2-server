@@ -1,9 +1,26 @@
-// @flow strict
 /* eslint-disable no-console */
-// eslint-disable-next-line no-unused-vars, import/default
-import unused from './console-warnings-fail-tests';
 
 describe('console-warnings-fail-tests', () => {
+  /*
+  We are suppressing console output for the following tests here. We are not reusing `suppressConsole`, as it does not
+  work well with the order of wrapping original `console` and importing/requiring the actual SUT module, also it does
+  not currently suppress `console.warn`.
+   */
+  let oldConsoleWarn;
+  let oldConsoleError;
+  beforeAll(() => {
+    oldConsoleWarn = console.warn;
+    oldConsoleError = console.error;
+    console.warn = () => {};
+    console.error = () => {};
+    // eslint-disable-next-line no-unused-vars, global-require
+    const unused = require('./console-warnings-fail-tests');
+  });
+
+  afterAll(() => {
+    console.warn = oldConsoleWarn;
+    console.error = oldConsoleError;
+  });
   describe('console.error', () => {
     it('throws error if used', () => {
       expect(() => { console.error('hello there!'); }).toThrowError(new Error('hello there!'));
