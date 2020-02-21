@@ -22,7 +22,7 @@ type State = {
 
 type BuilderState = Map<string, any>;
 
-type JsonState = {
+export type ViewStateJson = {
   formatting?: FormattingSettingsJSON,
   positions: { [string]: WidgetPosition },
   selected_fields: FieldNameList,
@@ -142,7 +142,7 @@ export default class ViewState {
     };
   }
 
-  static fromJSON(value: JsonState): ViewState {
+  static fromJSON(value: ViewStateJson): ViewState {
     // eslint-disable-next-line camelcase
     const { selected_fields, titles, widgets, widget_mapping, positions, formatting } = value;
     return ViewState.builder()

@@ -6,6 +6,7 @@ import ViewState from './ViewState';
 import Search from '../search/Search';
 import type { QueryId } from '../queries/Query';
 import type { WidgetMapping } from './types';
+import type { ViewStateJson } from './ViewState';
 
 export type Properties = Immutable.List<any>;
 
@@ -42,7 +43,7 @@ export type ViewJson = {
   description: string,
   search_id: string,
   properties: Properties,
-  state: { [QueryId]: ViewState },
+  state: { [QueryId]: ViewStateJson },
   created_at: Date,
   owner: string,
   requires: Requirements,
