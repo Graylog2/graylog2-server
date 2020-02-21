@@ -9,8 +9,10 @@ import { Spinner } from 'components/common';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import CombinedProvider from 'injection/CombinedProvider';
+import connect from 'stores/connect';
 
 const { LdapGroupsActions } = CombinedProvider.get('LdapGroups');
+const { LdapStore } = CombinedProvider.get('Ldap');
 const { RolesStore } = CombinedProvider.get('Roles');
 
 const StyledLegend = styled.legend`
@@ -19,6 +21,7 @@ const StyledLegend = styled.legend`
 
 class LdapGroupsComponent extends React.Component {
   static propTypes = {
+    ldapSettings: PropTypes.object.isRequired,
     onCancel: PropTypes.func.isRequired,
     onShowConfig: PropTypes.func.isRequired,
   };
@@ -91,6 +94,16 @@ class LdapGroupsComponent extends React.Component {
   };
 
   render() {
+    const { ldapSettings } = this.props;
+    if (!ldapSettings.enabled) {
+      return (
+        <Panel header="LDAP is disabled" bsStyle="info">
+          <p>Please enable and configure LDAP to proceed.</p>
+          <Button bsSize="sm" onClick={this._onShowConfig}>Open LDAP settings</Button>
+        </Panel>
+      );
+    }
+
     if (this._isLoading()) {
       return <Spinner />;
     }
@@ -152,4 +165,5 @@ class LdapGroupsComponent extends React.Component {
   }
 }
 
-export default LdapGroupsComponent;
+export default connect(LdapGroupsComponent, { ldapStore: LdapStore },
+  ({ ldapStore, ...otherProps }) => ({ ...otherProps, ldapSettings: ldapStore.ldapSettings }));
