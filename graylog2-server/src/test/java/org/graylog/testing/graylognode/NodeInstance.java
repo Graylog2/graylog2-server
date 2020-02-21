@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.graylognode;
 
+import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -23,6 +24,7 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class NodeInstance {
@@ -42,25 +44,25 @@ public class NodeInstance {
     }
 
     private GenericContainer buildContainer(Network network, String mongoDbUri, String elasticsearchUri) {
-        final String unpackedTarballDir = "/tmp/opt-graylog";
-
         final ImageFromDockerfile image = new ImageFromDockerfile()
                 .withFileFromClasspath("Dockerfile", "org/graylog/testing/graylognode/Dockerfile")
                 .withFileFromClasspath("docker-entrypoint.sh", "org/graylog/testing/graylognode/docker-entrypoint.sh")
                 .withFileFromClasspath("graylog.conf", "org/graylog/testing/graylognode/config/graylog.conf")
                 .withFileFromClasspath("log4j2.xml", "org/graylog/testing/graylognode/config/log4j2.xml")
-                //TODO: manually assembled for now
-                // - how do we prepare the graylog directory?
-                // - how do we find the latest jars?
-                .withFileFromPath(".", Paths.get(unpackedTarballDir));
+                .withFileFromPath("sigar", pathTo("sigar_dir"))
+                .withFileFromPath("graylog.jar", pathTo("server_jar"));
 
         return new GenericContainer<>(image)
                 .withExposedPorts(9000)
                 .withNetwork(network)
                 .withEnv("GRAYLOG_MONGODB_URI", mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", elasticsearchUri)
-                .waitingFor(Wait.forHttp("/api"))
-                ;
+                .waitingFor(Wait.forHttp("/api"));
+    }
+
+    private Path pathTo(String propertyName) {
+        String property = PropertyLoader.get("api-it-tests.properties", propertyName);
+        return Paths.get(property);
     }
 
     public void stop() {

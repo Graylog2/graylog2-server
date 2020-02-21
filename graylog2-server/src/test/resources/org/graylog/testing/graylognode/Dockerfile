@@ -8,10 +8,6 @@ ARG GRAYLOG_UID=1100
 ARG GRAYLOG_GROUP=graylog
 ARG GRAYLOG_GID=1100
 
-COPY . ${GRAYLOG_HOME}
-COPY graylog.conf ${GRAYLOG_HOME}/data/config
-COPY log4j2.xml ${GRAYLOG_HOME}/data/config
-
 WORKDIR ${GRAYLOG_HOME}
 
 # hadolint ignore=DL3027,DL3008
@@ -63,13 +59,29 @@ RUN \
     /usr/share/X11 \
     /usr/share/doc/* 2> /dev/null
 
-
-COPY docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
-
 EXPOSE 9000
 USER ${GRAYLOG_USER}
-VOLUME ${GRAYLOG_HOME}/data
+
+RUN \
+  install \
+    --directory \
+    --mode=0750 \
+    ${GRAYLOG_HOME}/data \
+    ${GRAYLOG_HOME}/data/journal \
+    ${GRAYLOG_HOME}/data/log \
+    ${GRAYLOG_HOME}/data/config \
+    ${GRAYLOG_HOME}/data/plugin \
+    ${GRAYLOG_HOME}/data/data \
+    ${GRAYLOG_HOME}/lib \
+    ${GRAYLOG_HOME}/log \
+    ${GRAYLOG_HOME}/plugin
+
+COPY sigar ${GRAYLOG_HOME}/lib/sigar
+COPY docker-entrypoint.sh /
+COPY graylog.conf ${GRAYLOG_HOME}/data/config
+COPY log4j2.xml ${GRAYLOG_HOME}/data/config
+
+COPY graylog.jar ${GRAYLOG_HOME}
 
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 CMD ["graylog"]
