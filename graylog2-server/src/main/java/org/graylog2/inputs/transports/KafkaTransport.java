@@ -64,6 +64,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -89,6 +92,7 @@ public class KafkaTransport extends ThrottleableTransport {
     public static final String CK_THREADS = "threads";
     public static final String CK_OFFSET_RESET = "offset_reset";
     public static final String CK_GROUP_ID = "group_id";
+    public static final String CK_CUSTOM_PROPERTIES = "custom_properties";
 
     // See https://kafka.apache.org/090/documentation.html for available values for "auto.offset.reset".
     private static final ImmutableMap<String, String> OFFSET_RESET_VALUES = ImmutableMap.of(
@@ -226,6 +230,8 @@ public class KafkaTransport extends ThrottleableTransport {
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
 
+        insertCustomProperties(props);
+
         final int numThreads = configuration.getInt(CK_THREADS);
         final ExecutorService executor = executorService(numThreads);
         // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
@@ -314,6 +320,8 @@ public class KafkaTransport extends ThrottleableTransport {
         // Set a consumer timeout to avoid blocking on the consumer iterator.
         props.put("consumer.timeout.ms", "1000");
 
+        insertCustomProperties(props);
+
         final int numThreads = configuration.getInt(CK_THREADS);
         final ConsumerConfig consumerConfig = new ConsumerConfig(props);
         cc = Consumer.createJavaConsumerConnector(consumerConfig);
@@ -387,6 +395,16 @@ public class KafkaTransport extends ThrottleableTransport {
                     stopLatch.countDown();
                 }
             });
+        }
+    }
+
+    private void insertCustomProperties(Properties props) {
+        try {
+            final Properties customProperties = new Properties();
+            customProperties.load(new ByteArrayInputStream(configuration.getString(CK_CUSTOM_PROPERTIES, "").getBytes(StandardCharsets.UTF_8)));
+            props.putAll(customProperties);
+        } catch (IOException e) {
+            LOG.error("Failed to read custom properties", e);
         }
     }
 
@@ -511,6 +529,15 @@ public class KafkaTransport extends ThrottleableTransport {
                     DEFAULT_GROUP_ID,
                     "Name of the consumer group the Kafka input belongs to",
                     ConfigurationField.Optional.OPTIONAL));
+            cr.addField(new TextField(
+                    CK_CUSTOM_PROPERTIES,
+                    "Custom Kafka properties",
+                    "",
+                    "A newline separated list of Kafka properties. (e.g.: \"ssl.keystore.location=/etc/graylog/server/kafka.keystore.jks\").",
+                    ConfigurationField.Optional.OPTIONAL,
+                    110,
+                    TextField.Attribute.TEXTAREA
+                    ));
 
             return cr;
         }
