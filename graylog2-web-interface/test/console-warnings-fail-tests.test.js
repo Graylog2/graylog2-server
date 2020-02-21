@@ -1,7 +1,7 @@
 // @flow strict
 /* eslint-disable no-console */
 // eslint-disable-next-line no-unused-vars
-const unused = require('./console-warnings-fail-tests');
+import unused from './console-warnings-fail-tests';
 
 describe('console-warnings-fail-tests', () => {
   describe('console.error', () => {
