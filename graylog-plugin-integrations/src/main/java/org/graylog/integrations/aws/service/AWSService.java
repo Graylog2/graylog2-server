@@ -123,12 +123,10 @@ public class AWSService {
 
         ArrayList<AvailableService> services = new ArrayList<>();
 
-        // Deliberately provide the policy JSON as a string. The UI will format and display this to the user.
         String policy;
         try {
             policy = objectMapper.writeValueAsString(awsPolicy);
         } catch (JsonProcessingException e) {
-            // Return a more general internal server error if JSON encoding fails.
             LOG.error(POLICY_ENCODING_ERROR, e);
             throw new InternalServerErrorException(POLICY_ENCODING_ERROR, e);
         }

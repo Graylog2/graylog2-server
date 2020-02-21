@@ -81,7 +81,6 @@ public class KinesisConsumer implements Runnable {
 
         final Region region = Region.of(request.region());
 
-        // Create all clients needed for the Kinesis consumer.
         final DynamoDbAsyncClientBuilder dynamoDbClientBuilder = DynamoDbAsyncClient.builder();
         AWSClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
         final DynamoDbAsyncClient dynamoClient = dynamoDbClientBuilder.build();
@@ -97,8 +96,7 @@ public class KinesisConsumer implements Runnable {
         final String workerId = String.format(Locale.ENGLISH, "graylog-node-%s", nodeId.anonymize());
         LOG.debug("Using workerId [{}].", workerId);
 
-        // The application name needs to be unique per input/consumer. Using the same name for two different Kinesis
-        // streams will cause trouble with state handling in DynamoDB.
+        // The application name needs to be unique per input/consumer.
         final String applicationName = String.format(Locale.ENGLISH, "graylog-aws-plugin-%s", kinesisStreamName);
         LOG.debug("Using Kinesis applicationName [{}].", applicationName);
 
@@ -113,10 +111,6 @@ public class KinesisConsumer implements Runnable {
         final PollingConfig pollingConfig = new PollingConfig(kinesisStreamName, kinesisAsyncClient);
 
         // Default max records per request is 10k.
-        // CloudWatch Kinesis subscription records may each contain a large number of log messages.
-        // The batch size (max number of messages retrieved in each requests) can be reduced to limit large
-        // bursts of messages being dropped onto the Graylog journal. Reducing this value too much can
-        // significantly limit throughput.
         if (recordBatchSize != null) {
             LOG.debug("Using explicit batch size [{}]", recordBatchSize);
             pollingConfig.maxRecords(recordBatchSize);

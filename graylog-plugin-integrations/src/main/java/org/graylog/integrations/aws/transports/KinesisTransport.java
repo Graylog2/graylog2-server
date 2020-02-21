@@ -107,8 +107,6 @@ public class KinesisTransport extends ThrottleableTransport {
         validateEndpoint(iamEndpoint, "IAM");
         validateEndpoint(iamEndpoint, "Kinesis");
 
-        // Creating and passing an AWSRequest here is not ideal (since it's a web request object), but at least the
-        // builder can be used for all of the required request fields. Perhaps this can be improved later.
         final AWSRequest awsRequest = AWSRequestImpl.builder()
                                                     .region(region.id())
                                                     .awsAccessKeyId(key)

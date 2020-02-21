@@ -75,12 +75,6 @@ public class KinesisService {
     private static final int EIGHT_BITS = 8;
     private static final int KINESIS_LIST_STREAMS_MAX_ATTEMPTS = 1000;
 
-    // This number is intentionally high to avoid unneeded paging. The ListStreams request is different than other AWS
-    // requests in the way it pages (also seems to be sensitive to rate limiting and exact limits are not published).
-    // The ListStreams request is also fairly light, so there is no harm in the high page size.
-    // Usually the number of streams in an entire AWS account is limited to 1000, but exceptions can be made for very
-    // large accounts. 400 is high enough to not require unnecessary paging for many accounts, and also small enough
-    // that paging occurs in the case of a huge number of streams.
     private static final int KINESIS_LIST_STREAMS_LIMIT = 400;
     private static final int RECORDS_SAMPLE_SIZE = 10;
     private static final int SHARD_COUNT = 1;
@@ -137,13 +131,11 @@ public class KinesisService {
 
         KinesisClient kinesisClient = AWSClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
-        // Retrieve one records from the Kinesis stream
         final List<Record> records = retrieveRecords(request.streamName(), kinesisClient);
         if (records.size() == 0) {
             throw new BadRequestException(String.format("The Kinesis stream [%s] does not contain any messages.", request.streamName()));
         }
 
-        // Select random record from list, and check if the payload is compressed
         Record record = selectRandomRecord(records);
         final byte[] payloadBytes = record.data().asByteArray();
         final boolean compressed = isCompressed(payloadBytes);
@@ -151,36 +143,22 @@ public class KinesisService {
             return handleCompressedMessages(request, payloadBytes);
         }
 
-        // The best timestamp available is the approximate arrival time of the message to the Kinesis stream.
         DateTime timestamp = new DateTime(record.approximateArrivalTimestamp().toEpochMilli(), DateTimeZone.UTC);
         return detectAndParseMessage(new String(payloadBytes), timestamp, request.streamName(), "", "", compressed);
     }
 
-    /**
-     * Get a list of Kinesis stream names. All available streams will be returned.
-     *
-     * @param request The full AWS request object.
-     * @return A list of all available Kinesis streams in the supplied region.
-     */
     public StreamsResponse getKinesisStreamNames(AWSRequest request) throws ExecutionException {
 
         LOG.debug("List Kinesis streams for region [{}]", request.region());
 
-        // KinesisClient.listStreams() is paginated. Use a retryer to loop and stream names (while ListStreamsResponse.hasMoreStreams() is true).
-        // The stopAfterAttempt retryer option is an emergency brake to prevent infinite loops
-        // if AWS API always returns true for hasMoreStreamNames.
         final KinesisClient kinesisClient = AWSClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
         ListStreamsRequest streamsRequest = ListStreamsRequest.builder().limit(KINESIS_LIST_STREAMS_LIMIT).build();
         final ListStreamsResponse listStreamsResponse = kinesisClient.listStreams(streamsRequest);
         final List<String> streamNames = new ArrayList<>(listStreamsResponse.streamNames());
 
-        // Create retryer to keep checking if more streams exist.
         final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
                 .retryIfResult(b -> Objects.equals(b, Boolean.TRUE))
-                // Rate limiting is very likely to occur if multiple requests are executed in succession.
-                // Retrying on occurrence of LimitExceededException allows requests to repeat until successful.
-                // Usually the 3rd or 4th attempt is successful.
                 .retryIfExceptionOfType(LimitExceededException.class)
                 .withStopStrategy(StopStrategies.stopAfterAttempt(KINESIS_LIST_STREAMS_MAX_ATTEMPTS))
                 .build();
@@ -199,9 +177,6 @@ public class KinesisService {
                     // If more streams, then this will execute again.
                     return moreSteamsResponse.hasMoreStreams();
                 });
-                // Only catch the RetryException, which occurs after too many attempts. When this happens, we still want
-                // to the return the response with any streams obtained.
-                // All other exceptions will be bubbled up to the client caller.
             } catch (RetryException e) {
                 LOG.error("Failed to get all stream names after {} attempts. Proceeding to return currently obtained streams.", KINESIS_LIST_STREAMS_MAX_ATTEMPTS);
             }
@@ -272,29 +247,24 @@ public class KinesisService {
             String shardIterator = kinesisClient.getShardIterator(getShardIteratorRequest).shardIterator();
             boolean stayOnCurrentShard = true;
             LOG.debug("Retrieved shard id: [{}] with shard iterator: [{}]", shardId, shardIterator);
-            // Loop until shardIterator is current
             while (stayOnCurrentShard) {
-                // Set the nextShardIterator
                 LOG.debug("Getting more records");
                 final GetRecordsRequest getRecordsRequest = GetRecordsRequest.builder().shardIterator(shardIterator).build();
                 final GetRecordsResponse getRecordsResponse = kinesisClient.getRecords(getRecordsRequest);
                 shardIterator = getRecordsResponse.nextShardIterator();
 
                 for (Record record : getRecordsResponse.records()) {
-                    // Skip CloudWatch control records
                     if (isControlMessage(record)) {
                         continue;
                     }
                     recordsList.add(record);
 
-                    // Return as soon as sample size is met
                     if (recordsList.size() == RECORDS_SAMPLE_SIZE) {
                         LOG.debug("Returning the list of records now that sample size [{}] has been met.", RECORDS_SAMPLE_SIZE);
                         return recordsList;
                     }
                 }
 
-                // Find when the shardIterator is current
                 if (getRecordsResponse.millisBehindLatest() == 0) {
                     LOG.debug("Found the end of the shard. No more records returned from the shard.");
                     stayOnCurrentShard = false;
@@ -346,30 +316,23 @@ public class KinesisService {
 
         LOG.debug("The message is type [{}]", awsMessageType);
 
-        // Build the specific default response type for the message. This might be overridden below.
         final String responseMessage = String.format("Success. The message is a %s message.", awsMessageType.getLabel());
 
-        // Parse the Flow Log message
         final KinesisLogEntry logEvent = KinesisLogEntry.create(kinesisStreamName, logGroupName, logStreamName,
                                                                 timestamp, logMessage);
 
-        // Detect the codec needed for the type of log by name.
-        // All messages will resolve to a particular codec. Event Unknown messages will resolve to the raw logs codec.
         final Codec.Factory<? extends Codec> codecFactory = this.availableCodecs.get(awsMessageType.getCodecName());
         if (codecFactory == null) {
             throw new BadRequestException(String.format("A codec with name [%s] could not be found.", awsMessageType.getCodecName()));
         }
 
-        // Parse the message with the selected codec.
         // TODO: Do we need to provide a valid configuration here?
         final Codec codec = codecFactory.create(Configuration.EMPTY_CONFIGURATION);
 
-        // Load up appropriate codec and parse the message.
         final byte[] payload;
         try {
             payload = objectMapper.writeValueAsBytes(logEvent);
         } catch (JsonProcessingException e) {
-            // If this fails, there is probably a coding error somewhere.
             throw new BadRequestException("Encoding the message to bytes failed.", e);
         }
 

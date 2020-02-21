@@ -11,7 +11,6 @@ import java.util.List;
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-// Define a JSON field order matching AWS examples. This improves readability.
 @JsonPropertyOrder({AWSPolicyStatement.SID, AWSPolicyStatement.EFFECT, AWSPolicyStatement.ACTION, AWSPolicyStatement.RESOURCE})
 public abstract class AWSPolicyStatement {
 

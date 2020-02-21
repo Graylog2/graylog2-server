@@ -62,9 +62,6 @@ public class KinesisSetupResource extends RestResource implements PluginRestReso
     public KinesisNewStreamResponse createNewKinesisStream(@ApiParam(name = "JSON body", required = true)
                                                            @Valid @NotNull KinesisNewStreamRequest request) {
 
-        // Record the fact that a particular user agreed to create AWS resources.
-        // Print the user id (instead of name) in the log. This is harder to trace back, but it avoids recording actual
-        // user names in the server log file.
         final User user = getCurrentUser();
         LOG.info("User [{}] agreed to the Kinesis auto-setup, which will create a Kinesis stream [{}], " +
                  "role/policy, and a CloudWatch log group subscription. " +

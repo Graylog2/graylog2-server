@@ -21,7 +21,6 @@ public abstract class KinesisNewStreamResponse {
     @JsonProperty(STREAM_ARN)
     public abstract String streamArn();
 
-    // Some specific success or error message from AWS SDK.
     @JsonProperty(RESULT)
     public abstract String result();
 

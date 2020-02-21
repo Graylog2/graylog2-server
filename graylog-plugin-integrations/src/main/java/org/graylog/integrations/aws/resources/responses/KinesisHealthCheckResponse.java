@@ -18,17 +18,12 @@ public abstract class KinesisHealthCheckResponse {
     private static final String EXPLANATION = "explanation";
     private static final String MESSAGE_FIELDS = "message_fields";
 
-    // Eg. CloudWatch, other.
     @JsonProperty(INPUT_TYPE)
     public abstract AWSMessageType inputType();
 
-    // Some specific success or error message from AWS SDK.
     @JsonProperty(EXPLANATION)
     public abstract String explanation();
 
-    // A JSON representation of the message. This will be displayed in the UI to show the user
-    // that we have identified the message type. The user can then verify that the parsed
-    // message looks correct.
     @JsonProperty(MESSAGE_FIELDS)
     public abstract Map<String, Object> messageFields();
 

@@ -76,10 +76,6 @@ public class CloudWatchService {
                                             .distribution(Distribution.BY_LOG_STREAM)
                                             .build();
         try {
-            // IAM roles/policies are eventually consistent (created in the previous step). So, the only way to
-            // find out when the CloudWatch log subscription can be created successfully is to retry until it works.
-            // InvalidParameterException is thrown by the AWS SDK when the subscription policy cannot successfully use
-            // the specified role. The following retryer catches that exception and reties.
             final Retryer<Void> retryer = RetryerBuilder.<Void>newBuilder()
                     .retryIfExceptionOfType(InvalidParameterException.class)
                     .withWaitStrategy(WaitStrategies.fixedWait(SUBSCRIPTION_RETRY_DELAY, SUBSCRIPTION_RETRY_DELAY_UNIT))
@@ -121,6 +117,5 @@ public class CloudWatchService {
             LOG.error(responseMessage);
             throw new BadRequestException(responseMessage, e);
         }
-        // software.amazon.awssdk.services.cloudwatchlogs.model.InvalidParameterException: Could not deliver test message to specified Kinesis stream. Check if the given kinesis stream is in ACTIVE state. (Service: CloudWatchLogs, Status Code: 400, Request ID: 1764176b-4a2c-4852-8191-f615b2a02eaa)
     }
 }
