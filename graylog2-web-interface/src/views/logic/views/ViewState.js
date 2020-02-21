@@ -9,6 +9,7 @@ import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
 import type { WidgetMapping } from './types';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
+import type { TitleType } from '../../stores/TitleTypes';
 
 type FieldNameList = Array<string>;
 type State = {
@@ -176,7 +177,7 @@ class Builder {
     return new Builder(this.value.set('formatting', value));
   }
 
-  titles(value: TitlesMap): Builder {
+  titles(value: (TitlesMap | { [TitleType]: { [string]: string } })): Builder {
     return new Builder(this.value.set('titles', fromJS(value)));
   }
 
