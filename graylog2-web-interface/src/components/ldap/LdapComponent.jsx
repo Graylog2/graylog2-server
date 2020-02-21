@@ -485,7 +485,7 @@ class LdapComponent extends React.Component {
                 </Col>
                 <Col md={9} mdOffset={3}>
                   <Panel bsStyle="warning">
-                    Take some time to review the{' '}
+                    Remember to review the{' '}
                     <GroupMappingLink text={`${isAD ? 'AD' : 'LDAP'} group mapping`} onClick={this._onShowGroups} />{' '}
                     after making changes in this section.
                   </Panel>
