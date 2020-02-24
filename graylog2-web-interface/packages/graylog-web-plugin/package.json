@@ -52,7 +52,7 @@
     "reflux": "0.2.13",
     "styled-components": "4.3.2",
     "styled-theming": "2.2.0",
-    "webpack": "4.41.2",
+    "webpack": "4.41.6",
     "webpack-cleanup-plugin": "0.5.1",
     "webpack-cli": "3.3.11",
     "webpack-merge": "4.2.2"
