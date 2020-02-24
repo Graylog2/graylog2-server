@@ -108,7 +108,7 @@ describe('Headers', () => {
         seriesWithName('foo', 'Total Count'),
         seriesWithName('avg(foo)', 'Average Foness'),
       ];
-      const wrapper = mount((
+      mount((
         <RenderHeaders series={series}
                        fields={null} />
       ));
