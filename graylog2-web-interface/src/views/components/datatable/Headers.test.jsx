@@ -103,5 +103,15 @@ describe('Headers', () => {
       ));
       expectCorrectTypes(wrapper);
     });
+    it('renders with `null` fields', () => {
+      const series = [
+        seriesWithName('foo', 'Total Count'),
+        seriesWithName('avg(foo)', 'Average Foness'),
+      ];
+      const wrapper = mount((
+        <RenderHeaders series={series}
+                       fields={null} />
+      ));
+    });
   });
 });
