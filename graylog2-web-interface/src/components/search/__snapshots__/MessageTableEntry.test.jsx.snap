@@ -261,11 +261,11 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                             <OverlayTrigger
                               defaultOverlayShown={false}
                               overlay={
-                                <ForwardRef(Tooltip)
+                                <Tooltip
                                   id="copy-button-tooltip"
                                 >
                                   
-                                </ForwardRef(Tooltip)>
+                                </Tooltip>
                               }
                               placement="top"
                               rootClose={true}
@@ -1972,11 +1972,11 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                         <OverlayTrigger
                                           defaultOverlayShown={false}
                                           overlay={
-                                            <ForwardRef(Popover)
+                                            <Popover
                                               id="popover-trigger-hover-focus"
                                             >
                                               This timestamp is rendered in your timezone.
-                                            </ForwardRef(Popover)>
+                                            </Popover>
                                           }
                                           trigger={
                                             Array [
