@@ -73,7 +73,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
         },
       ]
     }
-    types={Array []}
+    types={Immutable.List []}
     valuePath={
       Array [
         Object {

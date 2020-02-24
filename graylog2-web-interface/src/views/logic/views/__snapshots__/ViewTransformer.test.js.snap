@@ -82,7 +82,7 @@ Object {
         "formatting": Object {
           "highlighting": Array [],
         },
-        "positions": Object {
+        "positions": Immutable.Map {
           "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": Object {
             "col": 1,
             "height": 2,

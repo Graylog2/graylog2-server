@@ -21,7 +21,7 @@ export type FieldName = string;
 export type FieldValue = any;
 
 class FieldType {
-  value: Immutable.Map<string, *>;
+  value: Immutable.Map<string, any>;
 
   constructor(type: string, properties: Array<Property>, indexNames: Array<string>) {
     this.value = Immutable.Map({ type, properties: Immutable.Set(properties), indexNames: Immutable.Set(indexNames) });

@@ -6,6 +6,7 @@ import history from 'util/History';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 const useActionListeners = (actions, callback, dependencies) => {
   useEffect(() => {
@@ -14,11 +15,11 @@ const useActionListeners = (actions, callback, dependencies) => {
   }, dependencies);
 };
 
-const extractTimerangeParams = (timerange) => {
+const extractTimerangeParams = (timerange: TimeRange) => {
   const { type } = timerange;
   const result = { rangetype: type };
 
-  switch (type) {
+  switch (timerange.type) {
     case 'relative': return Object.entries({ ...result, relative: timerange.range });
     case 'keyword': return Object.entries({ ...result, keyword: timerange.keyword });
     case 'absolute': return Object.entries({ ...result, from: timerange.from, to: timerange.to });

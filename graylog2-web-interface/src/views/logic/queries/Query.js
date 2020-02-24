@@ -1,5 +1,5 @@
 // @flow strict
-import Immutable, { is } from 'immutable';
+import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import { isEqual } from 'lodash';
 
@@ -36,36 +36,36 @@ const _streamFilters = (selectedStreams: Array<string>): Array<{ type: string, i
   return selectedStreams.map(stream => ({ type: 'stream', id: stream }));
 };
 
-export const filtersForQuery = (streams: ?Array<string>) => {
+export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {
   if (!streams || streams.length === 0) {
     return null;
   }
   const streamFilters = _streamFilters(streams);
-  return {
+  return Immutable.Map({
     type: 'or',
     filters: streamFilters,
-  };
+  });
 };
 
 export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 
-export type RelativeTimeRange = {
+export type RelativeTimeRange = {|
   type: 'relative',
   range: number,
-};
+|};
 
-export type AbsoluteTimeRange = {
+export type AbsoluteTimeRange = {|
   type: 'absolute',
   from: string,
   to: string,
-};
+|};
 
-export type KeywordTimeRange = {
+export type KeywordTimeRange = {|
   type: 'keyword',
   keyword: string,
-};
+|};
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
@@ -100,9 +100,12 @@ export default class Query {
   toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
     // eslint-disable-next-line no-use-before-define
-    return Query.builder().id(id).query(query).timerange(timerange)
-      .filter(filter)
+    const builder = Query.builder()
+      .id(id)
+      .query(query)
+      .timerange(timerange)
       .searchTypes(searchTypes);
+    return filter ? builder.filter(filter) : builder;
   }
 
   equals(other: any): boolean {
@@ -113,7 +116,11 @@ export default class Query {
       return false;
     }
 
-    if (this.id !== other.id || !isEqual(this.query, other.query) || !isEqual(this.timerange, other.timerange) || !is(this.filter, other.filter) || !is(this.searchTypes, other.searchTypes)) {
+    if (this.id !== other.id
+      || !isEqual(this.query, other.query)
+      || !isEqual(this.timerange, other.timerange)
+      || !Immutable.is(this.filter, other.filter)
+      || !Immutable.is(this.searchTypes, other.searchTypes)) {
       return false;
     }
 

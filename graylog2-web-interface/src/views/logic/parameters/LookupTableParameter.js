@@ -97,7 +97,7 @@ export default class LookupTableParameter extends Parameter {
 class Builder {
   value: InternalBuilderState;
 
-  constructor(value: Immutable.Map = Immutable.Map()) {
+  constructor(value: InternalBuilderState = Immutable.Map()) {
     this.value = value;
   }
 

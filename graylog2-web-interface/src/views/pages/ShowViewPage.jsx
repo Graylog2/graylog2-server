@@ -40,7 +40,6 @@ type State = {
   loaded: boolean,
 };
 
-
 class ShowViewPage extends React.Component<Props, State> {
   static propTypes = {
     location: PropTypes.shape({
@@ -86,7 +85,6 @@ class ShowViewPage extends React.Component<Props, State> {
 
   loadView = (viewId: string): Promise<?View> => {
     const { location, loadingViewHooks, executingViewHooks, viewLoader } = this.props;
-    // eslint-disable-next-line react/prop-types
     const { query } = location;
 
     return viewLoader(

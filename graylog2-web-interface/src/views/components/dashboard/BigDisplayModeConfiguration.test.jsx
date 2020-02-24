@@ -10,6 +10,7 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
+import type { ViewStateMap } from 'views/logic/views/View';
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
 expect.extend({ toBeDisabled });
@@ -31,11 +32,11 @@ const createViewWithQueries = () => {
     Query.builder().id('query-id-2').build(),
     Query.builder().id('other-query-id').build(),
   ];
-  const states = {
+  const states: ViewStateMap = Immutable.Map({
     'query-id-1': ViewState.create(),
     'query-id-2': ViewState.builder().titles(Immutable.fromJS({ tab: { title: 'My awesome Query tab' } })).build(),
     'other-query-id': ViewState.create(),
-  };
+  });
   const searchWithQueries = search.toBuilder()
     .queries(queries)
     .build();

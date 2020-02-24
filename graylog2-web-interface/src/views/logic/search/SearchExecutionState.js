@@ -66,7 +66,7 @@ type InternalBuilderState = Immutable.Map<string, any>;
 class Builder {
   value: InternalBuilderState;
 
-  constructor(value: Immutable.Map = Immutable.Map()) {
+  constructor(value: InternalBuilderState = Immutable.Map()) {
     this.value = value;
   }
 
@@ -86,6 +86,6 @@ class Builder {
 
 const getParameterBindingValue = (executionState: SearchExecutionState, parameterName: string) => executionState.parameterBindings.get(parameterName, ParameterBinding.empty()).value;
 
-const getParameterBindingsAsMap = (bindings: ParameterBindings) => bindings.flatMap((binding: ParameterBinding, name: string) => ({ [name]: binding.value }));
+const getParameterBindingsAsMap = (bindings: ParameterBindings) => bindings.flatMap<string, string>((binding: ParameterBinding, name: string) => Immutable.Map({ [name]: binding.value }));
 
 export { getParameterBindingsAsMap, getParameterBindingValue };
