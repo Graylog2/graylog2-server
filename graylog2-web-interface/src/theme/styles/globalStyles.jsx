@@ -2466,16 +2466,6 @@ const globalStyles = css`
     margin-bottom: 2px;
   }
 
-  #react-gettingstarted {
-    margin-left: -19px;
-    margin-right: -19px;
-    margin-top: -4px;
-  }
-
-  #react-gettingstarted iframe {
-    height: 1000px;
-  }
-
   .sortable-list-cursor {
     cursor: move;
   }
