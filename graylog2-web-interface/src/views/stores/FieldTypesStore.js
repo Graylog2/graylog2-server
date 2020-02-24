@@ -34,6 +34,9 @@ export const FieldTypesStore = singletonStore(
   () => Reflux.createStore({
     listenables: [FieldTypesActions],
 
+    _all: Immutable.List<FieldTypeMapping>(),
+    _queryFields: Immutable.Map<String, FieldTypeMappingsList>(),
+
     init() {
       this.all();
       this.listenTo(QueryFiltersStore, this.onQueryFiltersUpdate, this.onQueryFiltersUpdate);
