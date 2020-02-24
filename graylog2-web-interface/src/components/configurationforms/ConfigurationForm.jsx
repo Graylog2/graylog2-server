@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
+import lodash from 'lodash';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationFormField, TitleField } from 'components/configurationforms';
@@ -18,6 +19,7 @@ class ConfigurationForm extends React.Component {
     // eslint-disable-next-line react/no-unused-prop-types
     values: PropTypes.object,
     wrapperComponent: PropTypes.elementType,
+    isInputForm: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -30,6 +32,7 @@ class ConfigurationForm extends React.Component {
     typeName: undefined,
     values: {},
     wrapperComponent: BootstrapModalForm,
+    isInputForm: false,
   };
 
   constructor(props) {
@@ -100,6 +103,22 @@ class ConfigurationForm extends React.Component {
     return diff;
   };
 
+  _renderConfigFields = (configFields, autoFocus) => {
+    let shouldAutoFocus = autoFocus;
+    const configFieldKeys = $.map(configFields, (field, name) => name)
+      .map((name, pos) => ({ name: name, pos: pos }))
+      .sort(this._sortByPosOrOptionality);
+
+    const renderedConfigFields = configFieldKeys.map((key) => {
+      const configField = this._renderConfigField(configFields[key.name], key.name, shouldAutoFocus);
+      if (shouldAutoFocus) {
+        shouldAutoFocus = false;
+      }
+      return configField;
+    });
+    return renderedConfigFields;
+  };
+
   _save = () => {
     const data = this.getValue();
 
@@ -151,7 +170,7 @@ class ConfigurationForm extends React.Component {
   };
 
   render() {
-    const { typeName, title, helpBlock, wrapperComponent: WrapperComponent = BootstrapModalForm, includeTitleField, children } = this.props;
+    const { typeName, isInputForm, title, helpBlock, wrapperComponent: WrapperComponent = BootstrapModalForm, includeTitleField, children } = this.props;
 
     let shouldAutoFocus = true;
     let titleElement;
@@ -168,17 +187,27 @@ class ConfigurationForm extends React.Component {
     }
 
     const { configFields } = this.state;
-    const configFieldKeys = $.map(configFields, (field, name) => name)
-      .map((name, pos) => ({ name: name, pos: pos }))
-      .sort(this._sortByPosOrOptionality);
 
-    const renderedConfigFields = configFieldKeys.map((key) => {
-      const configField = this._renderConfigField(configFields[key.name], key.name, shouldAutoFocus);
-      if (shouldAutoFocus) {
-        shouldAutoFocus = false;
-      }
-      return configField;
-    });
+    let renderedConfigFields;
+    if (isInputForm) {
+      // lodash partition
+      const transportFields = lodash.pickBy(configFields, field => field.context === 'transport');
+      const codecFields = lodash.pickBy(configFields, field => field.context === 'codec');
+      renderedConfigFields = (
+        <React.Fragment>
+          <hr />
+          <h3>Transport Settings</h3>
+          <br />
+          { this._renderConfigFields(transportFields, shouldAutoFocus) }
+          <hr />
+          <h3>Codec Settings</h3>
+          <br />
+          { this._renderConfigFields(codecFields, false) }
+        </React.Fragment>
+      );
+    } else {
+      renderedConfigFields = this._renderConfigFields(configFields, shouldAutoFocus);
+    }
 
     return (
       <WrapperComponent ref={(modal) => { this.modal = modal; }}

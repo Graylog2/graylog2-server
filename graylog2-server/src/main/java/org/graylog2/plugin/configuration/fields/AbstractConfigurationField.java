@@ -22,6 +22,7 @@ import java.util.Map;
 
 public abstract class AbstractConfigurationField implements ConfigurationField {
     protected final String field_type;
+    protected String context;
     protected final String name;
     protected final String humanName;
     protected final String description;
@@ -30,6 +31,7 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
 
     public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional1) {
         this.field_type = field_type;
+        this.context = "";
         this.name = name;
         this.humanName = humanName;
         this.description = description;
@@ -44,6 +46,16 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     @Override
     public String getFieldType() {
         return field_type;
+    }
+
+    @Override
+    public String getContext() {
+        return context;
+    }
+
+    @Override
+    public void setContext(String context) {
+        this.context = context;
     }
 
     @Override

@@ -49,4 +49,9 @@ public interface ConfigurationField {
     default int getPosition() {
         return DEFAULT_POSITION;
     }
+    default void setContext(String context) {
+    }
+    default String getContext() {
+        return "";
+    }
 }

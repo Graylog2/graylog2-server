@@ -84,6 +84,7 @@ public class ConfigurationRequest {
         for (ConfigurationField f : fields.values()) {
             final Map<String, Object> config = Maps.newHashMap();
             config.put("type", f.getFieldType());
+            config.put("context", f.getContext());
             config.put("human_name", f.getHumanName());
             config.put("description", f.getDescription());
             config.put("default_value", f.getDefaultValue());

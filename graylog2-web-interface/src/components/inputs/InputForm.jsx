@@ -42,6 +42,7 @@ class InputForm extends React.Component {
     return (
       <ConfigurationForm {...this.props}
                          ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+                         isInputForm
                          values={values}
                          titleValue={titleValue}
                          submitAction={this._onSubmit}>

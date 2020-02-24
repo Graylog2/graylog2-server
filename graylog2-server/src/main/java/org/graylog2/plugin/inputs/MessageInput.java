@@ -392,7 +392,10 @@ public abstract class MessageInput implements Stoppable {
             final ConfigurationRequest transport = transportConfig.getRequestedConfiguration();
             final ConfigurationRequest codec = codecConfig.getRequestedConfiguration();
             final ConfigurationRequest r = new ConfigurationRequest();
+
+            transport.getFields().forEach((key, value) -> value.setContext("transport"));
             r.putAll(transport.getFields());
+            codec.getFields().forEach((key, value) -> value.setContext("codec"));
             r.putAll(codec.getFields());
 
             // give the codec the opportunity to override default values for certain configuration fields,
