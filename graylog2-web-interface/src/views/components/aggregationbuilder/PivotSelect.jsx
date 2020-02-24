@@ -1,4 +1,6 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
+import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
 import connect from 'stores/connect';
@@ -40,7 +42,9 @@ const PivotSelect = ({ onChange, fields, value, ...props }) => {
   // eslint-disable-next-line react/prop-types
   const ValueComponent = ({ children, innerProps, ...rest }) => {
     const element = rest.data;
-    const fieldTypes = fields.all.filter(v => v.name === element.label);
+    const fieldTypes = fields && fields.all
+      ? fields.all.filter(v => v.name === element.label)
+      : Immutable.List();
     const fieldType = fieldTypes.isEmpty() ? FieldType.Unknown : fieldTypes.first().type;
     // eslint-disable-next-line react/prop-types
     const { className } = innerProps;
