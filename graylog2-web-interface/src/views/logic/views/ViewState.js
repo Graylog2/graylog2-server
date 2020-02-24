@@ -1,36 +1,35 @@
 // @flow strict
-
-import { List, Map, Collection, fromJS, is } from 'immutable';
+import { List, Map, fromJS, is } from 'immutable';
 
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
-import type { TitlesMap } from 'views/stores/TitleTypes';
+import type { TitlesMap, TitleType } from 'views/stores/TitleTypes';
+import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
+import type { WidgetMapping } from './types';
 
 type FieldNameList = Array<string>;
-type WidgetMapping = Map<string, Collection<string>>;
 type State = {
   fields: FieldNameList,
   formatting: FormattingSettings,
   titles: TitlesMap,
   widgets: List<Widget>,
   widgetMapping: WidgetMapping,
-  widgetPositions: { [string]: WidgetPosition },
+  widgetPositions: Map<string, WidgetPosition>,
   staticMessageListId?: string,
 };
 
 type BuilderState = Map<string, any>;
 
-type JsonState = {
+export type ViewStateJson = {
   formatting?: FormattingSettingsJSON,
-  positions: { [string]: WidgetPosition },
+  positions: { [string]: WidgetPositionJSON },
   selected_fields: FieldNameList,
   titles: TitlesMap,
   widgets: Array<any>,
   widget_mapping: WidgetMapping,
-  positions: { [string]: WidgetPosition },
   staticMessageListId?: string,
 };
 
@@ -44,14 +43,14 @@ export default class ViewState {
     widgetPositions: { [string]: WidgetPosition },
     formatting: FormattingSettings,
     staticMessageListId?: string) {
-    this._value = { fields, titles, widgets, widgetMapping, widgetPositions, formatting, staticMessageListId };
+    this._value = { fields, titles, widgets: List(widgets), widgetMapping, widgetPositions: Map(widgetPositions), formatting, staticMessageListId };
   }
 
   static create(): ViewState {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
       .widgets(List())
-      .widgetPositions({})
+      .widgetPositions(Map())
       .titles(Map())
       .build();
   }
@@ -77,7 +76,7 @@ export default class ViewState {
   }
 
   get widgetPositions(): { [string]: WidgetPosition } {
-    return this._value.widgetPositions;
+    return this._value.widgetPositions.toJS();
   }
 
   get staticMessageListId(): ?string {
@@ -91,7 +90,7 @@ export default class ViewState {
       widgetIdTranslation[widget.id] = newWidget.id;
       return newWidget;
     });
-    const newWidgetTitles = this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]);
+    const newWidgetTitles = Map(this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]));
     const newTitles = this.titles
       .set(TitleTypes.Widget, newWidgetTitles)
       .updateIn([TitleTypes.Tab, 'title'], value => (value ? `${value} (Copy)` : value));
@@ -106,8 +105,9 @@ export default class ViewState {
 
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
+    const value: Object = this._value;
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Map(this._value));
+    return new Builder(Map(value));
   }
 
   equals(other: any) {
@@ -142,15 +142,14 @@ export default class ViewState {
     };
   }
 
-  static fromJSON(value: JsonState): ViewState {
-    // eslint-disable-next-line camelcase
-    const { selected_fields, titles, widgets, widget_mapping, positions, formatting } = value;
+  static fromJSON(value: ViewStateJson): ViewState {
+    const { selected_fields: selectedFields, titles, widgets, widget_mapping: widgetMapping, positions, formatting } = value;
     return ViewState.builder()
       .titles(fromJS(titles))
       .widgets(List(widgets.map(w => Widget.fromJSON(w))))
-      .widgetMapping(fromJS(widget_mapping))
-      .fields(selected_fields)
-      .widgetPositions(Map(positions).map(v => WidgetPosition.fromJSON(v)).toObject())
+      .widgetMapping(fromJS(widgetMapping))
+      .fields(selectedFields)
+      .widgetPositions(Map(positions).map(WidgetPosition.fromJSON))
       .formatting(formatting ? FormattingSettings.fromJSON(formatting) : FormattingSettings.empty())
       .build();
   }
@@ -177,20 +176,20 @@ class Builder {
     return new Builder(this.value.set('formatting', value));
   }
 
-  titles(value: TitlesMap): Builder {
+  titles(value: (TitlesMap | { [TitleType]: { [string]: string } })): Builder {
     return new Builder(this.value.set('titles', fromJS(value)));
   }
 
-  widgets(value: List<Widget>): Builder {
-    return new Builder(this.value.set('widgets', value));
+  widgets(value: (List<Widget> | Array<Widget>)): Builder {
+    return new Builder(this.value.set('widgets', List(value)));
   }
 
   widgetMapping(value: WidgetMapping): Builder {
     return new Builder(this.value.set('widgetMapping', value));
   }
 
-  widgetPositions(value: Map<string, WidgetPosition>): Builder {
-    return new Builder(this.value.set('widgetPositions', value));
+  widgetPositions(value: (Map<string, WidgetPosition> | { [string]: WidgetPosition })): Builder {
+    return new Builder(this.value.set('widgetPositions', Map(value)));
   }
 
   build(): ViewState {

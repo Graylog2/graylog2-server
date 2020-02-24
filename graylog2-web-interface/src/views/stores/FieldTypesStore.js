@@ -26,7 +26,7 @@ export const FieldTypesActions: FieldTypesActionsType = singletonActions(
 export type FieldTypeMappingsList = Immutable.List<FieldTypeMapping>;
 export type FieldTypesStoreState = {
   all: FieldTypeMappingsList,
-  queryFields: Immutable.Map<String, FieldTypeMappingsList>,
+  queryFields: Immutable.Map<string, FieldTypeMappingsList>,
 };
 
 export const FieldTypesStore = singletonStore(

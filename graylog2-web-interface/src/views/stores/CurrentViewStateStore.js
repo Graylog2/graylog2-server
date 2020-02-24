@@ -13,6 +13,7 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
+import ViewState from '../logic/views/ViewState';
 
 type CurrentViewStateActionsType = RefluxActions<{
   fields: (Immutable.Set<string>) => Promise<*>,
@@ -118,7 +119,7 @@ export const CurrentViewStateStore = singletonStore(
       CurrentViewStateActions.formatting.promise(promise);
     },
 
-    _activeState() {
+    _activeState(): ViewState {
       return this.states.get(this.activeQuery);
     },
 

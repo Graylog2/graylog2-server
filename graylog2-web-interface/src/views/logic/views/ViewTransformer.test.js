@@ -84,7 +84,7 @@ describe('ViewTransformer', () => {
 
       const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
-      const viewStateMap: ViewStateMap = Map.of('query-id', viewState);
+      const viewStateMap: ViewStateMap = Map({ 'query-id': viewState });
       const searchView = View.builder()
         .type(View.Type.Search)
         .state(viewStateMap)
@@ -109,7 +109,7 @@ describe('ViewTransformer', () => {
 
       const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
-      const viewStateMap: ViewStateMap = Map.of('query-id', viewState);
+      const viewStateMap: ViewStateMap = Map({ 'query-id': viewState });
       const searchView = View.builder()
         .type(View.Type.Search)
         .state(viewStateMap)
@@ -124,7 +124,7 @@ describe('ViewTransformer', () => {
     it('should add the streams to the widget', async () => {
       const query = Query.builder()
         .id('query-id')
-        .filter({ type: 'or', filters: List.of(Map.of('type', 'stream', 'id', '1234-abcd')) })
+        .filter(Map({ type: 'or', filters: List([Map({ type: 'stream', id: '1234-abcd' })]) }))
         .build();
 
       const search = Search.builder()
@@ -134,7 +134,7 @@ describe('ViewTransformer', () => {
 
       const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
-      const viewStateMap: ViewStateMap = Map.of('query-id', viewState);
+      const viewStateMap: ViewStateMap = Map({ 'query-id': viewState });
       const searchView = View.builder()
         .type(View.Type.Search)
         .state(viewStateMap)

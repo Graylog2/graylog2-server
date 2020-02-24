@@ -1,6 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import { get, isEqual } from 'lodash';
 

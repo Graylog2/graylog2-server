@@ -2,7 +2,6 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
-import type { RecordFactory, RecordOf } from 'immutable';
 
 import type { RefluxActions } from 'stores/StoreTypes';
 import ViewState from 'views/logic/views/ViewState';
@@ -28,9 +27,9 @@ const HighlightingRulesActions: HighlightingRulesActionsType = singletonActions(
 );
 
 type KeyProps = { field: string, value: Value };
-type KeyType = RecordOf<KeyProps>;
+type KeyType = Immutable.Record<KeyProps>;
 
-const makeKey: RecordFactory<KeyProps> = Immutable.Record({ field: null, value: null });
+const makeKey = Immutable.Record({ field: null, value: null });
 
 type StateType = Immutable.OrderedMap<KeyType, string>;
 

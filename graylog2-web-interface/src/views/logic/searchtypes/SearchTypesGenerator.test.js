@@ -37,8 +37,8 @@ describe('SearchTypesGenerator', () => {
     const widgetWithFilterId = widgetMapping.get('widgetWithFilter').first();
     const widgetWithoutFilterId = widgetMapping.get('widgetWithoutFilter').first();
 
-    const searchTypeWithFilter = searchTypes.find(w => (w.get('id') === widgetWithFilterId)).toJS();
-    const searchTypeWithoutFilter = searchTypes.find(w => (w.get('id') === widgetWithoutFilterId)).toJS();
+    const searchTypeWithFilter = searchTypes.find(w => (w.get('id') === widgetWithFilterId), null, Immutable.Map()).toJS();
+    const searchTypeWithoutFilter = searchTypes.find(w => (w.get('id') === widgetWithoutFilterId), null, Immutable.Map()).toJS();
 
     expect(searchTypeWithFilter.filter).toEqual({ query: 'source: foo', type: 'query_string' });
     expect(searchTypeWithoutFilter.filter).toBeUndefined();
