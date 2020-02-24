@@ -37,7 +37,11 @@ describe('PivotConfigGenerator', () => {
         id: expect.any(String),
       },
     });
-    expect(result[1].timerange.id).toEqual(result[0].id);
+    const [{ id }, { timerange }] = result;
+    if (!timerange) {
+      throw new Error('Expected `timerange` on generated config, but not present!');
+    }
+    expect(timerange.id).toEqual(id);
   });
 
   it('should add a event annotation config when configured', () => {
@@ -65,7 +69,11 @@ describe('PivotConfigGenerator', () => {
         { interval: { type: 'timeunit', unit: timeUnit, value: 1 } },
       ));
       const result = PivotConfigGenerator({ config });
-      const [{ config: { row_groups: [pivot] } }] = result;
+      const [{ config: pivotConfig }] = result;
+      if (!pivotConfig) {
+        throw new Error('Expected `config` in first element of result is missing!');
+      }
+      const { row_groups: [pivot] } = pivotConfig;
       const { interval: { timeunit } } = pivot;
       expect(timeunit).toEqual(expectedMappedTimeUnit);
     };

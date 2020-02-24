@@ -4,7 +4,9 @@ import { Set } from 'immutable';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type { Definition } from 'views/logic/aggregationbuilder/Series';
 import type { TimeUnit } from '../../../Constants';
+import SortConfig from '../../aggregationbuilder/SortConfig';
 
 const mapTimeunit = (unit: TimeUnit) => {
   switch (unit) {
@@ -18,7 +20,16 @@ const mapTimeunit = (unit: TimeUnit) => {
   }
 };
 
-const formatPivot = (pivot: Pivot) => {
+type FormattedPivot = {
+  type: string,
+  field: string,
+  interval: {
+    timeunit: string,
+    type: string,
+  }
+};
+
+const formatPivot = (pivot: Pivot): FormattedPivot => {
   const { type, field, config } = pivot;
   const newConfig = Object.assign({}, config);
 
@@ -41,6 +52,10 @@ const formatPivot = (pivot: Pivot) => {
   };
 };
 
+type FormattedSeries = {
+  id: string,
+} & Definition;
+
 const generateConfig = (id: string, name: string, { rollup, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig) => ({
   id,
   name,
@@ -50,7 +65,7 @@ const generateConfig = (id: string, name: string, { rollup, rowPivots, columnPiv
     rollup,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
-    series: series.map(s => Object.assign({}, { id: s.effectiveName }, parseSeries(s.function))),
+    series: series.map<FormattedSeries>(s => Object.assign({}, { id: s.effectiveName }, parseSeries(s.function))),
     sort: sort,
   },
 });
@@ -83,19 +98,38 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
   return configBuilder.build();
 };
 
+type Config = {
+  id: string,
+  name: string,
+  type: string,
+  config?: {
+    id: string,
+    rollup: boolean,
+    row_groups: Array<FormattedPivot>,
+    column_groups: Array<FormattedPivot>,
+    series: Array<FormattedSeries>,
+    sort: Array<SortConfig>,
+  },
+  timerange?: {
+    type: string,
+    source: string,
+    id: string,
+  },
+};
+
 class ConfigBuilder {
-  value: Set<any>;
+  value: Set<Config>;
 
   constructor(values: Array<any>) {
     this.value = Set.of(...values);
   }
 
-  add(val) {
+  add(val: Config) {
     this.value = this.value.add(val);
     return this;
   }
 
-  build(): Array<any> {
+  build(): Array<Config> {
     return this.value.toArray();
   }
 
