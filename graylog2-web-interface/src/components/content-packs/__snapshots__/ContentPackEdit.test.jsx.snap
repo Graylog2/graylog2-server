@@ -2156,24 +2156,60 @@ exports[`<ContentPackEdit /> should render spinner with no content pack 1`] = `
   selectedEntities={Object {}}
 >
   <Spinner
+    delay={200}
     name="spinner"
     text="Loading..."
   >
-    <span>
-      <ForwardRef
-        fixedWidth={false}
-        inverse={false}
-        name="spinner"
-        pulse={false}
-        spin={true}
+    <Spinner__Wrapper
+      visible={false}
+    >
+      <StyledComponent
+        forwardedComponent={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "attrs": Array [],
+            "componentStyle": ComponentStyle {
+              "componentId": "Spinner__Wrapper-hg0ct4-0",
+              "isStatic": false,
+              "lastClassName": "hyHIAb",
+              "rules": Array [
+                "visibility:",
+                [Function],
+                ";",
+              ],
+            },
+            "displayName": "Spinner__Wrapper",
+            "foldedComponentIds": Array [],
+            "render": [Function],
+            "styledComponentId": "Spinner__Wrapper-hg0ct4-0",
+            "target": "span",
+            "toString": [Function],
+            "warnTooManyClasses": [Function],
+            "withComponent": [Function],
+          }
+        }
+        forwardedRef={null}
+        visible={false}
       >
-        <i
-          className="fa fa-spinner fa-spin"
-        />
-      </ForwardRef>
-       
-      Loading...
-    </span>
+        <span
+          className="Spinner__Wrapper-hg0ct4-0 hyHIAb"
+        >
+          <ForwardRef
+            fixedWidth={false}
+            inverse={false}
+            name="spinner"
+            pulse={false}
+            spin={true}
+          >
+            <i
+              className="fa fa-spinner fa-spin"
+            />
+          </ForwardRef>
+           
+          Loading...
+        </span>
+      </StyledComponent>
+    </Spinner__Wrapper>
   </Spinner>
 </ContentPackEdit>
 `;
