@@ -9,8 +9,8 @@ import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
 import NumberUtils from 'util/NumberUtils';
-import { LinkToNode, Spinner } from 'components/common';
-import { Icon } from 'components/common';
+import { LinkToNode, Spinner, Icon } from 'components/common';
+
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');

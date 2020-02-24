@@ -19,8 +19,8 @@ class SimulationPreview extends React.Component {
           <p><strong>Message would be dropped</strong></p>
           <p>
             The pipeline processor would drop such a message. That means that the message <strong>would
-            not be stored
-            </strong>, and would not be available for searches, alerts, outputs, or dashboards.
+              not be stored
+                                                                                          </strong>, and would not be available for searches, alerts, outputs, or dashboards.
           </p>
         </Alert>
       );

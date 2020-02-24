@@ -80,7 +80,7 @@ const UserList = createReactClass({
         const popover = (
           <Popover id="decorators-help" className={UserListStyle.sessionBadgeDetails}>
             <p className="description">
-            The address of the client used to initially establish the session, not necessarily its current address.
+              The address of the client used to initially establish the session, not necessarily its current address.
             </p>
           </Popover>
         );

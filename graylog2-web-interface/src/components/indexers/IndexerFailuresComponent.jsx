@@ -4,11 +4,11 @@ import numeral from 'numeral';
 import moment from 'moment';
 
 import { Alert, Col, Row, Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Icon, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import { Spinner } from 'components/common';
+
 import { SmallSupportLink, DocumentationLink } from 'components/support';
 
 const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');

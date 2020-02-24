@@ -34,10 +34,10 @@ class CSVFileAdapterDocumentation extends React.Component {
 
         <h5 style={{ marginBottom: 10 }}>Configuration</h5>
         <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code><br />
-        Quote character: <code>"</code><br />
-        Key column: <code>ipaddr</code><br />
-        Value column: <code>hostname</code>
+          Separator: <code>,</code><br />
+          Quote character: <code>"</code><br />
+          Key column: <code>ipaddr</code><br />
+          Value column: <code>hostname</code>
         </p>
 
         <h5 style={{ marginBottom: 10 }}>CSV File</h5>
@@ -47,10 +47,10 @@ class CSVFileAdapterDocumentation extends React.Component {
 
         <h5 style={{ marginBottom: 10 }}>Configuration</h5>
         <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>;</code><br />
-        Quote character: <code>'</code><br />
-        Key column: <code>ipaddr</code><br />
-        Value column: <code>hostname</code>
+          Separator: <code>;</code><br />
+          Quote character: <code>'</code><br />
+          Key column: <code>ipaddr</code><br />
+          Value column: <code>hostname</code>
         </p>
 
         <h5 style={{ marginBottom: 10 }}>CSV File</h5>

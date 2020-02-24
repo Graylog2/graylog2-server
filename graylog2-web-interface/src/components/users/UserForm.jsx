@@ -345,7 +345,7 @@ const UserForm = createReactClass({
               ? (
                 <Col smOffset={3} sm={9}>
                   <Alert bsStyle="warning" role="alert">
-                Please edit your Graylog server configuration file to change the admin password.
+                    Please edit your Graylog server configuration file to change the admin password.
                   </Alert>
                 </Col>
               )
@@ -353,8 +353,8 @@ const UserForm = createReactClass({
                 ? (
                   <Col smOffset={3} sm={9}>
                     <Alert bsStyle="warning" role="alert">
-                  This user was created from an external system and you can't change the password here.
-                  Please contact an administrator for more information.
+                      This user was created from an external system and you can't change the password here.
+                      Please contact an administrator for more information.
                     </Alert>
                   </Col>
                 )
@@ -401,7 +401,7 @@ const UserForm = createReactClass({
                     <div className="form-group">
                       <Col smOffset={3} sm={9}>
                         <Button bsStyle="primary" type="submit" className="save-button-margin">
-                      Update Password
+                          Update Password
                         </Button>
                         <Button onClick={this._onCancel}>Cancel</Button>
                       </Col>

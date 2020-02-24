@@ -30,8 +30,8 @@ const DSVHTTPAdapterDocumentation = () => {
 
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-      Separator: <code>,</code><br />
-      Quote character: <code>"</code><br />
+        Separator: <code>,</code><br />
+        Quote character: <code>"</code><br />
       </p>
 
       <h5 style={{ marginBottom: 10 }}>DSV File</h5>
@@ -41,8 +41,8 @@ const DSVHTTPAdapterDocumentation = () => {
 
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-      Separator: <code>;</code><br />
-      Quote character: <code>'</code><br />
+        Separator: <code>;</code><br />
+        Quote character: <code>'</code><br />
       </p>
 
       <h5 style={{ marginBottom: 10 }}>DSV File</h5>
