@@ -18,6 +18,7 @@ package org.graylog2.security;
 
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.security.token.AccessTokenServiceImpl;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
