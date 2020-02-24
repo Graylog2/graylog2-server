@@ -27,6 +27,7 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ThrottleState;
 import org.graylog2.rest.resources.system.responses.JournalSummaryResponse;
+import org.graylog2.rest.resources.system.responses.KafkaJournalConfigurationSummary;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -84,7 +85,7 @@ public class JournalResource extends RestResource {
                                                         Size.bytes(throttleState.journalSizeLimit),
                                                         kafkaJournal.numberOfSegments(),
                                                         new DateTime(oldestSegment, DateTimeZone.UTC),
-                                                        kafkaJournalConfiguration
+                                                        KafkaJournalConfigurationSummary.of(kafkaJournalConfiguration)
             );
 
         }
