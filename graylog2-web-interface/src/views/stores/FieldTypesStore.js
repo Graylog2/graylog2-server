@@ -66,7 +66,7 @@ export const FieldTypesStore = singletonStore(
     },
 
     all() {
-      /*const promise = fetch('GET', fieldTypesUrl)
+      const promise = fetch('GET', fieldTypesUrl)
         .then(this._deserializeFieldTypes)
         .then((response) => {
           this._all = Immutable.fromJS(response);
@@ -75,12 +75,12 @@ export const FieldTypesStore = singletonStore(
 
       FieldTypesActions.all.promise(promise);
 
-      return promise;*/
+      return promise;
     },
 
     forStreams(streams) {
-      /*return fetch('POST', fieldTypesUrl, { streams: streams })
-        .then(this._deserializeFieldTypes);*/
+      return fetch('POST', fieldTypesUrl, { streams: streams })
+        .then(this._deserializeFieldTypes);
     },
 
     _deserializeFieldTypes(response) {
