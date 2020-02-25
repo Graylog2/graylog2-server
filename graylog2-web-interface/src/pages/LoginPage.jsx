@@ -89,7 +89,7 @@ const LoginPage = createReactClass({
         <div>
           <div className="container" id="login-box">
             <Row>
-              <Col md={4} mdOffset={4} id="login-box-content" className="well">
+              <Col md={4} mdOffset={4} xs={6} xsOffset={3} id="login-box-content" className="well">
                 <legend><Icon name="group" /> Welcome to Graylog</legend>
                 {alert}
 
