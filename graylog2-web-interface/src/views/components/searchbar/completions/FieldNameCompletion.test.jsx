@@ -55,7 +55,7 @@ describe('FieldNameCompletion', () => {
 
   it('returns matching fields after _exists_-operator', () => {
     const completer = new FieldNameCompletion();
-    expect(completer.getCompletions(null, { type: 'keyword', value: '_exists_:'}, 'e')
+    expect(completer.getCompletions(null, { type: 'keyword', value: '_exists_:' }, 'e')
       .map(result => result.name))
       .toEqual(['source', 'message', 'timestamp']);
   });
