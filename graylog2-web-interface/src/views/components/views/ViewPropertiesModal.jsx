@@ -7,15 +7,12 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 
 export default class ViewPropertiesModal extends React.Component {
+  modal = React.createRef();
+
   static propTypes = {
     view: PropTypes.object.isRequired,
     title: PropTypes.string.isRequired,
     onSave: PropTypes.func.isRequired,
-    onClose: PropTypes.func,
-  };
-
-  static defaultProps = {
-    onClose: () => {},
   };
 
   constructor(props) {
@@ -32,6 +29,10 @@ export default class ViewPropertiesModal extends React.Component {
     if (title !== nextProps.title || !isEqual(view, nextProps.view)) {
       this.setState({ view: nextProps.view, title: nextProps.title });
     }
+  }
+
+  open = () => {
+    this.modal.open();
   }
 
   // eslint-disable-next-line consistent-return
@@ -51,26 +52,26 @@ export default class ViewPropertiesModal extends React.Component {
     }
   };
 
-  _onClose = () => {
-    const { onClose } = this.props;
-    onClose();
-  };
+  _cleanState = () => {
+    const { view, title } = this.props;
+    this.setState({ view, title });
+  }
 
   _onSave = () => {
-    const { onSave, onClose } = this.props;
+    const { onSave } = this.props;
     const { view } = this.state;
     onSave(view);
-    onClose();
+    this.modal.close();
   };
 
   render() {
     const { view: { title = '', summary = '', description = '' }, title: modalTitle } = this.state;
     return (
-      <BootstrapModalForm title={modalTitle}
+      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+                          title={modalTitle}
+                          onModalClose={this._cleanState}
                           onSubmitForm={this._onSave}
-                          onModalClose={this._onClose}
                           submitButtonText="Save"
-                          show
                           bsSize="large">
         <Input id="title"
                type="text"

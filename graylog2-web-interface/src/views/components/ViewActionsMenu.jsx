@@ -1,5 +1,5 @@
 // @flow strict
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { withRouter } from 'react-router';
@@ -36,9 +36,8 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => {
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
-  const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
-  const [editViewOpen, setEditViewOpen] = useState(false);
-
+  const saveNewModal = useRef<ViewPropertiesModal>();
+  const editModal = useRef<ViewPropertiesModal>();
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
@@ -55,11 +54,11 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
               disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>
         <Icon name="save" /> Save
       </Button>
-      <Button onClick={() => setSaveAsViewOpen(true)} disabled={hasUndeclaredParameters}>
+      <Button onClick={() => editModal.current.open()} disabled={hasUndeclaredParameters}>
         <Icon name="copy" /> Save as
       </Button>
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
-        <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
+        <MenuItem onSelect={() => editModal.current.open()} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit
         </MenuItem>
         <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
@@ -72,20 +71,14 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
         </IfDashboard>
       </DropdownButton>
       <DebugOverlay show={debugOpen} onClose={() => setDebugOpen(false)} />
-      {saveAsViewOpen && (
-        <ViewPropertiesModal view={view.toBuilder().newId().build()}
-                             title="Save new dashboard"
-                             onSave={newView => onSaveAsView(newView, router)}
-                             show
-                             onClose={() => setSaveAsViewOpen(false)} />
-      )}
-      {editViewOpen && (
-        <ViewPropertiesModal view={view}
-                             title="Editing dashboard"
-                             onSave={updatedView => onSaveView(updatedView, router)}
-                             show
-                             onClose={() => setEditViewOpen(false)} />
-      )}
+      <ViewPropertiesModal view={view.toBuilder().newId().build()}
+                           title="Save new dashboard"
+                           onSave={newView => onSaveAsView(newView, router)}
+                           ref={saveNewModal} />
+      <ViewPropertiesModal view={view}
+                           title="Editing dashboard"
+                           onSave={updatedView => onSaveView(updatedView, router)}
+                           ref={editModal} />
       {shareViewOpen && <ShareViewModal view={view} show onClose={() => setShareViewOpen(false)} />}
     </ButtonGroup>
   );
