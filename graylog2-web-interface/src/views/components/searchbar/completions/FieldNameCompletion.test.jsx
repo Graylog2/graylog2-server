@@ -25,7 +25,7 @@ describe('FieldNameCompletion', () => {
   it('returns empty list if inputs are empty', () => {
     asMock(FieldTypesStore.getInitialState).mockReturnValue(_createFieldTypesStoreState([]));
 
-    const completer = new FieldNameCompletion();
+    const completer = new FieldNameCompletion([]);
     expect(completer.getCompletions(null, null, '')).toEqual([]);
   });
 
@@ -36,14 +36,33 @@ describe('FieldNameCompletion', () => {
   });
 
   it('returns matching fields if prefix is present in at least one field name', () => {
-    const completer = new FieldNameCompletion();
+    const completer = new FieldNameCompletion([]);
     expect(completer.getCompletions(null, null, 'e').map(result => result.name))
       .toEqual(['source', 'message', 'timestamp']);
   });
 
   it('suffixes matching fields with colon', () => {
-    const completer = new FieldNameCompletion();
+    const completer = new FieldNameCompletion([]);
     expect(completer.getCompletions(null, null, 'e').map(result => result.value))
       .toEqual(['source:', 'message:', 'timestamp:']);
+  });
+
+  it('returns _exist_-operator if matching prefix', () => {
+    const completer = new FieldNameCompletion();
+    expect(completer.getCompletions(null, null, '_e').map(result => result.value))
+      .toEqual(['_exists_:']);
+  });
+
+  it('returns matching fields after _exists_-operator', () => {
+    const completer = new FieldNameCompletion();
+    expect(completer.getCompletions(null, { type: 'keyword', value: '_exists_:'}, 'e')
+      .map(result => result.name))
+      .toEqual(['source', 'message', 'timestamp']);
+  });
+
+  it('returns exists operator together with matching fields', () => {
+    const completer = new FieldNameCompletion();
+    expect(completer.getCompletions(null, null, 'e').map(result => result.name))
+      .toEqual(['_exists_', 'source', 'message', 'timestamp']);
   });
 });
