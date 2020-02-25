@@ -57,94 +57,129 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
             onlyActiveOnIndex={false}
             to="/system/overview"
           >
-            <InactiveNavItem
+            <NotificationBadge__StyledInactiveNavItem
               action="push"
-              className="notification-badge-link"
               onClick={[Function]}
               onSelect={null}
             >
-              <NavItem
+              <StyledComponent
                 action="push"
-                active={false}
-                className="notification-badge-link"
-                disabled={false}
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "NotificationBadge__StyledInactiveNavItem-c049cm-0",
+                      "isStatic": true,
+                      "lastClassName": "ijmPPY",
+                      "rules": Array [
+                        "a:hover{border:0px;text-decoration:none;}",
+                      ],
+                    },
+                    "displayName": "NotificationBadge__StyledInactiveNavItem",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "NotificationBadge__StyledInactiveNavItem-c049cm-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
                 onClick={[Function]}
                 onSelect={null}
               >
-                <li
-                  className="notification-badge-link"
-                  role="presentation"
+                <InactiveNavItem
+                  action="push"
+                  className="NotificationBadge__StyledInactiveNavItem-c049cm-0 ijmPPY"
+                  onClick={[Function]}
+                  onSelect={null}
                 >
-                  <SafeAnchor
+                  <NavItem
                     action="push"
-                    componentClass="a"
+                    active={false}
+                    className="NotificationBadge__StyledInactiveNavItem-c049cm-0 ijmPPY"
                     disabled={false}
                     onClick={[Function]}
+                    onSelect={null}
                   >
-                    <a
-                      action="push"
-                      href="#"
-                      onClick={[Function]}
-                      onKeyDown={[Function]}
-                      role="button"
+                    <li
+                      className="NotificationBadge__StyledInactiveNavItem-c049cm-0 ijmPPY"
+                      role="presentation"
                     >
-                      <ForwardRef
-                        bsStyle="danger"
-                        id="notification-badge"
+                      <SafeAnchor
+                        action="push"
+                        componentClass="a"
+                        disabled={false}
+                        onClick={[Function]}
                       >
-                        <Badge__StyledBadge
-                          bsStyle="danger"
-                          id="notification-badge"
+                        <a
+                          action="push"
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="button"
                         >
-                          <StyledComponent
+                          <ForwardRef
                             bsStyle="danger"
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                  "isStatic": false,
-                                  "lastClassName": "cPDALi",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Badge__StyledBadge",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
                             id="notification-badge"
                           >
-                            <Badge
-                              bsClass="badge"
+                            <Badge__StyledBadge
                               bsStyle="danger"
-                              className="Badge__StyledBadge-sc-4gzqz0-0 cPDALi"
                               id="notification-badge"
-                              pullRight={false}
                             >
-                              <span
-                                className="Badge__StyledBadge-sc-4gzqz0-0 cPDALi badge badge-danger"
+                              <StyledComponent
+                                bsStyle="danger"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                      "isStatic": false,
+                                      "lastClassName": "cPDALi",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Badge__StyledBadge",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 id="notification-badge"
                               >
-                                42
-                              </span>
-                            </Badge>
-                          </StyledComponent>
-                        </Badge__StyledBadge>
-                      </ForwardRef>
-                    </a>
-                  </SafeAnchor>
-                </li>
-              </NavItem>
-            </InactiveNavItem>
+                                <Badge
+                                  bsClass="badge"
+                                  bsStyle="danger"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 cPDALi"
+                                  id="notification-badge"
+                                  pullRight={false}
+                                >
+                                  <span
+                                    className="Badge__StyledBadge-sc-4gzqz0-0 cPDALi badge badge-danger"
+                                    id="notification-badge"
+                                  >
+                                    42
+                                  </span>
+                                </Badge>
+                              </StyledComponent>
+                            </Badge__StyledBadge>
+                          </ForwardRef>
+                        </a>
+                      </SafeAnchor>
+                    </li>
+                  </NavItem>
+                </InactiveNavItem>
+              </StyledComponent>
+            </NotificationBadge__StyledInactiveNavItem>
           </LinkContainer>
         </ul>
       </Nav>

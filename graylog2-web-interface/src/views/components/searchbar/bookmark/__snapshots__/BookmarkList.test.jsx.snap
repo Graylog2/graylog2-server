@@ -16,7 +16,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 cHlGak in modal"
+      class="fade Modal-nuree8-0 bmCcvm in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -241,7 +241,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 cHlGak in modal"
+      class="fade Modal-nuree8-0 bmCcvm in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
