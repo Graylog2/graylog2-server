@@ -16,12 +16,12 @@
  */
 package org.graylog2.security.token;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
@@ -35,24 +35,28 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AccessTokenServiceImpl extends PersistedServiceImpl implements AccessTokenService {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     private static final SecureRandom RANDOM = new SecureRandom();
+    private final AccessTokenCipher cipher;
 
     @Inject
-    public AccessTokenServiceImpl(MongoConnection mongoConnection) {
+    public AccessTokenServiceImpl(MongoConnection mongoConnection, AccessTokenCipher accessTokenCipher) {
         super(mongoConnection);
+        this.cipher = accessTokenCipher;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public AccessToken load(String token) {
         DBObject query = new BasicDBObject();
-        query.put(AccessTokenImpl.TOKEN, token);
+        query.put(AccessTokenImpl.TOKEN, cipher.encrypt(token));
         final List<DBObject> objects = query(AccessTokenImpl.class, query);
 
         if (objects.isEmpty()) {
@@ -62,9 +66,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             LOG.error("Multiple access tokens found, this is a serious bug.");
             throw new IllegalStateException("Access tokens collection has no unique index!");
         }
-        final DBObject tokenObject = objects.get(0);
-        final Object id = tokenObject.get("_id");
-        return new AccessTokenImpl((ObjectId) id, tokenObject.toMap());
+        return fromDBObject(objects.get(0));
     }
 
     @Override
@@ -73,13 +75,9 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         DBObject query = new BasicDBObject();
         query.put(AccessTokenImpl.USERNAME, username);
         final List<DBObject> objects = query(AccessTokenImpl.class, query);
-        List<AccessToken> tokens = Lists.newArrayList();
-        for (DBObject tokenObject : objects) {
-            final Object id = tokenObject.get("_id");
-            final AccessToken accessToken = new AccessTokenImpl((ObjectId) id, tokenObject.toMap());
-            tokens.add(accessToken);
-        }
-        return tokens;
+        return objects.stream()
+                .map(this::fromDBObject)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -119,7 +117,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     public String save(AccessToken accessToken) throws ValidationException {
         // make sure we cannot overwrite an existing access token
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
-        return super.save(accessToken);
+        return super.save(encrypt(accessToken));
     }
 
     @Override
@@ -129,5 +127,29 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final int result = destroy(query, AccessTokenImpl.COLLECTION_NAME);
         LOG.debug("Deleted {} access tokens of user \"{}\"", result, username);
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private AccessTokenImpl fromDBObject(DBObject dbObject) {
+        final Map<String, Object> fields = new HashMap<String, Object>(dbObject.toMap());
+        final String ciphertext = (String) fields.get(AccessTokenImpl.TOKEN);
+        if (StringUtils.isNotBlank(ciphertext)) {
+            fields.put(AccessTokenImpl.TOKEN, cipher.decrypt(ciphertext));
+        }
+        final ObjectId id = (ObjectId) dbObject.get("_id");
+        return new AccessTokenImpl(id, fields);
+    }
+
+    private AccessTokenImpl encrypt(AccessToken token) {
+        Map<String, Object> fields = new HashMap<>(token.getFields());
+        final String cleartext = (String) fields.get(AccessTokenImpl.TOKEN);
+        if (StringUtils.isNotBlank(cleartext)) {
+            fields.put(AccessTokenImpl.TOKEN, cipher.encrypt(cleartext));
+        }
+        if (token.getId() == null) {
+            return new AccessTokenImpl(fields);
+        } else {
+            return new AccessTokenImpl(new ObjectId(token.getId()), fields);
+        }
     }
 }

@@ -24,17 +24,23 @@ import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 
 public class AESTools {
     private static final Logger LOG = LoggerFactory.getLogger(AESTools.class);
 
     @Nullable
     public static String encrypt(String plainText, String encryptionKey, String salt) {
+        return encrypt(plainText, encryptionKey, salt.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Nullable
+    public static String encrypt(String plainText, String encryptionKey, byte[] salt) {
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
             SecretKeySpec key = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
+            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt));
             return Hex.encodeToString(cipher.doFinal(plainText.getBytes("UTF-8")));
         } catch (Exception e) {
             LOG.error("Could not encrypt value.", e);
@@ -44,11 +50,16 @@ public class AESTools {
 
     @Nullable
     public static String decrypt(String cipherText, String encryptionKey, String salt) {
+        return decrypt(cipherText, encryptionKey, salt.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Nullable
+    public static String decrypt(String cipherText, String encryptionKey, byte[] salt) {
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
             SecretKeySpec key = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
-            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
+            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt));
             return new String(cipher.doFinal(Hex.decode(cipherText)), "UTF-8");
         } catch (Exception e) {
             LOG.error("Could not decrypt value.", e);

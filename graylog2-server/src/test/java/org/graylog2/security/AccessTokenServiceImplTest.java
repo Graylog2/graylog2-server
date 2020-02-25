@@ -16,8 +16,10 @@
  */
 package org.graylog2.security;
 
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.security.token.AccessTokenCipher;
 import org.graylog2.security.token.AccessTokenServiceImpl;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -31,6 +33,9 @@ import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AccessTokenServiceImplTest {
     @Rule
@@ -40,7 +45,12 @@ public class AccessTokenServiceImplTest {
 
     @Before
     public void setupService () {
-        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection());
+        // Simple cipher which reverses the cleartext. DB fixtures need to contain the reversed (i.e. encrypted token)
+        final AccessTokenCipher accessTokenCipher = mock(AccessTokenCipher.class);
+        when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
+        when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
+
+        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), accessTokenCipher);
     }
 
     @After
