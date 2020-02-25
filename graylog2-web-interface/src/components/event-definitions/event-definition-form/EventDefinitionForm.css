@@ -45,5 +45,5 @@
 }
 
 :local(.steps).nav > li.active:after {
-    background-color: #9e1f63;
+    background-color: #9E1F63;
 }
