@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Modal, Button } from 'components/graylog';
+import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 
 import type { TitlesMap } from 'views/stores/TitleTypes';
@@ -18,41 +18,32 @@ type Props = {
 }
 
 type State = {
-  show: boolean,
   titleDraft: string,
 }
 
 class QueryTitleEditModal extends React.Component<Props, State> {
+  modal: BootstrapModalForm = React.createRef();
+
   static propTypes = {
     onTitleChange: PropTypes.func.isRequired,
   };
 
   state = {
-    show: false,
     titleDraft: '',
   };
 
   open = (activeQueryTitle: string) => {
     this.setState({
-      show: true,
       titleDraft: activeQueryTitle,
     });
-  };
-
-  _close = () => {
-    this.setState({
-      show: false,
-      titleDraft: '',
-    });
-  };
+    this.modal.open();
+  }
 
   _onDraftSave = () => {
     const { titleDraft } = this.state;
     const { onTitleChange } = this.props;
-    if (titleDraft !== '') {
-      onTitleChange(titleDraft);
-      this._close();
-    }
+    onTitleChange(titleDraft);
+    this.modal.close();
   };
 
   _onDraftChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
@@ -60,28 +51,24 @@ class QueryTitleEditModal extends React.Component<Props, State> {
   };
 
   render() {
-    const { show, titleDraft } = this.state;
+    const { titleDraft } = this.state;
     return (
-      <Modal show={show} bsSize="large" onHide={this._close}>
-        <Modal.Header closeButton>
-          <Modal.Title>Editing query title</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Input autoFocus
-                 help="The title of the query tab. It has a maximum length of 40 characters."
-                 id="title"
-                 label="Title"
-                 name="title"
-                 onChange={this._onDraftChange}
-                 maxLength={40}
-                 type="text"
-                 value={titleDraft} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={this._onDraftSave} bsStyle="success">Save</Button>
-          <Button onClick={this._close}>Cancel</Button>
-        </Modal.Footer>
-      </Modal>
+      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+                          title="Editing query title"
+                          onSubmitForm={this._onDraftSave}
+                          submitButtonText="Save"
+                          bsSize="large">
+        <Input autoFocus
+               help="The title of the query tab. It has a maximum length of 40 characters."
+               id="title"
+               label="Title"
+               name="title"
+               onChange={this._onDraftChange}
+               maxLength={40}
+               required
+               type="text"
+               value={titleDraft} />
+      </BootstrapModalForm>
     );
   }
 }
