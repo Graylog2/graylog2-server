@@ -22,7 +22,7 @@ const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
 const panelVariantStyles = hex => css`
   border-color: ${borderColor(hex)};
 
-  & > ${PanelHeading} {
+  ${PanelHeading} {
     color: ${util.colorLevel(backgroundColor(hex), 9)};
     background-color: ${backgroundColor(hex)};
     border-color: ${borderColor(hex)};
@@ -167,11 +167,10 @@ const Panel = ({
                              onToggle={handleToggle}
                              {...props}>
         {(header || title) && (
-          <DeprecatedStyledPanel.Heading>
-            <Panel.Title toggle={collapsible}>
-              {header || title}
-            </Panel.Title>
-          </DeprecatedStyledPanel.Heading>
+          <BootstrapPanel.Heading toggle={collapsible}>
+            {header}
+            {title && <BootstrapPanel.Title>{title}</BootstrapPanel.Title>}
+          </BootstrapPanel.Heading>
         )}
         <DeprecatedStyledPanel.Body collapsible={collapsible}>
           {children}

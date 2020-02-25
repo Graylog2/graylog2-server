@@ -18,9 +18,8 @@ import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
-const StreamAlertHeader = styled.h4`
+const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
-  margin: 0 0 12px;
 `;
 
 const matchColor = matches => (matches ? '#00AE42' : '#AD0707');
