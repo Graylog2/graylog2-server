@@ -33,7 +33,7 @@ const TimeUnitTimeHistogramPivot = ({ interval, onChange }: Props) => (
                    step="1"
                    min="1"
                    onChange={e => _changeValue(e, interval, onChange)} />
-      <DropdownButton componentClass={InputGroup.Button.type}
+      <DropdownButton componentClass={InputGroup.Button}
                       id="input-dropdown-addon"
                       title={TimeUnits[interval.unit] || ''}
                       onChange={newUnit => _changeUnit(newUnit, interval, onChange)}>
