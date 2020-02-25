@@ -114,12 +114,10 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
                               "componentId": "HelpBlock-i8is92-0",
-                              "isStatic": true,
+                              "isStatic": false,
                               "lastClassName": "huFHQV",
                               "rules": Array [
-                                "display:block;margin-top:5px;margin-bottom:10px;color:",
-                                "#9f9f9f",
-                                ";",
+                                [Function],
                               ],
                             },
                             "displayName": "HelpBlock",

@@ -1,12 +1,10 @@
 // eslint-disable-next-line no-restricted-imports
 import { Well as BootstrapWell } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import teinte from 'theme/teinte';
-
-const Well = styled(BootstrapWell)`
-  background-color: ${teinte.secondary.due};
-  border-color: ${teinte.secondary.tre};
-`;
+const Well = styled(BootstrapWell)(({ theme }) => css`
+  background-color: ${theme.color.secondary.due};
+  border-color: ${theme.color.secondary.tre};
+`);
 
 export default Well;
