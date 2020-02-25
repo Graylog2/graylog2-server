@@ -11,14 +11,14 @@ const NodeRow = styled.div`
   border-bottom: 1px solid #ccc;
   padding-bottom: 8px;
   margin-bottom: 8px;
-  margin-top: 0px;
+  margin-top: 0;
 
   .hostname {
     font-size: 12px;
   }
 
   .well {
-    margin-bottom: 0px;
+    margin-bottom: 0;
     margin-top: 3px;
     font-family: monospace;
     font-size: 11px;
