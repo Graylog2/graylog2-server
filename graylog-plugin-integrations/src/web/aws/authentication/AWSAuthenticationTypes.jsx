@@ -1,9 +1,8 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
-import { useTheme } from 'theme/GraylogThemeContext';
 
 import { FormDataContext } from 'aws/context/FormData';
 import { AWS_AUTH_TYPES } from 'aws/common/constants';
@@ -13,7 +12,6 @@ import Automatic from './Automatic';
 import ARN from './ARN';
 
 const AWSAuthenticationTypes = ({ onChange }) => {
-  const { colors } = useTheme();
   const { clearField, formData } = useContext(FormDataContext);
 
   const {
@@ -30,11 +28,11 @@ const AWSAuthenticationTypes = ({ onChange }) => {
     onChange({ target: { name: 'awsAuthenticationType', value: defaultAuthTypeValue } });
   }, []);
 
-  const AuthWrapper = useCallback(styled.div`
+  const AuthWrapper = useCallback(styled.div(({ theme }) => css`
     margin: 0 0 21px 9px;
     padding: 3px 0 3px 21px;
-    border-left: 3px solid ${colors.secondary.tre};
-  `, []);
+    border-left: 3px solid ${theme.color.secondary.tre};
+  `), []);
 
   const isType = (type) => {
     return currentType === type;
