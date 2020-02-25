@@ -2,13 +2,19 @@
 import * as Immutable from 'immutable';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
 
 import type { CompletionResult, Token } from '../ace-types';
 import type { Completer } from '../SearchBarAutocompletions';
 
-const _fieldResult = (field: FieldTypeMapping, score: number = 1, valuePosition: boolean = false): CompletionResult => {
+type Suggestion = $ReadOnly<{
+  name: string,
+  type: $ReadOnly<{
+    type: string,
+  }>,
+}>;
+
+const _fieldResult = (field: Suggestion, score: number = 1, valuePosition: boolean = false): CompletionResult => {
   const { name, type } = field;
   return {
     name,
@@ -18,7 +24,7 @@ const _fieldResult = (field: FieldTypeMapping, score: number = 1, valuePosition:
   };
 };
 
-export const existsOperator = {
+export const existsOperator: Suggestion = {
   name: '_exists_',
   type: {
     type: 'operator',
@@ -41,7 +47,9 @@ class FieldNameCompletion implements Completer {
 
   fields: FieldTypesStoreState;
 
-  constructor(staticSuggestions: Array<FieldTypeMapping> = [existsOperator]) {
+  staticSuggestions: Array<Suggestion>;
+
+  constructor(staticSuggestions: Array<Suggestion> = [existsOperator]) {
     this.staticSuggestions = staticSuggestions;
     this.fields = FieldTypesStore.getInitialState();
     FieldTypesStore.listen((newState) => {
