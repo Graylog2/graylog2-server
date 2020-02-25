@@ -43,7 +43,7 @@ describe('UrlWhitelistForm', () => {
     it('should create new instance', () => {
       wrapper = mount(<UrlWhiteListForm urls={config.entries}
                                         disabled={config.disabled}
-                                        onUpdate={onUpdate} />);
+                                        onUpdate={() => {}} />);
       expect(wrapper).toMatchSnapshot();
     });
 

@@ -67,12 +67,10 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
+                        "isStatic": false,
                         "lastClassName": "iZJNbd",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -118,24 +116,10 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "FormControl-sc-1amoaox-0",
-                        "isStatic": true,
-                        "lastClassName": "iHrYrm",
+                        "isStatic": false,
+                        "lastClassName": "eOArng",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";background-color:",
-                          "#FFF",
-                          ";border-color:",
-                          "#DCE1E5",
-                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                          "#b8b8b8",
-                          ";}&:focus{border-color:",
-                          "#6DC6E7",
-                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                          "rgba(109,198,231,0.4)",
-                          ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                          "#DCE1E5",
-                          ";}~ .form-control-feedback.glyphicon{display:none;}",
+                          [Function],
                         ],
                       },
                       "displayName": "FormControl",
@@ -155,14 +139,14 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <FormControl
                     bsClass="form-control"
-                    className="FormControl-sc-1amoaox-0 iHrYrm"
+                    className="FormControl-sc-1amoaox-0 eOArng"
                     componentClass="input"
                     onChange={[Function]}
                     type="text"
                     value="count()"
                   >
                     <input
-                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                      className="FormControl-sc-1amoaox-0 eOArng form-control"
                       onChange={[Function]}
                       type="text"
                       value="count()"
@@ -178,12 +162,10 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "HelpBlock-i8is92-0",
-                        "isStatic": true,
+                        "isStatic": false,
                         "lastClassName": "huFHQV",
                         "rules": Array [
-                          "display:block;margin-top:5px;margin-bottom:10px;color:",
-                          "#9f9f9f",
-                          ";",
+                          [Function],
                         ],
                       },
                       "displayName": "HelpBlock",

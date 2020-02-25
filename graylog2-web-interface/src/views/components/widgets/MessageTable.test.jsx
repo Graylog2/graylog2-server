@@ -31,7 +31,7 @@ describe('MessageTable', () => {
     const wrapper = mount(<MessageTable messages={messages}
                                         activeQueryId={activeQueryId}
                                         fields={Immutable.List(fields)}
-                                        selectedFields={{}}
+                                        selectedFields={Immutable.Set()}
                                         config={config} />);
     const th = wrapper.find('th').at(0);
     expect(th.text()).toContain('file_name');
@@ -41,7 +41,7 @@ describe('MessageTable', () => {
     const wrapper = mount(<MessageTable messages={messages}
                                         activeQueryId={activeQueryId}
                                         fields={Immutable.List(fields)}
-                                        selectedFields={{}}
+                                        selectedFields={Immutable.Set()}
                                         config={config} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
@@ -55,7 +55,7 @@ describe('MessageTable', () => {
                                           activeQueryId={activeQueryId}
                                           // $FlowFixMe: violating contract on purpose
                                           fields={undefined}
-                                          selectedFields={{}}
+                                          selectedFields={Immutable.Set()}
                                           config={config} />);
       const messageTableEntry = wrapper.find('MessageTableEntry');
       expect(messageTableEntry).not.toBeEmptyRender();
@@ -68,7 +68,7 @@ describe('MessageTable', () => {
     const wrapper = mount(<MessageTable messages={messages}
                                         activeQueryId={activeQueryId}
                                         fields={Immutable.List(fields)}
-                                        selectedFields={{}}
+                                        selectedFields={Immutable.Set()}
                                         config={configWithFields} />);
 
     const tableHeadFields = wrapper.find('Field').map(field => field.text());

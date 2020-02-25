@@ -2127,12 +2127,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
                                             "componentId": "ControlLabel-sc-1edmum5-0",
-                                            "isStatic": true,
+                                            "isStatic": false,
                                             "lastClassName": "iZJNbd",
                                             "rules": Array [
-                                              "color:",
-                                              "#1F1F1F",
-                                              ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                              [Function],
                                             ],
                                           },
                                           "displayName": "ControlLabel",
@@ -5057,12 +5055,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
+                                        "isStatic": false,
                                         "lastClassName": "iZJNbd",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -6904,12 +6900,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": true,
+                                              "isStatic": false,
                                               "lastClassName": "iZJNbd",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "ControlLabel",
@@ -6964,24 +6958,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "iHrYrm",
+                                                  "isStatic": false,
+                                                  "lastClassName": "eOArng",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";background-color:",
-                                                    "#FFF",
-                                                    ";border-color:",
-                                                    "#DCE1E5",
-                                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                    "#b8b8b8",
-                                                    ";}&:focus{border-color:",
-                                                    "#6DC6E7",
-                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                    "rgba(109,198,231,0.4)",
-                                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                    "#DCE1E5",
-                                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "FormControl",
@@ -7005,7 +6985,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 iHrYrm"
+                                              className="FormControl-sc-1amoaox-0 eOArng"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Threshold"
@@ -7016,7 +6996,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                                className="FormControl-sc-1amoaox-0 eOArng form-control"
                                                 id="aggregation-threshold"
                                                 label="Threshold"
                                                 name="threshold"
@@ -12367,24 +12347,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "iHrYrm",
+                                                  "isStatic": false,
+                                                  "lastClassName": "eOArng",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";background-color:",
-                                                    "#FFF",
-                                                    ";border-color:",
-                                                    "#DCE1E5",
-                                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                    "#b8b8b8",
-                                                    ";}&:focus{border-color:",
-                                                    "#6DC6E7",
-                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                    "rgba(109,198,231,0.4)",
-                                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                    "#DCE1E5",
-                                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "FormControl",
@@ -12408,7 +12374,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 iHrYrm"
+                                              className="FormControl-sc-1amoaox-0 eOArng"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label=""
@@ -12419,7 +12385,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                                className="FormControl-sc-1amoaox-0 eOArng form-control"
                                                 id="aggregation-threshold"
                                                 label=""
                                                 name="threshold"
@@ -14909,12 +14875,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
                                             "componentId": "ControlLabel-sc-1edmum5-0",
-                                            "isStatic": true,
+                                            "isStatic": false,
                                             "lastClassName": "iZJNbd",
                                             "rules": Array [
-                                              "color:",
-                                              "#1F1F1F",
-                                              ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                              [Function],
                                             ],
                                           },
                                           "displayName": "ControlLabel",
@@ -17839,12 +17803,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
+                                        "isStatic": false,
                                         "lastClassName": "iZJNbd",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -19686,12 +19648,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": true,
+                                              "isStatic": false,
                                               "lastClassName": "iZJNbd",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "ControlLabel",
@@ -19746,24 +19706,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "iHrYrm",
+                                                  "isStatic": false,
+                                                  "lastClassName": "eOArng",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";background-color:",
-                                                    "#FFF",
-                                                    ";border-color:",
-                                                    "#DCE1E5",
-                                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                    "#b8b8b8",
-                                                    ";}&:focus{border-color:",
-                                                    "#6DC6E7",
-                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                    "rgba(109,198,231,0.4)",
-                                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                    "#DCE1E5",
-                                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "FormControl",
@@ -19787,7 +19733,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 iHrYrm"
+                                              className="FormControl-sc-1amoaox-0 eOArng"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Threshold"
@@ -19798,7 +19744,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                                className="FormControl-sc-1amoaox-0 eOArng form-control"
                                                 id="aggregation-threshold"
                                                 label="Threshold"
                                                 name="threshold"
@@ -26971,24 +26917,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                           "attrs": Array [],
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "FormControl-sc-1amoaox-0",
-                                                            "isStatic": true,
-                                                            "lastClassName": "iHrYrm",
+                                                            "isStatic": false,
+                                                            "lastClassName": "eOArng",
                                                             "rules": Array [
-                                                              "color:",
-                                                              "#1F1F1F",
-                                                              ";background-color:",
-                                                              "#FFF",
-                                                              ";border-color:",
-                                                              "#DCE1E5",
-                                                              ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                              "#b8b8b8",
-                                                              ";}&:focus{border-color:",
-                                                              "#6DC6E7",
-                                                              ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                              "rgba(109,198,231,0.4)",
-                                                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                              "#DCE1E5",
-                                                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                              [Function],
                                                             ],
                                                           },
                                                           "displayName": "FormControl",
@@ -27012,7 +26944,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     >
                                                       <FormControl
                                                         bsClass="form-control"
-                                                        className="FormControl-sc-1amoaox-0 iHrYrm"
+                                                        className="FormControl-sc-1amoaox-0 eOArng"
                                                         componentClass="input"
                                                         inputRef={[Function]}
                                                         label=""
@@ -27023,7 +26955,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         value={0}
                                                       >
                                                         <input
-                                                          className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                                          className="FormControl-sc-1amoaox-0 eOArng form-control"
                                                           id="aggregation-threshold"
                                                           label=""
                                                           name="threshold"
@@ -29430,12 +29362,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "ControlLabel-sc-1edmum5-0",
-                                                  "isStatic": true,
+                                                  "isStatic": false,
                                                   "lastClassName": "iZJNbd",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "ControlLabel",
@@ -32360,12 +32290,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": true,
+                                              "isStatic": false,
                                               "lastClassName": "iZJNbd",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "ControlLabel",
@@ -34207,12 +34135,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "iZJNbd",
                                                     "rules": Array [
-                                                      "color:",
-                                                      "#1F1F1F",
-                                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                      [Function],
                                                     ],
                                                   },
                                                   "displayName": "ControlLabel",
@@ -34267,24 +34193,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
-                                                        "isStatic": true,
-                                                        "lastClassName": "iHrYrm",
+                                                        "isStatic": false,
+                                                        "lastClassName": "eOArng",
                                                         "rules": Array [
-                                                          "color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#FFF",
-                                                          ";border-color:",
-                                                          "#DCE1E5",
-                                                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                          "#b8b8b8",
-                                                          ";}&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                          "#DCE1E5",
-                                                          ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                          [Function],
                                                         ],
                                                       },
                                                       "displayName": "FormControl",
@@ -34308,7 +34220,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 iHrYrm"
+                                                    className="FormControl-sc-1amoaox-0 eOArng"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Threshold"
@@ -34319,7 +34231,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     value={0}
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
                                                       id="aggregation-threshold"
                                                       label="Threshold"
                                                       name="threshold"
@@ -36622,12 +36534,10 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
+                                        "isStatic": false,
                                         "lastClassName": "iZJNbd",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -39357,12 +39267,10 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
                                     "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": true,
+                                    "isStatic": false,
                                     "lastClassName": "iZJNbd",
                                     "rules": Array [
-                                      "color:",
-                                      "#1F1F1F",
-                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                      [Function],
                                     ],
                                   },
                                   "displayName": "ControlLabel",
@@ -41192,12 +41100,10 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
                                           "componentId": "ControlLabel-sc-1edmum5-0",
-                                          "isStatic": true,
+                                          "isStatic": false,
                                           "lastClassName": "iZJNbd",
                                           "rules": Array [
-                                            "color:",
-                                            "#1F1F1F",
-                                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                            [Function],
                                           ],
                                         },
                                         "displayName": "ControlLabel",
@@ -41252,24 +41158,10 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
-                                              "isStatic": true,
-                                              "lastClassName": "iHrYrm",
+                                              "isStatic": false,
+                                              "lastClassName": "eOArng",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";background-color:",
-                                                "#FFF",
-                                                ";border-color:",
-                                                "#DCE1E5",
-                                                ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                "#b8b8b8",
-                                                ";}&:focus{border-color:",
-                                                "#6DC6E7",
-                                                ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                "rgba(109,198,231,0.4)",
-                                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                "#DCE1E5",
-                                                ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "FormControl",
@@ -41293,7 +41185,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 iHrYrm"
+                                          className="FormControl-sc-1amoaox-0 eOArng"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Threshold"
@@ -41304,7 +41196,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                           value={0}
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                            className="FormControl-sc-1amoaox-0 eOArng form-control"
                                             id="aggregation-threshold"
                                             label="Threshold"
                                             name="threshold"
@@ -43626,12 +43518,10 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
+                                        "isStatic": false,
                                         "lastClassName": "iZJNbd",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -46556,12 +46446,10 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
                                     "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": true,
+                                    "isStatic": false,
                                     "lastClassName": "iZJNbd",
                                     "rules": Array [
-                                      "color:",
-                                      "#1F1F1F",
-                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                      [Function],
                                     ],
                                   },
                                   "displayName": "ControlLabel",
@@ -48438,12 +48326,10 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
                                           "componentId": "ControlLabel-sc-1edmum5-0",
-                                          "isStatic": true,
+                                          "isStatic": false,
                                           "lastClassName": "iZJNbd",
                                           "rules": Array [
-                                            "color:",
-                                            "#1F1F1F",
-                                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                            [Function],
                                           ],
                                         },
                                         "displayName": "ControlLabel",
@@ -48498,24 +48384,10 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
-                                              "isStatic": true,
-                                              "lastClassName": "iHrYrm",
+                                              "isStatic": false,
+                                              "lastClassName": "eOArng",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";background-color:",
-                                                "#FFF",
-                                                ";border-color:",
-                                                "#DCE1E5",
-                                                ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                "#b8b8b8",
-                                                ";}&:focus{border-color:",
-                                                "#6DC6E7",
-                                                ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                "rgba(109,198,231,0.4)",
-                                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                "#DCE1E5",
-                                                ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "FormControl",
@@ -48539,7 +48411,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 iHrYrm"
+                                          className="FormControl-sc-1amoaox-0 eOArng"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Threshold"
@@ -48550,7 +48422,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                           value={12}
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                            className="FormControl-sc-1amoaox-0 eOArng form-control"
                                             id="aggregation-threshold"
                                             label="Threshold"
                                             name="threshold"

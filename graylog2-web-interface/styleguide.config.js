@@ -74,7 +74,7 @@ module.exports = {
   ],
   usageMode: 'expand',
   styleguideComponents: {
-    Wrapper: path.join(__dirname, 'src/theme/GraylogThemeContext'),
+    Wrapper: path.join(__dirname, 'src/theme/GraylogThemeProvider'),
   },
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',

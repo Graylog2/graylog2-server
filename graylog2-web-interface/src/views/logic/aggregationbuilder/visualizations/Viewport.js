@@ -57,10 +57,11 @@ export default class Viewport {
   }
 }
 
+type InternalBuilderState = Immutable.Map<string, any>;
 class Builder {
-  value: Immutable.Map<State>;
+  value: InternalBuilderState;
 
-  constructor(value: State = Immutable.Map()) {
+  constructor(value: InternalBuilderState = Immutable.Map()) {
     this.value = value;
   }
 

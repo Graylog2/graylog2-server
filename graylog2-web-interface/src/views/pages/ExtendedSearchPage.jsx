@@ -155,7 +155,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
     }, () => { });
 
     // Returning cleanup function used when unmounting
-    return () => storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc());
+    return () => { storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc()); };
   }, []);
 
   useSyncWithQueryParameters(query);

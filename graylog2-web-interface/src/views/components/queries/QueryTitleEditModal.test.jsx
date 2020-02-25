@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
@@ -17,7 +18,7 @@ describe('QueryTitleEditModal', () => {
     let modalRef;
     const { queryByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={() => Promise.resolve()} />,
+                           onTitleChange={() => Promise.resolve(Immutable.Map())} />,
     );
     // Modal should not be visible initially
     expect(queryByText(modalHeadline)).toBeNull();
@@ -30,7 +31,7 @@ describe('QueryTitleEditModal', () => {
     let modalRef;
     const { getByDisplayValue } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={() => Promise.resolve()} />,
+                           onTitleChange={() => Promise.resolve(Immutable.Map())} />,
     );
     openModal(modalRef);
     expect(getByDisplayValue('CurrentTitle')).not.toBeNull();

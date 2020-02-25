@@ -36,8 +36,14 @@ const BigDisplayModeHeader = ({ view: { activeQuery, view } = {} }: Props) => {
 
 BigDisplayModeHeader.propTypes = {
   view: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-  }).isRequired,
+    view: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+    }),
+  }),
+};
+
+BigDisplayModeHeader.defaultProps = {
+  view: undefined,
 };
 
 export default connect(BigDisplayModeHeader, { view: ViewStore });

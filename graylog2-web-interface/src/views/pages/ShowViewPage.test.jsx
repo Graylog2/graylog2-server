@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { List } from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
 import Routes from 'routing/Routes';
@@ -40,14 +41,14 @@ jest.mock('util/History', () => ({}));
 jest.mock('./ExtendedSearchPage', () => 'extended-search-page');
 
 describe('ShowViewPage', () => {
-  const viewJson = {
+  const viewJson: ViewJson = {
     id: 'foo',
     type: 'DASHBOARD',
     title: 'Foo',
     summary: 'summary',
     description: 'Foo',
     search_id: 'foosearch',
-    properties: {},
+    properties: List<any>(),
     state: {},
     dashboard_state: { widgets: [], positions: [] },
     created_at: new Date(),

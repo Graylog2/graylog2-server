@@ -36,7 +36,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
 
   toBuilder() {
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map(this._value));
+    return new Builder(Immutable.Map((this._value: { [string]: any })));
   }
 
   static create(

@@ -51,7 +51,8 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
     queryBuilder = queryBuilder.timerange(timerange);
   }
 
-  return QueriesActions.update(firstQuery.id, queryBuilder.build());
+  return QueriesActions.update(firstQuery.id, queryBuilder.build())
+    .then(() => true, () => false);
 };
 
 export default bindSearchParamsFromQuery;

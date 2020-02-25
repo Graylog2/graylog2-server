@@ -6,8 +6,6 @@ import styled from 'styled-components';
 import connect from 'stores/connect';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { ViewStore } from 'views/stores/ViewStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import BigDisplayModeHeader from 'views/components/dashboard/BigDisplayModeHeader';
 import CycleQueryTab from 'views/components/dashboard/bigdisplay/CycleQueryTab';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -45,7 +43,7 @@ const BodyPositioningWrapper = styled.div`
   padding: 10px;
 `;
 
-const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, activeQuery } }: Props) => {
+const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, activeQuery } = {} }: Props) => {
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
   useEffect(() => {
@@ -64,4 +62,4 @@ const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, 
   );
 };
 
-export default withRouter(connect(ShowDashboardInBigDisplayMode, { view: ViewStore, viewMetadata: ViewMetadataStore, query: CurrentQueryStore }));
+export default withRouter(connect(ShowDashboardInBigDisplayMode, { view: ViewStore }));

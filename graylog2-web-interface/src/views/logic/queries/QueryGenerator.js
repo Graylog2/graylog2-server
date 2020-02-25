@@ -7,10 +7,9 @@ import type { QueryId } from './Query';
 export default (streamId: ?string, id: QueryId = uuid()): Query => {
   const streamIds = streamId ? [streamId] : null;
   const streamFilter = filtersForQuery(streamIds);
-  return Query.builder()
+  const builder = Query.builder()
     .id(id)
     .query(createElasticsearchQueryString())
-    .filter(streamFilter)
-    .timerange(DEFAULT_TIMERANGE)
-    .build();
+    .timerange(DEFAULT_TIMERANGE);
+  return streamFilter ? builder.filter(streamFilter).build() : builder.build();
 };

@@ -2,10 +2,10 @@
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import { teinte, util } from 'theme';
+import { util } from 'theme';
 
-const Nav = styled(BootstrapNav)(() => {
-  const borderColor = util.colorLevel(teinte.tertiary.due, -3);
+const Nav = styled(BootstrapNav)(({ theme }) => {
+  const borderColor = util.colorLevel(theme.color.tertiary.due, -3);
 
   return css`
     &.nav {
@@ -13,7 +13,7 @@ const Nav = styled(BootstrapNav)(() => {
         &,
         &:hover,
         &:focus {
-          background-color: ${util.colorLevel(teinte.secondary.due, -3)};
+          background-color: ${util.colorLevel(theme.color.secondary.due, -3)};
           border-color: ${borderColor};
         }
       }
@@ -22,16 +22,16 @@ const Nav = styled(BootstrapNav)(() => {
         > a {
           &:hover,
           &:focus {
-            background-color: ${util.colorLevel(teinte.secondary.due, -3)};
+            background-color: ${util.colorLevel(theme.color.secondary.due, -3)};
           }
         }
 
         &.disabled > a {
-          color: ${teinte.secondary.tre};
+          color: ${theme.color.secondary.tre};
 
           &:hover,
           &:focus {
-            color: ${teinte.secondary.tre};
+            color: ${theme.color.secondary.tre};
           }
         }
       }
@@ -43,7 +43,7 @@ const Nav = styled(BootstrapNav)(() => {
           &,
           &:hover,
           &:focus {
-            color: ${teinte.primary.due};
+            color: ${theme.color.primary.due};
             background-color: ${borderColor};
           }
         }

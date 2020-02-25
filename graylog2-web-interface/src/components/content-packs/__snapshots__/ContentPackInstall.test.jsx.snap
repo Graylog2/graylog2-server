@@ -143,12 +143,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
                                   "componentId": "ControlLabel-sc-1edmum5-0",
-                                  "isStatic": true,
+                                  "isStatic": false,
                                   "lastClassName": "iZJNbd",
                                   "rules": Array [
-                                    "color:",
-                                    "#1F1F1F",
-                                    ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                    [Function],
                                   ],
                                 },
                                 "displayName": "ControlLabel",
@@ -208,24 +206,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
                                       "componentId": "FormControl-sc-1amoaox-0",
-                                      "isStatic": true,
-                                      "lastClassName": "iHrYrm",
+                                      "isStatic": false,
+                                      "lastClassName": "eOArng",
                                       "rules": Array [
-                                        "color:",
-                                        "#1F1F1F",
-                                        ";background-color:",
-                                        "#FFF",
-                                        ";border-color:",
-                                        "#DCE1E5",
-                                        ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                        "#b8b8b8",
-                                        ";}&:focus{border-color:",
-                                        "#6DC6E7",
-                                        ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                        "rgba(109,198,231,0.4)",
-                                        ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                        "#DCE1E5",
-                                        ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                        [Function],
                                       ],
                                     },
                                     "displayName": "FormControl",
@@ -250,7 +234,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 iHrYrm"
+                                  className="FormControl-sc-1amoaox-0 eOArng"
                                   componentClass="input"
                                   inputRef={[Function]}
                                   label="Comment"
@@ -262,7 +246,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   value=""
                                 >
                                   <input
-                                    className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                    className="FormControl-sc-1amoaox-0 eOArng form-control"
                                     id="comment"
                                     label="Comment"
                                     maxLength={512}
@@ -386,12 +370,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
                                   "componentId": "ControlLabel-sc-1edmum5-0",
-                                  "isStatic": true,
+                                  "isStatic": false,
                                   "lastClassName": "iZJNbd",
                                   "rules": Array [
-                                    "color:",
-                                    "#1F1F1F",
-                                    ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                    [Function],
                                   ],
                                 },
                                 "displayName": "ControlLabel",
@@ -452,24 +434,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
                                       "componentId": "FormControl-sc-1amoaox-0",
-                                      "isStatic": true,
-                                      "lastClassName": "iHrYrm",
+                                      "isStatic": false,
+                                      "lastClassName": "eOArng",
                                       "rules": Array [
-                                        "color:",
-                                        "#1F1F1F",
-                                        ";background-color:",
-                                        "#FFF",
-                                        ";border-color:",
-                                        "#DCE1E5",
-                                        ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                        "#b8b8b8",
-                                        ";}&:focus{border-color:",
-                                        "#6DC6E7",
-                                        ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                        "rgba(109,198,231,0.4)",
-                                        ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                        "#DCE1E5",
-                                        ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                        [Function],
                                       ],
                                     },
                                     "displayName": "FormControl",
@@ -495,7 +463,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 iHrYrm"
+                                  className="FormControl-sc-1amoaox-0 eOArng"
                                   componentClass="input"
                                   inputRef={[Function]}
                                   label="A parameter"
@@ -508,7 +476,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   value="parameter"
                                 >
                                   <input
-                                    className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                    className="FormControl-sc-1amoaox-0 eOArng form-control"
                                     id="PARAM"
                                     label="A parameter"
                                     maxLength={250}
@@ -1086,18 +1054,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
-                                              "isStatic": true,
+                                              "isStatic": false,
                                               "lastClassName": "cHlGak",
                                               "rules": Array [
-                                                ".modal-content{background-color:",
-                                                "#FFF",
-                                                ";border-color:",
-                                                "rgba(31,31,31,0.2)",
-                                                ";.modal-header{border-bottom-color:",
-                                                "#DCE1E5",
-                                                ";}.modal-footer{border-top-color:",
-                                                "#DCE1E5",
-                                                ";}}",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "Modal",

@@ -19,7 +19,7 @@ import type { MessageListOptions } from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
-import type { WidgetMapping } from 'views/logic/views/View';
+import type { WidgetMapping } from 'views/logic/views/types';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'views/logic/singleton';
 

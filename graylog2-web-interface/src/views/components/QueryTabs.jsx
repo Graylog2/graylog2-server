@@ -19,7 +19,7 @@ type Props = {
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
   queries: Array<QueryIdsStore>,
   selectedQueryId: string,
-  titles: Immutable.Map<{[queryId: string]: string}>,
+  titles: Immutable.Map<string, string>,
 }
 
 class QueryTabs extends React.Component<Props> {

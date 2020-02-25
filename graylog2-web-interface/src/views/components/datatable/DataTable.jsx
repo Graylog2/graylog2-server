@@ -70,11 +70,11 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   const { columnPivots, rowPivots, series, rollup } = config;
   const { chart: rows = [] } = data || {};
 
-  const rowFieldNames = rowPivots.map(pivot => pivot.field);
+  const rowFieldNames = rowPivots.map<string>(pivot => pivot.field);
   const columnFieldNames = columnPivots.map(pivot => pivot.field);
 
   const seriesToMerge = rollup ? series : [];
-  const effectiveFields = new Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({ effectiveName }) => effectiveName));
+  const effectiveFields = Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({ effectiveName }) => effectiveName));
 
   const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter(r => r.source === 'leaf'));
 

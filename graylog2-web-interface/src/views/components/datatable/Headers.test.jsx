@@ -1,15 +1,15 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
 import Headers from './Headers';
-import SeriesConfig from '../../logic/aggregationbuilder/SeriesConfig';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
 jest.mock('logic/datetimes/DateTime', () => 'DateTime');
@@ -30,7 +30,7 @@ describe('Headers', () => {
     series?: Array<Series>,
     rollup?: boolean,
     actualColumnPivotFields?: Array<Array<string>>,
-    fields?: FieldTypeMappingsList,
+    fields?: Array<FieldTypeMapping>,
   };
   /* eslint-enable react/require-default-props */
 
@@ -50,7 +50,7 @@ describe('Headers', () => {
                  series={series}
                  rollup={rollup}
                  actualColumnPivotFields={actualColumnPivotFields}
-                 fields={fields} />
+                 fields={Immutable.List(fields)} />
       </thead>
     </table>
   );

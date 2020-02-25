@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import * as Immutable from 'immutable';
+import { List, OrderedSet } from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -8,13 +8,13 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import Series from 'views/logic/aggregationbuilder/Series';
+import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import DataTableEntry from './DataTableEntry';
-import SeriesConfig from '../../logic/aggregationbuilder/SeriesConfig';
 import EmptyValue from '../EmptyValue';
 
 jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
 
-const fields = Immutable.OrderedSet(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);
+const fields = OrderedSet(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);
 const item = {
   nf_dst_address: '192.168.1.24',
   nf_proto_name: {
@@ -57,7 +57,7 @@ describe('DataTableEntry', () => {
                         fields={fields}
                         item={item}
                         series={series}
-                        types={[]}
+                        types={List([])}
                         valuePath={valuePath} />
       </table>
     ));
@@ -80,7 +80,7 @@ describe('DataTableEntry', () => {
                         fields={fields}
                         item={item}
                         series={series}
-                        types={types}
+                        types={List(types)}
                         valuePath={valuePath} />
       </table>
     ));
@@ -101,7 +101,7 @@ describe('DataTableEntry', () => {
                         fields={fields}
                         item={item}
                         series={series}
-                        types={[]}
+                        types={List([])}
                         valuePath={valuePath} />
       </table>
     ));
@@ -111,7 +111,7 @@ describe('DataTableEntry', () => {
   });
 
   it('does not render `Empty Value` for deduplicated values', () => {
-    const fieldsWithDeduplicatedValues = Immutable.OrderedSet(['nf_dst_address', 'nf_dst_port']);
+    const fieldsWithDeduplicatedValues = OrderedSet(['nf_dst_address', 'nf_dst_port']);
     const itemWithDeduplicatedValues = {
       nf_dst_port: 443,
     };
@@ -123,7 +123,7 @@ describe('DataTableEntry', () => {
                         fields={fieldsWithDeduplicatedValues}
                         item={itemWithDeduplicatedValues}
                         series={series}
-                        types={[]}
+                        types={List([])}
                         valuePath={valuePath} />
       </table>
     ));
@@ -141,7 +141,7 @@ describe('DataTableEntry', () => {
                           fields={fields}
                           item={item}
                           series={series}
-                          types={[timestampTypeMapping]}
+                          types={List([timestampTypeMapping])}
                           valuePath={valuePath} />
         </table>
       ));
@@ -153,7 +153,7 @@ describe('DataTableEntry', () => {
       const itemWithRenamedSeries = {
         'Last Timestamp': 1554106041841,
       };
-      const fieldsWithRenamedSeries = Immutable.OrderedSet(['Last Timestamp']);
+      const fieldsWithRenamedSeries = OrderedSet(['Last Timestamp']);
 
       const wrapper = mount((
         <table>
@@ -163,7 +163,7 @@ describe('DataTableEntry', () => {
                           fields={fieldsWithRenamedSeries}
                           item={itemWithRenamedSeries}
                           series={renamedSeries}
-                          types={[timestampTypeMapping]}
+                          types={List([timestampTypeMapping])}
                           valuePath={[]} />
         </table>
       ));
@@ -187,7 +187,7 @@ describe('DataTableEntry', () => {
         'Last Timestamp': 1554106041841,
         'card(timestamp)': 20,
       };
-      const fieldsWithRenamedSeries = Immutable.OrderedSet(['nf_dst_address', 'count()', 'Last Timestamp', 'card(timestamp)']);
+      const fieldsWithRenamedSeries = OrderedSet(['nf_dst_address', 'count()', 'Last Timestamp', 'card(timestamp)']);
 
       const wrapper = mount((
         <table>
@@ -197,7 +197,7 @@ describe('DataTableEntry', () => {
                           fields={fieldsWithRenamedSeries}
                           item={itemWithRenamedSeries}
                           series={renamedSeries}
-                          types={[timestampTypeMapping]}
+                          types={List([timestampTypeMapping])}
                           valuePath={valuePath} />
         </table>
       ));

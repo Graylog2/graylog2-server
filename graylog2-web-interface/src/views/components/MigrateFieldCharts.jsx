@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { values, isEmpty } from 'lodash';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';

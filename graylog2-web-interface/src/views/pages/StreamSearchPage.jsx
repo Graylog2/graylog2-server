@@ -82,6 +82,7 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
     return loadNewView({}).then(() => {
       const { pathname, search } = router.getCurrentLocation();
       const currentQuery = `${pathname}${search}`;
+      // running syncWithQueryParameters with the "old" query, will replace the url query with the new view settings
       syncWithQueryParameters(currentQuery);
     });
   };

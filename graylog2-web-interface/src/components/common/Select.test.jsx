@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { mount, shallow } from 'wrappedEnzyme';
 
 import SelectComponent, { components as Components } from 'react-select';
 import Select from './Select';

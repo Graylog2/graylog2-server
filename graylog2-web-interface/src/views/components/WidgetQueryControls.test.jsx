@@ -52,12 +52,8 @@ describe('WidgetQueryControls', () => {
   const emptyGlobalOverride = {};
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
-  const renderSUT = (props = {}) => render(
-    <WrappingContainer>
-      <WidgetQueryControls {...defaultProps}
-                           {...props} />
-    </WrappingContainer>,
-  );
+  const renderSUT = (props = {}) => render(<WidgetQueryControls {...defaultProps}
+                                                                {...props} />);
   it('should do something', () => {
     const { container } = renderSUT();
     expect(container).toMatchSnapshot();

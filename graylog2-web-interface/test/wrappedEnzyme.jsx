@@ -1,6 +1,9 @@
-import { mount, shallow } from 'enzyme';
+import { configure, mount, shallow } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 
 import WrappingContainer from './WrappingContainer';
+
+configure({ adapter: new Adapter() });
 
 export const shallowWithWrapper = (Component, options = {}) => shallow(Component, {
   wrappingComponent: WrappingContainer,

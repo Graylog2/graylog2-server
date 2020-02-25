@@ -1,20 +1,77 @@
-import { memo } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { InputGroup as BootstrapInputGroup } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { lighten } from 'polished';
+import classNames from 'classnames';
 
-import teinte from 'theme/teinte';
+const StyledBootstrapInputAddon = ({ className, ...rest }) => {
+  return <BootstrapInputGroup.Addon bsClass={className} {...rest} />;
+};
 
-const InputGroup = memo(styled(BootstrapInputGroup)`
-  .input-group-addon {
-    color: ${lighten(0.30, teinte.primary.tre)};
-    background-color: ${teinte.primary.due};
-    border-color: ${teinte.secondary.tre};
-  }
-`);
+const Addon = ({ bsClass, className, ...addonProps }) => {
+  const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
+    && {
+      color: ${lighten(0.30, theme.color.primary.tre)};
+      background-color: ${theme.color.primary.due};
+      border-color: ${theme.color.secondary.tre};
+    }
+  `);
 
-InputGroup.Addon = memo(BootstrapInputGroup.Addon);
-InputGroup.Button = memo(BootstrapInputGroup.Button);
+  return <StyledAddon className={classNames(bsClass, className)} {...addonProps} />;
+};
+
+const Button = ({ bsClass, className, ...addonProps }) => {
+  return <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />;
+};
+
+const InputGroup = ({ bsClass, className, ...restProps }) => {
+  return <BootstrapInputGroup bsClass={classNames(bsClass, className)} {...restProps} />;
+};
+
+InputGroup.Addon = Addon;
+InputGroup.Button = Button;
+
+StyledBootstrapInputAddon.propTypes = {
+  className: PropTypes.string,
+};
+
+StyledBootstrapInputAddon.defaultProps = {
+  className: undefined,
+};
+
+InputGroup.propTypes = {
+  bsClass: PropTypes.string,
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
+
+InputGroup.defaultProps = {
+  bsClass: 'input-group',
+  className: undefined,
+};
+
+Addon.propTypes = {
+  bsClass: PropTypes.string,
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
+
+Addon.defaultProps = {
+  bsClass: 'input-group-addon',
+  className: undefined,
+};
+
+Button.propTypes = {
+  bsClass: PropTypes.string,
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
+
+Button.defaultProps = {
+  bsClass: 'input-group-btn',
+  className: undefined,
+};
 
 export default InputGroup;

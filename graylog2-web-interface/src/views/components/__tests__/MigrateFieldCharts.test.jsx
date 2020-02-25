@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, fireEvent, wait, cleanup } from '@testing-library/react';
+import { render, fireEvent, wait, cleanup } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
