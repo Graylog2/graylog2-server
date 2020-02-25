@@ -3,39 +3,7 @@
 exports[`UrlWhitelistForm render the UrlWhitelistForm component should create new instance 1`] = `
 <UrlWhiteListForm
   disabled={false}
-  onUpdate={
-    [MockFunction] {
-      "calls": Array [
-        Array [
-          Object {
-            "disabled": false,
-            "entries": Array [
-              Object {
-                "id": "f7033f1f-d50f-4323-96df-294ede41d951",
-                "title": "testam",
-                "type": "regex",
-                "value": "http://localhost:8080/system/",
-              },
-              Object {
-                "id": "636a2d40-c4c5-40b9-ab3a-48cf7978e9af",
-                "title": "test",
-                "type": "regex",
-                "value": "http://localhost:8080/system/",
-              },
-              Object {
-                "id": "f28fd891-5f2d-4128-9a94-e97c1ab07a1f",
-                "title": "test",
-                "type": "literal",
-                "value": "http://localhost:8080/system/",
-              },
-            ],
-          },
-          true,
-        ],
-      ],
-      "results": undefined,
-    }
-  }
+  onUpdate={[Function]}
   urls={
     Array [
       Object {

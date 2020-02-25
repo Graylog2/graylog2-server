@@ -168,9 +168,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         Not updating
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -202,18 +202,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           Not updating
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             Not updating
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
@@ -750,9 +750,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         Not updating
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -784,18 +784,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           Not updating
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             Not updating
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
@@ -1332,7 +1332,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         <React.Fragment>
                           Update every 
                           <span>
@@ -1345,7 +1345,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             />
                           </span>
                         </React.Fragment>
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -1377,7 +1377,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           <React.Fragment>
                             Update every 
                             <span>
@@ -1390,14 +1390,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               />
                             </span>
                           </React.Fragment>
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             <React.Fragment>
                               Update every 
                               <span>
@@ -1410,7 +1410,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 />
                               </span>
                             </React.Fragment>
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
@@ -1960,7 +1960,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         <React.Fragment>
                           Update every 
                           <span>
@@ -1973,7 +1973,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             />
                           </span>
                         </React.Fragment>
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -2005,7 +2005,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           <React.Fragment>
                             Update every 
                             <span>
@@ -2018,14 +2018,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               />
                             </span>
                           </React.Fragment>
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             <React.Fragment>
                               Update every 
                               <span>
@@ -2038,7 +2038,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 />
                               </span>
                             </React.Fragment>
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
@@ -2588,7 +2588,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         <React.Fragment>
                           Update every 
                           <span>
@@ -2601,7 +2601,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             />
                           </span>
                         </React.Fragment>
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -2633,7 +2633,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           <React.Fragment>
                             Update every 
                             <span>
@@ -2646,14 +2646,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               />
                             </span>
                           </React.Fragment>
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             <React.Fragment>
                               Update every 
                               <span>
@@ -2666,7 +2666,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 />
                               </span>
                             </React.Fragment>
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
@@ -3216,7 +3216,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         <React.Fragment>
                           Update every 
                           <span>
@@ -3229,7 +3229,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             />
                           </span>
                         </React.Fragment>
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -3261,7 +3261,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           <React.Fragment>
                             Update every 
                             <span>
@@ -3274,14 +3274,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               />
                             </span>
                           </React.Fragment>
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             <React.Fragment>
                               Update every 
                               <span>
@@ -3294,7 +3294,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 />
                               </span>
                             </React.Fragment>
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
@@ -3844,7 +3844,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         <React.Fragment>
                           Update every 
                           <span>
@@ -3857,7 +3857,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             />
                           </span>
                         </React.Fragment>
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -3889,7 +3889,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           <React.Fragment>
                             Update every 
                             <span>
@@ -3902,14 +3902,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               />
                             </span>
                           </React.Fragment>
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             <React.Fragment>
                               Update every 
                               <span>
@@ -3922,7 +3922,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 />
                               </span>
                             </React.Fragment>
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
@@ -4472,7 +4472,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         <React.Fragment>
                           Update every 
                           <span>
@@ -4485,7 +4485,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             />
                           </span>
                         </React.Fragment>
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -4517,7 +4517,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           <React.Fragment>
                             Update every 
                             <span>
@@ -4530,14 +4530,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               />
                             </span>
                           </React.Fragment>
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             <React.Fragment>
                               Update every 
                               <span>
@@ -4550,7 +4550,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 />
                               </span>
                             </React.Fragment>
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
@@ -5100,7 +5100,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   <DropdownButton
                     id="refresh-options-dropdown"
                     title={
-                      <ForwardRef(RefreshControls__ButtonLabel)>
+                      <RefreshControls__ButtonLabel>
                         <React.Fragment>
                           Update every 
                           <span>
@@ -5113,7 +5113,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             />
                           </span>
                         </React.Fragment>
-                      </ForwardRef(RefreshControls__ButtonLabel)>
+                      </RefreshControls__ButtonLabel>
                     }
                   >
                     <StyledComponent
@@ -5145,7 +5145,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       forwardedRef={null}
                       id="refresh-options-dropdown"
                       title={
-                        <ForwardRef(RefreshControls__ButtonLabel)>
+                        <RefreshControls__ButtonLabel>
                           <React.Fragment>
                             Update every 
                             <span>
@@ -5158,14 +5158,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                               />
                             </span>
                           </React.Fragment>
-                        </ForwardRef(RefreshControls__ButtonLabel)>
+                        </RefreshControls__ButtonLabel>
                       }
                     >
                       <DropdownButton
                         className="DropdownButton-sc-1343dcx-0 eTmTdM"
                         id="refresh-options-dropdown"
                         title={
-                          <ForwardRef(RefreshControls__ButtonLabel)>
+                          <RefreshControls__ButtonLabel>
                             <React.Fragment>
                               Update every 
                               <span>
@@ -5178,7 +5178,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 />
                               </span>
                             </React.Fragment>
-                          </ForwardRef(RefreshControls__ButtonLabel)>
+                          </RefreshControls__ButtonLabel>
                         }
                       >
                         <Uncontrolled(Dropdown)
