@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import type { FieldTypesStoreState } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';
 
 import type { CompletionResult, Token } from '../ace-types';
 import type { Completer } from '../SearchBarAutocompletions';
@@ -18,7 +18,7 @@ const _fieldResult = (field: FieldTypeMapping, score: number = 1, valuePosition:
   };
 };
 
-const existsOperator = {
+export const existsOperator = {
   name: '_exists_',
   type: {
     type: 'operator',
@@ -41,7 +41,8 @@ class FieldNameCompletion implements Completer {
 
   fields: FieldTypesStoreState;
 
-  constructor() {
+  constructor(staticSuggestions: Array<FieldTypeMapping> = [existsOperator]) {
+    this.staticSuggestions = staticSuggestions;
     this.fields = FieldTypesStore.getInitialState();
     FieldTypesStore.listen((newState) => {
       this.fields = newState;
@@ -56,8 +57,12 @@ class FieldNameCompletion implements Completer {
     this.activeQuery = activeQuery;
   };
 
+  _isFollowingExistsOperator = (lastToken: ?Token) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
+
+  _isFollowingFieldName = (lastToken: ?Token) => (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':'));
+
   getCompletions = (currentToken: ?Token, lastToken: ?Token, prefix: string) => {
-    if (lastToken && lastToken.type === 'keyword' && lastToken.value.endsWith(':') && lastToken.value !== `${existsOperator.name}:`) {
+    if (this._isFollowingFieldName(lastToken) && !this._isFollowingExistsOperator(lastToken)) {
       return [];
     }
     if (currentToken && currentToken.type === 'string') {
@@ -65,13 +70,16 @@ class FieldNameCompletion implements Completer {
     }
     const matchesFieldName = _matchesFieldName(prefix);
     const { all, queryFields } = this.fields;
-    const currentQueryFields = queryFields.get(this.activeQuery, Immutable.Set());
+    const currentQueryFields: FieldTypeMappingsList = queryFields.get(this.activeQuery, Immutable.List());
 
-    const valuePosition = (lastToken && lastToken.value === `${existsOperator.name}:`) === true;
+    const valuePosition = this._isFollowingExistsOperator(lastToken);
 
     const currentQueryFieldNames = currentQueryFields.map(fieldMapping => fieldMapping.name);
     const allButInCurrent = all.filter(field => !currentQueryFieldNames.includes(field.name));
-    const currentQuery = [existsOperator, ...currentQueryFields].filter(matchesFieldName)
+    const fieldsToMatchIn = valuePosition
+      ? [...currentQueryFields]
+      : [...this.staticSuggestions, ...currentQueryFields];
+    const currentQuery = fieldsToMatchIn.filter(matchesFieldName)
       .map(field => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
     const allFields = allButInCurrent.filter(matchesFieldName)
       .map(field => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
