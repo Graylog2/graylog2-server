@@ -204,7 +204,7 @@ const Scratchpad = () => {
                              title="Are you sure?"
                              onConfirm={handleClearText}
                              onCancel={handleCancelClear}>
-           This will clear out your Scratchpad content, do you wish to proceed?
+        This will clear out your Scratchpad content, do you wish to proceed?
       </BootstrapModalConfirm>
     </InteractableModal>
   );

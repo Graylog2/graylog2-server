@@ -3,7 +3,6 @@ import React from 'react';
 import { Alert } from 'components/graylog';
 
 class CaffeineCacheDocumentation extends React.Component {
-
   render() {
     return (
       <div>
@@ -25,15 +24,15 @@ class CaffeineCacheDocumentation extends React.Component {
 
         <h5 style={{ marginBottom: 10 }}>Expire after access</h5>
         <p style={{ marginBottom: 10, padding: 0 }}>
-        The cache will remove entries after a fixed time since they have been used the last time.<br />
-        This results in the cache behaving as a space limited least recently used cache.
+          The cache will remove entries after a fixed time since they have been used the last time.<br />
+          This results in the cache behaving as a space limited least recently used cache.
         </p>
 
         <h5 style={{ marginBottom: 10 }}>Expire after write</h5>
         <p style={{ marginBottom: 10, padding: 0 }}>
-        The cache will remove entries after a fixed time since they have been entered into the cache.<br />
-        This results in entries that are never older than the given time, which can be important for
-        regularly changing data, such as configuration state of external systems.
+          The cache will remove entries after a fixed time since they have been entered into the cache.<br />
+          This results in entries that are never older than the given time, which can be important for
+          regularly changing data, such as configuration state of external systems.
         </p>
 
       </div>

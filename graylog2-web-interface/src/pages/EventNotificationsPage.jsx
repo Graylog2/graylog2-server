@@ -13,12 +13,12 @@ const EventNotificationsPage = () => {
       <span>
         <PageHeader title="Notifications">
           <span>
-              Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-              to you or to other systems you use for that purpose.
+            Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+            to you or to other systems you use for that purpose.
           </span>
 
           <span>
-              Remember to assign Notifications while creating or editing an Event Definition.
+            Remember to assign Notifications while creating or editing an Event Definition.
           </span>
 
           <ButtonToolbar>

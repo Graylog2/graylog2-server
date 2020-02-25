@@ -19,7 +19,7 @@
     "eslint-plugin-flowtype": "^4.5.2",
     "eslint-plugin-import": "2.18.2",
     "eslint-plugin-jsx-a11y": "6.2.3",
-    "eslint-plugin-react": "7.16.0",
+    "eslint-plugin-react": "7.18.3",
     "eslint-plugin-react-hooks": "^2.0.1"
   },
   "peerDependencies": {

@@ -71,7 +71,7 @@ class EditRolesForm extends React.Component {
     if (newRoles != null && !(newRoles.includes('Reader') || newRoles.includes('Admin'))) {
       rolesAlert = (
         <Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
-        You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
+          You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
         </Alert>
       );
     }

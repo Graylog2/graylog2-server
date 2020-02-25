@@ -27,12 +27,12 @@ const CreateEventDefinitionPage = ({ currentUser, route }) => {
       <span>
         <PageHeader title="New Notification">
           <span>
-              Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-              to you or to other systems you use for that purpose.
+            Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+            to you or to other systems you use for that purpose.
           </span>
 
           <span>
-              Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
+            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
             <DocumentationLink page={DocsHelper.PAGES.ALERTS}
                                text="documentation" />
           </span>
