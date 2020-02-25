@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Input } from 'components/bootstrap';
-import URLWhitelistFormModal from 'components/configurations/URLWhitelistFormModal';
+import URLWhitelistFormModal from 'components/common/URLWhitelistFormModal';
 import StoreProvider from 'injection/StoreProvider';
 import URLUtils from 'util/URLUtils';
 import FormsUtils from 'util/FormsUtils';
@@ -30,7 +30,7 @@ const URLWhitelistInput = ({ label, onChange, validationMessage, validationState
   };
 
   const [suggestedUrl, setSuggestedUrl] = useState(url);
-  const isError = () => currentValidationState === 'error';
+  const isWhitelistError = () => currentValidationState === 'error' && URLUtils.isValidURL(url);
   const ref = useRef();
 
   const handleCheckIsWhitelisted = () => {
@@ -38,7 +38,8 @@ const URLWhitelistInput = ({ label, onChange, validationMessage, validationState
     promise.then((result) => {
       if (!result.is_whitelisted && validationState === null) {
         setCurrentValidationState('error');
-        setOwnValidationMessage(`URL ${url} is not whitelisted or not valid URL.`);
+        const message = URLUtils.isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not valid URL.`;
+        setOwnValidationMessage(message);
       } else {
         setOwnValidationMessage(validationMessage);
         setCurrentValidationState(validationState);
@@ -72,7 +73,7 @@ const URLWhitelistInput = ({ label, onChange, validationMessage, validationState
   }, [url, validationState]);
 
 
-  const addButton = isError() && !isWhitelisted ? <URLWhitelistFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
+  const addButton = isWhitelistError() && !isWhitelisted ? <URLWhitelistFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
   const helpMessage = <>{validationState === null ? ownValidationMessage : validationMessage} {addButton}</>;
   return (
     <Input type="text"
