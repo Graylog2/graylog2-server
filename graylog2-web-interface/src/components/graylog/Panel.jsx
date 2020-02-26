@@ -167,10 +167,10 @@ const Panel = ({
                              onToggle={handleToggle}
                              {...props}>
         {(header || title) && (
-          <BootstrapPanel.Heading toggle={collapsible}>
+          <PanelHeading>
             {header}
-            {title && <BootstrapPanel.Title>{title}</BootstrapPanel.Title>}
-          </BootstrapPanel.Heading>
+            {title && <BootstrapPanel.Title toggle={collapsible}>{title}</BootstrapPanel.Title>}
+          </PanelHeading>
         )}
         <DeprecatedStyledPanel.Body collapsible={collapsible}>
           {children}
