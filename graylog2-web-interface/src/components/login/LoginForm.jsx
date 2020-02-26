@@ -9,7 +9,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { SessionActions } = CombinedProvider.get('Session');
 
 const StyledFormGroup = styled(FormGroup)`
-  margin-bottom: 10px;
+  margin-bottom: 0;
 `;
 
 const LoginForm = ({ onErrorChange }) => {
@@ -50,8 +50,16 @@ const LoginForm = ({ onErrorChange }) => {
 
   return (
     <form onSubmit={onSignInClicked}>
-      <Input ref={(username) => { usernameInput = username; }} id="username" type="text" placeholder="Username" autoFocus />
-      <Input ref={(password) => { passwordInput = password; }} id="password" type="password" placeholder="Password" />
+      <Input ref={(username) => { usernameInput = username; }}
+             id="username"
+             type="text"
+             placeholder="Username"
+             autoFocus />
+
+      <Input ref={(password) => { passwordInput = password; }}
+             id="password"
+             type="password"
+             placeholder="Password" />
 
       <StyledFormGroup>
         <Button type="submit" bsStyle="info" disabled={isLoading}>

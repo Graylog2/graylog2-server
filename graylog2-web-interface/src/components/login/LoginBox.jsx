@@ -4,32 +4,24 @@ import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 
-const LoginBoxWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-`;
-
-// const LoginContainer = styled.div(({ theme }) => css`
-//   /* background-color: ${theme.color.primary.due};
-//   width: 20vw;
-//   min-width: max-content;
-//   padding: 9px 18px;
-//   border-radius: 4px; */
-// `);
+const LoginCol = styled(Col)(({ theme }) => css`
+  padding: 15px;
+  background-color: ${theme.color.primary.due};
+  border: 1px solid ${theme.color.secondary.tre};
+  border-radius: 4px;
+  box-shadow: 0 0 21px rgba(0, 0, 0, 0.75);
+  margin-top: 120px;
+`);
 
 const LoginBox = ({ children }) => {
   return (
-    <LoginBoxWrapper className="container">
-
+    <div className="container">
       <Row>
-        <Col md={4} mdOffset={4} className="well" id="login-box-content">
+        <LoginCol md={4} mdOffset={4} xs={6} xsOffset={3}>
           {children}
-        </Col>
+        </LoginCol>
       </Row>
-
-    </LoginBoxWrapper>
+    </div>
   );
 };
 
