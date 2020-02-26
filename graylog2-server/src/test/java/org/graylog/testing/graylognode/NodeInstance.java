@@ -26,6 +26,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 public class NodeInstance {
 
@@ -77,6 +78,6 @@ public class NodeInstance {
     }
 
     public String getApiAddress() {
-        return String.format("http://%s:%d/api", container.getContainerIpAddress(), container.getFirstMappedPort());
+        return String.format(Locale.US, container.getContainerIpAddress(), container.getFirstMappedPort());
     }
 }
