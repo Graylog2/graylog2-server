@@ -3,7 +3,6 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import { render } from 'wrappedTestingLibrary';
-import '@testing-library/jest-dom/extend-expect';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
