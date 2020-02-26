@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import { util } from 'theme';
 
 const Nav = styled(BootstrapNav)(({ theme }) => {
-  const borderColor = util.colorLevel(theme.color.tertiary.due, -3);
+  const borderColor = util.colorLevel(theme.color.tertiary.quattro, -3);
 
   return css`
     &.nav {
@@ -20,6 +20,8 @@ const Nav = styled(BootstrapNav)(({ theme }) => {
 
       > li {
         > a {
+          color: ${theme.color.tertiary.quattro};
+
           &:hover,
           &:focus {
             background-color: ${util.colorLevel(theme.color.secondary.due, -3)};
@@ -43,8 +45,8 @@ const Nav = styled(BootstrapNav)(({ theme }) => {
           &,
           &:hover,
           &:focus {
-            color: ${theme.color.primary.due};
-            background-color: ${borderColor};
+            color: ${util.readableColor(theme.color.tertiary.quattro)};
+            background-color: ${theme.color.tertiary.quattro};
           }
         }
       }
