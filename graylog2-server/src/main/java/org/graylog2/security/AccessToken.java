@@ -23,6 +23,24 @@ import org.joda.time.DateTime;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface AccessToken extends Persisted {
+    enum Type {
+        PLAINTEXT(0), AESSIV(1);
+
+        private final int type;
+
+        Type(int type) {
+            this.type = type;
+        }
+
+        public int getIntValue() {
+            return type;
+        }
+
+        public static Type defaultType() {
+            return AESSIV;
+        }
+    }
+
     DateTime getLastAccess();
 
     String getUserName();

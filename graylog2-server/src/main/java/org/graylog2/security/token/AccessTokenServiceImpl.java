@@ -148,6 +148,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final String ciphertext = (String) fields.get(AccessTokenImpl.TOKEN);
         if (StringUtils.isNotBlank(ciphertext)) {
             fields.put(AccessTokenImpl.TOKEN, cipher.decrypt(ciphertext));
+            fields.remove(AccessTokenImpl.TOKEN_TYPE);
         }
         final ObjectId id = (ObjectId) dbObject.get("_id");
         return new AccessTokenImpl(id, fields);
@@ -158,6 +159,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final String cleartext = (String) fields.get(AccessTokenImpl.TOKEN);
         if (StringUtils.isNotBlank(cleartext)) {
             fields.put(AccessTokenImpl.TOKEN, cipher.encrypt(cleartext));
+            fields.put(AccessTokenImpl.TOKEN_TYPE, AccessToken.Type.defaultType().getIntValue());
         }
         if (token.getId() == null) {
             return new AccessTokenImpl(fields);
