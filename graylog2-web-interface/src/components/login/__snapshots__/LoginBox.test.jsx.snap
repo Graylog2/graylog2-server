@@ -3,12 +3,16 @@
 exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] = `
 <div>
   <div
-    class="container LoginBox__LoginBoxWrapper-sc-1uryto7-0 izDTki"
+    class="container"
   >
     <div
-      class="LoginBox__LoginContainer-sc-1uryto7-1 idwsAA"
+      class="row"
     >
-      <div />
+      <div
+        class="LoginBox__LoginCol-sc-1uryto7-0 cHxlne col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3"
+      >
+        <div />
+      </div>
     </div>
   </div>
 </div>
