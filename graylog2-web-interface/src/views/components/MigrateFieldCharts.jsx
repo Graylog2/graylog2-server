@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { values, isEmpty } from 'lodash';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
@@ -201,22 +201,22 @@ const MigrateFieldCharts = () => {
           <h2>Migrate existing search page charts</h2>
           {/* Should we inform the user here about the backend migrations? */}
           <br />
-            We found {chartAmount} chart(s), created for an older version of the search.
-            Do you want to migrate these chart(s) for the current search?
+          We found {chartAmount} chart(s), created for an older version of the search.
+          Do you want to migrate these chart(s) for the current search?
           <br />
-            When you have run the migration and want to keep the newly created charts, you will have to save the current search as a new dashboard.
-            Otherwise the charts will get lost, when leaving the search page.
+          When you have run the migration and want to keep the newly created charts, you will have to save the current search as a new dashboard.
+          Otherwise the charts will get lost, when leaving the search page.
           <br />
           <Actions>
             <Button bsStyle="primary"
                     onClick={() => _onMigrate(legacyCharts, setMigrating, setMigrationFinished)}
                     disabled={migrating}
                     className="save-button-margin">
-                  Migrate {migrating && <Spinner text="" />}
+              Migrate {migrating && <Spinner text="" />}
             </Button>
             <Button onClick={() => _onCancel(setMigrationFinished)}
                     disabled={migrating}>
-                  Discard charts
+              Discard charts
             </Button>
           </Actions>
         </Alert>

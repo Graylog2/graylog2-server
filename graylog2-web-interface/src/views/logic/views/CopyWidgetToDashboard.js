@@ -44,9 +44,9 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
 
   if (match) {
     const [widget, queryId] = match;
-    const { timerange, query, filter = List.of() } = queryMap.get(queryId);
+    const { timerange, query, filter = Map() } = queryMap.get(queryId);
 
-    const streams = filter.get('filters', List.of())
+    const streams = (filter ? filter.get('filters', List.of()) : List.of())
       .filter(value => Map.isMap(value) && value.get('type') === 'stream')
       .map(value => value.get('id'))
       .toList()

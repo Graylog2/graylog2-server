@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, fireEvent, render } from '@testing-library/react';
+import { cleanup, fireEvent, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';

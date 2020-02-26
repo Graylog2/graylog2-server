@@ -40,12 +40,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": true,
+                          "isStatic": false,
                           "lastClassName": "iZJNbd",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                            [Function],
                           ],
                         },
                         "displayName": "ControlLabel",
@@ -103,24 +101,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
-                          "isStatic": true,
-                          "lastClassName": "iHrYrm",
+                          "isStatic": false,
+                          "lastClassName": "eOArng",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                            "#b8b8b8",
-                            ";}&:focus{border-color:",
-                            "#6DC6E7",
-                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                            "rgba(109,198,231,0.4)",
-                            ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                            "#DCE1E5",
-                            ";}~ .form-control-feedback.glyphicon{display:none;}",
+                            [Function],
                           ],
                         },
                         "displayName": "FormControl",
@@ -142,7 +126,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 iHrYrm"
+                      className="FormControl-sc-1amoaox-0 eOArng"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -151,7 +135,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                        className="FormControl-sc-1amoaox-0 eOArng form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -393,12 +377,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": true,
+                                              "isStatic": false,
                                               "lastClassName": "iZJNbd",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "ControlLabel",
@@ -455,24 +437,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "iHrYrm",
+                                                  "isStatic": false,
+                                                  "lastClassName": "eOArng",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";background-color:",
-                                                    "#FFF",
-                                                    ";border-color:",
-                                                    "#DCE1E5",
-                                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                    "#b8b8b8",
-                                                    ";}&:focus{border-color:",
-                                                    "#6DC6E7",
-                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                    "rgba(109,198,231,0.4)",
-                                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                    "#DCE1E5",
-                                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "FormControl",
@@ -494,7 +462,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 iHrYrm"
+                                              className="FormControl-sc-1amoaox-0 eOArng"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -503,7 +471,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                                className="FormControl-sc-1amoaox-0 eOArng form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -742,7 +710,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   <ForwardRef
                     className="listGroupHeader"
                   >
-                    <ListGroupItem
+                    <ListGroupItem__StyledListGroupItem
                       className="listGroupHeader"
                     >
                       <StyledComponent
@@ -758,50 +726,17 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
+                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "dvkPPN",
                               "rules": Array [
-                                "background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                "#6c6c6c",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#6c6c6c",
-                                ";}}&.active,&.active:hover,&.active:focus{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#faf3f7",
-                                ";}}a&,button&{color:",
-                                "#1F1F1F",
-                                ";.list-group-item-heading{color:",
-                                "#1F1F1F",
-                                ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                "#F1F2F2",
-                                ";color:",
-                                "#9E1F63",
-                                ";&.active{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";}}}",
                                 [Function],
                               ],
                             },
-                            "displayName": "ListGroupItem",
+                            "displayName": "ListGroupItem__StyledListGroupItem",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -812,11 +747,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
                           listItem={false}
                         >
                           <span
-                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
                           >
                             <div
                               className="headerWrapper"
@@ -824,12 +759,12 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           </span>
                         </ListGroupItem>
                       </StyledComponent>
-                    </ListGroupItem>
+                    </ListGroupItem__StyledListGroupItem>
                   </ForwardRef>
                 </ControlledTableListHeader>
                 <ControlledTableListItem>
                   <ForwardRef>
-                    <ListGroupItem>
+                    <ListGroupItem__StyledListGroupItem>
                       <StyledComponent
                         forwardedComponent={
                           Object {
@@ -842,50 +777,17 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
+                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "dvkPPN",
                               "rules": Array [
-                                "background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                "#6c6c6c",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#6c6c6c",
-                                ";}}&.active,&.active:hover,&.active:focus{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#faf3f7",
-                                ";}}a&,button&{color:",
-                                "#1F1F1F",
-                                ";.list-group-item-heading{color:",
-                                "#1F1F1F",
-                                ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                "#F1F2F2",
-                                ";color:",
-                                "#9E1F63",
-                                ";&.active{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";}}}",
                                 [Function],
                               ],
                             },
-                            "displayName": "ListGroupItem",
+                            "displayName": "ListGroupItem__StyledListGroupItem",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -896,17 +798,17 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
                           >
                             No items to display
                           </span>
                         </ListGroupItem>
                       </StyledComponent>
-                    </ListGroupItem>
+                    </ListGroupItem__StyledListGroupItem>
                   </ForwardRef>
                 </ControlledTableListItem>
               </div>
@@ -996,12 +898,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": true,
+                          "isStatic": false,
                           "lastClassName": "iZJNbd",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                            [Function],
                           ],
                         },
                         "displayName": "ControlLabel",
@@ -1059,24 +959,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
-                          "isStatic": true,
-                          "lastClassName": "iHrYrm",
+                          "isStatic": false,
+                          "lastClassName": "eOArng",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                            "#b8b8b8",
-                            ";}&:focus{border-color:",
-                            "#6DC6E7",
-                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                            "rgba(109,198,231,0.4)",
-                            ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                            "#DCE1E5",
-                            ";}~ .form-control-feedback.glyphicon{display:none;}",
+                            [Function],
                           ],
                         },
                         "displayName": "FormControl",
@@ -1098,7 +984,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 iHrYrm"
+                      className="FormControl-sc-1amoaox-0 eOArng"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -1107,7 +993,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                        className="FormControl-sc-1amoaox-0 eOArng form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -1371,12 +1257,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": true,
+                                              "isStatic": false,
                                               "lastClassName": "iZJNbd",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "ControlLabel",
@@ -1433,24 +1317,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "iHrYrm",
+                                                  "isStatic": false,
+                                                  "lastClassName": "eOArng",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";background-color:",
-                                                    "#FFF",
-                                                    ";border-color:",
-                                                    "#DCE1E5",
-                                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                                    "#b8b8b8",
-                                                    ";}&:focus{border-color:",
-                                                    "#6DC6E7",
-                                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                                    "rgba(109,198,231,0.4)",
-                                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                    "#DCE1E5",
-                                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "FormControl",
@@ -1472,7 +1342,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 iHrYrm"
+                                              className="FormControl-sc-1amoaox-0 eOArng"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -1481,7 +1351,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                                                className="FormControl-sc-1amoaox-0 eOArng form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -1720,7 +1590,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   <ForwardRef
                     className="listGroupHeader"
                   >
-                    <ListGroupItem
+                    <ListGroupItem__StyledListGroupItem
                       className="listGroupHeader"
                     >
                       <StyledComponent
@@ -1736,50 +1606,17 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
+                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "dvkPPN",
                               "rules": Array [
-                                "background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                "#6c6c6c",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#6c6c6c",
-                                ";}}&.active,&.active:hover,&.active:focus{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#faf3f7",
-                                ";}}a&,button&{color:",
-                                "#1F1F1F",
-                                ";.list-group-item-heading{color:",
-                                "#1F1F1F",
-                                ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                "#F1F2F2",
-                                ";color:",
-                                "#9E1F63",
-                                ";&.active{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";}}}",
                                 [Function],
                               ],
                             },
-                            "displayName": "ListGroupItem",
+                            "displayName": "ListGroupItem__StyledListGroupItem",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -1790,11 +1627,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
                           listItem={false}
                         >
                           <span
-                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
                           >
                             <div
                               className="headerWrapper"
@@ -1802,14 +1639,14 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           </span>
                         </ListGroupItem>
                       </StyledComponent>
-                    </ListGroupItem>
+                    </ListGroupItem__StyledListGroupItem>
                   </ForwardRef>
                 </ControlledTableListHeader>
                 <ControlledTableListItem
                   key="item-beef2001"
                 >
                   <ForwardRef>
-                    <ListGroupItem>
+                    <ListGroupItem__StyledListGroupItem>
                       <StyledComponent
                         forwardedComponent={
                           Object {
@@ -1822,50 +1659,17 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
+                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "dvkPPN",
                               "rules": Array [
-                                "background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                "#6c6c6c",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#6c6c6c",
-                                ";}}&.active,&.active:hover,&.active:focus{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#faf3f7",
-                                ";}}a&,button&{color:",
-                                "#1F1F1F",
-                                ";.list-group-item-heading{color:",
-                                "#1F1F1F",
-                                ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                "#F1F2F2",
-                                ";color:",
-                                "#9E1F63",
-                                ";&.active{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";}}}",
                                 [Function],
                               ],
                             },
-                            "displayName": "ListGroupItem",
+                            "displayName": "ListGroupItem__StyledListGroupItem",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -1876,11 +1680,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
                           >
                             <div
                               className="itemWrapper itemWrapperStatic"
@@ -1992,14 +1796,14 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           </span>
                         </ListGroupItem>
                       </StyledComponent>
-                    </ListGroupItem>
+                    </ListGroupItem__StyledListGroupItem>
                   </ForwardRef>
                 </ControlledTableListItem>
                 <ControlledTableListItem
                   key="item-beef2002"
                 >
                   <ForwardRef>
-                    <ListGroupItem>
+                    <ListGroupItem__StyledListGroupItem>
                       <StyledComponent
                         forwardedComponent={
                           Object {
@@ -2012,50 +1816,17 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
+                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "dvkPPN",
                               "rules": Array [
-                                "background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";.list-group-item-heading{font-weight:bold;}&.disabled,&.disabled:hover,&.disabled:focus{color:",
-                                "#6c6c6c",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";.list-group-item-heading{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#6c6c6c",
-                                ";}}&.active,&.active:hover,&.active:focus{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";.list-group-item-heading,.list-group-item-heading > small,.list-group-item-heading > .small{color:inherit;font-weight:bold;}.list-group-item-text{color:",
-                                "#faf3f7",
-                                ";}}a&,button&{color:",
-                                "#1F1F1F",
-                                ";.list-group-item-heading{color:",
-                                "#1F1F1F",
-                                ";font-weight:bold;}&:hover:not(.disabled),&:focus:not(.disabled){background-color:",
-                                "#F1F2F2",
-                                ";color:",
-                                "#9E1F63",
-                                ";&.active{color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#9E1F63",
-                                ";background-color:",
-                                "#9E1F63",
-                                ";}}}",
                                 [Function],
                               ],
                             },
-                            "displayName": "ListGroupItem",
+                            "displayName": "ListGroupItem__StyledListGroupItem",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -2066,11 +1837,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
                           >
                             <div
                               className="itemWrapper itemWrapperStatic"
@@ -2182,7 +1953,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           </span>
                         </ListGroupItem>
                       </StyledComponent>
-                    </ListGroupItem>
+                    </ListGroupItem__StyledListGroupItem>
                   </ForwardRef>
                 </ControlledTableListItem>
               </div>

@@ -5,11 +5,13 @@ import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 
 describe('MessageConfigGenerator', () => {
   it('generates basic search type from message widget', () => {
-    const widget = MessagesWidget.builder().config(
-      MessagesWidgetConfig.builder()
-        .decorators([])
-        .build(),
-    ).build();
+    // $FlowFixMe: We need to force this being a `MessagesWidget`
+    const widget: MessagesWidget = MessagesWidget.builder()
+      .config(
+        MessagesWidgetConfig.builder()
+          .decorators([])
+          .build(),
+      ).build();
 
     const result = MessageConfigGenerator(widget);
 
@@ -20,11 +22,13 @@ describe('MessageConfigGenerator', () => {
       { id: 'decorator1', type: 'something', config: {}, stream: null, order: 0 },
       { id: 'decorator2', type: 'something else', config: {}, stream: null, order: 1 },
     ];
-    const widget = MessagesWidget.builder().config(
-      MessagesWidgetConfig.builder()
-        .decorators(decorators)
-        .build(),
-    ).build();
+    // $FlowFixMe: We need to force this being a `MessagesWidget`
+    const widget: MessagesWidget = MessagesWidget.builder()
+      .config(
+        MessagesWidgetConfig.builder()
+          .decorators(decorators)
+          .build(),
+      ).build();
 
     const result = MessageConfigGenerator(widget);
 

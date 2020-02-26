@@ -5,15 +5,16 @@ import Widget from 'views/logic/widgets/Widget';
 
 import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
+import type { WidgetMapping } from '../views/types';
 
 const filterForWidget = widget => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 
 export type ResultType = {
   searchTypes: Immutable.Set<Immutable.Map<string, any>>,
-  widgetMapping: Immutable.Map<string, Immutable.Set<string>>,
+  widgetMapping: WidgetMapping,
 };
 
-export default (widgets: Array<Widget>): ResultType => {
+export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType => {
   let widgetMapping = Immutable.Map();
   const searchTypes = widgets
     .map(widget => widgetDefinition(widget.type)
@@ -35,7 +36,7 @@ export default (widgets: Array<Widget>): ResultType => {
       }
       const { defaults = {} } = typeDefinition || {};
       const { config, widgetId, ...rest } = searchType;
-      return new Immutable.Map(defaults)
+      return Immutable.Map(defaults)
         .merge(rest)
         .merge(config)
         .merge(

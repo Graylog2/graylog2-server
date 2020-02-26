@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Jumbotron, Row } from 'components/graylog';
-import styled, { createGlobalStyle } from 'styled-components';
+import { Col, Row } from 'components/graylog';
+import { StyledJumbotron } from 'components/graylog/Jumbotron';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { rgba } from 'polished';
 
-import { useTheme } from 'theme/GraylogThemeContext';
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 
 const GlobalStyle = createGlobalStyle`
@@ -18,17 +18,12 @@ const ContainerRow = styled(Row)`
   height: 82vh;
 `;
 
-const StyledJumbotron = color => useMemo(
-  () => {
-    return styled(Jumbotron)`
-      && {
-        background-color: ${rgba(color, 0.8)};
-        text-align: center;
-      }
-    `;
-  },
-  [color],
-);
+const StyledErrorJumbotron = styled(StyledJumbotron)(({ theme }) => css`
+  && {
+    background-color: ${rgba(theme.color.primary.due, 0.8)};
+    text-align: center;
+  }
+`);
 
 export const H1 = styled.h1`
   font-size: 52px;
@@ -36,17 +31,13 @@ export const H1 = styled.h1`
 `;
 
 const ErrorJumbotron = ({ children }) => {
-  const { colors } = useTheme();
-
-  const StyledJumbo = StyledJumbotron(colors.primary.due);
-
   return (
     <ContainerRow>
       <GlobalStyle />
       <Col mdOffset={2} md={8}>
-        <StyledJumbo>
+        <StyledErrorJumbotron>
           {children}
-        </StyledJumbo>
+        </StyledErrorJumbotron>
       </Col>
     </ContainerRow>
   );

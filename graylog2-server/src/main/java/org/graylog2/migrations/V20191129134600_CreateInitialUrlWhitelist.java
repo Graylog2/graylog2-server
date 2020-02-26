@@ -34,6 +34,7 @@ import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.system.urlwhitelist.LiteralWhitelistEntry;
+import org.graylog2.system.urlwhitelist.RegexHelper;
 import org.graylog2.system.urlwhitelist.RegexWhitelistEntry;
 import org.graylog2.system.urlwhitelist.UrlWhitelist;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
@@ -44,14 +45,11 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -66,15 +64,17 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
     private final UrlWhitelistService whitelistService;
     private final DBDataAdapterService dataAdapterService;
     private final DBNotificationService notificationService;
+    private final RegexHelper regexHelper;
 
     @Inject
     public V20191129134600_CreateInitialUrlWhitelist(final ClusterConfigService clusterConfigService,
             UrlWhitelistService whitelistService, DBDataAdapterService dataAdapterService,
-            DBNotificationService notificationService) {
+            DBNotificationService notificationService, RegexHelper regexHelper) {
         this.configService = clusterConfigService;
         this.whitelistService = whitelistService;
         this.dataAdapterService = dataAdapterService;
         this.notificationService = notificationService;
+        this.regexHelper = regexHelper;
     }
 
     @Override
@@ -149,11 +149,9 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
             final String url = StringUtils.strip(((HTTPJSONPathDataAdapter.Config) config).url());
             // Quote all parts around the ${key} template parameter( and replace the ${key} template param with a
             // wildcard match
-            String transformedUrl = Arrays.stream(StringUtils.splitByWholeSeparator(url, "${key}"))
-                    .map(part -> StringUtils.isBlank(part) ? part : Pattern.quote(part))
-                    .collect(Collectors.joining(".*?"));
+            String regex = regexHelper.createRegexForUrlTemplate(url, "${key}");
             return defaultIfNotMatching(RegexWhitelistEntry.create(UUID.randomUUID().toString(),
-                    "\"" + dataAdapterDto.title() + "\" data adapter", "^" + transformedUrl + "$"), url);
+                    "\"" + dataAdapterDto.title() + "\" data adapter", regex), url);
         }
 
         return Optional.empty();

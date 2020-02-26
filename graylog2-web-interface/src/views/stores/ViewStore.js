@@ -7,7 +7,7 @@ import type { RefluxActions, Store } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
-import type { Properties, ViewType } from 'views/logic/views/View';
+import type { Properties, ViewType, ViewStateMap } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { QuerySet } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
@@ -31,7 +31,7 @@ type ViewActionsType = RefluxActions<{
   properties: (Properties) => Promise<void>,
   search: (Search) => Promise<View>,
   selectQuery: (string) => Promise<string>,
-  state: (ViewState) => Promise<View>,
+  state: (ViewStateMap) => Promise<View>,
   update: (View) => Promise<ViewStoreState>,
 }>;
 

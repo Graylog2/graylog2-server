@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { Panel as BootstrapPanel } from 'react-bootstrap';
 import { adjustHue, darken } from 'polished';
 
-import { teinte, util } from 'theme';
+import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const panelVariantStyles = (hex) => {
@@ -36,30 +36,30 @@ const panelVariantStyles = (hex) => {
   `;
 };
 
-const StyledPanel = styled(BootstrapPanel)`
-  background-color: ${teinte.primary.due};
+const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
+  background-color: ${theme.color.primary.due};
 
   .panel-footer {
-    background-color: ${teinte.secondary.tre};
-    border-top-color: ${teinte.secondary.due};
+    background-color: ${theme.color.secondary.tre};
+    border-top-color: ${theme.color.secondary.due};
   }
 
   .panel-group {
     .panel-heading {
       + .panel-collapse > .panel-body,
       + .panel-collapse > .list-group {
-        border-top-color: ${teinte.secondary.due};
+        border-top-color: ${theme.color.secondary.due};
       }
     }
 
     .panel-footer {
       + .panel-collapse .panel-body {
-        border-bottom-color: ${teinte.secondary.due};
+        border-bottom-color: ${theme.color.secondary.due};
       }
     }
   }
 
   ${bsStyleThemeVariant(panelVariantStyles)}
-`;
+`);
 
 export default StyledPanel;

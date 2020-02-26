@@ -77,7 +77,7 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
               ))}
             </ul>
             <HelpBlock>
-            Select the query tabs to include in rotation.
+              Select the query tabs to include in rotation.
             </HelpBlock>
           </FormGroup>
 

@@ -3,7 +3,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { darken } from 'polished';
 
 import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
@@ -14,8 +14,6 @@ import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-import teinte from 'theme/teinte';
-
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
@@ -28,7 +26,7 @@ const NodeHeap = styled.div`
   }
 `;
 
-const Blob = styled.span`
+const Blob = styled.span(({ theme }) => css`
   display: inline-block;
   width: 9px;
   height: 9px;
@@ -36,20 +34,20 @@ const Blob = styled.span`
   border: 1px solid;
 
   &.used-memory {
-    background-color: ${teinte.tertiary.quattro};
-    border-color: ${darken(0.1, teinte.tertiary.quattro)};
+    background-color: ${theme.color.tertiary.quattro};
+    border-color: ${darken(0.1, theme.color.tertiary.quattro)};
   }
 
   &.committed-memory {
-    background-color: ${teinte.tertiary.sei};
-    border-color: ${darken(0.1, teinte.tertiary.sei)};
+    background-color: ${theme.color.tertiary.sei};
+    border-color: ${darken(0.1, theme.color.tertiary.sei)};
   }
 
   &.max-memory {
-    background-color: ${teinte.secondary.due};
-    border-color: ${darken(0.1, teinte.secondary.due)};
+    background-color: ${theme.color.secondary.due};
+    border-color: ${darken(0.1, theme.color.secondary.due)};
   }
-`;
+`);
 
 const StyledProgressBar = styled(ProgressBar)`
   height: 25px;

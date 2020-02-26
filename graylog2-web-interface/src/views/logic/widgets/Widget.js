@@ -5,7 +5,7 @@ import uuid from 'uuid/v4';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import { singleton } from '../singleton';
 
-type State = {
+export type WidgetState = {
   id: string,
   type: string,
   config: any,
@@ -16,7 +16,7 @@ type State = {
 };
 
 class Widget {
-  _value: State;
+  _value: WidgetState;
 
   // eslint-disable-next-line no-use-before-define
   static Builder: typeof Builder;
@@ -70,7 +70,7 @@ class Widget {
     return { id, type: type.toLocaleLowerCase(), config, filter, timerange, query, streams };
   }
 
-  static fromJSON(value: State): Widget {
+  static fromJSON(value: WidgetState): Widget {
     const { id, type, config, filter, timerange, query, streams } = value;
     const implementingClass = Widget.__registrations[type.toLocaleLowerCase()];
 

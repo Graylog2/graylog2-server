@@ -62,97 +62,105 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
           >
             <InputWrapper>
               <span>
-                <InputGroup>
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "Addon": [Function],
-                        "Button": [Function],
-                        "SIZES": Array [
-                          "large",
-                          "small",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "InputGroup-sc-1a8jz8l-0",
-                          "isStatic": true,
-                          "lastClassName": "lpjKsW",
-                          "rules": Array [
-                            ".input-group-addon{color:",
-                            "#6c6c6c",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";}",
-                          ],
-                        },
-                        "displayName": "InputGroup",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "InputGroup-sc-1a8jz8l-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                <InputGroup
+                  bsClass="input-group"
+                >
+                  <InputGroup
+                    bsClass="input-group"
                   >
-                    <InputGroup
-                      bsClass="input-group"
-                      className="InputGroup-sc-1a8jz8l-0 lpjKsW"
+                    <span
+                      className="input-group"
                     >
-                      <span
-                        className="InputGroup-sc-1a8jz8l-0 lpjKsW input-group"
+                      <FormControl
+                        componentClass="input"
+                        inputRef={[Function]}
+                        label=""
+                        name="inputWithAddon"
+                        placeholder=""
+                        type="text"
                       >
-                        <FormControl
+                        <StyledComponent
                           componentClass="input"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "Feedback": [Function],
+                              "SIZES": Array [
+                                "small",
+                                "large",
+                              ],
+                              "Static": [Function],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "FormControl-sc-1amoaox-0",
+                                "isStatic": false,
+                                "lastClassName": "eOArng",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "FormControl",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "FormControl-sc-1amoaox-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
                           inputRef={[Function]}
                           label=""
                           name="inputWithAddon"
                           placeholder=""
                           type="text"
                         >
-                          <StyledComponent
+                          <FormControl
+                            bsClass="form-control"
+                            className="FormControl-sc-1amoaox-0 eOArng"
                             componentClass="input"
+                            inputRef={[Function]}
+                            label=""
+                            name="inputWithAddon"
+                            placeholder=""
+                            type="text"
+                          >
+                            <input
+                              className="FormControl-sc-1amoaox-0 eOArng form-control"
+                              id="inputWithAddon"
+                              label=""
+                              name="inputWithAddon"
+                              placeholder=""
+                              type="text"
+                            />
+                          </FormControl>
+                        </StyledComponent>
+                      </FormControl>
+                      <Addon
+                        bsClass="input-group-addon"
+                      >
+                        <InputGroup__StyledAddon
+                          className="input-group-addon"
+                        >
+                          <StyledComponent
+                            className="input-group-addon"
                             forwardedComponent={
                               Object {
                                 "$$typeof": Symbol(react.forward_ref),
-                                "Feedback": [Function],
-                                "SIZES": Array [
-                                  "small",
-                                  "large",
-                                ],
-                                "Static": [Function],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "FormControl-sc-1amoaox-0",
-                                  "isStatic": true,
-                                  "lastClassName": "iHrYrm",
+                                  "componentId": "InputGroup__StyledAddon-sc-1a8jz8l-0",
+                                  "isStatic": false,
+                                  "lastClassName": "cqbzVZ",
                                   "rules": Array [
-                                    "color:",
-                                    "#1F1F1F",
-                                    ";background-color:",
-                                    "#FFF",
-                                    ";border-color:",
-                                    "#DCE1E5",
-                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                    "#b8b8b8",
-                                    ";}&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                    "#DCE1E5",
-                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    [Function],
                                   ],
                                 },
-                                "displayName": "FormControl",
+                                "displayName": "InputGroup__StyledAddon",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "styledComponentId": "InputGroup__StyledAddon-sc-1a8jz8l-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -160,43 +168,25 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                               }
                             }
                             forwardedRef={null}
-                            inputRef={[Function]}
-                            label=""
-                            name="inputWithAddon"
-                            placeholder=""
-                            type="text"
                           >
-                            <FormControl
-                              bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 iHrYrm"
-                              componentClass="input"
-                              inputRef={[Function]}
-                              label=""
-                              name="inputWithAddon"
-                              placeholder=""
-                              type="text"
+                            <StyledBootstrapInputAddon
+                              className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cqbzVZ"
                             >
-                              <input
-                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
-                                id="inputWithAddon"
-                                label=""
-                                name="inputWithAddon"
-                                placeholder=""
-                                type="text"
-                              />
-                            </FormControl>
+                              <InputGroupAddon
+                                bsClass="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cqbzVZ"
+                              >
+                                <span
+                                  className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cqbzVZ"
+                                >
+                                  .00
+                                </span>
+                              </InputGroupAddon>
+                            </StyledBootstrapInputAddon>
                           </StyledComponent>
-                        </FormControl>
-                        <InputGroupAddon>
-                          <span
-                            className="input-group-addon"
-                          >
-                            .00
-                          </span>
-                        </InputGroupAddon>
-                      </span>
-                    </InputGroup>
-                  </StyledComponent>
+                        </InputGroup__StyledAddon>
+                      </Addon>
+                    </span>
+                  </InputGroup>
                 </InputGroup>
               </span>
             </InputWrapper>
@@ -274,132 +264,87 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
           >
             <InputWrapper>
               <span>
-                <InputGroup>
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "Addon": [Function],
-                        "Button": [Function],
-                        "SIZES": Array [
-                          "large",
-                          "small",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "InputGroup-sc-1a8jz8l-0",
-                          "isStatic": true,
-                          "lastClassName": "lpjKsW",
-                          "rules": Array [
-                            ".input-group-addon{color:",
-                            "#6c6c6c",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";}",
-                          ],
-                        },
-                        "displayName": "InputGroup",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "InputGroup-sc-1a8jz8l-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                <InputGroup
+                  bsClass="input-group"
+                >
+                  <InputGroup
+                    bsClass="input-group"
                   >
-                    <InputGroup
-                      bsClass="input-group"
-                      className="InputGroup-sc-1a8jz8l-0 lpjKsW"
+                    <span
+                      className="input-group"
                     >
-                      <span
-                        className="InputGroup-sc-1a8jz8l-0 lpjKsW input-group"
+                      <FormControl
+                        componentClass="input"
+                        inputRef={[Function]}
+                        label=""
+                        name="inputWithButton"
+                        placeholder=""
+                        type="text"
                       >
-                        <FormControl
+                        <StyledComponent
                           componentClass="input"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "Feedback": [Function],
+                              "SIZES": Array [
+                                "small",
+                                "large",
+                              ],
+                              "Static": [Function],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "FormControl-sc-1amoaox-0",
+                                "isStatic": false,
+                                "lastClassName": "eOArng",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "FormControl",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "FormControl-sc-1amoaox-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
                           inputRef={[Function]}
                           label=""
                           name="inputWithButton"
                           placeholder=""
                           type="text"
                         >
-                          <StyledComponent
+                          <FormControl
+                            bsClass="form-control"
+                            className="FormControl-sc-1amoaox-0 eOArng"
                             componentClass="input"
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "Feedback": [Function],
-                                "SIZES": Array [
-                                  "small",
-                                  "large",
-                                ],
-                                "Static": [Function],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "FormControl-sc-1amoaox-0",
-                                  "isStatic": true,
-                                  "lastClassName": "iHrYrm",
-                                  "rules": Array [
-                                    "color:",
-                                    "#1F1F1F",
-                                    ";background-color:",
-                                    "#FFF",
-                                    ";border-color:",
-                                    "#DCE1E5",
-                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                    "#b8b8b8",
-                                    ";}&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                    "#DCE1E5",
-                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
-                                  ],
-                                },
-                                "displayName": "FormControl",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "FormControl-sc-1amoaox-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
                             inputRef={[Function]}
                             label=""
                             name="inputWithButton"
                             placeholder=""
                             type="text"
                           >
-                            <FormControl
-                              bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 iHrYrm"
-                              componentClass="input"
-                              inputRef={[Function]}
+                            <input
+                              className="FormControl-sc-1amoaox-0 eOArng form-control"
+                              id="inputWithButton"
                               label=""
                               name="inputWithButton"
                               placeholder=""
                               type="text"
-                            >
-                              <input
-                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
-                                id="inputWithButton"
-                                label=""
-                                name="inputWithButton"
-                                placeholder=""
-                                type="text"
-                              />
-                            </FormControl>
-                          </StyledComponent>
-                        </FormControl>
-                        <InputGroupButton>
+                            />
+                          </FormControl>
+                        </StyledComponent>
+                      </FormControl>
+                      <Button
+                        bsClass="input-group-btn"
+                      >
+                        <InputGroupButton
+                          bsClass="input-group-btn"
+                        >
                           <span
                             className="input-group-btn"
                           >
@@ -468,9 +413,9 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                             </ForwardRef>
                           </span>
                         </InputGroupButton>
-                      </span>
-                    </InputGroup>
-                  </StyledComponent>
+                      </Button>
+                    </span>
+                  </InputGroup>
                 </InputGroup>
               </span>
             </InputWrapper>
@@ -550,97 +495,105 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
           >
             <InputWrapper>
               <span>
-                <InputGroup>
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "Addon": [Function],
-                        "Button": [Function],
-                        "SIZES": Array [
-                          "large",
-                          "small",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "InputGroup-sc-1a8jz8l-0",
-                          "isStatic": true,
-                          "lastClassName": "lpjKsW",
-                          "rules": Array [
-                            ".input-group-addon{color:",
-                            "#6c6c6c",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";}",
-                          ],
-                        },
-                        "displayName": "InputGroup",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "InputGroup-sc-1a8jz8l-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                <InputGroup
+                  bsClass="input-group"
+                >
+                  <InputGroup
+                    bsClass="input-group"
                   >
-                    <InputGroup
-                      bsClass="input-group"
-                      className="InputGroup-sc-1a8jz8l-0 lpjKsW"
+                    <span
+                      className="input-group"
                     >
-                      <span
-                        className="InputGroup-sc-1a8jz8l-0 lpjKsW input-group"
+                      <FormControl
+                        componentClass="input"
+                        inputRef={[Function]}
+                        label=""
+                        name="inputWithCheckboxAddon"
+                        placeholder=""
+                        type="text"
                       >
-                        <FormControl
+                        <StyledComponent
                           componentClass="input"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "Feedback": [Function],
+                              "SIZES": Array [
+                                "small",
+                                "large",
+                              ],
+                              "Static": [Function],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "FormControl-sc-1amoaox-0",
+                                "isStatic": false,
+                                "lastClassName": "eOArng",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "FormControl",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "FormControl-sc-1amoaox-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
                           inputRef={[Function]}
                           label=""
                           name="inputWithCheckboxAddon"
                           placeholder=""
                           type="text"
                         >
-                          <StyledComponent
+                          <FormControl
+                            bsClass="form-control"
+                            className="FormControl-sc-1amoaox-0 eOArng"
                             componentClass="input"
+                            inputRef={[Function]}
+                            label=""
+                            name="inputWithCheckboxAddon"
+                            placeholder=""
+                            type="text"
+                          >
+                            <input
+                              className="FormControl-sc-1amoaox-0 eOArng form-control"
+                              id="inputWithCheckboxAddon"
+                              label=""
+                              name="inputWithCheckboxAddon"
+                              placeholder=""
+                              type="text"
+                            />
+                          </FormControl>
+                        </StyledComponent>
+                      </FormControl>
+                      <Addon
+                        bsClass="input-group-addon"
+                      >
+                        <InputGroup__StyledAddon
+                          className="input-group-addon"
+                        >
+                          <StyledComponent
+                            className="input-group-addon"
                             forwardedComponent={
                               Object {
                                 "$$typeof": Symbol(react.forward_ref),
-                                "Feedback": [Function],
-                                "SIZES": Array [
-                                  "small",
-                                  "large",
-                                ],
-                                "Static": [Function],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "FormControl-sc-1amoaox-0",
-                                  "isStatic": true,
-                                  "lastClassName": "iHrYrm",
+                                  "componentId": "InputGroup__StyledAddon-sc-1a8jz8l-0",
+                                  "isStatic": false,
+                                  "lastClassName": "cqbzVZ",
                                   "rules": Array [
-                                    "color:",
-                                    "#1F1F1F",
-                                    ";background-color:",
-                                    "#FFF",
-                                    ";border-color:",
-                                    "#DCE1E5",
-                                    ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                                    "#b8b8b8",
-                                    ";}&:focus{border-color:",
-                                    "#6DC6E7",
-                                    ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                                    "rgba(109,198,231,0.4)",
-                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                    "#DCE1E5",
-                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    [Function],
                                   ],
                                 },
-                                "displayName": "FormControl",
+                                "displayName": "InputGroup__StyledAddon",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "styledComponentId": "InputGroup__StyledAddon-sc-1a8jz8l-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -648,47 +601,29 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                               }
                             }
                             forwardedRef={null}
-                            inputRef={[Function]}
-                            label=""
-                            name="inputWithCheckboxAddon"
-                            placeholder=""
-                            type="text"
                           >
-                            <FormControl
-                              bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 iHrYrm"
-                              componentClass="input"
-                              inputRef={[Function]}
-                              label=""
-                              name="inputWithCheckboxAddon"
-                              placeholder=""
-                              type="text"
+                            <StyledBootstrapInputAddon
+                              className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cqbzVZ"
                             >
-                              <input
-                                className="FormControl-sc-1amoaox-0 iHrYrm form-control"
-                                id="inputWithCheckboxAddon"
-                                label=""
-                                name="inputWithCheckboxAddon"
-                                placeholder=""
-                                type="text"
-                              />
-                            </FormControl>
+                              <InputGroupAddon
+                                bsClass="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cqbzVZ"
+                              >
+                                <span
+                                  className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cqbzVZ"
+                                >
+                                  <input
+                                    aria-label="..."
+                                    id="addonCheckbox"
+                                    type="checkbox"
+                                  />
+                                </span>
+                              </InputGroupAddon>
+                            </StyledBootstrapInputAddon>
                           </StyledComponent>
-                        </FormControl>
-                        <InputGroupAddon>
-                          <span
-                            className="input-group-addon"
-                          >
-                            <input
-                              aria-label="..."
-                              id="addonCheckbox"
-                              type="checkbox"
-                            />
-                          </span>
-                        </InputGroupAddon>
-                      </span>
-                    </InputGroup>
-                  </StyledComponent>
+                        </InputGroup__StyledAddon>
+                      </Addon>
+                    </span>
+                  </InputGroup>
                 </InputGroup>
               </span>
             </InputWrapper>
@@ -785,24 +720,10 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
-                          "isStatic": true,
-                          "lastClassName": "iHrYrm",
+                          "isStatic": false,
+                          "lastClassName": "eOArng",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                            "#b8b8b8",
-                            ";}&:focus{border-color:",
-                            "#6DC6E7",
-                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                            "rgba(109,198,231,0.4)",
-                            ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                            "#DCE1E5",
-                            ";}~ .form-control-feedback.glyphicon{display:none;}",
+                            [Function],
                           ],
                         },
                         "displayName": "FormControl",
@@ -824,7 +745,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 iHrYrm"
+                      className="FormControl-sc-1amoaox-0 eOArng"
                       componentClass="input"
                       inputRef={[Function]}
                       label=""
@@ -833,7 +754,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                       type="text"
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                        className="FormControl-sc-1amoaox-0 eOArng form-control"
                         id="inputWithoutNameProp"
                         label=""
                         name="inputWithNameProp"
@@ -937,24 +858,10 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
-                          "isStatic": true,
-                          "lastClassName": "iHrYrm",
+                          "isStatic": false,
+                          "lastClassName": "eOArng",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                            "#b8b8b8",
-                            ";}&:focus{border-color:",
-                            "#6DC6E7",
-                            ";box-shadow:inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px ",
-                            "rgba(109,198,231,0.4)",
-                            ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                            "#DCE1E5",
-                            ";}~ .form-control-feedback.glyphicon{display:none;}",
+                            [Function],
                           ],
                         },
                         "displayName": "FormControl",
@@ -976,7 +883,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 iHrYrm"
+                      className="FormControl-sc-1amoaox-0 eOArng"
                       componentClass="input"
                       inputRef={[Function]}
                       label=""
@@ -985,7 +892,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                       type="text"
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 iHrYrm form-control"
+                        className="FormControl-sc-1amoaox-0 eOArng form-control"
                         id="inputWithoutNameProp"
                         label=""
                         name="inputWithoutNameProp"

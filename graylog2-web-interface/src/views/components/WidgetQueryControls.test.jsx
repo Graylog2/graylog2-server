@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import '@testing-library/jest-dom/extend-expect';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
@@ -52,12 +51,8 @@ describe('WidgetQueryControls', () => {
   const emptyGlobalOverride = {};
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
-  const renderSUT = (props = {}) => render(
-    <WrappingContainer>
-      <WidgetQueryControls {...defaultProps}
-                           {...props} />
-    </WrappingContainer>,
-  );
+  const renderSUT = (props = {}) => render(<WidgetQueryControls {...defaultProps}
+                                                                {...props} />);
   it('should do something', () => {
     const { container } = renderSUT();
     expect(container).toMatchSnapshot();

@@ -26,7 +26,7 @@ export type QuerySet = Immutable.Set<Query>;
 export default class Search {
   _value: InternalState;
 
-  constructor(id: SearchId, queries: Array<Query>, parameters: Array<Parameter>) {
+  constructor(id: SearchId, queries: (Array<Query> | QuerySet), parameters: Array<Parameter>) {
     this._value = { id, queries: Immutable.OrderedSet(queries), parameters: Immutable.Set(parameters) };
   }
 
@@ -101,7 +101,7 @@ class Builder {
     return this.id(ObjectID().toString());
   }
 
-  queries(value: Array<Query>): Builder {
+  queries(value: (Array<Query> | QuerySet)): Builder {
     return new Builder(this.value.set('queries', value));
   }
 

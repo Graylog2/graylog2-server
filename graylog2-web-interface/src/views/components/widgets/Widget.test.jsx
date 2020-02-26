@@ -87,7 +87,7 @@ describe('<Widget />', () => {
   const search = View.builder()
     .search(searchSearch)
     .type(View.Type.Dashboard)
-    .state(Map.of('query-id', viewState))
+    .state(Map({ 'query-id': viewState }))
     .id('search-1')
     .title('search 1')
     .build();

@@ -22,6 +22,7 @@ import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
+import type { FieldTypeMappingsList } from '../../stores/FieldTypesStore';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 
@@ -41,11 +42,11 @@ type State = {
 }
 
 type Props = {
-  fields: {},
+  fields: FieldTypeMappingsList,
   pageSize: number,
   config: MessagesWidgetConfig,
   data: { messages: Array<Object>, total: number, id: string },
-  selectedFields?: {},
+  selectedFields?: Immutable.Set<string>,
   searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
   setLoadingState: (loading: boolean) => void,
   currentView: {
@@ -93,7 +94,7 @@ class MessageList extends React.Component<Props, State> {
     if (currentPage !== 1) {
       this.setState({ currentPage: 1, errors: [] });
     }
-  }
+  };
 
   _handlePageChange = (pageNo: number) => {
     // execute search with new offset
@@ -109,7 +110,7 @@ class MessageList extends React.Component<Props, State> {
         currentPage: pageNo,
       });
     });
-  }
+  };
 
   _getListKey = () => {
     // When the component receives new messages, we want to reset the scroll position, by defining a new key or the MessageTable.
@@ -121,7 +122,7 @@ class MessageList extends React.Component<Props, State> {
       return `${defaultKey}-${firstMessageId}`;
     }
     return defaultKey;
-  }
+  };
 
   static contextType = RenderCompletionCallback;
 
@@ -137,6 +138,7 @@ class MessageList extends React.Component<Props, State> {
     const { currentPage, errors } = this.state;
     const hasError = !isEmpty(errors);
     const listKey = this._getListKey();
+
     return (
       <Wrapper>
         <PaginatedList onChange={this._handlePageChange}
@@ -144,8 +146,14 @@ class MessageList extends React.Component<Props, State> {
                        showPageSizeSelect={false}
                        totalItems={totalMessages}
                        pageSize={pageSize}>
-          {!hasError && <MessageTable messages={messages} fields={fields} config={config} selectedFields={selectedFields} activeQueryId={activeQueryId} key={listKey} />}
-          {hasError && (<ErrorWidget errors={errors} />)}
+          {!hasError ? (
+            <MessageTable messages={messages}
+                          fields={fields}
+                          config={config}
+                          selectedFields={selectedFields}
+                          activeQueryId={activeQueryId}
+                          key={listKey} />
+          ) : <ErrorWidget errors={errors} />}
         </PaginatedList>
       </Wrapper>
     );

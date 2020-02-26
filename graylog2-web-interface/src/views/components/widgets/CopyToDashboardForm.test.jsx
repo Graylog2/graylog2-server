@@ -83,7 +83,8 @@ describe('CopyToDashboardForm', () => {
     const searchInput = getByPlaceholderText('Enter search query...');
     fireEvent.change(searchInput, { target: { value: 'view 1' } });
     const searchButton = getByText('Search');
+
     fireEvent.click(searchButton);
-    expect(DashboardsActions.search).toHaveBeenCalledTimes(1);
+    expect(DashboardsActions.search).toHaveBeenCalledWith('view 1', 1, 5);
   });
 });

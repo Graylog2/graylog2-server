@@ -8,6 +8,7 @@ import { ViewActions } from 'views/stores/ViewStore';
 import Search from '../search/Search';
 import View from './View';
 import ViewLoader from './ViewLoader';
+import type { ViewJson } from './View';
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {},
@@ -19,13 +20,14 @@ jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {},
 }));
 
-const viewJson = {
+const viewJson: ViewJson = {
   id: 'foo',
+  type: 'SEARCH',
   title: 'Foo',
   summary: 'summary',
   description: 'Foo',
   search_id: 'foosearch',
-  properties: {},
+  properties: Immutable.List(),
   state: {},
   created_at: new Date('2019-05-24T12:34:04.993Z'),
   owner: 'admin',
@@ -45,10 +47,11 @@ describe('ViewLoader', () => {
       expect(result).toEqual(
         View.builder()
           .id('foo')
+          .type('SEARCH')
           .title('Foo')
           .summary('summary')
           .description('Foo')
-          .properties({})
+          .properties(Immutable.List())
           .state(Immutable.Map())
           .createdAt(new Date('2019-05-24T12:34:04.993Z'))
           .owner('admin')
@@ -56,8 +59,8 @@ describe('ViewLoader', () => {
             Search.create()
               .toBuilder()
               .id('foosearch')
-              .parameters(Immutable.Set())
-              .queries(Immutable.OrderedSet())
+              .parameters([])
+              .queries([])
               .build(),
           )
           .requires({})

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
+import styled from 'styled-components';
 
 import { Grid, Row, Col, Button } from 'components/graylog';
 import { Spinner, Icon } from 'components/common';
@@ -8,7 +9,27 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
+const FullHeightContainer = styled.div`
+  height: calc(100vh - 100px);
+  margin-left: -15px;
+  margin-right: -15px;
+`;
+
+const GettingStartedFrame = styled.iframe`
+  height: 100%;
+  width: 100%;
+  display: ${props => (props.guideLoaded ? 'block' : 'none')};
+`;
+
+const DismissButton = styled(Button)`
+  margin-right: 5px;
+  top: -4px;
+  position: relative;
+`;
+
 class GettingStarted extends React.Component {
+  timeoutId = null;
+
   static propTypes = {
     clusterId: PropTypes.string.isRequired,
     masterOs: PropTypes.string.isRequired,
@@ -29,8 +50,6 @@ class GettingStarted extends React.Component {
     showStaticContent: false,
   };
 
-  timeoutId = null;
-
   componentDidMount() {
     if (window.addEventListener) {
       window.addEventListener('message', this._onMessage);
@@ -50,7 +69,6 @@ class GettingStarted extends React.Component {
 
   _onMessage = (messageEvent) => {
     const { gettingStartedUrl } = this.props;
-    const { minHeight } = this.state;
     // make sure we only process messages from the getting started url, otherwise this can interfere with other messages being posted
     if (gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
       if (this.timeoutId !== null) {
@@ -60,7 +78,6 @@ class GettingStarted extends React.Component {
       this.setState({
         guideLoaded: messageEvent.data.guideLoaded,
         guideUrl: messageEvent.data.guideUrl,
-        minHeight: messageEvent.data.height === 0 ? minHeight : messageEvent.data.height,
       });
     }
   };
@@ -80,14 +97,14 @@ class GettingStarted extends React.Component {
 
   render() {
     const { noDismissButton, clusterId, masterOs, masterVersion, gettingStartedUrl } = this.props;
-    const { minHeight, showStaticContent, guideLoaded, guideUrl } = this.state;
+    const { showStaticContent, guideLoaded, guideUrl } = this.state;
 
     let dismissButton = null;
     if (!noDismissButton) {
       dismissButton = (
-        <Button bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
+        <DismissButton bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
           <Icon name="times" /> Dismiss guide
-        </Button>
+        </DismissButton>
       );
     }
     let gettingStartedContent = null;
@@ -113,16 +130,6 @@ class GettingStarted extends React.Component {
         m: noDismissButton,
       });
 
-      const iframeStyles = {
-        minHeight: minHeight,
-        height: minHeight,
-        width: '100%',
-      };
-      // hide iframe if there's no content loaded yet
-      if (!guideLoaded) {
-        iframeStyles.display = 'none';
-      }
-
       const url = guideUrl === '' ? (`${gettingStartedUrl}?${query}`) : guideUrl;
       let spinner = null;
       if (!guideLoaded) {
@@ -138,24 +145,24 @@ class GettingStarted extends React.Component {
       }
 
       gettingStartedContent = (
-        <div>
+        <>
           {spinner}
-          <iframe src={url}
-                  style={iframeStyles}
-                  id="getting-started-frame"
-                  frameBorder="0"
-                  scrolling="yes"
-                  title="getting-started-content">
+          <GettingStartedFrame src={url}
+                               guideLoaded={guideLoaded}
+                               id="getting-started-frame"
+                               frameBorder="0"
+                               scrolling="yes"
+                               title="getting-started-content">
             <p>Sorry, no iframes</p>
-          </iframe>
-        </div>
+          </GettingStartedFrame>
+        </>
       );
     }
     return (
-      <div id="react-gettingstarted">
+      <FullHeightContainer>
         <div className="pull-right">{dismissButton}</div>
         {gettingStartedContent}
-      </div>
+      </FullHeightContainer>
     );
   }
 }

@@ -1,23 +1,21 @@
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { darken } from 'polished';
 
-import teinte from 'theme/teinte';
-
-const Pagination = styled(BootstrapPagination)`
+const Pagination = styled(BootstrapPagination)(({ theme }) => css`
   > li {
     > a,
     > span {
-      color: ${teinte.tertiary.quattro};
-      background-color: ${teinte.primary.due};
-      border-color: ${teinte.secondary.tre};
+      color: ${theme.color.tertiary.quattro};
+      background-color: ${theme.color.primary.due};
+      border-color: ${theme.color.secondary.tre};
 
       &:hover,
       &:focus {
-        color: ${darken(0.15, teinte.tertiary.quattro)};
-        background-color: ${teinte.secondary.due};
-        border-color: ${teinte.secondary.tre};
+        color: ${darken(0.15, theme.color.tertiary.quattro)};
+        background-color: ${theme.color.secondary.due};
+        border-color: ${theme.color.secondary.tre};
       }
     }
   }
@@ -27,9 +25,9 @@ const Pagination = styled(BootstrapPagination)`
     &,
     &:hover,
     &:focus {
-      color: ${teinte.primary.due};
-      background-color: ${teinte.tertiary.quattro};
-      border-color: ${teinte.tertiary.quattro};
+      color: ${theme.color.primary.due};
+      background-color: ${theme.color.tertiary.quattro};
+      border-color: ${theme.color.tertiary.quattro};
     }
   }
 
@@ -40,11 +38,11 @@ const Pagination = styled(BootstrapPagination)`
     > a,
     > a:hover,
     > a:focus {
-      color: ${darken(0.25, teinte.secondary.tre)};
-      background-color: ${teinte.primary.due};
-      border-color: ${teinte.secondary.tre};
+      color: ${darken(0.25, theme.color.secondary.tre)};
+      background-color: ${theme.color.primary.due};
+      border-color: ${theme.color.secondary.tre};
     }
   }
-`;
+`);
 
 export default Pagination;

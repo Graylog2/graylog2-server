@@ -57,10 +57,11 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
   }
 }
 
+type InternalBuilderState = Immutable.Map<string, any>;
 class Builder {
-  value: Immutable.Map<State>;
+  value: InternalBuilderState;
 
-  constructor(value: Immutable.Map<State> = Immutable.Map()) {
+  constructor(value: InternalBuilderState = Immutable.Map()) {
     this.value = value;
   }
 

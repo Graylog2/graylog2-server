@@ -99,7 +99,7 @@ type BuilderState = Immutable.Map<string, any>;
 class Builder {
   value: BuilderState;
 
-  constructor(value: Immutable.Map = Immutable.Map()) {
+  constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;
   }
 

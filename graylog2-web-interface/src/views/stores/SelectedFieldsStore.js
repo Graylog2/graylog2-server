@@ -50,7 +50,7 @@ export const SelectedFieldsStore = singletonStore(
       CurrentViewStateActions.fields(this.selectedFields.remove(field));
     },
     set(fields: Array<string>) {
-      CurrentViewStateActions.fields(fields);
+      CurrentViewStateActions.fields(Set(fields));
     },
     _state() {
       return this.selectedFields;

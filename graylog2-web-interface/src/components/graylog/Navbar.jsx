@@ -1,37 +1,37 @@
 // eslint-disable-next-line no-restricted-imports
 import { Navbar as BootstrapNavbar } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { darken, lighten } from 'polished';
 
-import { breakpoint, teinte } from 'theme';
+import { breakpoint } from 'theme';
 
-const Navbar = styled(BootstrapNavbar)`
+const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   &.navbar-default {
-    background-color: ${teinte.secondary.due};
-    border-color: ${darken(0.065, teinte.secondary.due)};
+    background-color: ${theme.color.secondary.due};
+    border-color: ${darken(0.065, theme.color.secondary.due)};
 
     .navbar-brand {
-      color: ${teinte.tertiary.uno};
+      color: ${theme.color.tertiary.uno};
 
       &:hover,
       &:focus {
-        color: ${darken(0.1, teinte.tertiary.uno)};
+        color: ${darken(0.1, theme.color.tertiary.uno)};
         background-color: transparent;
       }
     }
 
     .navbar-text {
-      color: ${teinte.primary.tre};
+      color: ${theme.color.primary.tre};
     }
 
     .navbar-nav {
       > li > a,
       > li > .btn-link {
-        color: ${teinte.tertiary.uno};
+        color: ${theme.color.tertiary.uno};
 
         &:hover,
         &:focus {
-          color: ${darken(0.25, teinte.tertiary.uno)};
+          color: ${darken(0.25, theme.color.tertiary.uno)};
           background-color: transparent;
         }
       }
@@ -40,8 +40,8 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, teinte.tertiary.uno)};
-          background-color: ${darken(0.065, teinte.secondary.due)};
+          color: ${darken(0.15, theme.color.tertiary.uno)};
+          background-color: ${darken(0.065, theme.color.secondary.due)};
         }
       }
 
@@ -49,7 +49,7 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.25, teinte.secondary.tre)};
+          color: ${darken(0.25, theme.color.secondary.tre)};
           background-color: transparent;
         }
       }
@@ -58,8 +58,8 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, teinte.tertiary.uno)};
-          background-color: ${darken(0.065, teinte.secondary.due)};
+          color: ${darken(0.15, theme.color.tertiary.uno)};
+          background-color: ${darken(0.065, theme.color.secondary.due)};
         }
       }
 
@@ -67,11 +67,11 @@ const Navbar = styled(BootstrapNavbar)`
         .open .dropdown-menu {
           > li > a,
           > li > .btn-link {
-            color: ${teinte.tertiary.uno};
+            color: ${theme.color.tertiary.uno};
 
             &:hover,
             &:focus {
-              color: ${darken(0.25, teinte.tertiary.uno)};
+              color: ${darken(0.25, theme.color.tertiary.uno)};
               background-color: transparent;
             }
           }
@@ -80,8 +80,8 @@ const Navbar = styled(BootstrapNavbar)`
             &,
             &:hover,
             &:focus {
-              color: ${darken(0.15, teinte.tertiary.uno)};
-              background-color: ${darken(0.065, teinte.secondary.due)};
+              color: ${darken(0.15, theme.color.tertiary.uno)};
+              background-color: ${darken(0.065, theme.color.secondary.due)};
             }
           }
 
@@ -89,7 +89,7 @@ const Navbar = styled(BootstrapNavbar)`
             &,
             &:hover,
             &:focus {
-              color: ${teinte.secondary.tre};
+              color: ${theme.color.secondary.tre};
               background-color: transparent;
             }
           }
@@ -98,75 +98,75 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-toggle {
-      border-color: ${teinte.secondary.tre};
+      border-color: ${theme.color.secondary.tre};
 
       &:hover,
       &:focus {
-        background-color: ${teinte.secondary.tre};
+        background-color: ${theme.color.secondary.tre};
       }
 
       .icon-bar {
-        background-color: ${darken(0.25, teinte.secondary.tre)};
+        background-color: ${darken(0.25, theme.color.secondary.tre)};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${darken(0.065, teinte.secondary.due)};
+      border-color: ${darken(0.065, theme.color.secondary.due)};
     }
 
     .navbar-link {
-      color: ${teinte.tertiary.uno};
+      color: ${theme.color.tertiary.uno};
 
       &:hover {
-        color: ${darken(0.25, teinte.tertiary.uno)};
+        color: ${darken(0.25, theme.color.tertiary.uno)};
       }
     }
 
     .btn-link {
-      color: ${teinte.tertiary.uno};
+      color: ${theme.color.tertiary.uno};
 
       &:hover,
       &:focus {
-        color: ${darken(0.25, teinte.tertiary.uno)};
+        color: ${darken(0.25, theme.color.tertiary.uno)};
       }
 
       &[disabled],
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${teinte.secondary.tre};
+          color: ${theme.color.secondary.tre};
         }
       }
     }
   }
 
   &.navbar-inverse {
-    background-color: ${teinte.primary.tre};
-    border-color: ${darken(0.15, teinte.primary.tre)};
+    background-color: ${theme.color.primary.tre};
+    border-color: ${darken(0.15, theme.color.primary.tre)};
 
     .navbar-brand {
-      color: ${lighten(0.15, teinte.tertiary.uno)};
+      color: ${lighten(0.15, theme.color.tertiary.uno)};
 
       &:hover,
       &:focus {
-        color: ${teinte.primary.due};
+        color: ${theme.color.primary.due};
         background-color: transparent;
       }
     }
 
     .navbar-text {
-      color: ${lighten(0.15, teinte.primary.tre)};
+      color: ${lighten(0.15, theme.color.primary.tre)};
     }
 
     .navbar-nav {
       > li > a,
       > li > .btn-link {
-        color: ${teinte.secondary.due};
+        color: ${theme.color.secondary.due};
 
         &:hover,
         &:focus {
-          color: ${teinte.tertiary.due};
+          color: ${theme.color.tertiary.due};
           background-color: transparent;
         }
       }
@@ -175,8 +175,8 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${teinte.primary.due};
-          background-color: ${lighten(0.20, teinte.primary.tre)};
+          color: ${theme.color.primary.due};
+          background-color: ${lighten(0.20, theme.color.primary.tre)};
         }
       }
 
@@ -184,7 +184,7 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${lighten(0.50, teinte.primary.tre)};
+          color: ${lighten(0.50, theme.color.primary.tre)};
           background-color: transparent;
         }
       }
@@ -193,28 +193,28 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${teinte.primary.due};
-          background-color: ${lighten(0.20, teinte.primary.tre)};
+          color: ${theme.color.primary.due};
+          background-color: ${lighten(0.20, theme.color.primary.tre)};
         }
       }
 
       @media (max-width: ${breakpoint.max.sm}) {
         .open .dropdown-menu {
           > .dropdown-header {
-            border-color: ${darken(0.10, teinte.primary.tre)};
+            border-color: ${darken(0.10, theme.color.primary.tre)};
           }
 
           .divider {
-            background-color: ${lighten(0.20, teinte.primary.tre)};
+            background-color: ${lighten(0.20, theme.color.primary.tre)};
           }
 
           > li > a,
           > li > .btn-link {
-            color: ${teinte.secondary.due};
+            color: ${theme.color.secondary.due};
 
             &:hover,
             &:focus {
-              color: ${teinte.tertiary.due};
+              color: ${theme.color.tertiary.due};
               background-color: transparent;
             }
           }
@@ -223,8 +223,8 @@ const Navbar = styled(BootstrapNavbar)`
             &,
             &:hover,
             &:focus {
-              color: ${teinte.primary.due};
-              background-color: ${lighten(0.20, teinte.primary.tre)};
+              color: ${theme.color.primary.due};
+              background-color: ${lighten(0.20, theme.color.primary.tre)};
             }
           }
 
@@ -232,7 +232,7 @@ const Navbar = styled(BootstrapNavbar)`
             &,
             &:hover,
             &:focus {
-              color: ${lighten(0.50, teinte.primary.tre)};
+              color: ${lighten(0.50, theme.color.primary.tre)};
               background-color: transparent;
             }
           }
@@ -241,48 +241,48 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-toggle {
-      border-color: ${lighten(0.35, teinte.primary.tre)};
+      border-color: ${lighten(0.35, theme.color.primary.tre)};
 
       &:hover,
       &:focus {
-        background-color: ${lighten(0.35, teinte.primary.tre)};
+        background-color: ${lighten(0.35, theme.color.primary.tre)};
       }
 
       .icon-bar {
-        background-color: ${teinte.primary.due};
+        background-color: ${theme.color.primary.due};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${darken(0.07, teinte.primary.tre)};
+      border-color: ${darken(0.07, theme.color.primary.tre)};
     }
 
     .navbar-link {
-      color: ${lighten(0.15, teinte.tertiary.uno)};
+      color: ${lighten(0.15, theme.color.tertiary.uno)};
 
       &:hover {
-        color: ${teinte.primary.due};
+        color: ${theme.color.primary.due};
       }
     }
 
     .btn-link {
-      color: ${lighten(0.15, teinte.tertiary.uno)};
+      color: ${lighten(0.15, theme.color.tertiary.uno)};
 
       &:hover,
       &:focus {
-        color: ${teinte.primary.due};
+        color: ${theme.color.primary.due};
       }
 
       &[disabled],
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${lighten(0.50, teinte.primary.tre)};
+          color: ${lighten(0.50, theme.color.primary.tre)};
         }
       }
     }
   }
-`;
+`);
 
 export default Navbar;

@@ -56,7 +56,7 @@ class MessageFieldExtractorActions extends React.Component {
                         key={1}
                         id={`select-extractor-type-dropdown-field-${this.props.fieldName}`}>
           <MenuItem key="select-extractor-type-disabled" disabled>
-                    Extractors can only be used with string fields.
+            Extractors can only be used with string fields.
           </MenuItem>
         </DropdownButton>
       </div>

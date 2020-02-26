@@ -3,13 +3,13 @@
 exports[`<ProgressBar /> properly renders with animated 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    class="ProgressBar__ProgressWrap-fsyx32-0 ddVSCa"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="45"
-      class="ProgressBar__Bar-fsyx32-1 ifNlYY"
+      class="ProgressBar__Bar-fsyx32-1 eLJRPJ"
       role="progressbar"
       value="45"
     />
@@ -20,13 +20,13 @@ exports[`<ProgressBar /> properly renders with animated 1`] = `
 exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    class="ProgressBar__ProgressWrap-fsyx32-0 ddVSCa"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="67"
-      class="ProgressBar__Bar-fsyx32-1 hmulOj"
+      class="ProgressBar__Bar-fsyx32-1 bHtyrm"
       role="progressbar"
       value="67"
     />
@@ -37,14 +37,14 @@ exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
 exports[`<ProgressBar /> properly renders with label 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    class="ProgressBar__ProgressWrap-fsyx32-0 ddVSCa"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="23"
       aria-valuetext="Example ProgressBar"
-      class="ProgressBar__Bar-fsyx32-1 fCNhAs"
+      class="ProgressBar__Bar-fsyx32-1 OfnwP"
       role="progressbar"
       value="23"
     >
@@ -57,13 +57,13 @@ exports[`<ProgressBar /> properly renders with label 1`] = `
 exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    class="ProgressBar__ProgressWrap-fsyx32-0 ddVSCa"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="35"
-      class="ProgressBar__Bar-fsyx32-1 cJAaYy"
+      class="ProgressBar__Bar-fsyx32-1 daMGHP"
       role="progressbar"
       value="35"
     />
@@ -71,7 +71,7 @@ exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="55"
-      class="ProgressBar__Bar-fsyx32-1 hIhmCC"
+      class="ProgressBar__Bar-fsyx32-1 eKKnqT"
       role="progressbar"
       value="55"
     />
@@ -82,13 +82,13 @@ exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
 exports[`<ProgressBar /> properly renders with no props 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    class="ProgressBar__ProgressWrap-fsyx32-0 ddVSCa"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="0"
-      class="ProgressBar__Bar-fsyx32-1 kUsvMb"
+      class="ProgressBar__Bar-fsyx32-1 iWvoPs"
       role="progressbar"
       value="0"
     />
@@ -99,13 +99,13 @@ exports[`<ProgressBar /> properly renders with no props 1`] = `
 exports[`<ProgressBar /> properly renders with one bar 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    class="ProgressBar__ProgressWrap-fsyx32-0 ddVSCa"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="35"
-      class="ProgressBar__Bar-fsyx32-1 cJAaYy"
+      class="ProgressBar__Bar-fsyx32-1 daMGHP"
       role="progressbar"
       value="35"
     />
@@ -116,13 +116,13 @@ exports[`<ProgressBar /> properly renders with one bar 1`] = `
 exports[`<ProgressBar /> properly renders with striped 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 bHpnwx"
+    class="ProgressBar__ProgressWrap-fsyx32-0 ddVSCa"
   >
     <div
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="56"
-      class="ProgressBar__Bar-fsyx32-1 cGkszn"
+      class="ProgressBar__Bar-fsyx32-1 eFlkdK"
       role="progressbar"
       value="56"
     />

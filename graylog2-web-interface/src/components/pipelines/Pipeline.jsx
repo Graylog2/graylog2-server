@@ -38,9 +38,9 @@ const Pipeline = createReactClass({
     if (this.props.connections.length == 0) {
       return (
         <Alert bsStyle="danger" className="pipeline-no-connections-warning">
-            This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one
-            stream to make it process incoming messages. Note that this is not required if you intend to use this
-            pipeline only for search result transformation using decorators.
+          This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one
+          stream to make it process incoming messages. Note that this is not required if you intend to use this
+          pipeline only for search result transformation using decorators.
         </Alert>
       );
     }

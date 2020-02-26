@@ -139,14 +139,10 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "Well-sc-19gs1oc-0",
-                        "isStatic": true,
+                        "isStatic": false,
                         "lastClassName": "kezSPd",
                         "rules": Array [
-                          "background-color:",
-                          "#F1F2F2",
-                          ";border-color:",
-                          "#DCE1E5",
-                          ";",
+                          [Function],
                         ],
                       },
                       "displayName": "Well",

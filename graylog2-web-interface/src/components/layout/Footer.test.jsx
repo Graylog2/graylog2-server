@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render, waitForElement } from '@testing-library/react';
+import { cleanup, render, waitForElement } from 'wrappedTestingLibrary';
 
 import Footer from './Footer';
 

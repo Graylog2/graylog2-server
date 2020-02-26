@@ -35,7 +35,7 @@ const EmptyResultWidget = () => (
     <Icon name="times" size="3x" className={styles.iconMargin} />
     <div>
       <strong>
-      Your search returned no results, try changing the used time range or the search query.{' '}
+        Your search returned no results, try changing the used time range or the search query.{' '}
       </strong>
 
       <br />

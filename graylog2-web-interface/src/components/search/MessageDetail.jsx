@@ -5,12 +5,12 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
 import { Button, ButtonGroup, Row, Col, DropdownButton, MenuItem, Label } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Icon, Spinner, ClipboardButton, Timestamp } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
-import { Spinner, ClipboardButton, Timestamp } from 'components/common';
+
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 
 import Routes from 'routing/Routes';

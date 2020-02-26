@@ -66,22 +66,22 @@ export default class ParameterBinding {
 }
 
 class Builder {
-  value: InternalStateBuilder;
+  _value: InternalStateBuilder;
 
-  constructor(value: Immutable.Map<string, *> = Immutable.Map()) {
-    this.value = value;
+  constructor(value: InternalStateBuilder = Immutable.Map()) {
+    this._value = value;
   }
 
   type(value: string): Builder {
-    return new Builder(this.value.set('type', value));
+    return new Builder(this._value.set('type', value));
   }
 
   value(value: string): Builder {
-    return new Builder(this.value.set('value', value));
+    return new Builder(this._value.set('value', value));
   }
 
   build(): ParameterBinding {
-    const { type, value } = this.value.toObject();
+    const { type, value } = this._value.toObject();
     return new ParameterBinding(type, value);
   }
 }

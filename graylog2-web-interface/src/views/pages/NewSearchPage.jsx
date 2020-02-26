@@ -68,6 +68,7 @@ class NewSearchPage extends React.Component<Props, State> {
     return this.loadNewView({}).then(() => {
       const { pathname, search } = router.getCurrentLocation();
       const query = `${pathname}${search}`;
+      // running syncWithQueryParameters with the "old" query, will replace the url query with the new view settings
       syncWithQueryParameters(query);
     });
   }
