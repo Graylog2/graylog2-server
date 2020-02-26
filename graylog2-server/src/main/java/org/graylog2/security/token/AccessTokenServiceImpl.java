@@ -110,7 +110,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             fields.put(AccessTokenImpl.LAST_ACCESS, Tools.dateTimeFromDouble(0)); // aka never.
             accessToken = new AccessTokenImpl(fields);
             try {
-                id = saveWithoutValidation(accessToken);
+                id = saveWithoutValidation(encrypt(accessToken));
             } catch (DuplicateKeyException ignore) {
             }
         } while (iterations++ < 10 && id == null);
