@@ -39,8 +39,12 @@ import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.InvalidOffsetException;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.internals.NoOpConsumerRebalanceListener;
+import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.errors.AuthorizationException;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
@@ -69,11 +73,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -239,69 +245,103 @@ public class KafkaTransport extends ThrottleableTransport {
         // this is to avoid yanking away the connection from the consumer runnables
         stopLatch = new CountDownLatch(numThreads);
 
-        IntStream.range(0, numThreads).forEach(i -> {
-            executor.submit(() -> {
-                final Properties nprops = (Properties) props.clone();
-                nprops.put("client.id", "gl2-" + nodeId + "-" + input.getId() + "-" + i);
-                final KafkaConsumer<byte[], byte[]> consumer;
+        IntStream.range(0, numThreads).forEach(i -> executor.submit(new ConsumerRunnable(props, input, i)));
+    }
+
+    private class ConsumerRunnable implements Runnable {
+        private final Properties props;
+        private final MessageInput input;
+        private final KafkaConsumer<byte[], byte[]> consumer;
+
+        public ConsumerRunnable(Properties props, MessageInput input, int threadId) {
+            this.input = input;
+            final Properties nprops = (Properties) props.clone();
+            nprops.put("client.id", "gl2-" + nodeId + "-" + input.getId() + "-" + threadId);
+            this.props = nprops;
+            consumer = new KafkaConsumer<>(props);
+            //noinspection ConstantConditions
+            consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)), new NoOpConsumerRebalanceListener());
+        }
+
+        private void consumeRecords(Iterator<ConsumerRecord<byte[], byte[]>> consumerIterator) {
+            // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
+            // noinspection WhileLoopReplaceableByForEach
+            while (consumerIterator.hasNext()) {
+                if (paused) {
+                    // we try not to spin here, so we wait until the lifecycle goes back to running.
+                    LOG.debug("Message processing is paused, blocking until message processing is turned back on.");
+                    Uninterruptibles.awaitUninterruptibly(pausedLatch);
+                }
+                // check for being stopped before actually getting the message, otherwise we could end up losing that message
+                if (stopped) {
+                    break;
+                }
+                if (isThrottled()) {
+                    blockUntilUnthrottled();
+                }
+
+                // process the message, this will immediately mark the message as having been processed. this gets tricky
+                // if we get an exception about processing it down below.
+                final byte[] bytes = consumerIterator.next().value();
+
+                // it is possible that the message is null
+                if (bytes == null) {
+                    continue;
+                }
+                totalBytesRead.addAndGet(bytes.length);
+                lastSecBytesReadTmp.addAndGet(bytes.length);
+
+                final RawMessage rawMessage = new RawMessage(bytes);
+                input.processRawMessage(rawMessage);
+            }
+        }
+
+        private Optional<Iterator<ConsumerRecord<byte[], byte[]>>> tryPoll() {
+            try {
+                // Workaround https://issues.apache.org/jira/browse/KAFKA-4189 by calling wakeup()
+                final ScheduledFuture<?> future = scheduler.schedule(consumer::wakeup, 2000, TimeUnit.MILLISECONDS);
+                final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(1000);
+                future.cancel(true);
+
+                return Optional.of(consumerRecords.iterator());
+            } catch (WakeupException e) {
+                LOG.error("WakeupException in poll. Kafka server is not responding.");
+            } catch (InvalidOffsetException | AuthorizationException e) {
+                LOG.error("Exception in poll.", e);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public void run() {
+            while (!stopped) {
+                final Optional<Iterator<ConsumerRecord<byte[], byte[]>>> consumerIterator;
                 try {
-                    consumer = new KafkaConsumer<>(nprops);
-                    //noinspection ConstantConditions
-                    consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)), new NoOpConsumerRebalanceListener());
-                } catch (Exception e) {
-                    LOG.warn("Could not create KafkaConsumer", e);
-                    throw e;
-                }
-
-                while (!stopped) {
-                    final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(1000);
-                    final Iterator<ConsumerRecord<byte[], byte[]>> consumerIterator = consumerRecords.iterator();
-                    try {
-                        // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
-                        // noinspection WhileLoopReplaceableByForEach
-                        while (consumerIterator.hasNext()) {
-                            if (paused) {
-                                // we try not to spin here, so we wait until the lifecycle goes back to running.
-                                LOG.debug("Message processing is paused, blocking until message processing is turned back on.");
-                                Uninterruptibles.awaitUninterruptibly(pausedLatch);
-                            }
-                            // check for being stopped before actually getting the message, otherwise we could end up losing that message
-                            if (stopped) {
-                                break;
-                            }
-                            if (isThrottled()) {
-                                blockUntilUnthrottled();
-                            }
-
-                            // process the message, this will immediately mark the message as having been processed. this gets tricky
-                            // if we get an exception about processing it down below.
-                            // final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
-
-                            final byte[] bytes = consumerIterator.next().value();
-
-                            // it is possible that the message is null
-                            if (bytes == null) {
-                                continue;
-                            }
-
-                            totalBytesRead.addAndGet(bytes.length);
-                            lastSecBytesReadTmp.addAndGet(bytes.length);
-
-                            final RawMessage rawMessage = new RawMessage(bytes);
-
-                            input.processRawMessage(rawMessage);
-                        }
-                    } catch (Exception e) {
-                        LOG.error("Kafka error in consumer thread.", e);
+                    consumerIterator = tryPoll();
+                    if (! consumerIterator.isPresent()) {
+                        LOG.error("Caught recoverable exception. Retrying");
+                        Thread.sleep(2000);
+                        continue;
                     }
+                } catch (KafkaException | InterruptedException e) {
+                    LOG.error("Caught unrecoverable exception in poll. Stopping input", e);
+                    stopped = true;
+                    break;
                 }
-                // explicitly commit our offsets when stopping.
-                // this might trigger a couple of times, but it won't hurt
-                consumer.commitAsync();
-                stopLatch.countDown();
-                consumer.close();
-            });
-        });
+                try {
+                    consumeRecords(consumerIterator.get());
+                } catch (Exception e) {
+                    LOG.error("Exception in consumer thread. Continuing", e);
+                }
+            }
+            // explicitly commit our offsets when stopping.
+            // this might trigger a couple of times, but it won't hurt
+            consumer.commitAsync();
+            stopLatch.countDown();
+            // TODO once we update our kafka client, we should call this with a timeout
+            // Otherwise might hang if kafka is not available: https://issues.apache.org/jira/browse/KAFKA-3822
+            consumer.close();
+        }
     }
 
     private void doLaunchLegacy(final MessageInput input) {
