@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { render, cleanup, fireEvent, waitForElement } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
-import '@testing-library/jest-dom';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';

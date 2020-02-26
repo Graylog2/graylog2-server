@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import { render, waitForElement } from 'wrappedTestingLibrary';
-import '@testing-library/jest-dom/extend-expect';
 
 import asMock from 'helpers/mocking/AsMock';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
