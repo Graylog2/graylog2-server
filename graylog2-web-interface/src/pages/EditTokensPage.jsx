@@ -53,9 +53,9 @@ const EditTokensPage = createReactClass({
       [`users:tokenlist:${username}`]);
   },
 
-  _deleteToken(token, tokenName) {
-    const promise = UsersStore.deleteToken(this.props.params.username, token, tokenName);
-    this.setState({ deletingToken: token });
+  _deleteToken(tokenId, tokenName) {
+    const promise = UsersStore.deleteToken(this.props.params.username, tokenId, tokenName);
+    this.setState({ deletingToken: tokenId });
     promise.then(() => {
       this._loadTokens(this.props.params.username);
       this.setState({ deletingToken: undefined });

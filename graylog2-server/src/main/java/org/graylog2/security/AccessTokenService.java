@@ -19,6 +19,7 @@ package org.graylog2.security;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -27,6 +28,9 @@ import java.util.List;
 public interface AccessTokenService extends PersistedService {
     @SuppressWarnings("unchecked")
     AccessToken load(String token);
+
+    @Nullable
+    AccessToken loadById(String id);
 
     @SuppressWarnings("unchecked")
     List<AccessToken> loadAll(String username);

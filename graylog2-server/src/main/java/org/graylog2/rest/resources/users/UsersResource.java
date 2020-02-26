@@ -443,7 +443,7 @@ public class UsersResource extends RestResource {
 
         final ImmutableList.Builder<Token> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
-            tokenList.add(Token.create(token.getName(), token.getToken(), token.getLastAccess()));
+            tokenList.add(Token.create(token.getId(), token.getName(), token.getToken(), token.getLastAccess()));
         }
 
         return TokenList.create(tokenList.build());
@@ -466,21 +466,26 @@ public class UsersResource extends RestResource {
 
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
 
-        return Token.create(accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
+        return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
 
     @DELETE
-    @Path("{username}/tokens/{token}")
+    @Path("{username}/tokens/{idOrToken}")
     @ApiOperation("Removes a token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_DELETE)
     public void revokeToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
-            @ApiParam(name = "token", required = true) @PathParam("token") String token) {
+            @ApiParam(name = "idOrToken", required = true) @PathParam("idOrToken") String idOrToken) {
         if (!isPermitted(USERS_TOKENREMOVE, username)) {
             throw new ForbiddenException("Not allowed to remove tokens for user " + username);
         }
 
-        final AccessToken accessToken = accessTokenService.load(token);
+        // The endpoint supports both, deletion by token ID and deletion by using the token value itself.
+        // The latter should not be used anymore because the plain text token will be part of the URL and URLs
+        // will most probably be logged. We keep the old behavior for backwards compatibility.
+        // TODO: Remove support for old behavior in 4.0
+        final AccessToken accessToken = Optional.ofNullable(accessTokenService.loadById(idOrToken))
+                .orElse(accessTokenService.load(idOrToken));
 
         if (accessToken != null) {
             accessTokenService.destroy(accessToken);

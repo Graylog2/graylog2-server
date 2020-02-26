@@ -32,6 +32,7 @@ import org.graylog2.security.AccessTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -67,6 +68,18 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             throw new IllegalStateException("Access tokens collection has no unique index!");
         }
         return fromDBObject(objects.get(0));
+    }
+
+    @Nullable
+    @Override
+    public AccessToken loadById(String id) {
+        try {
+            return fromDBObject(get(AccessTokenImpl.class, id));
+        } catch (IllegalArgumentException e) {
+            // Happens when id is not a valid BSON ObjectId
+            LOG.debug("Couldn't load access token", e);
+            return null;
+        }
     }
 
     @Override
