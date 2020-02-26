@@ -16,45 +16,30 @@
  */
 package org.graylog2.security.token;
 
-import com.google.common.base.Preconditions;
 import com.google.common.hash.Hashing;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.graylog2.Configuration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.security.AESTools;
 
 import javax.inject.Inject;
-import java.nio.charset.StandardCharsets;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AccessTokenCipher {
 
-    private final byte[] iV;
-    private final String encryptionKey;
+    private final byte[] encryptionKey;
 
     @Inject
-    public AccessTokenCipher(ClusterConfigService clusterConfigService, Configuration configuration) {
-        encryptionKey = configuration.getPasswordSecret()
-                .substring(0, 16);
-
-        ClusterId clusterId = clusterConfigService.get(ClusterId.class);
-        Preconditions.checkArgument(clusterId != null && StringUtils.isNotBlank(clusterId.clusterId()),
-                "No cluster ID found. This is a precondition for being able to encrypt/decrypt access tokens!");
-
-        // Hash the cluster ID so that we always get the 16 bytes we need for the IV
-        final byte[] hashedClusterId = Hashing.sha256()
-                .hashString(clusterId.clusterId(), StandardCharsets.UTF_8)
-                .asBytes();
-
-        this.iV = ArrayUtils.subarray(hashedClusterId, 0, 16);
+    public AccessTokenCipher(Configuration configuration) {
+        // The password secret is only required to be at least 16 bytes long. Since the encryptSiv/decryptSiv methods
+        // in AESTools require an encryption key that is at least 32 bytes long, we create a hash of the value.
+        encryptionKey = Hashing.sha256().hashString(configuration.getPasswordSecret(), UTF_8).asBytes();
     }
 
     public String encrypt(String cleartext) {
-        return AESTools.encrypt(cleartext, encryptionKey, iV);
+        return AESTools.encryptSiv(cleartext, encryptionKey);
     }
 
     public String decrypt(String ciphertext) {
-        return AESTools.decrypt(ciphertext, encryptionKey, iV);
+        return AESTools.decryptSiv(ciphertext, encryptionKey);
     }
 }

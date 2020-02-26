@@ -211,6 +211,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.cryptomator</groupId>
+            <artifactId>siv-mode</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
         </dependency>

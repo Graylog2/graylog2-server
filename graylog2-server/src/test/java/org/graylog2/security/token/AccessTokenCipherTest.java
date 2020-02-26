@@ -17,8 +17,6 @@
 package org.graylog2.security.token;
 
 import org.graylog2.Configuration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,18 +34,13 @@ public class AccessTokenCipherTest {
     private AccessTokenCipher cipher;
 
     @Mock
-    ClusterConfigService clusterConfigService;
-
-    @Mock
     Configuration configuration;
 
     @Before
     public void setUp() throws Exception {
         when(configuration.getPasswordSecret()).thenReturn("0123456789ABCDEF");
-        when(clusterConfigService.get(ClusterId.class)).thenReturn(
-                ClusterId.create("ad81df7d-564f-4c08-9c8c-9cdb4f67bc22"));
 
-        cipher = new AccessTokenCipher(clusterConfigService, configuration);
+        cipher = new AccessTokenCipher(configuration);
     }
 
     @Test
@@ -58,12 +51,12 @@ public class AccessTokenCipherTest {
     @Test
     public void encrypt() {
         final String ciphertext = cipher.encrypt("cleartext");
-        assertThat(ciphertext).isEqualTo("a870705382bd82b62c980648ce3b0944");
+        assertThat(ciphertext).isEqualTo("e5cb18c577b661b60ef0810675962f3fb9b0c2ad63b9e76afb");
     }
 
     @Test
     public void decrypt() {
-        final String cleartext = cipher.decrypt("a870705382bd82b62c980648ce3b0944");
+        final String cleartext = cipher.decrypt("e5cb18c577b661b60ef0810675962f3fb9b0c2ad63b9e76afb");
         assertThat(cleartext).isEqualTo("cleartext");
     }
 

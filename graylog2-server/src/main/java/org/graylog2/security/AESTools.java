@@ -17,6 +17,7 @@
 package org.graylog2.security;
 
 import org.apache.shiro.codec.Hex;
+import org.cryptomator.siv.SivMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +25,14 @@ import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AESTools {
     private static final Logger LOG = LoggerFactory.getLogger(AESTools.class);
+
+    private static final SivMode SIV_MODE = new SivMode();
 
     @Nullable
     public static String encrypt(String plainText, String encryptionKey, String salt) {
@@ -54,5 +60,62 @@ public class AESTools {
             LOG.error("Could not decrypt value.", e);
         }
         return null;
+    }
+
+    /**
+     * Encrypt the given plain text value with the given encryption key using AES SIV. (RFC 5297)
+     *
+     * @param plainText     the plain text value to encrypt
+     * @param encryptionKey the encryption key (must be at least 32 bytes)
+     * @return the encrypted cipher text or null if encryption failed
+     * @throws IllegalArgumentException if the encryption key is smaller than 32 bytes
+     */
+    @Nullable
+    public static String encryptSiv(String plainText, byte[] encryptionKey) {
+        validateTextAndEntryptionKey(plainText, encryptionKey);
+        try {
+            final byte[] cipherBytes = SIV_MODE.encrypt(
+                    Arrays.copyOf(encryptionKey, 16),
+                    Arrays.copyOfRange(encryptionKey, 16, encryptionKey.length),
+                    plainText.getBytes(UTF_8)
+            );
+            return Hex.encodeToString(cipherBytes);
+        } catch (Exception e) {
+            LOG.error("Couldn't encrypt value", e);
+        }
+        return null;
+    }
+
+    /**
+     * Decrypt the given cipher text value with the given encryption key using AES SIV. (RFC 5297)
+     *
+     * @param cipherText    the cipher text value to decrypt
+     * @param encryptionKey the encryption key (must be at least 32 bytes)
+     * @return the decrypted cipher text or null if decryption failed
+     * @throws IllegalArgumentException if the encryption key is smaller than 32 bytes
+     */
+    @Nullable
+    public static String decryptSiv(String cipherText, byte[] encryptionKey) {
+        validateTextAndEntryptionKey(cipherText, encryptionKey);
+        try {
+            final byte[] plainBytes = SIV_MODE.decrypt(
+                    Arrays.copyOf(encryptionKey, 16),
+                    Arrays.copyOfRange(encryptionKey, 16, encryptionKey.length),
+                    Hex.decode(cipherText.getBytes(UTF_8))
+            );
+            return new String(plainBytes, UTF_8);
+        } catch (Exception e) {
+            LOG.error("Couldn't decrypt value", e);
+        }
+        return null;
+    }
+
+    private static void validateTextAndEntryptionKey(String text, byte[] encryptionKey) {
+        if (text == null) {
+            throw new IllegalArgumentException("text value cannot be null");
+        }
+        if (encryptionKey == null || encryptionKey.length < 32) {
+            throw new IllegalArgumentException("encryptionKey cannot be null and must be at least 32 bytes long");
+        }
     }
 }
