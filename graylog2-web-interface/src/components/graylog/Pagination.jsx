@@ -7,22 +7,21 @@ import { css } from 'styled-components';
 import { darken } from 'polished';
 
 import { DEPRECATION_NOTICE } from 'util/constants';
-import teinte from 'theme/teinte';
 
 export const paginationStyles = css(({ theme }) => css`
   &.pagination {
     > li {
       > a,
       > span {
-        color: ${teinte.tertiary.quattro};
-        background-color: ${teinte.primary.due};
-        border-color: ${teinte.secondary.tre};
+        color: ${theme.color.tertiary.quattro};
+        background-color: ${theme.color.primary.due};
+        border-color: ${theme.color.secondary.tre};
 
         &:hover,
         &:focus {
-          color: ${darken(0.15, teinte.tertiary.quattro)};
-          background-color: ${teinte.secondary.due};
-          border-color: ${teinte.secondary.tre};
+          color: ${darken(0.15, theme.color.tertiary.quattro)};
+          background-color: ${theme.color.secondary.due};
+          border-color: ${theme.color.secondary.tre};
         }
       }
     }
