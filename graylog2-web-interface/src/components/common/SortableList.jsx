@@ -10,6 +10,7 @@ import SortableListItem from './SortableListItem';
 
 const SortableListGroup = styled(ListGroup)(({ disableDragging }) => css`
   cursor: ${disableDragging ? 'default' : 'move'};
+  margin: 0 0 15px;
 
   .dragging {
     opacity: 0.5;
@@ -19,14 +20,19 @@ const SortableListGroup = styled(ListGroup)(({ disableDragging }) => css`
     border: 1px dashed #8c8e86;
   }
 
-  .list-group-item:first-child {
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
+  .list-group-item {
+    border-radius: 0;
   }
 
-  .list-group-item:last-child {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+  & > div:first-child .list-group-item {
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+  }
+
+  & > div:last-child .list-group-item {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    margin-bottom: 0;
   }
 `);
 
