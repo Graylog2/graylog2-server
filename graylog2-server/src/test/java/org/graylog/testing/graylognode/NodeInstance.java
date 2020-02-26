@@ -50,7 +50,10 @@ public class NodeInstance {
                 .withFileFromClasspath("graylog.conf", "org/graylog/testing/graylognode/config/graylog.conf")
                 .withFileFromClasspath("log4j2.xml", "org/graylog/testing/graylognode/config/log4j2.xml")
                 .withFileFromPath("sigar", pathTo("sigar_dir"))
-                .withFileFromPath("graylog.jar", pathTo("server_jar"));
+                .withFileFromPath("graylog.jar", pathTo("server_jar"))
+                .withFileFromPath("graylog-plugin-aws.jar", pathTo("aws_plugin_jar"))
+                .withFileFromPath("graylog-plugin-threatintel.jar", pathTo("threatintel_plugin_jar"))
+                .withFileFromPath("graylog-plugin-collector.jar", pathTo("collector_plugin_jar"));
 
         return new GenericContainer<>(image)
                 .withExposedPorts(9000)
@@ -74,6 +77,6 @@ public class NodeInstance {
     }
 
     public String getApiAddress() {
-        return "http://" + container.getContainerIpAddress() + ":" + container.getFirstMappedPort();
+        return String.format("http://%s:%d/api", container.getContainerIpAddress(), container.getFirstMappedPort());
     }
 }

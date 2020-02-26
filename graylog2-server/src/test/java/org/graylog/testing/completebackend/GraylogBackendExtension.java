@@ -41,7 +41,6 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
     @Override
     public void beforeAll(ExtensionContext context) {
-
         Stopwatch sw = Stopwatch.createStarted();
 
         backend = GraylogBackend.createStarted();

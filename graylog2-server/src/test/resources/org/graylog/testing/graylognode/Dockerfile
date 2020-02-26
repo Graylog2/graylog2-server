@@ -81,6 +81,7 @@ COPY docker-entrypoint.sh /
 COPY graylog.conf ${GRAYLOG_HOME}/data/config
 COPY log4j2.xml ${GRAYLOG_HOME}/data/config
 
+COPY graylog-plugin-*.jar ${GRAYLOG_HOME}/plugin/
 COPY graylog.jar ${GRAYLOG_HOME}
 
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
