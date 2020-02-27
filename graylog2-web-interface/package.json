@@ -31,7 +31,7 @@
     ],
     "setupFiles": [
       "jest-localstorage-mock",
-      "<rootDir>/test/setup-jest.jsx",
+      "<rootDir>/test/setup-jest.js",
       "<rootDir>/test/mock-FetchProvider.js",
       "<rootDir>/test/mock-Version.js"
     ],
@@ -64,8 +64,9 @@
     }
   },
   "dependencies": {
+    "@react-bootstrap/pagination": "^1.0.0",
     "bluebird": "^3.4.0",
-    "bootstrap": "^3.4.0",
+    "bootstrap": "3.4.1",
     "bson-objectid": "^1.2.5",
     "c3": "^0.4.11-rc4",
     "chroma-js": "^2.0.3",
