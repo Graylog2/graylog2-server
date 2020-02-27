@@ -148,6 +148,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final String ciphertext = (String) fields.get(AccessTokenImpl.TOKEN);
         if (StringUtils.isNotBlank(ciphertext)) {
             fields.put(AccessTokenImpl.TOKEN, cipher.decrypt(ciphertext));
+            // The token type field is only used internally for now so we don't want to expose it
             fields.remove(AccessTokenImpl.TOKEN_TYPE);
         }
         final ObjectId id = (ObjectId) dbObject.get("_id");

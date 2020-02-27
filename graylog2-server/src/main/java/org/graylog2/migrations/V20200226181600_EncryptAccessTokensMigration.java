@@ -55,6 +55,8 @@ public class V20200226181600_EncryptAccessTokensMigration extends Migration {
     public void upgrade() {
         final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(AccessTokenImpl.COLLECTION_NAME);
 
+        // We use the absence of the "token_type" field as an indicator to select access tokens that need to be encrypted
+        // If we should change the encryption method in the future, we need to adjust the query
         for (final Document document : collection.find(Filters.exists(AccessTokenImpl.TOKEN_TYPE, false))) {
             final String tokenId = document.getObjectId("_id").toHexString();
             final String tokenName = document.getString(AccessTokenImpl.NAME);
