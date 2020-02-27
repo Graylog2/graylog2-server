@@ -224,7 +224,6 @@ class MessageTable extends React.Component<Props, State> {
               <AdditionalContext.Provider key={messageKey}
                                           value={{ message }}>
                 <MessageTableEntry fields={fields}
-                                   disableSurroundingSearch
                                    message={message}
                                    showMessageRow={config && config.showMessageRow}
                                    selectedFields={selectedFields}
