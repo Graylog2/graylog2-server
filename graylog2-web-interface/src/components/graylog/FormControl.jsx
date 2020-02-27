@@ -25,10 +25,13 @@ const FormControl = memo(styled(BootstrapFormControl)(({ theme }) => css`
     background-color: ${theme.color.secondary.tre};
   }
 
-  ~ .form-control-feedback.glyphicon { display: none; }
+  ~ .form-control-feedback.glyphicon {
+    display: none;
+  }
 `));
 
 FormControl.Static = BootstrapFormControl.Static;
 FormControl.Feedback = BootstrapFormControl.Feedback;
 
+/** @component */
 export default FormControl;

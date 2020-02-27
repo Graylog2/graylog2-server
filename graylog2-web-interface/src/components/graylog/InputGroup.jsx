@@ -74,4 +74,5 @@ Button.defaultProps = {
   className: undefined,
 };
 
+/** @component */
 export default InputGroup;

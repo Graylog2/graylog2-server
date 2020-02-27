@@ -7,4 +7,5 @@ const Well = styled(BootstrapWell)(({ theme }) => css`
   border-color: ${theme.color.secondary.tre};
 `);
 
+/** @component */
 export default Well;

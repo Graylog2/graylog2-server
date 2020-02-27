@@ -48,4 +48,5 @@ ConfirmLeaveDialog.defaultProps = {
   question: 'Are you sure?',
 };
 
+/** @component */
 export default withRouter(ConfirmLeaveDialog);

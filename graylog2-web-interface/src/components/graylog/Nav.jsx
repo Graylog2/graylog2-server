@@ -54,4 +54,5 @@ const Nav = styled(BootstrapNav)(({ theme }) => {
   `;
 });
 
+/** @component */
 export default Nav;
