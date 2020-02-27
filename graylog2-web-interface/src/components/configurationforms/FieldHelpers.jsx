@@ -9,4 +9,5 @@ const FieldHelpers = {
   },
 };
 
+/** @component */
 export default FieldHelpers;

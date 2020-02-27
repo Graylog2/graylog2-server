@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoginBox renders a button after the input if buttonAfter is passed 1`] = `
+<div>
+  <div
+    class="container"
+  >
+    <div
+      class="row"
+    >
+      <div
+        class="LoginBox__LoginCol-sc-1uryto7-0 cHxlne col-md-4 col-md-offset-4 col-xs-6 col-xs-offset-3"
+      >
+        <div />
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -13,4 +13,5 @@ const DropdownButton = styled(BootstrapDropdownButton)`
   }
 `;
 
+/** @component */
 export default DropdownButton;

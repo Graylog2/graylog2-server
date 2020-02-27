@@ -19,10 +19,8 @@ const ContainerRow = styled(Row)`
 `;
 
 const StyledErrorJumbotron = styled(StyledJumbotron)(({ theme }) => css`
-  && {
-    background-color: ${rgba(theme.color.primary.due, 0.8)};
-    text-align: center;
-  }
+  background-color: ${rgba(theme.color.primary.due, 0.8)};
+  text-align: center;
 `);
 
 export const H1 = styled.h1`
