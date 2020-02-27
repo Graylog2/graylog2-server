@@ -8,6 +8,7 @@ import Routes from 'routing/Routes';
 import { DropdownButton, MenuItem } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 import { addToQuery, escape } from 'views/logic/queries/QueryHelper';
+import type { SearchesConfig } from './SearchConfig';
 
 const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }) => Object.entries(surroundingTimerangeOptions)
   .reduce((prev, [key, value]) => ({ ...prev, [moment.duration(key).asSeconds()]: value }), {});
@@ -45,10 +46,7 @@ const searchLink = (range, timestamp, id, messageFields, searchConfig) => {
 };
 
 type Props = {
-  searchConfig: {
-    surrounding_timerange_options: {},
-    surrounding_filter_fields: Array<string>,
-  },
+  searchConfig: SearchesConfig,
   timestamp: string,
   id: string,
   messageFields: { [string]: mixed },
@@ -58,7 +56,7 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
   const timeRangeOptions = buildTimeRangeOptions(searchConfig);
   const menuItems = Object.keys(timeRangeOptions)
     .sort((a, b) => naturalSort(a, b))
-    .map((range) => (
+    .map(range => (
       <MenuItem key={range} href={searchLink(range, timestamp, id, messageFields, searchConfig)}>
         {timeRangeOptions[range]}
       </MenuItem>
