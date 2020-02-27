@@ -1,13 +1,12 @@
 import PropTypes from 'prop-types';
-import React from 'react';
-import { DropdownButton, MenuItem } from 'components/graylog';
-import naturalSort from 'javascript-natural-sort';
-
-import StoreProvider from 'injection/StoreProvider';
-
+import * as React from 'react';
+import Qs from 'qs';
 import moment from 'moment';
 
-const SearchStore = StoreProvider.getStore('Search');
+import Routes from 'routing/Routes';
+import { DropdownButton, MenuItem } from 'components/graylog';
+import naturalSort from 'javascript-natural-sort';
+import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 
 class SurroundingSearchButton extends React.Component {
   static propTypes = {
@@ -28,22 +27,37 @@ class SurroundingSearchButton extends React.Component {
   };
 
   _buildFilterFields = () => {
-    const fields = {};
+    const { messageFields, searchConfig } = this.props;
+    const { surrounding_filter_fields: surroundingFilterFields = [] } = searchConfig;
 
-    if (this.props.searchConfig) {
-      this.props.searchConfig.surrounding_filter_fields.forEach((field) => {
-        fields[field] = this.props.messageFields[field];
-      });
-    }
+    return surroundingFilterFields.reduce((prev, cur) => ({ ...prev, [cur]: messageFields[cur] }), {});
+  };
 
-    return fields;
+  _buildSearchLink = (id, fromTime, toTime, fields, filter) => {
+    const query = Object.keys(filter)
+      .filter(key => (filter[key] !== null && filter[key] !== undefined))
+      .map(key => `${key}:"${escape(filter[key])}"`)
+      .reduce((prev, cur) => addToQuery(prev, cur), '');
+
+    const params = {
+      rangetype: 'absolute',
+      from: fromTime,
+      to: toTime,
+      q: query,
+      highlightMessage: id,
+      fields,
+    };
+
+    return `${Routes.SEARCH}?${Qs.stringify(params)}`;
   };
 
   _searchLink = (range) => {
-    const fromTime = moment.unix(this.props.timestamp - Number(range)).toISOString();
-    const toTime = moment.unix(this.props.timestamp + Number(range)).toISOString();
+    const { timestamp, id } = this.props;
+    const fromTime = moment(timestamp).subtract(Number(range), 'seconds').toISOString();
+    const toTime = moment(timestamp).add(Number(range), 'seconds').toISOString();
+    const filterFields = this._buildFilterFields();
 
-    return SearchStore.searchSurroundingMessages(this.props.id, fromTime, toTime, this._buildFilterFields());
+    return this._buildSearchLink(id, fromTime, toTime, [], filterFields);
   };
 
   render() {
