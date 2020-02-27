@@ -91,6 +91,6 @@ public class NodeInstance {
     }
 
     public String getApiAddress() {
-        return String.format(Locale.US, container.getContainerIpAddress(), container.getFirstMappedPort());
+        return String.format(Locale.US, "http://%s:%d/api", container.getContainerIpAddress(), container.getFirstMappedPort());
     }
 }
