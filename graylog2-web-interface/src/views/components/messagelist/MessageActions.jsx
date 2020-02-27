@@ -12,6 +12,7 @@ type Props = {
   id: string,
   fields: {
     timestamp: string,
+    [string]: mixed,
   },
   decorationStats: ?any,
   disabled: boolean,
@@ -54,11 +55,13 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
 
   const messageUrl = index ? Routes.message_show(index, id) : '#';
 
+  const { timestamp, ...remainingFields } = fields;
+
   const surroundingSearchButton = disableSurroundingSearch || (
     <SurroundingSearchButton id={id}
-                             timestamp={fields.timestamp}
+                             timestamp={timestamp}
                              searchConfig={searchConfig}
-                             messageFields={fields} />
+                             messageFields={remainingFields} />
   );
 
   const showChanges = decorationStats && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;
