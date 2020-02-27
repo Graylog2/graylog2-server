@@ -2,8 +2,6 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import mockComponent from 'helpers/mocking/MockComponent';
-
 import { ViewSharingActions } from 'views/stores/ViewSharingStore';
 import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
@@ -13,7 +11,6 @@ const mockLoadRoles = jest.fn(() => Promise.resolve([]));
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 
-jest.mock('components/bootstrap/BootstrapModalForm', () => mockComponent('BootstrapModalForme'));
 jest.mock('stores/connect', () => x => x);
 jest.mock('injection/StoreProvider', () => ({
   getStore: (store) => {

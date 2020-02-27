@@ -3,7 +3,7 @@ import * as React from 'react';
 import { get } from 'lodash';
 
 import { FormGroup, HelpBlock, Radio } from 'components/graylog';
-import { BootstrapModalConfirm } from 'components/bootstrap';
+import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 import Select from 'views/components/Select';
 import Spinner from 'components/common/Spinner';
 import StoreProvider from 'injection/StoreProvider';
