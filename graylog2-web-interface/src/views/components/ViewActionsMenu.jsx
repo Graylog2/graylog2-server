@@ -6,6 +6,7 @@ import { withRouter } from 'react-router';
 
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
 import { Icon } from 'components/common';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
@@ -35,7 +36,7 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 
 const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => {
   const [shareViewOpen, setShareViewOpen] = useState(false);
-  const [debugOpen, setDebugOpen] = useState(false);
+  const debugModal = useRef<BootstrapModalWrapper>();
   const saveNewModal = useRef<ViewPropertiesModal>();
   const editModal = useRef<ViewPropertiesModal>();
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
@@ -43,7 +44,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
   const debugOverlay = AppConfig.gl2DevMode() && (
     <React.Fragment>
       <MenuItem divider />
-      <MenuItem onSelect={() => setDebugOpen(true)}>
+      <MenuItem onSelect={() => debugModal.current.open()}>
         <Icon name="code" /> Debug
       </MenuItem>
     </React.Fragment>
@@ -70,7 +71,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />
         </IfDashboard>
       </DropdownButton>
-      <DebugOverlay show={debugOpen} onClose={() => setDebugOpen(false)} />
+      <DebugOverlay ref={debugModal} />
       <ViewPropertiesModal view={view.toBuilder().newId().build()}
                            title="Save new dashboard"
                            onSave={newView => onSaveAsView(newView, router)}

@@ -1,41 +1,34 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
-import { Modal } from 'components/graylog';
 
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchStore } from 'views/stores/SearchStore';
 import connect from 'stores/connect';
 
-const DebugOverlay = createReactClass({
-  displayName: 'DebugOverlay',
+import { Modal } from 'components/graylog';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import type { SearchStoreState } from 'views/stores/SearchStore';
 
-  propTypes: {
-    show: PropTypes.bool.isRequired,
-    onClose: PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      onClose: () => {},
-    };
-  },
-
-  render() {
-    const { show, onClose } = this.props;
-    const modalBody = show && (
+type Props = {
+  currentView: ViewStoreState,
+  searches: SearchStoreState,
+  modalRef: BootstrapModalWrapper
+}
+const DebugOverlay = ({ currentView, searches, modalRef }: Props) => (
+  <BootstrapModalWrapper ref={modalRef}>
+    <Modal.Body>
       <textarea disabled
                 style={{ height: '80vh', width: '100%' }}
-                value={JSON.stringify(this.props, null, 2)} />
-    );
-    return (
-      <Modal onHide={onClose} show={show}>
-        <Modal.Body>
-          {modalBody}
-        </Modal.Body>
-      </Modal>
-    );
-  },
-});
+                value={JSON.stringify({ currentView, searches }, null, 2)} />
+    </Modal.Body>
+  </BootstrapModalWrapper>
+);
 
-export default connect(DebugOverlay, { views: ViewStore, searches: SearchStore });
+DebugOverlay.propTypes = {
+  currentView: PropTypes.object.isRequired,
+  searches: PropTypes.object.isRequired,
+};
+
+export default connect(DebugOverlay, { currentView: ViewStore, searches: SearchStore });

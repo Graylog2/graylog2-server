@@ -36,7 +36,7 @@ const searchUrl = URLUtils.qualifyUrl('/views/search');
 
 export { SearchActions };
 
-type InternalState = {
+export type SearchStoreState = {
   search: Search,
   result: SearchResult,
   widgetMapping: WidgetMapping,
@@ -170,7 +170,7 @@ export const SearchStore = singletonStore(
       throw new Error('Unable to execute search when no search is loaded!');
     },
 
-    _state(): InternalState {
+    _state(): SearchStoreState {
       return { search: this.search, result: this.result, widgetMapping: this.widgetMapping };
     },
 
