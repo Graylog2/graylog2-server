@@ -4,7 +4,7 @@ import Qs from 'qs';
 import styled, { css } from 'styled-components';
 
 import { Grid, Row, Col, Button } from 'components/graylog';
-import { Spinner, Icon } from 'components/common';
+import { ContentHeadRow, Spinner, Icon } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
@@ -111,15 +111,15 @@ class GettingStarted extends React.Component {
     if (showStaticContent) {
       gettingStartedContent = (
         <Grid>
-          <Row>
-            <Col mdPush={3} md={6} className="content content-head text-center" style={{ paddingBottom: '15px' }}>
+          <ContentHeadRow className="content">
+            <Col mdPush={3} md={6} className="text-center" style={{ paddingBottom: '15px' }}>
               <span>
                 We could not load the{' '}
                 <a target="_blank" rel="noopener noreferrer" href="https://gettingstarted.graylog.org/assets/index.html">Graylog Getting Started Guide</a>.
                 Please open it directly with a browser that can access the public internet.
               </span>
             </Col>
-          </Row>
+          </ContentHeadRow>
         </Grid>
       );
     } else {
@@ -135,11 +135,11 @@ class GettingStarted extends React.Component {
       if (!guideLoaded) {
         spinner = (
           <Grid>
-            <Row>
-              <Col mdPush={3} md={6} className="content content-head text-center" style={{ paddingBottom: '15px' }}>
+            <ContentHeadRow className="content">
+              <Col mdPush={3} md={6} className="text-center" style={{ paddingBottom: '15px' }}>
                 <Spinner text="Loading Graylog Getting started guide ..." />
               </Col>
-            </Row>
+            </ContentHeadRow>
           </Grid>
         );
       }

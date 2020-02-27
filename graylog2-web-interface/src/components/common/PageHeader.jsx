@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
+import { ContentHeadRow } from 'components/common';
 import lodash from 'lodash';
 
 import SupportLink from 'components/support/SupportLink';
@@ -64,10 +65,10 @@ class PageHeader extends React.Component {
   render() {
     const children = (this.props.children !== undefined && this.props.children.length !== undefined ? this.props.children : [this.props.children]);
 
-    const topLevelClassNames = this.props.subpage ? 'content-head' : 'content content-head';
+    const topLevelClassNames = this.props.subpage ? '' : 'content';
     return (
       <div>
-        <Row className={topLevelClassNames}>
+        <ContentHeadRow className={topLevelClassNames}>
           <Col sm={12}>
             {children[2]
             && (
@@ -106,7 +107,7 @@ class PageHeader extends React.Component {
             </Col>
             )
           }
-        </Row>
+        </ContentHeadRow>
       </div>
     );
   }
