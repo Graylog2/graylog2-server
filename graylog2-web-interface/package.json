@@ -202,6 +202,7 @@
   "resolutions": {
     "@types/jquery": "3.3.0",
     "jquery": "3.4.1",
+    "jsdom": "15.2.1",
     "upath": "1.0.5"
   }
 }
