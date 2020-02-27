@@ -16,6 +16,7 @@ type Props = {
   currentView: ViewStoreState,
   onClose: () => void,
   searches: SearchStoreState,
+  show: boolean,
 }
 
 const DebugOverlay = ({ currentView, searches, show, onClose }: Props) => (
