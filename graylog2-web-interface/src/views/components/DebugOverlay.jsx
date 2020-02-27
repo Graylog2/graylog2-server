@@ -8,14 +8,16 @@ import connect from 'stores/connect';
 
 import { Modal } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { SearchStoreState } from 'views/stores/SearchStore';
 
 type Props = {
   currentView: ViewStoreState,
+  onClose: () => void,
   searches: SearchStoreState,
-  onClose: () => void
 }
+
 const DebugOverlay = ({ currentView, searches, show, onClose }: Props) => (
   <BootstrapModalWrapper showModal={show} onHide={onClose}>
     <Modal.Body>
@@ -28,8 +30,8 @@ const DebugOverlay = ({ currentView, searches, show, onClose }: Props) => (
 
 DebugOverlay.propTypes = {
   currentView: PropTypes.object.isRequired,
-  searches: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
+  searches: PropTypes.object.isRequired,
   show: PropTypes.bool.isRequired,
 };
 

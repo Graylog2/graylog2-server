@@ -1,12 +1,11 @@
 // @flow strict
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { withRouter } from 'react-router';
 
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
 import { Icon } from 'components/common';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
@@ -36,15 +35,15 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 
 const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => {
   const [shareViewOpen, setShareViewOpen] = useState(false);
-  const [debugViewOpen, setDebugViewOpen] = useState(false);
+  const [debugOpen, setDebugOpen] = useState(false);
   const [saveNewOpen, setSaveAsOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
+  const [editViewOpen, setEditViewOpen] = useState(false);
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
     <React.Fragment>
       <MenuItem divider />
-      <MenuItem onSelect={() => setDebugViewOpen(true)}>
+      <MenuItem onSelect={() => setDebugOpen(true)}>
         <Icon name="code" /> Debug
       </MenuItem>
     </React.Fragment>
@@ -62,7 +61,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
         <Icon name="copy" /> Save as
       </Button>
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
-        <MenuItem onSelect={() => setEditOpen(true)} disabled={isNewView || !allowedToEdit}>
+        <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit
         </MenuItem>
         <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
@@ -74,7 +73,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />
         </IfDashboard>
       </DropdownButton>
-      {debugViewOpen && <DebugOverlay show onClose={() => setDebugViewOpen(false)} />}
+      {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveNewOpen && (
         <ViewPropertiesModal show
                              view={view.toBuilder().newId().build()}
@@ -82,11 +81,11 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
                              onClose={() => setSaveAsOpen(false)}
                              onSave={newView => onSaveAsView(newView, router)} />
       )}
-      {editOpen && (
+      {editViewOpen && (
         <ViewPropertiesModal show
                              view={view}
                              title="Editing dashboard"
-                             onClose={() => setEditOpen(false)}
+                             onClose={() => setEditViewOpen(false)}
                              onSave={updatedView => onSaveView(updatedView, router)} />
       )}
       {shareViewOpen && <ShareViewModal show view={view} onClose={() => setShareViewOpen(false)} />}
