@@ -3,6 +3,8 @@ import fieldTypeFor from './FieldTypeFor';
 
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';
+import AggregationControls from '../../components/aggregationbuilder/AggregationControls';
+import * as React from "react";
 
 describe('FieldTypeFor', () => {
   it('returns `FieldType.Unknown` if field type is not found', () => {
@@ -11,6 +13,7 @@ describe('FieldTypeFor', () => {
       .toEqual(FieldType.Unknown);
   });
   it('returns `FieldType.Unknown` if field types are `undefined`', () => {
+    // $FlowFixMe: Passing `undefined` types on purpose
     expect(fieldTypeFor('', undefined)).toEqual(FieldType.Unknown);
   });
   it('returns type of field if present', () => {

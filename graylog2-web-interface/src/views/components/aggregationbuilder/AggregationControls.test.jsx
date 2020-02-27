@@ -44,9 +44,9 @@ describe('AggregationControls', () => {
     suppressConsole(() => {
       const { getByTestId } = render((
         <AggregationControls config={config}
+                             // $FlowFixMe: Passing `undefined` fields on purpose
                              fields={undefined}
-                             onChange={() => {
-                             }}>
+                             onChange={() => {}}>
           {children}
         </AggregationControls>
       ));
