@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Modal, Well } from 'components/graylog';
+import { Button, Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import AuthThemeStyles from 'theme/styles/authStyles';
@@ -23,11 +23,16 @@ class ServerUnavailablePage extends React.Component {
   };
 
   _toggleDetails = () => {
-    this.setState({ showDetails: !this.state.showDetails });
+    const { showDetails } = this.state;
+
+    this.setState({ showDetails: !showDetails });
   };
 
   _formatErrorMessage = () => {
-    if (!this.state.showDetails) {
+    const { showDetails } = this.state;
+    const { server } = this.props;
+
+    if (!showDetails) {
       return null;
     }
 
@@ -38,11 +43,11 @@ class ServerUnavailablePage extends React.Component {
       </div>
     );
 
-    if (!this.props.server || !this.props.server.error) {
+    if (!server || !server.error) {
       return noInformationMessage;
     }
 
-    const { error } = this.props.server;
+    const { error } = server;
 
     const errorDetails = [];
     if (error.message) {
@@ -85,6 +90,8 @@ class ServerUnavailablePage extends React.Component {
   };
 
   render() {
+    const { showDetails } = this.state;
+
     return (
       <DocumentTitle title="Server unavailable">
         <AuthThemeStyles />
@@ -104,9 +111,9 @@ class ServerUnavailablePage extends React.Component {
                 <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
               </p>
               <div>
-                <a role="button" tabIndex={0} onClick={this._toggleDetails}>
-                  {this.state.showDetails ? 'Less details' : 'More details'}
-                </a>
+                <Button bsStyle="link" tabIndex={0} onClick={this._toggleDetails}>
+                  {showDetails ? 'Less details' : 'More details'}
+                </Button>
                 {this._formatErrorMessage()}
               </div>
             </div>
