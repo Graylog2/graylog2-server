@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.graylognode;
 
+import com.google.common.io.Resources;
 import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -31,6 +33,9 @@ import java.util.Locale;
 public class NodeInstance {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodeInstance.class);
+
+    @SuppressWarnings("OctalInteger")
+    private static final int EXECUTABLE_MODE = 0100755;
 
     private final GenericContainer container;
 
@@ -45,9 +50,12 @@ public class NodeInstance {
     }
 
     private GenericContainer buildContainer(Network network, String mongoDbUri, String elasticsearchUri) {
+
+        File entrypointScript = resourceFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
+
         final ImageFromDockerfile image = new ImageFromDockerfile()
                 .withFileFromClasspath("Dockerfile", "org/graylog/testing/graylognode/Dockerfile")
-                .withFileFromClasspath("docker-entrypoint.sh", "org/graylog/testing/graylognode/docker-entrypoint.sh")
+                .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
                 .withFileFromClasspath("graylog.conf", "org/graylog/testing/graylognode/config/graylog.conf")
                 .withFileFromClasspath("log4j2.xml", "org/graylog/testing/graylognode/config/log4j2.xml")
                 .withFileFromPath("sigar", pathTo("sigar_dir"))
@@ -62,6 +70,11 @@ public class NodeInstance {
                 .withEnv("GRAYLOG_MONGODB_URI", mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", elasticsearchUri)
                 .waitingFor(Wait.forHttp("/api"));
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private File resourceFile(@SuppressWarnings("SameParameterValue") String resourceName) {
+        return new File(Resources.getResource(resourceName).getFile());
     }
 
     private Path pathTo(String propertyName) {
