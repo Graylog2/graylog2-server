@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
+import mockComponent from 'helpers/mocking/MockComponent';
+
 import { ViewSharingActions } from 'views/stores/ViewSharingStore';
 import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
@@ -11,6 +13,7 @@ const mockLoadRoles = jest.fn(() => Promise.resolve([]));
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 
+jest.mock('components/bootstrap/BootstrapModalForm', () => mockComponent('BootstrapModalForme'));
 jest.mock('stores/connect', () => x => x);
 jest.mock('injection/StoreProvider', () => ({
   getStore: (store) => {
@@ -98,7 +101,7 @@ describe('ShareViewModal', () => {
     const wrapper = mount(<ShareViewModal show view={view} currentUser={currentUser} onClose={onClose} />);
     setImmediate(() => {
       wrapper.update();
-      const button = wrapper.find('button[children="Save"]');
+      const button = wrapper.find('button[children="Confirm"]');
       button.simulate('click');
 
       expect(ViewSharingActions.create).not.toHaveBeenCalled();
@@ -112,7 +115,7 @@ describe('ShareViewModal', () => {
       wrapper.update();
       const allUsersOfInstanceRadio = wrapper.find('input[name="all_of_instance"]');
       allUsersOfInstanceRadio.simulate('change', { target: { name: 'all_of_instance' } });
-      const button = wrapper.find('button[children="Save"]');
+      const button = wrapper.find('button[children="Confirm"]');
       button.simulate('click');
 
       expect(ViewSharingActions.create).toHaveBeenCalledWith(view.id, AllUsersOfInstance.create(view.id));

@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { get } from 'lodash';
 
+import { FormGroup, HelpBlock, Radio } from 'components/graylog';
+import { BootstrapModalConfirm } from 'components/bootstrap';
 import Select from 'views/components/Select';
-
-import { FormGroup, HelpBlock, Modal, Radio, Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
@@ -173,16 +173,12 @@ class ShareViewModal extends React.Component<Props, State> {
       </FormGroup>
     );
     return (
-      <Modal show={show} onHide={this._onClose}>
-        <Modal.Body>
-          <h3>Who is supposed to access the dashboard {view.title}?</h3>
-          {content}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={this._onSave} bsStyle="success">Save</Button>
-          <Button onClick={this._onClose}>Cancel</Button>
-        </Modal.Footer>
-      </Modal>
+      <BootstrapModalConfirm showModal={show}
+                             onCancel={() => this._onClose()}
+                             onConfirm={() => this._onSave()}
+                             title={`Who is supposed to access the dashboard ${view.title}?`}>
+        {content}
+      </BootstrapModalConfirm>
     );
   }
 }
