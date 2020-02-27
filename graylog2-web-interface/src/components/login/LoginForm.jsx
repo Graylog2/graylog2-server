@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, FormGroup } from 'components/graylog';
+import styled from 'styled-components';
 
+import { Button, FormGroup } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { SessionActions } = CombinedProvider.get('Session');
+
+const StyledFormGroup = styled(FormGroup)`
+  margin-bottom: 0;
+`;
 
 const LoginForm = ({ onErrorChange }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -45,14 +50,22 @@ const LoginForm = ({ onErrorChange }) => {
 
   return (
     <form onSubmit={onSignInClicked}>
-      <Input ref={(username) => { usernameInput = username; }} id="username" type="text" placeholder="Username" autoFocus />
-      <Input ref={(password) => { passwordInput = password; }} id="password" type="password" placeholder="Password" />
+      <Input ref={(username) => { usernameInput = username; }}
+             id="username"
+             type="text"
+             placeholder="Username"
+             autoFocus />
 
-      <FormGroup>
+      <Input ref={(password) => { passwordInput = password; }}
+             id="password"
+             type="password"
+             placeholder="Password" />
+
+      <StyledFormGroup>
         <Button type="submit" bsStyle="info" disabled={isLoading}>
           {isLoading ? 'Signing in...' : 'Sign in'}
         </Button>
-      </FormGroup>
+      </StyledFormGroup>
     </form>
   );
 };
