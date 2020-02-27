@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import { ClipboardButton } from 'components/common';
