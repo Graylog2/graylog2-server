@@ -14,10 +14,10 @@ import type { SearchStoreState } from 'views/stores/SearchStore';
 type Props = {
   currentView: ViewStoreState,
   searches: SearchStoreState,
-  modalRef: BootstrapModalWrapper
+  onClose: () => void
 }
-const DebugOverlay = ({ currentView, searches, modalRef }: Props) => (
-  <BootstrapModalWrapper ref={modalRef}>
+const DebugOverlay = ({ currentView, searches, show, onClose }: Props) => (
+  <BootstrapModalWrapper showModal={show} onHide={onClose}>
     <Modal.Body>
       <textarea disabled
                 style={{ height: '80vh', width: '100%' }}
@@ -29,6 +29,8 @@ const DebugOverlay = ({ currentView, searches, modalRef }: Props) => (
 DebugOverlay.propTypes = {
   currentView: PropTypes.object.isRequired,
   searches: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
 };
 
 export default connect(DebugOverlay, { currentView: ViewStore, searches: SearchStore });

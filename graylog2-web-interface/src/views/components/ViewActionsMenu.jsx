@@ -36,15 +36,15 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 
 const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => {
   const [shareViewOpen, setShareViewOpen] = useState(false);
-  const debugModal = useRef<BootstrapModalWrapper>();
-  const saveNewModal = useRef<ViewPropertiesModal>();
-  const editModal = useRef<ViewPropertiesModal>();
+  const [debugViewOpen, setDebugViewOpen] = useState(false);
+  const [saveNewOpen, setSaveAsOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
     <React.Fragment>
       <MenuItem divider />
-      <MenuItem onSelect={() => debugModal.current.open()}>
+      <MenuItem onSelect={() => setDebugViewOpen(true)}>
         <Icon name="code" /> Debug
       </MenuItem>
     </React.Fragment>
@@ -56,13 +56,13 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
               data-testid="dashboard-save-button">
         <Icon name="save" /> Save
       </Button>
-      <Button onClick={() => saveNewModal.current.open()}
+      <Button onClick={() => setSaveAsOpen(true)}
               disabled={hasUndeclaredParameters}
               data-testid="dashboard-save-as-button">
         <Icon name="copy" /> Save as
       </Button>
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
-        <MenuItem onSelect={() => editModal.current.open()} disabled={isNewView || !allowedToEdit}>
+        <MenuItem onSelect={() => setEditOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit
         </MenuItem>
         <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
@@ -74,16 +74,22 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />
         </IfDashboard>
       </DropdownButton>
-      <DebugOverlay ref={debugModal} />
-      <ViewPropertiesModal view={view.toBuilder().newId().build()}
-                           title="Save new dashboard"
-                           onSave={newView => onSaveAsView(newView, router)}
-                           ref={saveNewModal} />
-      <ViewPropertiesModal view={view}
-                           title="Editing dashboard"
-                           onSave={updatedView => onSaveView(updatedView, router)}
-                           ref={editModal} />
-      {shareViewOpen && <ShareViewModal view={view} show onClose={() => setShareViewOpen(false)} />}
+      {debugViewOpen && <DebugOverlay show onClose={() => setDebugViewOpen(false)} />}
+      {saveNewOpen && (
+        <ViewPropertiesModal show
+                             view={view.toBuilder().newId().build()}
+                             title="Save new dashboard"
+                             onClose={() => setSaveAsOpen(false)}
+                             onSave={newView => onSaveAsView(newView, router)} />
+      )}
+      {editOpen && (
+        <ViewPropertiesModal show
+                             view={view}
+                             title="Editing dashboard"
+                             onClose={() => setEditOpen(false)}
+                             onSave={updatedView => onSaveView(updatedView, router)} />
+      )}
+      {shareViewOpen && <ShareViewModal show view={view} onClose={() => setShareViewOpen(false)} />}
     </ButtonGroup>
   );
 };

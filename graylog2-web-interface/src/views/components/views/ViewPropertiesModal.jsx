@@ -10,9 +10,11 @@ export default class ViewPropertiesModal extends React.Component {
   modal = React.createRef();
 
   static propTypes = {
-    view: PropTypes.object.isRequired,
-    title: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
+    show: PropTypes.bool.isRequired,
+    title: PropTypes.string.isRequired,
+    view: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -29,10 +31,6 @@ export default class ViewPropertiesModal extends React.Component {
     if (title !== nextProps.title || !isEqual(view, nextProps.view)) {
       this.setState({ view: nextProps.view, title: nextProps.title });
     }
-  }
-
-  open = () => {
-    this.modal.open();
   }
 
   // eslint-disable-next-line consistent-return
@@ -58,17 +56,19 @@ export default class ViewPropertiesModal extends React.Component {
   }
 
   _onSave = () => {
-    const { onSave } = this.props;
+    const { onClose, onSave } = this.props;
     const { view } = this.state;
     onSave(view);
-    this.modal.close();
+    onClose();
   };
 
   render() {
     const { view: { title = '', summary = '', description = '' }, title: modalTitle } = this.state;
+    const { onClose, show } = this.props;
     return (
-      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+      <BootstrapModalForm show={show}
                           title={modalTitle}
+                          onCancel={onClose}
                           onModalClose={this._cleanState}
                           onSubmitForm={this._onSave}
                           submitButtonText="Save"
