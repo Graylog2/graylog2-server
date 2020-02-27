@@ -24,6 +24,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
@@ -48,6 +49,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -84,7 +86,16 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
         applyHighlightingIfActivated(searchSourceBuilder, job, query);
 
         final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, SortOrder.DESC)));
-        sorts.forEach(sort -> searchSourceBuilder.sort(sort.field(), sort.order()));
+        final Map<String, Set<String>> allFieldTypes = firstNonNull(queryContext.fieldTypes(), Collections.emptyMap());
+        sorts.forEach(sort -> {
+            final Set<String> fieldTypes = allFieldTypes.get(sort.field());
+            final String fieldType = fieldTypes == null || fieldTypes.size() > 1 ? null : fieldTypes.stream().findFirst().orElse(null);
+            searchSourceBuilder.sort(
+                    SortBuilders.fieldSort(sort.field())
+                            .order(sort.order())
+                            .unmappedType(fieldType)
+            );
+        });
     }
 
     private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {
