@@ -3,8 +3,6 @@ import fieldTypeFor from './FieldTypeFor';
 
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';
-import AggregationControls from '../../components/aggregationbuilder/AggregationControls';
-import * as React from "react";
 
 describe('FieldTypeFor', () => {
   it('returns `FieldType.Unknown` if field type is not found', () => {

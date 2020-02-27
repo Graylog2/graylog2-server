@@ -10,7 +10,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
 import Headers from './Headers';
-import AggregationControls from '../aggregationbuilder/AggregationControls';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
 jest.mock('logic/datetimes/DateTime', () => 'DateTime');
