@@ -2,26 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
-import styled from 'styled-components';
 
 import { ListGroupItem } from 'components/graylog';
 import Icon from './Icon';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import SortableListItemStyle from '!style!css!components/common/SortableListItem.css';
-
-const SortableListItemWrap = styled.div`
-  &:first-child .list-group-item {
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
-  }
-
-  &:last-child .list-group-item {
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
-    margin-bottom: 0;
-  }
-`;
 
 const ItemTypes = {
   ITEM: 'item',
