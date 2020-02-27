@@ -52,10 +52,13 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
   return (
     <ButtonGroup>
       <Button onClick={() => onSaveView(view)}
-              disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>
+              disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
+              data-testid="dashboard-save-button">
         <Icon name="save" /> Save
       </Button>
-      <Button onClick={() => editModal.current.open()} disabled={hasUndeclaredParameters}>
+      <Button onClick={() => saveNewModal.current.open()}
+              disabled={hasUndeclaredParameters}
+              data-testid="dashboard-save-as-button">
         <Icon name="copy" /> Save as
       </Button>
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
