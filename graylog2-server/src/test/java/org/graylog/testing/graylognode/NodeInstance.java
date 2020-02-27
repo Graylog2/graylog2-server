@@ -52,6 +52,8 @@ public class NodeInstance {
 
     private GenericContainer buildContainer(Network network, String mongoDbUri, String elasticsearchUri) {
 
+        packageServerIfExecutedFromIntellij();
+
         File entrypointScript = resourceFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
 
         final ImageFromDockerfile image = new ImageFromDockerfile()
@@ -73,6 +75,19 @@ public class NodeInstance {
                 .waitingFor(Wait.forHttp("/api"));
     }
 
+    private void packageServerIfExecutedFromIntellij() {
+        if (isRunFromIntellij()) {
+            LOG.info("Running from Intellij. Packaging server jar now...");
+            MavenPackager.packageJar(property("project_dir") + "/..");
+        }
+    }
+
+    //It would be more robust to detect whether tests are executed from within maven and skip if yes
+    private boolean isRunFromIntellij() {
+        String classPath = System.getProperty("java.class.path");
+        return classPath != null && classPath.split(":")[0].endsWith("idea_rt.jar");
+    }
+
     @SuppressWarnings("UnstableApiUsage")
     private File resourceFile(@SuppressWarnings("SameParameterValue") String resourceName) {
         try {
@@ -83,16 +98,15 @@ public class NodeInstance {
     }
 
     private Path pathTo(String propertyName) {
-        String property = PropertyLoader.get("api-it-tests.properties", propertyName);
-        return Paths.get(property);
+        return Paths.get(property(propertyName));
+    }
+
+    private String property(String propertyName) {
+        return PropertyLoader.get("api-it-tests.properties", propertyName);
     }
 
     public void stop() {
         container.stop();
-    }
-
-    public int getPort() {
-        return container.getFirstMappedPort();
     }
 
     public String getApiAddress() {
