@@ -96,10 +96,6 @@ const GlobalThemeStyles = createGlobalStyle`
     border-left-width: 0;
   }
 
-  .navbar-brand {
-    padding: 12px 15px 0 15px;
-  }
-
   .content {
     padding-top: 15px;
     padding-bottom: 15px;
@@ -113,30 +109,10 @@ const GlobalThemeStyles = createGlobalStyle`
     color: #939393;
   }
 
-  .content-head {
-    padding-bottom: 0;
-  }
-
-  .content-head p {
-    margin-top: 15px;
-  }
-
-  .content-head .actions-lg {
-    float: right;
-  }
-
   .actions-lg .actions-container {
     height: 60px;
     margin-top: 10px;
     padding-left: 50px;
-  }
-
-  .content-head .actions-sm {
-    padding-bottom: 15px;
-  }
-
-  .content-head .description-tooltips .fa-stack {
-    margin-right: 3px;
   }
 
   .content p.description-tooltips-small .fa-stack {
@@ -1204,11 +1180,6 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-bottom: 3px;
   }
 
-  .stream-stopped {
-    position: relative;
-    top: -3px;
-  }
-
   ul.entity-list {
     padding: 0;
     margin: 0;
@@ -1239,61 +1210,6 @@ const GlobalThemeStyles = createGlobalStyle`
     li.entity-list-item:not(:last-child) {
       border-bottom: 1px solid #6dcff6;
     }
-  }
-
-  .breadcrumb {
-    margin-bottom: 10px !important;
-    margin-left: -15px;
-    margin-right: -15px;
-  }
-
-  .graylog-node {
-    margin-top: 15px;
-  }
-
-  .graylog-node-title {
-    margin-top: 8px;
-  }
-
-  dl.graylog-node-state {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
-  dl.graylog-node-state dt {
-    float: left;
-  }
-
-  dl.graylog-node-state dd {
-    margin-left: 180px;
-  }
-
-  #message-table-paginator-top {
-    width: 90%;
-  }
-
-  #message-table-paginator-top ul {
-    margin: 0;
-  }
-
-  .messages-container {
-    padding-right: 13px;
-    width: 100%;
-  }
-
-  .message-details-title {
-    height: 30px;
-  }
-
-  .message-details-title a {
-    color: #000;
-  }
-
-  .message-details-title .label {
-    font-size: 50%;
-    line-height: 200%;
-    margin-left: 5px;
-    vertical-align: bottom;
   }
 
   dl.message-details {
@@ -1477,10 +1393,6 @@ const GlobalThemeStyles = createGlobalStyle`
 
   .stream-description .fa-cube {
     margin-right: 5px;
-  }
-
-  .content-head .btn-lg {
-    font-size: 16px;
   }
 
   .stream-loader {

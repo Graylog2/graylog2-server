@@ -10,6 +10,7 @@ import StoreProvider from 'injection/StoreProvider';
 
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
+import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 
@@ -244,11 +245,11 @@ class MessageDetail extends React.Component {
         <Row className="row-sm">
           <Col md={12}>
             {this._formatMessageActions()}
-            <h3 className="message-details-title">
+            <MessageDetailsTitle>
               <Icon name="envelope" />
             &nbsp;
               {messageTitle}
-            </h3>
+            </MessageDetailsTitle>
           </Col>
         </Row>
         <Row>
