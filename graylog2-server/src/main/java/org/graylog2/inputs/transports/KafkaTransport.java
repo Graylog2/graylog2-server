@@ -64,6 +64,7 @@ import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +122,7 @@ public class KafkaTransport extends ThrottleableTransport {
     private final AtomicLong totalBytesRead = new AtomicLong(0);
     private final AtomicLong lastSecBytesRead = new AtomicLong(0);
     private final AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
+    private final ExecutorService executor;
 
     private volatile boolean stopped = false;
     private volatile boolean paused = true;
@@ -144,6 +146,8 @@ public class KafkaTransport extends ThrottleableTransport {
         this.serverStatus = serverStatus;
         this.scheduler = scheduler;
         this.metricRegistry = localRegistry;
+        final int numThreads = configuration.getInt(CK_THREADS);
+        this.executor = executorService(numThreads);
 
         localRegistry.register("read_bytes_1sec", new Gauge<Long>() {
             @Override
@@ -239,7 +243,6 @@ public class KafkaTransport extends ThrottleableTransport {
         insertCustomProperties(props);
 
         final int numThreads = configuration.getInt(CK_THREADS);
-        final ExecutorService executor = executorService(numThreads);
         // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
         // and then shutting down the connection.
         // this is to avoid yanking away the connection from the consumer runnables
@@ -324,8 +327,9 @@ public class KafkaTransport extends ThrottleableTransport {
                         continue;
                     }
                 } catch (KafkaException | InterruptedException e) {
-                    LOG.error("Caught unrecoverable exception in poll. Stopping input", e);
-                    stopped = true;
+                    LOG.error("Caught unrecoverable exception in poll. Restarting input", e);
+                    // (Ab)use serverEventBus to properly restart the entire input.
+                    serverEventBus.post(InputCreated.create(input.getId()));
                     break;
                 }
                 try {
@@ -369,7 +373,6 @@ public class KafkaTransport extends ThrottleableTransport {
         final TopicFilter filter = new Whitelist(configuration.getString(CK_TOPIC_FILTER));
 
         final List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, numThreads);
-        final ExecutorService executor = executorService(numThreads);
 
         // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
         // and then shutting down the connection.
@@ -483,6 +486,12 @@ public class KafkaTransport extends ThrottleableTransport {
         if (cc != null) {
             cc.shutdown();
             cc = null;
+        }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOG.error("Interrupted in transport executor shutdown.");
         }
     }
 
