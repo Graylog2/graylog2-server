@@ -3274,13 +3274,6 @@ bytes@3.1.0:
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.1.0.tgz#f6cf7933a360e0588fa9fde85651cdc7f805d1f6"
   integrity sha512-zauLjrfCG+xvoyaqLoV8bLVXXNGC4JqlxFCutSDWA6fJrTo2ZuvLYTqZ7aHBLZSMOopbzwv8f+wZcVzfVTI2Dg==
 
-c3@^0.4.11-rc4:
-  version "0.4.24"
-  resolved "https://registry.yarnpkg.com/c3/-/c3-0.4.24.tgz#57b62357098842d38e265a265f6de1e8c6faadd2"
-  integrity sha512-mVCFtN5ZWUT5UE7ilFQ7KBQ7TUCdKIq6KsDt1hH/1m6gC1tBjvzFTO7fqhaiWHfhNOjjM7makschdhg6DkWQMA==
-  dependencies:
-    d3 "~3.5.0"
-
 cacache@^12.0.2, cacache@^12.0.3:
   version "12.0.3"
   resolved "https://registry.yarnpkg.com/cacache/-/cacache-12.0.3.tgz#be99abba4e1bf5df461cd5a2c1071fc432573390"
@@ -4299,11 +4292,6 @@ cross-spawn@^7.0.0:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-crossfilter2@~1.3:
-  version "1.3.14"
-  resolved "https://registry.yarnpkg.com/crossfilter2/-/crossfilter2-1.3.14.tgz#c45bd8d335f6c91accbac26eda203377f195f680"
-  integrity sha1-xFvY0zX2yRrMusJu2iAzd/GV9oA=
-
 crossfilter@1.3.x:
   version "1.3.12"
   resolved "https://registry.yarnpkg.com/crossfilter/-/crossfilter-1.3.12.tgz#147d7236a98c45c69f78bdc3a99d6fb00f70930c"
@@ -4643,7 +4631,7 @@ d3-timer@1:
   resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-1.0.10.tgz#dfe76b8a91748831b13b6d9c793ffbd508dd9de5"
   integrity sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==
 
-d3@3.5.17, d3@^3, d3@^3.5.12, d3@~3.5.0:
+d3@^3.5.12:
   version "3.5.17"
   resolved "https://registry.yarnpkg.com/d3/-/d3-3.5.17.tgz#bc46748004378b21a360c9fc7cf5231790762fb8"
   integrity sha1-vEZ0gAQ3iyGjYMn8fPUjF5B2L7g=
@@ -4677,13 +4665,10 @@ data-urls@^1.1.0:
     whatwg-mimetype "^2.2.0"
     whatwg-url "^7.0.0"
 
-dc@2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/dc/-/dc-2.0.5.tgz#f111901dfc5356d0b11bfbe50bac1bb580d4f0ef"
-  integrity sha1-8RGQHfxTVtCxG/vlC6wbtYDU8O8=
-  dependencies:
-    crossfilter2 "~1.3"
-    d3 "^3"
+date-now@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
+  integrity sha1-6vQ5/U1ISK105cx9vvIAZyueNFs=
 
 debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.6.0, debug@^2.6.9:
   version "2.6.9"
@@ -7272,7 +7257,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   dependencies:
     "@babel/preset-env" "7.8.4"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v4/npm-graylog-web-plugin-3.3.0-SNAPSHOT-e219580a-c0d7-4b62-bcca-1682562c354b-1582720541840/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v4/npm-graylog-web-plugin-3.3.0-SNAPSHOT-b2887189-6265-4a03-869a-8d2eb15281c8-1582794567656/node_modules/eslint-config-graylog"
     html-webpack-plugin "3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"
