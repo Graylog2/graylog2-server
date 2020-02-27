@@ -7,8 +7,6 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 
 export default class ViewPropertiesModal extends React.Component {
-  modal = React.createRef();
-
   static propTypes = {
     onClose: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
