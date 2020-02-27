@@ -76,7 +76,7 @@ public class AESTools {
         try {
             final byte[] cipherBytes = SIV_MODE.encrypt(
                     Arrays.copyOf(encryptionKey, 16),
-                    Arrays.copyOfRange(encryptionKey, 16, encryptionKey.length),
+                    Arrays.copyOfRange(encryptionKey, 16, 32),
                     plainText.getBytes(UTF_8)
             );
             return Hex.encodeToString(cipherBytes);
@@ -100,7 +100,7 @@ public class AESTools {
         try {
             final byte[] plainBytes = SIV_MODE.decrypt(
                     Arrays.copyOf(encryptionKey, 16),
-                    Arrays.copyOfRange(encryptionKey, 16, encryptionKey.length),
+                    Arrays.copyOfRange(encryptionKey, 16, 32),
                     Hex.decode(cipherText.getBytes(UTF_8))
             );
             return new String(plainBytes, UTF_8);
