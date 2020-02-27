@@ -50,11 +50,6 @@ export default class ViewPropertiesModal extends React.Component {
     }
   };
 
-  _cleanState = () => {
-    const { view, title } = this.props;
-    this.setState({ view, title });
-  }
-
   _onSave = () => {
     const { onClose, onSave } = this.props;
     const { view } = this.state;
@@ -69,7 +64,6 @@ export default class ViewPropertiesModal extends React.Component {
       <BootstrapModalForm show={show}
                           title={modalTitle}
                           onCancel={onClose}
-                          onModalClose={this._cleanState}
                           onSubmitForm={this._onSave}
                           submitButtonText="Save"
                           bsSize="large">
