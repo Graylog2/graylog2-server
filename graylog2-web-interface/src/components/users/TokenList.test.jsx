@@ -8,8 +8,8 @@ jest.mock('components/common/ClipboardButton', () => 'clipboard-button');
 
 describe('<TokenList />', () => {
   const tokens = [
-    { name: 'Acme', token: 'beef2001' },
-    { name: 'Hamfred', token: 'beef2002' },
+    { name: 'Acme', token: 'beef2001', id: 'abc1' },
+    { name: 'Hamfred', token: 'beef2002', id: 'abc2' },
   ];
 
   it('should render with empty tokens', () => {
@@ -26,8 +26,8 @@ describe('<TokenList />', () => {
     const createFn = jest.fn((tokenName) => {
       expect(tokenName).toEqual('hans');
     });
-    const deleteFn = jest.fn((token) => {
-      expect(token).toEqual('beef2001');
+    const deleteFn = jest.fn((tokenId) => {
+      expect(tokenId).toEqual('abc1');
     });
     const wrapper = mount(<TokenList tokens={tokens}
                                      onCreate={createFn}
