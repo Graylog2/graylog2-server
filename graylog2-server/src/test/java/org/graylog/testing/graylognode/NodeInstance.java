@@ -26,6 +26,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -74,7 +75,11 @@ public class NodeInstance {
 
     @SuppressWarnings("UnstableApiUsage")
     private File resourceFile(@SuppressWarnings("SameParameterValue") String resourceName) {
-        return new File(Resources.getResource(resourceName).getFile());
+        try {
+            return new File(Resources.getResource(resourceName).toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Path pathTo(String propertyName) {
