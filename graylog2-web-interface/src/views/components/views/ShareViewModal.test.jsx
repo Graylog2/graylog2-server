@@ -98,7 +98,7 @@ describe('ShareViewModal', () => {
     const wrapper = mount(<ShareViewModal show view={view} currentUser={currentUser} onClose={onClose} />);
     setImmediate(() => {
       wrapper.update();
-      const button = wrapper.find('button[children="Confirm"]');
+      const button = wrapper.find('button[children="Save"]');
       button.simulate('click');
 
       expect(ViewSharingActions.create).not.toHaveBeenCalled();
@@ -112,7 +112,7 @@ describe('ShareViewModal', () => {
       wrapper.update();
       const allUsersOfInstanceRadio = wrapper.find('input[name="all_of_instance"]');
       allUsersOfInstanceRadio.simulate('change', { target: { name: 'all_of_instance' } });
-      const button = wrapper.find('button[children="Confirm"]');
+      const button = wrapper.find('button[children="Save"]');
       button.simulate('click');
 
       expect(ViewSharingActions.create).toHaveBeenCalledWith(view.id, AllUsersOfInstance.create(view.id));

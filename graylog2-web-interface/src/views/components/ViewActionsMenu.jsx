@@ -36,7 +36,7 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => {
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
-  const [saveNewOpen, setSaveAsOpen] = useState(false);
+  const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
   const [editViewOpen, setEditViewOpen] = useState(false);
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
@@ -55,7 +55,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
               data-testid="dashboard-save-button">
         <Icon name="save" /> Save
       </Button>
-      <Button onClick={() => setSaveAsOpen(true)}
+      <Button onClick={() => setSaveAsViewOpen(true)}
               disabled={hasUndeclaredParameters}
               data-testid="dashboard-save-as-button">
         <Icon name="copy" /> Save as
@@ -74,11 +74,11 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
         </IfDashboard>
       </DropdownButton>
       {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
-      {saveNewOpen && (
+      {saveAsViewOpen && (
         <ViewPropertiesModal show
                              view={view.toBuilder().newId().build()}
                              title="Save new dashboard"
-                             onClose={() => setSaveAsOpen(false)}
+                             onClose={() => setSaveAsViewOpen(false)}
                              onSave={newView => onSaveAsView(newView, router)} />
       )}
       {editViewOpen && (

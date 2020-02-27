@@ -173,10 +173,11 @@ class ShareViewModal extends React.Component<Props, State> {
       </FormGroup>
     );
     return (
-      <BootstrapModalConfirm showModal={show}
-                             onCancel={() => this._onClose()}
+      <BootstrapModalConfirm onCancel={() => this._onClose()}
                              onConfirm={() => this._onSave()}
-                             title={`Who is supposed to access the dashboard ${view.title}?`}>
+                             title={`Who is supposed to access the dashboard ${view.title}?`}
+                             confirmButtonText="Save"
+                             showModal={show}>
         {content}
       </BootstrapModalConfirm>
     );
