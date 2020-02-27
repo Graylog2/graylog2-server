@@ -9,7 +9,6 @@ import View from 'views/logic/views/View';
 
 import ViewActionsMenu from './ViewActionsMenu';
 
-
 const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)
   .search(Search.builder().build())
   .createdAt(new Date('2019-10-16T14:38:44.681Z'))
@@ -71,6 +70,7 @@ describe('ViewActionsMenu', () => {
     const { getByTestId, getByText } = render(<ViewActionsMenu router={{}} />);
     const saveAsMenuItem = getByTestId('dashboard-save-as-button');
     fireEvent.click(saveAsMenuItem);
+
     expect(getByText('Save new dashboard')).not.toBeNull();
   });
 
@@ -78,12 +78,14 @@ describe('ViewActionsMenu', () => {
     const { getByText } = render(<ViewActionsMenu router={{}} />);
     const editMenuItem = getByText(/Edit/i);
     fireEvent.click(editMenuItem);
+
     expect(getByText('Editing dashboard')).not.toBeNull();
   });
   it('should dashboard share modal', () => {
     const { getByText } = render(<ViewActionsMenu router={{}} />);
     const editMenuItem = getByText(/Share/i);
     fireEvent.click(editMenuItem);
+
     expect(getByText(/Who is supposed to access the dashboard/i)).not.toBeNull();
   });
 });
