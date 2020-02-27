@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.streams.StreamService;
@@ -76,6 +77,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
 
     @Before
     public void setUp() throws Exception {
+        final IndexFieldTypesService indexFieldTypesService = mock(IndexFieldTypesService.class);
         this.backend = new ElasticsearchBackend(
                 ImmutableMap.of(
                         "dummy", () -> mock(DummyHandler.class)
@@ -84,7 +86,8 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 jestClient,
                 indexRangeService,
                 streamService,
-                new ESQueryDecorators(Collections.emptySet())
+                new ESQueryDecorators(Collections.emptySet()),
+                indexFieldTypesService
         );
         when(streamService.loadByIds(any())).thenReturn(Collections.emptySet());
 

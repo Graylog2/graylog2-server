@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.streams.StreamService;
@@ -54,7 +55,8 @@ public class ElasticsearchBackendTest {
         handlers.put(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
 
         final QueryStringParser queryStringParser = new QueryStringParser();
-        backend = new ElasticsearchBackend(handlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake());
+        final IndexFieldTypesService indexFieldTypesService = mock(IndexFieldTypesService.class);
+        backend = new ElasticsearchBackend(handlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake(), indexFieldTypesService);
     }
 
     @Test
