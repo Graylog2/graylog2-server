@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Input } from 'components/bootstrap';
-import URLWhitelistInput from 'components/common/URLWhitelistInput';
+import { URLWhiteListInput } from 'components/common';
 
 const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMessage, config }) => {
   return (
     <fieldset>
-      <URLWhitelistInput label="File URL"
+      <URLWhiteListInput label="File URL"
                          onChange={handleFormEvent}
                          validationMessage={validationMessage('url', 'The URL of the DSV file.')}
                          validationState={validationState('url')}

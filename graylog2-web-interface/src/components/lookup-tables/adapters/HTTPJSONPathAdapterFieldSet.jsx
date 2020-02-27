@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
-import URLWhitelistInput from 'components/common/URLWhitelistInput';
-import { KeyValueTable } from 'components/common';
+import { URLWhiteListInput, KeyValueTable } from 'components/common';
+
 import ObjectUtils from 'util/ObjectUtils';
 
 class HTTPJSONPathAdapterFieldSet extends React.Component {
@@ -29,7 +29,7 @@ class HTTPJSONPathAdapterFieldSet extends React.Component {
 
     return (
       <fieldset>
-        <URLWhitelistInput label="Lookup URL"
+        <URLWhiteListInput label="Lookup URL"
                            onChange={handleFormEvent}
                            validationMessage={validationMessage('url', 'The URL for the lookup. (this is a template - see documentation)')}
                            validationState={validationState('url')}

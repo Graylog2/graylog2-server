@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import URLWhitelistInput from 'components/common/URLWhitelistInput';
+import { URLWhiteListInput } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 
 class HttpNotificationForm extends React.Component {
@@ -32,7 +32,7 @@ class HttpNotificationForm extends React.Component {
 
     return (
       <React.Fragment>
-        <URLWhitelistInput label="URL"
+        <URLWhiteListInput label="URL"
                            onChange={this.handleChange}
                            validationState={validation.errors.url ? 'error' : null}
                            validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}

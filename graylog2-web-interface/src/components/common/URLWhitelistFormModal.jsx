@@ -30,7 +30,7 @@ type Props = {
 };
 
 
-class URLWhitelistFormModal extends React.Component<Props, State> {
+class URLWhiteListFormModal extends React.Component<Props, State> {
     configModal: ?BootstrapModalForm = React.createRef();
 
     inputs = {};
@@ -99,11 +99,6 @@ class URLWhitelistFormModal extends React.Component<Props, State> {
     this.setState(updatedState);
   }
 
-
-  _resetConfig = () => {
-
-  }
-
   _updateConfig = (configType, config) => {
     switch (configType) {
       case URL_WHITELIST_CONFIG:
@@ -143,7 +138,7 @@ class URLWhitelistFormModal extends React.Component<Props, State> {
   }
 }
 
-URLWhitelistFormModal.propTypes = {
+URLWhiteListFormModal.propTypes = {
   newUrlEntry: PropTypes.string,
   onUpdate: PropTypes.func,
   configuration: PropTypes.object,
@@ -151,7 +146,7 @@ URLWhitelistFormModal.propTypes = {
   urlType: PropTypes.string,
 };
 
-export default connect(URLWhitelistFormModal, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({
+export default connect(URLWhiteListFormModal, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({
   ...configurations,
   ...currentUser,
   ...otherProps,
