@@ -4,7 +4,7 @@ import React from 'react';
 import { Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
-import DisconnectedThemeStyles from 'theme/styles/disconnectedStyles';
+import AuthThemeStyles from 'theme/styles/authStyles';
 
 import URLUtils from 'util/URLUtils';
 
@@ -87,7 +87,7 @@ class ServerUnavailablePage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Server unavailable">
-        <DisconnectedThemeStyles />
+        <AuthThemeStyles />
         <Modal show>
           <Modal.Header>
             <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>

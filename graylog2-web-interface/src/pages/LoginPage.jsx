@@ -10,7 +10,6 @@ import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
 
 import AuthThemeStyles from 'theme/styles/authStyles';
-import DisconnectedThemeStyles from 'theme/styles/disconnectedStyles';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import LoadingPage from './LoadingPage';
@@ -79,7 +78,6 @@ const LoginPage = createReactClass({
     const alert = this.formatLastError(lastError);
     return (
       <DocumentTitle title="Sign in">
-        <DisconnectedThemeStyles />
         <AuthThemeStyles />
         <LoginBox>
           <legend><Icon name="group" /> Welcome to Graylog</legend>

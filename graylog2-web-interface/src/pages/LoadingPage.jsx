@@ -4,33 +4,25 @@ import React from 'react';
 import { DocumentTitle, Spinner, Icon } from 'components/common';
 import LoginBox from 'components/login/LoginBox';
 import AuthThemeStyles from 'theme/styles/authStyles';
-import DisconnectedThemeStyles from 'theme/styles/disconnectedStyles';
 
-class LoadingPage extends React.Component {
-  static propTypes = {
-    text: PropTypes.string,
-  };
-
-  static defaultProps = {
-    text: 'Loading, please wait...',
-  };
-
-  render() {
-    const { text } = this.props;
-
-    return (
-      <DocumentTitle title="Loading...">
-        <DisconnectedThemeStyles />
-        <AuthThemeStyles />
-        <LoginBox>
-          <legend><Icon name="group" /> Welcome to Graylog</legend>
-          <p className="loading-text">
-            <Spinner text={text} />
-          </p>
-        </LoginBox>
-      </DocumentTitle>
-    );
-  }
-}
+const LoadingPage = ({ text }) => {
+  return (
+    <DocumentTitle title="Loading...">
+      <AuthThemeStyles />
+      <LoginBox>
+        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        <p className="loading-text">
+          <Spinner text={text} />
+        </p>
+      </LoginBox>
+    </DocumentTitle>
+  );
+};
+LoadingPage.propTypes = {
+  text: PropTypes.string,
+};
+LoadingPage.defaultProps = {
+  text: 'Loading, please wait...',
+};
 
 export default LoadingPage;
