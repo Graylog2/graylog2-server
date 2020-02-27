@@ -27,7 +27,7 @@ const inferTypeForSeries = (series: Series, types: Array<FieldTypeMapping>): Fie
   }
 
   if (typePreservingFunctions.includes(type)) {
-    const mapping = types.find(t => (t.name === field));
+    const mapping = types && types.find(t => (t.name === field));
 
     if (!mapping) {
       return newMapping(FieldType.Unknown);

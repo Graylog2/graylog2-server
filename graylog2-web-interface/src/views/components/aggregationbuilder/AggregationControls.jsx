@@ -116,10 +116,12 @@ export default class AggregationControls extends React.Component<Props, State> {
     const sortDirection = Immutable.Set(sort.map(s => s.direction)).first();
 
     const formattedFields = fields
-      .map(fieldType => fieldType.name)
-      .valueSeq()
-      .toJS()
-      .sort(defaultCompare);
+      ? fields
+        .map(fieldType => fieldType.name)
+        .valueSeq()
+        .toJS()
+        .sort(defaultCompare)
+      : [];
     const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
     const suggester = new SeriesFunctionsSuggester(formattedFields);
 
