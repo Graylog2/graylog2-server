@@ -23,14 +23,11 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
-
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
 public abstract class Token {
     @JsonProperty
-    @Nullable
     public abstract String id();
 
     @JsonProperty
@@ -43,7 +40,7 @@ public abstract class Token {
     public abstract DateTime lastAccess();
 
     @JsonCreator
-    public static Token create(@JsonProperty("id") @Nullable String id,
+    public static Token create(@JsonProperty("id") String id,
                                @JsonProperty("name") String name,
                                @JsonProperty("token") String token,
                                @JsonProperty("last_access") DateTime lastAccess) {
