@@ -29,7 +29,7 @@ import java.util.Map;
 @CollectionName(AccessTokenImpl.COLLECTION_NAME)
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public enum Type {
-        PLAINTEXT(0), AESSIV(1);
+        PLAINTEXT(0), AES_SIV(1);
 
         private final int type;
 
@@ -97,7 +97,7 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public void setToken(String token) {
         fields.put(TOKEN, token);
         // The token type is used to state the algorithm that is used to encrypt the value
-        fields.put(TOKEN_TYPE, Type.AESSIV.getIntValue());
+        fields.put(TOKEN_TYPE, Type.AES_SIV.getIntValue());
     }
 
     @Override

@@ -69,7 +69,7 @@ public class V20200226181600_EncryptAccessTokensMigration extends Migration {
 
             final Bson query = Filters.eq("_id", document.getObjectId("_id"));
             final Bson updates = Updates.combine(
-                    Updates.set(AccessTokenImpl.TOKEN_TYPE, AccessTokenImpl.Type.AESSIV.getIntValue()),
+                    Updates.set(AccessTokenImpl.TOKEN_TYPE, AccessTokenImpl.Type.AES_SIV.getIntValue()),
                     Updates.set(AccessTokenImpl.TOKEN, accessTokenCipher.encrypt(tokenValue))
             );
 

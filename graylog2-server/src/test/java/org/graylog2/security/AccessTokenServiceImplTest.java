@@ -154,7 +154,7 @@ public class AccessTokenServiceImplTest {
                             .isEqualTo(StringUtils.reverse(token.getToken()));
                     assertThat(tokenDocument.getInteger("token_type"))
                             .as("check that token type is set for %s/%s", token.getId(), token.getName())
-                            .isEqualTo(AccessTokenImpl.Type.AESSIV.getIntValue());
+                            .isEqualTo(AccessTokenImpl.Type.AES_SIV.getIntValue());
                 });
     }
 
