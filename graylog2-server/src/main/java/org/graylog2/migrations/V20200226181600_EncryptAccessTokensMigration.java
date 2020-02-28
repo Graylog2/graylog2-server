@@ -23,7 +23,6 @@ import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.security.AccessToken;
 import org.graylog2.security.token.AccessTokenCipher;
 import org.graylog2.security.token.AccessTokenImpl;
 import org.slf4j.Logger;
@@ -70,7 +69,7 @@ public class V20200226181600_EncryptAccessTokensMigration extends Migration {
 
             final Bson query = Filters.eq("_id", document.getObjectId("_id"));
             final Bson updates = Updates.combine(
-                    Updates.set(AccessTokenImpl.TOKEN_TYPE, AccessToken.Type.AESSIV.getIntValue()),
+                    Updates.set(AccessTokenImpl.TOKEN_TYPE, AccessTokenImpl.Type.AESSIV.getIntValue()),
                     Updates.set(AccessTokenImpl.TOKEN, accessTokenCipher.encrypt(tokenValue))
             );
 

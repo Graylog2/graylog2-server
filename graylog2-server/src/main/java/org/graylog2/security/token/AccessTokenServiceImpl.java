@@ -163,7 +163,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final String cleartext = (String) fields.get(AccessTokenImpl.TOKEN);
         if (StringUtils.isNotBlank(cleartext)) {
             fields.put(AccessTokenImpl.TOKEN, cipher.encrypt(cleartext));
-            fields.put(AccessTokenImpl.TOKEN_TYPE, AccessToken.Type.defaultType().getIntValue());
+            fields.put(AccessTokenImpl.TOKEN_TYPE, AccessTokenImpl.Type.defaultType().getIntValue());
         }
         if (token.getId() == null) {
             return new AccessTokenImpl(fields);

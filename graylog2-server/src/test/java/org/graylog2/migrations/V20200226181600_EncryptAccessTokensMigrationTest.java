@@ -23,8 +23,8 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
-import org.graylog2.security.AccessToken;
 import org.graylog2.security.token.AccessTokenCipher;
+import org.graylog2.security.token.AccessTokenImpl;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -91,7 +91,7 @@ public class V20200226181600_EncryptAccessTokensMigrationTest {
             assertThat(token.getString(NAME)).isEqualTo("cli-access");
             assertThat(token.getString(USERNAME)).isEqualTo("jane");
             assertThat(token.getString(TOKEN)).isEqualTo("cc21d0e8fcbf8c28f8fd56c30e81e5f92cf8bcbf846c69cdcc4eec5ffe64f592bf604141be77e46c819a8997d9d245f1bc9f5f60dc44e490ca6ad07b25d45338efb3bad5");
-            assertThat(token.getInteger(TOKEN_TYPE)).isEqualTo(AccessToken.Type.AESSIV.getIntValue());
+            assertThat(token.getInteger(TOKEN_TYPE)).isEqualTo(AccessTokenImpl.Type.AESSIV.getIntValue());
             assertThat(token.get(LAST_ACCESS)).isEqualTo(DateTime.parse("2020-02-26T21:50:12.454Z").toDate());
         });
 
@@ -102,7 +102,7 @@ public class V20200226181600_EncryptAccessTokensMigrationTest {
             assertThat(token.getString(NAME)).isEqualTo("test-1");
             assertThat(token.getString(USERNAME)).isEqualTo("john");
             assertThat(token.getString(TOKEN)).isEqualTo("d5f6fc27206946c15f183764c32526674108f9f4");
-            assertThat(token.getInteger(TOKEN_TYPE)).isEqualTo(AccessToken.Type.AESSIV.getIntValue());
+            assertThat(token.getInteger(TOKEN_TYPE)).isEqualTo(AccessTokenImpl.Type.AESSIV.getIntValue());
             assertThat(token.get(LAST_ACCESS)).isEqualTo(DateTime.parse("2020-01-27T16:23:02.758Z").toDate());
         });
 
@@ -113,7 +113,7 @@ public class V20200226181600_EncryptAccessTokensMigrationTest {
             assertThat(token.getString(NAME)).isEqualTo("test-2");
             assertThat(token.getString(USERNAME)).isEqualTo("john");
             assertThat(token.getString(TOKEN)).isEqualTo("55acb1b25c787ae1bc91e7eb1694b39277881b4e4643369590c49afd18ac745b4b60ad4aab058dfb4b6f00eba8d30a2c4c188cc9b5832cd9d9620aab82281651797ff3");
-            assertThat(token.getInteger(TOKEN_TYPE)).isEqualTo(AccessToken.Type.AESSIV.getIntValue());
+            assertThat(token.getInteger(TOKEN_TYPE)).isEqualTo(AccessTokenImpl.Type.AESSIV.getIntValue());
             assertThat(token.get(LAST_ACCESS)).isEqualTo(DateTime.parse("2020-01-27T18:23:02.758Z").toDate());
         });
     }

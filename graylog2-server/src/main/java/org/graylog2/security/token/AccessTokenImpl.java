@@ -29,6 +29,24 @@ import java.util.Map;
 
 @CollectionName(AccessTokenImpl.COLLECTION_NAME)
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
+    public enum Type {
+        PLAINTEXT(0), AESSIV(1);
+
+        private final int type;
+
+        Type(int type) {
+            this.type = type;
+        }
+
+        public int getIntValue() {
+            return type;
+        }
+
+        public static Type defaultType() {
+            return AESSIV;
+        }
+    }
+
     public static final String COLLECTION_NAME = "access_tokens";
     public static final String USERNAME = "username";
     public static final String TOKEN = "token";
@@ -95,5 +113,4 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public void setName(String name) {
         fields.put(NAME, name);
     }
-
 }

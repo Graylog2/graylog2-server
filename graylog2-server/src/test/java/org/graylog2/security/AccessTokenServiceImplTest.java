@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.security.token.AccessTokenCipher;
+import org.graylog2.security.token.AccessTokenImpl;
 import org.graylog2.security.token.AccessTokenServiceImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -156,7 +157,7 @@ public class AccessTokenServiceImplTest {
                             .isEqualTo(StringUtils.reverse(token.getToken()));
                     assertThat(tokenDocument.getInteger("token_type"))
                             .as("check that token type is set for %s/%s", token.getId(), token.getName())
-                            .isEqualTo(1);
+                            .isEqualTo(AccessTokenImpl.Type.AESSIV.getIntValue());
                 });
     }
 
