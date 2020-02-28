@@ -123,18 +123,18 @@ type Props = {
 };
 
 const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
-  const [modalOpen, setModalOpen] = useState(show);
+  const [configurationModalOpen, setConfigurationModalOpen] = useState(show);
   const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view));
 
   return (
     <React.Fragment>
-      {modalOpen && (
-        <ConfigurationModal onClose={() => setModalOpen(false)}
+      {configurationModalOpen && (
+        <ConfigurationModal onClose={() => setConfigurationModalOpen(false)}
                             onSave={onSave}
                             show
                             view={view} />
       )}
-      <MenuItem disabled={disabled} onSelect={() => setModalOpen(true)}>
+      <MenuItem disabled={disabled} onSelect={() => setConfigurationModalOpen(true)}>
         <Icon name="desktop" /> Full Screen
       </MenuItem>
     </React.Fragment>
