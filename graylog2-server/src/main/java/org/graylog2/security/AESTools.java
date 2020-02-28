@@ -72,7 +72,7 @@ public class AESTools {
      */
     @Nullable
     public static String encryptSiv(String plainText, byte[] encryptionKey) {
-        validateTextAndEntryptionKey(plainText, encryptionKey);
+        validateTextAndEncryptionKey(plainText, encryptionKey);
         try {
             final byte[] cipherBytes = SIV_MODE.encrypt(
                     Arrays.copyOf(encryptionKey, 16),
@@ -96,7 +96,7 @@ public class AESTools {
      */
     @Nullable
     public static String decryptSiv(String cipherText, byte[] encryptionKey) {
-        validateTextAndEntryptionKey(cipherText, encryptionKey);
+        validateTextAndEncryptionKey(cipherText, encryptionKey);
         try {
             final byte[] plainBytes = SIV_MODE.decrypt(
                     Arrays.copyOf(encryptionKey, 16),
@@ -110,7 +110,7 @@ public class AESTools {
         return null;
     }
 
-    private static void validateTextAndEntryptionKey(String text, byte[] encryptionKey) {
+    private static void validateTextAndEncryptionKey(String text, byte[] encryptionKey) {
         if (text == null) {
             throw new IllegalArgumentException("text value cannot be null");
         }
