@@ -712,6 +712,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     ]
                                   }
+                                  placeholder="Select url type"
                                   size="normal"
                                   value="regex"
                                   valueKey="value"
@@ -751,6 +752,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         },
                                       ]
                                     }
+                                    placeholder="Select url type"
                                     size="normal"
                                     styles={
                                       Object {
@@ -835,7 +837,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         ]
                                       }
                                       pageSize={5}
-                                      placeholder="Select..."
+                                      placeholder="Select url type"
                                       screenReaderStatus={[Function]}
                                       size="normal"
                                       styles={
@@ -951,7 +953,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               },
                                             ],
                                             "pageSize": 5,
-                                            "placeholder": "Select...",
+                                            "placeholder": "Select url type",
                                             "screenReaderStatus": [Function],
                                             "size": "normal",
                                             "styles": Object {
@@ -1101,7 +1103,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   },
                                                 ],
                                                 "pageSize": 5,
-                                                "placeholder": "Select...",
+                                                "placeholder": "Select url type",
                                                 "screenReaderStatus": [Function],
                                                 "size": "normal",
                                                 "styles": Object {
@@ -1243,7 +1245,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       },
                                                     ],
                                                     "pageSize": 5,
-                                                    "placeholder": "Select...",
+                                                    "placeholder": "Select url type",
                                                     "screenReaderStatus": [Function],
                                                     "size": "normal",
                                                     "styles": Object {
@@ -1389,7 +1391,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -1524,7 +1526,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -1754,7 +1756,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       },
                                                     ],
                                                     "pageSize": 5,
-                                                    "placeholder": "Select...",
+                                                    "placeholder": "Select url type",
                                                     "screenReaderStatus": [Function],
                                                     "size": "normal",
                                                     "styles": Object {
@@ -1895,7 +1897,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -2040,7 +2042,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -2637,6 +2639,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     ]
                                   }
+                                  placeholder="Select url type"
                                   size="normal"
                                   value="regex"
                                   valueKey="value"
@@ -2676,6 +2679,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         },
                                       ]
                                     }
+                                    placeholder="Select url type"
                                     size="normal"
                                     styles={
                                       Object {
@@ -2760,7 +2764,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         ]
                                       }
                                       pageSize={5}
-                                      placeholder="Select..."
+                                      placeholder="Select url type"
                                       screenReaderStatus={[Function]}
                                       size="normal"
                                       styles={
@@ -2876,7 +2880,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               },
                                             ],
                                             "pageSize": 5,
-                                            "placeholder": "Select...",
+                                            "placeholder": "Select url type",
                                             "screenReaderStatus": [Function],
                                             "size": "normal",
                                             "styles": Object {
@@ -3026,7 +3030,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   },
                                                 ],
                                                 "pageSize": 5,
-                                                "placeholder": "Select...",
+                                                "placeholder": "Select url type",
                                                 "screenReaderStatus": [Function],
                                                 "size": "normal",
                                                 "styles": Object {
@@ -3168,7 +3172,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       },
                                                     ],
                                                     "pageSize": 5,
-                                                    "placeholder": "Select...",
+                                                    "placeholder": "Select url type",
                                                     "screenReaderStatus": [Function],
                                                     "size": "normal",
                                                     "styles": Object {
@@ -3314,7 +3318,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -3449,7 +3453,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -3679,7 +3683,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       },
                                                     ],
                                                     "pageSize": 5,
-                                                    "placeholder": "Select...",
+                                                    "placeholder": "Select url type",
                                                     "screenReaderStatus": [Function],
                                                     "size": "normal",
                                                     "styles": Object {
@@ -3820,7 +3824,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -3965,7 +3969,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -4562,6 +4566,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     ]
                                   }
+                                  placeholder="Select url type"
                                   size="normal"
                                   value="literal"
                                   valueKey="value"
@@ -4601,6 +4606,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         },
                                       ]
                                     }
+                                    placeholder="Select url type"
                                     size="normal"
                                     styles={
                                       Object {
@@ -4685,7 +4691,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         ]
                                       }
                                       pageSize={5}
-                                      placeholder="Select..."
+                                      placeholder="Select url type"
                                       screenReaderStatus={[Function]}
                                       size="normal"
                                       styles={
@@ -4801,7 +4807,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               },
                                             ],
                                             "pageSize": 5,
-                                            "placeholder": "Select...",
+                                            "placeholder": "Select url type",
                                             "screenReaderStatus": [Function],
                                             "size": "normal",
                                             "styles": Object {
@@ -4951,7 +4957,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   },
                                                 ],
                                                 "pageSize": 5,
-                                                "placeholder": "Select...",
+                                                "placeholder": "Select url type",
                                                 "screenReaderStatus": [Function],
                                                 "size": "normal",
                                                 "styles": Object {
@@ -5093,7 +5099,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       },
                                                     ],
                                                     "pageSize": 5,
-                                                    "placeholder": "Select...",
+                                                    "placeholder": "Select url type",
                                                     "screenReaderStatus": [Function],
                                                     "size": "normal",
                                                     "styles": Object {
@@ -5239,7 +5245,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -5374,7 +5380,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -5604,7 +5610,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       },
                                                     ],
                                                     "pageSize": 5,
-                                                    "placeholder": "Select...",
+                                                    "placeholder": "Select url type",
                                                     "screenReaderStatus": [Function],
                                                     "size": "normal",
                                                     "styles": Object {
@@ -5745,7 +5751,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {
@@ -5890,7 +5896,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         ],
                                                         "pageSize": 5,
-                                                        "placeholder": "Select...",
+                                                        "placeholder": "Select url type",
                                                         "screenReaderStatus": [Function],
                                                         "size": "normal",
                                                         "styles": Object {

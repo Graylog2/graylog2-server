@@ -159,6 +159,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
               <Select clearable={false}
                       options={options}
                       matchProp="label"
+                      placeholder="Select url type"
                       onChange={option => _onUpdateType(idx, option)}
                       value={url.type} />
             </Input>
