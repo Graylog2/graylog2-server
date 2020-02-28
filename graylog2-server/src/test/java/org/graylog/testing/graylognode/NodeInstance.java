@@ -60,6 +60,7 @@ public class NodeInstance {
 
         final ImageFromDockerfile image = new ImageFromDockerfile()
                 .withFileFromClasspath("Dockerfile", "org/graylog/testing/graylognode/Dockerfile")
+                // set mode here explicitly, because file system permissions can get lost when executing from maven
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
                 .withFileFromClasspath("graylog.conf", "org/graylog/testing/graylognode/config/graylog.conf")
                 .withFileFromClasspath("log4j2.xml", "org/graylog/testing/graylognode/config/log4j2.xml")
@@ -90,6 +91,7 @@ public class NodeInstance {
         return classPath != null && classPath.split(":")[0].endsWith("idea_rt.jar");
     }
 
+    // workaround for testcontainers which only allows passing permissions if you pass a `File`
     private File resourceFile(@SuppressWarnings("SameParameterValue") String resourceName) {
 
         InputStream resource = this.getClass().getClassLoader().getResourceAsStream(resourceName);
