@@ -101,6 +101,7 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     @Override
     public void setToken(String token) {
         fields.put(TOKEN, token);
+        // The token type is used to state the algorithm that is used to encrypt the value
         fields.put(TOKEN_TYPE, Type.defaultType().getIntValue());
     }
 
