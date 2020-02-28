@@ -13,6 +13,22 @@ import AppRouter from 'routing/AppRouter';
 
 import viewsBindings from 'views/bindings';
 
+jest.mock('views/stores/DashboardsStore', () => ({
+  DashboardsActions: {
+    search: jest.fn(() => Promise.resolve()),
+  },
+  DashboardsStore: MockStore(
+    ['listen', () => jest.fn()],
+    ['getInitialState', () => ({
+      listen: [],
+      pagination: {
+        total: 100,
+        page: 1,
+        perPage: 20,
+      },
+    })],
+  ),
+}));
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
   ['listen', () => jest.fn()],
   'get',
