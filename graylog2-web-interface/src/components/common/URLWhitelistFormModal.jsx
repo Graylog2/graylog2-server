@@ -3,13 +3,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
 import connect from 'stores/connect';
-import { IfPermitted } from 'components/common';
 import { Button } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import CombinedProvider from 'injection/CombinedProvider';
 import PermissionsMixin from 'util/PermissionsMixin';
 import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+import IfPermitted from 'components/common/IfPermitted';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
@@ -59,7 +59,22 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     }
 
 
-  _getConfig = (configType: string) => {
+    componentDidUpdate() {
+      const { config: { entries } } = this.state;
+      const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
+      if (urlwhitelistConfig && entries.length === 0) {
+        this._setDefaultWhiteListState(urlwhitelistConfig);
+      }
+    }
+
+  _setDefaultWhiteListState =(urlwhitelistConfig) => {
+    const { newUrlEntry, urlType } = this.props;
+    const { isValid } = this.state;
+    const config = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: urlType || 'literal' }], disabled: urlwhitelistConfig.disabled };
+    this._update(config, isValid);
+  }
+
+  _getConfig = (configType: string): Object => {
     const { configuration } = this.props;
     if (configuration && configuration[configType]) {
       return configuration[configType];
@@ -108,14 +123,15 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
     }
   };
 
+  _resetConfig = () => {
+    const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
+    this._setDefaultWhiteListState(urlwhitelistConfig);
+  }
 
   render() {
     const urlwhitelistConfig = this._getConfig(URL_WHITELIST_CONFIG);
     if (urlwhitelistConfig) {
-      const { newUrlEntry, urlType } = this.props;
-      const initialConfig = { entries: [...urlwhitelistConfig.entries, { id: uuid(), title: '', value: newUrlEntry, type: urlType || 'literal' }], disabled: urlwhitelistConfig.disabled };
-      const { entries, disabled } = initialConfig;
-      const { isValid } = this.state;
+      const { isValid, config: { entries, disabled } } = this.state;
       return (
         <>
           <IfPermitted permissions="urlwhitelist:write">
@@ -129,7 +145,7 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
                               submitButtonDisabled={!isValid}
                               submitButtonText="Save">
             <h3>Whitelist URLs</h3>
-            <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={this._update} newUrlEntry={newUrlEntry} />
+            <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={this._update} />
           </BootstrapModalForm>
         </>
       );

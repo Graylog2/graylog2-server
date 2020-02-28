@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
 import { cloneDeep, debounce } from 'lodash';
 import Input from 'components/bootstrap/Input';
-import { Select, Icon } from 'components/common';
+import Select from 'components/common/Select';
+import Icon from 'components/common/Icon';
 import { Button, Table } from 'components/graylog';
 import FormUtils from 'util/FormsUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
@@ -16,10 +17,9 @@ type Props = {
   urls: Array<Url>,
   disabled: boolean,
   onUpdate: (config: WhiteListConfig, valid: boolean) => void,
-  newUrlEntry: string
 };
 
-const UrlWhiteListForm = ({ urls, onUpdate, disabled, newUrlEntry }: Props) => {
+const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
   const options = [{ value: literal, label: 'Exact match' }, { value: regex, label: 'Regex' }];
@@ -179,12 +179,6 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newUrlEntry }: Props) => {
     onUpdate(config, valid);
   }, [config]);
 
-  useEffect(() => {
-    if (newUrlEntry) {
-      FormUtils.triggerInput(inputs[`value${config.entries.length - 1}`]);
-    }
-  }, [newUrlEntry]);
-
   return (
     <>
       <Input type="checkbox"
@@ -217,14 +211,12 @@ UrlWhiteListForm.propTypes = {
   urls: PropTypes.array,
   disabled: PropTypes.bool,
   onUpdate: PropTypes.func,
-  newUrlEntry: PropTypes.string,
 };
 
 UrlWhiteListForm.defaultProps = {
   urls: [],
   disabled: false,
   onUpdate: () => {},
-  newUrlEntry: '',
 };
 
 export default UrlWhiteListForm;

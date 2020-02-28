@@ -2,10 +2,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Input } from 'components/bootstrap';
-import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 import StoreProvider from 'injection/StoreProvider';
 import URLUtils from 'util/URLUtils';
 import FormsUtils from 'util/FormsUtils';
+import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 type Props = {
@@ -116,7 +116,7 @@ URLWhiteListInput.defaultProps = {
   validationMessage: '',
   labelClassName: '',
   wrapperClassName: '',
-  urlType: '',
+  urlType: 'literal',
 };
 
 export default URLWhiteListInput;

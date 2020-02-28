@@ -4,8 +4,7 @@ const FormUtils = {
   getValueFromInput(input) {
     switch (input.type) {
       case 'radio':
-        const { value } = input;
-        return (value === 'true' || value === 'false' ? value === 'true' : value);
+        return (input.value === 'true' || input.value === 'false' ? input.value === 'true' : input.value);
       case 'checkbox':
         return input.checked;
       case 'number':
