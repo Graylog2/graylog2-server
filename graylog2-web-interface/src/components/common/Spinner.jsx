@@ -1,12 +1,11 @@
 // @flow strict
 import React, { useState, useEffect } from 'react';
-import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import Icon from './Icon';
 
-const Wrapper: ComponentType<{ visible: boolean }> = styled.span`
+const Wrapper: StyledComponent<{ visible: boolean }, {}, HTMLSpanElement> = styled.span`
   visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
 `;
 
