@@ -1,7 +1,10 @@
 import React from 'react';
-import { render, cleanup } from 'wrappedTestingLibrary';
+import { render, cleanup, wait } from 'wrappedTestingLibrary';
+import { act } from 'react-dom/test-utils';
 
 import Spinner from 'components/common/Spinner';
+
+jest.useFakeTimers();
 
 describe('<Spinner />', () => {
   afterEach(() => {
@@ -17,5 +20,19 @@ describe('<Spinner />', () => {
     const text = 'Hello world!';
     const { getByText } = render(<Spinner text={text} />);
     expect(getByText(text)).not.toBeNull();
+  });
+
+  it('should not be visible initially', () => {
+    const { container } = render(<Spinner />);
+    expect(container.firstChild).toHaveStyle('visibility: hidden');
+  });
+
+  it('should be visible after when delay is completed', () => {
+    const { container } = render(<Spinner />);
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+
+    expect(container.firstChild).toHaveStyle('visibility: visible');
   });
 });
