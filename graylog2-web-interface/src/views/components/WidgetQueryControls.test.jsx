@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import '@testing-library/jest-dom/extend-expect';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';

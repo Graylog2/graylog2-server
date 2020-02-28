@@ -54,4 +54,5 @@ IfPermitted.defaultProps = {
   anyPermissions: false,
 };
 
+/** @component */
 export default connect(IfPermitted, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ currentUser: currentUser ? currentUser.currentUser : currentUser }));

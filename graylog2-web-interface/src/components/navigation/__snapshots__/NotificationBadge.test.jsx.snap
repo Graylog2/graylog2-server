@@ -19,7 +19,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "Nav-dzawzr-0",
             "isStatic": false,
-            "lastClassName": "cUmrKl",
+            "lastClassName": "hlreIC",
             "rules": Array [
               [Function],
             ],
@@ -39,7 +39,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
     >
       <Nav
         bsClass="nav"
-        className="Nav-dzawzr-0 cUmrKl"
+        className="Nav-dzawzr-0 hlreIC"
         justified={false}
         navbar={true}
         pullLeft={false}
@@ -47,7 +47,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
         stacked={false}
       >
         <ul
-          className="Nav-dzawzr-0 cUmrKl nav navbar-nav"
+          className="Nav-dzawzr-0 hlreIC nav navbar-nav"
           role={null}
         >
           <LinkContainer

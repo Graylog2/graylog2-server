@@ -9,4 +9,5 @@ const ControlLabel = styled(BootstrapControlLabel)(({ theme }) => css`
   display: inline-block;
 `);
 
+/** @component */
 export default ControlLabel;

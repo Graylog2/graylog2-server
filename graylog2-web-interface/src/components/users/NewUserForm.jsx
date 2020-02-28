@@ -79,7 +79,7 @@ class NewUserForm extends React.Component {
     if (roles != null && !(roles.includes('Reader') || roles.includes('Admin'))) {
       rolesAlert = (
         <Alert bsStyle="danger" role="alert">
-        You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
+          You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
         </Alert>
       );
     }

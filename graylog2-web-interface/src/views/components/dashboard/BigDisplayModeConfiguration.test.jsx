@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { render, cleanup, fireEvent, waitForElement } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
-import { toBeDisabled } from '@testing-library/jest-dom';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -12,8 +11,6 @@ import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import type { ViewStateMap } from 'views/logic/views/View';
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
-
-expect.extend({ toBeDisabled });
 
 jest.mock('util/History', () => ({}));
 jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));

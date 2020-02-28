@@ -72,8 +72,8 @@ const IndexSetPage = createReactClass({
               <p>
                 We could not get the indices overview information. This usually means there was a problem
                 connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from
-                Graylog
-                </strong>.
+                  Graylog
+                                                 </strong>.
               </p>
               <p>
                 Graylog will continue storing your messages in its journal, but you will not be able to search on them

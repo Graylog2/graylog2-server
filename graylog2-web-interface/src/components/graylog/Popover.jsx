@@ -50,4 +50,5 @@ const Popover = styled(BoostrapPopover)(({ theme }) => {
   `;
 });
 
+/** @component */
 export default Popover;

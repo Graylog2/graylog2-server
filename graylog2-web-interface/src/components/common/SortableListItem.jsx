@@ -118,13 +118,15 @@ class SortableListItem extends React.Component {
     const handle = <span className={SortableListItemStyle.itemHandle}><Icon name="sort" /></span>;
 
     const component = (
-      <div className="sortable-list-item">
-        <ListGroupItem className={classes.join(' ')}>
-          <div>
-            {this.props.disableDragging ? null : handle}
-            {content}
-          </div>
-        </ListGroupItem>
+      <div>
+        <div>
+          <ListGroupItem className={classes.join(' ')}>
+            <div>
+              {this.props.disableDragging ? null : handle}
+              {content}
+            </div>
+          </ListGroupItem>
+        </div>
       </div>
     );
 

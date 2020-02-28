@@ -66,7 +66,7 @@ class RegexReplaceExtractorConfiguration extends React.Component {
   render() {
     const regexHelpMessage = (
       <span>
-          The regular expression used for extraction.{' '}
+        The regular expression used for extraction.{' '}
         Learn more in the <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
       </span>
     );

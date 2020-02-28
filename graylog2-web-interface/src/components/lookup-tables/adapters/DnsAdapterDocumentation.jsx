@@ -134,8 +134,8 @@ const DnsAdapterDocumentation = () => {
 
       <p style={styleMarginBottom}>
         A comma-separated list of DNS server IP addresses and optional ports to use (eg. <code>192.168.1.1:5353,
-        192.168.1.244
-        </code>).
+          192.168.1.244
+                                                                                         </code>).
         Leave this blank to use the DNS server defined for your local system. All requests use port 53 unless
         otherwise specified.
       </p>

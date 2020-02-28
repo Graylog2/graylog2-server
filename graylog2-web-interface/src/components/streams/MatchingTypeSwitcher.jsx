@@ -1,11 +1,36 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
+
 import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
 
 const StreamsStore = StoreProvider.getStore('Streams');
+
+const StreamRuleConnector = styled.div`
+  margin-top: 10px;
+  margin-bottom: 13px;
+
+  label {
+    font-size: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 5px;
+  }
+
+  .radio {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  input[type=radio] {
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+`;
 
 class MatchingTypeSwitcher extends React.Component {
   static propTypes = {
@@ -34,7 +59,7 @@ class MatchingTypeSwitcher extends React.Component {
 
   render() {
     return (
-      <div className="streamrule-connector-type-form">
+      <StreamRuleConnector>
         <div>
           <Input id="streamrule-and-connector"
                  type="radio"
@@ -47,7 +72,7 @@ class MatchingTypeSwitcher extends React.Component {
                  checked={this.props.stream.matching_type === 'OR'}
                  onChange={this.handleTypeChangeToOr} />
         </div>
-      </div>
+      </StreamRuleConnector>
     );
   }
 }

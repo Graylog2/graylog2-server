@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { DataTable, Timestamp } from 'components/common';
-import { Icon } from 'components/common';
+import { DataTable, Timestamp, Icon } from 'components/common';
+
 
 class SidecarStatusFileList extends React.Component {
   static propTypes = {
