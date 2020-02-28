@@ -2157,7 +2157,9 @@ exports[`<ContentPackEdit /> should render spinner with no content pack 1`] = `
 >
   <Spinner
     delay={200}
+    fixedWidth={false}
     name="spinner"
+    pulse={false}
     text="Loading..."
   >
     <Spinner__Wrapper

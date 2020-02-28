@@ -492,7 +492,9 @@ exports[`<ContentPackInstallEntityList /> should render without entities 1`] = `
 >
   <Spinner
     delay={200}
+    fixedWidth={false}
     name="spinner"
+    pulse={false}
     text="Loading..."
   >
     <Spinner__Wrapper
