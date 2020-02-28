@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.testing.api;
 
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.builder.RequestSpecBuilder;
+import org.graylog.testing.completebackend.ApiIntegrationTest;
+import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -29,11 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @ApiIntegrationTest
-class GraylogBackendIT {
+class GraylogBackendTest {
 
     private final GraylogBackend sut;
 
-    public GraylogBackendIT(GraylogBackend sut) {
+    public GraylogBackendTest(GraylogBackend sut) {
         this.sut = sut;
     }
 

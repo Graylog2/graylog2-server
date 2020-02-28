@@ -23,12 +23,14 @@ import integration.BaseRestTest;
 import integration.MongoDbSeed;
 import integration.RequiresAuthentication;
 import integration.RequiresVersion;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+@Ignore("legacy test that should be converted or deleted")
 @RequiresAuthentication
 @RequiresVersion(">=0.90.0")
 @MongoDbSeed
@@ -36,9 +38,9 @@ public class StreamsTest extends BaseRestTest {
     @Test
     public void listStreamsWhenNoStreamsArePresent() throws Exception {
         final JsonPath response = given()
-            .when()
+                .when()
                 .get("/streams")
-            .then()
+                .then()
                 .statusCode(200)
                 .assertThat()
                 .body(".", containsAllKeys("total", "streams"))
@@ -217,7 +219,7 @@ public class StreamsTest extends BaseRestTest {
         final int beforeCount = streamCount();
 
         createStreamFromRequest(jsonResourceForMethod())
-            .statusCode(400);
+                .statusCode(400);
 
         final int afterCount = streamCount();
         assertThat(afterCount).isEqualTo(beforeCount);

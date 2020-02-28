@@ -21,11 +21,13 @@ import integration.BaseRestTest;
 import integration.MongoDbSeed;
 import integration.RequiresAuthentication;
 import integration.RequiresVersion;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore("legacy test that should be converted or deleted")
 @RequiresAuthentication
 @RequiresVersion(">1.1.99")
 @MongoDbSeed

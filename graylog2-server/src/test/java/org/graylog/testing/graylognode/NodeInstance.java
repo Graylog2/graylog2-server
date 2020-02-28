@@ -16,7 +16,7 @@
  */
 package org.graylog.testing.graylognode;
 
-import com.google.common.io.Resources;
+import org.apache.commons.io.FileUtils;
 import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +26,12 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.File;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.UUID;
 
 public class NodeInstance {
 
@@ -88,13 +90,22 @@ public class NodeInstance {
         return classPath != null && classPath.split(":")[0].endsWith("idea_rt.jar");
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private File resourceFile(@SuppressWarnings("SameParameterValue") String resourceName) {
+
+        InputStream resource = this.getClass().getClassLoader().getResourceAsStream(resourceName);
+
+        if (resource == null)
+            throw new RuntimeException("Couldn't load resource " + resourceName);
+
+        File f = new File("/tmp/" + UUID.randomUUID().toString() + "-" + Paths.get(resourceName).getFileName());
+
         try {
-            return new File(Resources.getResource(resourceName).toURI());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            FileUtils.copyInputStreamToFile(resource, f);
+        } catch (IOException e) {
+            throw new RuntimeException("Error copying resource to file: " + resourceName);
         }
+
+        return f;
     }
 
     private Path pathTo(String propertyName) {

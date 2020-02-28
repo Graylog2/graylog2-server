@@ -21,6 +21,7 @@ import com.jayway.restassured.response.ValidatableResponse;
 import integration.BaseRestTest;
 import integration.RequiresAuthentication;
 import integration.RequiresVersion;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -29,6 +30,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
+@Ignore("legacy test that should be converted or deleted")
 @RequiresVersion(">=1.2.0")
 @RequiresAuthentication
 public class ContentPackStreamsTest extends BaseRestTest {

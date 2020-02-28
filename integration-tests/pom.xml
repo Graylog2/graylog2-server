@@ -37,10 +37,25 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <skip.integration.tests>true</skip.integration.tests>
+        <skip.integration.tests>false</skip.integration.tests>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-server</artifactId>
+            <version>3.3.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-server</artifactId>
+            <version>3.3.0-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Logging dependencies -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -134,6 +149,14 @@
             <artifactId>junit</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
         </dependency>
@@ -144,6 +167,16 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
