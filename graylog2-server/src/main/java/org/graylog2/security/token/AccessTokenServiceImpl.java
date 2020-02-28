@@ -57,6 +57,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     public AccessTokenServiceImpl(MongoConnection mongoConnection, AccessTokenCipher accessTokenCipher) {
         super(mongoConnection);
         this.cipher = accessTokenCipher;
+        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
     }
 
     @Override
