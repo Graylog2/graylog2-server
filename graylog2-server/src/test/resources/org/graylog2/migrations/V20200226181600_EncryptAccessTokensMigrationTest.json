@@ -1,0 +1,38 @@
+{
+  "access_tokens": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "last_access": {
+        "$date": "2020-02-26T21:50:12.454Z"
+      },
+      "token": "1f56ccn5hpokf9f8d91pn0j7tqlv7552f92jt6i4lnb3u7b5osjq",
+      "username": "jane",
+      "NAME": "cli-access"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "last_access": {
+        "$date": "2020-01-27T16:23:02.758Z"
+      },
+      "token": "d5f6fc27206946c15f183764c32526674108f9f4",
+      "token_type": 1,
+      "username": "john",
+      "NAME": "test-1"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "last_access": {
+        "$date": "2020-01-27T18:23:02.758Z"
+      },
+      "token": "uhni0kdqrl053hsfkoltqm16imujqmel396khgan803p6m7cbo4",
+      "username": "john",
+      "NAME": "test-2"
+    }
+  ]
+}
