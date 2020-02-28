@@ -71,7 +71,7 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
 
 SurroundingSearchButton.propTypes = {
   id: PropTypes.string.isRequired,
-  timestamp: PropTypes.number.isRequired,
+  timestamp: PropTypes.string.isRequired,
   searchConfig: PropTypes.object.isRequired,
   messageFields: PropTypes.object.isRequired,
 };
