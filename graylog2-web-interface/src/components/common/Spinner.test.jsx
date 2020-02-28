@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, cleanup, wait } from 'wrappedTestingLibrary';
+import { render, cleanup } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import Spinner from 'components/common/Spinner';
