@@ -74,12 +74,15 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     @Override
     public AccessToken loadById(String id) {
         try {
-            return fromDBObject(get(AccessTokenImpl.class, id));
+            final DBObject dbObject = get(AccessTokenImpl.class, id);
+            if (dbObject != null) {
+                return fromDBObject(dbObject);
+            }
         } catch (IllegalArgumentException e) {
             // Happens when id is not a valid BSON ObjectId
             LOG.debug("Couldn't load access token", e);
-            return null;
         }
+        return null;
     }
 
     @Override
