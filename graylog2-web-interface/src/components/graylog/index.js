@@ -9,6 +9,7 @@ import HelpBlock from './HelpBlock';
 import InputGroup from './InputGroup';
 import Jumbotron from './Jumbotron';
 import Label from './Label';
+import ListGroup from './ListGroup';
 import ListGroupItem from './ListGroupItem';
 import Modal from './Modal';
 import Nav from './Nav';
@@ -36,6 +37,7 @@ export {
   InputGroup,
   Jumbotron,
   Label,
+  ListGroup,
   ListGroupItem,
   Modal,
   Nav,

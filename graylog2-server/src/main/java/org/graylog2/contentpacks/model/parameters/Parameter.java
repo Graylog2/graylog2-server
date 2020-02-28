@@ -67,12 +67,7 @@ public interface Parameter<T> {
         @JsonProperty(FIELD_TYPE)
         SELF valueType(ValueType type);
 
-        // It would be nicer to use
-        //     SELF defaultValue(T defaultValue);
-        // but this isn't possible until the following issues have been fixed:
-        // https://github.com/google/auto/issues/627
-        // https://github.com/google/auto/pull/515
         @JsonProperty(FIELD_DEFAULT_VALUE)
-        SELF defaultValue(Optional defaultValue);
+        SELF defaultValue(Optional<T> defaultValue);
     }
 }

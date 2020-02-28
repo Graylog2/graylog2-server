@@ -8,4 +8,5 @@ const NavDropdown = styled(BootstrapNavDropdown)`
   ${menuItemStyles}
 `;
 
+/** @component */
 export default NavDropdown;

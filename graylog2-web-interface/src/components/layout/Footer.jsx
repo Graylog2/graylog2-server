@@ -1,6 +1,8 @@
 // @flow strict
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+
 
 import Version from 'util/Version';
 import connect from 'stores/connect';
@@ -14,6 +16,17 @@ type Props = {
     hostname: string
   },
 };
+
+const StyledFooter = styled.footer`
+  text-align: center;
+  font-size: 11px;
+  color: #aaa;
+  margin-bottom: 15px;
+
+  @media print {
+    display: none;
+  }
+`;
 
 const Footer = ({ system }: Props) => {
   const [jvm, setJvm] = useState();
@@ -32,16 +45,16 @@ const Footer = ({ system }: Props) => {
 
   if (!(system && jvm)) {
     return (
-      <div id="footer">
+      <StyledFooter>
         Graylog {Version.getFullVersion()}
-      </div>
+      </StyledFooter>
     );
   }
 
   return (
-    <div id="footer">
+    <StyledFooter>
       Graylog {system.version} on {system.hostname} ({jvm.info})
-    </div>
+    </StyledFooter>
   );
 };
 

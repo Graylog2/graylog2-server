@@ -6,7 +6,7 @@ import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
-import { PaginatedList, SearchForm , Icon} from 'components/common';
+import { PaginatedList, SearchForm, Icon } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 
 import Styles from './Overview.css';
@@ -124,7 +124,7 @@ class LookupTablesOverview extends React.Component {
         <Row className="content">
           <Col md={12}>
             <h2>
-            Configured lookup tables
+              Configured lookup tables
               <span>&nbsp;<small>{this.props.pagination.total} total</small></span>
             </h2>
             <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>

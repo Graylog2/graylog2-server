@@ -285,4 +285,5 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   }
 `);
 
+/** @component */
 export default Navbar;

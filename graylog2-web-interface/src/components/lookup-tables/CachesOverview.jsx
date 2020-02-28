@@ -101,7 +101,7 @@ class CachesOverview extends React.Component {
         <Row className="content">
           <Col md={12}>
             <h2>
-            Configured lookup Caches
+              Configured lookup Caches
               <span>&nbsp;
                 <small>{pagination.total} total</small>
               </span>

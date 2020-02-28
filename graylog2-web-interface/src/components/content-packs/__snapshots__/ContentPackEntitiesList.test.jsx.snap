@@ -1082,9 +1082,8 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 autoFocus={true}
                                 backdrop="static"
                                 backdropClassName="modal-backdrop"
-                                backdropTransitionTimeout={150}
+                                backdropTransition={[Function]}
                                 containerClassName="modal-open"
-                                dialogTransitionTimeout={300}
                                 enforceFocus={true}
                                 keyboard={true}
                                 manager={
@@ -1102,6 +1101,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 onEntering={[Function]}
                                 onExited={[Function]}
                                 onHide={[Function]}
+                                onMouseUp={[Function]}
                                 renderBackdrop={[Function]}
                                 restoreFocus={true}
                                 show={false}
@@ -1196,9 +1196,8 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 autoFocus={true}
                                 backdrop="static"
                                 backdropClassName="modal-backdrop"
-                                backdropTransitionTimeout={150}
+                                backdropTransition={[Function]}
                                 containerClassName="modal-open"
-                                dialogTransitionTimeout={300}
                                 enforceFocus={true}
                                 keyboard={true}
                                 manager={
@@ -1216,6 +1215,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 onEntering={[Function]}
                                 onExited={[Function]}
                                 onHide={[Function]}
+                                onMouseUp={[Function]}
                                 renderBackdrop={[Function]}
                                 restoreFocus={true}
                                 show={false}
@@ -1544,9 +1544,8 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 autoFocus={true}
                                 backdrop="static"
                                 backdropClassName="modal-backdrop"
-                                backdropTransitionTimeout={150}
+                                backdropTransition={[Function]}
                                 containerClassName="modal-open"
-                                dialogTransitionTimeout={300}
                                 enforceFocus={true}
                                 keyboard={true}
                                 manager={
@@ -1564,6 +1563,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 onEntering={[Function]}
                                 onExited={[Function]}
                                 onHide={[Function]}
+                                onMouseUp={[Function]}
                                 renderBackdrop={[Function]}
                                 restoreFocus={true}
                                 show={false}
@@ -1658,9 +1658,8 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 autoFocus={true}
                                 backdrop="static"
                                 backdropClassName="modal-backdrop"
-                                backdropTransitionTimeout={150}
+                                backdropTransition={[Function]}
                                 containerClassName="modal-open"
-                                dialogTransitionTimeout={300}
                                 enforceFocus={true}
                                 keyboard={true}
                                 manager={
@@ -1678,6 +1677,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 onEntering={[Function]}
                                 onExited={[Function]}
                                 onHide={[Function]}
+                                onMouseUp={[Function]}
                                 renderBackdrop={[Function]}
                                 restoreFocus={true}
                                 show={false}

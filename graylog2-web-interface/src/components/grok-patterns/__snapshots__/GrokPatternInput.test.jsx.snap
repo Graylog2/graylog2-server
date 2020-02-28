@@ -483,475 +483,479 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
           <ListGroup
             bsClass="resultList"
           >
-            <div
-              className="resultList"
+            <ListGroup
+              bsClass="resultList"
             >
-              <ForwardRef
-                header="COMMONMAC"
-                id="list-item-0"
-                key="COMMONMAC"
-                onKeyDown={[Function]}
+              <div
+                className="resultList"
               >
-                <ListGroupItem__StyledListGroupItem
+                <ForwardRef
                   header="COMMONMAC"
                   id="list-item-0"
+                  key="COMMONMAC"
                   onKeyDown={[Function]}
                 >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "STYLES": Array [
-                          "success",
-                          "warning",
-                          "danger",
-                          "info",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                          "isStatic": false,
-                          "lastClassName": "dvkPPN",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "ListGroupItem__StyledListGroupItem",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                  <ListGroupItem__StyledListGroupItem
                     header="COMMONMAC"
                     id="list-item-0"
                     onKeyDown={[Function]}
                   >
-                    <ListGroupItem
-                      bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "success",
+                            "warning",
+                            "danger",
+                            "info",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                            "isStatic": false,
+                            "lastClassName": "dvkPPN",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "ListGroupItem__StyledListGroupItem",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
                       header="COMMONMAC"
                       id="list-item-0"
-                      listItem={false}
                       onKeyDown={[Function]}
                     >
-                      <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
+                      <ListGroupItem
+                        bsClass="list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
+                        header="COMMONMAC"
                         id="list-item-0"
+                        listItem={false}
                         onKeyDown={[Function]}
                       >
-                        <h4
-                          className="list-group-item-heading"
+                        <span
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
+                          id="list-item-0"
+                          onKeyDown={[Function]}
                         >
-                          COMMONMAC
-                        </h4>
-                        <p
-                          className="list-group-item-text"
-                        >
-                          <span
-                            className="patternDisplay"
+                          <h4
+                            className="list-group-item-heading"
                           >
-                            (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
-                          </span>
-                          <span
-                            className="addButton"
+                            COMMONMAC
+                          </h4>
+                          <p
+                            className="list-group-item-text"
                           >
-                            <ForwardRef
-                              bsSize="xsmall"
-                              bsStyle="primary"
-                              onClick={[Function]}
+                            <span
+                              className="patternDisplay"
                             >
-                              <Button
+                              (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
+                            </span>
+                            <span
+                              className="addButton"
+                            >
+                              <ForwardRef
                                 bsSize="xsmall"
                                 bsStyle="primary"
                                 onClick={[Function]}
                               >
-                                <StyledComponent
+                                <Button
                                   bsSize="xsmall"
                                   bsStyle="primary"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "ghlLDE",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
+                                  <StyledComponent
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 ghlLDE"
-                                    disabled={false}
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                          "xsmall",
+                                        ],
+                                        "STYLES": Array [
+                                          "success",
+                                          "warning",
+                                          "danger",
+                                          "info",
+                                          "default",
+                                          "primary",
+                                          "link",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "Button-c9cbmb-0",
+                                          "isStatic": false,
+                                          "lastClassName": "ghlLDE",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "Button",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
                                     onClick={[Function]}
                                   >
-                                    <button
-                                      className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="xsmall"
+                                      bsStyle="primary"
+                                      className="Button-c9cbmb-0 ghlLDE"
                                       disabled={false}
                                       onClick={[Function]}
-                                      type="button"
                                     >
-                                      Add
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button>
-                            </ForwardRef>
-                          </span>
-                        </p>
-                      </span>
-                    </ListGroupItem>
-                  </StyledComponent>
-                </ListGroupItem__StyledListGroupItem>
-              </ForwardRef>
-              <ForwardRef
-                header="DATA"
-                id="list-item-1"
-                key="DATA"
-                onKeyDown={[Function]}
-              >
-                <ListGroupItem__StyledListGroupItem
+                                      <button
+                                        className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Add
+                                      </button>
+                                    </Button>
+                                  </StyledComponent>
+                                </Button>
+                              </ForwardRef>
+                            </span>
+                          </p>
+                        </span>
+                      </ListGroupItem>
+                    </StyledComponent>
+                  </ListGroupItem__StyledListGroupItem>
+                </ForwardRef>
+                <ForwardRef
                   header="DATA"
                   id="list-item-1"
+                  key="DATA"
                   onKeyDown={[Function]}
                 >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "STYLES": Array [
-                          "success",
-                          "warning",
-                          "danger",
-                          "info",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                          "isStatic": false,
-                          "lastClassName": "dvkPPN",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "ListGroupItem__StyledListGroupItem",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                  <ListGroupItem__StyledListGroupItem
                     header="DATA"
                     id="list-item-1"
                     onKeyDown={[Function]}
                   >
-                    <ListGroupItem
-                      bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "success",
+                            "warning",
+                            "danger",
+                            "info",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                            "isStatic": false,
+                            "lastClassName": "dvkPPN",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "ListGroupItem__StyledListGroupItem",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
                       header="DATA"
                       id="list-item-1"
-                      listItem={false}
                       onKeyDown={[Function]}
                     >
-                      <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
+                      <ListGroupItem
+                        bsClass="list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
+                        header="DATA"
                         id="list-item-1"
+                        listItem={false}
                         onKeyDown={[Function]}
                       >
-                        <h4
-                          className="list-group-item-heading"
+                        <span
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
+                          id="list-item-1"
+                          onKeyDown={[Function]}
                         >
-                          DATA
-                        </h4>
-                        <p
-                          className="list-group-item-text"
-                        >
-                          <span
-                            className="patternDisplay"
+                          <h4
+                            className="list-group-item-heading"
                           >
-                            .*?
-                          </span>
-                          <span
-                            className="addButton"
+                            DATA
+                          </h4>
+                          <p
+                            className="list-group-item-text"
                           >
-                            <ForwardRef
-                              bsSize="xsmall"
-                              bsStyle="primary"
-                              onClick={[Function]}
+                            <span
+                              className="patternDisplay"
                             >
-                              <Button
+                              .*?
+                            </span>
+                            <span
+                              className="addButton"
+                            >
+                              <ForwardRef
                                 bsSize="xsmall"
                                 bsStyle="primary"
                                 onClick={[Function]}
                               >
-                                <StyledComponent
+                                <Button
                                   bsSize="xsmall"
                                   bsStyle="primary"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "ghlLDE",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
+                                  <StyledComponent
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 ghlLDE"
-                                    disabled={false}
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                          "xsmall",
+                                        ],
+                                        "STYLES": Array [
+                                          "success",
+                                          "warning",
+                                          "danger",
+                                          "info",
+                                          "default",
+                                          "primary",
+                                          "link",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "Button-c9cbmb-0",
+                                          "isStatic": false,
+                                          "lastClassName": "ghlLDE",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "Button",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
                                     onClick={[Function]}
                                   >
-                                    <button
-                                      className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="xsmall"
+                                      bsStyle="primary"
+                                      className="Button-c9cbmb-0 ghlLDE"
                                       disabled={false}
                                       onClick={[Function]}
-                                      type="button"
                                     >
-                                      Add
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button>
-                            </ForwardRef>
-                          </span>
-                        </p>
-                      </span>
-                    </ListGroupItem>
-                  </StyledComponent>
-                </ListGroupItem__StyledListGroupItem>
-              </ForwardRef>
-              <ForwardRef
-                header="DATE"
-                id="list-item-2"
-                key="DATE"
-                onKeyDown={[Function]}
-              >
-                <ListGroupItem__StyledListGroupItem
+                                      <button
+                                        className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Add
+                                      </button>
+                                    </Button>
+                                  </StyledComponent>
+                                </Button>
+                              </ForwardRef>
+                            </span>
+                          </p>
+                        </span>
+                      </ListGroupItem>
+                    </StyledComponent>
+                  </ListGroupItem__StyledListGroupItem>
+                </ForwardRef>
+                <ForwardRef
                   header="DATE"
                   id="list-item-2"
+                  key="DATE"
                   onKeyDown={[Function]}
                 >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "STYLES": Array [
-                          "success",
-                          "warning",
-                          "danger",
-                          "info",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                          "isStatic": false,
-                          "lastClassName": "dvkPPN",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "ListGroupItem__StyledListGroupItem",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                  <ListGroupItem__StyledListGroupItem
                     header="DATE"
                     id="list-item-2"
                     onKeyDown={[Function]}
                   >
-                    <ListGroupItem
-                      bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "success",
+                            "warning",
+                            "danger",
+                            "info",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                            "isStatic": false,
+                            "lastClassName": "dvkPPN",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "ListGroupItem__StyledListGroupItem",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
                       header="DATE"
                       id="list-item-2"
-                      listItem={false}
                       onKeyDown={[Function]}
                     >
-                      <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
+                      <ListGroupItem
+                        bsClass="list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN"
+                        header="DATE"
                         id="list-item-2"
+                        listItem={false}
                         onKeyDown={[Function]}
                       >
-                        <h4
-                          className="list-group-item-heading"
+                        <span
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
+                          id="list-item-2"
+                          onKeyDown={[Function]}
                         >
-                          DATE
-                        </h4>
-                        <p
-                          className="list-group-item-text"
-                        >
-                          <span
-                            className="patternDisplay"
+                          <h4
+                            className="list-group-item-heading"
                           >
-                            %{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}
-                          </span>
-                          <span
-                            className="addButton"
+                            DATE
+                          </h4>
+                          <p
+                            className="list-group-item-text"
                           >
-                            <ForwardRef
-                              bsSize="xsmall"
-                              bsStyle="primary"
-                              onClick={[Function]}
+                            <span
+                              className="patternDisplay"
                             >
-                              <Button
+                              %{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}
+                            </span>
+                            <span
+                              className="addButton"
+                            >
+                              <ForwardRef
                                 bsSize="xsmall"
                                 bsStyle="primary"
                                 onClick={[Function]}
                               >
-                                <StyledComponent
+                                <Button
                                   bsSize="xsmall"
                                   bsStyle="primary"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "ghlLDE",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
+                                  <StyledComponent
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 ghlLDE"
-                                    disabled={false}
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                          "xsmall",
+                                        ],
+                                        "STYLES": Array [
+                                          "success",
+                                          "warning",
+                                          "danger",
+                                          "info",
+                                          "default",
+                                          "primary",
+                                          "link",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "Button-c9cbmb-0",
+                                          "isStatic": false,
+                                          "lastClassName": "ghlLDE",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "Button",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
                                     onClick={[Function]}
                                   >
-                                    <button
-                                      className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="xsmall"
+                                      bsStyle="primary"
+                                      className="Button-c9cbmb-0 ghlLDE"
                                       disabled={false}
                                       onClick={[Function]}
-                                      type="button"
                                     >
-                                      Add
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button>
-                            </ForwardRef>
-                          </span>
-                        </p>
-                      </span>
-                    </ListGroupItem>
-                  </StyledComponent>
-                </ListGroupItem__StyledListGroupItem>
-              </ForwardRef>
-            </div>
+                                      <button
+                                        className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Add
+                                      </button>
+                                    </Button>
+                                  </StyledComponent>
+                                </Button>
+                              </ForwardRef>
+                            </span>
+                          </p>
+                        </span>
+                      </ListGroupItem>
+                    </StyledComponent>
+                  </ListGroupItem__StyledListGroupItem>
+                </ForwardRef>
+              </div>
+            </ListGroup>
           </ListGroup>
         </div>
       </Col>
@@ -1428,9 +1432,13 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
           <ListGroup
             bsClass="resultList"
           >
-            <ul
-              className="resultList"
-            />
+            <ListGroup
+              bsClass="resultList"
+            >
+              <ul
+                className="resultList"
+              />
+            </ListGroup>
           </ListGroup>
         </div>
       </Col>

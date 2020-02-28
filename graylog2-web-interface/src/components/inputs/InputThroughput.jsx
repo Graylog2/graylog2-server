@@ -3,14 +3,44 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
+import styled from 'styled-components';
+
 
 import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
 
 import NumberUtils from 'util/NumberUtils';
-import { LinkToNode, Spinner } from 'components/common';
-import { Icon } from 'components/common';
+import { Icon, LinkToNode, Spinner } from 'components/common';
+
+const InputIO = styled.span`
+  .total {
+    color: #b8b8b8;
+  }
+
+  .value {
+    font-family: monospace;
+  }
+
+  .persec {
+    margin-left: 3px;
+  }
+
+  .channel-direction {
+    position: relative;
+    left: -1px;
+  }
+
+  .channel-direction-down {
+    position: relative;
+    top: 1px;
+  }
+
+  .channel-direction-up {
+    position: relative;
+    top: -1px;
+  }
+`;
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
@@ -97,7 +127,7 @@ const InputThroughput = createReactClass({
 
   _formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal) {
     const network = (
-      <span className="input-io">
+      <InputIO>
         <span>Network IO: </span>
         <span className="persec">
           <Icon name="caret-down" className="channel-direction channel-direction-down" />
@@ -117,7 +147,7 @@ const InputThroughput = createReactClass({
           <span> )</span>
         </span>
         <br />
-      </span>
+      </InputIO>
     );
 
     return network;

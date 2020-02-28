@@ -51,57 +51,57 @@ end`;
   return (
     <div>
       <p>
-      The HTTPJSONPath data adapter executes <em>HTTP GET</em> requests to lookup a key and parses the result based on
-      configured JSONPath expressions.
+        The HTTPJSONPath data adapter executes <em>HTTP GET</em> requests to lookup a key and parses the result based on
+        configured JSONPath expressions.
       </p>
 
       <Alert style={{ marginBottom: 10 }} bsStyle="info">
-      Every lookup table result has two values. A <em>single value</em> and a <em>multi value</em>. The single
-      value will be used when the lookup result is expected to be a string, number or boolean. The multi value
-      will be used when the lookup result is expected to be a map or list.
+        Every lookup table result has two values. A <em>single value</em> and a <em>multi value</em>. The single
+        value will be used when the lookup result is expected to be a string, number or boolean. The multi value
+        will be used when the lookup result is expected to be a map or list.
       </Alert>
 
       <h3 style={{ marginBottom: 10 }}>Configuration</h3>
 
       <h5 style={{ marginBottom: 10 }}>Lookup URL</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-      The URL that will be used for the HTTP request. To use the <em>lookup key</em> in the URL, the
+        The URL that will be used for the HTTP request. To use the <em>lookup key</em> in the URL, the
         <code>{'${key}'}</code>
-      value can be used. This variable will be replaced by the actual key that is passed to a lookup function. <br />
-      (example: <code>{'https://example.com/api/lookup?key=${key}'}</code>)
+        value can be used. This variable will be replaced by the actual key that is passed to a lookup function. <br />
+        (example: <code>{'https://example.com/api/lookup?key=${key}'}</code>)
       </p>
 
       <h5 style={{ marginBottom: 10 }}>Single value JSONPath</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-      This JSONPath expression will be used to parse the <em>single value</em> of the lookup result.
-      (example: <code>$.user.full_name</code>)
+        This JSONPath expression will be used to parse the <em>single value</em> of the lookup result.
+        (example: <code>$.user.full_name</code>)
       </p>
 
       <h5 style={{ marginBottom: 10 }}>Multi value JSONPath</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-      This JSONPath expression will be used to parse the <em>multi value</em> of the lookup result.
-      (example: <code>$.users[*]</code>)
-      The multi value JSONPath setting is <em>optional</em>. Without it, the single value is also present in the
-      multi value result.
+        This JSONPath expression will be used to parse the <em>multi value</em> of the lookup result.
+        (example: <code>$.users[*]</code>)
+        The multi value JSONPath setting is <em>optional</em>. Without it, the single value is also present in the
+        multi value result.
       </p>
 
       <h5 style={{ marginBottom: 10 }}>HTTP User-Agent</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-      This is the <em>User-Agent</em> header that will be used for the HTTP requests. You should include some
-      contact details so owners of the services you query know whom to contact if issues arise.
-      (like excessive API requests from your Graylog cluster)
+        This is the <em>User-Agent</em> header that will be used for the HTTP requests. You should include some
+        contact details so owners of the services you query know whom to contact if issues arise.
+        (like excessive API requests from your Graylog cluster)
       </p>
 
       <hr />
 
       <h3 style={{ marginBottom: 10 }}>Example</h3>
       <p>
-      This shows an example configuration and the values that will be returned from a lookup.<br />
-      The configured URL is <strong>{'https://example.com/api/users/${key}'}</strong> and the <code>{'${key}'}</code>
-      gets replaced by <strong>jane</strong> during the lookup request.
+        This shows an example configuration and the values that will be returned from a lookup.<br />
+        The configured URL is <strong>{'https://example.com/api/users/${key}'}</strong> and the <code>{'${key}'}</code>
+        gets replaced by <strong>jane</strong> during the lookup request.
       </p>
       <p>
-      This is the resulting JSON document:
+        This is the resulting JSON document:
       </p>
       <pre>{exampleJSON}</pre>
 
@@ -109,15 +109,15 @@ end`;
         <Col md={4}>
           <h5 style={{ marginBottom: 10 }}>Configuration</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-          Single value JSONPath: <code>$.user.full_name</code><br />
-          Multi value JSONPath: <em>empty</em><br />
+            Single value JSONPath: <code>$.user.full_name</code><br />
+            Multi value JSONPath: <em>empty</em><br />
           </p>
         </Col>
         <Col md={8}>
           <h5 style={{ marginBottom: 10 }}>Result</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-          Single value: <code>Jane Doe</code><br />
-          Multi value:
+            Single value: <code>Jane Doe</code><br />
+            Multi value:
             <pre>{noMultiResult}</pre>
           </p>
         </Col>
@@ -126,15 +126,15 @@ end`;
         <Col md={4}>
           <h5 style={{ marginBottom: 10 }}>Configuration</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-          Single value JSONPath: <code>$.user.full_name</code><br />
-          Multi value JSONPath: <code>$.user</code><br />
+            Single value JSONPath: <code>$.user.full_name</code><br />
+            Multi value JSONPath: <code>$.user</code><br />
           </p>
         </Col>
         <Col md={8}>
           <h5 style={{ marginBottom: 10 }}>Result</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-          Single value: <code>Jane Doe</code><br />
-          Multi value:
+            Single value: <code>Jane Doe</code><br />
+            Multi value:
             <pre>{mapResult}</pre>
           </p>
         </Col>
@@ -143,15 +143,15 @@ end`;
         <Col md={4}>
           <h5 style={{ marginBottom: 10 }}>Configuration</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-          Single value JSONPath: <code>$.user.contact.email</code><br />
-          Multi value JSONPath: <code>$.user.roles[*]</code><br />
+            Single value JSONPath: <code>$.user.contact.email</code><br />
+            Multi value JSONPath: <code>$.user.roles[*]</code><br />
           </p>
         </Col>
         <Col md={8}>
           <h5 style={{ marginBottom: 10 }}>Result</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-          Single value: <code>jane@example.com</code><br />
-          Multi value:
+            Single value: <code>jane@example.com</code><br />
+            Multi value:
             <pre>{listResult}</pre>
           </p>
         </Col>
@@ -160,15 +160,15 @@ end`;
         <Col md={4}>
           <h5 style={{ marginBottom: 10 }}>Configuration</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-          Single value JSONPath: <code>$.user.full_name</code><br />
-          Multi value JSONPath: <code>$.user.contact</code><br />
+            Single value JSONPath: <code>$.user.full_name</code><br />
+            Multi value JSONPath: <code>$.user.contact</code><br />
           </p>
         </Col>
         <Col md={8}>
           <h5 style={{ marginBottom: 10 }}>Result</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-          Single value: <code>Jane Doe</code><br />
-          Multi value:
+            Single value: <code>Jane Doe</code><br />
+            Multi value:
             <pre>{smallMapResult}</pre>
           </p>
         </Col>
@@ -176,7 +176,7 @@ end`;
 
       <h5 style={{ marginBottom: 10 }}>Pipeline Rule</h5>
       <p>
-      This is an example pipeline rule that uses the example data from our last configuration example.
+        This is an example pipeline rule that uses the example data from our last configuration example.
       </p>
       <pre>{pipelineRule}</pre>
     </div>
