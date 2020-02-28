@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.security.token;
+package org.graylog2.security;
 
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
@@ -22,7 +22,6 @@ import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.plugin.database.validators.Validator;
-import org.graylog2.security.AccessToken;
 import org.joda.time.DateTime;
 
 import java.util.Map;

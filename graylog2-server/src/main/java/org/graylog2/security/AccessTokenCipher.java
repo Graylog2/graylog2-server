@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.security.token;
+package org.graylog2.security;
 
 import com.google.common.hash.Hashing;
 import org.graylog2.Configuration;
-import org.graylog2.security.AESTools;
 
 import javax.inject.Inject;
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.security.token;
+package org.graylog2.security;
 
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
@@ -27,8 +27,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.security.AccessToken;
-import org.graylog2.security.AccessTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -23,8 +23,8 @@ import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.security.token.AccessTokenCipher;
-import org.graylog2.security.token.AccessTokenImpl;
+import org.graylog2.security.AccessTokenCipher;
+import org.graylog2.security.AccessTokenImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

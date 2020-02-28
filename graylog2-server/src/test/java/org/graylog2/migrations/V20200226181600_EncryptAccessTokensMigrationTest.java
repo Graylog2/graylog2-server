@@ -23,8 +23,8 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
-import org.graylog2.security.token.AccessTokenCipher;
-import org.graylog2.security.token.AccessTokenImpl;
+import org.graylog2.security.AccessTokenCipher;
+import org.graylog2.security.AccessTokenImpl;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,12 +34,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.security.token.AccessTokenImpl.COLLECTION_NAME;
-import static org.graylog2.security.token.AccessTokenImpl.LAST_ACCESS;
-import static org.graylog2.security.token.AccessTokenImpl.NAME;
-import static org.graylog2.security.token.AccessTokenImpl.TOKEN;
-import static org.graylog2.security.token.AccessTokenImpl.TOKEN_TYPE;
-import static org.graylog2.security.token.AccessTokenImpl.USERNAME;
+import static org.graylog2.security.AccessTokenImpl.COLLECTION_NAME;
+import static org.graylog2.security.AccessTokenImpl.LAST_ACCESS;
+import static org.graylog2.security.AccessTokenImpl.NAME;
+import static org.graylog2.security.AccessTokenImpl.TOKEN;
+import static org.graylog2.security.AccessTokenImpl.TOKEN_TYPE;
+import static org.graylog2.security.AccessTokenImpl.USERNAME;
 import static org.mockito.Mockito.when;
 
 public class V20200226181600_EncryptAccessTokensMigrationTest {

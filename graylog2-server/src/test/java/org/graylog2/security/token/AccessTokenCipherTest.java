@@ -17,6 +17,7 @@
 package org.graylog2.security.token;
 
 import org.graylog2.Configuration;
+import org.graylog2.security.AccessTokenCipher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
