@@ -4,7 +4,6 @@ module.exports = [
   'jquery',
   'leaflet',
   'moment-timezone',
-  'moment',
   'polished',
   'react-addons-pure-render-mixin',
   'react-bootstrap',

@@ -84,7 +84,6 @@
     "lodash": "^4.17.4",
     "markdown": "^0.5.0",
     "md5": "^2.2.1",
-    "moment": "^2.24.0",
     "moment-duration-format": "2.2.2",
     "numeral": "^2.0.6",
     "opensans-npm-webfont": "^1.0.0",
