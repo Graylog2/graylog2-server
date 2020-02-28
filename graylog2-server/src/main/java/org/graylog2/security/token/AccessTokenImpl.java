@@ -41,10 +41,6 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
         public int getIntValue() {
             return type;
         }
-
-        public static Type defaultType() {
-            return AESSIV;
-        }
     }
 
     public static final String COLLECTION_NAME = "access_tokens";
@@ -102,7 +98,7 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public void setToken(String token) {
         fields.put(TOKEN, token);
         // The token type is used to state the algorithm that is used to encrypt the value
-        fields.put(TOKEN_TYPE, Type.defaultType().getIntValue());
+        fields.put(TOKEN_TYPE, Type.AESSIV.getIntValue());
     }
 
     @Override
