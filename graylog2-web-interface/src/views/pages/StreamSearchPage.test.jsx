@@ -14,7 +14,6 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Search from 'views/logic/search/Search';
 import StreamSearchPage from './StreamSearchPage';
 
-
 const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);
 const mockView = View.create()
   .toBuilder()
