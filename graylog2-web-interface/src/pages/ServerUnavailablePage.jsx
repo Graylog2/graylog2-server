@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Button, Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -7,6 +8,10 @@ import DocumentTitle from 'components/common/DocumentTitle';
 import AuthThemeStyles from 'theme/styles/authStyles';
 
 import URLUtils from 'util/URLUtils';
+
+const StyledIcon = styled(Icon)`
+  margin-left: 6px;
+`;
 
 class ServerUnavailablePage extends React.Component {
   static propTypes = {
@@ -111,8 +116,9 @@ class ServerUnavailablePage extends React.Component {
                 <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
               </p>
               <div>
-                <Button bsStyle="link" tabIndex={0} onClick={this._toggleDetails}>
+                <Button bsStyle="primary" tabIndex={0} onClick={this._toggleDetails}>
                   {showDetails ? 'Less details' : 'More details'}
+                  <StyledIcon name={showDetails ? 'chevron-up' : 'chevron-down'} />
                 </Button>
                 {this._formatErrorMessage()}
               </div>
