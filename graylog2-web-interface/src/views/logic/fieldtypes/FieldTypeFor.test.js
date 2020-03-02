@@ -10,6 +10,10 @@ describe('FieldTypeFor', () => {
     expect(fieldTypeFor('bar', [FieldTypeMapping.create('foo', FieldTypes.LONG())]))
       .toEqual(FieldType.Unknown);
   });
+  it('returns `FieldType.Unknown` if field types are `undefined`', () => {
+    // $FlowFixMe: Passing `undefined` types on purpose
+    expect(fieldTypeFor('', undefined)).toEqual(FieldType.Unknown);
+  });
   it('returns type of field if present', () => {
     expect(fieldTypeFor('foo', [FieldTypeMapping.create('foo', FieldTypes.LONG())]))
       .toEqual(FieldTypes.LONG());
