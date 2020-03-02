@@ -31,7 +31,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.RestTools;
-import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
+import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ActorAwareAuthenticationToken;
@@ -41,8 +41,6 @@ import org.graylog2.shared.security.ShiroAuthenticationFilter;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.IpSubnet;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +62,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -81,14 +78,13 @@ public class SessionsResource extends RestResource {
     private final Request grizzlyRequest;
     private final SessionCreator sessionCreator;
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
+    private final SessionResponseFactory sessionResponseFactory;
 
     @Inject
-    public SessionsResource(UserService userService,
-                            DefaultSecurityManager securityManager,
-                            ShiroAuthenticationFilter authenticationFilter,
-                            @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
-                            @Context Request grizzlyRequest, SessionCreator sessionCreator,
-                            ActorAwareAuthenticationTokenFactory tokenFactory) {
+    public SessionsResource(UserService userService, DefaultSecurityManager securityManager,
+            ShiroAuthenticationFilter authenticationFilter, @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
+            @Context Request grizzlyRequest, SessionCreator sessionCreator,
+            ActorAwareAuthenticationTokenFactory tokenFactory, SessionResponseFactory sessionResponseFactory) {
         this.userService = userService;
         this.securityManager = securityManager;
         this.authenticationFilter = authenticationFilter;
@@ -96,12 +92,14 @@ public class SessionsResource extends RestResource {
         this.grizzlyRequest = grizzlyRequest;
         this.sessionCreator = sessionCreator;
         this.tokenFactory = tokenFactory;
+        this.sessionResponseFactory = sessionResponseFactory;
     }
 
     @POST
-    @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
+    @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or " +
+            "reactivates an existing session: the equivalent of logging in.")
     @NoAuditEvent("dispatches audit events in the method body")
-    public SessionResponse newSession(@Context ContainerRequestContext requestContext,
+    public JsonNode newSession(@Context ContainerRequestContext requestContext,
                                       @ApiParam(name = "Login request", value = "Credentials. The default " +
                                               "implementation requires presence of two properties: 'username' and " +
                                               "'password'. However a plugin may customize which kind of credentials " +
@@ -128,11 +126,7 @@ public class SessionsResource extends RestResource {
 
         Optional<Session> session = sessionCreator.create(sessionId, host, authToken);
         if (session.isPresent()) {
-            Session s = session.get();
-            Date validUntil = new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate();
-            String newSessionId = s.getId().toString();
-            String username = getUsernameFromSession(s);
-            return SessionResponse.create(validUntil, newSessionId, username);
+            return sessionResponseFactory.forSession(session.get());
         } else {
             throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
         }
@@ -176,12 +170,5 @@ public class SessionsResource extends RestResource {
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
-    }
-
-    private String getUsernameFromSession(Session s) {
-        return new Subject.Builder().sessionId(s.getId())
-                                    .buildSubject()
-                                    .getPrincipal()
-                                    .toString();
     }
 }

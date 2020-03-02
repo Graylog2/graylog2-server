@@ -19,6 +19,8 @@ package org.graylog2.shared.security;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponseFactory;
+import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 
 public class SecurityBindings extends PluginModule {
     @Override
@@ -29,5 +31,7 @@ public class SecurityBindings extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                       .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);
+        OptionalBinder.newOptionalBinder(binder(), SessionResponseFactory.class)
+                .setDefault().to(DefaultSessionResponseFactory.class);
     }
 }
