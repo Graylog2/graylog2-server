@@ -47,6 +47,18 @@ export const filtersForQuery = (streams: ?Array<string>) => {
   };
 };
 
+export const filtersToStreamSet = (filter: ?Immutable.Map<string, any>): Immutable.Set<string> => {
+  if (!filter) {
+    return Immutable.Set();
+  }
+  const type = filter.get('type');
+  if (type === 'stream') {
+    return Immutable.Set([filter.get('id')]);
+  }
+  const filters = filter.get('filters', Immutable.List());
+  return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
+};
+
 export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
