@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
+import { debounce } from 'lodash';
 import URLUtils from 'util/URLUtils';
 import FormsUtils from 'util/FormsUtils';
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
@@ -69,11 +70,13 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
         }
       }
     };
-    checkSuggestion();
+    const timer = setTimeout(() => checkSuggestion(), 500);
+    return () => clearTimeout(timer);
   }, [url]);
 
   useEffect(() => {
-    checkIsWhitelisted();
+    const timer = setTimeout(() => checkIsWhitelisted(), 500);
+    return () => clearTimeout(timer);
   }, [url, validationState]);
 
 
