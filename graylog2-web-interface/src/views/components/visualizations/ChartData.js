@@ -53,7 +53,7 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
     flatLeafs.forEach(([key, value]) => {
       const joinedKey = keyJoiner(value.key);
       const targetIdx = xLabels.findIndex(l => isEqual(l, key));
-      if (value.value) {
+      if (value.value === 0 || value.value) {
         set(valuesBySeries, [joinedKey, targetIdx], value.value);
       }
     });
