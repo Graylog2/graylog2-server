@@ -1,12 +1,9 @@
 'use strict';
 
-import $ = require('jquery');
-import Immutable = require('immutable');
-import ApiRoutes = require('routing/ApiRoutes');
+import * as Immutable from 'immutable';
 const Routes = require('routing/Routes');
-var Qs = require('qs');
+const Qs = require('qs');
 const URLUtils = require('util/URLUtils');
-const moment = require('moment');
 const history = require('util/History');
 const DateTime = require('logic/datetimes/DateTime');
 
@@ -459,4 +456,4 @@ class SearchStore {
 
 var searchStore = new SearchStore();
 
-export = searchStore;
+export default searchStore;

@@ -3,9 +3,10 @@
     "target": "es5",
     "sourceMap" : true,
     "lib": ["es5", "es6", "dom"],
-    "types": ["node"]
+    "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": [
-    "src/**/*.ts",
-  ]
+    "src/**/*.ts"
+  ],
 }
