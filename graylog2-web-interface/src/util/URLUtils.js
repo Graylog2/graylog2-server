@@ -55,3 +55,14 @@ const URLUtils = {
 };
 
 export default URLUtils;
+
+export const {
+  parser,
+  appPrefixed,
+  getParsedHash,
+  getParsedSearch,
+  qualifyUrl,
+  replaceHashParam,
+  concatURLPath,
+  areCredentialsInURLSupported,
+} = URLUtils;
