@@ -42,7 +42,7 @@ import java.util.Set;
 public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     private final ElasticsearchBackend elasticsearchBackend;
-    private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
+    private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newLinkedHashMap();
     private Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
     private Set<SearchError> errors = Sets.newHashSet();
