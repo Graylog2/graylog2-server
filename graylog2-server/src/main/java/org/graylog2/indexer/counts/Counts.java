@@ -16,10 +16,12 @@
  */
 package org.graylog2.indexer.counts;
 
+import com.github.joschi.jadconfig.util.Duration;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexSet;
@@ -27,19 +29,23 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class Counts {
     private final JestClient jestClient;
     private final IndexSetRegistry indexSetRegistry;
+    private final Duration esRequestTimeout;
 
     @Inject
-    public Counts(JestClient jestClient, IndexSetRegistry indexSetRegistry) {
+    public Counts(JestClient jestClient, IndexSetRegistry indexSetRegistry, @Named("elasticsearch_request_timeout") Duration requestTimeout) {
         this.jestClient = jestClient;
         this.indexSetRegistry = indexSetRegistry;
+        this.esRequestTimeout = requestTimeout;
     }
 
     public long total() {
@@ -61,6 +67,7 @@ public class Counts {
         final String query = new SearchSourceBuilder()
                 .query(QueryBuilders.matchAllQuery())
                 .size(0)
+                .timeout(new TimeValue(esRequestTimeout.toMilliseconds(), TimeUnit.MILLISECONDS))
                 .toString();
         final Search request = new Search.Builder(query)
                 .addIndex(indices)

@@ -20,6 +20,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -164,25 +165,16 @@ public class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
         metricRegistry = new MetricRegistry();
-        searches = new Searches(
-            new Configuration(),
-            indexRangeService,
-            metricRegistry,
-            streamService,
-            indices,
-            indexSetRegistry,
-                jestClient(),
-            new ScrollResult.Factory() {
-                @Override
-                public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
-                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
-                }
-                @Override
-                public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
-                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
-                }
+        searches = new Searches(new Configuration(), indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, jestClient(), new ScrollResult.Factory() {
+            @Override
+            public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
+                return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
             }
-        );
+            @Override
+            public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
+                return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
+            }
+        }, Duration.minutes(1));
     }
 
     @Test

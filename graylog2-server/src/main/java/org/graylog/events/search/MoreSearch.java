@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import com.codahale.metrics.MetricRegistry;
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
@@ -26,6 +27,7 @@ import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -61,6 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
@@ -94,6 +97,7 @@ public class MoreSearch extends Searches {
     private final JestClient jestClient;
     private final boolean allowLeadingWildcardSearches;
     private final ESQueryDecorators esQueryDecorators;
+    private final Duration esRequestTimeout;
 
     @Inject
     public MoreSearch(StreamService streamService,
@@ -104,14 +108,16 @@ public class MoreSearch extends Searches {
                       ScrollResult.Factory scrollResultFactory,
                       JestClient jestClient,
                       Configuration configuration,
-                      ESQueryDecorators esQueryDecorators) {
-        super(configuration, indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, jestClient, scrollResultFactory);
+                      ESQueryDecorators esQueryDecorators,
+                      @Named("elasticsearch_request_timeout") Duration requestTimeout) {
+        super(configuration, indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, jestClient, scrollResultFactory, requestTimeout);
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
         this.scrollResultFactory = scrollResultFactory;
         this.jestClient = jestClient;
         this.allowLeadingWildcardSearches = configuration.isAllowLeadingWildcardSearches();
         this.esQueryDecorators = esQueryDecorators;
+        this.esRequestTimeout = requestTimeout;
     }
 
     /**
@@ -158,7 +164,8 @@ public class MoreSearch extends Searches {
                 .query(filter)
                 .from((parameters.page() - 1) * parameters.perPage())
                 .size(parameters.perPage())
-                .sort(sorting.getField(), sorting.asElastic());
+                .sort(sorting.getField(), sorting.asElastic())
+                .timeout(new TimeValue(esRequestTimeout.toMilliseconds(), TimeUnit.MILLISECONDS));
 
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
                 .addType(IndexMapping.TYPE_MESSAGE)
@@ -251,7 +258,8 @@ public class MoreSearch extends Searches {
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
-                .size(batchSize);
+                .size(batchSize)
+                .timeout(new TimeValue(esRequestTimeout.toMilliseconds(), TimeUnit.MILLISECONDS));
 
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
                 .addType(IndexMapping.TYPE_MESSAGE)

@@ -21,6 +21,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
@@ -39,6 +40,7 @@ import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import io.searchbox.params.Parameters;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -84,6 +86,7 @@ import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
@@ -184,6 +187,7 @@ public class Searches {
     private final IndexSetRegistry indexSetRegistry;
     private final JestClient jestClient;
     private final ScrollResult.Factory scrollResultFactory;
+    private final Duration esRequestTimeout;
 
     @Inject
     public Searches(Configuration configuration,
@@ -193,9 +197,11 @@ public class Searches {
                     Indices indices,
                     IndexSetRegistry indexSetRegistry,
                     JestClient jestClient,
-                    ScrollResult.Factory scrollResultFactory) {
+                    ScrollResult.Factory scrollResultFactory,
+                    @Named("elasticsearch_request_timeout") Duration requestTimeout) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.indexRangeService = requireNonNull(indexRangeService, "indexRangeService");
+        this.esRequestTimeout = requestTimeout;
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
         this.esTimeRangeHistogram = metricRegistry.histogram(name(Searches.class, "elasticsearch", "ranges"));
@@ -773,7 +779,8 @@ public class Searches {
         }
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-            .query(QueryBuilders.boolQuery().must(queryBuilder).filter(standardFilters(range, filter)));
+            .query(QueryBuilders.boolQuery().must(queryBuilder).filter(standardFilters(range, filter)))
+            .timeout(new TimeValue(esRequestTimeout.toMilliseconds(), TimeUnit.MILLISECONDS));
 
         if (offset >= 0) {
             searchSourceBuilder.from(offset);

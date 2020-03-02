@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.counts;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
@@ -66,7 +67,7 @@ public class CountsIT extends ElasticsearchBaseTest {
         client().createIndex(INDEX_NAME_2, 1, 0);
         client().waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2);
 
-        counts = new Counts(jestClient(), indexSetRegistry);
+        counts = new Counts(jestClient(), indexSetRegistry, Duration.minutes(1));
 
         final IndexSetConfig indexSetConfig1 = IndexSetConfig.builder()
                 .id("id-1")
