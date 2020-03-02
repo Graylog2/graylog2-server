@@ -116,7 +116,10 @@ class ServerUnavailablePage extends React.Component {
                 <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
               </p>
               <div>
-                <Button bsStyle="primary" tabIndex={0} onClick={this._toggleDetails}>
+                <Button bsStyle="primary"
+                        tabIndex={0}
+                        onClick={this._toggleDetails}
+                        bsSize="sm">
                   {showDetails ? 'Less details' : 'More details'}
                   <StyledIcon name={showDetails ? 'chevron-up' : 'chevron-down'} />
                 </Button>
