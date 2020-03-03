@@ -11,7 +11,7 @@ const LoadingPage = ({ text }) => {
       <AuthThemeStyles />
       <LoginBox>
         <legend><Icon name="group" /> Welcome to Graylog</legend>
-        <p className="loading-text">
+        <p>
           <Spinner text={text} />
         </p>
       </LoginBox>
