@@ -90,6 +90,21 @@ describe('Chart helper functions', () => {
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
+    it('should remove data points with a value of null or undefined', () => {
+      const input = readFixture('ChartData.test.withNullAndUndefined.json');
+      const result = chartData(config, input, 'bar');
+      const expectedResult = [{
+        name: 'count()',
+        type: 'bar',
+        x: [
+          '2018-05-28T11:48:00.000Z',
+          '2018-05-28T11:53:00.000Z',
+        ],
+        y: [7813, 702],
+      }];
+      expect(result).toHaveLength(1);
+      expect(result).toEqual(expectedResult);
+    });
     it('should properly extract series from fixture with two column pivots', () => {
       const input = readFixture('ChartData.test.twoColumnPivots.json');
       const result = chartData(config, input, 'dummy');
