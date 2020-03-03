@@ -7,6 +7,10 @@ import * as Immutable from 'immutable';
 
 import SortableSelect from 'views/components/aggregationbuilder/SortableSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
+import FieldSortSelect from 'views/components/FieldSortSelect';
+import SortDirectionSelect from 'views/components/aggregationbuilder/SortDirectionSelect';
+
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -34,6 +38,16 @@ const _onShowMessageRowChanged = (config, onChange) => {
   return onChange(newConfig);
 };
 
+const _onSortChange = (sort: $PropertyType<AggregationWidgetConfig, 'sort'>, config, onChange) => {
+  const newConfig = config.toBuilder().sort(sort).build();
+  return onChange(newConfig);
+};
+
+const _onSortDirectionChange = (direction: $PropertyType<AggregationWidgetConfig, 'direction'>, config, onChange) => {
+  const newConfig = config.toBuilder().sort(config.sort.map(sort => sort.toBuilder().direction(direction).build())).build();
+  return onChange(newConfig);
+};
+
 type Props = {
   children: React.Node,
   config: MessagesWidgetConfig,
@@ -42,6 +56,8 @@ type Props = {
 };
 
 const EditMessageList = ({ children, config, fields, onChange }: Props) => {
+  const { sort } = config;
+  const sortDirection = Immutable.Set(sort.map(s => s.direction)).first();
   const fieldsForSelect = fields
     .map(fieldType => fieldType.name)
     .map(fieldName => ({ label: fieldName, value: fieldName }))
@@ -69,6 +85,14 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
                             decorators={config.decorators}
                             maximumHeight={600}
                             onChange={onDecoratorsChange} />
+        </DescriptionBox>
+        <DescriptionBox description="Sorting">
+          <FieldSortSelect fields={fields} sort={sort} onChange={data => _onSortChange(data, config, onChange)} />
+        </DescriptionBox>
+        <DescriptionBox description="Direction">
+          <SortDirectionSelect disabled={!sort || sort.length === 0}
+                               direction={sortDirection && sortDirection.direction}
+                               onChange={data => _onSortDirectionChange(data, config, onChange)} />
         </DescriptionBox>
       </FullHeightCol>
       <FullHeightCol md={9}>
