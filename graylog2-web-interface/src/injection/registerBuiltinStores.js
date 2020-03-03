@@ -115,7 +115,6 @@ const stores = {
   FilterPreview: () => require('stores/event-definitions/FilterPreviewStore'),
   Roles: () => require('stores/users/RolesStore'),
   Rules: () => require('stores/rules/RulesStore'),
-  Search: () => require('stores/search/SearchStore'),
   ServerAvailability: () => require('stores/sessions/ServerAvailabilityStore'),
   Session: () => require('stores/sessions/SessionStore'),
   Sidecars: () => require('stores/sidecars/SidecarsStore'),
