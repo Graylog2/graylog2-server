@@ -8,6 +8,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import MessageTable from './MessageTable';
+import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 const messages = [
   {
@@ -73,5 +74,37 @@ describe('MessageTable', () => {
 
     const tableHeadFields = wrapper.find('Field').map(field => field.text());
     expect(tableHeadFields).toEqual(configFields);
+  });
+
+  it('highlights messsage with id passed in `HighlightMessageContext`', () => {
+    const wrapper = mount((
+      <HighlightMessageContext.Provider value="message-id-1">
+        <MessageTable messages={messages}
+                      activeQueryId={activeQueryId}
+                      fields={Immutable.List(fields)}
+                      selectedFields={Immutable.Set()}
+                      config={config} />
+      </HighlightMessageContext.Provider>
+    ));
+
+    const highlightedMessage = wrapper.find('.message-highlight');
+
+    expect(highlightedMessage).toExist();
+  });
+
+  it('does not highlight non-existing message id', () => {
+    const wrapper = mount((
+      <HighlightMessageContext.Provider value="message-id-42">
+        <MessageTable messages={messages}
+                      activeQueryId={activeQueryId}
+                      fields={Immutable.List(fields)}
+                      selectedFields={Immutable.Set()}
+                      config={config} />
+      </HighlightMessageContext.Provider>
+    ));
+
+    const highlightedMessage = wrapper.find('.message-highlight');
+
+    expect(highlightedMessage).not.toExist();
   });
 });
