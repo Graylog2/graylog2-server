@@ -2,7 +2,6 @@ import React from 'react';
 import lodash from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
-import AceEditor from 'react-ace-builds';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -11,6 +10,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
+import AceEditor from './AsyncAceEditor';
 import ClipboardButton from './ClipboardButton';
 import Icon from './Icon';
 import style from './SourceCodeEditor.css';
