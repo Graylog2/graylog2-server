@@ -46,6 +46,7 @@ import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters'
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
+import HighlightMessageInQuery from '../components/messagelist/HighlightMessageInQuery';
 
 const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ${({ interactive }) => (interactive ? css`
@@ -195,7 +196,9 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
                 </IfInteractive>
 
                 <ViewAdditionalContextProvider>
-                  <SearchResult />
+                  <HighlightMessageInQuery query={location.query}>
+                    <SearchResult />
+                  </HighlightMessageInQuery>
                 </ViewAdditionalContextProvider>
                 <Footer />
               </SearchGrid>
