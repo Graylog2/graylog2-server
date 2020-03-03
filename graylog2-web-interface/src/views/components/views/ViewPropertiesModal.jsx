@@ -8,14 +8,11 @@ import Input from 'components/bootstrap/Input';
 
 export default class ViewPropertiesModal extends React.Component {
   static propTypes = {
-    view: PropTypes.object.isRequired,
-    title: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
-    onClose: PropTypes.func,
-  };
-
-  static defaultProps = {
-    onClose: () => {},
+    show: PropTypes.bool.isRequired,
+    title: PropTypes.string.isRequired,
+    view: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -51,13 +48,8 @@ export default class ViewPropertiesModal extends React.Component {
     }
   };
 
-  _onClose = () => {
-    const { onClose } = this.props;
-    onClose();
-  };
-
   _onSave = () => {
-    const { onSave, onClose } = this.props;
+    const { onClose, onSave } = this.props;
     const { view } = this.state;
     onSave(view);
     onClose();
@@ -65,12 +57,13 @@ export default class ViewPropertiesModal extends React.Component {
 
   render() {
     const { view: { title = '', summary = '', description = '' }, title: modalTitle } = this.state;
+    const { onClose, show } = this.props;
     return (
-      <BootstrapModalForm title={modalTitle}
+      <BootstrapModalForm show={show}
+                          title={modalTitle}
+                          onCancel={onClose}
                           onSubmitForm={this._onSave}
-                          onModalClose={this._onClose}
                           submitButtonText="Save"
-                          show
                           bsSize="large">
         <Input id="title"
                type="text"
