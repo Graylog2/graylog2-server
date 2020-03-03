@@ -124,7 +124,11 @@ describe('BindSearchParamsFromQuery should', () => {
 
     const expectedFilter = Immutable.Map({
       type: 'or',
-      filters: [{ id: 'stream1', type: 'stream' }, { id: 'stream2', type: 'stream' }, { id: 'stream3', type: 'stream' }],
+      filters: [
+        Immutable.Map({ type: 'stream', id: 'stream1' }),
+        Immutable.Map({ type: 'stream', id: 'stream2' }),
+        Immutable.Map({ type: 'stream', id: 'stream3' }),
+      ],
     });
     expect(QueriesActions.update)
       .toHaveBeenCalledWith(
