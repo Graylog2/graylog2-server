@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
 import history from 'util/History';
+import * as Immutable from 'immutable';
 
 import asMock from 'helpers/mocking/AsMock';
 import { ViewStore } from 'views/stores/ViewStore';
@@ -34,7 +35,7 @@ const createSearch = (timerange: TimeRange = lastFiveMinutes, streams: Array<str
   .queries([
     Query.builder()
       .timerange(timerange)
-      .filter(filtersForQuery(streams))
+      .filter(filtersForQuery(streams) || Immutable.Map())
       .query(createElasticsearchQueryString(queryString))
       .build(),
   ])
