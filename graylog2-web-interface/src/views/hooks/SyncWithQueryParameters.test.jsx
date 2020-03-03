@@ -1,18 +1,22 @@
 // @flow strict
+import * as React from 'react';
+import { cleanup, render } from 'wrappedTestingLibrary';
 import history from 'util/History';
 
 import asMock from 'helpers/mocking/AsMock';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
-import { syncWithQueryParameters } from './SyncWithQueryParameters';
-import Query, { createElasticsearchQueryString } from '../logic/queries/Query';
+import { syncWithQueryParameters, useSyncWithQueryParameters } from './SyncWithQueryParameters';
+import Query, { createElasticsearchQueryString, filtersForQuery } from '../logic/queries/Query';
 import Search from '../logic/search/Search';
+import { QueryFiltersActions } from '../stores/QueryFiltersStore';
+import type { TimeRange } from '../logic/queries/Query';
 
 jest.mock('views/stores/QueryFiltersStore', () => ({
   QueryFiltersActions: {
     streams: {
       completed: {
-        listen: jest.fn(),
+        listen: jest.fn(() => () => {}),
       },
     },
   },
@@ -25,10 +29,12 @@ jest.mock('views/stores/ViewStore', () => ({
 }));
 jest.mock('util/History', () => ({ push: jest.fn(), replace: jest.fn() }));
 
-const createSearch = (timerange, queryString = 'foo:42') => Search.builder()
+const lastFiveMinutes = { type: 'relative', range: 300 };
+const createSearch = (timerange: TimeRange = lastFiveMinutes, streams: Array<string> = [], queryString = 'foo:42') => Search.builder()
   .queries([
     Query.builder()
       .timerange(timerange)
+      .filter(filtersForQuery(streams))
       .query(createElasticsearchQueryString(queryString))
       .build(),
   ])
@@ -40,6 +46,7 @@ const createView = (search, type = View.Type.Search) => View.builder()
   .build();
 
 describe('SyncWithQueryParameters', () => {
+  afterEach(() => { jest.clearAllMocks(); });
   it('does not do anything if no view is loaded', () => {
     syncWithQueryParameters('');
     expect(history.push).not.toHaveBeenCalled();
@@ -98,6 +105,27 @@ describe('SyncWithQueryParameters', () => {
       syncWithQueryParameters('/search', history.replace);
 
       expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
+    });
+    it('adds list of streams to query', () => {
+      const viewWithStreams = createView(createSearch(lastFiveMinutes, ['stream1', 'stream2']));
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithStreams });
+
+      syncWithQueryParameters('/search');
+
+      expect(history.push)
+        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=300&streams=stream1%2Cstream2');
+    });
+  });
+  describe('useSyncWithQueryParameters', () => {
+    afterEach(cleanup);
+    const TestComponent = () => {
+      useSyncWithQueryParameters('');
+      return <span>Hi!</span>;
+    };
+    it('listens on action used for adding streams', () => {
+      render(<TestComponent />);
+
+      expect(QueryFiltersActions.streams.completed.listen).toHaveBeenCalled();
     });
   });
 });
