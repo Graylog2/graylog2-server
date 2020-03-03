@@ -12,12 +12,13 @@ const LoadingPage = ({ text }) => {
       <LoginBox>
         <legend><Icon name="group" /> Welcome to Graylog</legend>
         <p>
-          <Spinner text={text} />
+          <Spinner text={text} delay={0} />
         </p>
       </LoginBox>
     </DocumentTitle>
   );
 };
+
 LoadingPage.propTypes = {
   text: PropTypes.string,
 };
