@@ -6,7 +6,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import { SearchStore } from 'views/stores/SearchStore';
 import connect from 'stores/connect';
 
-import { Modal } from 'components/graylog';
+import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import type { ViewStoreState } from 'views/stores/ViewStore';
@@ -21,11 +21,17 @@ type Props = {
 
 const DebugOverlay = ({ currentView, searches, show, onClose }: Props) => (
   <BootstrapModalWrapper showModal={show} onHide={onClose}>
+    <Modal.Header closeButton>
+      <Modal.Title>Debug information</Modal.Title>
+    </Modal.Header>
     <Modal.Body>
       <textarea disabled
                 style={{ height: '80vh', width: '100%' }}
                 value={JSON.stringify({ currentView, searches }, null, 2)} />
     </Modal.Body>
+    <Modal.Footer>
+      <Button type="button" onClick={() => onClose()} bsStyle="primary">Close</Button>
+    </Modal.Footer>
   </BootstrapModalWrapper>
 );
 
