@@ -19,22 +19,23 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };
 
-  const data = {
-    chart: [{
-      key: ['2018-10-04T09:43:50.000Z'],
-      source: 'leaf',
-      values: [{
-        key: ['hulud.net', 'count()'],
-        rollup: false,
-        source: 'col-leaf',
-        value: 408,
-      }, {
-        key: ['count()'],
-        rollup: true,
-        source: 'row-leaf',
-        value: 408,
-      }],
+  const rows = [{
+    key: ['2018-10-04T09:43:50.000Z'],
+    source: 'leaf',
+    values: [{
+      key: ['hulud.net', 'count()'],
+      rollup: false,
+      source: 'col-leaf',
+      value: 408,
+    }, {
+      key: ['count()'],
+      rollup: true,
+      source: 'row-leaf',
+      value: 408,
     }],
+  }];
+  const data = {
+    chart: rows,
   };
 
   const columnPivot = new Pivot('source', 'values', { limit: 15 });
@@ -71,6 +72,23 @@ describe('DataTable', () => {
                                                data={data}
                                                fields={Immutable.List([])} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('should render for legacy search result with id as key', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot])
+      .series([series])
+      .sort([])
+      .visualization('table')
+      .rollup(true)
+      .build();
+
+    const wrapper = mount(<DataTable config={config}
+                                     currentView={currentView}
+                                     data={{ 'd8e311db-276c-46e4-ba75-57bf1e0b4d35': rows }}
+                                     fields={Immutable.List([])} />);
+    expect(wrapper).toIncludeText('hulud.net');
   });
 
   it('should render with filled data without rollup', () => {
