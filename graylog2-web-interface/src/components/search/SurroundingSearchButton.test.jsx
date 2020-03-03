@@ -91,4 +91,12 @@ describe('SurroundingSearchButton', () => {
     expect(option.href).toContain('q=somefield%3A%2242%22');
     expect(option.href).not.toContain('someotherfield');
   });
+
+  it('adds a query parameter for highlighting the id of the current message', () => {
+    const { getByText } = renderButton();
+
+    const option = getOption('1 second', getByText);
+
+    expect(option.href).toContain('highlightMessage=foo-bar');
+  });
 });
