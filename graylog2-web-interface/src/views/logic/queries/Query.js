@@ -5,7 +5,7 @@ import { isEqual } from 'lodash';
 
 export type QueryId = string;
 
-type FilterType = Immutable.Map<string, any>;
+export type FilterType = Immutable.Map<string, any>;
 type SearchTypeList = Array<any>;
 type InternalBuilderState = Immutable.Map<string, any>;
 
