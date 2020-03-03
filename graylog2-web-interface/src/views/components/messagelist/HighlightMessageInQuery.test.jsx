@@ -13,6 +13,7 @@ describe('HighlightMessageInQuery', () => {
   );
   it('should render component for empty query', () => {
     const { container } = render((
+      // $FlowFixMe: Passing `undefined` on purpose
       <HighlightMessageInQuery query={undefined}>
         <TestComponent />
       </HighlightMessageInQuery>
