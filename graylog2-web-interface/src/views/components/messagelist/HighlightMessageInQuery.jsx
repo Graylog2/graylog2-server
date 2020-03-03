@@ -7,7 +7,7 @@ type Props = {
   query: { [string]: string },
 };
 
-const HighlightMessageInQuery = ({ children, query = {}}: Props) => {
+const HighlightMessageInQuery = ({ children, query = {} }: Props) => {
   const { highlightMessage } = query;
   return (
     <HighlightMessageContext.Provider value={highlightMessage}>
