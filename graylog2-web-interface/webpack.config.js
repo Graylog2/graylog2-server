@@ -51,7 +51,6 @@ const webpackConfig = {
   module: {
     rules: [
       { test: /\.js(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
-      { test: /\.ts$/, use: [BABELLOADER, { loader: 'ts-loader' }], exclude: /node_modules|\.node_cache/ },
       { test: /\.(svg)(\?.+)?$/, loader: 'file-loader' },
       {
         test: /\.(woff(2)?|ttf)(\?.+)?$/,
@@ -93,7 +92,7 @@ const webpackConfig = {
   },
   resolve: {
     // you can now require('file') instead of require('file.coffee')
-    extensions: ['.js', '.json', '.jsx', '.ts'],
+    extensions: ['.js', '.json', '.jsx'],
     modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
     alias: {
       theme: path.resolve(APP_PATH, 'theme'),
