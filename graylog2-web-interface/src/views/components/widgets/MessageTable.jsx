@@ -14,6 +14,7 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 
 import { MessageTableEntry } from 'views/components/messagelist';
 import Field from 'views/components/Field';
+import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 const Table = styled.table`
   position: relative;
@@ -223,15 +224,19 @@ class MessageTable extends React.Component<Props, State> {
             return (
               <AdditionalContext.Provider key={messageKey}
                                           value={{ message }}>
-                <MessageTableEntry fields={fields}
-                                   disableSurroundingSearch
-                                   message={message}
-                                   showMessageRow={config && config.showMessageRow}
-                                   selectedFields={selectedFields}
-                                   expanded={expandedMessages.contains(messageKey)}
-                                   toggleDetail={this._toggleMessageDetail}
-                                   highlight
-                                   expandAllRenderAsync={false} />
+                <HighlightMessageContext.Consumer>
+                  {highlightMessageId => (
+                    <MessageTableEntry fields={fields}
+                                       message={message}
+                                       showMessageRow={config && config.showMessageRow}
+                                       selectedFields={selectedFields}
+                                       expanded={expandedMessages.contains(messageKey)}
+                                       toggleDetail={this._toggleMessageDetail}
+                                       highlightMessage={highlightMessageId}
+                                       highlight
+                                       expandAllRenderAsync={false} />
+                  )}
+                </HighlightMessageContext.Consumer>
               </AdditionalContext.Provider>
             );
           })}
