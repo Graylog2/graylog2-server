@@ -1,6 +1,5 @@
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
 import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/graylog';
 
 import { Spinner } from 'components/common';
@@ -11,112 +10,108 @@ import SimulationChanges from './SimulationChanges';
 import SimulationPreview from './SimulationPreview';
 import SimulationTrace from './SimulationTrace';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import style from '!style/useable!css!./SimulationResults.css';
 
-const SimulationResults = createReactClass({
-  displayName: 'SimulationResults',
+const VIEW_OPTIONS = {
+  SIMULATION_PREVIEW: 1,
+  SIMULATION_SUMMARY: 2,
+  SIMULATION_TRACE: 3,
+};
 
-  propTypes: {
-    stream: PropTypes.object.isRequired,
-    originalMessage: PropTypes.object,
-    simulationResults: PropTypes.object,
-    isLoading: PropTypes.bool,
-    error: PropTypes.object,
-  },
-
-  getInitialState() {
-    return {
-      viewOption: this.VIEW_OPTIONS.SIMULATION_SUMMARY,
+class SimulationResults extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      viewOption: VIEW_OPTIONS.SIMULATION_SUMMARY,
     };
-  },
+  }
 
   componentDidMount() {
-    this.style.use();
-  },
+    style.use();
+  }
 
   componentWillUnmount() {
-    this.style.unuse();
-  },
+    style.unuse();
+  }
 
-  VIEW_OPTIONS: {
-    SIMULATION_PREVIEW: 1,
-    SIMULATION_SUMMARY: 2,
-    SIMULATION_TRACE: 3,
-  },
+  _changeViewOptions = (eventKey) => {
+    const selectedOption = Object.keys(VIEW_OPTIONS).find(key => VIEW_OPTIONS[key] === eventKey);
+    this.setState({ viewOption: VIEW_OPTIONS[selectedOption] });
+  };
 
-  style: require('!style/useable!css!./SimulationResults.css'),
+  _getViewOptionsMenuItems = () => [
+    this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_SUMMARY, 'Changes summary'),
+    this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_PREVIEW, 'Results preview'),
+    this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_TRACE, 'Simulation trace'),
+  ];
 
-  _changeViewOptions(eventKey) {
-    const selectedOption = Object.keys(this.VIEW_OPTIONS).find(key => this.VIEW_OPTIONS[key] === eventKey);
-    this.setState({ viewOption: this.VIEW_OPTIONS[selectedOption] });
-  },
-
-  _getViewOptionsMenuItems() {
-    const viewOptionsMenuItems = [];
-
-    viewOptionsMenuItems.push(this._getViewOptionsMenuItem(this.VIEW_OPTIONS.SIMULATION_SUMMARY, 'Changes summary'));
-    viewOptionsMenuItems.push(this._getViewOptionsMenuItem(this.VIEW_OPTIONS.SIMULATION_PREVIEW, 'Results preview'));
-    viewOptionsMenuItems.push(this._getViewOptionsMenuItem(this.VIEW_OPTIONS.SIMULATION_TRACE, 'Simulation trace'));
-
-    return viewOptionsMenuItems;
-  },
-
-  _getViewOptionsMenuItem(option, text) {
+  _getViewOptionsMenuItem = (option, text) => {
+    const { viewOption } = this.state;
     return (
-      <MenuItem key={option} eventKey={option} active={this.state.viewOption === option}>
+      <MenuItem key={option} eventKey={option} active={viewOption === option}>
         {text}
       </MenuItem>
     );
-  },
+  };
 
-  _getViewComponent(streams) {
-    if (this.props.isLoading || !this.props.simulationResults) {
+  _getViewComponent = (streams) => {
+    const { simulationResults, isLoading, originalMessage } = this.props;
+    if (isLoading || !simulationResults) {
       return <Spinner />;
     }
 
-    switch (this.state.viewOption) {
-      case this.VIEW_OPTIONS.SIMULATION_PREVIEW:
-        return <SimulationPreview simulationResults={this.props.simulationResults} streams={streams} />;
-      case this.VIEW_OPTIONS.SIMULATION_SUMMARY:
-        return <SimulationChanges originalMessage={this.props.originalMessage} simulationResults={this.props.simulationResults} />;
-      case this.VIEW_OPTIONS.SIMULATION_TRACE:
-        return <SimulationTrace simulationResults={this.props.simulationResults} />;
+    const { viewOption } = this.state;
+    switch (viewOption) {
+      case VIEW_OPTIONS.SIMULATION_PREVIEW:
+        return <SimulationPreview simulationResults={simulationResults} streams={streams} />;
+      case VIEW_OPTIONS.SIMULATION_SUMMARY:
+        return (
+          <SimulationChanges originalMessage={originalMessage}
+                             simulationResults={simulationResults} />
+        );
+      case VIEW_OPTIONS.SIMULATION_TRACE:
+        return <SimulationTrace simulationResults={simulationResults} />;
       default:
       // it should never happen™
     }
 
     return null;
-  },
+  };
 
   render() {
-    if (!this.props.originalMessage && !this.props.simulationResults) {
+    const { stream, simulationResults, isLoading, error, originalMessage } = this.props;
+    if (!originalMessage && !simulationResults) {
       return null;
     }
 
-    const streams = {};
-    streams[this.props.stream.id] = this.props.stream;
+    const streams = {
+      [stream.id]: stream,
+    };
 
-    let originalMessagePreview = (this.props.isLoading ? <Spinner /> : null);
-    if (this.props.originalMessage) {
-      originalMessagePreview = (
-        <MessageShow message={this.props.originalMessage}
-                     streams={streams} />
-      );
-    }
+    // eslint-disable-next-line no-nested-ternary
+    const originalMessagePreview = isLoading
+      ? <Spinner />
+      : originalMessage
+        ? (
+          <MessageShow message={originalMessage}
+                       streams={streams} />
+        )
+        : null;
 
-    let errorMessage;
-    if (this.props.error) {
-      errorMessage = (
+    const errorMessage = error
+      ? (
         <Alert bsStyle="danger">
           <p><strong>Error simulating message processing</strong></p>
           <p>
-            Could not simulate processing of message <em>{this.props.originalMessage.id}</em> in stream{' '}
-            <em>{this.props.stream.title}</em>.
+            Could not simulate processing of message <em>{originalMessage.id}</em> in stream{' '}
+            <em>{stream.title}</em>.
             <br />
             Please try loading the message again, or use another message for the simulation.
           </p>
         </Alert>
-      );
-    }
+      )
+      : null;
 
     return (
       <Row>
@@ -143,16 +138,30 @@ const SimulationResults = createReactClass({
           </div>
           <h1>Simulation results</h1>
           <p>
-            {this.props.isLoading
+            {isLoading
               ? 'Simulating message processing, please wait a moment.'
-              : `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(this.props.simulationResults.took_microseconds)} µs.`}
+              : `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(simulationResults.took_microseconds)} µs.`}
           </p>
           {errorMessage}
           {this._getViewComponent(streams)}
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
+
+SimulationResults.propTypes = {
+  stream: PropTypes.object.isRequired,
+  originalMessage: PropTypes.object.isRequired,
+  simulationResults: PropTypes.object,
+  isLoading: PropTypes.bool,
+  error: PropTypes.object,
+};
+
+SimulationResults.defaultProps = {
+  simulationResults: undefined,
+  isLoading: false,
+  error: undefined,
+};
 
 export default SimulationResults;
