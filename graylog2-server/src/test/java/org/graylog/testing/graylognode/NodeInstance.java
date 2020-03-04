@@ -42,6 +42,7 @@ public class NodeInstance {
 
     @SuppressWarnings("OctalInteger")
     private static final int EXECUTABLE_MODE = 0100755;
+    private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
     private final GenericContainer container;
 
@@ -65,19 +66,25 @@ public class NodeInstance {
                 .withFileFromClasspath("Dockerfile", "org/graylog/testing/graylognode/Dockerfile")
                 // set mode here explicitly, because file system permissions can get lost when executing from maven
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
-                .withFileFromClasspath("graylog.conf", "org/graylog/testing/graylognode/config/graylog.conf")
+                .withFileFromPath("graylog.conf", pathTo("graylog_config"))
                 .withFileFromClasspath("log4j2.xml", "org/graylog/testing/graylognode/config/log4j2.xml")
                 .withFileFromPath("sigar", pathTo("sigar_dir"));
 
+        String graylogHome = "/usr/share/graylog";
+
         return new GenericContainer<>(image)
-                .withFileSystemBind(property("server_jar"), "/usr/share/graylog/graylog.jar", BindMode.READ_ONLY)
-                .withFileSystemBind(property("aws_plugin_jar"), "/usr/share/graylog/plugin/graylog-plugin-aws.jar", BindMode.READ_ONLY)
-                .withFileSystemBind(property("threatintel_plugin_jar"), "/usr/share/graylog/plugin/graylog-plugin-threatintel.jar", BindMode.READ_ONLY)
-                .withFileSystemBind(property("collector_plugin_jar"), "/usr/share/graylog/plugin/graylog-plugin-collector.jar", BindMode.READ_ONLY)
+                .withFileSystemBind(property("server_jar"), graylogHome + "/graylog.jar", BindMode.READ_ONLY)
+                .withFileSystemBind(property("aws_plugin_jar"), graylogHome + "/plugin/graylog-plugin-aws.jar", BindMode.READ_ONLY)
+                .withFileSystemBind(property("threatintel_plugin_jar"), graylogHome + "/plugin/graylog-plugin-threatintel.jar", BindMode.READ_ONLY)
+                .withFileSystemBind(property("collector_plugin_jar"), graylogHome + "/plugin/graylog-plugin-collector.jar", BindMode.READ_ONLY)
                 .withExposedPorts(9000)
                 .withNetwork(network)
                 .withEnv("GRAYLOG_MONGODB_URI", mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", elasticsearchUri)
+                .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?")
+                .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
+                .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:9000")
+                .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
                 .waitingFor(Wait.forHttp("/api"));
     }
 
