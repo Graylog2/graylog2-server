@@ -71,9 +71,9 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                     "componentStyle": ComponentStyle {
                       "componentId": "NotificationBadge__StyledInactiveNavItem-c049cm-0",
                       "isStatic": true,
-                      "lastClassName": "ijmPPY",
+                      "lastClassName": "dMglXF",
                       "rules": Array [
-                        "a:hover{border:0px;text-decoration:none;}",
+                        "a:hover{border:0;text-decoration:none;}",
                       ],
                     },
                     "displayName": "NotificationBadge__StyledInactiveNavItem",
@@ -92,20 +92,20 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
               >
                 <InactiveNavItem
                   action="push"
-                  className="NotificationBadge__StyledInactiveNavItem-c049cm-0 ijmPPY"
+                  className="NotificationBadge__StyledInactiveNavItem-c049cm-0 dMglXF"
                   onClick={[Function]}
                   onSelect={null}
                 >
                   <NavItem
                     action="push"
                     active={false}
-                    className="NotificationBadge__StyledInactiveNavItem-c049cm-0 ijmPPY"
+                    className="NotificationBadge__StyledInactiveNavItem-c049cm-0 dMglXF"
                     disabled={false}
                     onClick={[Function]}
                     onSelect={null}
                   >
                     <li
-                      className="NotificationBadge__StyledInactiveNavItem-c049cm-0 ijmPPY"
+                      className="NotificationBadge__StyledInactiveNavItem-c049cm-0 dMglXF"
                       role="presentation"
                     >
                       <SafeAnchor
