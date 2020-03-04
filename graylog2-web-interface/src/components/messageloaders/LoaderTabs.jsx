@@ -162,9 +162,6 @@ const LoaderTabs = createReactClass({
           <MessageShow message={this.state.message}
                        inputs={this.state.inputs}
                        streams={this.state.streams}
-                       disableTestAgainstStream
-                       disableSurroundingSearch
-                       disableFieldActions={!this.props.customFieldActions}
                        customFieldActions={this.props.customFieldActions} />
         </Col>
       );

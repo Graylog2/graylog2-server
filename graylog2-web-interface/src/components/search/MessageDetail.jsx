@@ -3,8 +3,8 @@ import React from 'react';
 import Immutable from 'immutable';
 import { Link } from 'react-router';
 
-import { Button, ButtonGroup, Row, Col, Label } from 'components/graylog';
-import { Icon, ClipboardButton, Timestamp } from 'components/common';
+import { Button, ButtonGroup, Col, Label, Row } from 'components/graylog';
+import { ClipboardButton, Icon, Timestamp } from 'components/common';
 
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
@@ -14,29 +14,29 @@ import Routes from 'routing/Routes';
 
 class MessageDetail extends React.Component {
   static propTypes = {
-    renderForDisplay: PropTypes.func,
+    renderForDisplay: PropTypes.func.isRequired,
     inputs: PropTypes.object,
     nodes: PropTypes.object,
-    message: PropTypes.object,
-    streams: PropTypes.object,
+    message: PropTypes.object.isRequired,
+    streams: PropTypes.object.isRequired,
     customFieldActions: PropTypes.node,
-    searchConfig: PropTypes.object,
-    disableMessageActions: PropTypes.bool,
   };
 
-  state = {
-    allStreamsLoaded: false,
-    allStreams: Immutable.List(),
-    showOriginal: false,
+  static defaultProps = {
+    inputs: undefined,
+    nodes: undefined,
+    customFieldActions: undefined,
   };
 
   _inputName = (inputId) => {
-    const input = this.props.inputs.get(inputId);
+    const { inputs } = this.props;
+    const input = inputs.get(inputId);
     return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
   };
 
   _nodeName = (nodeId) => {
-    const node = this.props.nodes.get(nodeId);
+    const { nodes } = this.props;
+    const node = nodes.get(nodeId);
     let nodeInformation;
 
     if (node) {
@@ -45,8 +45,8 @@ class MessageDetail extends React.Component {
         <a href={nodeURL}>
           <Icon name="code-fork" />
           &nbsp;
-          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}
-          </span>
+          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;
+          <span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
         </a>
       );
     } else {
@@ -56,34 +56,27 @@ class MessageDetail extends React.Component {
   };
 
   _formatMessageActions = () => {
-    if (this.props.disableMessageActions) {
+    const { message, customFieldActions } = this.props;
+    if (!customFieldActions) {
       return <ButtonGroup className="pull-right" bsSize="small" />;
     }
 
-    const messageUrl = this.props.message.index ? Routes.message_show(this.props.message.index, this.props.message.id) : '#';
-
-    let showChanges = null;
-    if (this.props.message.decoration_stats) {
-      showChanges = <Button onClick={this._toggleShowOriginal} active={this.state.showOriginal}>Show changes</Button>;
-    }
+    const messageUrl = message.index ? Routes.message_show(message.index, message.id) : '#';
 
     return (
       <ButtonGroup className="pull-right" bsSize="small">
-        {showChanges}
         <Button href={messageUrl}>Permalink</Button>
 
-        <ClipboardButton title="Copy ID" text={this.props.message.id} />
+        <ClipboardButton title="Copy ID" text={message.id} />
       </ButtonGroup>
     );
   };
 
-  _toggleShowOriginal = () => {
-    this.setState({ showOriginal: !this.state.showOriginal });
-  };
-
   render() {
-    const streamIds = Immutable.Set(this.props.message.stream_ids);
+    const { renderForDisplay, nodes, message, customFieldActions } = this.props;
+    const streamIds = Immutable.Set(message.stream_ids);
     const streams = streamIds.map((id) => {
+      // eslint-disable-next-line react/destructuring-assignment
       const stream = this.props.streams.get(id);
       if (stream !== undefined) {
         return <li key={stream.id}><StreamLink stream={stream} /></li>;
@@ -92,30 +85,30 @@ class MessageDetail extends React.Component {
     });
 
     // Legacy
-    let viaRadio = this.props.message.source_radio_id;
+    let viaRadio = message.source_radio_id;
     if (viaRadio) {
       viaRadio = (
         <span>
-          via <em>{this._inputName(this.props.message.source_radio_input_id)}</em> on
-          radio {this._nodeName(this.props.message.source_radio_id)}
+          via <em>{this._inputName(message.source_radio_input_id)}</em> on
+          radio {this._nodeName(message.source_radio_id)}
         </span>
       );
     }
 
     let timestamp = [];
-    const rawTimestamp = this.props.message.fields.timestamp;
+    const rawTimestamp = message.fields.timestamp;
 
     timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
     timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
 
     let receivedBy;
-    if (this.props.message.source_input_id && this.props.message.source_node_id && this.props.nodes) {
+    if (message.source_input_id && message.source_node_id && nodes) {
       receivedBy = (
         <div>
           <dt>Received by</dt>
           <dd>
-            <em>{this._inputName(this.props.message.source_input_id)}</em>{' '}
-            on {this._nodeName(this.props.message.source_node_id)}
+            <em>{this._inputName(message.source_input_id)}</em>{' '}
+            on {this._nodeName(message.source_node_id)}
             { viaRadio && <br /> }
             {viaRadio}
           </dd>
@@ -126,14 +119,14 @@ class MessageDetail extends React.Component {
     }
 
     let messageTitle;
-    if (this.props.message.index) {
+    if (message.index) {
       messageTitle = (
-        <Link to={Routes.message_show(this.props.message.index, this.props.message.id)}>
-          {this.props.message.id}
+        <Link to={Routes.message_show(message.index, message.id)}>
+          {message.id}
         </Link>
       );
     } else {
-      messageTitle = <span>{this.props.message.id} <Label bsStyle="warning">Not stored</Label></span>;
+      messageTitle = <span>{message.id} <Label bsStyle="warning">Not stored</Label></span>;
     }
 
     return (
@@ -155,7 +148,7 @@ class MessageDetail extends React.Component {
               {receivedBy}
 
               <dt>Stored in index</dt>
-              <dd>{this.props.message.index ? this.props.message.index : 'Message is not stored'}</dd>
+              <dd>{message.index ? message.index : 'Message is not stored'}</dd>
 
               { streamIds.size > 0 && <dt>Routed into streams</dt> }
               { streamIds.size > 0
@@ -171,10 +164,9 @@ class MessageDetail extends React.Component {
           </Col>
           <Col md={9}>
             <div>
-              <MessageFields message={this.props.message}
-                             renderForDisplay={this.props.renderForDisplay}
-                             customFieldActions={this.props.customFieldActions}
-                             showDecoration={this.state.showOriginal} />
+              <MessageFields message={message}
+                             renderForDisplay={renderForDisplay}
+                             customFieldActions={customFieldActions} />
             </div>
           </Col>
         </Row>

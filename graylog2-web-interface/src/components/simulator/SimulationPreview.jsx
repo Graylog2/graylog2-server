@@ -30,11 +30,7 @@ class SimulationPreview extends React.Component {
       return (
         <MessageShow key={message.id}
                      message={message}
-                     streams={this.props.streams}
-                     disableTestAgainstStream
-                     disableSurroundingSearch
-                     disableFieldActions
-                     disableMessageActions />
+                     streams={this.props.streams} />
       );
     });
 

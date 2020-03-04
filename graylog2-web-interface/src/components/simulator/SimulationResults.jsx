@@ -99,11 +99,7 @@ const SimulationResults = createReactClass({
     if (this.props.originalMessage) {
       originalMessagePreview = (
         <MessageShow message={this.props.originalMessage}
-                     streams={streams}
-                     disableTestAgainstStream
-                     disableSurroundingSearch
-                     disableFieldActions
-                     disableMessageActions />
+                     streams={streams} />
       );
     }
 

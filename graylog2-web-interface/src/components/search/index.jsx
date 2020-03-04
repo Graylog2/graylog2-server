@@ -5,5 +5,4 @@ export { default as MessageFieldExtractorActions } from './MessageFieldExtractor
 export { default as MessageField } from './MessageField';
 export { default as MessageFields } from './MessageFields';
 export { default as MessageShow } from './MessageShow';
-export { default as MessageTableEntry } from './MessageTableEntry';
 export { default as SurroundingSearchButton } from './SurroundingSearchButton';
