@@ -1,31 +1,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import { Button, ButtonGroup, Row, Col, DropdownButton, MenuItem, Label } from 'components/graylog';
-import { Icon, Spinner, ClipboardButton, Timestamp } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
+import { Button, ButtonGroup, Row, Col, Label } from 'components/graylog';
+import { Icon, ClipboardButton, Timestamp } from 'components/common';
 
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 
-import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
-
 import Routes from 'routing/Routes';
-
-const StreamsStore = StoreProvider.getStore('Streams');
 
 class MessageDetail extends React.Component {
   static propTypes = {
-    allStreams: PropTypes.object,
-    allStreamsLoaded: PropTypes.bool,
-    disableTestAgainstStream: PropTypes.bool,
-    disableSurroundingSearch: PropTypes.bool,
-    expandAllRenderAsync: PropTypes.bool,
-    showTimestamp: PropTypes.bool,
     disableFieldActions: PropTypes.bool,
     renderForDisplay: PropTypes.func,
     inputs: PropTypes.object,
@@ -41,23 +29,6 @@ class MessageDetail extends React.Component {
     allStreamsLoaded: false,
     allStreams: Immutable.List(),
     showOriginal: false,
-  };
-
-  componentDidMount() {
-    if (this.props.allStreams === undefined) {
-      // our parent does not provide allStreams for the test against stream menu, we have to load it ourselves
-      // this can happen if the component is used outside the regular search result
-      // only load the streams per page
-      if (this.state.allStreamsLoaded || this.props.disableTestAgainstStream) {
-        return;
-      }
-      const promise = StreamsStore.listStreams();
-      promise.done(streams => this._onStreamsLoaded(streams));
-    }
-  }
-
-  _onStreamsLoaded = (streams) => {
-    this.setState({ allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title) });
   };
 
   _inputName = (inputId) => {
@@ -85,70 +56,12 @@ class MessageDetail extends React.Component {
     return nodeInformation;
   };
 
-  _getAllStreams = () => {
-    if (this.props.allStreams) {
-      return this.props.allStreams;
-    }
-    return this.state.allStreams;
-  };
-
-  _getTestAgainstStreamButton = () => {
-    if (this.props.disableTestAgainstStream) {
-      return null;
-    }
-
-    let streamList = null;
-    this._getAllStreams().forEach((stream) => {
-      if (!streamList) {
-        streamList = [];
-      }
-      if (stream.is_default) {
-        streamList.push(
-          <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>,
-        );
-      } else {
-        streamList.push(
-          <LinkContainer key={stream.id}
-                         to={Routes.stream_edit_example(stream.id, this.props.message.index,
-                           this.props.message.id)}>
-            <MenuItem>{stream.title}</MenuItem>
-          </LinkContainer>,
-        );
-      }
-    });
-
-    return (
-      <DropdownButton pullRight
-                      bsSize="small"
-                      title="Test against stream"
-                      id="select-stream-dropdown">
-        { streamList }
-        { (!streamList && !this.props.allStreamsLoaded) && (
-        <MenuItem header><Icon name="spinner" spin />
-          Loading streams
-        </MenuItem>
-        ) }
-        { (!streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
-      </DropdownButton>
-    );
-  };
-
   _formatMessageActions = () => {
     if (this.props.disableMessageActions) {
       return <ButtonGroup className="pull-right" bsSize="small" />;
     }
 
     const messageUrl = this.props.message.index ? Routes.message_show(this.props.message.index, this.props.message.id) : '#';
-
-    let surroundingSearchButton;
-    if (!this.props.disableSurroundingSearch) {
-      surroundingSearchButton = (
-        <SurroundingSearchButton id={this.props.message.id}
-                                 timestamp={this.props.message.timestamp}
-                                 searchConfig={this.props.searchConfig}
-                                 messageFields={this.props.message.fields} />
-      );
-    }
 
     let showChanges = null;
     if (this.props.message.decoration_stats) {
@@ -161,8 +74,6 @@ class MessageDetail extends React.Component {
         <Button href={messageUrl}>Permalink</Button>
 
         <ClipboardButton title="Copy ID" text={this.props.message.id} />
-        {surroundingSearchButton}
-        {this._getTestAgainstStreamButton()}
       </ButtonGroup>
     );
   };
@@ -172,17 +83,6 @@ class MessageDetail extends React.Component {
   };
 
   render() {
-    // Short circuit when all messages are being expanded at the same time
-    if (this.props.expandAllRenderAsync) {
-      return (
-        <Row>
-          <Col md={12}>
-            <Spinner />
-          </Col>
-        </Row>
-      );
-    }
-
     const streamIds = Immutable.Set(this.props.message.stream_ids);
     const streams = streamIds.map((id) => {
       const stream = this.props.streams.get(id);
@@ -203,14 +103,11 @@ class MessageDetail extends React.Component {
       );
     }
 
-    let timestamp = null;
-    if (this.props.showTimestamp) {
-      timestamp = [];
-      const rawTimestamp = this.props.message.fields.timestamp;
+    let timestamp = [];
+    const rawTimestamp = this.props.message.fields.timestamp;
 
-      timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
-      timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
-    }
+    timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
+    timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
 
     let receivedBy;
     if (this.props.message.source_input_id && this.props.message.source_node_id && this.props.nodes) {
