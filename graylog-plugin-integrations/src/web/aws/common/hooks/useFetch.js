@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import { FormDataContext } from '../../context/FormData';
-import awsAuth from '../awsAuth';
 
 /* useFetch Custom Hook
 
@@ -53,8 +52,7 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
-  const { key, secret } = awsAuth(formData);
-  const qualifiedURL = fetchUrl ? URLUtils.qualifyUrl(fetchUrl) : null;
+  const qualifiedURL = fetchUrl ? qualifyUrl(fetchUrl) : null;
 
   useEffect(() => {
     let isFetchable = !!qualifiedURL;
@@ -71,6 +69,8 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
           awsEndpointIAM = { value: undefined },
           awsEndpointDynamoDB = { value: undefined },
           awsEndpointKinesis = { value: undefined },
+          key = undefined,
+          secret = undefined,
         } = formData;
 
         if (method === 'GET') {

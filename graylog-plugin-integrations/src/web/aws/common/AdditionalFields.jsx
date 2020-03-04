@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 import { Icon } from 'components/common';
+import { Button } from 'components/graylog';
 
 const AdditionalFields = ({ children, className, onToggle, title, visible }) => {
   const [fieldsVisible, setFieldsVisible] = useState(visible);
@@ -14,7 +15,7 @@ const AdditionalFields = ({ children, className, onToggle, title, visible }) => 
 
   return (
     <div className={className}>
-      <ToggleAdditionalFields onClick={handleToggle} type="button">
+      <ToggleAdditionalFields bsStyle="link" bsSize="xsmall" onClick={handleToggle} type="button">
         {title} <Icon name={fieldsVisible ? 'angle-down' : 'angle-right'} fixedWidth />
       </ToggleAdditionalFields>
 
@@ -44,14 +45,12 @@ const AdditionalFieldsContent = styled.div`
   padding: 0 100px 0 25px;
 `;
 
-const ToggleAdditionalFields = styled.button`
+const ToggleAdditionalFields = styled(Button)`
   border: 0;
-  color: #16ace3;
-  font-size: 14px;
   display: block;
+  font-size: 14px;
 
   :hover {
-    color: #5e123b;
     text-decoration: underline;
   }
 `;
