@@ -61,12 +61,11 @@ public class HttpPollTransportTest {
     @Test
     public void testParseResponseHeaders() throws Exception {
 
+        //the resposne payload format is not known and this is a assumption.
+        //this needs to be rewritten
         Map<String, String> expectedSingle = ImmutableMap.of(
-                "next", "https://dev-337840-admin.okta.com/api/v1/logs?q=Nick&after=1583250857409_1");
-
-
-       //link: <https://dev-337840-admin.okta.com/api/v1/logs?q=Nick&after=1583250857409_1>; rel="next"
-        assertEquals(expectedSingle, parseResponseHeaders("link: <https://dev-337840-admin.okta.com/api/v1/logs?q=Nick&after=1583250857409_1>; rel=\"next\""));
+                "next", "https://graylog.okta.com/api/v1/logs?q=Nick&after=1583250857409_1");
+        assertEquals(expectedSingle, parseResponseHeaders("link: <https://graylog.okta.com/api/v1/logs?q=Nick&after=1583250857409_1>; rel=\"next\""));
 
     }
 
