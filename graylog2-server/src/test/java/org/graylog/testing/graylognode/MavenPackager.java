@@ -32,11 +32,14 @@ public class MavenPackager {
     private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build";
 
     static void packageJarIfNecessary(String projectDir) {
-        if (!isRunFromMaven()) {
+        if (skipPackaging()) {
+            LOG.info("Skipping packaging");
+        } else if (isRunFromMaven()) {
+            LOG.info("Running from Maven. Assuming jars are current.");
+        } else {
             LOG.info("Running from outside Maven. Packaging server jar now...");
             MavenPackager.packageJar(projectDir);
-        } else {
-            LOG.info("Running from Maven. Assuming jars are current.");
+
         }
     }
 
@@ -44,8 +47,12 @@ public class MavenPackager {
         return System.getProperty("surefire.test.class.path") != null;
     }
 
-    static void packageJar(String pomDir) {
+    private static boolean skipPackaging() {
+        String skipFlag = System.getenv("GRAYLOG_IT_SKIP_PACKAGING");
+        return skipFlag != null && skipFlag.equalsIgnoreCase("true");
+    }
 
+    static void packageJar(String pomDir) {
         Process p = startProcess(pomDir);
 
         Stopwatch sw = Stopwatch.createStarted();
