@@ -30,10 +30,7 @@ import okhttp3.Response;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.DropdownField;
-import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.configuration.fields.*;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
@@ -66,6 +63,7 @@ public class HttpPollTransport extends ThrottleableTransport {
     private static final String CK_HEADERS = "headers";
     private static final String CK_TIMEUNIT = "timeunit";
     private static final String CK_INTERVAL = "interval";
+    private static final String CK_PAGINATE_USING_LINK = "paginate";
 
     private final Configuration configuration;
     private final EventBus serverEventBus;
@@ -74,6 +72,7 @@ public class HttpPollTransport extends ThrottleableTransport {
     private final OkHttpClient httpClient;
 
     private volatile boolean paused = true;
+    private volatile String  dynamicURL = "";
     private ScheduledFuture<?> scheduledFuture;
 
     @AssistedInject
@@ -88,6 +87,7 @@ public class HttpPollTransport extends ThrottleableTransport {
         this.serverStatus = serverStatus;
         this.scheduler = scheduler;
         this.httpClient = httpClient;
+        this.dynamicURL = configuration.getString(CK_URL);
     }
 
     @VisibleForTesting
@@ -107,6 +107,23 @@ public class HttpPollTransport extends ThrottleableTransport {
         return headers;
     }
 
+    @VisibleForTesting
+    static Map<String, String> parseResponseHeaders(String headerString) {
+        if (isNullOrEmpty(headerString)) {
+            return Collections.emptyMap();
+        }
+        final Map<String, String> headers = Maps.newHashMap();
+        for (String headerPart : headerString.trim().split(",")) {
+            final String[] parts = headerPart.trim().split(";");
+            final String s = parts[0].trim();
+            final String nextUrl  = s.substring(s.indexOf("<") + 1, s.indexOf(">"));
+            headers.put("next", nextUrl);
+        }
+        return headers;
+    }
+
+
+
     @Subscribe
     public void lifecycleStateChange(Lifecycle lifecycle) {
         LOG.debug("Lifecycle changed to {}", lifecycle);
@@ -122,6 +139,10 @@ public class HttpPollTransport extends ThrottleableTransport {
     @Override
     public void setMessageAggregator(CodecAggregator aggregator) {
         // not supported
+    }
+
+    public Map<String, String> getUrl() {
+        return null;
     }
 
     @Override
@@ -236,6 +257,15 @@ public class HttpPollTransport extends ThrottleableTransport {
                     DropdownField.ValueTemplates.timeUnits(),
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
+
+            r.addField(
+                    new BooleanField(
+                            CK_PAGINATE_USING_LINK,
+                            "Paginate using link",
+                            true,
+                            "Use the Link header response to paginate for the next batch of records")
+            );
+
 
             return r;
         }

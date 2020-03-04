@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.graylog2.inputs.transports.HttpPollTransport.parseHeaders;
+import static org.graylog2.inputs.transports.HttpPollTransport.parseResponseHeaders;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -56,5 +57,19 @@ public class HttpPollTransportTest {
         assertEquals(expectedSingle, parseHeaders(" Accept :application/json "));
 
     }
+
+    @Test
+    public void testParseResponseHeaders() throws Exception {
+
+        Map<String, String> expectedSingle = ImmutableMap.of(
+                "next", "https://dev-337840-admin.okta.com/api/v1/logs?q=Nick&after=1583250857409_1");
+
+
+       //link: <https://dev-337840-admin.okta.com/api/v1/logs?q=Nick&after=1583250857409_1>; rel="next"
+        assertEquals(expectedSingle, parseResponseHeaders("link: <https://dev-337840-admin.okta.com/api/v1/logs?q=Nick&after=1583250857409_1>; rel=\"next\""));
+
+    }
+
+
 
 }
