@@ -67,7 +67,7 @@ public class NodeInstance {
                 // set mode here explicitly, because file system permissions can get lost when executing from maven
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
-                .withFileFromClasspath("log4j2.xml", "org/graylog/testing/graylognode/config/log4j2.xml")
+                .withFileFromClasspath("log4j2.xml", "log4j2.xml")
                 .withFileFromPath("sigar", pathTo("sigar_dir"));
 
         String graylogHome = "/usr/share/graylog";
