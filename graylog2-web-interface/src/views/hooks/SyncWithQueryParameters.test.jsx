@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { cleanup, render, wait } from 'wrappedTestingLibrary';
 import history from 'util/History';
 import * as Immutable from 'immutable';
 
@@ -126,7 +126,7 @@ describe('SyncWithQueryParameters', () => {
     it('listens on action used for adding streams', () => {
       render(<TestComponent />);
 
-      expect(QueryFiltersActions.streams.completed.listen).toHaveBeenCalled();
+      wait(() => expect(QueryFiltersActions.streams.completed.listen).toHaveBeenCalled());
     });
   });
 });
