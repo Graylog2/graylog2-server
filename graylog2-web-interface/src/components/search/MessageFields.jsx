@@ -28,7 +28,8 @@ class MessageFields extends React.Component {
   };
 
   render() {
-    const formattedFields = this.props.message.formatted_fields;
+    const { message } = this.props;
+    const formattedFields = message.formatted_fields;
     const fields = this._formatFields(formattedFields);
 
     return (
