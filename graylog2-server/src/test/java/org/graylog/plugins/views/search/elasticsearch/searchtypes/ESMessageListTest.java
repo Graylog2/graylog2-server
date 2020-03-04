@@ -96,7 +96,7 @@ public class ESMessageListTest {
     public void passesTypeOfSortingFieldAsUnmappedType() {
         final MessageList messageList = someMessageListWithSorting();
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
-        when(context.fieldTypes()).thenReturn(Collections.singletonMap("somefield", Collections.singleton("long")));
+        when(context.fieldTypes(Collections.singleton("stream1"))).thenReturn(Collections.singletonMap("somefield", Collections.singleton("long")));
 
         final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Collections.emptySet(), context);
 
@@ -108,7 +108,7 @@ public class ESMessageListTest {
     public void passesNullForUnmappedTypeIfTypeIsNotFound() {
         final MessageList messageList = someMessageListWithSorting();
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
-        when(context.fieldTypes()).thenReturn(Collections.emptyMap());
+        when(context.fieldTypes(Collections.singleton("stream1"))).thenReturn(Collections.emptyMap());
 
         final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Collections.emptySet(), context);
 
@@ -120,7 +120,7 @@ public class ESMessageListTest {
     public void passesNullForUnmappedTypeIfTypeIsAmbigious() {
         final MessageList messageList = someMessageListWithSorting();
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
-        when(context.fieldTypes()).thenReturn(Collections.singletonMap("somefield",
+        when(context.fieldTypes(Collections.singleton("stream1"))).thenReturn(Collections.singletonMap("somefield",
                 ImmutableSet.of(
                         "long",
                         "float"

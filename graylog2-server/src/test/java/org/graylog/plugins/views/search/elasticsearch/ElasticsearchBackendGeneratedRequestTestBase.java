@@ -36,7 +36,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -58,7 +57,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -77,20 +75,30 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
     @Mock
     protected StreamService streamService;
 
+    @Mock
+    protected FieldTypesLookup fieldTypesLookup;
+
+    protected Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticSearchTypeHandlers;
+
     @Captor
     protected ArgumentCaptor<MultiSearch> clientRequestCaptor;
 
     @Before
     public void setUpSUT() {
-        Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticSearchTypeHandlers = new HashMap<>();
+        this.elasticSearchTypeHandlers = new HashMap<>();
         final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers = Collections.emptyMap();
         final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
         seriesHandlers.put(Average.NAME, new ESAverageHandler());
         seriesHandlers.put(Max.NAME, new ESMaxHandler());
         elasticSearchTypeHandlers.put(Pivot.NAME, () -> new ESPivot(bucketHandlers, seriesHandlers));
 
-        final IndexFieldTypesService indexFieldTypesService = mock(IndexFieldTypesService.class);
-        this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers, queryStringParser, jestClient, indexRangeService, streamService, new ESQueryDecorators.Fake(), indexFieldTypesService);
+        this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
+                queryStringParser,
+                jestClient,
+                indexRangeService,
+                streamService,
+                new ESQueryDecorators.Fake(),
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup));
     }
 
     SearchJob searchJobForQuery(Query query) {

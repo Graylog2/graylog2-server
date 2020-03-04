@@ -29,7 +29,6 @@ import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHa
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -94,8 +93,14 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
     public void setupSUT() throws Exception {
         when(jestClient.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulResponseWithSingleQuery.json")));
 
-        final IndexFieldTypesService indexFieldTypesService = mock(IndexFieldTypesService.class);
-        this.backend = new ElasticsearchBackend(handlers, queryStringParser, jestClient, indexRangeService, streamService, new ESQueryDecorators.Fake(), indexFieldTypesService);
+        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
+        this.backend = new ElasticsearchBackend(handlers,
+                queryStringParser,
+                jestClient,
+                indexRangeService,
+                streamService,
+                new ESQueryDecorators.Fake(),
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup));
     }
 
     @Before

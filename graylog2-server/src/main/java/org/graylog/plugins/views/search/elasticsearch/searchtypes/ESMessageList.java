@@ -85,17 +85,22 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
         applyHighlightingIfActivated(searchSourceBuilder, job, query);
 
+        final Set<String> effectiveStreamIds = messageList.effectiveStreams().isEmpty()
+                ? query.usedStreamIds()
+                : messageList.effectiveStreams();
+
         final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, SortOrder.DESC)));
-        final Map<String, Set<String>> allFieldTypes = firstNonNull(queryContext.fieldTypes(), Collections.emptyMap());
-        sorts.forEach(sort -> {
-            final Set<String> fieldTypes = allFieldTypes.get(sort.field());
-            final String fieldType = fieldTypes == null || fieldTypes.size() > 1 ? null : fieldTypes.stream().findFirst().orElse(null);
-            searchSourceBuilder.sort(
-                    SortBuilders.fieldSort(sort.field())
-                            .order(sort.order())
-                            .unmappedType(fieldType)
-            );
-        });
+        sorts.forEach(sort -> searchSourceBuilder.sort(
+                SortBuilders.fieldSort(sort.field())
+                        .order(sort.order())
+                        .unmappedType(unmappedTypeForSort(sort, queryContext, effectiveStreamIds))
+        ));
+    }
+
+    private String unmappedTypeForSort(Sort sort, ESGeneratedQueryContext queryContext, Set<String> effectiveStreamIds) {
+        final Map<String, Set<String>> allFieldTypes = firstNonNull(queryContext.fieldTypes(effectiveStreamIds), Collections.emptyMap());
+        final Set<String> fieldTypes = allFieldTypes.get(sort.field());
+        return fieldTypes == null || fieldTypes.size() > 1 ? null : fieldTypes.stream().findFirst().orElse(null);
     }
 
     private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {

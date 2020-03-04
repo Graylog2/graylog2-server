@@ -30,7 +30,6 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.streams.StreamService;
@@ -54,9 +53,15 @@ public class ElasticsearchBackendTest {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
 
+        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         final QueryStringParser queryStringParser = new QueryStringParser();
-        final IndexFieldTypesService indexFieldTypesService = mock(IndexFieldTypesService.class);
-        backend = new ElasticsearchBackend(handlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake(), indexFieldTypesService);
+        backend = new ElasticsearchBackend(handlers,
+                queryStringParser,
+                null,
+                mock(IndexRangeService.class),
+                mock(StreamService.class),
+                new ESQueryDecorators.Fake(),
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup));
     }
 
     @Test

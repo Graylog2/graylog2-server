@@ -19,6 +19,8 @@ package org.graylog.plugins.views.search.elasticsearch;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -42,59 +44,41 @@ import java.util.Set;
 public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     private final ElasticsearchBackend elasticsearchBackend;
-    private final Map<String, SearchSourceBuilder> searchTypeQueries;
-    private Map<Object, Object> contextMap;
+    private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
+    private Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
-    private Set<SearchError> errors;
+    private Set<SearchError> errors = Sets.newHashSet();
     private final SearchSourceBuilder ssb;
     private final SearchJob job;
     private final Query query;
     private final Set<QueryResult> results;
 
-    private final Map<String, Set<String>> fieldTypes;
+    private final FieldTypesLookup fieldTypes;
 
-    public ESGeneratedQueryContext(ElasticsearchBackend elasticsearchBackend, SearchSourceBuilder ssb, SearchJob job, Query query, Set<QueryResult> results) {
+    @AssistedInject
+    public ESGeneratedQueryContext(
+            @Assisted ElasticsearchBackend elasticsearchBackend,
+            @Assisted SearchSourceBuilder ssb,
+            @Assisted SearchJob job,
+            @Assisted Query query,
+            @Assisted Set<QueryResult> results,
+            FieldTypesLookup fieldTypes) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
         this.job = job;
         this.query = query;
         this.results = results;
-        this.contextMap = Maps.newHashMap();
-        this.searchTypeQueries = Maps.newHashMap();
-        this.errors = Sets.newHashSet();
-        this.fieldTypes = null;
-    }
-
-    private ESGeneratedQueryContext(ElasticsearchBackend elasticsearchBackend,
-                                    SearchSourceBuilder ssb,
-                                    SearchJob job,
-                                    Query query,
-                                    Set<QueryResult> results,
-                                    Map<Object, Object> contextMap,
-                                    Map<String, SearchSourceBuilder> searchTypeQueries,
-                                    Set<SearchError> errors,
-                                    Map<String, Set<String>> fieldTypes) {
-        this.elasticsearchBackend = elasticsearchBackend;
-        this.ssb = ssb;
-        this.job = job;
-        this.query = query;
-        this.results = results;
-        this.contextMap = contextMap;
-        this.searchTypeQueries = searchTypeQueries;
-        this.errors = errors;
         this.fieldTypes = fieldTypes;
     }
 
-    public ESGeneratedQueryContext withFieldTypes(Map<String, Set<String>> fieldTypes) {
-        return new ESGeneratedQueryContext(this.elasticsearchBackend,
-                this.ssb,
-                this.job,
-                this.query,
-                this.results,
-                this.contextMap,
-                this.searchTypeQueries,
-                this.errors,
-                fieldTypes);
+    public interface Factory {
+        ESGeneratedQueryContext create(
+                ElasticsearchBackend elasticsearchBackend,
+                SearchSourceBuilder ssb,
+                SearchJob job,
+                Query query,
+                Set<QueryResult> results
+        );
     }
 
     public SearchSourceBuilder searchSourceBuilder(SearchType searchType) {
@@ -141,8 +125,8 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         builders.forEach(builder -> this.searchTypeQueries().get(searchType.id()).aggregation(builder));
     }
 
-    public Map<String, Set<String>> fieldTypes() {
-        return fieldTypes;
+    public Map<String, Set<String>> fieldTypes(Set<String> streamIds) {
+        return fieldTypes.get(streamIds);
     }
 
     @Override

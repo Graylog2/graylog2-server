@@ -51,8 +51,6 @@ import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.Message;
@@ -80,7 +78,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.graylog2.indexer.cluster.jest.JestUtils.deduplicateErrors;
 
-
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
 
@@ -90,7 +87,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final IndexRangeService indexRangeService;
     private final StreamService streamService;
     private final ESQueryDecorators esQueryDecorators;
-    private final IndexFieldTypesService indexFieldTypesService;
+    private final ESGeneratedQueryContext.Factory queryContextFactory;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -99,14 +96,14 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 IndexRangeService indexRangeService,
                                 StreamService streamService,
                                 ESQueryDecorators esQueryDecorators,
-                                IndexFieldTypesService indexFieldTypesService) {
+                                ESGeneratedQueryContext.Factory queryContextFactory) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.queryStringParser = queryStringParser;
         this.jestClient = jestClient;
         this.indexRangeService = indexRangeService;
         this.streamService = streamService;
         this.esQueryDecorators = esQueryDecorators;
-        this.indexFieldTypesService = indexFieldTypesService;
+        this.queryContextFactory = queryContextFactory;
     }
 
     private QueryBuilder normalizeQueryString(String queryString) {
@@ -136,24 +133,14 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .from(0)
                 .size(0);
 
-        final ESGeneratedQueryContext queryContext = new ESGeneratedQueryContext(this, searchSourceBuilder, job, query, results);
+        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, results);
         for (SearchType searchType : searchTypes) {
+            final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
+
             final Set<String> effectiveStreamIds = searchType.effectiveStreams().isEmpty()
                     ? query.usedStreamIds()
                     : searchType.effectiveStreams();
 
-            final Map<String, Set<String>> fieldTypesOfStreams = this.indexFieldTypesService.findForStreamIds(effectiveStreamIds)
-                    .stream()
-                    .flatMap(indexFieldTypes -> indexFieldTypes.fields().stream())
-                    .collect(Collectors.toMap(
-                            FieldTypeDTO::fieldName,
-                            fieldType -> Collections.singleton(fieldType.physicalType()),
-                            Sets::union
-                    ));
-
-            final ESGeneratedQueryContext searchTypeQueryContext = queryContext.withFieldTypes(fieldTypesOfStreams);
-
-            final SearchSourceBuilder searchTypeSourceBuilder = searchTypeQueryContext.searchSourceBuilder(searchType);
             final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                     .must(searchTypeSourceBuilder.query())
                     .must(
@@ -179,11 +166,11 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
             final Provider<ESSearchTypeHandler<? extends SearchType>> searchTypeHandler = elasticsearchSearchTypeHandlers.get(type);
             if (searchTypeHandler == null) {
                 LOG.error("Unknown search type {} for elasticsearch backend, cannot generate query part. Skipping this search type.", type);
-                searchTypeQueryContext.addError(new SearchTypeError(query, searchType.id(), "Unknown search type '" + type + "' for elasticsearch backend, cannot generate query"));
+                queryContext.addError(new SearchTypeError(query, searchType.id(), "Unknown search type '" + type + "' for elasticsearch backend, cannot generate query"));
                 continue;
             }
 
-            searchTypeHandler.get().generateQueryPart(job, query, searchType, searchTypeQueryContext);
+            searchTypeHandler.get().generateQueryPart(job, query, searchType, queryContext);
         }
 
         return queryContext;
