@@ -37,10 +37,22 @@ public class GraylogBackend {
     private final MongoDBInstance mongodb;
     private final NodeInstance node;
 
+    private static GraylogBackend instance;
+
+    public static GraylogBackend createStarted() {
+        if (instance == null)
+            instance = createStartedBackend();
+        else
+            instance.fullReset();
+        LOG.info("Reusing running backend");
+
+        return instance;
+    }
+
     // Assuming that parallel start works, because
     // - mongodb and es are independent
     // - node will retry connections to mongodb and es until they are there
-    public static GraylogBackend createStarted() {
+    private static GraylogBackend createStartedBackend() {
         Network network = Network.newNetwork();
 
         ExecutorService executor = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder().setNameFormat("build-api-it-containers-%d").build());
