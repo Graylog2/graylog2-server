@@ -165,6 +165,7 @@ public class ESMessageListTest {
                 .id("amessagelist")
                 .limit(100)
                 .offset(0)
+                .streams(Collections.singleton("stream1"))
                 .sort(Collections.singletonList(Sort.create("somefield", SortOrder.ASC)))
                 .build();
     }
