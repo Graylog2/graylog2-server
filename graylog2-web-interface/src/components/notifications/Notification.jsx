@@ -19,7 +19,7 @@ const StyledAlert = styled(Alert)`
   }
 
   form {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
 `;
 

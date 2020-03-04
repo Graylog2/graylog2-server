@@ -55,10 +55,10 @@ const StyledTable = styled(Table)`
 
   tr.fields-row {
     cursor: pointer;
-  }
 
-  tr.fields-row td {
-    padding-top: 10px;
+    td {
+      padding-top: 10px;
+    }
   }
 
   tr.message-row td {
@@ -72,24 +72,24 @@ const StyledTable = styled(Table)`
   tr.message-row {
     margin-bottom: 5px;
     cursor: pointer;
-  }
 
-  tr.message-row .message-wrapper {
-    line-height: 1.5em;
-    white-space: pre-line;
-    max-height: 6em; /* show 4 lines: line-height * 4 */
-    overflow: hidden;
-  }
+    .message-wrapper {
+      line-height: 1.5em;
+      white-space: pre-line;
+      max-height: 6em; /* show 4 lines: line-height * 4 */
+      overflow: hidden;
 
-  tr.message-row .message-wrapper:after {
-    content: "";
-    text-align: right;
-    position: absolute;
-    width: 99%;
-    left: 5px;
-    top: 4.5em;
-    height: 1.5em;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
+      &::after {
+        content: "";
+        text-align: right;
+        position: absolute;
+        width: 99%;
+        left: 5px;
+        top: 4.5em;
+        height: 1.5em;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
+      }
+    }
   }
 
   tr.message-detail-row {

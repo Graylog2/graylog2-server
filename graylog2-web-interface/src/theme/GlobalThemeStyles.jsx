@@ -1381,7 +1381,7 @@ const GlobalThemeStyles = createGlobalStyle`
 
   .pill {
     color: #333;
-    background-color: #E3E5E5;
+    background-color: #e3e5e5;
     padding: 6px 12px;
   }
 

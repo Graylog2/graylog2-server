@@ -13,7 +13,7 @@ const { NotificationsActions, NotificationsStore } = CombinedProvider.get('Notif
 
 const StyledInactiveNavItem = styled(InactiveNavItem)`
   a:hover {
-    border: 0px;
+    border: 0;
     text-decoration: none;
   }
 `;
