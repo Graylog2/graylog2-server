@@ -16,35 +16,35 @@ const _permissionPredicate = (permissionSet, p) => {
   return (permissionSet.indexOf(`${p}:*`) > -1);
 };
 
-const PermissionsMixin = {
-  isPermitted(possessedPermissions, requiredPermissions) {
-    if (!requiredPermissions || requiredPermissions.length === 0) {
-      return true;
-    }
-    if (!possessedPermissions) {
-      return false;
-    }
-    if (_isWildCard(possessedPermissions)) {
-      return true;
-    }
-    if (requiredPermissions.every) {
-      return requiredPermissions.every(p => _permissionPredicate(possessedPermissions, p));
-    }
-    return _permissionPredicate(possessedPermissions, requiredPermissions);
-  },
-
-  isAnyPermitted(possessedPermissions, requiredPermissions) {
-    if (!requiredPermissions || requiredPermissions.length === 0) {
-      return true;
-    }
-    if (!possessedPermissions) {
-      return false;
-    }
-    if (_isWildCard(possessedPermissions)) {
-      return true;
-    }
-    return requiredPermissions.some(p => _permissionPredicate(possessedPermissions, p));
-  },
+export const isPermitted = (possessedPermissions, requiredPermissions) => {
+  if (!requiredPermissions || requiredPermissions.length === 0) {
+    return true;
+  }
+  if (!possessedPermissions) {
+    return false;
+  }
+  if (_isWildCard(possessedPermissions)) {
+    return true;
+  }
+  if (requiredPermissions.every) {
+    return requiredPermissions.every(p => _permissionPredicate(possessedPermissions, p));
+  }
+  return _permissionPredicate(possessedPermissions, requiredPermissions);
 };
+
+export const isAnyPermitted = (possessedPermissions, requiredPermissions) => {
+  if (!requiredPermissions || requiredPermissions.length === 0) {
+    return true;
+  }
+  if (!possessedPermissions) {
+    return false;
+  }
+  if (_isWildCard(possessedPermissions)) {
+    return true;
+  }
+  return requiredPermissions.some(p => _permissionPredicate(possessedPermissions, p));
+};
+
+const PermissionsMixin = { isPermitted, isAnyPermitted };
 
 export default PermissionsMixin;
