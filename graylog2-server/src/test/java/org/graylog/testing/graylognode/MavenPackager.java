@@ -31,6 +31,19 @@ public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
     private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build";
 
+    static void packageJarIfNecessary(String projectDir) {
+        if (!isRunFromMaven()) {
+            LOG.info("Running from outside Maven. Packaging server jar now...");
+            MavenPackager.packageJar(projectDir);
+        } else {
+            LOG.info("Running from Maven. Assuming jars are current.");
+        }
+    }
+
+    private static boolean isRunFromMaven() {
+        return System.getProperty("surefire.test.class.path") != null;
+    }
+
     static void packageJar(String pomDir) {
 
         Process p = startProcess(pomDir);

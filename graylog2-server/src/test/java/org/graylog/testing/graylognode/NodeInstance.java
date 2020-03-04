@@ -57,8 +57,7 @@ public class NodeInstance {
     }
 
     private GenericContainer buildContainer(Network network, String mongoDbUri, String elasticsearchUri) {
-
-        packageServerIfExecutedFromIntellij();
+        MavenPackager.packageJarIfNecessary(property("server_project_dir"));
 
         File entrypointScript = resourceFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
 
@@ -88,19 +87,6 @@ public class NodeInstance {
                 .waitingFor(Wait.forHttp("/api"));
     }
 
-    private void packageServerIfExecutedFromIntellij() {
-        if (isRunFromIntellij()) {
-            LOG.info("Running from Intellij. Packaging server jar now...");
-            MavenPackager.packageJar(property("project_dir") + "/..");
-        }
-    }
-
-    //It would be more robust to detect whether tests are executed from within maven and skip if yes
-    private boolean isRunFromIntellij() {
-        String classPath = System.getProperty("java.class.path");
-        return classPath != null && classPath.split(":")[0].endsWith("idea_rt.jar");
-    }
-
     // workaround for testcontainers which only allows passing permissions if you pass a `File`
     private File resourceFile(@SuppressWarnings("SameParameterValue") String resourceName) {
 
@@ -124,7 +110,7 @@ public class NodeInstance {
         return Paths.get(property(propertyName));
     }
 
-    private String property(String propertyName) {
+    private static String property(String propertyName) {
         return PropertyLoader.get("api-it-tests.properties", propertyName);
     }
 
