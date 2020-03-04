@@ -200,7 +200,7 @@ export default {
     },
     {
       type: 'aggregate',
-      title: 'Aggregate',
+      title: 'Show top values',
       handler: AggregateActionHandler,
       isEnabled: (({ field, type }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated()): ActionHandlerCondition),
     },
