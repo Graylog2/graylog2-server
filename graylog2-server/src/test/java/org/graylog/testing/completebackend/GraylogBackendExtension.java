@@ -17,7 +17,6 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
-import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -32,16 +31,19 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
 
-public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCallback, AfterAllCallback, ParameterResolver {
+public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCallback, ParameterResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackendExtension.class);
     private static final Namespace NAMESPACE = Namespace.create(GraylogBackendExtension.class);
 
     private GraylogBackend backend;
+    private Lifecycle lifecycle;
 
     @Override
     public void beforeAll(ExtensionContext context) {
         Stopwatch sw = Stopwatch.createStarted();
+
+        lifecycle = Lifecycle.from(context);
 
         backend = GraylogBackend.createStarted();
 
@@ -49,17 +51,12 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
         sw.stop();
 
-        LOG.info("Containers started after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
-    }
-
-    @Override
-    public void afterAll(ExtensionContext context) {
-        backend.shutDown();
+        LOG.info("Backend started after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
     }
 
     @Override
     public void afterEach(ExtensionContext context) {
-        backend.purgeData();
+        lifecycle.afterEach(backend);
     }
 
     @Override

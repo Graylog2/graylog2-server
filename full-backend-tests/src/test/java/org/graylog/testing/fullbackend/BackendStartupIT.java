@@ -28,9 +28,10 @@ import java.util.List;
 import static com.jayway.restassured.RestAssured.when;
 import static com.jayway.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
 
-@ApiIntegrationTest
+@ApiIntegrationTest(serverLifecycle = CLASS)
 class BackendStartupIT {
 
     private final GraylogBackend sut;

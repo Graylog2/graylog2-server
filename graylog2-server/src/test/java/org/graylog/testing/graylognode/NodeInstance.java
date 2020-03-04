@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.graylognode;
 
+import com.google.common.base.Stopwatch;
 import org.apache.commons.io.FileUtils;
 import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class NodeInstance {
 
@@ -119,8 +121,12 @@ public class NodeInstance {
         return PropertyLoader.get("api-it-tests.properties", propertyName);
     }
 
-    public void stop() {
+    public void restart() {
+        Stopwatch sw = Stopwatch.createStarted();
         container.stop();
+        container.start();
+        sw.stop();
+        LOG.info("Restarted node container in " + sw.elapsed(TimeUnit.SECONDS));
     }
 
     public String getApiAddress() {

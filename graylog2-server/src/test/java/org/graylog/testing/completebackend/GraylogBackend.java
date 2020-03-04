@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 public class GraylogBackend {
+
     private static final Logger LOG = LoggerFactory.getLogger(GraylogBackend.class);
     private final ElasticsearchInstance es;
     private final MongoDBInstance mongodb;
@@ -70,13 +71,14 @@ public class GraylogBackend {
         this.node = node;
     }
 
-    public void shutDown() {
-        node.stop();
-    }
-
     public void purgeData() {
         mongodb.dropDatabase();
         es.cleanUp();
+    }
+
+    public void fullReset() {
+        purgeData();
+        node.restart();
     }
 
     public String apiAddress() {
