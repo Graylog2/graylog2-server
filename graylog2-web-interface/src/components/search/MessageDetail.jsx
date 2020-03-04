@@ -85,49 +85,42 @@ class MessageDetail extends React.Component {
     });
 
     // Legacy
-    let viaRadio = message.source_radio_id;
-    if (viaRadio) {
-      viaRadio = (
+    const viaRadio = message.source_radio_id
+      ? (
         <span>
           via <em>{this._inputName(message.source_radio_input_id)}</em> on
           radio {this._nodeName(message.source_radio_id)}
         </span>
-      );
-    }
+      )
+      : null;
 
-    let timestamp = [];
     const rawTimestamp = message.fields.timestamp;
+    const timestamp = [
+      <dt key={`dt-${rawTimestamp}`}>Timestamp</dt>,
+      <dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>,
+    ];
 
-    timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
-    timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
-
-    let receivedBy;
-    if (message.source_input_id && message.source_node_id && nodes) {
-      receivedBy = (
+    const receivedBy = message.source_input_id && message.source_node_id && nodes
+      ? (
         <div>
           <dt>Received by</dt>
           <dd>
             <em>{this._inputName(message.source_input_id)}</em>{' '}
             on {this._nodeName(message.source_node_id)}
-            { viaRadio && <br /> }
+            {viaRadio && <br />}
             {viaRadio}
           </dd>
         </div>
-      );
-    } else {
-      receivedBy = null;
-    }
+      )
+      : null;
 
-    let messageTitle;
-    if (message.index) {
-      messageTitle = (
+    const messageTitle = message.index
+      ? (
         <Link to={Routes.message_show(message.index, message.id)}>
           {message.id}
         </Link>
-      );
-    } else {
-      messageTitle = <span>{message.id} <Label bsStyle="warning">Not stored</Label></span>;
-    }
+      )
+      : <span>{message.id} <Label bsStyle="warning">Not stored</Label></span>;
 
     return (
       <div>
