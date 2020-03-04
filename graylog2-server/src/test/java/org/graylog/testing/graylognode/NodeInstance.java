@@ -17,7 +17,6 @@
 package org.graylog.testing.graylognode;
 
 import com.google.common.base.Stopwatch;
-import org.apache.commons.io.FileUtils;
 import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +27,12 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static org.graylog.testing.graylognode.ResourceUtil.resourceToTmpFile;
 
 public class NodeInstance {
 
@@ -44,7 +42,7 @@ public class NodeInstance {
     private static final int EXECUTABLE_MODE = 0100755;
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
-    private final GenericContainer container;
+    private final GenericContainer<?> container;
 
     public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri) {
         NodeInstance instance = new NodeInstance(network, mongoDbUri, elasticsearchUri);
@@ -56,19 +54,28 @@ public class NodeInstance {
         this.container = buildContainer(network, mongoDbUri, elasticsearchUri);
     }
 
-    private GenericContainer buildContainer(Network network, String mongoDbUri, String elasticsearchUri) {
+    private GenericContainer<?> buildContainer(Network network, String mongoDbUri, String elasticsearchUri) {
         MavenPackager.packageJarIfNecessary(property("server_project_dir"));
 
-        File entrypointScript = resourceFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
+        ImageFromDockerfile image = createImage();
 
-        final ImageFromDockerfile image = new ImageFromDockerfile()
+        return createRunningContainer(network, mongoDbUri, elasticsearchUri, image);
+    }
+
+    private ImageFromDockerfile createImage() {
+        // testcontainers only allows passing permissions if you pass a `File`
+        File entrypointScript = resourceToTmpFile("org/graylog/testing/graylognode/docker-entrypoint.sh");
+
+        return new ImageFromDockerfile()
                 .withFileFromClasspath("Dockerfile", "org/graylog/testing/graylognode/Dockerfile")
                 // set mode here explicitly, because file system permissions can get lost when executing from maven
                 .withFileFromFile("docker-entrypoint.sh", entrypointScript, EXECUTABLE_MODE)
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
                 .withFileFromClasspath("log4j2.xml", "log4j2.xml")
                 .withFileFromPath("sigar", pathTo("sigar_dir"));
+    }
 
+    private GenericContainer<?> createRunningContainer(Network network, String mongoDbUri, String elasticsearchUri, ImageFromDockerfile image) {
         String graylogHome = "/usr/share/graylog";
 
         return new GenericContainer<>(image)
@@ -85,25 +92,6 @@ public class NodeInstance {
                 .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:9000")
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
                 .waitingFor(Wait.forHttp("/api"));
-    }
-
-    // workaround for testcontainers which only allows passing permissions if you pass a `File`
-    private File resourceFile(@SuppressWarnings("SameParameterValue") String resourceName) {
-
-        InputStream resource = this.getClass().getClassLoader().getResourceAsStream(resourceName);
-
-        if (resource == null)
-            throw new RuntimeException("Couldn't load resource " + resourceName);
-
-        File f = new File("/tmp/" + UUID.randomUUID().toString() + "-" + Paths.get(resourceName).getFileName());
-
-        try {
-            FileUtils.copyInputStreamToFile(resource, f);
-        } catch (IOException e) {
-            throw new RuntimeException("Error copying resource to file: " + resourceName);
-        }
-
-        return f;
     }
 
     private Path pathTo(String propertyName) {
