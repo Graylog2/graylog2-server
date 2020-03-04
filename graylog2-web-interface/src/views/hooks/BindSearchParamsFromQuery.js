@@ -4,7 +4,7 @@ import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
-import { createElasticsearchQueryString } from '../logic/queries/Query';
+import { createElasticsearchQueryString, filtersForQuery } from '../logic/queries/Query';
 
 const _getTimerange = (query = {}) => {
   const type = query.rangetype || DEFAULT_RANGE_TYPE;
@@ -27,14 +27,25 @@ const _getTimerange = (query = {}) => {
   }
 };
 
+const _getStreams = (query = {}): Array<string> => {
+  const rawStreams = query.streams;
+  if (rawStreams === undefined || rawStreams === null) {
+    return [];
+  }
+  return String(rawStreams).split(',')
+    .map(stream => stream.trim())
+    .filter(stream => (stream !== ''));
+};
+
 const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   if (view.type !== View.Type.Search) {
     return Promise.resolve(true);
   }
   const { q: queryString } = query;
   const timerange = _getTimerange(query);
+  const streams = filtersForQuery(_getStreams(query));
 
-  if (!queryString && !timerange) {
+  if (!queryString && !timerange && !streams) {
     return Promise.resolve(true);
   }
 
@@ -49,6 +60,9 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   }
   if (timerange) {
     queryBuilder = queryBuilder.timerange(timerange);
+  }
+  if (streams) {
+    queryBuilder = queryBuilder.filter(streams);
   }
 
   return QueriesActions.update(firstQuery.id, queryBuilder.build())
