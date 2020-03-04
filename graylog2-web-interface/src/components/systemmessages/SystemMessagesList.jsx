@@ -20,7 +20,7 @@ const TimestampTH = styled.th`
 
 const SystemMessagesList = ({ messages }) => {
   return (
-    <SystemMessagesTable className="system-messages" striped hover condensed>
+    <SystemMessagesTable striped hover condensed>
       <thead>
         <tr>
           <TimestampTH>Timestamp</TimestampTH>

@@ -164,22 +164,6 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-top: 5px;
   }
 
-  .system-messages {
-    font-size: 12px;
-  }
-
-  .notification {
-    margin-top: 10px !important;
-  }
-
-  .notification i {
-    color: #000;
-  }
-
-  .notification form {
-    margin-bottom: 0;
-  }
-
   .selected-resolution {
     font-weight: bold;
   }
@@ -188,24 +172,12 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-bottom: 0;
   }
 
-  .input-list h2 {
-    margin-bottom: 5px;
-  }
-
-  .input-list .alert {
-    margin-top: 10px;
-  }
-
   .input-new {
     margin-bottom: 8px;
   }
 
   .alert-bar {
     margin: 10px -20px 0;
-  }
-
-  .system-messages a {
-    color: #000;
   }
 
   .xtrc-new-example {
@@ -326,20 +298,6 @@ const GlobalThemeStyles = createGlobalStyle`
     width: 10px;
     height: 10px;
     margin: 0 4px 0 0;
-  }
-
-  .input-list .static-fields {
-    margin-top: 10px;
-    margin-left: 3px;
-  }
-
-  .input-list .static-fields ul {
-    margin: 0;
-    padding: 0;
-  }
-
-  .input-list .static-fields ul .remove-static-field {
-    margin-left: 5px;
   }
 
   #field-graphs .spinner {
@@ -747,21 +705,6 @@ const GlobalThemeStyles = createGlobalStyle`
     color: #a94442;
     padding-left: 2px;
     padding-right: 2px;
-  }
-
-  .messages th i.sort-order-desc {
-    position: relative;
-    top: -1px;
-  }
-
-  .messages th i.sort-order-item {
-    margin-right: 2px;
-    color: #222; /* same color as .messsages th cannot display: none it because it would push the table columns out on hover :( */
-  }
-
-  .messages th i.sort-order-active,
-  .messages th:hover i.sort-order-item {
-    color: #fff;
   }
 
   .add-alert-type {
@@ -1370,10 +1313,6 @@ const GlobalThemeStyles = createGlobalStyle`
 
   .threaddump {
     font-size: 11px;
-  }
-
-  .modal-body .form-group {
-    margin-bottom: 5px;
   }
 
   h2.extractor-title {
