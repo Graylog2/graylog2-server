@@ -46,7 +46,7 @@ describe('DrilldownContextProvider', () => {
       <DrilldownContextProvider widget={widget}>
         <TestComponent />
       </DrilldownContextProvider>
-    </ViewTypeContext.Provider>
+    </ViewTypeContext.Provider>,
   );
   describe('if current view is a dashboard', () => {
     it('passes current query, streams & timerange of widget if global override is not set', () => {
