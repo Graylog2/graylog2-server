@@ -1,18 +1,15 @@
 // @flow strict
 import * as React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
-import * as Immutable from 'immutable';
 import Qs from 'qs';
 import moment from 'moment';
 import naturalSort from 'javascript-natural-sort';
 
 import Routes from 'routing/Routes';
-import connect from 'stores/connect';
 import { DropdownButton, MenuItem } from 'components/graylog';
 import { addToQuery, escape } from 'views/logic/queries/QueryHelper';
-import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import type { FilterType } from 'views/logic/queries/Query';
-import { filtersToStreamSet } from 'views/logic/queries/Query';
+import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import type { SearchesConfig } from './SearchConfig';
 
 const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }) => Object.entries(surroundingTimerangeOptions)
@@ -58,12 +55,11 @@ type Props = {
   timestamp: string,
   id: string,
   messageFields: { [string]: mixed },
-  queryFilters: ?FilterType,
 };
 
-const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields, queryFilters }: Props) => {
+const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }: Props) => {
+  const { streams } = useContext(DrilldownContext);
   const timeRangeOptions = buildTimeRangeOptions(searchConfig);
-  const streams = filtersToStreamSet(queryFilters).toJS();
   const menuItems = Object.keys(timeRangeOptions)
     .sort((a, b) => naturalSort(a, b))
     .map(range => (
@@ -86,8 +82,4 @@ SurroundingSearchButton.propTypes = {
   messageFields: PropTypes.object.isRequired,
 };
 
-export default connect(
-  SurroundingSearchButton,
-  { queryFilters: QueryFiltersStore },
-  ({ queryFilters = Immutable.Map() }) => ({ queryFilters: queryFilters.first() }),
-);
+export default SurroundingSearchButton;

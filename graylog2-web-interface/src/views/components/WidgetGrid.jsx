@@ -16,6 +16,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
+import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 
 const defaultTitleGenerator = w => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
@@ -91,23 +92,25 @@ class WidgetGrid extends React.Component {
 
       returnedWidgets.widgets.push(
         <div key={widget.id} className={style.widgetContainer}>
-          <WidgetContext.Provider value={widget}>
-            <AdditionalContext.Provider value={{ widget }}>
-              <Widget key={widgetId}
-                      id={widgetId}
-                      widget={widget}
-                      data={widgetData}
-                      errors={widgetErrors}
-                      height={height}
-                      position={returnedWidgets.positions[widgetId]}
-                      width={width}
-                      allFields={allFields}
-                      fields={fields}
-                      onPositionsChange={onPositionsChange}
-                      onSizeChange={this._onWidgetSizeChange}
-                      title={widgetTitle} />
-            </AdditionalContext.Provider>
-          </WidgetContext.Provider>
+          <DrilldownContextProvider widget={widget}>
+            <WidgetContext.Provider value={widget}>
+              <AdditionalContext.Provider value={{ widget }}>
+                <Widget key={widgetId}
+                        id={widgetId}
+                        widget={widget}
+                        data={widgetData}
+                        errors={widgetErrors}
+                        height={height}
+                        position={returnedWidgets.positions[widgetId]}
+                        width={width}
+                        allFields={allFields}
+                        fields={fields}
+                        onPositionsChange={onPositionsChange}
+                        onSizeChange={this._onWidgetSizeChange}
+                        title={widgetTitle} />
+              </AdditionalContext.Provider>
+            </WidgetContext.Provider>
+          </DrilldownContextProvider>
         </div>,
       );
     });
