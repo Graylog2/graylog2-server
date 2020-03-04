@@ -4,18 +4,6 @@ import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
-
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
-import { DecoratedMessageFieldMarker } from 'components/search';
-import DecorationStats from 'logic/message/DecorationStats';
-import MessageFieldSearchActions from './MessageFieldSearchActions';
-
-const SearchStore = StoreProvider.getStore('Search');
-// eslint-disable-next-line no-unused-vars
-const MessagesStore = StoreProvider.getStore('Messages');
-const MessagesActions = ActionsProvider.getActions('Messages');
-
 const MessageTerms = styled.span`
   margin-right: 8px;
   font-family: monospace;
@@ -27,32 +15,19 @@ class MessageFieldDescription extends React.Component {
     fieldName: PropTypes.string.isRequired,
     fieldValue: PropTypes.any.isRequired,
     renderForDisplay: PropTypes.func.isRequired,
-    disableFieldActions: PropTypes.bool,
     customFieldActions: PropTypes.node,
+  };
+
+  static defaultProps = {
+    customFieldActions: undefined,
   };
 
   state = {
     messageTerms: Immutable.List(),
   };
 
-  loadTerms = (field) => {
-    return () => {
-      const promise = MessagesActions.fieldTerms.triggerPromise(this.props.message.index, this.props.message.fields[field]);
-      promise.then(terms => this._onTermsLoaded(terms));
-    };
-  };
-
-  _onTermsLoaded = (terms) => {
-    this.setState({ messageTerms: Immutable.fromJS(terms) });
-  };
-
   _shouldShowTerms = () => {
     return this.state.messageTerms.size !== 0;
-  };
-
-  addFieldToSearchBar = (event) => {
-    event.preventDefault();
-    SearchStore.addSearchTerm(this.props.fieldName, this.props.fieldValue);
   };
 
   _getFormattedTerms = () => {
@@ -65,29 +40,13 @@ class MessageFieldDescription extends React.Component {
   };
 
   _getFormattedFieldActions = () => {
-    if (this.props.disableFieldActions) {
-      return null;
-    }
-
-    let fieldActions;
-    if (this.props.customFieldActions) {
-      fieldActions = React.cloneElement(this.props.customFieldActions, { fieldName: this.props.fieldName, message: this.props.message });
-    } else {
-      fieldActions = (
-        <MessageFieldSearchActions fieldName={this.props.fieldName}
-                                   message={this.props.message}
-                                   onAddFieldToSearchBar={this.addFieldToSearchBar}
-                                   onLoadTerms={this.loadTerms} />
-      );
-    }
-
-    return fieldActions;
+    const { customFieldActions, fieldName, message } = this.props;
+    return customFieldActions ? React.cloneElement(customFieldActions, { fieldName, message }) : null;
   };
 
   render() {
     const { fieldName } = this.props;
     const className = fieldName === 'message' || fieldName === 'full_message' ? 'message-field' : '';
-    const isDecorated = DecorationStats.isFieldDecorated(this.props.message, fieldName);
 
     return (
       <dd className={className} key={`${fieldName}dd`}>
@@ -100,7 +59,6 @@ class MessageFieldDescription extends React.Component {
         </Alert>
         )
         }
-        {isDecorated && <DecoratedMessageFieldMarker />}
       </dd>
     );
   }

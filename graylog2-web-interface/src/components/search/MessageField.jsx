@@ -11,7 +11,6 @@ const MessageField = createReactClass({
 
   propTypes: {
     customFieldActions: PropTypes.node,
-    disableFieldActions: PropTypes.bool,
     fieldName: PropTypes.string.isRequired,
     message: PropTypes.object.isRequired,
     renderForDisplay: PropTypes.func.isRequired,
@@ -36,7 +35,6 @@ const MessageField = createReactClass({
                                  fieldName={key}
                                  fieldValue={innerValue}
                                  renderForDisplay={this.props.renderForDisplay}
-                                 disableFieldActions={DecorationStats.isFieldAddedByDecorator(message, key) || this.props.disableFieldActions}
                                  customFieldActions={this.props.customFieldActions} />
       </span>
     );

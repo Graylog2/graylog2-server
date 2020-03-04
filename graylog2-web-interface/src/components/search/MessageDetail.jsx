@@ -14,7 +14,6 @@ import Routes from 'routing/Routes';
 
 class MessageDetail extends React.Component {
   static propTypes = {
-    disableFieldActions: PropTypes.bool,
     renderForDisplay: PropTypes.func,
     inputs: PropTypes.object,
     nodes: PropTypes.object,
@@ -174,7 +173,6 @@ class MessageDetail extends React.Component {
             <div>
               <MessageFields message={this.props.message}
                              renderForDisplay={this.props.renderForDisplay}
-                             disableFieldActions={this.props.disableFieldActions}
                              customFieldActions={this.props.customFieldActions}
                              showDecoration={this.state.showOriginal} />
             </div>
