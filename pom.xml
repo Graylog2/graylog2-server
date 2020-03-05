@@ -139,7 +139,7 @@
         <pkts.version>3.0.5</pkts.version>
         <protobuf.version>3.6.1</protobuf.version>
         <reflections.version>0.9.12</reflections.version>
-        <retrofit.version>2.7.1</retrofit.version>
+        <retrofit.version>2.7.2</retrofit.version>
         <scala.version>2.11.8</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.5.1</shiro.version>
