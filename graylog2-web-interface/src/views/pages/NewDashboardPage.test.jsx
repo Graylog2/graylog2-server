@@ -27,14 +27,11 @@ describe('NewDashboardPage', () => {
     jest.clearAllMocks();
   });
 
-  it('should render minimal', async () => {
+  it('should render minimal and show loading spinner initially', async () => {
     const { getByText } = render(<SimpleNewDashboardPage />);
-    await waitForElement(() => getByText('Extended search page'));
-  });
 
-  it('should show spinner while loading dashboard', () => {
-    const { getByText } = render(<SimpleNewDashboardPage />);
     expect(getByText('Loading...')).not.toBeNull();
+    await waitForElement(() => getByText('Extended search page'));
   });
 
   it('should create new view with type dashboard on mount', async () => {
