@@ -4,9 +4,8 @@ import styled from 'styled-components';
 import { util } from 'theme';
 
 import { Badge, Button } from 'components/graylog';
-import { Icon } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { ColorPickerPopover, IfPermitted } from 'components/common';
+import { ColorPickerPopover, IfPermitted, Icon } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
 import StringUtils from 'util/StringUtils';
