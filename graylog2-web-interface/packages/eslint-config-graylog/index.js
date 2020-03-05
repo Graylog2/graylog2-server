@@ -38,6 +38,7 @@ module.exports = {
     'react/jsx-first-prop-new-line': ['warn', 'never'],
     'react/jsx-indent-props': ['error', 'first'],
     'react/jsx-one-expression-per-line': 'off',
+    'react/jsx-props-no-spreading': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
   },
