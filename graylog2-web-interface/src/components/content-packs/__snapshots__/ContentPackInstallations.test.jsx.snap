@@ -370,7 +370,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Modal-nuree8-0",
                                         "isStatic": false,
-                                        "lastClassName": "cHlGak",
+                                        "lastClassName": "bmCcvm",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -395,7 +395,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     backdrop="static"
                                     bsClass="modal"
                                     bsSize="large"
-                                    className="Modal-nuree8-0 cHlGak"
+                                    className="Modal-nuree8-0 bmCcvm"
                                     dialogComponentClass={[Function]}
                                     enforceFocus={true}
                                     keyboard={true}

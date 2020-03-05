@@ -56,7 +56,7 @@ const ThreadDumpPage = createReactClass({
           <PageHeader title={title}>
             <span />
           </PageHeader>
-          <Row className="content input-list">
+          <Row className="content">
             <Col md={12}>
               {threadDump}
             </Col>

@@ -1,10 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Alert } from 'components/graylog';
 import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
+
+const ESClusterStatus = styled(Alert)`
+  margin-top: 10px;
+  margin-bottom: 5px;
+`;
 
 class IndexerClusterHealthSummary extends React.Component {
   static propTypes = {
@@ -42,7 +48,7 @@ class IndexerClusterHealthSummary extends React.Component {
   render() {
     const { health } = this.props;
     return (
-      <Alert bsStyle={this._alertClassForHealth(health)} className="es-cluster-status">
+      <ESClusterStatus bsStyle={this._alertClassForHealth(health)}>
         <Icon name={this._iconNameForHealth(health)} /> &nbsp;{this._formatTextForHealth(health)}{' '}
         Shards:{' '}
         {health.shards.active} active,{' '}
@@ -50,7 +56,7 @@ class IndexerClusterHealthSummary extends React.Component {
         {health.shards.relocating} relocating,{' '}
         {health.shards.unassigned} unassigned,{' '}
         <DocumentationLink page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED} text="What does this mean?" />
-      </Alert>
+      </ESClusterStatus>
     );
   }
 }

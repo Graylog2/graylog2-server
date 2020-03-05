@@ -12,6 +12,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import DataTableEntry from './DataTableEntry';
+import MessagesTable from './MessagesTable';
 
 import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
@@ -100,20 +101,18 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   return (
     <div className={styles.container}>
       <div className={styles.scrollContainer}>
-        <div className="messages-container">
-          <table className="table table-condensed messages">
-            <thead>
-              <Headers activeQuery={currentView.activeQuery}
-                       actualColumnPivotFields={actualColumnPivotFields}
-                       columnPivots={columnPivots}
-                       fields={fields}
-                       rollup={rollup}
-                       rowPivots={rowPivots}
-                       series={series} />
-            </thead>
-            {formattedRows}
-          </table>
-        </div>
+        <MessagesTable>
+          <thead>
+            <Headers activeQuery={currentView.activeQuery}
+                     actualColumnPivotFields={actualColumnPivotFields}
+                     columnPivots={columnPivots}
+                     fields={fields}
+                     rollup={rollup}
+                     rowPivots={rowPivots}
+                     series={series} />
+          </thead>
+          {formattedRows}
+        </MessagesTable>
       </div>
     </div>
   );

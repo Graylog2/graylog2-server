@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import styled from 'styled-components';
+
 import { Row, Col } from 'components/graylog';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
@@ -19,6 +21,30 @@ const InputTypesActions = ActionsProvider.getActions('InputTypes');
 
 const InputsStore = StoreProvider.getStore('Inputs');
 const SingleNodeStore = StoreProvider.getStore('SingleNode');
+
+const InputListRow = styled(Row)`
+  h2 {
+    margin-bottom: 5px;
+  }
+
+  .alert {
+    margin-top: 10px;
+  }
+
+  .static-fields {
+    margin-top: 10px;
+    margin-left: 3px;
+
+    ul {
+      margin: 0;
+      padding: 0;
+
+      .remove-static-field {
+        margin-left: 5px;
+      }
+    }
+  }
+`;
 
 const InputsList = createReactClass({
   displayName: 'InputsList',
@@ -147,7 +173,7 @@ const InputsList = createReactClass({
         )
         }
 
-        <Row id="filter-input" className="content input-list">
+        <InputListRow id="filter-input" className="content">
           <Col md={12}>
             <SearchForm onSearch={this._onFilterInputs}
                         topMargin={0}
@@ -176,7 +202,7 @@ const InputsList = createReactClass({
                           : 'No local inputs match the filter'}
                         items={this.state.filteredLocalInputs.map(input => this._formatInput(input))} />
           </Col>
-        </Row>
+        </InputListRow>
       </div>
     );
   },
