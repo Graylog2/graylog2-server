@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import AppConfig from 'util/AppConfig';
@@ -19,11 +20,14 @@ const HeaderBadge = ({ configuration }) => {
   const badgeEnabled = config && config.badge_enable;
 
   if (badgeEnabled) {
-    return (<Badge className="dev-badge" style={{ backgroundColor: config.badge_color }}>{config.badge_text}</Badge>);
+    const StyledBadge = styled(Badge)`
+      background-color: ${config.badge_color}
+    `;
+    return (<StyledBadge className="dev-badge">{config.badge_text}</StyledBadge>);
   }
 
   return AppConfig.gl2DevMode()
-    ? <Badge className={`dev-badge danger`}>DEV</Badge>
+    ? <Badge className="dev-badge" bsStyle="danger">DEV</Badge>
     : null;
 };
 
