@@ -53,8 +53,15 @@ public class ElasticsearchBackendTest {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
 
+        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         final QueryStringParser queryStringParser = new QueryStringParser();
-        backend = new ElasticsearchBackend(handlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake());
+        backend = new ElasticsearchBackend(handlers,
+                queryStringParser,
+                null,
+                mock(IndexRangeService.class),
+                mock(StreamService.class),
+                new ESQueryDecorators.Fake(),
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup));
     }
 
     @Test
