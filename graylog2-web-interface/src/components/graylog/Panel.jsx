@@ -90,6 +90,7 @@ const deprecatedVariantStyles = hex => css(({ theme }) => {
       + .panel-collapse > .panel-body {
         border-top-color: ${borderColor};
       }
+
       .badge {
         color: ${backgroundColor};
         background-color: ${hex};

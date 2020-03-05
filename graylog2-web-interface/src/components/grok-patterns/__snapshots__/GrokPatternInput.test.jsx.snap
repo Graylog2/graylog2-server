@@ -170,7 +170,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                   "componentStyle": ComponentStyle {
                                     "componentId": "FormControl-sc-1amoaox-0",
                                     "isStatic": false,
-                                    "lastClassName": "gvyprk",
+                                    "lastClassName": "igyPGR",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -198,7 +198,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 gvyprk"
+                                className="FormControl-sc-1amoaox-0 igyPGR"
                                 componentClass="textarea"
                                 inputRef={[Function]}
                                 label="Pattern"
@@ -211,7 +211,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                 value=""
                               >
                                 <textarea
-                                  className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                  className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                   id="pattern-input"
                                   label="Pattern"
                                   name="pattern-input"
@@ -418,7 +418,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                   "componentStyle": ComponentStyle {
                                     "componentId": "FormControl-sc-1amoaox-0",
                                     "isStatic": false,
-                                    "lastClassName": "gvyprk",
+                                    "lastClassName": "igyPGR",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -446,7 +446,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <FormControl
                                 autoComplete="off"
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 gvyprk"
+                                className="FormControl-sc-1amoaox-0 igyPGR"
                                 componentClass="input"
                                 inputRef={[Function]}
                                 label="Filter pattern"
@@ -459,7 +459,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               >
                                 <input
                                   autoComplete="off"
-                                  className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                  className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                   id="pattern-selector"
                                   label="Filter pattern"
                                   name="pattern-selector"
@@ -1119,7 +1119,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                   "componentStyle": ComponentStyle {
                                     "componentId": "FormControl-sc-1amoaox-0",
                                     "isStatic": false,
-                                    "lastClassName": "gvyprk",
+                                    "lastClassName": "igyPGR",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1147,7 +1147,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 gvyprk"
+                                className="FormControl-sc-1amoaox-0 igyPGR"
                                 componentClass="textarea"
                                 inputRef={[Function]}
                                 label="Pattern"
@@ -1160,7 +1160,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                 value=""
                               >
                                 <textarea
-                                  className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                  className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                   id="pattern-input"
                                   label="Pattern"
                                   name="pattern-input"
@@ -1367,7 +1367,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                   "componentStyle": ComponentStyle {
                                     "componentId": "FormControl-sc-1amoaox-0",
                                     "isStatic": false,
-                                    "lastClassName": "gvyprk",
+                                    "lastClassName": "igyPGR",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1395,7 +1395,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                               <FormControl
                                 autoComplete="off"
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 gvyprk"
+                                className="FormControl-sc-1amoaox-0 igyPGR"
                                 componentClass="input"
                                 inputRef={[Function]}
                                 label="Filter pattern"
@@ -1408,7 +1408,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                               >
                                 <input
                                   autoComplete="off"
-                                  className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                  className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                   id="pattern-selector"
                                   label="Filter pattern"
                                   name="pattern-selector"

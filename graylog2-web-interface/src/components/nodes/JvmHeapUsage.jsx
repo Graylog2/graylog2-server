@@ -4,7 +4,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled, { css } from 'styled-components';
-import { darken } from 'polished';
 
 import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
 import { Spinner } from 'components/common';

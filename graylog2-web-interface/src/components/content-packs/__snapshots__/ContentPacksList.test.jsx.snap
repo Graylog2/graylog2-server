@@ -424,7 +424,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "gvyprk",
+                                              "lastClassName": "igyPGR",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -448,7 +448,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 gvyprk"
+                                          className="FormControl-sc-1amoaox-0 igyPGR"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -457,7 +457,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                            className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
@@ -9292,7 +9292,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "gvyprk",
+                                              "lastClassName": "igyPGR",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -9316,7 +9316,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 gvyprk"
+                                          className="FormControl-sc-1amoaox-0 igyPGR"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -9325,7 +9325,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                            className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"

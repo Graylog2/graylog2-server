@@ -16,7 +16,8 @@ const FormControl = memo(styled(BootstrapFormControl)(({ theme }) => {
 
     &:focus {
       border-color: ${theme.color.variant.light.info};
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px ${transparentize(0.6, theme.color.variant.light.info)};
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+        0 0 8px ${transparentize(0.6, theme.color.variant.light.info)};
     }
 
     &[disabled],

@@ -463,7 +463,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           "componentStyle": ComponentStyle {
                                                                             "componentId": "FormControl-sc-1amoaox-0",
                                                                             "isStatic": false,
-                                                                            "lastClassName": "gvyprk",
+                                                                            "lastClassName": "igyPGR",
                                                                             "rules": Array [
                                                                               [Function],
                                                                             ],
@@ -487,7 +487,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                     >
                                                                       <FormControl
                                                                         bsClass="form-control"
-                                                                        className="FormControl-sc-1amoaox-0 gvyprk"
+                                                                        className="FormControl-sc-1amoaox-0 igyPGR"
                                                                         componentClass="input"
                                                                         inputRef={[Function]}
                                                                         label="Filter Streams"
@@ -496,7 +496,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         type="text"
                                                                       >
                                                                         <input
-                                                                          className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                                                          className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                                           id="filter-streams-data-filter"
                                                                           label="Filter Streams"
                                                                           name="filter-streams-data-filter"
@@ -1801,7 +1801,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           "componentStyle": ComponentStyle {
                                                                             "componentId": "FormControl-sc-1amoaox-0",
                                                                             "isStatic": false,
-                                                                            "lastClassName": "gvyprk",
+                                                                            "lastClassName": "igyPGR",
                                                                             "rules": Array [
                                                                               [Function],
                                                                             ],
@@ -1825,7 +1825,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                     >
                                                                       <FormControl
                                                                         bsClass="form-control"
-                                                                        className="FormControl-sc-1amoaox-0 gvyprk"
+                                                                        className="FormControl-sc-1amoaox-0 igyPGR"
                                                                         componentClass="input"
                                                                         inputRef={[Function]}
                                                                         label="Filter Dashboards"
@@ -1834,7 +1834,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         type="text"
                                                                       >
                                                                         <input
-                                                                          className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                                                          className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                                           id="filter-dashboards-data-filter"
                                                                           label="Filter Dashboards"
                                                                           name="filter-dashboards-data-filter"
@@ -3381,7 +3381,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           "componentStyle": ComponentStyle {
                                                                             "componentId": "FormControl-sc-1amoaox-0",
                                                                             "isStatic": false,
-                                                                            "lastClassName": "gvyprk",
+                                                                            "lastClassName": "igyPGR",
                                                                             "rules": Array [
                                                                               [Function],
                                                                             ],
@@ -3405,7 +3405,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                     >
                                                                       <FormControl
                                                                         bsClass="form-control"
-                                                                        className="FormControl-sc-1amoaox-0 gvyprk"
+                                                                        className="FormControl-sc-1amoaox-0 igyPGR"
                                                                         componentClass="input"
                                                                         inputRef={[Function]}
                                                                         label="Filter Streams"
@@ -3414,7 +3414,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         type="text"
                                                                       >
                                                                         <input
-                                                                          className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                                                          className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                                           id="filter-streams-data-filter"
                                                                           label="Filter Streams"
                                                                           name="filter-streams-data-filter"
@@ -4719,7 +4719,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           "componentStyle": ComponentStyle {
                                                                             "componentId": "FormControl-sc-1amoaox-0",
                                                                             "isStatic": false,
-                                                                            "lastClassName": "gvyprk",
+                                                                            "lastClassName": "igyPGR",
                                                                             "rules": Array [
                                                                               [Function],
                                                                             ],
@@ -4743,7 +4743,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                     >
                                                                       <FormControl
                                                                         bsClass="form-control"
-                                                                        className="FormControl-sc-1amoaox-0 gvyprk"
+                                                                        className="FormControl-sc-1amoaox-0 igyPGR"
                                                                         componentClass="input"
                                                                         inputRef={[Function]}
                                                                         label="Filter Dashboards"
@@ -4752,7 +4752,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         type="text"
                                                                       >
                                                                         <input
-                                                                          className="FormControl-sc-1amoaox-0 gvyprk form-control"
+                                                                          className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                                           id="filter-dashboards-data-filter"
                                                                           label="Filter Dashboards"
                                                                           name="filter-dashboards-data-filter"

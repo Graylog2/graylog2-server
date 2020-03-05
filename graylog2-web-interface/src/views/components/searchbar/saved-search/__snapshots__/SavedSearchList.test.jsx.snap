@@ -210,7 +210,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 gvyprk form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 igyPGR form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
