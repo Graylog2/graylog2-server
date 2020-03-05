@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-import {util} from 'theme';
+import { util } from 'theme';
 
 import { Badge, Button } from 'components/graylog';
 import { Icon } from 'components/common';
