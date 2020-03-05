@@ -147,12 +147,10 @@ public class HttpPollTransport extends ThrottleableTransport {
         serverEventBus.register(this);
 
         final Map<String, String> headers = parseHeaders(configuration.getString(CK_HEADERS));
-
         nextlink = configuration.getString(CK_URL);
 
         // figure out a reasonable remote address
         final String url = nextlink;
-        System.out.println("url" + url);
         final InetSocketAddress remoteAddress;
         InetSocketAddress remoteAddress1;
         try {
