@@ -40,7 +40,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                       "secondary": Object {
                         "due": "#F1F2F2",
                         "tre": "#DCE1E5",
-                        "uno": "#FF3B00",
+                        "uno": "#AD0707",
                       },
                       "tertiary": Object {
                         "cinque": "#FF6418",
@@ -481,7 +481,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                       "secondary": Object {
                         "due": "#F1F2F2",
                         "tre": "#DCE1E5",
-                        "uno": "#FF3B00",
+                        "uno": "#AD0707",
                       },
                       "tertiary": Object {
                         "cinque": "#FF6418",
@@ -999,7 +999,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                       "secondary": Object {
                         "due": "#F1F2F2",
                         "tre": "#DCE1E5",
-                        "uno": "#FF3B00",
+                        "uno": "#AD0707",
                       },
                       "tertiary": Object {
                         "cinque": "#FF6418",
