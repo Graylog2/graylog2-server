@@ -7,7 +7,6 @@ export type MessageSortConifgJson = {
   order: 'ASC' | 'DESC',
 };
 
-
 export default class MessageSortConifg {
   _value: SortConfig
 
