@@ -242,30 +242,31 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       </StyledComponent>
     </Button>
   </ForwardRef>
-  <Table
+  <UrlWhiteListForm__StyledTable
     bordered={true}
-    className="top-margin"
     striped={true}
   >
     <StyledComponent
       bordered={true}
-      className="top-margin"
       forwardedComponent={
         Object {
           "$$typeof": Symbol(react.forward_ref),
           "attrs": Array [],
           "componentStyle": ComponentStyle {
-            "componentId": "Table-ztr4bi-0",
+            "componentId": "UrlWhiteListForm__StyledTable-sc-1nddwv6-0",
             "isStatic": false,
-            "lastClassName": "ZHHeb",
+            "lastClassName": "hJQNDQ",
             "rules": Array [
               [Function],
+              "margin-top:10px;",
             ],
           },
-          "displayName": "Table",
-          "foldedComponentIds": Array [],
+          "displayName": "UrlWhiteListForm__StyledTable",
+          "foldedComponentIds": Array [
+            "Table-ztr4bi-0",
+          ],
           "render": [Function],
-          "styledComponentId": "Table-ztr4bi-0",
+          "styledComponentId": "UrlWhiteListForm__StyledTable-sc-1nddwv6-0",
           "target": [Function],
           "toString": [Function],
           "warnTooManyClasses": [Function],
@@ -278,14 +279,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       <Table
         bordered={true}
         bsClass="table"
-        className="top-margin Table-ztr4bi-0 ZHHeb"
+        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hJQNDQ"
         condensed={false}
         hover={false}
         responsive={false}
         striped={true}
       >
         <table
-          className="top-margin Table-ztr4bi-0 ZHHeb table table-striped table-bordered"
+          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hJQNDQ table table-striped table-bordered"
         >
           <thead>
             <tr>
@@ -6092,7 +6093,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
         </table>
       </Table>
     </StyledComponent>
-  </Table>
+  </UrlWhiteListForm__StyledTable>
   <ForwardRef
     bsSize="sm"
     bsStyle="default"

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
 import { cloneDeep, debounce } from 'lodash';
+import styled from 'styled-components';
 import Input from 'components/bootstrap/Input';
 import Select from 'components/common/Select';
 import Icon from 'components/common/Icon';
@@ -18,6 +19,10 @@ type Props = {
   disabled: boolean,
   onUpdate: (config: WhiteListConfig, valid: boolean) => void,
 };
+
+const StyledTable = styled(Table)`
+  margin-top: 10px;
+`;
 
 const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const literal = 'literal';
@@ -189,7 +194,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
              onChange={() => setConfig({ ...config, disabled: !config.disabled })}
              help="Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk." />
       <Button bsSize="sm" onClick={event => _onAdd(event)}>Add Url</Button>
-      <Table striped bordered className="top-margin">
+      <StyledTable striped bordered>
         <thead>
           <tr>
             <th>#</th>
@@ -202,7 +207,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
         <tbody>
           {_getSummary()}
         </tbody>
-      </Table>
+      </StyledTable>
       <Button bsSize="sm" onClick={event => _onAdd(event)}>Add Url</Button>
     </>
   );
