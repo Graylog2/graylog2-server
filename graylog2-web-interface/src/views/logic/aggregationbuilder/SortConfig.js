@@ -96,7 +96,7 @@ export default class SortConfig {
 }
 
 type BuilderState = Immutable.Map<string, any>;
-class Builder {
+export class Builder {
   value: BuilderState;
 
   constructor(value: BuilderState = Immutable.Map()) {
