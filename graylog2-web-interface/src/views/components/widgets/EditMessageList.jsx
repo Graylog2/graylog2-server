@@ -8,7 +8,7 @@ import * as Immutable from 'immutable';
 import SortableSelect from 'views/components/aggregationbuilder/SortableSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
-import SortDirectionSelect from 'views/components/aggregationbuilder/SortDirectionSelect';
+import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
