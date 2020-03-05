@@ -16,8 +16,8 @@
  */
 package org.graylog.testing.fullbackend;
 
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.builder.RequestSpecBuilder;
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,8 +25,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.jayway.restassured.RestAssured.when;
-import static com.jayway.restassured.http.ContentType.JSON;
+import static io.restassured.RestAssured.when;
+import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
@@ -46,7 +46,7 @@ class BackendStartupIT {
                 new RequestSpecBuilder().build()
                         .accept(JSON)
                         .contentType(JSON)
-                        .authentication().preemptive().basic("admin", "admin");
+                        .auth().basic("admin", "admin");
     }
 
     @Test

@@ -23,7 +23,7 @@ import integration.RequiresVersion;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 @Ignore("legacy test that should be converted or deleted")

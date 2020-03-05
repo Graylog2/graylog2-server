@@ -16,17 +16,17 @@
  */
 package integration.streams;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.ValidatableResponse;
 import integration.BaseRestTest;
 import integration.MongoDbSeed;
 import integration.RequiresAuthentication;
 import integration.RequiresVersion;
+import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.ValidatableResponse;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 

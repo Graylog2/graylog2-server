@@ -16,13 +16,13 @@
  */
 package integration.system.grok;
 
-import com.jayway.restassured.response.ValidatableResponse;
 import integration.BaseRestTest;
 import integration.RequiresAuthentication;
+import io.restassured.response.ValidatableResponse;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 @Ignore("legacy test that should be converted or deleted")

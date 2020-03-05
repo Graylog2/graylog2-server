@@ -22,7 +22,7 @@ import integration.RequiresVersion;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
 @Ignore("legacy test that should be converted or deleted")
 @RequiresVersion(">=1.1.0")
