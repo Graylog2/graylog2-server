@@ -125,8 +125,8 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         builders.forEach(builder -> this.searchTypeQueries().get(searchType.id()).aggregation(builder));
     }
 
-    public Map<String, Set<String>> fieldTypes(Set<String> streamIds) {
-        return fieldTypes.get(streamIds);
+    public Optional<String> fieldType(Set<String> streamIds, String field) {
+        return fieldTypes.getType(streamIds, field);
     }
 
     @Override

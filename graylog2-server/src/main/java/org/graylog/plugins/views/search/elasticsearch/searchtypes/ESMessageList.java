@@ -24,6 +24,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.Query;
@@ -49,6 +50,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -90,17 +92,12 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 : messageList.effectiveStreams();
 
         final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, SortOrder.DESC)));
-        sorts.forEach(sort -> searchSourceBuilder.sort(
-                SortBuilders.fieldSort(sort.field())
-                        .order(sort.order())
-                        .unmappedType(unmappedTypeForSort(sort, queryContext, effectiveStreamIds))
-        ));
-    }
-
-    private String unmappedTypeForSort(Sort sort, ESGeneratedQueryContext queryContext, Set<String> effectiveStreamIds) {
-        final Map<String, Set<String>> allFieldTypes = firstNonNull(queryContext.fieldTypes(effectiveStreamIds), Collections.emptyMap());
-        final Set<String> fieldTypes = allFieldTypes.get(sort.field());
-        return fieldTypes == null || fieldTypes.size() > 1 ? null : fieldTypes.stream().findFirst().orElse(null);
+        sorts.forEach(sort -> {
+            final FieldSortBuilder fieldSort = SortBuilders.fieldSort(sort.field())
+                    .order(sort.order());
+            final Optional<String> fieldType = queryContext.fieldType(effectiveStreamIds, sort.field());
+            searchSourceBuilder.sort(fieldType.map(fieldSort::unmappedType).orElse(fieldSort));
+        });
     }
 
     private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {

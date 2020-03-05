@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.elasticsearch.searchtypes;
 
-import com.google.common.collect.ImmutableSet;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.revinate.assertj.json.JsonPathAssert;
@@ -40,6 +39,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,7 +96,7 @@ public class ESMessageListTest {
     public void passesTypeOfSortingFieldAsUnmappedType() {
         final MessageList messageList = someMessageListWithSorting();
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
-        when(context.fieldTypes(Collections.singleton("stream1"))).thenReturn(Collections.singletonMap("somefield", Collections.singleton("long")));
+        when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.of("long"));
 
         final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Collections.emptySet(), context);
 
@@ -108,24 +108,7 @@ public class ESMessageListTest {
     public void passesNullForUnmappedTypeIfTypeIsNotFound() {
         final MessageList messageList = someMessageListWithSorting();
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
-        when(context.fieldTypes(Collections.singleton("stream1"))).thenReturn(Collections.emptyMap());
-
-        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Collections.emptySet(), context);
-
-        final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
-        assertThat(doc.read("$.sort[0].somefield", Map.class)).doesNotContainKey("unmapped_type");
-    }
-
-    @Test
-    public void passesNullForUnmappedTypeIfTypeIsAmbigious() {
-        final MessageList messageList = someMessageListWithSorting();
-        final ESGeneratedQueryContext context = mockQueryContext(messageList);
-        when(context.fieldTypes(Collections.singleton("stream1"))).thenReturn(Collections.singletonMap("somefield",
-                ImmutableSet.of(
-                        "long",
-                        "float"
-                )
-        ));
+        when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.empty());
 
         final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, Collections.emptySet(), context);
 
