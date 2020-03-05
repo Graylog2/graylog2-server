@@ -94,7 +94,7 @@ public class ESMessageListTest {
 
     @Test
     public void passesTypeOfSortingFieldAsUnmappedType() {
-        final MessageList messageList = someMessageListWithSorting();
+        final MessageList messageList = someMessageListWithSorting("stream1", "somefield");
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
         when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.of("long"));
 
@@ -106,7 +106,7 @@ public class ESMessageListTest {
 
     @Test
     public void passesNullForUnmappedTypeIfTypeIsNotFound() {
-        final MessageList messageList = someMessageListWithSorting();
+        final MessageList messageList = someMessageListWithSorting("stream1", "somefield");
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
         when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.empty());
 
@@ -143,13 +143,13 @@ public class ESMessageListTest {
                 .build();
     }
 
-    private MessageList someMessageListWithSorting() {
+    private MessageList someMessageListWithSorting(String stream, String sortField) {
         return MessageList.builder()
                 .id("amessagelist")
                 .limit(100)
                 .offset(0)
-                .streams(Collections.singleton("stream1"))
-                .sort(Collections.singletonList(Sort.create("somefield", SortOrder.ASC)))
+                .streams(Collections.singleton(stream))
+                .sort(Collections.singletonList(Sort.create(sortField, SortOrder.ASC)))
                 .build();
     }
 
