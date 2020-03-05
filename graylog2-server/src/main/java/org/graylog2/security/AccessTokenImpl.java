@@ -28,9 +28,24 @@ import java.util.Map;
 
 @CollectionName(AccessTokenImpl.COLLECTION_NAME)
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
+    public enum Type {
+        PLAINTEXT(0), AES_SIV(1);
+
+        private final int type;
+
+        Type(int type) {
+            this.type = type;
+        }
+
+        public int getIntValue() {
+            return type;
+        }
+    }
+
     public static final String COLLECTION_NAME = "access_tokens";
     public static final String USERNAME = "username";
     public static final String TOKEN = "token";
+    public static final String TOKEN_TYPE = "token_type";
     public static final String NAME = "NAME";
 
     public static final String LAST_ACCESS = "last_access";
@@ -81,6 +96,8 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     @Override
     public void setToken(String token) {
         fields.put(TOKEN, token);
+        // The token type is used to state the algorithm that is used to encrypt the value
+        fields.put(TOKEN_TYPE, Type.AES_SIV.getIntValue());
     }
 
     @Override
@@ -92,5 +109,4 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public void setName(String name) {
         fields.put(NAME, name);
     }
-
 }

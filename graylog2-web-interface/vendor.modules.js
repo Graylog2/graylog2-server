@@ -1,7 +1,5 @@
 module.exports = [
-  'c3',
   'create-react-class',
-  'd3',
   'deep-equal',
   'jquery',
   'leaflet',

@@ -5,7 +5,7 @@ import { isEqual } from 'lodash';
 
 export type QueryId = string;
 
-type FilterType = Immutable.Map<string, any>;
+export type FilterType = Immutable.Map<string, any>;
 type SearchTypeList = Array<any>;
 type InternalBuilderState = Immutable.Map<string, any>;
 
@@ -32,8 +32,8 @@ export type ElasticsearchQueryString = {
 
 export const createElasticsearchQueryString = (query: string = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
 
-const _streamFilters = (selectedStreams: Array<string>): Array<{ type: string, id: string }> => {
-  return selectedStreams.map(stream => ({ type: 'stream', id: stream }));
+const _streamFilters = (selectedStreams: Array<string>): Array<Immutable.Map<string, string>> => {
+  return selectedStreams.map(stream => Immutable.Map({ type: 'stream', id: stream }));
 };
 
 export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {
@@ -45,6 +45,18 @@ export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {
     type: 'or',
     filters: streamFilters,
   });
+};
+
+export const filtersToStreamSet = (filter: ?Immutable.Map<string, any>): Immutable.Set<string> => {
+  if (!filter) {
+    return Immutable.Set();
+  }
+  const type = filter.get('type');
+  if (type === 'stream') {
+    return Immutable.Set([filter.get('id')]);
+  }
+  const filters = filter.get('filters', Immutable.List());
+  return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
 };
 
 export type QueryString = ElasticsearchQueryString;

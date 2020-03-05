@@ -68,7 +68,7 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   useEffect(onRenderComplete, [onRenderComplete]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
-  const { chart: rows = [] } = data || {};
+  const rows = data.chart || Object.values(data)[0] || [];
 
   const rowFieldNames = rowPivots.map<string>(pivot => pivot.field);
   const columnFieldNames = columnPivots.map(pivot => pivot.field);

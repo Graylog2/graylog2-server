@@ -117,6 +117,11 @@
                 <artifactId>caffeine</artifactId>
                 <version>${caffeine.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.cryptomator</groupId>
+                <artifactId>siv-mode</artifactId>
+                <version>${siv-mode.version}</version>
+            </dependency>
 
             <!-- Always check mongojack dependencies to see if we need to adjust our mongodb-driver dependencies -->
             <dependency>
@@ -847,6 +852,33 @@
                                 <goals>
                                     <goal>check</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>dependency-check</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>3.0.0-M3</version>
+                        <executions>
+                            <execution>
+                                <id>check-dependencies</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <banDuplicatePomDependencyVersions/>
+                                        <dependencyConvergence/>
+                                    </rules>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

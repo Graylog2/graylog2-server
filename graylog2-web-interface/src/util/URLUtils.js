@@ -47,8 +47,7 @@ const URLUtils = {
     }
 
     const joinedPath = `/${args.join('/')}`;
-    // eslint-disable-next-line no-useless-escape
-    return joinedPath.replace(/[\/]+/g, '/');
+    return joinedPath.replace(/[/]+/g, '/');
   },
   areCredentialsInURLSupported() {
     const browser = this.parser.getBrowser();
@@ -67,3 +66,14 @@ const URLUtils = {
 
 };
 export default URLUtils;
+
+export const {
+  parser,
+  appPrefixed,
+  getParsedHash,
+  getParsedSearch,
+  qualifyUrl,
+  replaceHashParam,
+  concatURLPath,
+  areCredentialsInURLSupported,
+} = URLUtils;

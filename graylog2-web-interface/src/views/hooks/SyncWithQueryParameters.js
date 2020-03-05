@@ -1,5 +1,6 @@
 // @flow strict
 import { useEffect } from 'react';
+import * as Immutable from 'immutable';
 import URI from 'urijs';
 import history from 'util/History';
 
@@ -7,6 +8,8 @@ import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { TimeRange } from 'views/logic/queries/Query';
+import { filtersToStreamSet } from 'views/logic/queries/Query';
+import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 
 const useActionListeners = (actions, callback, dependencies) => {
   useEffect(() => {
@@ -36,15 +39,18 @@ export const syncWithQueryParameters = (query: string, action: (string) => mixed
     }
     const firstQuery = queries.first();
     if (firstQuery) {
-      const { query: { query_string: queryString }, timerange } = firstQuery;
+      const { query: { query_string: queryString }, timerange, filter = Immutable.Map() } = firstQuery;
       const baseUri = new URI(query).setSearch('q', queryString)
         .removeQuery('from')
         .removeQuery('to')
         .removeQuery('keyword')
         .removeQuery('relative');
-      const uri = extractTimerangeParams(timerange)
-        .reduce((prev, [key, value]) => prev.setSearch(key, value), baseUri)
-        .toString();
+      const uriWithTimerange = extractTimerangeParams(timerange)
+        .reduce((prev, [key, value]) => prev.setSearch(key, value), baseUri);
+      const currentStreams = filtersToStreamSet(filter);
+      const uri = currentStreams.isEmpty()
+        ? uriWithTimerange.toString()
+        : uriWithTimerange.setSearch('streams', currentStreams.join(',')).toString();
       if (query !== uri) {
         action(uri);
       }
@@ -55,7 +61,7 @@ export const syncWithQueryParameters = (query: string, action: (string) => mixed
 export const useSyncWithQueryParameters = (query: string) => {
   useEffect(() => syncWithQueryParameters(query, history.replace), []);
   useActionListeners(
-    [QueriesActions.query.completed, QueriesActions.timerange.completed],
+    [QueriesActions.query.completed, QueriesActions.timerange.completed, QueryFiltersActions.streams.completed],
     () => syncWithQueryParameters(query),
     [query],
   );

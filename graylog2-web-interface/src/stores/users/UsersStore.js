@@ -109,9 +109,9 @@ const UsersStore = Reflux.createStore({
     return promise;
   },
 
-  deleteToken(username: string, token: string, tokenName: string): Promise<string[]> {
+  deleteToken(username: string, tokenId: string, tokenName: string): Promise<string[]> {
     const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(username),
-      encodeURIComponent(token)).url, {});
+      encodeURIComponent(tokenId)).url, {});
     const promise = fetch('DELETE', url);
 
     promise.then(() => {

@@ -5,41 +5,25 @@ import { DocumentTitle, Spinner, Icon } from 'components/common';
 import LoginBox from 'components/login/LoginBox';
 import AuthThemeStyles from 'theme/styles/authStyles';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
+const LoadingPage = ({ text }) => {
+  return (
+    <DocumentTitle title="Loading...">
+      <AuthThemeStyles />
+      <LoginBox>
+        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        <p>
+          <Spinner text={text} delay={0} />
+        </p>
+      </LoginBox>
+    </DocumentTitle>
+  );
+};
 
-class LoadingPage extends React.Component {
-  static propTypes = {
-    text: PropTypes.string,
-  };
-
-  static defaultProps = {
-    text: 'Loading, please wait...',
-  };
-
-  componentDidMount() {
-    disconnectedStyle.use();
-  }
-
-  componentWillUnmount() {
-    disconnectedStyle.unuse();
-  }
-
-  render() {
-    const { text } = this.props;
-
-    return (
-      <DocumentTitle title="Loading...">
-        <AuthThemeStyles />
-        <LoginBox>
-          <legend><Icon name="group" /> Welcome to Graylog</legend>
-          <p className="loading-text">
-            <Spinner text={text} />
-          </p>
-        </LoginBox>
-      </DocumentTitle>
-    );
-  }
-}
+LoadingPage.propTypes = {
+  text: PropTypes.string,
+};
+LoadingPage.defaultProps = {
+  text: 'Loading, please wait...',
+};
 
 export default LoadingPage;

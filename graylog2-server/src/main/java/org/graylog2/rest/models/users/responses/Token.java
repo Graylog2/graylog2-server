@@ -28,6 +28,9 @@ import org.joda.time.DateTime;
 @WithBeanGetter
 public abstract class Token {
     @JsonProperty
+    public abstract String id();
+
+    @JsonProperty
     public abstract String name();
 
     @JsonProperty
@@ -37,9 +40,10 @@ public abstract class Token {
     public abstract DateTime lastAccess();
 
     @JsonCreator
-    public static Token create(@JsonProperty("name") String name,
+    public static Token create(@JsonProperty("id") String id,
+                               @JsonProperty("name") String name,
                                @JsonProperty("token") String token,
                                @JsonProperty("last_access") DateTime lastAccess) {
-        return new AutoValue_Token(name, token, lastAccess);
+        return new AutoValue_Token(id, name, token, lastAccess);
     }
 }

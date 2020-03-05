@@ -1,6 +1,6 @@
 {
   "access_tokens" : [
-    {"_id" : {"$oid": "54e3deadbeefdeadbeefaffe"}, "username": "admin", "token": "foobar", "NAME": "web", "last_access": { "$date" : "2015-03-14T15:09:26.540Z" }},
-    {"_id" : {"$oid": "54f9deadbeefdeadbeefaffe"}, "username": "admin", "token": "foobar", "NAME": "web", "last_access": { "$date" : "2015-03-14T15:09:26.540Z" }}
+    {"_id" : {"$oid": "54e3deadbeefdeadbeefaffe"}, "username": "admin", "token": "raboof", "NAME": "web", "last_access": { "$date" : "2015-03-14T15:09:26.540Z" }},
+    {"_id" : {"$oid": "54f9deadbeefdeadbeefaffe"}, "username": "admin", "token": "raboof", "NAME": "web", "last_access": { "$date" : "2015-03-14T15:09:26.540Z" }}
   ]
 }
