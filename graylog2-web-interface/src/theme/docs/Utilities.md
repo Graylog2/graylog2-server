@@ -11,10 +11,10 @@ Recreating [`color-level`](https://github.com/twbs/bootstrap/blob/08ba61e276a639
 Negative numbers render a lighter color, positive numbers get darker. Check out the follow example to see some samples of this in action.
 
 ```js
-import { teinte, util } from 'theme';
+import { color, util } from 'theme';
 import ColorSwatch from './Colors';
 
-const { info, primary } = teinte.variant;
+const { info, primary } = color.teinte.variant;
 
 <>
   <p>
@@ -42,11 +42,11 @@ Accepts a color and [WCAG](https://www.w3.org/TR/WCAG21/#distinguishable) level,
   - defaults: "AAA" -Based on the [contrast calculations recommended by W3](https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced.html). (available levels: "AA", "AALarge", "AAA", "AAALarge")
 
 ```js
-import { teinte, util } from 'theme';
+import { color, util } from 'theme';
 import ColorSwatch from './Colors';
 
-const { info, primary } = teinte.variant;
-const { textDefault } = teinte.global;
+const { info, primary } = color.teinte.variant;
+const { textDefault } = color.teinte.global;
 
 <>
   <p>
@@ -76,17 +76,17 @@ Generating a readable color following W3C specs using [polished](https://polishe
   - any string that represents a color (ex: "#f00" or "rgb(255, 0, 0)")
 
 **`darkColor`**
-  - defaults: Currently `teinte.global.textDefault`
+  - defaults: Currently `color.teinte.global.textDefault`
 
 **`lightColor`**
-  - defaults: Currently `teinte.global.textAlt`
+  - defaults: Currently `color.teinte.global.textAlt`
 
 ```js
-import { teinte, util } from 'theme';
+import { color, util } from 'theme';
 import ColorSwatch from './Colors';
 
-const { info, primary } = teinte.variant;
-const { textDefault } = teinte.global;
+const { info, primary } = color.teinte.variant;
+const { textDefault } = color.teinte.global;
 
 <>
   <p>
