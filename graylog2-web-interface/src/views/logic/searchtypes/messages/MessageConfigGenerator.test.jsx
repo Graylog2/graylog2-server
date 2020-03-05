@@ -1,7 +1,7 @@
 // @flow strict
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import MessageConfigGenerator from './MessageConfigGenerator';
-import MessagesWidget from '../widgets/MessagesWidget';
-import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 
 describe('MessageConfigGenerator', () => {
   it('generates basic search type from message widget', () => {

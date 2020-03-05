@@ -16,6 +16,7 @@ export default {
       id: result.id,
       effectiveTimerange: result.effective_timerange,
       type: result.type,
+      sort: result.sort,
       messages: result.messages,
       total: result.total_results,
       fields: fieldNames, // computed fieldname -> occurrence count
