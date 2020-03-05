@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.streams.StreamService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,6 +31,7 @@ import java.util.Set;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class IndexFieldTypesServiceTest {
     @Rule
@@ -40,7 +42,8 @@ public class IndexFieldTypesServiceTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
-        this.dbService = new IndexFieldTypesService(mongodb.mongoConnection(), objectMapperProvider);
+        final StreamService streamService = mock(StreamService.class);
+        this.dbService = new IndexFieldTypesService(mongodb.mongoConnection(), streamService, objectMapperProvider);
     }
 
     @After

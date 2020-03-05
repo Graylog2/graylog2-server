@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBUpsertRetryer;
+import org.graylog2.streams.StreamService;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
@@ -30,7 +31,10 @@ import org.mongojack.WriteResult;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Manages the "index_field_types" MongoDB collection.
@@ -39,10 +43,13 @@ public class IndexFieldTypesService {
     private static final String FIELDS_FIELD_NAMES = String.format(Locale.US, "%s.%s", IndexFieldTypesDTO.FIELD_FIELDS, FieldTypeDTO.FIELD_NAME);
 
     private final JacksonDBCollection<IndexFieldTypesDTO, ObjectId> db;
+    private final StreamService streamService;
 
     @Inject
     public IndexFieldTypesService(MongoConnection mongoConnection,
+                                  StreamService streamService,
                                   MongoJackObjectMapperProvider objectMapperProvider) {
+        this.streamService = streamService;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("index_field_types"),
                 IndexFieldTypesDTO.class,
                 ObjectId.class,
@@ -103,6 +110,13 @@ public class IndexFieldTypesService {
         return findByQuery(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId));
     }
 
+    private Collection<IndexFieldTypesDTO> findForIndexSets(Collection<String> indexSetIds) {
+        return findByQuery(DBQuery.or(
+                indexSetIds.stream().map(indexSetId -> DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId))
+                .toArray(DBQuery.Query[]::new)
+        ));
+    }
+
     public Collection<IndexFieldTypesDTO> findForFieldNames(Collection<String> fieldNames) {
         return findByQuery(DBQuery.in(FIELDS_FIELD_NAMES, fieldNames));
     }
@@ -114,6 +128,16 @@ public class IndexFieldTypesService {
         );
 
         return findByQuery(query);
+    }
+
+    public Collection<IndexFieldTypesDTO> findForStreamIds(Collection<String> streamIds) {
+        final Set<String> indexSetIds = streamService.loadByIds(streamIds)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(stream -> stream.getIndexSet().getConfig().id())
+                .collect(Collectors.toSet());
+
+        return findForIndexSets(indexSetIds);
     }
 
     public Collection<IndexFieldTypesDTO> findAll() {

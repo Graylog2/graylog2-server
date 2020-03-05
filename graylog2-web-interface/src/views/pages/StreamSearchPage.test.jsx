@@ -70,14 +70,11 @@ describe('StreamSearchPage', () => {
     jest.resetModules();
   });
 
-  it('should render minimal', async () => {
+  it('should render minimal and show loading spinner initially', async () => {
     const { getByText } = render(<SimpleStreamSearchPage />);
-    await waitForElement(() => getByText('Extended search page'));
-  });
 
-  it('should show spinner while loading view', () => {
-    const { getByText } = render(<SimpleStreamSearchPage />);
     expect(getByText('Loading...')).not.toBeNull();
+    await waitForElement(() => getByText('Extended search page'));
   });
 
   it('should create view with streamId passed from props', async () => {

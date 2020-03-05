@@ -19,6 +19,8 @@ package org.graylog.plugins.views.search.elasticsearch;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -51,12 +53,32 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     private final Query query;
     private final Set<QueryResult> results;
 
-    public ESGeneratedQueryContext(ElasticsearchBackend elasticsearchBackend, SearchSourceBuilder ssb, SearchJob job, Query query, Set<QueryResult> results) {
+    private final FieldTypesLookup fieldTypes;
+
+    @AssistedInject
+    public ESGeneratedQueryContext(
+            @Assisted ElasticsearchBackend elasticsearchBackend,
+            @Assisted SearchSourceBuilder ssb,
+            @Assisted SearchJob job,
+            @Assisted Query query,
+            @Assisted Set<QueryResult> results,
+            FieldTypesLookup fieldTypes) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
         this.job = job;
         this.query = query;
         this.results = results;
+        this.fieldTypes = fieldTypes;
+    }
+
+    public interface Factory {
+        ESGeneratedQueryContext create(
+                ElasticsearchBackend elasticsearchBackend,
+                SearchSourceBuilder ssb,
+                SearchJob job,
+                Query query,
+                Set<QueryResult> results
+        );
     }
 
     public SearchSourceBuilder searchSourceBuilder(SearchType searchType) {
@@ -101,6 +123,10 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     public void addAggregations(Collection<AggregationBuilder> builders, SearchType searchType) {
         builders.forEach(builder -> this.searchTypeQueries().get(searchType.id()).aggregation(builder));
+    }
+
+    public Optional<String> fieldType(Set<String> streamIds, String field) {
+        return fieldTypes.getType(streamIds, field);
     }
 
     @Override
