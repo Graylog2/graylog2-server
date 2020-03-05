@@ -11,7 +11,7 @@ import StoreProvider from 'injection/StoreProvider';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import Routes from 'routing/Routes';
-import { appPrefixed } from 'util/URLUtils';
+import URLUtils from 'util/URLUtils';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -33,11 +33,11 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
 
 const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(appPrefixed(prefix)) === 0;
+  return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }) => {
-  const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} />;
+  const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} />;
   if (permissions) {
     return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
   }
