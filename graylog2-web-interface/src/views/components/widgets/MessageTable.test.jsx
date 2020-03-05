@@ -29,21 +29,25 @@ const activeQueryId = 'some-query-id';
 
 describe('MessageTable', () => {
   it('lists provided field in table head', () => {
-    const wrapper = mount(<MessageTable messages={messages}
-                                        activeQueryId={activeQueryId}
+    const wrapper = mount(<MessageTable activeQueryId={activeQueryId}
+                                        config={config}
                                         fields={Immutable.List(fields)}
+                                        messages={messages}
+                                        onConfigChange={() => Promise.resolve()}
                                         selectedFields={Immutable.Set()}
-                                        config={config} />);
+                                        setLoadingState={() => {}} />);
     const th = wrapper.find('th').at(0);
     expect(th.text()).toContain('file_name');
   });
 
   it('renders a table entry for messages', () => {
-    const wrapper = mount(<MessageTable messages={messages}
-                                        activeQueryId={activeQueryId}
+    const wrapper = mount(<MessageTable activeQueryId={activeQueryId}
+                                        config={config}
                                         fields={Immutable.List(fields)}
+                                        onConfigChange={() => Promise.resolve()}
                                         selectedFields={Immutable.Set()}
-                                        config={config} />);
+                                        setLoadingState={() => {}}
+                                        messages={messages} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
     expect(td.text()).toContain('frank.txt');
@@ -52,12 +56,14 @@ describe('MessageTable', () => {
   it('renders a table entry for messages, even if fields are `undefined`', () => {
     // Suppressing console to disable props warning because of `fields` being `undefined`.
     suppressConsole(() => {
-      const wrapper = mount(<MessageTable messages={messages}
-                                          activeQueryId={activeQueryId}
+      const wrapper = mount(<MessageTable activeQueryId={activeQueryId}
+                                          config={config}
                                           // $FlowFixMe: violating contract on purpose
                                           fields={undefined}
+                                          onConfigChange={() => Promise.resolve()}
                                           selectedFields={Immutable.Set()}
-                                          config={config} />);
+                                          setLoadingState={() => {}}
+                                          messages={messages} />);
       const messageTableEntry = wrapper.find('MessageTableEntry');
       expect(messageTableEntry).not.toBeEmptyRender();
     });
@@ -66,11 +72,13 @@ describe('MessageTable', () => {
   it('renders config fields in table head with correct order', () => {
     const configFields = ['gl2_receive_timestamp', 'user_id', 'gl2_source_input', 'gl2_message_id', 'ingest_time', 'http_method', 'action', 'source', 'ingest_time_hour', 'ingest_time_epoch'];
     const configWithFields = MessagesWidgetConfig.builder().fields(configFields).build();
-    const wrapper = mount(<MessageTable messages={messages}
-                                        activeQueryId={activeQueryId}
+    const wrapper = mount(<MessageTable activeQueryId={activeQueryId}
+                                        config={configWithFields}
                                         fields={Immutable.List(fields)}
+                                        onConfigChange={() => Promise.resolve()}
                                         selectedFields={Immutable.Set()}
-                                        config={configWithFields} />);
+                                        setLoadingState={() => {}}
+                                        messages={messages} />);
 
     const tableHeadFields = wrapper.find('Field').map(field => field.text());
     expect(tableHeadFields).toEqual(configFields);
@@ -79,11 +87,13 @@ describe('MessageTable', () => {
   it('highlights messsage with id passed in `HighlightMessageContext`', () => {
     const wrapper = mount((
       <HighlightMessageContext.Provider value="message-id-1">
-        <MessageTable messages={messages}
-                      activeQueryId={activeQueryId}
+        <MessageTable activeQueryId={activeQueryId}
+                      config={config}
                       fields={Immutable.List(fields)}
+                      onConfigChange={() => Promise.resolve()}
                       selectedFields={Immutable.Set()}
-                      config={config} />
+                      setLoadingState={() => {}}
+                      messages={messages} />
       </HighlightMessageContext.Provider>
     ));
 
@@ -95,11 +105,13 @@ describe('MessageTable', () => {
   it('does not highlight non-existing message id', () => {
     const wrapper = mount((
       <HighlightMessageContext.Provider value="message-id-42">
-        <MessageTable messages={messages}
-                      activeQueryId={activeQueryId}
+        <MessageTable activeQueryId={activeQueryId}
+                      config={config}
                       fields={Immutable.List(fields)}
+                      onConfigChange={() => Promise.resolve()}
                       selectedFields={Immutable.Set()}
-                      config={config} />
+                      setLoadingState={() => {}}
+                      messages={messages} />
       </HighlightMessageContext.Provider>
     ));
 

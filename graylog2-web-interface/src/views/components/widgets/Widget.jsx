@@ -228,18 +228,19 @@ class Widget extends React.Component<Props, State> {
       const { config, filter } = widget;
       const VisComponent = _visualizationForType(widget.type);
       return (
-        <VisComponent id={id}
-                      editing={editing}
-                      title={title}
-                      config={config}
+        <VisComponent config={config}
                       data={data}
+                      editing={editing}
                       fields={fields}
-                      height={height}
-                      width={width}
                       filter={filter}
+                      height={height}
+                      onConfigChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}
                       setLoadingState={this._setLoadingState}
+                      title={title}
+                      toggleEdit={this._onToggleEdit}
                       type={widget.type}
-                      toggleEdit={this._onToggleEdit} />
+                      width={width}
+                      id={id} />
       );
     }
     return <LoadingWidget />;

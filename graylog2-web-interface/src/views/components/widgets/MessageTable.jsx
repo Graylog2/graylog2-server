@@ -2,7 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
+import { isEmpty } from 'lodash';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -10,6 +11,9 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+import { Icon } from 'components/common';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
 
@@ -114,6 +118,20 @@ const Table = styled.table`
   }
 `;
 
+const SortIcon: StyledComponent<{fieldSortActive: boolean}, {}, HTMLButtonElement> = styled.button(({ fieldSortActive }) => {
+  const color = fieldSortActive ? '#333' : '#bdbdbd';
+
+  return css`
+    border: 0;
+    background: transparent;
+    color: ${color};
+
+    padding: 5px;
+
+    cursor: pointer;
+  `;
+});
+
 const TableHead = styled.thead`
   background-color: #eee;
   color: #333;
@@ -133,11 +151,14 @@ type State = {
 }
 
 type Props = {
-  fields: Immutable.List<FieldTypeMapping>,
-  config: MessagesWidgetConfig,
-  selectedFields?: Immutable.Set<string>,
   activeQueryId: string,
-  messages: Array<Object>
+  config: MessagesWidgetConfig,
+  editing?: boolean,
+  fields: Immutable.List<FieldTypeMapping>,
+  messages: Array<Object>,
+  onConfigChange: (MessagesWidgetConfig) => Promise<void>,
+  selectedFields?: Immutable.Set<string>,
+  setLoadingState: (loading: boolean) => void,
 };
 
 type DefaultProps = {
@@ -148,18 +169,46 @@ class MessageTable extends React.Component<Props, State> {
   static propTypes = {
     activeQueryId: PropTypes.string.isRequired,
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
+    editing: PropTypes.bool,
     fields: CustomPropTypes.FieldListType.isRequired,
     messages: PropTypes.arrayOf(PropTypes.object).isRequired,
+    onConfigChange: PropTypes.func.isRequired,
     selectedFields: PropTypes.object,
+    setLoadingState: PropTypes.func.isRequired,
   };
 
   static defaultProps: DefaultProps = {
+    editing: false,
     selectedFields: Immutable.Set<string>(),
   };
 
   state = {
     expandedMessages: Immutable.Set<string>(),
   };
+
+  _changeSort = (config: MessagesWidgetConfig, fieldName: string, fieldSortDirection: ?Direction) => {
+    const { onConfigChange, setLoadingState } = this.props;
+    let newSort;
+
+    setLoadingState(true);
+
+    switch (fieldSortDirection) {
+      case Direction.Ascending:
+        newSort = config.sort.map(sort => sort.toBuilder().direction(Direction.Descending).build());
+        break;
+      case Direction.Descending:
+        newSort = config.sort.map(sort => sort.toBuilder().direction(Direction.Ascending).build());
+        break;
+      default:
+        newSort = [new SortConfig('pivot', fieldName, Direction.Ascending)];
+        break;
+    }
+
+    const newConfig = config.toBuilder().sort(newSort).build();
+    onConfigChange(newConfig).then(() => {
+      setLoadingState(false);
+    });
+  }
 
   _columnStyle = (fieldName: string) => {
     const { fields } = this.props;
@@ -173,6 +222,21 @@ class MessageTable extends React.Component<Props, State> {
   _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => {
     return ((fields && fields.find(f => f.name === fieldName)) || { type: FieldType.Unknown }).type;
   };
+
+  _fieldSortDirection = (config: MessagesWidgetConfig, fieldName: string) => {
+    const currentSort = !isEmpty(config.sort) ? config.sort[0] : null;
+    if (currentSort && currentSort.field === fieldName) {
+      return currentSort.direction;
+    }
+    return undefined;
+  }
+
+  _fieldSortIcon = (fieldSortDirection?: string) => {
+    if (fieldSortDirection && fieldSortDirection === Direction.Descending) {
+      return 'sort-amount-desc';
+    }
+    return 'sort-amount-asc';
+  }
 
   _getFormattedMessages = (): Array<Object> => {
     const { messages } = this.props;
@@ -205,7 +269,7 @@ class MessageTable extends React.Component<Props, State> {
 
   render() {
     const { expandedMessages } = this.state;
-    const { fields, activeQueryId, config } = this.props;
+    const { fields, activeQueryId, config, editing } = this.props;
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
     return (
@@ -214,12 +278,19 @@ class MessageTable extends React.Component<Props, State> {
           <TableHead>
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
+                const fieldSortDirection = this._fieldSortDirection(config, selectedFieldName);
                 return (
                   <th key={selectedFieldName}
                       style={this._columnStyle(selectedFieldName)}>
                     <Field type={this._fieldTypeFor(selectedFieldName, fields)}
                            name={selectedFieldName}
                            queryId={activeQueryId} />
+                    {editing && (
+                      <SortIcon fieldSortActive={!!fieldSortDirection}
+                                onClick={() => this._changeSort(config, selectedFieldName, fieldSortDirection)}>
+                        <Icon name={this._fieldSortIcon(fieldSortDirection)} />
+                      </SortIcon>
+                    )}
                   </th>
                 );
               })}

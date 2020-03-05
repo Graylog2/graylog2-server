@@ -42,35 +42,39 @@ type State = {
 }
 
 type Props = {
-  fields: FieldTypeMappingsList,
-  pageSize: number,
   config: MessagesWidgetConfig,
-  data: { messages: Array<Object>, total: number, id: string },
-  selectedFields?: Immutable.Set<string>,
-  searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
-  setLoadingState: (loading: boolean) => void,
-  currentView: {
-    activeQuery: string,
-    view: {
-      id: number,
+    currentView: {
+      activeQuery: string,
+      view: {
+        id: number,
+      },
     },
-  },
+  data: { messages: Array<Object>, total: number, id: string },
+  editing: boolean,
+  fields: FieldTypeMappingsList,
+  onConfigChange: (MessagesWidgetConfig) => Promise<void>,
+  pageSize: number,
+  searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
+  selectedFields?: Immutable.Set<string>,
+  setLoadingState: (loading: boolean) => void,
 };
 
 class MessageList extends React.Component<Props, State> {
   static propTypes = {
-    fields: CustomPropTypes.FieldListType.isRequired,
-    pageSize: PropTypes.number,
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
+    currentView: PropTypes.object.isRequired,
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
       total: PropTypes.number.isRequired,
       id: PropTypes.string.isRequired,
     }).isRequired,
+    editing: PropTypes.bool.isRequired,
+    fields: CustomPropTypes.FieldListType.isRequired,
+    onConfigChange: PropTypes.func.isRequired,
+    pageSize: PropTypes.number,
     searchTypes: PropTypes.object.isRequired,
     selectedFields: PropTypes.object,
     setLoadingState: PropTypes.func.isRequired,
-    currentView: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -131,9 +135,12 @@ class MessageList extends React.Component<Props, State> {
       config,
       currentView: { activeQuery: activeQueryId },
       data: { messages, total: totalMessages },
+      editing,
       fields,
+      onConfigChange,
       pageSize,
       selectedFields,
+      setLoadingState,
     } = this.props;
     const { currentPage, errors } = this.state;
     const hasError = !isEmpty(errors);
@@ -147,12 +154,15 @@ class MessageList extends React.Component<Props, State> {
                        totalItems={totalMessages}
                        pageSize={pageSize}>
           {!hasError ? (
-            <MessageTable messages={messages}
-                          fields={fields}
+            <MessageTable activeQueryId={activeQueryId}
                           config={config}
+                          editing={editing}
+                          fields={fields}
+                          key={listKey}
+                          onConfigChange={onConfigChange}
                           selectedFields={selectedFields}
-                          activeQueryId={activeQueryId}
-                          key={listKey} />
+                          setLoadingState={setLoadingState}
+                          messages={messages} />
           ) : <ErrorWidget errors={errors} />}
         </PaginatedList>
       </Wrapper>

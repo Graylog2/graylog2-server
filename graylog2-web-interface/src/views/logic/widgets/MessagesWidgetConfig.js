@@ -1,7 +1,10 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { SortConfigJson } from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+
 import WidgetConfig from './WidgetConfig';
 
 export type Decorator = {
@@ -26,12 +29,14 @@ export type MessagesWidgetConfigJSON = {
   show_message_row: boolean,
 };
 
+const defaultSort = [new SortConfig('pivot', 'timestamp', Direction.Ascending)];
+
 export default class MessagesWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
   constructor(fields: Array<string>, showMessageRow: boolean, decorators: Array<Decorator>, sort: Array<SortConfig>) {
     super();
-    this._value = { decorators, fields: fields.slice(0), showMessageRow, sort };
+    this._value = { decorators, fields: fields.slice(0), showMessageRow, sort: sort && sort.length > 0 ? sort : defaultSort };
   }
 
   get decorators() {
