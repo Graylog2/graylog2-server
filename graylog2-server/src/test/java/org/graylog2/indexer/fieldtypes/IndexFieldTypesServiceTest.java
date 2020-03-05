@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.streams.StreamService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -33,6 +34,7 @@ import java.util.Set;
 import static com.google.common.collect.ImmutableSet.of;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class IndexFieldTypesServiceTest {
     @ClassRule
@@ -45,7 +47,8 @@ public class IndexFieldTypesServiceTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
-        this.dbService = new IndexFieldTypesService(mongoRule.getMongoConnection(), objectMapperProvider);
+        final StreamService streamService = mock(StreamService.class);
+        this.dbService = new IndexFieldTypesService(mongoRule.getMongoConnection(), streamService, objectMapperProvider);
     }
 
     @After

@@ -76,6 +76,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
 
     @Before
     public void setUp() throws Exception {
+        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(
                 ImmutableMap.of(
                         "dummy", () -> mock(DummyHandler.class)
@@ -84,7 +85,8 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 jestClient,
                 indexRangeService,
                 streamService,
-                new ESQueryDecorators(Collections.emptySet())
+                new ESQueryDecorators(Collections.emptySet()),
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup)
         );
         when(streamService.loadByIds(any())).thenReturn(Collections.emptySet());
 
@@ -114,7 +116,8 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 new SearchSourceBuilder(),
                 searchJob,
                 query,
-                Collections.emptySet()
+                Collections.emptySet(),
+                mock(FieldTypesLookup.class)
         );
 
         searchTypes.forEach(queryContext::searchSourceBuilder);
