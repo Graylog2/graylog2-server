@@ -1,6 +1,6 @@
 
 import { mix } from 'polished';
-import teinte from '../variants/teinte'; // TODO: replace this with whatever is coming from ThemeProvider
+import { teinte } from 'theme/colors';
 
 export default function colorLevel(colorHex, level = 0) {
   /**

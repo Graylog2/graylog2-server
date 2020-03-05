@@ -7,3 +7,7 @@ const colors = {
 };
 
 export default colors;
+export {
+  teinte,
+  noire,
+};
