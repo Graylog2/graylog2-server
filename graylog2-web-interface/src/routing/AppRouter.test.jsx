@@ -18,7 +18,16 @@ jest.mock('injection/CombinedProvider', () => {
       permissions: ['*'],
     },
   })]);
+
+  const mockConfigurationsStoretore = MockStore('get', 'listen', ['getInitialState', () => ({
+    configuatration: { },
+  })]);
+
   return new MockCombinedProvider({
+    Configurations: {
+      ConfigurationsStore: mockConfigurationsStoretore,
+      ConfigurationsActions: { list: jest.fn() },
+    },
     CurrentUser: { CurrentUserStore: mockCurrentUserStoretore },
     Notifications: { NotificationsActions: { list: jest.fn() } },
   });

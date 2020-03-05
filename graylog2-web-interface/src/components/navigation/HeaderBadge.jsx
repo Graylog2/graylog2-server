@@ -32,7 +32,11 @@ const HeaderBadge = ({ configuration }) => {
 };
 
 HeaderBadge.propTypes = {
-  configuration: PropTypes.object.isRequired,
+  configuration: PropTypes.object,
+};
+
+HeaderBadge.defaultProps = {
+  configuration: {},
 };
 
 export default connect(HeaderBadge, { configurations: ConfigurationsStore }, ({ configurations, ...otherProps }) => ({

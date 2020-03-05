@@ -31,6 +31,7 @@ class IntegrationEnvironment extends JSDomEnvironment {
     api.get(`${prefix}system/sessions`, (req, res) => res.json({ session_id: null, username: null, is_valid: false }));
     api.get(`${prefix}system/notifications`, (req, res) => res.json([]));
     api.get(`${prefix}system/cluster/nodes`, (req, res) => res.json({ nodes: [], total: 0 }));
+    api.get(`${prefix}system/cluster_config/org.graylog2.configuration.Customization`, (req, res) => res.json({}));
     api.get(`${prefix}system/cluster_config/org.graylog2.indexer.searches.SearchesClusterConfig`, (req, res) => res.json({
       relative_timerange_options: {},
       query_time_range_limit: 'P5M',
