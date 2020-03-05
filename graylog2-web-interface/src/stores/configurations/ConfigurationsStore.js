@@ -1,6 +1,6 @@
 // @flow
 import Reflux from 'reflux';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
@@ -43,7 +43,7 @@ const ConfigurationsStore = Reflux.createStore({
   },
 
   _url(path) {
-    return URLUtils.qualifyUrl(urlPrefix + path);
+    return qualifyUrl(urlPrefix + path);
   },
 
   list(configType) {
@@ -68,7 +68,7 @@ const ConfigurationsStore = Reflux.createStore({
   },
 
   listMessageProcessorsConfig(configType) {
-    const promise = fetch('GET', URLUtils.qualifyUrl('/system/messageprocessors/config')).then((response) => {
+    const promise = fetch('GET', qualifyUrl('/system/messageprocessors/config')).then((response) => {
       this.configuration[configType] = response;
       this.propagateChanges();
       return response;
@@ -78,13 +78,13 @@ const ConfigurationsStore = Reflux.createStore({
   },
 
   listWhiteListConfig(configType) {
-    const promise = fetch('GET', URLUtils.qualifyUrl('/system/urlwhitelist')).then((response) => {
+    const promise = fetch('GET', qualifyUrl('/system/urlwhitelist')).then((response) => {
       this.configuration[configType] = response;
       this.propagateChanges();
       return response;
     });
 
-    ConfigurationActions.listMessageProcessorsConfig.promise(promise);
+    ConfigurationActions.listWhiteListConfig.promise(promise);
   },
 
   listEventsClusterConfig() {
@@ -116,7 +116,7 @@ const ConfigurationsStore = Reflux.createStore({
   },
 
   updateWhitelist(configType, config) {
-    const promise = fetch('PUT', URLUtils.qualifyUrl('/system/urlwhitelist'), config);
+    const promise = fetch('PUT', qualifyUrl('/system/urlwhitelist'), config);
 
     promise.then(
       () => {
@@ -134,7 +134,7 @@ const ConfigurationsStore = Reflux.createStore({
   },
 
   updateMessageProcessorsConfig(configType, config) {
-    const promise = fetch('PUT', URLUtils.qualifyUrl('/system/messageprocessors/config'), config);
+    const promise = fetch('PUT', qualifyUrl('/system/messageprocessors/config'), config);
 
     promise.then(
       (response) => {
