@@ -51,7 +51,7 @@ const _onSortDirectionChange = (direction: $PropertyType<AggregationWidgetConfig
 type Props = {
   children: React.Node,
   config: MessagesWidgetConfig,
-  fields: Immutable.Set<FieldTypeMapping>,
+  fields: Immutable.List<FieldTypeMapping>,
   onChange: (MessagesWidgetConfig) => void,
 };
 
