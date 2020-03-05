@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -49,7 +49,9 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -72,7 +74,7 @@ public class HttpPollTransport extends ThrottleableTransport {
     private final OkHttpClient httpClient;
 
     private volatile boolean paused = true;
-    private volatile String  dynamicURL = "";
+    private volatile String nextlink = "";
     private ScheduledFuture<?> scheduledFuture;
 
     @AssistedInject
@@ -87,7 +89,16 @@ public class HttpPollTransport extends ThrottleableTransport {
         this.serverStatus = serverStatus;
         this.scheduler = scheduler;
         this.httpClient = httpClient;
-        this.dynamicURL = configuration.getString(CK_URL);
+
+    }
+
+    static Optional<String> getNextPageLink(List<String> links) {
+        return Optional.ofNullable(links.stream().filter(s -> s.contains("rel=\"next\"")).findFirst().get());
+    }
+
+    @VisibleForTesting
+    static String parseResponseHeaders(String nextPageURL) {
+        return nextPageURL.substring(nextPageURL.indexOf("<") + 1, nextPageURL.indexOf(">"));
     }
 
     @VisibleForTesting
@@ -106,23 +117,6 @@ public class HttpPollTransport extends ThrottleableTransport {
 
         return headers;
     }
-
-    @VisibleForTesting
-    static Map<String, String> parseResponseHeaders(String headerString) {
-        if (isNullOrEmpty(headerString)) {
-            return Collections.emptyMap();
-        }
-        final Map<String, String> headers = Maps.newHashMap();
-        for (String headerPart : headerString.trim().split(",")) {
-            final String[] parts = headerPart.trim().split(";");
-            final String s = parts[0].trim();
-            final String nextUrl  = s.substring(s.indexOf("<") + 1, s.indexOf(">"));
-            headers.put("next", nextUrl);
-        }
-        return headers;
-    }
-
-
 
     @Subscribe
     public void lifecycleStateChange(Lifecycle lifecycle) {
@@ -154,8 +148,11 @@ public class HttpPollTransport extends ThrottleableTransport {
 
         final Map<String, String> headers = parseHeaders(configuration.getString(CK_HEADERS));
 
+        nextlink = configuration.getString(CK_URL);
+
         // figure out a reasonable remote address
-        final String url = configuration.getString(CK_URL);
+        final String url = nextlink;
+        System.out.println("url" + url);
         final InetSocketAddress remoteAddress;
         InetSocketAddress remoteAddress1;
         try {
@@ -178,15 +175,17 @@ public class HttpPollTransport extends ThrottleableTransport {
             }
 
             final Request.Builder requestBuilder = new Request.Builder().get()
-                    .url(url)
+                    .url(nextlink)
                     .headers(Headers.of(headers));
 
             try (final Response r = httpClient.newCall(requestBuilder.build()).execute()) {
                 if (!r.isSuccessful()) {
                     throw new RuntimeException("Expected successful HTTP status code [2xx], got " + r.code());
                 }
-
+                nextlink = getNextlink(r);
+                LOG.debug("Link to the next batch run:" + nextlink);
                 input.processRawMessage(new RawMessage(r.body().bytes(), remoteAddress));
+
             } catch (IOException e) {
                 LOG.error("Could not fetch HTTP resource at " + url, e);
             }
@@ -195,6 +194,13 @@ public class HttpPollTransport extends ThrottleableTransport {
         scheduledFuture = scheduler.scheduleAtFixedRate(task, 0,
                 configuration.getInt(CK_INTERVAL),
                 TimeUnit.valueOf(configuration.getString(CK_TIMEUNIT)));
+    }
+
+    private String getNextlink(Response r) {
+        List<String> links = r.networkResponse().headers("Link");
+        LOG.debug("Links:" + links.toString());
+        Optional<String> nextPageLink = getNextPageLink(links);
+        return parseResponseHeaders(nextPageLink.get());
     }
 
     @Override

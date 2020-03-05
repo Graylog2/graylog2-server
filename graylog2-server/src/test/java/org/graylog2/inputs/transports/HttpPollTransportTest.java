@@ -19,11 +19,15 @@ package org.graylog2.inputs.transports;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static org.graylog2.inputs.transports.HttpPollTransport.parseHeaders;
-import static org.graylog2.inputs.transports.HttpPollTransport.parseResponseHeaders;
+import static org.graylog2.inputs.transports.HttpPollTransport.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -59,11 +63,23 @@ public class HttpPollTransportTest {
     }
 
     @Test
-    public void testParseResponseHeaders() throws Exception {
-        Map<String, String> expectedSingle = ImmutableMap.of(
-                "after", "1583250857409_1");
-        assertEquals(expectedSingle, parseResponseHeaders("link:<https://graylog.okta.com/api/v1/logs?q=Nick&after=1583250857409_1>; rel=\"next\""));
+    public void testNextPageLink() {
+        String expected = "<https://graylog.okta.com/api/v1/logs?since=2020-02-18T00%3A00%3A00.000Z&limit=10&after=1582228935103_1>; rel=\"next\"";
+        List<String> urls = Stream.of("<https://graylog.okta.com/api/v1/logs?since=2020-02-18T00%3A00%3A00.000Z&limit=10>; rel=\"self\"",
+                                      expected)
+                                  .collect(Collectors.toList());
+        Optional<String> nextPageLink = getNextPageLink(urls);
+        assertTrue(expected.equals(nextPageLink.get()));
+    }
 
+    @Test
+    public void testParseResponseHeaders() {
+        List<String> urls = Stream.of("<https://graylog.okta.com/api/v1/logs?since=2020-02-18T00%3A00%3A00.000Z&limit=10>; rel=\"self\"",
+                            "<https://graylog.okta.com/api/v1/logs?since=2020-02-18T00%3A00%3A00.000Z&limit=10&after=1582228935103_1>; rel=\"next\"")
+                            .collect(Collectors.toList());
+        Optional<String> nextPageLink = getNextPageLink(urls);
+        String expectedSingle = "https://graylog.okta.com/api/v1/logs?since=2020-02-18T00%3A00%3A00.000Z&limit=10&after=1582228935103_1";
+        assertEquals(expectedSingle, parseResponseHeaders(nextPageLink.get()));
     }
 
 
