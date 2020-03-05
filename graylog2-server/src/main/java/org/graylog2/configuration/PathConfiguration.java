@@ -16,6 +16,7 @@
  */
 package org.graylog2.configuration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.joschi.jadconfig.Parameter;
 
 import java.nio.file.Path;
@@ -42,6 +43,7 @@ public abstract class PathConfiguration {
     public Path getDataDir() {
         return dataDir;
     }
+    @JsonIgnore
     public Path getNativeLibDir() {
         return dataDir.resolve("libnative");
     }
