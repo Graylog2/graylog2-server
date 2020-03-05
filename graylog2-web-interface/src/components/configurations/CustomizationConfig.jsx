@@ -1,6 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
+import {util} from 'theme';
+
 import { Badge, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { ColorPickerPopover, IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
@@ -14,7 +18,7 @@ class CustomizationConfig extends React.Component {
       badge_color: PropTypes.string,
       badge_enable: PropTypes.bool,
     }),
-    error: PropTypes.shape({
+    warning: PropTypes.shape({
       badge_text: PropTypes.string,
     }),
     updateConfig: PropTypes.func.isRequired,
@@ -26,7 +30,7 @@ class CustomizationConfig extends React.Component {
       badge_color: 'primary',
       badge_enable: false,
     },
-    error: {
+    warning: {
       badge_text: null,
     },
   };
@@ -55,15 +59,12 @@ class CustomizationConfig extends React.Component {
   _resetConfig = () => {
     const { config } = this.props;
     // Reset to initial state when the modal is closed without saving.
-    this.setState({ config });
+    this.setState({ config, warning: {} });
   };
 
   _saveConfig = () => {
-    const { error, config } = this.state;
+    const { config } = this.state;
     const { updateConfig } = this.props;
-    if ((error || {}).badge_text) {
-      return;
-    }
     updateConfig(config).then(() => {
       this._closeModal();
     });
@@ -91,21 +92,26 @@ class CustomizationConfig extends React.Component {
   };
 
   validate = () => {
-    const { error = {}, config } = this.state;
+    const { warning = {}, config } = this.state;
 
     if (config.badge_text.length > 5) {
-      error.badge_text = 'Can be maximal 5 characters long';
+      warning.badge_text = 'Should be maximum 5 characters long';
     } else {
-      error.badge_text = null;
+      warning.badge_text = null;
     }
-    this.setState({ error });
+    this.setState({ warning });
   };
 
   render() {
-    const { error = {}, config } = this.state;
+    const { warning = {}, config } = this.state;
     const badge = config.badge_text
       ? <Badge style={{ backgroundColor: config.badge_color }} className={config.badge_color}><span>{config.badge_text}</span></Badge>
       : <span>No badge defined</span>;
+
+    const SelectBackgroundButton = styled(({ selectedBgColor, ...props }) => <Button {...props} />)`
+      background-color: ${props => (props.selectedBgColor)}; 
+      color: ${props => (util.contrastingColor(props.selectedBgColor))};
+    `;
 
     return (
       <div>
@@ -135,14 +141,18 @@ class CustomizationConfig extends React.Component {
           <Input type="text"
                  id="badge-text"
                  label="Badge Text"
-                 bsStyle={error.badge_text ? 'error' : null}
+                 bsStyle={warning.badge_text ? 'warning' : null}
                  value={config.badge_text}
                  onChange={this._onUpdate('badge_text')}
-                 help={error.badge_text ? error.badge_text : 'The text of the badge. Not more than five characters.'} />
+                 help={warning.badge_text ? warning.badge_text : 'The text of the badge. Not more than five characters.'} />
           <ColorPickerPopover id="badge-color"
                               placement="right"
                               color={config.badge_color}
-                              triggerNode={<Button bsStyle="primary">Select background color</Button>}
+                              triggerNode={(
+                                <SelectBackgroundButton selectedBgColor={config.badge_color}>
+                                  <Icon name="paint-brush" /> Background
+                                </SelectBackgroundButton>
+                              )}
                               onChange={this.handleColorChange} />
         </BootstrapModalForm>
       </div>
