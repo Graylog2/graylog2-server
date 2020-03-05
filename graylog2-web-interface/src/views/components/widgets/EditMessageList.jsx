@@ -80,12 +80,6 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
             Show message in new row
           </Checkbox>
         </DescriptionBox>
-        <DescriptionBox description="Decorators">
-          <DecoratorSidebar stream="000000000000000000000001"
-                            decorators={config.decorators}
-                            maximumHeight={600}
-                            onChange={onDecoratorsChange} />
-        </DescriptionBox>
         <DescriptionBox description="Sorting">
           <FieldSortSelect fields={fields} sort={sort} onChange={data => _onSortChange(data, config, onChange)} />
         </DescriptionBox>
@@ -93,6 +87,12 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
           <SortDirectionSelect disabled={!sort || sort.length === 0}
                                direction={sortDirection && sortDirection.direction}
                                onChange={data => _onSortDirectionChange(data, config, onChange)} />
+        </DescriptionBox>
+        <DescriptionBox description="Decorators">
+          <DecoratorSidebar stream="000000000000000000000001"
+                            decorators={config.decorators}
+                            maximumHeight={600}
+                            onChange={onDecoratorsChange} />
         </DescriptionBox>
       </FullHeightCol>
       <FullHeightCol md={9}>
