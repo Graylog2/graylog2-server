@@ -38,6 +38,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,6 +109,8 @@ public class RawMessage implements Serializable {
         if (null != remoteAddress) {
             setRemoteAddress(remoteAddress);
         }
+
+        log.info("payload:"+ByteString.copyFrom(payload).toString(StandardCharsets.UTF_8));
 
         msgBuilder.setPayload(ByteString.copyFrom(payload));
     }
