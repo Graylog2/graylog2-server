@@ -1,36 +1,37 @@
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+
 import CombinedProvider from 'injection/CombinedProvider';
-import { Badge } from 'react-bootstrap';
 import AppConfig from 'util/AppConfig';
-import badgeStyles from 'components/bootstrap/Badge.css';
+import { Badge } from 'components/graylog';
+import connect from 'stores/connect';
 
 const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
 
-const HeaderBadge = createReactClass({
-  displayName: 'HeaderBadge',
-  mixins: [Reflux.connect(ConfigurationsStore)],
+const CUSTOMIZATION_CONFIG = 'org.graylog2.configuration.Customization';
 
-  componentDidMount() {
-    ConfigurationsActions.list(this.CUSTOMIZATION_CONFIG);
-  },
+const HeaderBadge = ({ configuration }) => {
+  useEffect(() => {
+    ConfigurationsActions.list(CUSTOMIZATION_CONFIG);
+  }, []);
 
-  CUSTOMIZATION_CONFIG: 'org.graylog2.configuration.Customization',
+  const config = configuration[CUSTOMIZATION_CONFIG];
+  const badgeEnabled = config && config.badge_enable;
 
-  render() {
-    const { configuration = {} } = this.state;
-    const config = configuration[this.CUSTOMIZATION_CONFIG];
-    const badgeEnabled = config && config.badge_enable;
+  if (badgeEnabled) {
+    return (<Badge className="dev-badge" style={{ backgroundColor: config.badge_color }}>{config.badge_text}</Badge>);
+  }
 
-    if (badgeEnabled) {
-      return (<Badge className="dev-badge" style={{ backgroundColor: config.badge_color }}>{config.badge_text}</Badge>);
-    }
+  return AppConfig.gl2DevMode()
+    ? <Badge className={`dev-badge danger`}>DEV</Badge>
+    : null;
+};
 
-    return AppConfig.gl2DevMode()
-      ? <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
-      : null;
-  },
-});
+HeaderBadge.propTypes = {
+  configuration: PropTypes.object.isRequired,
+};
 
-export default HeaderBadge;
+export default connect(HeaderBadge, { configurations: ConfigurationsStore }, ({ configurations, ...otherProps }) => ({
+  ...configurations,
+  ...otherProps,
+}));

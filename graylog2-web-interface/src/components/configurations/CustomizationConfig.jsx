@@ -1,17 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import { Badge, Button } from 'react-bootstrap';
+import { Badge, Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { ColorPickerPopover, IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
 import StringUtils from 'util/StringUtils';
 
-const CustomizationConfig = createReactClass({
-  displayName: 'CustomizationConfig',
-
-  propTypes: {
+class CustomizationConfig extends React.Component {
+  static propTypes = {
     config: PropTypes.shape({
       badge_text: PropTypes.string,
       badge_color: PropTypes.string,
@@ -21,46 +18,47 @@ const CustomizationConfig = createReactClass({
       badge_text: PropTypes.string,
     }),
     updateConfig: PropTypes.func.isRequired,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      config: {
-        badge_text: 'PROD',
-        badge_color: 'primary',
-        badge_enable: false,
-      },
-      error: {
-        badge_text: null,
-      },
-    };
-  },
+  static defaultProps = {
+    config: {
+      badge_text: 'PROD',
+      badge_color: 'primary',
+      badge_enable: false,
+    },
+    error: {
+      badge_text: null,
+    },
+  };
 
-  getInitialState() {
-    const { config } = this.props;
-    return {
+  constructor(props) {
+    super(props);
+
+    const { config } = props;
+    this.state = {
       config: ObjectUtils.clone(config),
     };
-  },
+  }
 
   componentWillReceiveProps(newProps) {
     this.setState({ config: ObjectUtils.clone(newProps.config) });
-  },
+  }
 
-  _openModal() {
+  _openModal = () => {
     this.configModal.open();
-  },
+  };
 
-  _closeModal() {
+  _closeModal = () => {
     this.configModal.close();
-  },
+  };
 
-  _resetConfig() {
+  _resetConfig = () => {
+    const { config } = this.props;
     // Reset to initial state when the modal is closed without saving.
-    this.setState(this.getInitialState());
-  },
+    this.setState({ config });
+  };
 
-  _saveConfig() {
+  _saveConfig = () => {
     const { error, config } = this.state;
     const { updateConfig } = this.props;
     if ((error || {}).badge_text) {
@@ -69,9 +67,9 @@ const CustomizationConfig = createReactClass({
     updateConfig(config).then(() => {
       this._closeModal();
     });
-  },
+  };
 
-  _onUpdate(field) {
+  _onUpdate = (field) => {
     const { config } = this.state;
     return (value) => {
       const update = ObjectUtils.clone(config);
@@ -82,17 +80,17 @@ const CustomizationConfig = createReactClass({
       }
       this.setState({ config: update }, this.validate);
     };
-  },
+  };
 
-  handleColorChange(color, _, hidePopover) {
+  handleColorChange = (color, _, hidePopover) => {
     const { config } = this.state;
     hidePopover();
     const update = ObjectUtils.clone(config);
     update.badge_color = color;
     this.setState({ config: update });
-  },
+  };
 
-  validate() {
+  validate = () => {
     const { error = {}, config } = this.state;
 
     if (config.badge_text.length > 5) {
@@ -101,7 +99,7 @@ const CustomizationConfig = createReactClass({
       error.badge_text = null;
     }
     this.setState({ error });
-  },
+  };
 
   render() {
     const { error = {}, config } = this.state;
@@ -149,7 +147,7 @@ const CustomizationConfig = createReactClass({
         </BootstrapModalForm>
       </div>
     );
-  },
-});
+  }
+}
 
 export default CustomizationConfig;
