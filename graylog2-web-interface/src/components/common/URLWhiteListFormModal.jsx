@@ -26,7 +26,7 @@ type Props = {
   onUpdate: () => void,
   configuration: {},
   currentUser: {permissions: Array<string>},
-  urlType: string,
+  urlType: 'regex' | 'literal',
 };
 
 
@@ -57,7 +57,6 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
         ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
       }
     }
-
 
     componentDidUpdate(prevProps) {
       const { config: { entries } } = this.state;

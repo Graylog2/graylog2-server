@@ -3,13 +3,13 @@ import Reflux from 'reflux';
 import URI from 'urijs';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
 const ToolsStore = Reflux.createStore({
   testNaturalDate(text: string): Promise<string[]> {
     const { url } = ApiRoutes.ToolsApiController.naturalDateTest(text);
-    const promise = fetch('GET', URLUtils.qualifyUrl(url));
+    const promise = fetch('GET', qualifyUrl(url));
 
     promise.catch((errorThrown) => {
       if (errorThrown.additional.status !== 422) {
@@ -22,7 +22,7 @@ const ToolsStore = Reflux.createStore({
   },
   testGrok(pattern: string, namedCapturesOnly: boolean, string: string): Promise<Object> {
     const { url } = ApiRoutes.ToolsApiController.grokTest();
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), {
+    const promise = fetch('POST', qualifyUrl(url), {
       pattern: pattern,
       string: string,
       named_captures_only: namedCapturesOnly,
@@ -48,7 +48,7 @@ const ToolsStore = Reflux.createStore({
       string: string,
     };
 
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+    const promise = fetch('POST', qualifyUrl(url), payload);
 
     promise.catch((errorThrown) => {
       UserNotification.error(`Details: ${errorThrown}`,
@@ -60,7 +60,7 @@ const ToolsStore = Reflux.createStore({
   testRegexValidity(regex: string): Promise<Object> {
     const encodedRegex = URI.encode(regex);
     const { url } = ApiRoutes.ToolsApiController.regexValidate(encodedRegex);
-    const promise = fetch('GET', URLUtils.qualifyUrl(url));
+    const promise = fetch('GET', qualifyUrl(url));
 
     promise.catch((errorThrown) => {
       UserNotification.error(`Details: ${errorThrown}`,
@@ -71,7 +71,7 @@ const ToolsStore = Reflux.createStore({
   },
   urlWhiteListCheck(urlToCheck: string): Promise<Object> {
     const { url } = ApiRoutes.ToolsApiController.urlWhitelistCheck();
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), {
+    const promise = fetch('POST', qualifyUrl(url), {
       url: urlToCheck,
     });
 
@@ -84,7 +84,7 @@ const ToolsStore = Reflux.createStore({
   },
   urlWhiteListGenerateRegex(urlTemplate: string, placeholder: string): Promise<Object> {
     const { url } = ApiRoutes.ToolsApiController.urlWhitelistGenerateRegex();
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), {
+    const promise = fetch('POST', qualifyUrl(url), {
       url_template: urlTemplate,
       placeholder,
     });
@@ -98,7 +98,7 @@ const ToolsStore = Reflux.createStore({
   },
   testRegex(regex: string, string: string): Promise<Object> {
     const { url } = ApiRoutes.ToolsApiController.regexTest();
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), {
+    const promise = fetch('POST', qualifyUrl(url), {
       regex: regex,
       string: string,
     });
@@ -118,7 +118,7 @@ const ToolsStore = Reflux.createStore({
       replace_all: replaceAll,
       string: string,
     };
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+    const promise = fetch('POST', qualifyUrl(url), payload);
 
     promise.catch((errorThrown) => {
       UserNotification.error(`Details: ${errorThrown}`,
@@ -135,7 +135,7 @@ const ToolsStore = Reflux.createStore({
       string: string,
     };
 
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+    const promise = fetch('POST', qualifyUrl(url), payload);
 
     promise.catch((errorThrown) => {
       UserNotification.error(`Details: ${errorThrown}`,
@@ -152,7 +152,7 @@ const ToolsStore = Reflux.createStore({
       string: string,
     };
 
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+    const promise = fetch('POST', qualifyUrl(url), payload);
 
     promise.catch((errorThrown) => {
       UserNotification.error(`Details: ${errorThrown}`,
@@ -163,7 +163,7 @@ const ToolsStore = Reflux.createStore({
   },
   testContainsString(searchString: string, string: string): Promise<Object> {
     const { url } = ApiRoutes.ToolsApiController.containsStringTest();
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), {
+    const promise = fetch('POST', qualifyUrl(url), {
       search_string: searchString,
       string: string,
     });
@@ -178,7 +178,7 @@ const ToolsStore = Reflux.createStore({
 
   testLookupTable(lookupTableName: string, string: string): Promise<Object> {
     const { url } = ApiRoutes.ToolsApiController.lookupTableTest();
-    const promise = fetch('POST', URLUtils.qualifyUrl(url), {
+    const promise = fetch('POST', qualifyUrl(url), {
       lookup_table_name: lookupTableName,
       string: string,
     });

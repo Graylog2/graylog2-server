@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
-import URLUtils from 'util/URLUtils';
+import { isValidURL } from 'util/URLUtils';
 import FormsUtils from 'util/FormsUtils';
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 
@@ -26,11 +26,11 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
   const suggestRegexWhitelistUrl = (typedUrl: string, type: string): string | Promise<any> => {
     // eslint-disable-next-line no-template-curly-in-string
     const keyWildcard = '${key}';
-    return type && type === 'regex' && URLUtils.isValidURL(typedUrl) ? ToolsStore.urlWhiteListGenerateRegex(typedUrl, keyWildcard) : typedUrl;
+    return type && type === 'regex' && isValidURL(typedUrl) ? ToolsStore.urlWhiteListGenerateRegex(typedUrl, keyWildcard) : typedUrl;
   };
 
   const [suggestedUrl, setSuggestedUrl] = useState(url);
-  const isWhitelistError = () => currentValidationState === 'error' && URLUtils.isValidURL(url);
+  const isWhitelistError = () => currentValidationState === 'error' && isValidURL(url);
   const ref = useRef();
 
   const checkIsWhitelisted = () => {
@@ -39,7 +39,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
       promise.then((result) => {
         if (!result.is_whitelisted && validationState === null) {
           setCurrentValidationState('error');
-          const message = URLUtils.isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not valid URL.`;
+          const message = isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not valid URL.`;
           setOwnValidationMessage(message);
         } else {
           setOwnValidationMessage(validationMessage);
@@ -69,12 +69,12 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
         }
       }
     };
-    const timer = setTimeout(() => checkSuggestion(), 500);
+    const timer = setTimeout(() => checkSuggestion(), 250);
     return () => clearTimeout(timer);
   }, [url]);
 
   useEffect(() => {
-    const timer = setTimeout(() => checkIsWhitelisted(), 500);
+    const timer = setTimeout(() => checkIsWhitelisted(), 250);
     return () => clearTimeout(timer);
   }, [url, validationState]);
 

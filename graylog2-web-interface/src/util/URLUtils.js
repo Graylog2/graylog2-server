@@ -76,4 +76,5 @@ export const {
   replaceHashParam,
   concatURLPath,
   areCredentialsInURLSupported,
+  isValidURL,
 } = URLUtils;
