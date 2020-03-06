@@ -2,14 +2,11 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
-import Qs from 'qs';
 
 import { Icon } from 'components/common';
-import Routes from 'routing/Routes';
-import type { TimeRange } from 'views/logic/queries/Query';
-import DrilldownContext from '../contexts/DrilldownContext';
-import SearchLink from '../../../components/search/SearchLink';
+import SearchLink from 'components/search/SearchLink';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import DrilldownContext from '../contexts/DrilldownContext';
 
 const DitheredIcon: StyledComponent<{}, {}, HTMLElement> = styled(Icon)`
   opacity: 0.3;
