@@ -8,6 +8,8 @@ import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import type { TimeRange } from 'views/logic/queries/Query';
 import DrilldownContext from '../contexts/DrilldownContext';
+import SearchLink from '../../../components/search/SearchLink';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 const DitheredIcon: StyledComponent<{}, {}, HTMLElement> = styled(Icon)`
   opacity: 0.3;
@@ -24,31 +26,12 @@ const NeutralLink: StyledComponent<{}, {}, HTMLAnchorElement> = styled.a`
   }
 `;
 
-const _searchTimerange = (timerange: TimeRange) => {
-  const { type } = timerange;
-  const result = { rangetype: type };
-
-  switch (timerange.type) {
-    case 'relative': return { ...result, relative: timerange.range };
-    case 'keyword': return { ...result, keyword: timerange.keyword };
-    case 'absolute': return { ...result, from: timerange.from, to: timerange.to };
-    default: return result;
-  }
-};
-
-const buildSearchLink = (timerange, query, streams) => {
-  const searchTimerange = _searchTimerange(timerange);
-
-  const params = {
-    ...searchTimerange,
-    q: query,
-  };
-  const paramsWithStreams = streams && streams.length > 0
-    ? { ...params, streams: streams.join(',') }
-    : params;
-
-  return `${Routes.SEARCH}?${Qs.stringify(paramsWithStreams)}`;
-};
+const buildSearchLink = (timerange, query, streams) => SearchLink.builder()
+  .query(createElasticsearchQueryString(query))
+  .timerange(timerange)
+  .streams(streams)
+  .build()
+  .toURL();
 
 const ReplaySearchButton = () => {
   const { query, timerange, streams } = useContext(DrilldownContext);
