@@ -285,6 +285,12 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       }
     }
   }
+
+  .dropdown-header {
+    text-transform: uppercase;
+    padding: 0 15px !important;
+    font-weight: bold;
+  }
 `);
 
 /** @component */
