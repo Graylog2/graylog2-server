@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.Resources;
 import io.searchbox.client.JestClient;
 import io.searchbox.cluster.State;
 import org.graylog.testing.PropertyLoader;
@@ -34,6 +35,8 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.net.URI;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -174,7 +177,16 @@ public class ElasticsearchInstance extends ExternalResource {
         return client;
     }
 
-    FixtureImporter fixtureImporter() {
-        return fixtureImporter;
+    public void importFixtureResource(String resourcePath, Class<?> testClass) {
+        boolean isFullResourcePath = Paths.get(resourcePath).getNameCount() > 1;
+
+        @SuppressWarnings("UnstableApiUsage") final URL fixtureResource = isFullResourcePath
+                ? Resources.getResource(resourcePath)
+                : Resources.getResource(testClass, resourcePath);
+
+        fixtureImporter.importResource(fixtureResource, jestClient);
+
+        // Make sure the data we just imported is visible
+        client().refreshNode();
     }
 }

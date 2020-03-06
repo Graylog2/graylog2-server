@@ -16,15 +16,25 @@
  */
 package org.graylog.testing.fullbackend;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.ImmutableSet;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,10 +52,12 @@ class BackendStartupIT {
 
     @BeforeAll
     static void beforeAll() {
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
         RestAssured.requestSpecification =
                 new RequestSpecBuilder().build()
                         .accept(JSON)
                         .contentType(JSON)
+                        .header("X-Requested-By", "peterchen")
                         .auth().basic("admin", "admin");
     }
 
@@ -70,5 +82,31 @@ class BackendStartupIT {
                 "Threat Intelligence Plugin",
                 "Collector",
                 "AWS plugins");
+    }
+
+    @Test
+    void importsElasticsearchFixtures() throws InvalidRangeParametersException, JsonProcessingException {
+        sut.importElasticsearchFixture("one-message.json", getClass());
+
+        MessageList messageList = MessageList.builder().id("123").build();
+        Query q = Query.builder()
+                .id("123")
+                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .timerange(AbsoluteRange.create("2010-01-01T00:00:00.0Z", "2050-01-01T00:00:00.0Z"))
+                .searchTypes(ImmutableSet.of(messageList))
+                .build();
+        Search s = Search.builder().queries(ImmutableSet.of(q)).build();
+
+        String body = new ObjectMapperProvider().get().writeValueAsString(s);
+
+        List<String> j = given().when()
+                .body(body)
+                .post(sut.apiAddress() + "/views/search/sync")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath().getList("results." + q.id() + ".search_types." + messageList.id() + ".messages.message.message", String.class);
+
+        assertThat(j).containsExactly("Boom");
     }
 }

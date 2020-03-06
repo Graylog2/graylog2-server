@@ -93,6 +93,10 @@ public class GraylogBackend {
         node.restart();
     }
 
+    public void importElasticsearchFixture(String resourcePath, Class<?> testClass) {
+        es.importFixtureResource(resourcePath, testClass);
+    }
+
     public String apiAddress() {
         return node.getApiAddress();
     }
