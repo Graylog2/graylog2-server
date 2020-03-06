@@ -21,12 +21,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import java.util.Optional;
 
 public enum Lifecycle {
-    CLASS {
-        @Override
-        void afterEach(GraylogBackend backend) {
-            backend.purgeData();
-        }
-    },
+    CLASS,
     METHOD {
         @Override
         void afterEach(GraylogBackend backend) {
@@ -34,7 +29,10 @@ public enum Lifecycle {
         }
     };
 
-    abstract void afterEach(GraylogBackend backend);
+    void afterEach(GraylogBackend backend) {
+    }
+
+    ;
 
     public static Lifecycle from(ExtensionContext context) {
         Optional<Class<?>> testClass = context.getTestClass();
