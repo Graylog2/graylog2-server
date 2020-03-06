@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 import { Col, Label, Row } from 'components/graylog';
 import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'views/components/messagelist';
+import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import { Icon, Spinner, Timestamp } from 'components/common';
 
 import Routes from 'routing/Routes';
@@ -148,11 +149,11 @@ class MessageDetail extends React.Component {
                             toggleShowOriginal={this._toggleShowOriginal}
                             searchConfig={searchConfig}
                             streams={allStreams} />
-            <h3 className="message-details-title">
+            <MessageDetailsTitle>
               <Icon name="envelope" />
               &nbsp;
               {messageTitle}
-            </h3>
+            </MessageDetailsTitle>
           </Col>
         </Row>
         <Row>

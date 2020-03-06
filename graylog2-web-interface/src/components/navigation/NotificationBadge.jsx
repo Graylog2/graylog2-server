@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Badge, Nav } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
@@ -10,7 +11,16 @@ import InactiveNavItem from './InactiveNavItem';
 
 const { NotificationsActions, NotificationsStore } = CombinedProvider.get('Notifications');
 
+const StyledInactiveNavItem = styled(InactiveNavItem)`
+  a:hover {
+    border: 0;
+    text-decoration: none;
+  }
+`;
+
 class NotificationBadge extends React.PureComponent {
+  POLL_INTERVAL = 3000;
+
   static propTypes = {
     total: PropTypes.number,
   };
@@ -18,8 +28,6 @@ class NotificationBadge extends React.PureComponent {
   static defaultProps = {
     total: undefined,
   };
-
-  POLL_INTERVAL = 3000;
 
   componentDidMount() {
     NotificationsActions.list();
@@ -38,9 +46,9 @@ class NotificationBadge extends React.PureComponent {
     return (
       <Nav navbar>
         <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-          <InactiveNavItem className="notification-badge-link">
+          <StyledInactiveNavItem>
             <Badge bsStyle="danger" id="notification-badge">{total}</Badge>
-          </InactiveNavItem>
+          </StyledInactiveNavItem>
         </LinkContainer>
       </Nav>
     );

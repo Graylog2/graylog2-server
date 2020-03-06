@@ -7,7 +7,7 @@ const GlobalThemeStyles = createGlobalStyle`
 
   body {
     background-color: #e3e3e3;
-    font-family: 'Open Sans', sans-serif;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 12px;
     overflow-x: hidden;
     margin-top: 50px;
@@ -82,11 +82,6 @@ const GlobalThemeStyles = createGlobalStyle`
     }
   }
 
-  .input-group-addon.input-group-separator {
-    border-right-width: 0;
-    border-left-width: 0;
-  }
-
   label {
     font-size: 14px;
   }
@@ -96,33 +91,9 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-left: 5px;
   }
 
-  .btn:focus {
-    background-position: 0;
-  }
-
-  .modal-title {
-    font-size: 21px;
-  }
-
-  .modal-dialog {
-    margin-top: 55px;
-  }
-
-  .modal .modal-backdrop {
-    z-index: 0;
-  }
-
-  .modal-backdrop {
-    height: 100000%;  /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
-    z-index: 1030;
-  }
-
-  .navbar-brand {
-    padding: 12px 15px 0 15px;
-  }
-
-  #universalsearch-container {
-    padding: 0 25px;
+  .input-group-addon.input-group-separator {
+    border-right-width: 0;
+    border-left-width: 0;
   }
 
   .content {
@@ -138,30 +109,10 @@ const GlobalThemeStyles = createGlobalStyle`
     color: #939393;
   }
 
-  .content-head {
-    padding-bottom: 0;
-  }
-
-  .content-head p {
-    margin-top: 15px;
-  }
-
-  .content-head .actions-lg {
-    float: right;
-  }
-
   .actions-lg .actions-container {
     height: 60px;
     margin-top: 10px;
     padding-left: 50px;
-  }
-
-  .content-head .actions-sm {
-    padding-bottom: 15px;
-  }
-
-  .content-head .description-tooltips .fa-stack {
-    margin-right: 3px;
   }
 
   .content p.description-tooltips-small .fa-stack {
@@ -185,45 +136,9 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-bottom: 0;
   }
 
-  #main-content-sidebar {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
   #main-content {
     margin-top: 10px;
     padding: 5px 25px;
-  }
-
-  /* // This is rendered inside a #main-content, and we need to compensate the margin-top to make it look nicer */
-  #main-content-search {
-    margin-bottom: 0;
-    margin-top: -15px;
-  }
-
-  a.fields-set-chooser {
-    margin-right: 2px;
-    margin-left: 2px;
-  }
-
-  #result-graph {
-    margin-left: 40px;
-    margin-top: 5px;
-  }
-
-  #result-graph-timeline {
-    margin-left: 40px;
-  }
-
-  #y_axis {
-    float: left;
-    height: 200px;
-    width: 40px;
-  }
-
-  .message-terms {
-    margin-right: 8px;
-    font-family: monospace;
   }
 
   .support-sources ul {
@@ -232,36 +147,8 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-top: 5px;
   }
 
-  .systemjob {
-    margin-top: 10px;
-    border-bottom: 1px solid #ccc;
-  }
-
-  .systemjob .progress {
-    margin-top: 2px;
-    margin-bottom: 5px;
-  }
-
-  .systemjob .finished {
-    display: none;
-    position: relative;
-    top: -1px;
-    left: 2px;
-    font-family: "Arial", sans-serif;
-    font-size: 11px;
-  }
-
-  .systemjobs-none {
-    margin-top: 10px;
-  }
-
   .notifications-none {
     margin-top: 10px;
-  }
-
-  .notification-badge-link:hover {
-    border: 0 !important;
-    text-decoration: none !important;
   }
 
   .row {
@@ -277,74 +164,6 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-top: 5px;
   }
 
-  .system-messages {
-    font-size: 12px;
-  }
-
-  .notification {
-    margin-top: 10px !important;
-  }
-
-  .notification i {
-    color: #000;
-  }
-
-  .notification-head {
-    margin-bottom: 5px;
-  }
-
-  .notification-timestamp {
-    margin-left: 3px;
-    font-size: 10px;
-  }
-
-  .notification-solutions {
-    margin-top: 10px;
-  }
-
-  .notification-solutions label {
-    font-size: 13px;
-  }
-
-  .notification form {
-    margin-bottom: 0;
-  }
-
-  .notification-solutions h4 {
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 1px;
-  }
-
-  .notification-solutions .btn {
-    margin-top: 3px;
-    font-size: 12px;
-    padding: 3px 11px;
-  }
-
-  .change-message-processing {
-    position: relative;
-    top: -1px;
-  }
-
-  .es-cluster-status {
-    margin-top: 10px;
-    margin-bottom: 5px;
-  }
-
-  .graph-resolution-selector {
-    margin-top: 5px;
-    margin-bottom: 20px;
-  }
-
-  .graph-resolution-selector li {
-    padding-right: 0;
-  }
-
-  .graph-resolution-selector a {
-    text-transform: capitalize;
-  }
-
   .selected-resolution {
     font-weight: bold;
   }
@@ -353,24 +172,12 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-bottom: 0;
   }
 
-  .input-list h2 {
-    margin-bottom: 5px;
-  }
-
-  .input-list .alert {
-    margin-top: 10px;
-  }
-
   .input-new {
     margin-bottom: 8px;
   }
 
   .alert-bar {
     margin: 10px -20px 0;
-  }
-
-  .system-messages a {
-    color: #000;
   }
 
   .xtrc-new-example {
@@ -386,12 +193,6 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-bottom: 12px;
   }
 
-  .xtrc-hl {
-    background-color: #f8b9b7;
-    padding-top: 3px;
-    padding-bottom: 3px;
-  }
-
   #create-extractor {
     margin-top: 10px;
   }
@@ -400,38 +201,10 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-left: 20px;
   }
 
-  .xtrc-list-container {
-    margin-top: 15px;
-  }
-
-  .xtrc-list-container h2 {
-    margin-bottom: 5px;
-  }
-
-  .xtrc-list-container .alert {
-    margin-top: 5px;
-  }
-
-  .xtrc-list-drag {
-    margin-top: 10px;
-  }
-
-  .manual-selector-form {
-    margin-top: 5px;
-  }
-
   .u-light {
     border-bottom: 1px dotted #bbb;
     margin-bottom: 5px;
     padding-bottom: 5px;
-  }
-
-  .success-match {
-    color: #408140;
-  }
-
-  .fail-match {
-    color: #da4f49;
   }
 
   .input-docs {
@@ -440,43 +213,6 @@ const GlobalThemeStyles = createGlobalStyle`
 
   .input-docs:hover {
     text-decoration: none;
-  }
-
-  .open-analyze-field {
-    cursor: pointer;
-    font-size: 16px;
-    position: relative;
-    top: 4px;
-    color: #16ace3;
-  }
-
-  .open-analyze-field-active {
-    color: #1189b5;
-  }
-
-  .open-analyze-field:hover {
-    color: #1189b5;
-  }
-
-  .analyze-field {
-    margin-top: 10px;
-  }
-
-  .analyze-field .statistics .wrong-type {
-    margin-top: 5px;
-    color: #bbb;
-  }
-
-  .timerange-selector-container {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 6px;
-    margin-bottom: 8px;
-    margin-left: 5px;
-  }
-
-  .timerange-selector-container .input-prepend,
-  .input-append {
-    margin-bottom: 0;
   }
 
   .timerange-selector select {
@@ -506,10 +242,6 @@ const GlobalThemeStyles = createGlobalStyle`
     color: #f89406;
   }
 
-  .permission-select {
-    width: 350px;
-  }
-
   .loglevel-metrics-row {
     margin-top: 2px;
     margin-left: 10px;
@@ -530,39 +262,9 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-left: 10px;
   }
 
-  .subsystems-row {
-    margin-bottom: 10px;
-  }
-
-  #universalsearch .timerange-selector-container .keyword .icon {
-    margin-left: 5px;
-  }
-
-  #universalsearch .timerange-selector-container .keyword .keyword-preview {
-    margin-top: 4px;
-    margin-left: 45px;
-    font-size: 11px;
-  }
-
-  #universalsearch .timerange-selector-container .keyword .keyword-preview .fromto span {
-    background-color: #fec;
-    padding-left: 3px;
-    padding-right: 3px;
-  }
-
-  .no-active-nodes {
-    margin-top: 8px;
-  }
-
   .alpha80 {
     background: rgb(0, 0, 0) transparent;
     background: rgba(0, 0, 0, 0.8);
-    filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
-  }
-
-  .alpha70 {
-    background: rgb(0, 0, 0) transparent;
-    background: rgba(0, 0, 0, 0.7);
     filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
   }
 
@@ -596,49 +298,6 @@ const GlobalThemeStyles = createGlobalStyle`
     width: 10px;
     height: 10px;
     margin: 0 4px 0 0;
-  }
-
-  .input-list .static-fields {
-    margin-top: 10px;
-    margin-left: 3px;
-  }
-
-  .input-list .static-fields ul {
-    margin: 0;
-    padding: 0;
-  }
-
-  .input-list .static-fields ul .remove-static-field {
-    margin-left: 5px;
-  }
-
-  .field-graph-container {
-    padding-bottom: 35px;
-  }
-
-  .field-graph-container .dropdown-menu a.selected {
-    font-weight: bold;
-  }
-
-  .field-graph-container .type-description {
-    color: #bbb;
-    font-size: 11px;
-  }
-
-  .field-graph-container .field-graph-components {
-    margin-top: 10px;
-    margin-right: 12px;
-  }
-
-  .field-graph-container .field-graph {
-    margin-left: 40px;
-    margin-bottom: 25px;
-  }
-
-  .field-graph-container .field-graph-y-axis {
-    float: left;
-    height: 200px;
-    width: 40px;
   }
 
   #field-graphs .spinner {
@@ -779,13 +438,6 @@ const GlobalThemeStyles = createGlobalStyle`
     color: #ff4646 !important;
   }
 
-  .datatable-badge {
-    border-radius: 2px;
-    display: inline-block;
-    padding: 5px;
-    vertical-align: baseline;
-  }
-
   .tooltip .tooltip-inner {
     max-width: 300px;
   }
@@ -832,10 +484,6 @@ const GlobalThemeStyles = createGlobalStyle`
     overflow: hidden;
   }
 
-  .dashboard .widget .quickvalues-visualization {
-    overflow: auto;
-  }
-
   .dashboard .widget .quickvalues-graph {
     text-align: center;
   }
@@ -877,19 +525,6 @@ const GlobalThemeStyles = createGlobalStyle`
   .configuration-field-optional {
     margin-left: 5px;
     font-size: 11px;
-  }
-
-  .message-result-fields-range {
-    font-size: 11px;
-  }
-
-  .message-result-fields-set {
-    margin-bottom: 10px;
-  }
-
-  /* Chief Padding Officer */
-  .message-result-fields-set .btn-mini {
-    padding-top: 1px;
   }
 
   .index-description {
@@ -1022,20 +657,6 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-left: 120px;
   }
 
-  .closed-indices {
-    cursor: pointer;
-  }
-
-  .closed-indices ul {
-    margin-top: 5px;
-    list-style-type: square;
-    margin-left: 25px;
-  }
-
-  #streamrule-form-modal .well {
-    font-family: 'Open Sans', sans-serif !important;
-  }
-
   .search-help {
     margin: 0 5px;
     line-height: 34px;
@@ -1049,15 +670,13 @@ const GlobalThemeStyles = createGlobalStyle`
     word-break: break-all;
   }
 
-  .sources th,
-  .quickvalues-table th {
+  .sources th {
     background-color: #333;
     color: #fff;
     font-weight: normal;
   }
 
-  .sources .dc-table-column._3,
-  .quickvalues-table .dc-table-column._3 {
+  .sources .dc-table-column._3 {
     padding-right: 0;
     text-align: right;
   }
@@ -1081,66 +700,11 @@ const GlobalThemeStyles = createGlobalStyle`
     display: none;
   }
 
-  .field-graph-query-container {
-    position: relative;
-    padding-left: 10px;
-  }
-
-  .field-graph-query {
-    font-family: monospace;
-    color: #9da096;
-  }
-
-  .field-graph-container .reposition-handle {
-    cursor: move;
-  }
-
-  .field-graph-container .merge-hint {
-    text-align: center;
-    position: relative;
-    top: -115px;
-    margin-bottom: -21px;
-    display: none;
-    z-index: 2000;
-  }
-
-  .field-graph-container .merge-hint span {
-    padding: 15px 50px;
-    font-size: 15px;
-    color: #fff;
-  }
-
-  .field-graph-container .merge-drop-ready {
-    background-color: #000;
-  }
-
   .parse-error {
     background-color: #f2dede;
     color: #a94442;
     padding-left: 2px;
     padding-right: 2px;
-  }
-
-  .field-graph-query-color {
-    width: 8px;
-    height: 8px;
-    display: inline-block;
-    margin-right: 1px;
-  }
-
-  .messages th i.sort-order-desc {
-    position: relative;
-    top: -1px;
-  }
-
-  .messages th i.sort-order-item {
-    margin-right: 2px;
-    color: #222; /* same color as .messsages th cannot display: none it because it would push the table columns out on hover :( */
-  }
-
-  .messages th i.sort-order-active,
-  .messages th:hover i.sort-order-item {
-    color: #fff;
   }
 
   .add-alert-type {
@@ -1180,14 +744,6 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-top: 15px;
   }
 
-  #add-alert-receivers {
-    margin-top: 15px;
-  }
-
-  #add-alert-receivers span.twitter-typeahead {
-    vertical-align: middle;
-  }
-
   .alert-receivers {
     padding-left: 10px;
   }
@@ -1214,23 +770,8 @@ const GlobalThemeStyles = createGlobalStyle`
     color: #fff;
   }
 
-  li.alert-condition-item:not(:last-child) {
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ececec;
-  }
-
   .alert-condition .in-grace {
     color: #8c8e86;
-  }
-
-  .alert-conditions hr {
-    margin-top: 7px;
-    margin-bottom: 7px;
-  }
-
-  .streameditpermissions,
-  .dashboardeditpermissions {
-    margin-top: 10px;
   }
 
   .query-exception {
@@ -1276,26 +817,9 @@ const GlobalThemeStyles = createGlobalStyle`
     cursor: help;
   }
 
-  #result-graph-timeline .annotation .content {
-    left: -120px;
-  }
-
-  #result-graph-timeline .annotation .content::before {
-    left: 117px;
-  }
-
   .annotation .content {
     margin-bottom: 10px;
     cursor: auto !important;
-  }
-
-  .xtrc-order-handle {
-    cursor: move;
-    margin-right: 2px;
-  }
-
-  .xtrc-order-active {
-    background-color: #00a5cf;
   }
 
   textarea.textarea-xlarge {
@@ -1599,15 +1123,6 @@ const GlobalThemeStyles = createGlobalStyle`
     margin-bottom: 3px;
   }
 
-  ul.streams li.stream .streamrules-details {
-    margin-top: 15px;
-  }
-
-  .stream-stopped {
-    position: relative;
-    top: -3px;
-  }
-
   ul.entity-list {
     padding: 0;
     margin: 0;
@@ -1638,196 +1153,6 @@ const GlobalThemeStyles = createGlobalStyle`
     li.entity-list-item:not(:last-child) {
       border-bottom: 1px solid #6dcff6;
     }
-  }
-
-  .breadcrumb {
-    margin-bottom: 10px !important;
-    margin-left: -15px;
-    margin-right: -15px;
-  }
-
-  .graylog-node {
-    margin-top: 15px;
-  }
-
-  .graylog-node-title {
-    margin-top: 8px;
-  }
-
-  dl.graylog-node-state {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
-  dl.graylog-node-state dt {
-    float: left;
-  }
-
-  dl.graylog-node-state dd {
-    margin-left: 180px;
-  }
-
-  #message-table-paginator-top {
-    width: 90%;
-  }
-
-  #message-table-paginator-top ul {
-    margin: 0;
-  }
-
-  #message-table-paginator-bottom {
-    height: 75px;
-    margin-top: 20px;
-  }
-
-  #message-table-paginator-bottom nav {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-top: 1px #ddd solid;
-    margin-left: -10px;
-  }
-
-  #message-table-paginator-bottom .affix {
-    z-index: 3; /* show on top of .pagination .active links */
-    bottom: 1px;
-  }
-
-  #message-table-paginator-bottom .affix-bottom {
-    position: absolute;
-  }
-
-  #message-table-paginator-bottom .affix-bottom nav {
-    border: 0;
-  }
-
-  .search-results-table {
-    border-left: 2px solid #e3e3e3;
-    overflow-y: auto;
-    width: 100%;
-  }
-
-  .search-results-table > div {
-    border-left: 1px solid #d1d1d1;
-  }
-
-  .messages-container {
-    padding-right: 13px;
-    width: 100%;
-  }
-
-  table.messages {
-    position: relative;
-    font-size: 11px;
-    margin-top: 15px;
-    margin-bottom: 60px;
-    border-collapse: collapse;
-    padding-left: 13px;
-    width: 100%;
-    word-break: break-all;
-  }
-
-  table.messages thead > tr {
-    color: #fff;
-  }
-
-  table.messages td,
-  table.messages th {
-    position: relative;
-    left: 13px;
-  }
-
-  table.messages > thead th {
-    border: 0;
-    font-size: 11px;
-    font-weight: normal;
-    background-color: #222;
-    white-space: nowrap;
-  }
-
-  table.messages tr {
-    border: 0 !important;
-  }
-
-  table.messages tbody.message-group {
-    border-top: 0;
-  }
-
-  table.messages tbody.message-group-toggled {
-    border-left: 7px solid #16ace3;
-  }
-
-  table.messages tbody.message-highlight {
-    border-left: 7px solid #8dc63f;
-  }
-
-  table.messages tr.fields-row {
-    cursor: pointer;
-  }
-
-  table.messages tr.fields-row td {
-    padding-top: 10px;
-  }
-
-  table.messages tr.message-row td {
-    border-top: 0;
-    padding-top: 0;
-    padding-bottom: 5px;
-    font-family: monospace;
-    color: #16ace3;
-  }
-
-  table.messages tr.message-row {
-    margin-bottom: 5px;
-    cursor: pointer;
-  }
-
-  table.messages tr.message-row .message-wrapper {
-    line-height: 1.5em;
-    white-space: pre-line;
-    max-height: 6em; /* show 4 lines: line-height * 4 */
-    overflow: hidden;
-  }
-
-  table.messages tr.message-row .message-wrapper::after {
-    content: "";
-    text-align: right;
-    position: absolute;
-    width: 99%;
-    left: 5px;
-    top: 4.5em;
-    height: 1.5em;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
-  }
-
-  table.messages tr.message-detail-row {
-    display: none;
-  }
-
-  table.messages tr.message-detail-row td {
-    padding-top: 5px;
-    border-top: 0;
-  }
-
-  table.messages tr.message-detail-row .row {
-    margin-right: 0;
-  }
-
-  table.messages tr.message-detail-row div[class*="col-"] {
-    padding-right: 0;
-  }
-
-  .message-details-title {
-    height: 30px;
-  }
-
-  .message-details-title a {
-    color: #000;
-  }
-
-  .message-details-title .label {
-    font-size: 50%;
-    line-height: 200%;
-    margin-left: 5px;
-    vertical-align: bottom;
   }
 
   dl.message-details {
@@ -1878,11 +1203,6 @@ const GlobalThemeStyles = createGlobalStyle`
     top: -10px;
   }
 
-  .greyed-out {
-    opacity: 0.5;
-    z-index: 20;
-  }
-
   nav.navbar-fixed-top ul.dropdown-menu li a {
     font-size: 12px;
   }
@@ -1928,32 +1248,6 @@ const GlobalThemeStyles = createGlobalStyle`
     border-bottom: 1px;
   }
 
-  .graylog-input-actions {
-    margin-top: 5px;
-    text-align: right;
-  }
-
-  .graylog-input-subtitle {
-    margin-top: 5px;
-    margin-bottom: 0;
-  }
-
-  .graylog-input-error {
-    position: relative;
-    top: -4px;
-    margin: 0;
-    padding: 7px 7px 7px 10px;
-  }
-
-  .graylog-input-error a {
-    font-weight: normal;
-  }
-
-  /* Hide the star icon... */
-  .graylog-input-error i.master-node {
-    display: none;
-  }
-
   .graylog-input-metrics {
     margin-top: 5px;
   }
@@ -1993,10 +1287,6 @@ const GlobalThemeStyles = createGlobalStyle`
     vertical-align: middle;
   }
 
-  .no-alarm-callbacks {
-    margin-top: 10px;
-  }
-
   div.alert-callback hr {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -2016,10 +1306,6 @@ const GlobalThemeStyles = createGlobalStyle`
     border-bottom: 1px solid #ececec;
   }
 
-  .triggered-alerts .page-size {
-    margin-top: -23px; /* Height of the header */
-  }
-
   /* // Ensure that the stream start/pause buttons have the same size. */
   .toggle-stream-button {
     width: 8.5em;
@@ -2027,10 +1313,6 @@ const GlobalThemeStyles = createGlobalStyle`
 
   .threaddump {
     font-size: 11px;
-  }
-
-  .modal-body .form-group {
-    margin-bottom: 5px;
   }
 
   h2.extractor-title {
@@ -2048,34 +1330,12 @@ const GlobalThemeStyles = createGlobalStyle`
     top: -3px;
   }
 
-  .failure-object {
-    padding: 6px 10px 10px;
-    margin: 10px 0 0;
-    font-family: monospace;
-  }
-
   .stream-description .fa-cube {
     margin-right: 5px;
   }
 
-  .content-head .btn-lg {
-    font-size: 16px;
-  }
-
   .stream-loader {
     margin-top: 5px;
-  }
-
-  .quickvalues-visualization {
-    padding-top: 15px;
-  }
-
-  .quickvalues-visualization .dc-chart {
-    float: none;
-  }
-
-  .quickvalues-visualization .col-md-8 {
-    padding-right: 0;
   }
 
   .form-inline .typeahead-wrapper {
@@ -2135,16 +1395,6 @@ const GlobalThemeStyles = createGlobalStyle`
   .tag-remove::before,
   .pill-remove::before {
     content: "×";
-  }
-
-  #react-gettingstarted {
-    margin-left: -19px;
-    margin-right: -19px;
-    margin-top: -4px;
-  }
-
-  #react-gettingstarted iframe {
-    height: 1000px;
   }
 
   .field-analyzer {

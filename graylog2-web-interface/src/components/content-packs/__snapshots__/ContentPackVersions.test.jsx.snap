@@ -608,7 +608,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "Modal-nuree8-0",
                                                             "isStatic": false,
-                                                            "lastClassName": "cHlGak",
+                                                            "lastClassName": "bmCcvm",
                                                             "rules": Array [
                                                               [Function],
                                                             ],
@@ -633,7 +633,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                         backdrop="static"
                                                         bsClass="modal"
                                                         bsSize="large"
-                                                        className="Modal-nuree8-0 cHlGak"
+                                                        className="Modal-nuree8-0 bmCcvm"
                                                         dialogComponentClass={[Function]}
                                                         enforceFocus={true}
                                                         keyboard={true}
@@ -740,7 +740,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "cHlGak",
+                                  "lastClassName": "bmCcvm",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -765,7 +765,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 cHlGak"
+                              className="Modal-nuree8-0 bmCcvm"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1245,7 +1245,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "Modal-nuree8-0",
                                                             "isStatic": false,
-                                                            "lastClassName": "cHlGak",
+                                                            "lastClassName": "bmCcvm",
                                                             "rules": Array [
                                                               [Function],
                                                             ],
@@ -1270,7 +1270,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                         backdrop="static"
                                                         bsClass="modal"
                                                         bsSize="large"
-                                                        className="Modal-nuree8-0 cHlGak"
+                                                        className="Modal-nuree8-0 bmCcvm"
                                                         dialogComponentClass={[Function]}
                                                         enforceFocus={true}
                                                         keyboard={true}
@@ -1377,7 +1377,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "cHlGak",
+                                  "lastClassName": "bmCcvm",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1402,7 +1402,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 cHlGak"
+                              className="Modal-nuree8-0 bmCcvm"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1882,7 +1882,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "Modal-nuree8-0",
                                                             "isStatic": false,
-                                                            "lastClassName": "cHlGak",
+                                                            "lastClassName": "bmCcvm",
                                                             "rules": Array [
                                                               [Function],
                                                             ],
@@ -1907,7 +1907,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                         backdrop="static"
                                                         bsClass="modal"
                                                         bsSize="large"
-                                                        className="Modal-nuree8-0 cHlGak"
+                                                        className="Modal-nuree8-0 bmCcvm"
                                                         dialogComponentClass={[Function]}
                                                         enforceFocus={true}
                                                         keyboard={true}
@@ -2014,7 +2014,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "cHlGak",
+                                  "lastClassName": "bmCcvm",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -2039,7 +2039,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 cHlGak"
+                              className="Modal-nuree8-0 bmCcvm"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -2519,7 +2519,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "Modal-nuree8-0",
                                                             "isStatic": false,
-                                                            "lastClassName": "cHlGak",
+                                                            "lastClassName": "bmCcvm",
                                                             "rules": Array [
                                                               [Function],
                                                             ],
@@ -2544,7 +2544,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                         backdrop="static"
                                                         bsClass="modal"
                                                         bsSize="large"
-                                                        className="Modal-nuree8-0 cHlGak"
+                                                        className="Modal-nuree8-0 bmCcvm"
                                                         dialogComponentClass={[Function]}
                                                         enforceFocus={true}
                                                         keyboard={true}
@@ -2651,7 +2651,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "cHlGak",
+                                  "lastClassName": "bmCcvm",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -2676,7 +2676,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 cHlGak"
+                              className="Modal-nuree8-0 bmCcvm"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}

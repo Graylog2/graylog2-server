@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-
 import Version from 'util/Version';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
@@ -22,6 +21,7 @@ const StyledFooter = styled.footer`
   font-size: 11px;
   color: #aaa;
   margin-bottom: 15px;
+  height: 20px;
 
   @media print {
     display: none;

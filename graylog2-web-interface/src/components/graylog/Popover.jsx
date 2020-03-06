@@ -1,46 +1,46 @@
+import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import { darken, opacify, transparentize } from 'polished';
+import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
-const Popover = styled(BoostrapPopover)(({ theme }) => {
+const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
   const borderColor = transparentize(0.8, theme.color.primary.tre);
 
   return css`
-    && {
-      background-color: ${theme.color.primary.due};
-      border-color: ${borderColor};
+    background-color: ${theme.color.primary.due};
+    border-color: ${borderColor};
 
-      &.top > .arrow {
-        border-top-color: ${opacify(0.05, borderColor)};
+    &.top > .arrow {
+      border-top-color: ${opacify(0.05, borderColor)};
 
-        &::after {
-          border-top-color: ${theme.color.primary.due};
-        }
+      &::after {
+        border-top-color: ${theme.color.primary.due};
       }
+    }
 
-      &.right > .arrow {
-        border-right-color: ${opacify(0.05, borderColor)};
+    &.right > .arrow {
+      border-right-color: ${opacify(0.05, borderColor)};
 
-        &::after {
-          border-right-color: ${theme.color.primary.due};
-        }
+      &::after {
+        border-right-color: ${theme.color.primary.due};
       }
+    }
 
-      &.bottom > .arrow {
-        border-bottom-color: ${opacify(0.05, borderColor)};
+    &.bottom > .arrow {
+      border-bottom-color: ${opacify(0.05, borderColor)};
 
-        &::after {
-          border-bottom-color: ${theme.color.primary.due};
-        }
+      &::after {
+        border-bottom-color: ${theme.color.primary.due};
       }
+    }
 
-      &.left > .arrow {
-        border-left-color: ${opacify(0.05, borderColor)};
+    &.left > .arrow {
+      border-left-color: ${opacify(0.05, borderColor)};
 
-        &::after {
-          border-left-color: ${theme.color.primary.due};
-        }
+      &::after {
+        border-left-color: ${theme.color.primary.due};
       }
     }
 
@@ -49,6 +49,14 @@ const Popover = styled(BoostrapPopover)(({ theme }) => {
     }
   `;
 });
+
+const Popover = (allProps) => {
+  return (
+    <GraylogThemeProvider>
+      <StyledPopover {...allProps} />
+    </GraylogThemeProvider>
+  );
+};
 
 /** @component */
 export default Popover;

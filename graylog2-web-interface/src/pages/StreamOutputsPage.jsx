@@ -4,7 +4,7 @@ import { Col, Row } from 'components/graylog';
 import { Link } from 'react-router';
 import Reflux from 'reflux';
 
-import { DocumentTitle, Spinner } from 'components/common';
+import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';
@@ -45,7 +45,7 @@ const StreamOutputsPage = createReactClass({
     return (
       <DocumentTitle title={`Outputs for Stream ${stream.title}`}>
         <div>
-          <Row className="content content-head">
+          <ContentHeadRow className="content">
             <Col md={10}>
               <h1>
                 Outputs for Stream &raquo;{stream.title}&laquo;
@@ -65,7 +65,7 @@ const StreamOutputsPage = createReactClass({
                 You can see all defined outputs in details at the {' '} <Link to={Routes.SYSTEM.OUTPUTS}>global output list</Link>.
               </SupportLink>
             </Col>
-          </Row>
+          </ContentHeadRow>
           <OutputsComponent streamId={stream.id} permissions={currentUser.permissions} />
         </div>
       </DocumentTitle>

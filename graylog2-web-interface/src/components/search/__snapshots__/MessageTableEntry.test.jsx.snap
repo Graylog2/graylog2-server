@@ -598,34 +598,64 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           </DropdownButton>
                         </div>
                       </ButtonGroup>
-                      <h3
-                        className="message-details-title"
-                      >
-                        <ForwardRef
-                          fixedWidth={false}
-                          inverse={false}
-                          name="envelope"
-                          pulse={false}
-                          spin={false}
-                        >
-                          <i
-                            className="fa fa-envelope"
-                          />
-                        </ForwardRef>
-                         
-                        <Link
-                          onlyActiveOnIndex={false}
-                          style={Object {}}
-                          to="/messages/01/01"
-                        >
-                          <a
-                            onClick={[Function]}
-                            style={Object {}}
+                      <MessageDetailsTitle>
+                        <MessageDetailsTitle__Title>
+                          <StyledComponent
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "MessageDetailsTitle__Title-agdtn-0",
+                                  "isStatic": true,
+                                  "lastClassName": "bJwwq",
+                                  "rules": Array [
+                                    "height:30px;a{color:#000;}.label{font-size:50%;line-height:200%;margin-left:5px;vertical-align:bottom;}",
+                                  ],
+                                },
+                                "displayName": "MessageDetailsTitle__Title",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "MessageDetailsTitle__Title-agdtn-0",
+                                "target": "h3",
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
                           >
-                            01
-                          </a>
-                        </Link>
-                      </h3>
+                            <h3
+                              className="MessageDetailsTitle__Title-agdtn-0 bJwwq"
+                            >
+                              <ForwardRef
+                                fixedWidth={false}
+                                inverse={false}
+                                name="envelope"
+                                pulse={false}
+                                spin={false}
+                              >
+                                <i
+                                  className="fa fa-envelope"
+                                />
+                              </ForwardRef>
+                               
+                              <Link
+                                onlyActiveOnIndex={false}
+                                style={Object {}}
+                                to="/messages/01/01"
+                              >
+                                <a
+                                  onClick={[Function]}
+                                  style={Object {}}
+                                >
+                                  01
+                                </a>
+                              </Link>
+                            </h3>
+                          </StyledComponent>
+                        </MessageDetailsTitle__Title>
+                      </MessageDetailsTitle>
                     </div>
                   </Col>
                 </div>

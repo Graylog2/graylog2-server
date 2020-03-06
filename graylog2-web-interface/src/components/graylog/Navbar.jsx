@@ -12,6 +12,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
     .navbar-brand {
       color: ${theme.color.tertiary.uno};
+      padding: 12px 15px 0 15px;
 
       &:hover,
       &:focus {
@@ -147,6 +148,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
     .navbar-brand {
       color: ${lighten(0.15, theme.color.tertiary.uno)};
+      padding: 12px 15px 0 15px;
 
       &:hover,
       &:focus {
