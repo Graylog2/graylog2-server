@@ -857,10 +857,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
   tokens={
     Array [
       Object {
+        "id": "abc1",
         "name": "Acme",
         "token": "beef2001",
       },
       Object {
+        "id": "abc2",
         "name": "Hamfred",
         "token": "beef2002",
       },
@@ -1117,10 +1119,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
       items={
         Immutable.List [
           Object {
+            "id": "abc1",
             "name": "Acme",
             "token": "beef2001",
           },
           Object {
+            "id": "abc2",
             "name": "Hamfred",
             "token": "beef2002",
           },
@@ -1148,10 +1152,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   data={
                     Array [
                       Object {
+                        "id": "abc1",
                         "name": "Acme",
                         "token": "beef2001",
                       },
                       Object {
+                        "id": "abc2",
                         "name": "Hamfred",
                         "token": "beef2002",
                       },

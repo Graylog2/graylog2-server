@@ -720,32 +720,29 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   </td>
                                   <td>
                                     <ForwardRef
-                                      bsStyle="default"
                                       className="failure"
                                     >
-                                      <Badge
-                                        bsStyle="default"
+                                      <Badge__StyledBadge
                                         className="failure"
                                       >
                                         <StyledComponent
-                                          bsStyle="default"
                                           className="failure"
                                           forwardedComponent={
                                             Object {
                                               "$$typeof": Symbol(react.forward_ref),
                                               "attrs": Array [],
                                               "componentStyle": ComponentStyle {
-                                                "componentId": "Badge-sc-4gzqz0-0",
+                                                "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                 "isStatic": false,
-                                                "lastClassName": "cwxrQE",
+                                                "lastClassName": "gDhrrS",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
                                               },
-                                              "displayName": "Badge",
+                                              "displayName": "Badge__StyledBadge",
                                               "foldedComponentIds": Array [],
                                               "render": [Function],
-                                              "styledComponentId": "Badge-sc-4gzqz0-0",
+                                              "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                               "target": [Function],
                                               "toString": [Function],
                                               "warnTooManyClasses": [Function],
@@ -756,12 +753,11 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                         >
                                           <Badge
                                             bsClass="badge"
-                                            bsStyle="default"
-                                            className="failure Badge-sc-4gzqz0-0 cwxrQE"
+                                            className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
                                             pullRight={false}
                                           >
                                             <span
-                                              className="failure Badge-sc-4gzqz0-0 cwxrQE badge badge-default"
+                                              className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                                             >
                                               <ForwardRef
                                                 fixedWidth={false}
@@ -777,7 +773,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             </span>
                                           </Badge>
                                         </StyledComponent>
-                                      </Badge>
+                                      </Badge__StyledBadge>
                                     </ForwardRef>
                                   </td>
                                   <td>

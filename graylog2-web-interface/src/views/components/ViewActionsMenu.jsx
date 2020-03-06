@@ -38,7 +38,6 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
   const [editViewOpen, setEditViewOpen] = useState(false);
-
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
@@ -52,10 +51,13 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
   return (
     <ButtonGroup>
       <Button onClick={() => onSaveView(view)}
-              disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>
+              disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
+              data-testid="dashboard-save-button">
         <Icon name="save" /> Save
       </Button>
-      <Button onClick={() => setSaveAsViewOpen(true)} disabled={hasUndeclaredParameters}>
+      <Button onClick={() => setSaveAsViewOpen(true)}
+              disabled={hasUndeclaredParameters}
+              data-testid="dashboard-save-as-button">
         <Icon name="copy" /> Save as
       </Button>
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
@@ -71,22 +73,22 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />
         </IfDashboard>
       </DropdownButton>
-      <DebugOverlay show={debugOpen} onClose={() => setDebugOpen(false)} />
+      {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveAsViewOpen && (
-        <ViewPropertiesModal view={view.toBuilder().newId().build()}
+        <ViewPropertiesModal show
+                             view={view.toBuilder().newId().build()}
                              title="Save new dashboard"
-                             onSave={newView => onSaveAsView(newView, router)}
-                             show
-                             onClose={() => setSaveAsViewOpen(false)} />
+                             onClose={() => setSaveAsViewOpen(false)}
+                             onSave={newView => onSaveAsView(newView, router)} />
       )}
       {editViewOpen && (
-        <ViewPropertiesModal view={view}
+        <ViewPropertiesModal show
+                             view={view}
                              title="Editing dashboard"
-                             onSave={updatedView => onSaveView(updatedView, router)}
-                             show
-                             onClose={() => setEditViewOpen(false)} />
+                             onClose={() => setEditViewOpen(false)}
+                             onSave={updatedView => onSaveView(updatedView, router)} />
       )}
-      {shareViewOpen && <ShareViewModal view={view} show onClose={() => setShareViewOpen(false)} />}
+      {shareViewOpen && <ShareViewModal show view={view} onClose={() => setShareViewOpen(false)} />}
     </ButtonGroup>
   );
 };

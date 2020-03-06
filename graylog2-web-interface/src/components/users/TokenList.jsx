@@ -50,7 +50,7 @@ class TokenList extends React.Component {
 
   _deleteToken(token) {
     return () => {
-      this.props.onDelete(token.token, token.name);
+      this.props.onDelete(token.id, token.name);
     };
   }
 
@@ -61,12 +61,12 @@ class TokenList extends React.Component {
   }
 
   itemActionsFactory(token) {
-    const deleteButton = this.props.deletingToken === token.token ? <Spinner text="Deleting..." /> : 'Delete';
+    const deleteButton = this.props.deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete';
     return (
       <ButtonGroup>
         <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />
         <Button bsSize="xsmall"
-                disabled={this.props.deletingToken === token.token}
+                disabled={this.props.deletingToken === token.id}
                 bsStyle="primary"
                 onClick={this._deleteToken(token)}>
           {deleteButton}

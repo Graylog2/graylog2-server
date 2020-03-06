@@ -1,4 +1,6 @@
 // @flow strict
+import * as Immutable from 'immutable';
+
 import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -110,5 +112,40 @@ describe('BindSearchParamsFromQuery should', () => {
         MOCK_VIEW_QUERY_ID,
         expect.objectContaining({ timerange: expectedTimerange }),
       );
+  });
+
+  it('update streams of new search when comma-separated streams parameter was supplied', async () => {
+    const input = {
+      ...defaultInput,
+      query: { streams: 'stream1, stream2,  stream3 ' },
+    };
+
+    await bindSearchParamsFromQuery(input);
+
+    const expectedFilter = Immutable.Map({
+      type: 'or',
+      filters: [
+        Immutable.Map({ type: 'stream', id: 'stream1' }),
+        Immutable.Map({ type: 'stream', id: 'stream2' }),
+        Immutable.Map({ type: 'stream', id: 'stream3' }),
+      ],
+    });
+    expect(QueriesActions.update)
+      .toHaveBeenCalledWith(
+        MOCK_VIEW_QUERY_ID,
+        expect.objectContaining({ filter: expectedFilter }),
+      );
+  });
+
+  it('do not update streams of new search when streams parameter was supplied but is empty', async () => {
+    const input = {
+      ...defaultInput,
+      query: { streams: '' },
+    };
+
+    await bindSearchParamsFromQuery(input);
+
+    expect(QueriesActions.update)
+      .not.toHaveBeenCalled();
   });
 });

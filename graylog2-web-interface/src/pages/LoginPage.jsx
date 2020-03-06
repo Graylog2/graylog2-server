@@ -14,9 +14,6 @@ import AuthThemeStyles from 'theme/styles/authStyles';
 import CombinedProvider from 'injection/CombinedProvider';
 import LoadingPage from './LoadingPage';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
-
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 
 const LoginPage = createReactClass({
@@ -30,15 +27,10 @@ const LoginPage = createReactClass({
   },
 
   componentDidMount() {
-    disconnectedStyle.use();
     SessionActions.validate().then((response) => {
       this.setState({ didValidateSession: true });
       return response;
     });
-  },
-
-  componentWillUnmount() {
-    disconnectedStyle.unuse();
   },
 
   handleErrorChange(nextError) {

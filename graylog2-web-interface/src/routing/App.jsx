@@ -11,8 +11,6 @@ import AppErrorBoundary from './AppErrorBoundary';
 
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
-import 'c3/c3.css';
-import 'dc/dc.css';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
