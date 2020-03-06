@@ -2,7 +2,7 @@
 import React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
 
-import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction, { type DirectionJson } from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
@@ -36,7 +36,7 @@ const _newSort = (config, fieldName, currentSortDirectioName) => {
     case Direction.Descending.direction:
       return config.sort.map(sort => sort.toBuilder().direction(Direction.Ascending).build());
     default:
-      return [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, Direction.Descending)];
+      return [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, defaultSortDirection)];
   }
 };
 
