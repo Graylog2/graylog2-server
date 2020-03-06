@@ -10,10 +10,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import FieldSortSelect from './FieldSortSelect';
 
-
 describe('FieldSortSelect', () => {
-  afterEach(cleanup);
-
   const properties = ['enumerable'];
   const fieldType1 = new FieldType('string', properties, []);
   const fieldTypeMapping1 = new FieldTypeMapping('date', fieldType1);
@@ -21,6 +18,8 @@ describe('FieldSortSelect', () => {
   const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType2);
   const fields = List([fieldTypeMapping1, fieldTypeMapping2]);
   const sort = [new SortConfig('pivot', 'http_method', Direction.Ascending)];
+
+  afterEach(cleanup);
 
   it('should render minimal', () => {
     const { getByText } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
