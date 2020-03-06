@@ -88,7 +88,8 @@ const MessagesSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }
     <SortIcon fieldSortActive={!!fieldSortDirection}
               title={fieldSortDescription}
               aria-label={fieldSortDescription}
-              onClick={() => _changeSort(config, fieldName, fieldSortDirection, onConfigChange, setLoadingState)}>
+              onClick={() => _changeSort(config, fieldName, fieldSortDirection, onConfigChange, setLoadingState)}
+              data-testid="messages-sort-icon">
       <Icon name={_sortIcon(fieldSortDirection)} />
     </SortIcon>
   );
