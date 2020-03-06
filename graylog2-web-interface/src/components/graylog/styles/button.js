@@ -86,10 +86,10 @@ const cssBuilder = (hex, variant) => {
 const buttonStyles = (color) => {
   return bsStyleThemeVariant(cssBuilder, {
     link: {
-      teinte: cssBuilder(color.global.link),
+      teinte: cssBuilder(color.global.link, 'link'),
     },
     default: {
-      teinte: cssBuilder(color.gray[90]),
+      teinte: cssBuilder(color.gray[90], 'default'),
     },
   },
   ['danger', 'info', 'primary', 'success', 'warning']);
