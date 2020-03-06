@@ -231,6 +231,16 @@ class MessageTable extends React.Component<Props, State> {
     return undefined;
   }
 
+  _fieldSortDescription = (fielName: string, fieldSortDirection?: Direction) => {
+    let newDirection;
+    if (fieldSortDirection && fieldSortDirection.direction === Direction.Ascending) {
+      newDirection = Direction.Descending.direction;
+    } else {
+      newDirection = Direction.Ascending.direction;
+    }
+    return `Sort ${fielName} ${newDirection}`;
+  }
+
   _fieldSortIcon = (fieldSortDirection?: string) => {
     if (fieldSortDirection && fieldSortDirection === Direction.Descending) {
       return 'sort-amount-desc';
@@ -279,6 +289,7 @@ class MessageTable extends React.Component<Props, State> {
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
                 const fieldSortDirection = this._fieldSortDirection(config, selectedFieldName);
+                const fieldSortDescription = this._fieldSortDescription(selectedFieldName, fieldSortDirection);
                 return (
                   <th key={selectedFieldName}
                       style={this._columnStyle(selectedFieldName)}>
@@ -287,6 +298,8 @@ class MessageTable extends React.Component<Props, State> {
                            queryId={activeQueryId} />
                     {editing && (
                       <SortIcon fieldSortActive={!!fieldSortDirection}
+                                title={fieldSortDescription}
+                                aria-label={fieldSortDescription}
                                 onClick={() => this._changeSort(config, selectedFieldName, fieldSortDirection)}>
                         <Icon name={this._fieldSortIcon(fieldSortDirection)} />
                       </SortIcon>
