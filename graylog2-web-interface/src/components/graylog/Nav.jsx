@@ -41,7 +41,7 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
           &:hover,
           &:focus {
             color: ${theme.color.global.textAlt};
-            background-color: ${util.colorLevel(theme.color.variant.info, -3)};
+            background-color: ${theme.color.variant.primary};
           }
         }
       }
