@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
-import { ContentHeadRow } from 'components/common';
+import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
+import ContentHeadRow from 'components/common/ContentHeadRow';
 import lodash from 'lodash';
 
 import SupportLink from 'components/support/SupportLink';
