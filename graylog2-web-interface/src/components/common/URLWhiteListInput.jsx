@@ -5,6 +5,7 @@ import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 import { isValidURL } from 'util/URLUtils';
 import FormsUtils from 'util/FormsUtils';
+// Explicit import to fix eslint import/no-cycle
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 
 const ToolsStore = StoreProvider.getStore('Tools');

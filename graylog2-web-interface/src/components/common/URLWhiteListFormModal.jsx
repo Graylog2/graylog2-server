@@ -9,6 +9,7 @@ import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import CombinedProvider from 'injection/CombinedProvider';
 import PermissionsMixin from 'util/PermissionsMixin';
 import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
+// Explicit import to fix eslint import/no-cycle
 import IfPermitted from 'components/common/IfPermitted';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');

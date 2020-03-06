@@ -5,6 +5,7 @@ import uuid from 'uuid/v4';
 import { cloneDeep, debounce } from 'lodash';
 import styled from 'styled-components';
 import Input from 'components/bootstrap/Input';
+// Explicit import to fix eslint import/no-cycle
 import Select from 'components/common/Select';
 import Icon from 'components/common/Icon';
 import { Button, Table } from 'components/graylog';
