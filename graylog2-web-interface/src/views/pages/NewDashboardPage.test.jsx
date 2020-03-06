@@ -27,7 +27,7 @@ describe('NewDashboardPage', () => {
     jest.clearAllMocks();
   });
 
-  it('should render minimal and show loading spinner initially', async () => {
+  it('shows loading spinner before rendering page', async () => {
     const { getByText } = render(<SimpleNewDashboardPage />);
 
     expect(getByText('Loading...')).not.toBeNull();
