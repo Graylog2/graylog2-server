@@ -4,7 +4,7 @@ import { ThemeProvider } from 'styled-components';
 
 import { color } from 'theme';
 
-/* NOTE: mode can be `teinte` or `noire` and will eventually need to come from User Preferences */
+/* NOTE: mode will eventually need to come from User Preferences */
 const THEME_MODE = 'teinte';
 
 const GraylogThemeProvider = ({ children }) => {

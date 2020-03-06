@@ -1,13 +1,11 @@
 import teinte from './variants/teinte';
-import noire from './variants/noire';
+// TODO: Create more themes
 
 const colors = {
   teinte,
-  noire,
 };
 
 export default colors;
 export {
   teinte,
-  noire,
 };
