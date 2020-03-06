@@ -1,10 +1,12 @@
 // @flow strict
 import React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
+import PropTypes from 'prop-types';
 
 import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction, { type DirectionJson } from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import CustomPropTypes from 'views/components/CustomPropTypes';
 
 import { Icon } from 'components/common';
 
@@ -89,5 +91,11 @@ const FieldSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }: P
   );
 };
 
+FieldSortIcon.propTypes = {
+  config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
+  fieldName: PropTypes.string.isRequired,
+  onConfigChange: PropTypes.func.isRequired,
+  setLoadingState: PropTypes.func.isRequired,
+};
 
 export default FieldSortIcon;

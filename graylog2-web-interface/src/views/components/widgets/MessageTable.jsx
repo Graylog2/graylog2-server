@@ -10,12 +10,13 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
 
 import { MessageTableEntry } from 'views/components/messagelist';
+import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
+
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 const Table = styled.table`
