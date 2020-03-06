@@ -28,6 +28,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -80,6 +81,7 @@ public class OkHttpClientProviderTest {
     }
 
     @Test
+    @Ignore
     public void testSuccessfulProxyConnectionWithoutAuthentication() throws IOException, InterruptedException {
         server.enqueue(successfulMockResponse());
 
@@ -147,6 +149,7 @@ public class OkHttpClientProviderTest {
     }
 
     @Test
+    @Ignore
     public void testFailingProxyConnectionWithoutAuthentication() throws IOException, InterruptedException {
         server.enqueue(failedMockResponse());
 
