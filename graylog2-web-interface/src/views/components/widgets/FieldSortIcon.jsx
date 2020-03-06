@@ -76,7 +76,6 @@ const _sortIcon = (fieldSortDirection: ?DirectionJson) => {
   return 'sort-amount-desc';
 };
 
-
 const FieldSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }: Props) => {
   const sortDirectionName = _sortDirectionName(config, fieldName);
   const newSortDescription = _newSortDescription(fieldName, sortDirectionName);
