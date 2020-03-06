@@ -40,7 +40,7 @@ describe('ReplaySearchButton', () => {
       const { getByTitle } = render(<ReplaySearchButton />);
       const button = getByTitle('Replay search');
 
-      expect(button.href).toEqual('http://localhost/search?rangetype=relative&relative=300&q=');
+      expect(button.href).toEqual('http://localhost/search?rangetype=relative&relative=300');
     });
 
     it('opening in a new page', () => {
