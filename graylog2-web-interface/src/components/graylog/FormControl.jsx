@@ -1,10 +1,9 @@
-import { memo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { FormControl as BootstrapFormControl } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import { transparentize } from 'polished';
 
-const FormControl = memo(styled(BootstrapFormControl)(({ theme }) => {
+const FormControl = styled(BootstrapFormControl)(({ theme }) => {
   return css`
     color: ${theme.color.global.textDefault};
     background-color: ${theme.color.gray[100]};
@@ -30,7 +29,7 @@ const FormControl = memo(styled(BootstrapFormControl)(({ theme }) => {
       display: none;
     }
   `;
-}));
+});
 
 FormControl.Static = BootstrapFormControl.Static;
 FormControl.Feedback = BootstrapFormControl.Feedback;

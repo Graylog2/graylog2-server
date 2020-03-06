@@ -8,11 +8,12 @@ import { darken, lighten } from 'polished';
 
 import { themeModes, util } from 'theme';
 import FormControl from './FormControl';
-import InputGroup from './InputGroup';
+import { StyledAddon } from './InputGroup';
 
 const VALID_STATES = ['error', 'warning', 'success'];
 
 const createCss = validationState => css(({ theme }) => {
+  console.log('validState', validationState);
   const variant = validationState === 'error' ? 'danger' : validationState;
   const text = util.colorLevel(theme.color.variant[variant], 6);
   const border = theme.color.variant[variant];
@@ -33,8 +34,7 @@ const createCss = validationState => css(({ theme }) => {
         color: ${text};
       }
 
-      /** NOTE: FormControl is memoized so reference it with .type */
-      ${FormControl.type} {
+      ${FormControl} {
         border-color: ${border};
 
         &:focus {
@@ -43,13 +43,10 @@ const createCss = validationState => css(({ theme }) => {
         }
       }
 
-      /** NOTE: InputGroup is memoized so reference it with .type */
-      ${InputGroup.type} {
-        .input-group-addon {
-          color: ${text};
-          background-color: ${background};
-          border-color: ${border};
-        }
+      ${StyledAddon} {
+        color: ${text};
+        background-color: ${background};
+        border-color: ${border};
       }
 
       .form-control-feedback {

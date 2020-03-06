@@ -9,15 +9,13 @@ const StyledBootstrapInputAddon = ({ className, ...rest }) => {
   return <BootstrapInputGroup.Addon bsClass={className} {...rest} />;
 };
 
-const Addon = ({ bsClass, className, ...addonProps }) => {
-  const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
-    && {
-      color: ${theme.color.gray[30]};
-      background-color: ${theme.color.gray[100]};
-      border-color: ${theme.color.gray[80]};
-    }
-  `);
+export const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
+  color: ${theme.color.gray[30]};
+  background-color: ${theme.color.gray[100]};
+  border-color: ${theme.color.gray[80]};
+`);
 
+const Addon = ({ bsClass, className, ...addonProps }) => {
   return <StyledAddon className={classNames(bsClass, className)} {...addonProps} />;
 };
 
