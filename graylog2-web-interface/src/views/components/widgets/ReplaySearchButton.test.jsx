@@ -5,8 +5,8 @@ import { render } from '@testing-library/react';
 import ReplaySearchButton from './ReplaySearchButton';
 
 describe('ReplaySearchButton', () => {
-  it('should do something', () => {
-    const { container } = render(<ReplaySearchButton/>);
-    expect(container).not.toBeNull();
+  it('renders play button', () => {
+    const { getByTitle } = render(<ReplaySearchButton />);
+    expect(getByTitle("Replay search")).not.toBeNull();
   });
 });
