@@ -170,7 +170,6 @@ class MessageTable extends React.Component<Props, State> {
     expandedMessages: Immutable.Set<string>(),
   };
 
-
   _columnStyle = (fieldName: string) => {
     const { fields } = this.props;
     const selectedFields = Immutable.OrderedSet<string>(fields);

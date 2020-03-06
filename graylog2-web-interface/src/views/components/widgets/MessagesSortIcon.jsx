@@ -10,24 +10,24 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Icon } from 'components/common';
 
 type Props = {
-    config: MessagesWidgetConfig,
-    fieldName: string,
-    onConfigChange: (MessagesWidgetConfig) => Promise<void>,
-    setLoadingState: (loading: boolean) => void,
+  config: MessagesWidgetConfig,
+  fieldName: string,
+  onConfigChange: (MessagesWidgetConfig) => Promise<void>,
+  setLoadingState: (loading: boolean) => void,
 }
 
 const SortIcon: StyledComponent<{fieldSortActive: boolean}, {}, HTMLButtonElement> = styled.button(({ fieldSortActive }) => {
   const color = fieldSortActive ? '#333' : '#bdbdbd';
 
   return css`
-      border: 0;
-      background: transparent;
-      color: ${color};
-  
-      padding: 5px;
-  
-      cursor: pointer;
-    `;
+    border: 0;
+    background: transparent;
+    color: ${color};
+
+    padding: 5px;
+
+    cursor: pointer;
+  `;
 });
 
 const _changeSort = (config: MessagesWidgetConfig, fieldName: string, fieldSortDirection: ?Direction, onConfigChange: (MessagesWidgetConfig) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
