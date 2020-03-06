@@ -64,7 +64,6 @@ import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -327,9 +326,8 @@ public class KafkaTransport extends ThrottleableTransport {
                         continue;
                     }
                 } catch (KafkaException | InterruptedException e) {
-                    LOG.error("Caught unrecoverable exception in poll. Restarting input", e);
-                    // (Ab)use serverEventBus to properly restart the entire input.
-                    serverEventBus.post(InputCreated.create(input.getId()));
+                    LOG.error("Caught unrecoverable exception in poll. Stopping input", e);
+                    stopped = true;
                     break;
                 }
                 try {
