@@ -10,18 +10,29 @@ import bsStyleThemeVariant from './variants/bsStyle';
 const styleVariants = ['danger', 'info', 'success', 'warning'];
 
 const alertStyles = (hex) => {
-  const borderLevel = 6;
-  const lightenBorder = util.colorLevel(hex, -borderLevel);
-  const borderColor = lightenBorder === '#fff' ? util.colorLevel(hex, borderLevel) : lightenBorder;
-
-  const backgroundLevel = 8.5;
-  const lightenBackground = util.colorLevel(hex, -backgroundLevel);
-  const backgroundColor = lightenBackground === '#fff' ? util.colorLevel(hex, backgroundLevel) : lightenBackground;
+  const borderColor = util.colorLevel(hex, -8);
+  const backgroundColor = util.colorLevel(hex, -10);
 
   return css`
     background-color: ${backgroundColor};
     border-color: ${borderColor};
     color: ${util.readableColor(backgroundColor)};
+
+    a:not(.btn) {
+      color: ${util.contrastingColor(backgroundColor, 'AA')};
+      font-weight: bold;
+      text-decoration: underline;
+
+      &:hover,
+      &:focus {
+        color: ${util.contrastingColor(backgroundColor, 'AAA')};
+        text-decoration: none;
+      }
+
+      &:active {
+        color: ${util.contrastingColor(backgroundColor, 'AAA')};
+      }
+    }
   `;
 };
 
