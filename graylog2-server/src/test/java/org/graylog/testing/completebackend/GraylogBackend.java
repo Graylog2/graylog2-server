@@ -96,4 +96,8 @@ public class GraylogBackend {
     public String apiAddress() {
         return node.getApiAddress();
     }
+
+    public void printServerLog() {
+        node.printLog();
+    }
 }

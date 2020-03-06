@@ -7,6 +7,7 @@ ARG GRAYLOG_USER=graylog
 ARG GRAYLOG_UID=1100
 ARG GRAYLOG_GROUP=graylog
 ARG GRAYLOG_GID=1100
+ARG DEBUG_OPTS=''
 
 WORKDIR ${GRAYLOG_HOME}
 
@@ -15,7 +16,7 @@ RUN \
   echo "export JAVA_HOME=/usr/local/openjdk-8"     > /etc/profile.d/graylog.sh && \
   echo "export BUILD_DATE=${BUILD_DATE}"           >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_VERSION=${GRAYLOG_VERSION}" >> /etc/profile.d/graylog.sh && \
-  echo "export GRAYLOG_SERVER_JAVA_OPTS='-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow'" >> /etc/profile.d/graylog.sh && \
+  echo "export GRAYLOG_SERVER_JAVA_OPTS='-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow " ${DEBUG_OPTS} "'" >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_HOME=${GRAYLOG_HOME}"       >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_USER=${GRAYLOG_USER}"       >> /etc/profile.d/graylog.sh && \
   echo "export GRAYLOG_GROUP=${GRAYLOG_GROUP}"     >> /etc/profile.d/graylog.sh && \

@@ -56,6 +56,8 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
     @Override
     public void afterEach(ExtensionContext context) {
+        if (context.getExecutionException().isPresent())
+            backend.printServerLog();
         lifecycle.afterEach(backend);
     }
 
