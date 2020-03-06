@@ -6,14 +6,14 @@ type StyleProps = {
   expandRight: boolean,
 };
 
-export const Title: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div(({ isSelected, expandRight }) => css`
+export const Title: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div(({ isSelected, expandRight, theme }) => css`
   padding: 9px 10px;
   display: flex;
   align-items: center;
   cursor: pointer;
   position: relative;
   color: ${isSelected ? '#FF3633' : 'inherit'};
-  background: ${isSelected ? '#393939' : 'tranparent'};
+  background: ${isSelected ? theme.color.gray[10] : 'tranparent'};
   ${((isSelected && expandRight) && css`
 
     &::after {

@@ -144,7 +144,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
   &.navbar-inverse {
     background-color: ${theme.color.gray[10]};
-    border-color: ${theme.color.gray[30]};
+    border: 0;
 
     .navbar-brand {
       color: ${lighten(0.15, theme.color.variant.info)};

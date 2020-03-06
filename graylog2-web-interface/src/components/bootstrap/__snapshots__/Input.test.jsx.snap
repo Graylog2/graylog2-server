@@ -152,7 +152,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "InputGroup__StyledAddon-sc-1a8jz8l-0",
                                   "isStatic": false,
-                                  "lastClassName": "cUNrSb",
+                                  "lastClassName": "eyTRlw",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -170,13 +170,13 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                             forwardedRef={null}
                           >
                             <StyledBootstrapInputAddon
-                              className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cUNrSb"
+                              className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 eyTRlw"
                             >
                               <InputGroupAddon
-                                bsClass="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cUNrSb"
+                                bsClass="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 eyTRlw"
                               >
                                 <span
-                                  className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cUNrSb"
+                                  className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 eyTRlw"
                                 >
                                   .00
                                 </span>
@@ -585,7 +585,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "InputGroup__StyledAddon-sc-1a8jz8l-0",
                                   "isStatic": false,
-                                  "lastClassName": "cUNrSb",
+                                  "lastClassName": "eyTRlw",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -603,13 +603,13 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                             forwardedRef={null}
                           >
                             <StyledBootstrapInputAddon
-                              className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cUNrSb"
+                              className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 eyTRlw"
                             >
                               <InputGroupAddon
-                                bsClass="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cUNrSb"
+                                bsClass="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 eyTRlw"
                               >
                                 <span
-                                  className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 cUNrSb"
+                                  className="input-group-addon InputGroup__StyledAddon-sc-1a8jz8l-0 eyTRlw"
                                 >
                                   <input
                                     aria-label="..."
