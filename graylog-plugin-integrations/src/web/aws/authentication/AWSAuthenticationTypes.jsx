@@ -31,7 +31,7 @@ const AWSAuthenticationTypes = ({ onChange }) => {
   const AuthWrapper = useCallback(styled.div(({ theme }) => css`
     margin: 0 0 21px 9px;
     padding: 3px 0 3px 21px;
-    border-left: 3px solid ${theme.color.secondary.tre};
+    border-left: 3px solid ${theme.color.gray[80]};
   `), []);
 
   const isType = (type) => {
