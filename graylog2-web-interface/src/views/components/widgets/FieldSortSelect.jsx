@@ -42,7 +42,6 @@ const onOptionChange = (options: Immutable.List<Option>, onChange, newValue, rea
   }
   const { value } = newValue;
   const option = findOptionByValue(options, value);
-
   if (!option) {
     return undefined;
   }

@@ -115,7 +115,6 @@ const Table = styled.table`
   }
 `;
 
-
 const TableHead = styled.thead`
   background-color: #eee;
   color: #333;
