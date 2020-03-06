@@ -53,6 +53,7 @@ import java.util.Map;
 public class GelfCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(GelfCodec.class);
     private static final String CK_DECOMPRESS_SIZE_LIMIT = "decompress_size_limit";
+    public static final String NAME = "gelf";
     private static final int DEFAULT_DECOMPRESS_SIZE_LIMIT = 8388608;
 
     private final GelfChunkAggregator aggregator;
