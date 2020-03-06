@@ -95,8 +95,7 @@ class LoaderTabs extends React.Component {
     const messageLoaders = [];
 
     if (this._isTabVisible('recent')) {
-      const { inputs } = this.props;
-      const { selectedInputId } = this.props;
+      const { inputs, selectedInputId } = this.props;
       messageLoaders.push(
         <Tab key="recent" eventKey={this.TAB_KEYS.recent} title="Recent Message" style={{ marginBottom: 10 }}>
           <RecentMessageLoader inputs={inputs}
