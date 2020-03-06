@@ -46,7 +46,7 @@ const onOptionChange = (options: Immutable.List<Option>, onChange, newValue, rea
   if (!option) {
     return undefined;
   }
-  const sortConfig = new SortConfig('pivot', option.label, Direction.Ascending);
+  const sortConfig = new SortConfig(SortConfig.PIVOT_TYPE, option.label, Direction.Ascending);
   return onChange([sortConfig]);
 };
 

@@ -31,19 +31,20 @@ const SortIcon: StyledComponent<{fieldSortActive: boolean}, {}, HTMLButtonElemen
 });
 
 const _changeSort = (config: MessagesWidgetConfig, fieldName: string, fieldSortDirection: ?Direction, onConfigChange: (MessagesWidgetConfig) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
+  const directionName = fieldSortDirection && fieldSortDirection.direction;
   let newSort;
 
   setLoadingState(true);
 
-  switch (fieldSortDirection) {
-    case Direction.Ascending:
+  switch (directionName) {
+    case Direction.Ascending.direction:
       newSort = config.sort.map(sort => sort.toBuilder().direction(Direction.Descending).build());
       break;
-    case Direction.Descending:
+    case Direction.Descending.direction:
       newSort = config.sort.map(sort => sort.toBuilder().direction(Direction.Ascending).build());
       break;
     default:
-      newSort = [new SortConfig('pivot', fieldName, Direction.Ascending)];
+      newSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, Direction.Descending)];
       break;
   }
 
@@ -73,10 +74,10 @@ const _fieldSortDescription = (fielName: string, fieldSortDirection?: Direction)
 };
 
 const _sortIcon = (fieldSortDirection?: string) => {
-  if (fieldSortDirection && fieldSortDirection === Direction.Descending) {
-    return 'sort-amount-desc';
+  if (fieldSortDirection && fieldSortDirection === Direction.Ascending) {
+    return 'sort-amount-asc';
   }
-  return 'sort-amount-asc';
+  return 'sort-amount-desc';
 };
 
 

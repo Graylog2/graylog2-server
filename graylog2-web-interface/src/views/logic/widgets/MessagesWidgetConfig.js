@@ -29,7 +29,7 @@ export type MessagesWidgetConfigJSON = {
   show_message_row: boolean,
 };
 
-const defaultSort = [new SortConfig('pivot', 'timestamp', Direction.Descending)];
+const defaultSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending)];
 
 export default class MessagesWidgetConfig extends WidgetConfig {
   _value: InternalState;
