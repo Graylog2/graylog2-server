@@ -3,22 +3,30 @@
 ```js
 const styles = { position: 'relative', display: 'inline-block' };
 
-<div>
-  <Tooltip placement="right" className="in" id="tooltip-right" style={styles}>
-    Tooltip right
-  </Tooltip>
+<div style={{display: "grid", "grid-template-columns": "1fr 1fr 1fr 1fr"}}>
+  <div style={{height: "24px"}}>
+    <Tooltip placement="right" className="in" id="tooltip-right" style={styles}>
+      Tooltip right
+    </Tooltip>
+  </div>
 
-  <Tooltip placement="top" className="in" id="tooltip-top" style={styles}>
-    Tooltip top
-  </Tooltip>
+  <div style={{height: "24px"}}>
+    <Tooltip placement="top" className="in" id="tooltip-top" style={styles}>
+      Tooltip top
+    </Tooltip>
+  </div>
 
-  <Tooltip placement="left" className="in" id="tooltip-left" style={styles}>
-    Tooltip left
-  </Tooltip>
+  <div style={{height: "24px"}}>
+    <Tooltip placement="left" className="in" id="tooltip-left" style={styles}>
+      Tooltip left
+    </Tooltip>
+  </div>
 
-  <Tooltip placement="bottom" className="in" id="tooltip-bottom" style={styles}>
-    Tooltip bottom
-  </Tooltip>
+  <div style={{height: "24px"}}>
+    <Tooltip placement="bottom" className="in" id="tooltip-bottom" style={styles}>
+      Tooltip bottom
+    </Tooltip>
+  </div>
 </div>
 ```
 
