@@ -70,7 +70,7 @@ describe('StreamSearchPage', () => {
     jest.resetModules();
   });
 
-  it('should render minimal and show loading spinner initially', async () => {
+  it('shows loading spinner before rendering page', async () => {
     const { getByText } = render(<SimpleStreamSearchPage />);
 
     expect(getByText('Loading...')).not.toBeNull();
