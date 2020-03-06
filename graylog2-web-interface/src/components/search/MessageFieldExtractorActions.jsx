@@ -25,8 +25,8 @@ class MessageFieldExtractorActions extends React.Component {
 
   _formatExtractorMenuItem = (extractorType) => {
     return (
-      <LinkContainer to={this.newExtractorRoutes[extractorType]}>
-        <MenuItem key={`menu-item-${extractorType}`}>
+      <LinkContainer key={`menu-item-${extractorType}`} to={this.newExtractorRoutes[extractorType]}>
+        <MenuItem>
           {ExtractorUtils.getReadableExtractorTypeName(extractorType)}
         </MenuItem>
       </LinkContainer>
