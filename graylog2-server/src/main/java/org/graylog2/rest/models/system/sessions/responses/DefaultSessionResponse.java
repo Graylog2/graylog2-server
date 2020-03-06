@@ -27,7 +27,7 @@ import java.util.Date;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class SessionResponse {
+public abstract class DefaultSessionResponse {
     @JsonProperty("valid_until")
     public abstract Date validUntil();
 
@@ -38,9 +38,9 @@ public abstract class SessionResponse {
     public abstract String username();
 
     @JsonCreator
-    public static SessionResponse create(@JsonProperty("valid_until") Date validUntil,
+    public static DefaultSessionResponse create(@JsonProperty("valid_until") Date validUntil,
                                          @JsonProperty("session_id") String sessionId,
                                          @JsonProperty("username") String username) {
-        return new AutoValue_SessionResponse(validUntil, sessionId, username);
+        return new AutoValue_DefaultSessionResponse(validUntil, sessionId, username);
     }
 }
