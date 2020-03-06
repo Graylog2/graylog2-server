@@ -10,7 +10,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import MessagesSortIcon from 'views/components/widgets/MessagesSortIcon';
+import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
 
@@ -230,10 +230,10 @@ class MessageTable extends React.Component<Props, State> {
                            name={selectedFieldName}
                            queryId={activeQueryId} />
                     {editing && (
-                      <MessagesSortIcon config={config}
-                                        onConfigChange={onConfigChange}
-                                        setLoadingState={setLoadingState}
-                                        fieldName={selectedFieldName} />
+                      <FieldSortIcon fieldName={selectedFieldName}
+                                     onConfigChange={onConfigChange}
+                                     setLoadingState={setLoadingState}
+                                     config={config} />
                     )}
                   </th>
                 );

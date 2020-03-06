@@ -81,7 +81,7 @@ const _sortIcon = (fieldSortDirection?: string) => {
 };
 
 
-const MessagesSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }: Props) => {
+const FieldSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }: Props) => {
   const fieldSortDirection = _fieldSortDirection(config, fieldName);
   const fieldSortDescription = _fieldSortDescription(fieldName, fieldSortDirection);
   return (
@@ -96,4 +96,4 @@ const MessagesSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }
 };
 
 
-export default MessagesSortIcon;
+export default FieldSortIcon;
