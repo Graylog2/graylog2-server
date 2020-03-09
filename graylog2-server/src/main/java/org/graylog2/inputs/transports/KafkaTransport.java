@@ -333,7 +333,9 @@ public class KafkaTransport extends ThrottleableTransport {
                 try {
                     consumeRecords(consumerIterator.get());
                 } catch (Exception e) {
-                    LOG.error("Exception in consumer thread. Continuing", e);
+                    LOG.error("Exception in consumer thread. Stopping input", e);
+                    stopped = true;
+                    break;
                 }
             }
             // explicitly commit our offsets when stopping.
