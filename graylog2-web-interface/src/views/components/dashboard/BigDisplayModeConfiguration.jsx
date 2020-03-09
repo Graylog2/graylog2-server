@@ -64,6 +64,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
              required
              step={1}
              value={refreshInterval} />
+
       <FormGroup>
         <ControlLabel>Tabs</ControlLabel>
         <ul>
@@ -123,18 +124,18 @@ type Props = {
 };
 
 const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
-  const [configurationModalOpen, setConfigurationModalOpen] = useState(show);
+  const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view));
 
   return (
     <React.Fragment>
-      {configurationModalOpen && (
-        <ConfigurationModal onClose={() => setConfigurationModalOpen(false)}
+      {showConfigurationModal && (
+        <ConfigurationModal onClose={() => setShowConfigurationModal(false)}
                             onSave={onSave}
                             show
                             view={view} />
       )}
-      <MenuItem disabled={disabled} onSelect={() => setConfigurationModalOpen(true)}>
+      <MenuItem disabled={disabled} onSelect={() => setShowConfigurationModal(true)}>
         <Icon name="desktop" /> Full Screen
       </MenuItem>
     </React.Fragment>
