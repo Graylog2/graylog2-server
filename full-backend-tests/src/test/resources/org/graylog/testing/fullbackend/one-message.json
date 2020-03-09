@@ -12,7 +12,7 @@
         {
           "data": {
             "source": "affenmann.info",
-            "message": "Boom",
+            "message": "hello from es fixture",
             "timestamp": "2015-01-01 01:00:00.000",
             "streams": [
               "000000000000000000000001"

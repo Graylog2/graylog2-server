@@ -88,25 +88,38 @@ class BackendStartupIT {
     void importsElasticsearchFixtures() throws InvalidRangeParametersException, JsonProcessingException {
         sut.importElasticsearchFixture("one-message.json", getClass());
 
-        MessageList messageList = MessageList.builder().id("123").build();
+        String body = searchAllMessages();
+
+        List<String> allMessages = given().when()
+                .body(body)
+                .post(sut.apiAddress() + "/views/search/sync")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath().getList(allMessagesJsonPath("query-id", "message-list-id"), String.class);
+
+        assertThat(allMessages).containsExactly("hello from es fixture");
+    }
+
+    private String searchAllMessages() throws InvalidRangeParametersException, JsonProcessingException {
+        MessageList messageList = MessageList.builder().id("message-list-id").build();
         Query q = Query.builder()
-                .id("123")
+                .id("query-id")
                 .query(ElasticsearchQueryString.builder().queryString("").build())
                 .timerange(AbsoluteRange.create("2010-01-01T00:00:00.0Z", "2050-01-01T00:00:00.0Z"))
                 .searchTypes(ImmutableSet.of(messageList))
                 .build();
         Search s = Search.builder().queries(ImmutableSet.of(q)).build();
 
-        String body = new ObjectMapperProvider().get().writeValueAsString(s);
+        return toJsonString(s);
+    }
 
-        List<String> j = given().when()
-                .body(body)
-                .post(sut.apiAddress() + "/views/search/sync")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath().getList("results." + q.id() + ".search_types." + messageList.id() + ".messages.message.message", String.class);
+    @SuppressWarnings("SameParameterValue")
+    private String allMessagesJsonPath(String queryId, String messageListId) {
+        return "results." + queryId + ".search_types." + messageListId + ".messages.message.message";
+    }
 
-        assertThat(j).containsExactly("Boom");
+    private String toJsonString(Search s) throws JsonProcessingException {
+        return new ObjectMapperProvider().get().writeValueAsString(s);
     }
 }
