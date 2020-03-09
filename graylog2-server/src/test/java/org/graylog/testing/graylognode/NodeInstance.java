@@ -32,11 +32,12 @@ public class NodeInstance {
     private final GenericContainer<?> container;
 
     public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri) {
-        GenericContainer container = NodeContainerFactory.buildContainer(network, mongoDbUri, elasticsearchUri);
+        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri);
+        GenericContainer<?> container = NodeContainerFactory.buildContainer(config);
         return new NodeInstance(container);
     }
 
-    public NodeInstance(GenericContainer container) {
+    public NodeInstance(GenericContainer<?> container) {
         this.container = container;
     }
 
