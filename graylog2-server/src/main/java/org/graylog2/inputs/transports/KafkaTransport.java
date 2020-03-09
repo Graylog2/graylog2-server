@@ -71,7 +71,6 @@ import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -265,10 +264,8 @@ public class KafkaTransport extends ThrottleableTransport {
             consumer.subscribe(Pattern.compile(configuration.getString(CK_TOPIC_FILTER)), new NoOpConsumerRebalanceListener());
         }
 
-        private void consumeRecords(Iterator<ConsumerRecord<byte[], byte[]>> consumerIterator) {
-            // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
-            // noinspection WhileLoopReplaceableByForEach
-            while (consumerIterator.hasNext()) {
+        private void consumeRecords(ConsumerRecords<byte[], byte[]> consumerRecords) {
+            for (final ConsumerRecord<byte[], byte[]> record : consumerRecords) {
                 if (paused) {
                     // we try not to spin here, so we wait until the lifecycle goes back to running.
                     LOG.debug("Message processing is paused, blocking until message processing is turned back on.");
@@ -284,7 +281,7 @@ public class KafkaTransport extends ThrottleableTransport {
 
                 // process the message, this will immediately mark the message as having been processed. this gets tricky
                 // if we get an exception about processing it down below.
-                final byte[] bytes = consumerIterator.next().value();
+                final byte[] bytes = record.value();
 
                 // it is possible that the message is null
                 if (bytes == null) {
@@ -298,14 +295,14 @@ public class KafkaTransport extends ThrottleableTransport {
             }
         }
 
-        private Optional<Iterator<ConsumerRecord<byte[], byte[]>>> tryPoll() {
+        private Optional<ConsumerRecords<byte[], byte[]>> tryPoll() {
             try {
                 // Workaround https://issues.apache.org/jira/browse/KAFKA-4189 by calling wakeup()
                 final ScheduledFuture<?> future = scheduler.schedule(consumer::wakeup, 2000, TimeUnit.MILLISECONDS);
                 final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(1000);
                 future.cancel(true);
 
-                return Optional.of(consumerRecords.iterator());
+                return Optional.of(consumerRecords);
             } catch (WakeupException e) {
                 LOG.error("WakeupException in poll. Kafka server is not responding.");
             } catch (InvalidOffsetException | AuthorizationException e) {
@@ -317,10 +314,10 @@ public class KafkaTransport extends ThrottleableTransport {
         @Override
         public void run() {
             while (!stopped) {
-                final Optional<Iterator<ConsumerRecord<byte[], byte[]>>> consumerIterator;
+                final Optional<ConsumerRecords<byte[], byte[]>> consumerRecords;
                 try {
-                    consumerIterator = tryPoll();
-                    if (! consumerIterator.isPresent()) {
+                    consumerRecords = tryPoll();
+                    if (! consumerRecords.isPresent()) {
                         LOG.error("Caught recoverable exception. Retrying");
                         Thread.sleep(2000);
                         continue;
@@ -331,7 +328,7 @@ public class KafkaTransport extends ThrottleableTransport {
                     break;
                 }
                 try {
-                    consumeRecords(consumerIterator.get());
+                    consumeRecords(consumerRecords.get());
                 } catch (Exception e) {
                     LOG.error("Exception in consumer thread. Stopping input", e);
                     stopped = true;
