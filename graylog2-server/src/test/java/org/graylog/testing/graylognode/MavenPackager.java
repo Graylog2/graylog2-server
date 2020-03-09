@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
-    private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build";
+    private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build -Dforbiddenapis.skip=true";
 
     static void packageJarIfNecessary(String projectDir) {
         if (isRunFromMaven()) {
