@@ -4,7 +4,7 @@ import styled, { css, type StyledComponent } from 'styled-components';
 import PropTypes from 'prop-types';
 
 import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
-import Direction, { type DirectionJson } from 'views/logic/aggregationbuilder/Direction';
+import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 
@@ -17,8 +17,15 @@ type Props = {
   setLoadingState: (loading: boolean) => void,
 }
 
-const SortIcon: StyledComponent<{fieldSortActive: boolean}, {}, HTMLButtonElement> = styled.button(({ fieldSortActive }) => {
-  const color = fieldSortActive ? '#333' : '#bdbdbd';
+type CurrentState = {
+  onSortChange: (changeSort: (direction: Direction) => void) => void,
+  tooltip: (fieldName: string) => string,
+  sortActive: boolean,
+  icon: string
+}
+
+const SortIcon: StyledComponent<{sortActive: boolean}, {}, HTMLButtonElement> = styled.button(({ sortActive }) => {
+  const color = sortActive ? '#333' : '#bdbdbd';
 
   return css`
     border: 0;
@@ -31,61 +38,66 @@ const SortIcon: StyledComponent<{fieldSortActive: boolean}, {}, HTMLButtonElemen
   `;
 });
 
-const _newSort = (config, fieldName, currentSortDirectioName) => {
-  switch (currentSortDirectioName) {
-    case Direction.Ascending.direction:
-      return config.sort.map(sort => sort.toBuilder().direction(Direction.Descending).build());
-    case Direction.Descending.direction:
-      return config.sort.map(sort => sort.toBuilder().direction(Direction.Ascending).build());
-    default:
-      return [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, defaultSortDirection)];
-  }
+const _tooltip = (fieldName: string, newDirection: Direction) => {
+  return `Sort ${fieldName} ${newDirection.direction}`;
 };
 
-const _changeSort = (config: MessagesWidgetConfig, fieldName: string, sortDirectionName: ?DirectionJson, onConfigChange: (MessagesWidgetConfig) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
+const _changeSort = (nextDirection: Direction, config: MessagesWidgetConfig, fieldName: string, onConfigChange: (MessagesWidgetConfig) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
+  const nextSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
+  const newConfig = config.toBuilder().sort(nextSort).build();
   setLoadingState(true);
-  const newSort = _newSort(config, fieldName, sortDirectionName);
-  const newConfig = config.toBuilder().sort(newSort).build();
   onConfigChange(newConfig).then(() => {
     setLoadingState(false);
   });
 };
 
-const _sortDirectionName = (config: MessagesWidgetConfig, fieldName: string) => {
-  const currentSort = config.sort && config.sort.length > 0 ? config.sort[0] : null;
-  if (currentSort && currentSort.field === fieldName) {
-    return currentSort.direction.direction;
-  }
-  return null;
+const _isFieldSortActive = (config: MessagesWidgetConfig, fieldName: string) => {
+  return config.sort && config.sort.length > 0 && config.sort[0].field === fieldName;
 };
 
-const _newSortDescription = (fielName: string, sortDirectionName: ?DirectionJson) => {
-  let newDirection;
-  if (sortDirectionName && sortDirectionName === Direction.Ascending) {
-    newDirection = Direction.Descending.direction;
-  } else {
-    newDirection = Direction.Ascending.direction;
-  }
-  return `Sort ${fielName} ${newDirection}`;
+const StateAsc: CurrentState = {
+  icon: 'sort-amount-asc',
+  tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Descending),
+  onSortChange: changeSort => changeSort(Direction.Descending),
+  sortActive: true,
 };
 
-const _sortIcon = (fieldSortDirection: ?DirectionJson) => {
-  if (fieldSortDirection && fieldSortDirection === Direction.Ascending.direction) {
-    return 'sort-amount-asc';
+const StateDesc: CurrentState = {
+  icon: 'sort-amount-desc',
+  tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Ascending),
+  onSortChange: changeSort => changeSort(Direction.Ascending),
+  sortActive: true,
+};
+
+const StateNoSort: CurrentState = {
+  icon: defaultSortDirection.direction === Direction.Descending.direction ? StateDesc.icon : StateAsc.icon,
+  tooltip: (fieldName: string) => _tooltip(fieldName, defaultSortDirection),
+  onSortChange: changeSort => changeSort(defaultSortDirection),
+  sortActive: false,
+};
+
+const _currentState = (config: MessagesWidgetConfig, fieldName: string) => {
+  const fielSortDirection = _isFieldSortActive(config, fieldName) ? config.sort[0].direction.direction : null;
+  switch (fielSortDirection) {
+    case Direction.Ascending.direction:
+      return StateAsc;
+    case Direction.Descending.direction:
+      return StateDesc;
+    default:
+      return StateNoSort;
   }
-  return 'sort-amount-desc';
 };
 
 const FieldSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }: Props) => {
-  const sortDirectionName = _sortDirectionName(config, fieldName);
-  const newSortDescription = _newSortDescription(fieldName, sortDirectionName);
+  const changeSort = (nextDirection: Direction) => _changeSort(nextDirection, config, fieldName, onConfigChange, setLoadingState);
+  const { sortActive, tooltip, onSortChange, icon }: CurrentState = _currentState(config, fieldName);
   return (
-    <SortIcon fieldSortActive={!!sortDirectionName}
-              title={newSortDescription}
-              aria-label={newSortDescription}
-              onClick={() => _changeSort(config, fieldName, sortDirectionName, onConfigChange, setLoadingState)}
+    <SortIcon sortActive={sortActive}
+              title={tooltip(fieldName)}
+              aria-label={tooltip(fieldName)}
+              onClick={() => onSortChange(changeSort)}
               data-testid="messages-sort-icon">
-      <Icon name={_sortIcon(sortDirectionName)} />
+      <Icon name={icon} />
     </SortIcon>
   );
 };

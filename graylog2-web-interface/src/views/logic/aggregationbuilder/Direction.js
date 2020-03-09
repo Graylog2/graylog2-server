@@ -20,6 +20,10 @@ export default class Direction {
     return this._direction;
   }
 
+  static invert(direction: Direction) {
+    return direction.direction === this.Descending.direction ? this.Ascending : this.Descending;
+  }
+
   static fromJSON(value: DirectionJson): Direction {
     return Direction.fromString(value);
   }
