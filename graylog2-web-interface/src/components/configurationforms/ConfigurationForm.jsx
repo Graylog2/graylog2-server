@@ -83,7 +83,7 @@ class ConfigurationForm extends React.Component {
 
   _sortByPosOrOptionality = (x1, x2) => {
     const { configFields } = this.state;
-    const DEFAULT_POSITION = 100;
+    const DEFAULT_POSITION = 100; // corresponds to ConfigurationField.java
     const x1pos = configFields[x1.name].position || DEFAULT_POSITION;
     const x2pos = configFields[x2.name].position || DEFAULT_POSITION;
 

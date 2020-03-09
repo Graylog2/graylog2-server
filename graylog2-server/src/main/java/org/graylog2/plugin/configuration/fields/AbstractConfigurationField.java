@@ -27,7 +27,6 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     protected final String description;
     protected final ConfigurationField.Optional optional;
     protected int position;
-    final int DEFAULT_POSITION = 100;
 
     public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional1) {
         this.field_type = field_type;
