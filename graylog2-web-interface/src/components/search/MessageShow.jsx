@@ -7,11 +7,22 @@ import MessageDetail from './MessageDetail';
 
 class MessageShow extends React.Component {
   static propTypes = {
-    message: PropTypes.object,
+    message: PropTypes.object.isRequired,
     inputs: PropTypes.object,
-    streams: PropTypes.object,
+    streams: PropTypes.object.isRequired,
     nodes: PropTypes.object,
   };
+
+  static defaultProps = {
+    inputs: undefined,
+    nodes: undefined,
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = this._getImmutableProps(props);
+  }
 
   componentWillReceiveProps(nextProps) {
     this.setState(this._getImmutableProps(nextProps));
@@ -26,20 +37,21 @@ class MessageShow extends React.Component {
 
   renderForDisplay = (fieldName) => {
     // No highlighting for the message details view.
-    return StringUtils.stringify(this.props.message.fields[fieldName]);
+    const { message } = this.props;
+    return StringUtils.stringify(message.fields[fieldName]);
   };
 
-  state = this._getImmutableProps(this.props);
-
   render() {
+    const { inputs, message } = this.props;
+    const { streams, nodes } = this.state;
     return (
       <Row className="content">
         <Col md={12}>
           <MessageDetail {...this.props}
-                         message={this.props.message}
-                         inputs={this.props.inputs}
-                         streams={this.state.streams}
-                         nodes={this.state.nodes}
+                         message={message}
+                         inputs={inputs}
+                         streams={streams}
+                         nodes={nodes}
                          renderForDisplay={this.renderForDisplay}
                          showTimestamp />
         </Col>
