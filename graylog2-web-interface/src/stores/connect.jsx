@@ -1,6 +1,17 @@
 import React from 'react';
 import { ListenerMethods } from 'reflux';
-import { isFunction } from 'lodash';
+import { isEqualWith, isFunction } from 'lodash';
+import * as Immutable from 'immutable';
+
+const _isEqual = (first, second) => {
+  if (first && first.equals && isFunction(first.equals)) {
+    return Immutable.is(first, second);
+  }
+  if (Immutable.is(first, second)) {
+    return true;
+  }
+  return undefined;
+};
 
 /**
  * Generating a higher order component wrapping an ES6 React component class, connecting it to the supplied stores.
@@ -27,6 +38,7 @@ import { isFunction } from 'lodash';
  * connect(SamplesComponent, { samples: SamplesStore }, ({ samples }) => ({ samples: samples.filter(sample => sample.id === 4) }))
  *
  */
+
 export default (Component, stores, mapProps = props => props) => {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
   class ConnectStoresWrapper extends React.Component {
@@ -68,13 +80,25 @@ export default (Component, stores, mapProps = props => props) => {
       });
     }
 
-    render() {
+    shouldComponentUpdate(nextProps, nextState) {
+      const thisChildProps = this._genProps(this.state);
+      const nextChildProps = this._genProps(nextState);
+
+      return !(isEqualWith(thisChildProps, nextChildProps, _isEqual) && isEqualWith(this.props, nextProps, _isEqual));
+    }
+
+    _genProps = (state) => {
       const storeProps = {};
       Object.keys(stores).forEach((key) => {
-        storeProps[key] = this.state[key];
+        storeProps[key] = state[key];
       });
+      return mapProps(storeProps);
+    };
 
-      return <Component {...mapProps(storeProps)} {...this.props} />;
+    render() {
+      const nextProps = this._genProps(this.state);
+
+      return <Component {...nextProps} {...this.props} />;
     }
   }
   ConnectStoresWrapper.displayName = `ConnectStoresWrapper[${wrappedComponentName}] stores=${Object.keys(stores)}`;
