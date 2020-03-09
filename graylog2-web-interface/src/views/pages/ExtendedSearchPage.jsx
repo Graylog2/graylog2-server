@@ -149,12 +149,12 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
     StreamsActions.refresh();
 
     let storeListenersUnsubscribes = Immutable.List();
-    refreshIfNotUndeclared().then(() => {
+    refreshIfNotUndeclared().finally(() => {
       storeListenersUnsubscribes = storeListenersUnsubscribes
         .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
       return null;
-    }, () => { });
+    });
 
     // Returning cleanup function used when unmounting
     return () => storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc());
