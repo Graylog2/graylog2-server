@@ -5,10 +5,10 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 import MessageConfigGenerator from './MessageConfigGenerator';
-import MessageSortConifg from './MessageSortConifg';
+import MessageSortConfig from './MessageSortConfig';
 
 describe('MessageConfigGenerator', () => {
-  const defaultSort = [new MessageSortConifg(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending)];
+  const defaultSort = [new MessageSortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending)];
 
   it('generates basic search type from message widget with a default sort', () => {
     // $FlowFixMe: We need to force this being a `MessagesWidget`

@@ -1,6 +1,6 @@
 // @flow strict
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import MessageSortConifg from 'views/logic/searchtypes/messages/MessageSortConifg';
+import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 
 const MessageConfigGenerator = (widget: MessagesWidget) => {
   const { config: { decorators, sort: widgetSort } } = widget;
@@ -8,7 +8,7 @@ const MessageConfigGenerator = (widget: MessagesWidget) => {
   return [{
     type: 'messages',
     decorators,
-    sort: widgetSort.map(sort => new MessageSortConifg(sort.type, sort.field, sort.direction)),
+    sort: widgetSort.map(sort => new MessageSortConfig(sort.type, sort.field, sort.direction)),
   }];
 };
 
