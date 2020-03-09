@@ -73,6 +73,7 @@ RUN \
     ${GRAYLOG_HOME}/data/config \
     ${GRAYLOG_HOME}/data/plugin \
     ${GRAYLOG_HOME}/data/data \
+    ${GRAYLOG_HOME}/data/contentpacks \
     ${GRAYLOG_HOME}/lib \
     ${GRAYLOG_HOME}/log \
     ${GRAYLOG_HOME}/plugin
