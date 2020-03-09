@@ -108,6 +108,7 @@ describe('MessageList', () => {
     const wrapper1 = mount(<MessageList editing
                                         data={data}
                                         config={config}
+                                        onConfigChange={() => {}}
                                         fields={Immutable.List(fields)}
                                         setLoadingState={() => {}} />);
 
@@ -130,6 +131,7 @@ describe('MessageList', () => {
                                        data={data}
                                        fields={Immutable.List(fields)}
                                        config={config}
+                                       onConfigChange={() => {}}
                                        setLoadingState={() => {}} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
@@ -143,6 +145,7 @@ describe('MessageList', () => {
                        data={data}
                        fields={Immutable.List([])}
                        config={config}
+                       onConfigChange={() => {}}
                        setLoadingState={() => {}} />);
   });
 
@@ -153,6 +156,7 @@ describe('MessageList', () => {
                    data={data}
                    fields={Immutable.List([])}
                    config={config}
+                   onConfigChange={() => {}}
                    setLoadingState={() => {}} />
     );
     mount(<Component />);
@@ -172,6 +176,7 @@ describe('MessageList', () => {
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
+                                       onConfigChange={() => {}}
                                        setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
     expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, effectiveTimerange);
@@ -184,6 +189,7 @@ describe('MessageList', () => {
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
+                                       onConfigChange={() => {}}
                                        setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
     expect(RefreshActions.disable).toHaveBeenCalledTimes(1);
@@ -200,6 +206,7 @@ describe('MessageList', () => {
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
+                                       onConfigChange={() => {}}
                                        setLoadingState={() => {}} />);
 
     await wrapper.find('[aria-label="Next"]').simulate('click');
@@ -215,6 +222,7 @@ describe('MessageList', () => {
                    data={data}
                    fields={Immutable.List([])}
                    config={config}
+                   onConfigChange={() => {}}
                    setLoadingState={() => {}} />
     );
     return new Promise((resolve) => {
