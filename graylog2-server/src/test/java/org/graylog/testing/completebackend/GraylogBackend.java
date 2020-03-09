@@ -42,9 +42,10 @@ public class GraylogBackend {
     public static GraylogBackend createStarted() {
         if (instance == null)
             instance = createStartedBackend();
-        else
+        else {
             instance.fullReset();
-        LOG.info("Reusing running backend");
+            LOG.info("Reusing running backend");
+        }
 
         return instance;
     }

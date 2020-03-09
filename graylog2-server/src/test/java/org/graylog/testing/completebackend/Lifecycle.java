@@ -32,8 +32,6 @@ public enum Lifecycle {
     void afterEach(GraylogBackend backend) {
     }
 
-    ;
-
     public static Lifecycle from(ExtensionContext context) {
         Optional<Class<?>> testClass = context.getTestClass();
 
