@@ -40,7 +40,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
       promise.then((result) => {
         if (!result.is_whitelisted && validationState === null) {
           setCurrentValidationState('error');
-          const message = isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not valid URL.`;
+          const message = isValidURL(url) ? `URL ${url} is not whitelisted` : `URL ${url} is not a valid URL.`;
           setOwnValidationMessage(message);
         } else {
           setOwnValidationMessage(validationMessage);
