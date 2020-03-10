@@ -17,6 +17,7 @@ import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
 import { ViewManagementActions } from './ViewManagementStore';
+import isEqualForSearch from './isEqualForSearch';
 
 export type ViewStoreState = {
   activeQuery: QueryId,
@@ -176,7 +177,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       }
       const oldWidgets = get(this.view, 'state') && this.view.state.map(s => s.widgets);
       const newWidgets = get(view, 'state') && view.state.map(s => s.widgets);
-      if (!isEqualWith(oldWidgets, newWidgets, Immutable.is)) {
+      if (!isEqualForSearch(oldWidgets, newWidgets)) {
         const newView = UpdateSearchForWidgets(view);
         return [newView, true];
       }

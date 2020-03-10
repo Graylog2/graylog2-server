@@ -1,6 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import isDeepEqual from 'stores/isDeepEqual';
+import isEqualForSearch from 'views/stores/isEqualForSearch';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { SortConfigJson } from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -72,7 +74,17 @@ export default class MessagesWidgetConfig extends WidgetConfig {
   }
 
   equals(other: any): boolean {
-    return other instanceof MessagesWidgetConfig && other.decorators === this.decorators && other.sort === this.sort;
+    return other instanceof MessagesWidgetConfig
+      && isDeepEqual(this.decorators, other.decorators)
+      && isDeepEqual(this.fields, other.fields)
+      && isDeepEqual(this.sort, other.sort)
+      && this.showMessageRow === other.showMessageRow;
+  }
+
+  equalsForSearch(other: any): boolean {
+    return other instanceof MessagesWidgetConfig
+      && isEqualForSearch(other.decorators, this.decorators)
+      && isEqualForSearch(other.sort, this.sort);
   }
 
   // eslint-disable-next-line no-use-before-define

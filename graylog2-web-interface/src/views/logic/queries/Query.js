@@ -1,7 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
-import { isEqual } from 'lodash';
+
+import isDeepEqual from 'stores/isDeepEqual';
 
 export type QueryId = string;
 
@@ -33,7 +34,7 @@ export type ElasticsearchQueryString = {
 export const createElasticsearchQueryString = (query: string = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
 
 const _streamFilters = (selectedStreams: Array<string>): Array<Immutable.Map<string, string>> => {
-  return selectedStreams.map(stream => Immutable.Map({ type: 'stream', id: stream }));
+  return selectedStreams.map(stream => Immutable.Map({ type: 'stream', id: stream, }));
 };
 
 export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {
@@ -129,10 +130,10 @@ export default class Query {
     }
 
     if (this.id !== other.id
-      || !isEqual(this.query, other.query)
-      || !isEqual(this.timerange, other.timerange)
-      || !Immutable.is(this.filter, other.filter)
-      || !Immutable.is(this.searchTypes, other.searchTypes)) {
+      || !isDeepEqual(this.query, other.query)
+      || !isDeepEqual(this.timerange, other.timerange)
+      || !isDeepEqual(this.filter, other.filter)
+      || !isDeepEqual(this.searchTypes, other.searchTypes)) {
       return false;
     }
 

@@ -1,10 +1,10 @@
 // @flow strict
+import isDeepEqual from 'stores/isDeepEqual';
 import { DEFAULT_RANGE_TYPE } from 'views/Constants';
-
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
-import { createElasticsearchQueryString, filtersForQuery } from '../logic/queries/Query';
+import { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 
 const _getTimerange = (query = {}) => {
   const type = query.rangetype || DEFAULT_RANGE_TYPE;
@@ -64,9 +64,12 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   if (streams) {
     queryBuilder = queryBuilder.filter(streams);
   }
+  const newQuery = queryBuilder.build();
 
-  return QueriesActions.update(firstQuery.id, queryBuilder.build())
-    .then(() => true, () => false);
+  return isDeepEqual(newQuery, firstQuery)
+    ? Promise.resolve(true)
+    : QueriesActions.update(firstQuery.id, queryBuilder.build())
+      .then(() => true, () => false);
 };
 
 export default bindSearchParamsFromQuery;

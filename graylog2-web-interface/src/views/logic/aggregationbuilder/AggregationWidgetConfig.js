@@ -1,7 +1,9 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import isDeepEqual from 'stores/isDeepEqual';
 import { TIMESTAMP_FIELD } from 'views/Constants';
+import isEqualForSearch from 'views/stores/isEqualForSearch';
 import Pivot from './Pivot';
 import Series from './Series';
 import VisualizationConfig from './visualizations/VisualizationConfig';
@@ -144,10 +146,27 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   equals(other: any) {
-    const { is } = Immutable;
+    if (other instanceof AggregationWidgetConfig) {
+      return [
+        'columnPivots',
+        'rowPivots',
+        'series',
+        'sort',
+        'rollup',
+        'eventAnnotation',
+        'visualizationConfig',
+        'visualization',
+        'formattingSettings',
+      ]
+        .every(key => isDeepEqual(this[key], other[key]));
+    }
+    return false;
+  }
+
+  equalsForSearch(other: any) {
     if (other instanceof AggregationWidgetConfig) {
       return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig']
-        .every(key => is(Immutable.fromJS(this[key]), Immutable.fromJS(other[key])));
+        .every(key => isEqualForSearch(this[key], other[key]));
     }
     return false;
   }
