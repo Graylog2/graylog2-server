@@ -15,7 +15,7 @@ const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }) =>
   <div className={styles.widgetHeader}>
     {hideDragHandle || <Icon name="bars" className={`widget-drag-handle ${styles.widgetDragHandle}`} />}{' '}
     <EditableTitle disabled={!onRename} value={title} onChange={onRename} />
-    {loading && <LoadingSpinner text="" />}
+    {loading && <LoadingSpinner text="" delay={0} />}
     <span className={`pull-right ${styles.widgetActionDropdown}`}>
       {children}
     </span>
