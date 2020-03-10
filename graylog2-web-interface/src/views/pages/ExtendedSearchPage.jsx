@@ -50,19 +50,25 @@ import HighlightMessageInQuery from '../components/messagelist/HighlightMessageI
 
 const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ${({ interactive }) => (interactive ? css`
+    height: calc(100vh - 50px);
+    display: -ms-grid;
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: 50px 250px 1fr;
-    grid-template-areas: "sidebar search";
+    -ms-grid-rows: 1fr;
+    grid-template-columns: auto 1fr;
+    -ms-grid-columns: auto 1fr;
   ` : '')}
 `;
 
 const SearchArea = styled.div`
-  grid-area: search;
-  grid-column-start: 2;
-  grid-column-end: 4;
+  height: 100%;
+  grid-column: 2;
+  -ms-grid-column: 2;
+  grid-row: 1;
+  -ms-grid-row: 1;
   padding: 15px;
   z-index: 1;
+  overflow-y: auto
 `;
 
 const SearchGrid = styled(Grid)`
