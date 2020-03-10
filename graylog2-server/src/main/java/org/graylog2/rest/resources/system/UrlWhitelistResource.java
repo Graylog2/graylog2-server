@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Strings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -105,7 +104,7 @@ public class UrlWhitelistResource extends RestResource {
     public WhitelistRegexGenerationResponse generateRegex(@ApiParam(name = "JSON body", required = true)
     @Valid @NotNull final WhitelistRegexGenerationRequest generationRequest) {
         final String regex;
-        if (Strings.isNullOrEmpty(generationRequest.placeholder())) {
+        if (generationRequest.placeholder() == null) {
             regex = regexHelper.createRegexForUrl(generationRequest.urlTemplate());
         } else {
             regex = regexHelper.createRegexForUrlTemplate(generationRequest.urlTemplate(),

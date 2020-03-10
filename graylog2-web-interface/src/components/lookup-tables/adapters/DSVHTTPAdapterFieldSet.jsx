@@ -1,22 +1,18 @@
 import React from 'react';
-
+import PropTypes from 'prop-types';
 import { Input } from 'components/bootstrap';
+import { URLWhiteListInput } from 'components/common';
 
 const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMessage, config }) => {
   return (
     <fieldset>
-      <Input type="text"
-             id="url"
-             name="url"
-             label="File URL"
-             autoFocus
-             required
-             onChange={handleFormEvent}
-             help={validationMessage('url', 'The URL of the DSV file.')}
-             bsStyle={validationState('url')}
-             value={config.url}
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9" />
+      <URLWhiteListInput label="File URL"
+                         onChange={handleFormEvent}
+                         validationMessage={validationMessage('url', 'The URL of the DSV file.')}
+                         validationState={validationState('url')}
+                         url={config.url}
+                         labelClassName="col-sm-3"
+                         wrapperClassName="col-sm-9" />
       <Input type="number"
              id="refresh_interval"
              name="refresh_interval"
@@ -105,6 +101,14 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
              wrapperClassName="col-md-offset-3 col-md-9" />
     </fieldset>
   );
+};
+
+DSVHTTPAdapterFieldSet.propTypes = {
+  config: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
+  handleFormEvent: PropTypes.func.isRequired,
+  validationState: PropTypes.func.isRequired,
+  validationMessage: PropTypes.func.isRequired,
 };
 
 export default DSVHTTPAdapterFieldSet;

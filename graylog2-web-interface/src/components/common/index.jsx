@@ -54,3 +54,5 @@ export { default as JSONValueInput } from './JSONValueInput';
 export { default as TimeUnitInput } from './TimeUnitInput';
 export { default as TimeUnit } from './TimeUnit';
 export { default as Wizard } from './Wizard';
+export { default as URLWhiteListFormModal } from './URLWhiteListFormModal';
+export { default as URLWhiteListInput } from './URLWhiteListInput';

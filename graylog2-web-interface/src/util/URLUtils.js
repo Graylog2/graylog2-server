@@ -53,8 +53,18 @@ const URLUtils = {
     const browser = this.parser.getBrowser();
     return browser.name !== 'IE' && browser.name !== 'Edge';
   },
-};
+  isValidURL(str) {
+    let isValid = true;
+    try {
+      // eslint-disable-next-line
+      new URL(str);
+    } catch (e) {
+      isValid = false;
+    }
+    return isValid;
+  },
 
+};
 export default URLUtils;
 
 export const {
@@ -66,4 +76,5 @@ export const {
   replaceHashParam,
   concatURLPath,
   areCredentialsInURLSupported,
+  isValidURL,
 } = URLUtils;
