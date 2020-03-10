@@ -179,7 +179,6 @@ describe('ExtendedSearchPage', () => {
     expect(ViewActions.search.completed.listen).toHaveBeenCalled();
   });
   it('registers to ViewActions.search.completed even if search refresh condition fails', () => {
-
     mount(<SimpleExtendedSearchPage searchRefreshHools={[() => false]} />);
 
     expect(ViewActions.search.completed.listen).toHaveBeenCalled();
