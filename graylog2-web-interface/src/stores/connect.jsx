@@ -2,6 +2,7 @@ import React from 'react';
 import { ListenerMethods } from 'reflux';
 import { isEqualWith, isFunction } from 'lodash';
 import * as Immutable from 'immutable';
+import isDeepEqual from './isDeepEqual';
 
 const _isEqual = (first, second) => {
   if (first && first.equals && isFunction(first.equals)) {
@@ -84,7 +85,7 @@ export default (Component, stores, mapProps = props => props) => {
       const thisChildProps = this._genProps(this.state);
       const nextChildProps = this._genProps(nextState);
 
-      return !(isEqualWith(thisChildProps, nextChildProps, _isEqual) && isEqualWith(this.props, nextProps, _isEqual));
+      return !(isDeepEqual(thisChildProps, nextChildProps) && isDeepEqual(this.props, nextProps, _isEqual));
     }
 
     _genProps = (state) => {

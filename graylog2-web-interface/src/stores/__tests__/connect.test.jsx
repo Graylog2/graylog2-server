@@ -6,7 +6,18 @@ import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
 
 import { asMock } from 'helpers/mocking/index';
-import connect from './connect';
+import {
+  arrayOfMaps,
+  listWithObject,
+  mapWithObject,
+  mixedMapsAndObjects,
+  objectWithMap,
+  AlwaysEqual,
+  NeverEqual,
+  NonValueClass,
+} from './EqualityCheck.fixtures';
+
+import connect from '../connect';
 
 const SimpleComponentWithoutStores = () => <span>Hello World!</span>;
 
@@ -41,26 +52,6 @@ SimpleComponentWithDummyStore.propTypes = {
 SimpleComponentWithDummyStore.defaultProps = {
   simpleStore: undefined,
 };
-
-class AlwaysEqual {
-  equals(other) {
-    return true;
-  }
-}
-
-class NeverEqual {
-  equals(other) {
-    return false;
-  }
-}
-
-class NonValueClass {
-  value: number;
-
-  constructor(value: number) {
-    this.value = value;
-  }
-}
 
 describe('connect()', () => {
   it('does not do anything if no stores are provided', () => {
@@ -165,6 +156,11 @@ describe('connect()', () => {
     ${new AlwaysEqual()}     | ${new NeverEqual()}      | ${false}  | ${'value class which is always equal'}
     ${new NeverEqual()}      | ${new AlwaysEqual()}     | ${true}   | ${'value class which is never equal'}
     ${new NonValueClass(23)} | ${new NonValueClass(42)} | ${true}   | ${'value class which is never equal'}
+    ${mapWithObject()}       | ${mapWithObject()}       | ${false}  | ${'immutable maps containing objects'}
+    ${listWithObject()}      | ${listWithObject()}      | ${false}  | ${'immutable lists containing objects'}
+    ${objectWithMap()}       | ${objectWithMap()}       | ${false}  | ${'objects containing immutable maps'}
+    ${arrayOfMaps()}         | ${arrayOfMaps()}         | ${false}  | ${'arrays containing immutable maps'}
+    ${mixedMapsAndObjects()} | ${mixedMapsAndObjects()} | ${false}  | ${'nested immutable maps and objects'}
   `('compares $description and returns $result', verifyShouldComponentUpdate);
   });
 });
