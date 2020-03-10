@@ -33,6 +33,9 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
 
     if (dropdownLeft + dropdownWidth >= document.body.clientWidth) {
       setCurrentPlacement(oppositePlacement[currentPlacement]);
+    } else if (currentPlacement !== placement) {
+      // reset placement, when previously defined opposite placement is no longer suitable
+      setCurrentPlacement(placement);
     }
   };
 
