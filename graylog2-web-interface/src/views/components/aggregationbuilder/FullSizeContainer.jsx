@@ -1,6 +1,17 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled, { type StyledComponent } from 'styled-components';
+
+const Wrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  grid-row: 2;
+  grid-column: 1;
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
+`;
 
 type Props = {
   children: ({ height: number, width: number }) => React.Element<*>,
@@ -45,9 +56,9 @@ class FullSizeContainer extends React.Component<Props, State> {
     const { children } = this.props;
     const { height, width } = this.state;
     return (
-      <div ref={(elem) => { this.wrapper = elem; }} style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
+      <Wrapper ref={(elem) => { this.wrapper = elem; }}>
         {children({ height, width })}
-      </div>
+      </Wrapper>
     );
   }
 }

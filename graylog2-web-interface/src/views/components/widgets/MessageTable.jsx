@@ -20,6 +20,13 @@ import Field from 'views/components/Field';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
+const TableWrapper = styled.div`
+  grid-row: 1;
+  -ms-grid-row: 1;
+  grid-column: 1;
+  -ms-grid-column: 1;
+`;
+
 const Table = styled.table`
   position: relative;
   font-size: 11px;
@@ -219,7 +226,7 @@ class MessageTable extends React.Component<Props, State> {
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
     return (
-      <div className="table-responsive">
+      <TableWrapper className="table-responsive">
         <Table className="table table-condensed">
           <TableHead>
             <tr>
@@ -263,7 +270,7 @@ class MessageTable extends React.Component<Props, State> {
             );
           })}
         </Table>
-      </div>
+      </TableWrapper>
     );
   }
 }
