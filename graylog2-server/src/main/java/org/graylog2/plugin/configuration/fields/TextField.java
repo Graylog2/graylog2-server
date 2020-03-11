@@ -52,6 +52,16 @@ public class TextField extends AbstractConfigurationField {
             }
         }
     }
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, int position, Attribute... attrs) {
+        super(FIELD_TYPE, name, humanName, description, isOptional, position);
+        this.defaultValue = defaultValue;
+        this.attributes = Lists.newArrayList();
+        if (attrs != null) {
+            for (Attribute attribute : attrs) {
+                this.attributes.add(attribute.toString().toLowerCase(Locale.ENGLISH));
+            }
+        }
+    }
 
     @Override
     public Object getDefaultValue() {

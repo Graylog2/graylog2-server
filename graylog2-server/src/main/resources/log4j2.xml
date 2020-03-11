@@ -23,6 +23,7 @@
         <!-- Silence Kafka log chatter -->
         <Logger name="kafka.log.Log" level="warn"/>
         <Logger name="kafka.log.OffsetIndex" level="warn"/>
+        <Logger name="org.apache.kafka.clients.consumer.ConsumerConfig" level="warn"/>
         <!-- Silence useless session validation messages -->
         <Logger name="org.apache.shiro.session.mgt.AbstractValidatingSessionManager" level="warn"/>
         <Root level="warn">
