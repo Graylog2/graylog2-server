@@ -1,13 +1,9 @@
 // @flow strict
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
 
 import Icon from './Icon';
-
-const Wrapper: StyledComponent<{ visible: boolean }, {}, HTMLSpanElement> = styled.span`
-  visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
-`;
+import Delayed from './Delayed';
 
 type Props = {
   delay?: number,
@@ -18,23 +14,11 @@ type Props = {
 /**
  * Simple spinner to use while waiting for something to load.
  */
-const Spinner = ({ name, text, delay, ...rest }: Props) => {
-  const [delayFinished, setDelayFinished] = useState(false);
-
-  useEffect(() => {
-    const delayTimeout = window.setTimeout(() => {
-      setDelayFinished(true);
-    }, delay);
-
-    return () => clearTimeout(delayTimeout);
-  }, []);
-
-  return (
-    <Wrapper visible={delayFinished}>
-      <Icon {...rest} name={name} spin /> {text}
-    </Wrapper>
-  );
-};
+const Spinner = ({ name, text, delay, ...rest }: Props) => (
+  <Delayed delay={delay}>
+    <Icon {...rest} name={name} spin /> {text}
+  </Delayed>
+);
 
 Spinner.propTypes = {
   /** Delay in ms before displaying the spinner */
