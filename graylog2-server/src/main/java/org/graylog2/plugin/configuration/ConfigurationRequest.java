@@ -90,6 +90,7 @@ public class ConfigurationRequest {
             config.put("is_optional", f.isOptional().equals(ConfigurationField.Optional.OPTIONAL));
             config.put("attributes", f.getAttributes());
             config.put("additional_info", f.getAdditionalInformation());
+            config.put("position", f.getPosition());
 
             configs.put(f.getName(), config);
         }
