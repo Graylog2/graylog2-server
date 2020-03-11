@@ -122,7 +122,7 @@ class PaginatedList extends React.Component<Props, State> {
         {children}
 
         <IfInteractive>
-          <div className="text-center">
+          <div className="text-center pagination-wrapper">
             <Pagination bsSize="small"
                         items={numberPages}
                         maxButtons={10}

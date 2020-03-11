@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -19,6 +19,13 @@ import Field from 'views/components/Field';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 import FieldTypeMapping from '../../logic/fieldtypes/FieldTypeMapping';
+
+const TableWrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+  grid-row: 1;
+  -ms-grid-row: 1;
+  grid-column: 1;
+  -ms-grid-column: 1;
+`;
 
 const Table = styled.table`
   position: relative;
@@ -214,8 +221,8 @@ class MessageTable extends React.Component<Props, State> {
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
     return (
-      <div className="table-responsive">
-        <Table className="table table-condensed" style={{ marginTop: 0 }}>
+      <TableWrapper className="table-responsive">
+        <Table className="table table-condensed">
           <TableHead>
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
@@ -258,8 +265,7 @@ class MessageTable extends React.Component<Props, State> {
             );
           })}
         </Table>
-      </div>
-
+      </TableWrapper>
     );
   }
 }

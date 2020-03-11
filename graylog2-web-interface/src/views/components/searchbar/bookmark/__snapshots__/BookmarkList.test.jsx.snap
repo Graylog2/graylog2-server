@@ -121,7 +121,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
               No bookmarks found
             </span>
             <div
-              class="text-center"
+              class="text-center pagination-wrapper"
             >
               <ul
                 class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
@@ -352,7 +352,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
               </button>
             </div>
             <div
-              class="text-center"
+              class="text-center pagination-wrapper"
             >
               <ul
                 class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"

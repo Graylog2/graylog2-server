@@ -29,8 +29,20 @@ const { InputsActions } = CombinedProvider.get('Inputs');
 
 const Wrapper = styled.div`
   display: grid;
-  grid-template-rows: 1fr max-content;
+  display: -ms-grid;
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
+  grid-template-rows: 1fr auto;
+  -ms-grid-rows: 1fr auto;
+  -ms-grid-columns: 1fr;
   height: 100%;
+
+  .pagination-wrapper {
+    grid-row: 2;
+    -ms-grid-row: 2;
+    grid-column: 1;
+    -ms-grid-column: 1;
+  }
 
   .pagination {
     margin-bottom: 0;

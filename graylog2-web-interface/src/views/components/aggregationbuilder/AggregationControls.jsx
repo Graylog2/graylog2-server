@@ -35,8 +35,27 @@ type State = {
 
 const Container: React.ComponentType<{}> = styled.div`
   display: grid;
-  grid-template-rows: auto minmax(auto, 1fr);
+  display: -ms-grid;
+  grid-template-rows: auto minmax(10px, 1fr);
+  -ms-grid-rows: auto minmax(10px, 1fr);
+  grid-template-columns: 1fr;
+  -ms-grid-columns: 1fr;
   height: 100%;
+`;
+
+const TopRow = styled(Row)`
+  grid-column: 1;
+  -ms-grid-column: 1;
+  grid-row: 1;
+  -ms-grid-row: 1;
+`;
+
+const BottomRow = styled(Row)`
+  overflow-x: hidden;
+  grid-column: 1;
+  -ms-grid-column: 1;
+  grid-row: 2;
+  -ms-grid-row: 2;
 `;
 
 const _visualizationConfigFor = (type: string) => PluginStore.exports('visualizationConfigTypes')
@@ -130,7 +149,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     const VisualizationConfigType = _visualizationConfigFor(visualization);
     return (
       <Container>
-        <Row>
+        <TopRow>
           <Col md={2} style={{ paddingRight: '2px', paddingLeft: '10px' }}>
             <DescriptionBox description="Visualization Type">
               <VisualizationTypeSelect value={visualization} onChange={this._onVisualizationChange} />
@@ -160,8 +179,8 @@ export default class AggregationControls extends React.Component<Props, State> {
                                    onChange={this._onSortDirectionChange} />
             </DescriptionBox>
           </Col>
-        </Row>
-        <Row style={{ overflowX: 'hidden' }}>
+        </TopRow>
+        <BottomRow>
           <Col md={2} style={{ paddingRight: '2px', paddingLeft: '10px', height: '100%', overflowY: 'auto' }}>
             <DescriptionBox description="Metrics" help="The unit which is tracked for every row and subcolumn." style={{ marginTop: 0 }}>
               <SeriesSelect onChange={this._onSeriesChange} series={series} suggester={suggester} />
@@ -182,7 +201,7 @@ export default class AggregationControls extends React.Component<Props, State> {
           <Col md={10} style={{ height: '100%', paddingLeft: '7px' }}>
             {childrenWithCallback}
           </Col>
-        </Row>
+        </BottomRow>
       </Container>
     );
   }

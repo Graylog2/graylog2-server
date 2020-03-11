@@ -1,7 +1,12 @@
 :local(.widgetHeader) {
+    grid-column: 1;
+    grid-row: 1;
+    -ms-grid-column: 1;
+    -ms-grid-row: 1;
     font-size: 18px;
     text-overflow: ellipsis;
-    margin-bottom: 5px;
+    /* Usign paddding instead of margin / grid-gap because of IE11 grid compatibility */
+    padding-bottom: 5px;
 }
 
 :local(.widgetActionDropdown) {
