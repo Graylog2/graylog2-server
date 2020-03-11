@@ -77,8 +77,8 @@ const StateNoSort: CurrentState = {
 };
 
 const _currentState = (config: MessagesWidgetConfig, fieldName: string) => {
-  const fielSortDirection = _isFieldSortActive(config, fieldName) ? config.sort[0].direction.direction : null;
-  switch (fielSortDirection) {
+  const fieldSortDirection = _isFieldSortActive(config, fieldName) ? config.sort[0].direction.direction : null;
+  switch (fieldSortDirection) {
     case Direction.Ascending.direction:
       return StateAsc;
     case Direction.Descending.direction:
