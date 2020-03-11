@@ -58,9 +58,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -78,12 +78,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
@@ -661,9 +661,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -681,12 +681,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
@@ -1264,9 +1264,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -1284,12 +1284,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
@@ -1913,9 +1913,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -1933,12 +1933,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
@@ -2562,9 +2562,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -2582,12 +2582,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
@@ -3211,9 +3211,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -3231,12 +3231,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
@@ -3860,9 +3860,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -3880,12 +3880,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
@@ -4509,9 +4509,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -4529,12 +4529,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
@@ -5158,9 +5158,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
                     "isStatic": true,
-                    "lastClassName": "etyOYS",
+                    "lastClassName": "eAWkfW",
                     "rules": Array [
-                      "display:flex;> .btn-group{max-width:calc(100% - 34px);.btn:first-child{max-width:100%;}}",
+                      "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
                     ],
                   },
                   "displayName": "RefreshControls__FlexibleButtonGroup",
@@ -5178,12 +5178,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               <ButtonGroup
                 block={false}
                 bsClass="btn-group"
-                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS"
+                className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW"
                 justified={false}
                 vertical={false}
               >
                 <div
-                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
+                  className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
                     bsStyle="default"
