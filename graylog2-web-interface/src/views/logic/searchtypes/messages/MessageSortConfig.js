@@ -5,6 +5,7 @@ export type MessageSortConfigJson = {
   field: string,
   order: 'ASC' | 'DESC',
 };
+
 type InternalState = {
   field: string,
   direction: Direction,
@@ -19,7 +20,6 @@ export default class MessageSortConfig {
 
   toJSON(): MessageSortConfigJson {
     const { field, direction } = this._value;
-
     return {
       field,
       order: direction === Direction.Ascending ? 'ASC' : 'DESC',
