@@ -70,7 +70,7 @@ class MessageList extends React.Component<Props, State> {
     }).isRequired,
     editing: PropTypes.bool.isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
-    onConfigChange: PropTypes.func.isRequired,
+    onConfigChange: PropTypes.func,
     pageSize: PropTypes.number,
     searchTypes: PropTypes.object.isRequired,
     selectedFields: PropTypes.object,
@@ -78,6 +78,7 @@ class MessageList extends React.Component<Props, State> {
   };
 
   static defaultProps = {
+    onConfigChange: () => {},
     pageSize: Messages.DEFAULT_LIMIT,
     selectedFields: Immutable.Set(),
   };
