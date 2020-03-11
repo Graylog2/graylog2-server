@@ -2,25 +2,34 @@
 import styled, { type StyledComponent } from 'styled-components';
 import { Title as NavItemTitle } from './NavItem.styles';
 
+const sidebarWidth = {
+  open: '250px',
+  closed: '100%', // width is defined in parent container
+};
+
 export const Container: StyledComponent<{ open: boolean }, {}, HTMLDivElement> = styled.div`
-  grid-area: sidebar;
-  z-index: 3;
+  grid-row: 1;
+  -ms-grid-row: 1;
+  grid-column: 1;
+  -ms-grid-column: 1;
   background: #393939;
   color: #9e9e9e;
-  height: calc(100vh - 50px);
+  height: 100%;
   padding-top: 20px;
-  position: sticky;
+  position: ${props => (props.open ? 'fixed' : 'static')};
   top: 50px;
-  grid-column-start: 1;
-  grid-column-end: ${props => (props.open ? 3 : 2)};
+  width: ${props => (props.open ? sidebarWidth.open : sidebarWidth.closed)};
   box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);
+
+  /* z-index is needed for ie11 */
+  z-index: ${props => (props.open ? 20 : 'auto')};
 `;
 
 export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 300px;
+  left: ${sidebarWidth.open};
   right: 0;
   background: rgba(3, 3, 3, 0.25);
 `;

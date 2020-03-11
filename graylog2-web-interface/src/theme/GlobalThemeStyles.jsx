@@ -410,7 +410,10 @@ const GlobalThemeStyles = createGlobalStyle`
     margin: 0;
     padding: 20px;
     display: grid;
-    grid-template-rows: max-content minmax(10px, 1fr);
+    display: -ms-grid;
+    grid-template-rows: auto minmax(10px, 1fr);
+    -ms-grid-rows: auto minmax(10px, 1fr);
+    -ms-grid-columns: 1fr;
   }
 
   .dashboard .widget .widget-top {
