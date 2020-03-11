@@ -178,6 +178,11 @@ describe('ExtendedSearchPage', () => {
 
     expect(ViewActions.search.completed.listen).toHaveBeenCalled();
   });
+  it('registers to ViewActions.search.completed even if search refresh condition fails', () => {
+    mount(<SimpleExtendedSearchPage searchRefreshHools={[() => false]} />);
+
+    expect(ViewActions.search.completed.listen).toHaveBeenCalled();
+  });
   it('unregisters from ViewActions.search.completed upon unmount', () => {
     const unsubscribe = jest.fn();
     ViewActions.search.completed.listen = jest.fn(() => unsubscribe);
