@@ -6,16 +6,16 @@ import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
+import CustomPropTypes from 'views/components/CustomPropTypes';
+import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
 import RowPivotSelect from './RowPivotSelect';
 import ColumnPivotSelect from './ColumnPivotSelect';
-import SortDirectionSelect from './SortDirectionSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
 import DescriptionBox from './DescriptionBox';

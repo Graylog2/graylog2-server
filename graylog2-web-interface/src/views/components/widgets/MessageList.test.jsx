@@ -201,6 +201,7 @@ describe('MessageList', () => {
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
+                                       onSortChange={() => {}}
                                        setLoadingState={() => {}} />);
 
     await wrapper.find('[aria-label="Next"]').simulate('click');
@@ -216,6 +217,7 @@ describe('MessageList', () => {
                    data={data}
                    fields={Immutable.List([])}
                    config={config}
+                   onSortChange={() => {}}
                    setLoadingState={() => {}} />
     );
     return new Promise((resolve) => {

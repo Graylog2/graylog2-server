@@ -20,8 +20,10 @@ import { PaginatedList } from 'components/common';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
+import type { FieldTypeMappingsList } from '../../stores/FieldTypesStore';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 
@@ -41,38 +43,43 @@ type State = {
 }
 
 type Props = {
-  fields: {},
-  pageSize: number,
   config: MessagesWidgetConfig,
-  data: { messages: Array<Object>, total: number, id: string },
-  selectedFields?: {},
-  searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
-  setLoadingState: (loading: boolean) => void,
   currentView: {
     activeQuery: string,
     view: {
       id: number,
     },
   },
+  data: { messages: Array<Object>, total: number, id: string },
+  editing: boolean,
+  fields: FieldTypeMappingsList,
+  onConfigChange: (MessagesWidgetConfig) => Promise<void>,
+  pageSize: number,
+  searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
+  selectedFields?: Immutable.Set<string>,
+  setLoadingState: (loading: boolean) => void,
 };
 
 class MessageList extends React.Component<Props, State> {
   static propTypes = {
-    fields: CustomPropTypes.FieldListType.isRequired,
-    pageSize: PropTypes.number,
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
+    currentView: PropTypes.object.isRequired,
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
       total: PropTypes.number.isRequired,
       id: PropTypes.string.isRequired,
     }).isRequired,
+    editing: PropTypes.bool.isRequired,
+    fields: CustomPropTypes.FieldListType.isRequired,
+    onConfigChange: PropTypes.func,
+    pageSize: PropTypes.number,
     searchTypes: PropTypes.object.isRequired,
     selectedFields: PropTypes.object,
     setLoadingState: PropTypes.func.isRequired,
-    currentView: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
+    onConfigChange: () => {},
     pageSize: Messages.DEFAULT_LIMIT,
     selectedFields: Immutable.Set(),
   };
@@ -123,6 +130,12 @@ class MessageList extends React.Component<Props, State> {
     return defaultKey;
   }
 
+  _onSortChange = (newSort: SortConfig[]) => {
+    const { onConfigChange, config } = this.props;
+    const newConfig = config.toBuilder().sort(newSort).build();
+    return onConfigChange(newConfig);
+  }
+
   static contextType = RenderCompletionCallback;
 
   render() {
@@ -130,9 +143,11 @@ class MessageList extends React.Component<Props, State> {
       config,
       currentView: { activeQuery: activeQueryId },
       data: { messages, total: totalMessages },
+      editing,
       fields,
       pageSize,
       selectedFields,
+      setLoadingState,
     } = this.props;
     const { currentPage, errors } = this.state;
     const hasError = !isEmpty(errors);
@@ -144,7 +159,10 @@ class MessageList extends React.Component<Props, State> {
                        showPageSizeSelect={false}
                        totalItems={totalMessages}
                        pageSize={pageSize}>
-          {!hasError && <MessageTable messages={messages} fields={fields} config={config} selectedFields={selectedFields} activeQueryId={activeQueryId} key={listKey} />}
+          {!hasError && <MessageTable activeQueryId={activeQueryId}
+                          config={config}
+                          editing={editing} fields={fields} key={listKey}
+                          onSortChange={this._onSortChange} selectedFields={selectedFields} setLoadingState={setLoadingState} messages={messages} />}
           {hasError && (<ErrorWidget errors={errors} />)}
         </PaginatedList>
       </Wrapper>

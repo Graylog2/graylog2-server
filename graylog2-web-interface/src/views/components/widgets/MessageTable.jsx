@@ -8,13 +8,17 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
 
 import { MessageTableEntry } from 'views/components/messagelist';
+import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
+
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
+import FieldTypeMapping from '../../logic/fieldtypes/FieldTypeMapping';
 
 const Table = styled.table`
   position: relative;
@@ -131,23 +135,30 @@ type State = {
 }
 
 type Props = {
-  fields: {},
-  config: MessagesWidgetConfig,
-  selectedFields?: {},
   activeQueryId: string,
-  messages: Array<Object>
+  config: MessagesWidgetConfig,
+  editing?: boolean,
+  fields: Immutable.List<FieldTypeMapping>,
+  messages: Array<Object>,
+  onSortChange: (SortConfig[]) => Promise<void>,
+  selectedFields?: {},
+  setLoadingState: (loading: boolean) => void,
 };
 
 class MessageTable extends React.Component<Props, State> {
   static propTypes = {
     activeQueryId: PropTypes.string.isRequired,
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
+    editing: PropTypes.bool,
     fields: CustomPropTypes.FieldListType.isRequired,
     messages: PropTypes.arrayOf(PropTypes.object).isRequired,
+    onSortChange: PropTypes.func.isRequired,
     selectedFields: PropTypes.object,
+    setLoadingState: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
+    editing: false,
     selectedFields: Immutable.Set(),
   };
 
@@ -199,7 +210,7 @@ class MessageTable extends React.Component<Props, State> {
 
   render() {
     const { expandedMessages } = this.state;
-    const { fields, activeQueryId, config } = this.props;
+    const { fields, activeQueryId, config, editing, onSortChange, setLoadingState } = this.props;
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
     return (
@@ -214,6 +225,12 @@ class MessageTable extends React.Component<Props, State> {
                     <Field type={this._fieldTypeFor(selectedFieldName, fields)}
                            name={selectedFieldName}
                            queryId={activeQueryId} />
+                    {editing && (
+                      <FieldSortIcon fieldName={selectedFieldName}
+                                     onSortChange={onSortChange}
+                                     setLoadingState={setLoadingState}
+                                     config={config} />
+                    )}
                   </th>
                 );
               })}
