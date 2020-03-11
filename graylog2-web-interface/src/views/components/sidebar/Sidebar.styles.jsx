@@ -12,7 +12,6 @@ export const Container: StyledComponent<{ open: boolean }, {}, HTMLDivElement> =
   -ms-grid-row: 1;
   grid-column: 1;
   -ms-grid-column: 1;
-  z-index: 3;
   background: #393939;
   color: #9e9e9e;
   height: 100%;
