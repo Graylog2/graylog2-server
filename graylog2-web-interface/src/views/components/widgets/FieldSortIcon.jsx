@@ -17,7 +17,7 @@ type Props = {
   setLoadingState: (loading: boolean) => void,
 }
 
-type CurrentState = {
+type DirectionStrategy = {
   onSortChange: (changeSort: (direction: Direction) => void) => void,
   tooltip: (fieldName: string) => string,
   sortActive: boolean,
@@ -55,42 +55,42 @@ const _isFieldSortActive = (config: MessagesWidgetConfig, fieldName: string) => 
   return config.sort && config.sort.length > 0 && config.sort[0].field === fieldName;
 };
 
-const StateAsc: CurrentState = {
+const DirectionStrategyAsc: DirectionStrategy = {
   icon: 'sort-amount-asc',
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Descending),
   onSortChange: changeSort => changeSort(Direction.Descending),
   sortActive: true,
 };
 
-const StateDesc: CurrentState = {
+const DirectionStrategyDesc: DirectionStrategy = {
   icon: 'sort-amount-desc',
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Ascending),
   onSortChange: changeSort => changeSort(Direction.Ascending),
   sortActive: true,
 };
 
-const StateNoSort: CurrentState = {
-  icon: Direction.Descending.equals(defaultSortDirection) ? StateDesc.icon : StateAsc.icon,
+const DirectionStrategyNoSort: DirectionStrategy = {
+  icon: Direction.Descending.equals(defaultSortDirection) ? DirectionStrategyDesc.icon : DirectionStrategyAsc.icon,
   tooltip: (fieldName: string) => _tooltip(fieldName, defaultSortDirection),
   onSortChange: changeSort => changeSort(defaultSortDirection),
   sortActive: false,
 };
 
-const _currentState = (config: MessagesWidgetConfig, fieldName: string) => {
+const _directionStrategy = (config: MessagesWidgetConfig, fieldName: string) => {
   const fieldSortDirection = _isFieldSortActive(config, fieldName) ? config.sort[0].direction.direction : null;
   switch (fieldSortDirection) {
     case Direction.Ascending.direction:
-      return StateAsc;
+      return DirectionStrategyAsc;
     case Direction.Descending.direction:
-      return StateDesc;
+      return DirectionStrategyDesc;
     default:
-      return StateNoSort;
+      return DirectionStrategyNoSort;
   }
 };
 
 const FieldSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }: Props) => {
   const changeSort = (nextDirection: Direction) => _changeSort(nextDirection, config, fieldName, onConfigChange, setLoadingState);
-  const { sortActive, tooltip, onSortChange, icon }: CurrentState = _currentState(config, fieldName);
+  const { sortActive, tooltip, onSortChange, icon }: DirectionStrategy = _directionStrategy(config, fieldName);
   return (
     <SortIcon sortActive={sortActive}
               title={tooltip(fieldName)}
