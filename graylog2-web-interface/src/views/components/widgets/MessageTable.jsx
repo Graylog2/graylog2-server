@@ -9,6 +9,7 @@ import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -140,7 +141,7 @@ type Props = {
   editing?: boolean,
   fields: Immutable.List<FieldTypeMapping>,
   messages: Array<Object>,
-  onConfigChange: (MessagesWidgetConfig) => Promise<void>,
+  onSortChange: (SortConfig[]) => Promise<void>,
   selectedFields?: Immutable.Set<string>,
   setLoadingState: (loading: boolean) => void,
 };
@@ -156,7 +157,7 @@ class MessageTable extends React.Component<Props, State> {
     editing: PropTypes.bool,
     fields: CustomPropTypes.FieldListType.isRequired,
     messages: PropTypes.arrayOf(PropTypes.object).isRequired,
-    onConfigChange: PropTypes.func.isRequired,
+    onSortChange: PropTypes.func.isRequired,
     selectedFields: PropTypes.object,
     setLoadingState: PropTypes.func.isRequired,
   };
@@ -214,7 +215,7 @@ class MessageTable extends React.Component<Props, State> {
 
   render() {
     const { expandedMessages } = this.state;
-    const { fields, activeQueryId, config, editing, onConfigChange, setLoadingState } = this.props;
+    const { fields, activeQueryId, config, editing, onSortChange, setLoadingState } = this.props;
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
     return (
@@ -231,7 +232,7 @@ class MessageTable extends React.Component<Props, State> {
                            queryId={activeQueryId} />
                     {editing && (
                       <FieldSortIcon fieldName={selectedFieldName}
-                                     onConfigChange={onConfigChange}
+                                     onSortChange={onSortChange}
                                      setLoadingState={setLoadingState}
                                      config={config} />
                     )}

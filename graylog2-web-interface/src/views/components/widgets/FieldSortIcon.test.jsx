@@ -15,51 +15,48 @@ describe('FieldSortIcon', () => {
   afterEach(cleanup);
 
   it('should set descending sort on click, if field sort is not defined', () => {
-    const onChangeStub = jest.fn(() => Promise.resolve());
-    const { getByTestId } = render(<FieldSortIcon config={config} fieldName="source" onConfigChange={onChangeStub} setLoadingState={() => {}} />);
+    const onSortChangeStub = jest.fn(() => Promise.resolve());
+    const { getByTestId } = render(<FieldSortIcon config={config} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={() => {}} />);
 
     const sortIcon = getByTestId('messages-sort-icon');
     fireEvent.click(sortIcon);
 
-    const expectedSort = new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending);
-    const expectedConfig = config.toBuilder().sort([expectedSort]).build();
-    expect(onChangeStub).toHaveBeenCalledTimes(1);
-    expect(onChangeStub).toHaveBeenCalledWith(expectedConfig);
+    const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)];
+    expect(onSortChangeStub).toHaveBeenCalledTimes(1);
+    expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
   });
 
   it('should set ascending sort on click, if field sort is descending', () => {
-    const onChangeStub = jest.fn(() => Promise.resolve());
-    const { getByTestId } = render(<FieldSortIcon config={config} fieldName="timestamp" onConfigChange={onChangeStub} setLoadingState={() => {}} />);
+    const onSortChangeStub = jest.fn(() => Promise.resolve());
+    const { getByTestId } = render(<FieldSortIcon config={config} fieldName="timestamp" onSortChange={onSortChangeStub} setLoadingState={() => {}} />);
 
     const sortIcon = getByTestId('messages-sort-icon');
     fireEvent.click(sortIcon);
 
-    const expectedSort = new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Ascending);
-    const expectedConfig = config.toBuilder().sort([expectedSort]).build();
-    expect(onChangeStub).toHaveBeenCalledTimes(1);
-    expect(onChangeStub).toHaveBeenCalledWith(expectedConfig);
+    const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Ascending)];
+    expect(onSortChangeStub).toHaveBeenCalledTimes(1);
+    expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
   });
 
   it('should set ascending sort on click, if field sort is descending', () => {
     const initialSort = new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Ascending);
     const initialConfig = new MessagesWidgetConfig(['timestamp', 'source'], true, [], [initialSort]);
-    const onChangeStub = jest.fn(() => Promise.resolve());
+    const onSortChangeStub = jest.fn(() => Promise.resolve());
 
-    const { getByTestId } = render(<FieldSortIcon config={initialConfig} fieldName="source" onConfigChange={onChangeStub} setLoadingState={() => {}} />);
+    const { getByTestId } = render(<FieldSortIcon config={initialConfig} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={() => {}} />);
 
     const sortIcon = getByTestId('messages-sort-icon');
     fireEvent.click(sortIcon);
 
-    const expectedSort = new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending);
-    const expectedConfig = config.toBuilder().sort([expectedSort]).build();
-    expect(onChangeStub).toHaveBeenCalledTimes(1);
-    expect(onChangeStub).toHaveBeenCalledWith(expectedConfig);
+    const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)];
+    expect(onSortChangeStub).toHaveBeenCalledTimes(1);
+    expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
   });
 
   it('should set loading state while changing sort', async () => {
-    const onChangeStub = jest.fn(() => Promise.resolve());
+    const onSortChangeStub = jest.fn(() => Promise.resolve());
     const setLoadingStateStub = jest.fn();
-    const { getByTestId } = render(<FieldSortIcon config={config} fieldName="source" onConfigChange={onChangeStub} setLoadingState={setLoadingStateStub} />);
+    const { getByTestId } = render(<FieldSortIcon config={config} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingStateStub} />);
 
     const sortIcon = getByTestId('messages-sort-icon');
     fireEvent.click(sortIcon);

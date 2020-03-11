@@ -33,7 +33,7 @@ describe('MessageTable', () => {
                                         config={config}
                                         fields={Immutable.List(fields)}
                                         messages={messages}
-                                        onConfigChange={() => Promise.resolve()}
+                                        onSortChange={() => Promise.resolve()}
                                         selectedFields={Immutable.Set()}
                                         setLoadingState={() => {}} />);
     const th = wrapper.find('th').at(0);
@@ -44,7 +44,7 @@ describe('MessageTable', () => {
     const wrapper = mount(<MessageTable activeQueryId={activeQueryId}
                                         config={config}
                                         fields={Immutable.List(fields)}
-                                        onConfigChange={() => Promise.resolve()}
+                                        onSortChange={() => Promise.resolve()}
                                         selectedFields={Immutable.Set()}
                                         setLoadingState={() => {}}
                                         messages={messages} />);
@@ -60,7 +60,7 @@ describe('MessageTable', () => {
                                           config={config}
                                           // $FlowFixMe: violating contract on purpose
                                           fields={undefined}
-                                          onConfigChange={() => Promise.resolve()}
+                                          onSortChange={() => Promise.resolve()}
                                           selectedFields={Immutable.Set()}
                                           setLoadingState={() => {}}
                                           messages={messages} />);
@@ -75,7 +75,7 @@ describe('MessageTable', () => {
     const wrapper = mount(<MessageTable activeQueryId={activeQueryId}
                                         config={configWithFields}
                                         fields={Immutable.List(fields)}
-                                        onConfigChange={() => Promise.resolve()}
+                                        onSortChange={() => Promise.resolve()}
                                         selectedFields={Immutable.Set()}
                                         setLoadingState={() => {}}
                                         messages={messages} />);
@@ -90,7 +90,7 @@ describe('MessageTable', () => {
         <MessageTable activeQueryId={activeQueryId}
                       config={config}
                       fields={Immutable.List(fields)}
-                      onConfigChange={() => Promise.resolve()}
+                      onSortChange={() => Promise.resolve()}
                       selectedFields={Immutable.Set()}
                       setLoadingState={() => {}}
                       messages={messages} />
@@ -108,7 +108,7 @@ describe('MessageTable', () => {
         <MessageTable activeQueryId={activeQueryId}
                       config={config}
                       fields={Immutable.List(fields)}
-                      onConfigChange={() => Promise.resolve()}
+                      onSortChange={() => Promise.resolve()}
                       selectedFields={Immutable.Set()}
                       setLoadingState={() => {}}
                       messages={messages} />

@@ -13,15 +13,15 @@ import { Icon } from 'components/common';
 type Props = {
   config: MessagesWidgetConfig,
   fieldName: string,
-  onConfigChange: (MessagesWidgetConfig) => Promise<void>,
+  onSortChange: (SortConfig[]) => Promise<void>,
   setLoadingState: (loading: boolean) => void,
 }
 
 type DirectionStrategy = {
-  onSortChange: (changeSort: (direction: Direction) => void) => void,
-  tooltip: (fieldName: string) => string,
+  handleSortChange: (changeSort: (direction: Direction) => void) => void,
+  icon: string,
   sortActive: boolean,
-  icon: string
+  tooltip: (fieldName: string) => string,
 }
 
 const SortIcon: StyledComponent<{sortActive: boolean}, {}, HTMLButtonElement> = styled.button(({ sortActive }) => {
@@ -31,9 +31,7 @@ const SortIcon: StyledComponent<{sortActive: boolean}, {}, HTMLButtonElement> = 
     border: 0;
     background: transparent;
     color: ${color};
-
     padding: 5px;
-
     cursor: pointer;
   `;
 });
@@ -42,11 +40,10 @@ const _tooltip = (fieldName: string, newDirection: Direction) => {
   return `Sort ${fieldName} ${newDirection.direction}`;
 };
 
-const _changeSort = (nextDirection: Direction, config: MessagesWidgetConfig, fieldName: string, onConfigChange: (MessagesWidgetConfig) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
-  const nextSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
-  const newConfig = config.toBuilder().sort(nextSort).build();
+const _changeSort = (nextDirection: Direction, config: MessagesWidgetConfig, fieldName: string, onSortChange: (SortConfig[]) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
+  const newSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
   setLoadingState(true);
-  onConfigChange(newConfig).then(() => {
+  onSortChange(newSort).then(() => {
     setLoadingState(false);
   });
 };
@@ -58,21 +55,21 @@ const _isFieldSortActive = (config: MessagesWidgetConfig, fieldName: string) => 
 const DirectionStrategyAsc: DirectionStrategy = {
   icon: 'sort-amount-asc',
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Descending),
-  onSortChange: changeSort => changeSort(Direction.Descending),
+  handleSortChange: changeSort => changeSort(Direction.Descending),
   sortActive: true,
 };
 
 const DirectionStrategyDesc: DirectionStrategy = {
   icon: 'sort-amount-desc',
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Ascending),
-  onSortChange: changeSort => changeSort(Direction.Ascending),
+  handleSortChange: changeSort => changeSort(Direction.Ascending),
   sortActive: true,
 };
 
 const DirectionStrategyNoSort: DirectionStrategy = {
   icon: Direction.Descending.equals(defaultSortDirection) ? DirectionStrategyDesc.icon : DirectionStrategyAsc.icon,
   tooltip: (fieldName: string) => _tooltip(fieldName, defaultSortDirection),
-  onSortChange: changeSort => changeSort(defaultSortDirection),
+  handleSortChange: changeSort => changeSort(defaultSortDirection),
   sortActive: false,
 };
 
@@ -88,14 +85,14 @@ const _directionStrategy = (config: MessagesWidgetConfig, fieldName: string) => 
   }
 };
 
-const FieldSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }: Props) => {
-  const changeSort = (nextDirection: Direction) => _changeSort(nextDirection, config, fieldName, onConfigChange, setLoadingState);
-  const { sortActive, tooltip, onSortChange, icon }: DirectionStrategy = _directionStrategy(config, fieldName);
+const FieldSortIcon = ({ fieldName, config, onSortChange, setLoadingState }: Props) => {
+  const changeSort = (nextDirection: Direction) => _changeSort(nextDirection, config, fieldName, onSortChange, setLoadingState);
+  const { sortActive, tooltip, handleSortChange, icon }: DirectionStrategy = _directionStrategy(config, fieldName);
   return (
     <SortIcon sortActive={sortActive}
               title={tooltip(fieldName)}
               aria-label={tooltip(fieldName)}
-              onClick={() => onSortChange(changeSort)}
+              onClick={() => handleSortChange(changeSort)}
               data-testid="messages-sort-icon">
       <Icon name={icon} />
     </SortIcon>
@@ -105,7 +102,7 @@ const FieldSortIcon = ({ fieldName, config, onConfigChange, setLoadingState }: P
 FieldSortIcon.propTypes = {
   config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
   fieldName: PropTypes.string.isRequired,
-  onConfigChange: PropTypes.func.isRequired,
+  onSortChange: PropTypes.func.isRequired,
   setLoadingState: PropTypes.func.isRequired,
 };
 

@@ -20,6 +20,7 @@ import { PaginatedList } from 'components/common';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 import type { FieldTypeMappingsList } from '../../stores/FieldTypesStore';
@@ -129,6 +130,12 @@ class MessageList extends React.Component<Props, State> {
     return defaultKey;
   };
 
+  _onSortChange = (newSort: SortConfig[]) => {
+    const { onConfigChange, config } = this.props;
+    const newConfig = config.toBuilder().sort(newSort).build();
+    return onConfigChange(newConfig);
+  }
+
   static contextType = RenderCompletionCallback;
 
   render() {
@@ -138,7 +145,6 @@ class MessageList extends React.Component<Props, State> {
       data: { messages, total: totalMessages },
       editing,
       fields,
-      onConfigChange,
       pageSize,
       selectedFields,
       setLoadingState,
@@ -160,7 +166,7 @@ class MessageList extends React.Component<Props, State> {
                           editing={editing}
                           fields={fields}
                           key={listKey}
-                          onConfigChange={onConfigChange}
+                          onSortChange={this._onSortChange}
                           selectedFields={selectedFields}
                           setLoadingState={setLoadingState}
                           messages={messages} />
