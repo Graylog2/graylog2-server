@@ -4,7 +4,7 @@ import { Title as NavItemTitle } from './NavItem.styles';
 
 const sidebarWidth = {
   open: '250px',
-  closed: '50px',
+  closed: '100%', // width is defined in parent container
 };
 
 export const Container: StyledComponent<{ open: boolean }, {}, HTMLDivElement> = styled.div`
@@ -17,10 +17,13 @@ export const Container: StyledComponent<{ open: boolean }, {}, HTMLDivElement> =
   color: #9e9e9e;
   height: 100%;
   padding-top: 20px;
-  position: sticky;
+  position: ${props => (props.open ? 'fixed' : 'static')};
   top: 50px;
   width: ${props => (props.open ? sidebarWidth.open : sidebarWidth.closed)};
   box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);
+
+  /* z-index is needed for ie11 */
+  z-index: ${props => (props.open ? 20 : 'auto')};
 `;
 
 export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
@@ -30,9 +33,6 @@ export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.di
   left: ${sidebarWidth.open};
   right: 0;
   background: rgba(3, 3, 3, 0.25);
-
-  /* z-index is needed for ie11 */
-  z-index: 20;
 `;
 
 export const SidebarHeader: StyledComponent<{open: boolean, hasTitle: boolean}, {}, React.ComponentType> = styled(NavItemTitle)`

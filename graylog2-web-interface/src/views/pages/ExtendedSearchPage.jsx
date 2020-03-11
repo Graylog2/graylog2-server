@@ -55,8 +55,8 @@ const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
     display: grid;
     grid-template-rows: 1fr;
     -ms-grid-rows: 1fr;
-    grid-template-columns: auto 1fr;
-    -ms-grid-columns: auto 1fr;
+    grid-template-columns: 50px 1fr;
+    -ms-grid-columns: 50px 1fr;
   ` : '')}
 `;
 
