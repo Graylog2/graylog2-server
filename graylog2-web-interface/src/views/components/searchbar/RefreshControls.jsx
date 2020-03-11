@@ -18,7 +18,6 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
 
   > .btn-group {
-
     .btn:first-child {
       max-width: 100%;
     }

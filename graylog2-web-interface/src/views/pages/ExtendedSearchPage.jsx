@@ -68,7 +68,7 @@ const SearchArea = styled.div`
   -ms-grid-row: 1;
   padding: 15px;
   z-index: 1;
-  overflow-y: auto
+  overflow-y: auto;
 `;
 
 const SearchGrid = styled(Grid)`

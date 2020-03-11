@@ -30,6 +30,7 @@ export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.di
   left: ${sidebarWidth.open};
   right: 0;
   background: rgba(3, 3, 3, 0.25);
+
   /* z-index is needed for ie11 */
   z-index: 20;
 `;
