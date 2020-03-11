@@ -45,6 +45,8 @@ import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
+import IfDashboard from '../dashboard/IfDashboard';
+import ReplaySearchButton from './ReplaySearchButton';
 
 type Props = {
   id: string,
@@ -290,6 +292,10 @@ class Widget extends React.Component<Props, State> {
                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
                 <IfInteractive>
+                  <IfDashboard>
+                    <ReplaySearchButton />
+                    {' '}
+                  </IfDashboard>
                   <WidgetHorizontalStretch widgetId={widget.id}
                                            widgetType={widget.type}
                                            onStretch={onPositionsChange}
