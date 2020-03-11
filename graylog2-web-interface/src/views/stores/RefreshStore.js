@@ -39,8 +39,7 @@ export const RefreshStore = singletonStore(
     },
 
     setInterval(interval: number) {
-      this.refreshConfig.interval = interval;
-      this.refreshConfig.enabled = true;
+      this.refreshConfig = { interval, enabled: true };
 
       if (this.intervalId) {
         clearInterval(this.intervalId);
@@ -51,7 +50,7 @@ export const RefreshStore = singletonStore(
     },
 
     enable() {
-      this.refreshConfig.enabled = true;
+      this.refreshConfig = { ...this.refreshConfig, enabled: true };
       if (!this.intervalId) {
         this.intervalId = setInterval(SearchActions.executeWithCurrentState, this.refreshConfig.interval);
       }
@@ -59,7 +58,7 @@ export const RefreshStore = singletonStore(
     },
 
     disable() {
-      this.refreshConfig.enabled = false;
+      this.refreshConfig = { ...this.refreshConfig, enabled: false };
       if (this.intervalId) {
         clearInterval(this.intervalId);
         this.intervalId = undefined;
@@ -68,7 +67,8 @@ export const RefreshStore = singletonStore(
     },
 
     _trigger() {
-      this.trigger(this.refreshConfig);
+      const { enabled, interval } = this.refreshConfig;
+      this.trigger({ enabled, interval });
     },
   }),
 );
