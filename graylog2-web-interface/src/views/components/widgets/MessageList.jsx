@@ -43,12 +43,12 @@ type State = {
 
 type Props = {
   config: MessagesWidgetConfig,
-    currentView: {
-      activeQuery: string,
-      view: {
-        id: number,
-      },
+  currentView: {
+    activeQuery: string,
+    view: {
+      id: number,
     },
+  },
   data: { messages: Array<Object>, total: number, id: string },
   editing: boolean,
   fields: FieldTypeMappingsList,
