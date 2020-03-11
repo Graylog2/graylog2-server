@@ -2,6 +2,8 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 
+import asMock from 'helpers/mocking/AsMock';
+import CurrentUserStore from 'stores/users/CurrentUserStore';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -10,14 +12,28 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 
 import BookmarkControls from './BookmarkControls';
+import * as Permissions from '../../../Permissions';
+
+const mockUser = {
+  username: 'someone',
+  permissions: [],
+};
+
+jest.mock('stores/users/CurrentUserStore', () => ({
+  getInitialState: jest.fn(() => ({ currentUser: mockUser })),
+  listen: jest.fn(() => {}),
+  get: jest.fn(() => mockUser),
+}));
 
 describe('BookmarkControls', () => {
-  const createViewStoreState = (dirty = true) => ({
+  const createViewStoreState = (dirty = true, id) => ({
     activeQuery: '',
     view: View.builder()
+      .id(id)
       .title('title')
       .description('description')
       .search(Search.create().toBuilder().id('id-beef').build())
+      .owner('owningUser')
       .build(),
     dirty,
   });
@@ -51,6 +67,69 @@ describe('BookmarkControls', () => {
       setImmediate(() => {
         expect(onLoadView).toHaveBeenCalledTimes(1);
         done();
+      });
+    });
+    describe('has "Share search" option', () => {
+      it('includes the option to share the current search', () => {
+        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+
+        expect(wrapper.find('MenuItem[title="Share search"]')).toExist();
+      });
+
+      it('which should be disabled if current user is neither owner nor permitted to edit search', () => {
+        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+
+        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+
+        expect(shareSearch).toBeDisabled();
+      });
+      it('which should be enabled if current user is owner of search', () => {
+        const owningUser = {
+          username: 'owningUser',
+          permissions: [],
+        };
+        asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
+        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+
+        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+
+        expect(shareSearch).not.toBeDisabled();
+      });
+      it('which should be enabled if current user is permitted to edit search', () => {
+        const owningUser = {
+          username: 'powerfulUser',
+          permissions: [Permissions.View.Edit('some-id')],
+        };
+        asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
+        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+
+        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+
+        expect(shareSearch).not.toBeDisabled();
+      });
+      it('which should be enabled if current user is admin', () => {
+        const owningUser = {
+          username: 'powerfulUser',
+          permissions: ['*'],
+        };
+        asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
+        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+
+        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+
+        expect(shareSearch).not.toBeDisabled();
+      });
+      it('which should be disabled if search is unsaved', () => {
+        const owningUser = {
+          username: 'powerfulUser',
+          permissions: ['*'],
+        };
+        asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
+        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false)} />);
+
+        const shareSearch = wrapper.find('MenuItem[title="Share search"]');
+
+        expect(shareSearch).toBeDisabled();
       });
     });
   });

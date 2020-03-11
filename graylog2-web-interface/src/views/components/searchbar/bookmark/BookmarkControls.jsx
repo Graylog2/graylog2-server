@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
 
 import Routes from 'routing/Routes';
+import StoreProvider from 'injection/StoreProvider';
+import PermissionsMixin from 'util/PermissionsMixin';
 import { newDashboardsPath } from 'views/Constants';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -16,12 +18,21 @@ import connect from 'stores/connect';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import CSVExportModal from 'views/components/searchbar/CSVExportModal';
+import ShareViewModal from 'views/components/views/ShareViewModal';
+import * as Permissions from 'views/Permissions';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
 
+const { isPermitted } = PermissionsMixin;
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+
 type Props = {
   viewStoreState: ViewStoreState,
+  currentUser: {
+    username: string,
+  },
 };
 
 type State = {
@@ -31,11 +42,23 @@ type State = {
   newTitle: string,
 };
 
+const _isAllowedToEdit = (view: View, currentUser = {}) => (
+  view.owner === currentUser.username
+  || isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)])
+);
+
 class BookmarkControls extends React.Component<Props, State> {
   formTarget: any;
 
   static propTypes = {
     viewStoreState: PropTypes.object.isRequired,
+    currentUser: PropTypes.shape({
+      username: PropTypes.string.isRequired,
+    }),
+  };
+
+  static defaultProps = {
+    currentUser: undefined,
   };
 
   constructor(props: Props) {
@@ -46,6 +69,7 @@ class BookmarkControls extends React.Component<Props, State> {
 
     this.state = {
       showCSVExport: false,
+      showShareSearch: false,
       showForm: false,
       showList: false,
       newTitle: (view && view.title) || '',
@@ -65,6 +89,11 @@ class BookmarkControls extends React.Component<Props, State> {
   toggleCSVExport = () => {
     const { showCSVExport } = this.state;
     this.setState({ showCSVExport: !showCSVExport });
+  };
+
+  toggleShareSearch = () => {
+    const { showShareSearch } = this.state;
+    this.setState({ showShareSearch: !showShareSearch });
   };
 
   onChangeTitle = (e: SyntheticInputEvent<HTMLInputElement>) => {
@@ -158,12 +187,16 @@ class BookmarkControls extends React.Component<Props, State> {
   static contextType = ViewLoaderContext;
 
   render() {
-    const { showForm, showList, newTitle, showCSVExport } = this.state;
-    const { viewStoreState } = this.props;
+    const { showForm, showList, newTitle, showCSVExport, showShareSearch } = this.state;
+    const { currentUser, viewStoreState } = this.props;
     const { view, dirty } = viewStoreState;
 
     const csvExport = showCSVExport && (
       <CSVExportModal closeModal={this.toggleCSVExport} />
+    );
+
+    const shareSearch = showShareSearch && (
+      <ShareViewModal show view={view} onClose={this.toggleShareSearch} />
     );
 
     const bookmarkList = showList && (
@@ -220,8 +253,13 @@ class BookmarkControls extends React.Component<Props, State> {
                 <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
                   <Icon name="eraser" /> Reset search
                 </MenuItem>
+                <MenuItem divider />
+                <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!(view && view.id) || !_isAllowedToEdit(view, currentUser)}>
+                  <Icon name="share-alt" /> Share
+                </MenuItem>
               </DropdownButton>
               {csvExport}
+              {shareSearch}
             </ButtonGroup>
           </div>
         )}
@@ -230,4 +268,14 @@ class BookmarkControls extends React.Component<Props, State> {
   }
 }
 
-export default connect(BookmarkControls, { viewStoreState: ViewStore });
+export default connect(
+  BookmarkControls,
+  {
+    currentUser: CurrentUserStore,
+    viewStoreState: ViewStore,
+  },
+  ({ viewStoreState, currentUser: { currentUser } = {} }) => ({
+    currentUser,
+    viewStoreState,
+  }),
+);
