@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -20,7 +20,7 @@ import Field from 'views/components/Field';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
-const TableWrapper = styled.div`
+const TableWrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   grid-row: 1;
   -ms-grid-row: 1;
   grid-column: 1;
