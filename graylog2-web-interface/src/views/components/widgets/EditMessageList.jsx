@@ -7,6 +7,10 @@ import * as Immutable from 'immutable';
 
 import SortableSelect from 'views/components/aggregationbuilder/SortableSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
+import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
+import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
+
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -34,14 +38,26 @@ const _onShowMessageRowChanged = (config, onChange) => {
   return onChange(newConfig);
 };
 
+const _onSortChange = (sort: $PropertyType<AggregationWidgetConfig, 'sort'>, config, onChange) => {
+  const newConfig = config.toBuilder().sort(sort).build();
+  return onChange(newConfig);
+};
+
+const _onSortDirectionChange = (direction: $PropertyType<AggregationWidgetConfig, 'direction'>, config, onChange) => {
+  const newConfig = config.toBuilder().sort(config.sort.map(sort => sort.toBuilder().direction(direction).build())).build();
+  return onChange(newConfig);
+};
+
 type Props = {
   children: React.Node,
   config: MessagesWidgetConfig,
-  fields: Immutable.Set<FieldTypeMapping>,
+  fields: Immutable.List<FieldTypeMapping>,
   onChange: (MessagesWidgetConfig) => void,
 };
 
 const EditMessageList = ({ children, config, fields, onChange }: Props) => {
+  const { sort } = config;
+  const [sortDirection] = (sort || []).map(s => s.direction);
   const fieldsForSelect = fields
     .map(fieldType => fieldType.name)
     .map(fieldName => ({ label: fieldName, value: fieldName }))
@@ -63,6 +79,14 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
           <Checkbox checked={config.showMessageRow} onChange={() => _onShowMessageRowChanged(config, onChange)}>
             Show message in new row
           </Checkbox>
+        </DescriptionBox>
+        <DescriptionBox description="Sorting">
+          <FieldSortSelect fields={fields} sort={sort} onChange={data => _onSortChange(data, config, onChange)} />
+        </DescriptionBox>
+        <DescriptionBox description="Direction">
+          <SortDirectionSelect disabled={!sort || sort.length === 0}
+                               direction={sortDirection && sortDirection.direction}
+                               onChange={data => _onSortDirectionChange(data, config, onChange)} />
         </DescriptionBox>
         <DescriptionBox description="Decorators">
           <DecoratorSidebar stream="000000000000000000000001"

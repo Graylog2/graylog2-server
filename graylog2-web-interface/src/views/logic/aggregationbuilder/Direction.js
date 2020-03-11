@@ -20,6 +20,10 @@ export default class Direction {
     return this._direction;
   }
 
+  equals(other: any) {
+    return other && other.direction === this._direction;
+  }
+
   static fromJSON(value: DirectionJson): Direction {
     return Direction.fromString(value);
   }

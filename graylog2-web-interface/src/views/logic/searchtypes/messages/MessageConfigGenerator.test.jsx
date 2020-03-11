@@ -1,10 +1,15 @@
 // @flow strict
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+
 import MessageConfigGenerator from './MessageConfigGenerator';
-import MessagesWidget from '../widgets/MessagesWidget';
-import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
+import MessageSortConfig from './MessageSortConfig';
 
 describe('MessageConfigGenerator', () => {
-  it('generates basic search type from message widget', () => {
+  const defaultSort = [new MessageSortConfig('timestamp', Direction.Descending)];
+
+  it('generates basic search type from message widget with a default sort', () => {
     // $FlowFixMe: We need to force this being a `MessagesWidget`
     const widget: MessagesWidget = MessagesWidget.builder()
       .config(
@@ -15,7 +20,7 @@ describe('MessageConfigGenerator', () => {
 
     const result = MessageConfigGenerator(widget);
 
-    expect(result).toEqual([{ decorators: [], type: 'messages' }]);
+    expect(result).toEqual([{ decorators: [], sort: defaultSort, type: 'messages' }]);
   });
   it('adds decorators to search type', () => {
     const decorators = [
@@ -37,6 +42,7 @@ describe('MessageConfigGenerator', () => {
         { id: 'decorator1', type: 'something', config: {}, stream: null, order: 0 },
         { id: 'decorator2', type: 'something else', config: {}, stream: null, order: 1 },
       ],
+      sort: defaultSort,
       type: 'messages',
     }]);
   });
