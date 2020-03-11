@@ -44,8 +44,6 @@ class ValueActions extends React.Component<Props, State> {
     type: FieldType.Unknown,
   };
 
-  static contextType = ActionContext;
-
   constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
     this.state = {
@@ -55,6 +53,8 @@ class ValueActions extends React.Component<Props, State> {
   }
 
   _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
+
+  static contextType = ActionContext;
 
   render() {
     const { children, element, field, menuContainer, queryId, type, value } = this.props;
@@ -85,6 +85,7 @@ class ValueActions extends React.Component<Props, State> {
           </MenuItem>
         );
       });
+
     return (
       <React.Fragment>
         <OverlayDropdown show={open}
@@ -92,11 +93,11 @@ class ValueActions extends React.Component<Props, State> {
                          placement="right"
                          onToggle={this._onMenuToggle}
                          menuContainer={menuContainer}>
-          <div className={style.bottomSpacer}>
+          <li className={style.bottomSpacer}>
             <span className={style.dropdownheader}>
               {children}
             </span>
-          </div>
+          </li>
 
           <MenuItem divider />
           <MenuItem header>Actions</MenuItem>

@@ -267,16 +267,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -490,16 +480,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -689,16 +669,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -915,16 +885,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1141,16 +1101,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1343,16 +1293,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1572,16 +1512,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1798,16 +1728,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -2000,16 +1920,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -2229,16 +2139,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
