@@ -10,9 +10,9 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
+import * as Permissions from 'views/Permissions';
 
 import BookmarkControls from './BookmarkControls';
-import * as Permissions from '../../../Permissions';
 
 const mockUser = {
   username: 'someone',
@@ -29,6 +29,7 @@ describe('BookmarkControls', () => {
   const createViewStoreState = (dirty = true, id) => ({
     activeQuery: '',
     view: View.builder()
+      // $FlowFixMe: allowing `undefined` on purpose
       .id(id)
       .title('title')
       .description('description')

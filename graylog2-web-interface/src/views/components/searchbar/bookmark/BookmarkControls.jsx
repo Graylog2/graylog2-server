@@ -32,6 +32,7 @@ type Props = {
   viewStoreState: ViewStoreState,
   currentUser: {
     username: string,
+    permissions: Array<string>,
   },
 };
 
@@ -39,6 +40,7 @@ type State = {
   showForm: boolean,
   showList: boolean,
   showCSVExport: boolean,
+  showShareSearch: boolean,
   newTitle: string,
 };
 
