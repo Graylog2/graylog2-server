@@ -1,5 +1,10 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import type { SortConfigJson } from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+
 import WidgetConfig from './WidgetConfig';
 
 export type Decorator = {
@@ -13,21 +18,26 @@ export type Decorator = {
 type InternalState = {
   decorators: Array<Decorator>,
   fields: Array<string>,
+  sort: Array<SortConfig>,
   showMessageRow: boolean,
 };
 
 export type MessagesWidgetConfigJSON = {
   decorators: Array<Decorator>,
   fields: Array<string>,
+  sort: Array<SortConfigJson>,
   show_message_row: boolean,
 };
+
+export const defaultSortDirection = Direction.Descending;
+const defaultSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', defaultSortDirection)];
 
 export default class MessagesWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
-  constructor(fields: Array<string>, showMessageRow: boolean, decorators: Array<Decorator>) {
+  constructor(fields: Array<string>, showMessageRow: boolean, decorators: Array<Decorator>, sort: Array<SortConfig>) {
     super();
-    this._value = { decorators, fields: fields.slice(0), showMessageRow };
+    this._value = { decorators, fields: fields.slice(0), showMessageRow, sort: sort && sort.length > 0 ? sort : defaultSort };
   }
 
   get decorators() {
@@ -36,6 +46,10 @@ export default class MessagesWidgetConfig extends WidgetConfig {
 
   get fields() {
     return this._value.fields;
+  }
+
+  get sort() {
+    return this._value.sort;
   }
 
   get showMessageRow() {
@@ -48,16 +62,17 @@ export default class MessagesWidgetConfig extends WidgetConfig {
   }
 
   toJSON() {
-    const { decorators, fields, showMessageRow } = this._value;
+    const { decorators, fields, showMessageRow, sort } = this._value;
     return {
       decorators,
       fields,
       show_message_row: showMessageRow,
+      sort,
     };
   }
 
   equals(other: any): boolean {
-    return other instanceof MessagesWidgetConfig && other.decorators === this.decorators;
+    return other instanceof MessagesWidgetConfig && other.decorators === this.decorators && other.sort === this.sort;
   }
 
   // eslint-disable-next-line no-use-before-define
@@ -65,14 +80,15 @@ export default class MessagesWidgetConfig extends WidgetConfig {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
       .decorators([])
-      .fields([]);
+      .fields([])
+      .sort([]);
   }
 
   static fromJSON(value: MessagesWidgetConfigJSON) {
     // eslint-disable-next-line camelcase
-    const { decorators, show_message_row, fields } = value;
+    const { decorators, show_message_row, fields, sort } = value;
 
-    return new MessagesWidgetConfig(fields, show_message_row, decorators);
+    return new MessagesWidgetConfig(fields, show_message_row, decorators, sort.map(SortConfig.fromJSON));
   }
 }
 
@@ -96,8 +112,12 @@ class Builder {
     return new Builder(this.value.set('showMessageRow', value));
   }
 
+  sort(sorts: Array<SortConfig>) {
+    return new Builder(this.value.set('sort', sorts));
+  }
+
   build() {
-    const { decorators, fields, showMessageRow } = this.value.toObject();
-    return new MessagesWidgetConfig(fields, showMessageRow, decorators);
+    const { decorators, fields, showMessageRow, sort } = this.value.toObject();
+    return new MessagesWidgetConfig(fields, showMessageRow, decorators, sort);
   }
 }

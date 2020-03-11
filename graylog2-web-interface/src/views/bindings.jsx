@@ -4,7 +4,7 @@ import Routes from 'routing/Routes';
 import * as Permissions from 'views/Permissions';
 import { get } from 'lodash';
 
-import { MessageListHandler } from 'views/logic/searchtypes';
+import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
 
 import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
@@ -87,7 +87,7 @@ import LineVisualizationConfiguration from './components/aggregationbuilder/Line
 import AreaVisualizationConfiguration from './components/aggregationbuilder/AreaVisualizationConfiguration';
 import Parameter from './logic/parameters/Parameter';
 import ValueParameter from './logic/parameters/ValueParameter';
-import MessageConfigGenerator from './logic/searchtypes/MessageConfigGenerator';
+import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
