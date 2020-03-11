@@ -515,7 +515,7 @@ public class KafkaTransport extends ThrottleableTransport {
             cr.addField(new BooleanField(CK_LEGACY,
                     "Legacy mode",
                     true,
-                    "Use old ZooKeeper-based consumer API. (Used before Graylog 3.3)",
+                    "Use old ZooKeeper-based consumer API. (Used before Graylog 3.2.3)",
                     10
             ));
             cr.addField(new TextField(
