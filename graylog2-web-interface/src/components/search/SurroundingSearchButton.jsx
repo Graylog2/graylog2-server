@@ -2,15 +2,13 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
-import Qs from 'qs';
 import moment from 'moment';
 import naturalSort from 'javascript-natural-sort';
 
-import Routes from 'routing/Routes';
 import { DropdownButton, MenuItem } from 'components/graylog';
-import { addToQuery, escape } from 'views/logic/queries/QueryHelper';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import type { SearchesConfig } from './SearchConfig';
+import SearchLink from './SearchLink';
 
 const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }) => Object.entries(surroundingTimerangeOptions)
   .reduce((prev, [key, value]) => ({ ...prev, [moment.duration(key).asSeconds()]: value }), {});
@@ -21,26 +19,13 @@ const buildFilterFields = (messageFields, searchConfig) => {
   return surroundingFilterFields.reduce((prev, cur) => ({ ...prev, [cur]: messageFields[cur] }), {});
 };
 
-const buildSearchLink = (id, fromTime, toTime, fields, filterFields, streams) => {
-  const query = Object.keys(filterFields)
-    .filter(key => (filterFields[key] !== null && filterFields[key] !== undefined))
-    .map(key => `${key}:"${escape(filterFields[key])}"`)
-    .reduce((prev, cur) => addToQuery(prev, cur), '');
-
-  const params = {
-    rangetype: 'absolute',
-    from: fromTime,
-    to: toTime,
-    q: query,
-    highlightMessage: id,
-    fields,
-  };
-  const paramsWithStreams = streams && streams.length > 0
-    ? { ...params, streams: streams.join(',') }
-    : params;
-
-  return `${Routes.SEARCH}?${Qs.stringify(paramsWithStreams)}`;
-};
+const buildSearchLink = (id, from, to, fields, filterFields, streams) => SearchLink.builder()
+  .timerange({ type: 'absolute', from, to })
+  .streams(streams)
+  .filterFields(filterFields)
+  .highlightedMessage(id)
+  .build()
+  .toURL();
 
 const searchLink = (range, timestamp, id, messageFields, searchConfig, streams) => {
   const fromTime = moment(timestamp).subtract(Number(range), 'seconds').toISOString();

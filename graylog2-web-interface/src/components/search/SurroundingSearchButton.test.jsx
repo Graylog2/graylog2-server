@@ -1,18 +1,10 @@
 // @flow strict
 import * as React from 'react';
-import { Map } from 'immutable';
 import { cleanup, fireEvent, render } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
-import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import { filtersForQuery } from 'views/logic/queries/Query';
+import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import SurroundingSearchButton from './SurroundingSearchButton';
 import type { SearchesConfig } from './SearchConfig';
-import DrilldownContext from '../../views/components/contexts/DrilldownContext';
-
-jest.mock('views/stores/QueryFiltersStore', () => ({
-  QueryFiltersStore: MockStore(['getInitialState', jest.fn()], ['listen', jest.fn(() => () => {})]),
-}));
 
 const getOption = (optionText, getByText) => {
   const button = getByText('Show surrounding messages');
@@ -67,7 +59,7 @@ describe('SurroundingSearchButton', () => {
     const oneSecond = getOption('1 second', getByText);
 
     expect(oneSecond.href).toEqual(
-      'http://localhost/search?rangetype=absolute&from=2020-02-28T09%3A45%3A30.123Z&to=2020-02-28T09%3A45%3A32.123Z&q=&highlightMessage=foo-bar',
+      'http://localhost/search?rangetype=absolute&from=2020-02-28T09%3A45%3A30.123Z&to=2020-02-28T09%3A45%3A32.123Z&highlightMessage=foo-bar',
     );
   });
 
@@ -77,7 +69,7 @@ describe('SurroundingSearchButton', () => {
     const onlyAMinute = getOption('Only a minute', getByText);
 
     expect(onlyAMinute.href).toEqual(
-      'http://localhost/search?rangetype=absolute&from=2020-02-28T09%3A44%3A31.123Z&to=2020-02-28T09%3A46%3A31.123Z&q=&highlightMessage=foo-bar',
+      'http://localhost/search?rangetype=absolute&from=2020-02-28T09%3A44%3A31.123Z&to=2020-02-28T09%3A46%3A31.123Z&highlightMessage=foo-bar',
     );
   });
 
@@ -112,7 +104,6 @@ describe('SurroundingSearchButton', () => {
   });
   it('includes current set of streams in generated urls', () => {
     const streams = ['000000000000000000000001', '5c2e07eeba33a9681ad6070a', '5d2d9649e117dc4df84cf83c'];
-    asMock(QueryFiltersStore.getInitialState).mockReturnValueOnce(Map({ foobar: filtersForQuery(streams) }));
     const { getByText } = render((
       <DrilldownContext.Consumer>
         {drilldown => (
@@ -129,7 +120,6 @@ describe('SurroundingSearchButton', () => {
   });
 
   it('does not include a `streams` key in generated urls if none are selected', () => {
-    asMock(QueryFiltersStore.getInitialState).mockReturnValueOnce(Map());
     const { getByText } = renderButton();
 
     const option = getOption('1 second', getByText);
