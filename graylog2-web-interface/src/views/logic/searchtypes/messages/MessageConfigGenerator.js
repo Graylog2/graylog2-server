@@ -8,7 +8,7 @@ const MessageConfigGenerator = (widget: MessagesWidget) => {
   return [{
     type: 'messages',
     decorators,
-    sort: widgetSort.map(sort => new MessageSortConfig(sort.type, sort.field, sort.direction)),
+    sort: widgetSort.map(sort => new MessageSortConfig(sort.field, sort.direction)),
   }];
 };
 

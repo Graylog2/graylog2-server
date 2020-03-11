@@ -1,17 +1,20 @@
 // @flow strict
 import Direction from 'views/logic/aggregationbuilder/Direction';
-import SortConfig, { Builder } from 'views/logic/aggregationbuilder/SortConfig';
 
 export type MessageSortConfigJson = {
   field: string,
   order: 'ASC' | 'DESC',
 };
+type InternalState = {
+  field: string,
+  direction: Direction,
+}
 
 export default class MessageSortConfig {
-  _value: SortConfig
+  _value: InternalState
 
-  constructor(type: string, field: string, direction: Direction) {
-    this._value = new SortConfig(type, field, direction);
+  constructor(field: string, direction: Direction) {
+    this._value = { field, direction };
   }
 
   toJSON(): MessageSortConfigJson {
@@ -23,14 +26,8 @@ export default class MessageSortConfig {
     };
   }
 
-  static fromJSON(value: MessageSortConfigJson) {
-    const { field, order } = value;
-
-    // eslint-disable-next-line no-use-before-define
-    return new Builder()
-      .type(SortConfig.PIVOT_TYPE)
-      .field(field)
-      .direction(Direction.fromJSON(order === 'ASC' ? 'Ascending' : 'Descending'))
-      .build();
+  static fromJSON({ field, order }: MessageSortConfigJson) {
+    const direction = Direction.fromJSON(order === 'ASC' ? 'Ascending' : 'Descending');
+    return new MessageSortConfig(field, direction);
   }
 }
