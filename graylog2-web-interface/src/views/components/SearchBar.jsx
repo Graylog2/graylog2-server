@@ -38,15 +38,14 @@ type Props = {
   queryFilters: Immutable.Map<any, any>,
 };
 
-const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
-  if (!currentQuery || !config) {
+const SearchBar = ({ availableStreams, config, timerange, query, id, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
+  if (!id || !config) {
     return <Spinner />;
   }
   const submitForm = (event) => {
     event.preventDefault();
     performSearch();
   };
-  const { timerange, query, id } = currentQuery;
   const { type, ...rest } = timerange;
   const rangeParams = Immutable.Map(rest);
   const rangeType = type;
@@ -128,8 +127,11 @@ export default connect(
     availableStreams: StreamsStore,
     queryFilters: QueryFiltersStore,
   },
-  ({ availableStreams: { streams }, ...rest }) => ({
-    ...rest,
+  ({ availableStreams: { streams }, currentQuery: { timerange, query, id }, queryFilters }) => ({
+    timerange,
+    query,
+    id,
+    queryFilters,
     availableStreams: streams.map(stream => ({ key: stream.title, value: stream.id })),
   }),
 );
