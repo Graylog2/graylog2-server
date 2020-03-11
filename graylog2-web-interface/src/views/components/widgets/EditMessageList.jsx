@@ -57,7 +57,7 @@ type Props = {
 
 const EditMessageList = ({ children, config, fields, onChange }: Props) => {
   const { sort } = config;
-  const sortDirection = Immutable.Set(sort.map(s => s.direction)).first();
+  const [sortDirection] = (sort || []).map(s => s.direction);
   const fieldsForSelect = fields
     .map(fieldType => fieldType.name)
     .map(fieldName => ({ label: fieldName, value: fieldName }))
