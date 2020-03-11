@@ -412,7 +412,7 @@ const GlobalThemeStyles = createGlobalStyle`
     display: grid;
     display: -ms-grid;
     grid-template-rows: auto minmax(10px, 1fr);
-    -ms-grid-rows: auto 1fr;
+    -ms-grid-rows: auto minmax(10px, 1fr);
     -ms-grid-columns: 1fr;
   }
 
