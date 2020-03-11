@@ -70,7 +70,7 @@ const StateDesc: CurrentState = {
 };
 
 const StateNoSort: CurrentState = {
-  icon: defaultSortDirection.direction === Direction.Descending.direction ? StateDesc.icon : StateAsc.icon,
+  icon: Direction.Descending.equals(defaultSortDirection) ? StateDesc.icon : StateAsc.icon,
   tooltip: (fieldName: string) => _tooltip(fieldName, defaultSortDirection),
   onSortChange: changeSort => changeSort(defaultSortDirection),
   sortActive: false,
