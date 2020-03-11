@@ -50,16 +50,6 @@ class RefreshControls extends React.Component<Props> {
     refreshConfig: PropTypes.object.isRequired,
   };
 
-  static INTERVAL_OPTIONS : Array<[string, number]> = [
-    ['1 Second', 1000],
-    ['2 Seconds', 2000],
-    ['5 Seconds', 5000],
-    ['10 Seconds', 10000],
-    ['30 Seconds', 30000],
-    ['1 Minute', 60000],
-    ['5 Minutes', 300000],
-  ];
-
   componentWillUnmount(): void {
     RefreshActions.disable();
   }
@@ -84,6 +74,16 @@ class RefreshControls extends React.Component<Props> {
     }
     return <ButtonLabel>{buttonText}</ButtonLabel>;
   }
+
+  static INTERVAL_OPTIONS: Array<[string, number]> = [
+    ['1 Second', 1000],
+    ['2 Seconds', 2000],
+    ['5 Seconds', 5000],
+    ['10 Seconds', 10000],
+    ['30 Seconds', 30000],
+    ['1 Minute', 60000],
+    ['5 Minutes', 300000],
+  ];
 
   render() {
     const { refreshConfig } = this.props;

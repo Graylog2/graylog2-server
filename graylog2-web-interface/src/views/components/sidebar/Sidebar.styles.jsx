@@ -1,4 +1,3 @@
-import * as React from 'react';
 import styled from 'styled-components';
 
 import { Title as NavItemTitle } from './NavItem.styles';
@@ -8,7 +7,7 @@ const sidebarWidth = {
   closed: '100%', // width is defined in parent container
 };
 
-export const Container: StyledComponent<{ open: boolean }, {}, HTMLDivElement> = styled.div`
+export const Container = styled.div`
   grid-row: 1;
   -ms-grid-row: 1;
   grid-column: 1;
@@ -35,7 +34,7 @@ export const ContentOverlay = styled.div`
   background: rgba(3, 3, 3, 0.25);
 `;
 
-export const SidebarHeader: React.ComponentType<{open: boolean, hasTitle: boolean}> = styled(NavItemTitle)(({ open, hasTitle }) => {
+export const SidebarHeader = styled(NavItemTitle)(({ open, hasTitle }) => {
   let justifyContent = 'center';
   if (open && hasTitle) justifyContent = 'space-between';
   if (open && !hasTitle) justifyContent = 'flex-end';
