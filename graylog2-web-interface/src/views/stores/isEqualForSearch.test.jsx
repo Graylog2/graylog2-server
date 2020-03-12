@@ -1,6 +1,6 @@
 // @flow strict
-import isEqualForSearch from './isEqualForSearch';
 import { List, Map } from 'immutable';
+
 import {
   arrayOfMaps,
   listWithObject,
@@ -10,7 +10,8 @@ import {
   AlwaysEqual,
   NeverEqual,
   NonValueClass,
-} from '../../stores/__tests__/EqualityCheck.fixtures';
+} from 'stores/__tests__/EqualityCheck.fixtures';
+import isEqualForSearch from './isEqualForSearch';
 
 export class AlwaysEqualForSearch {
   equalsForSearch = () => {

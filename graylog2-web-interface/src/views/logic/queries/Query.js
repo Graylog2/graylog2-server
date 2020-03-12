@@ -34,7 +34,7 @@ export type ElasticsearchQueryString = {
 export const createElasticsearchQueryString = (query: string = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
 
 const _streamFilters = (selectedStreams: Array<string>): Array<Immutable.Map<string, string>> => {
-  return selectedStreams.map(stream => Immutable.Map({ type: 'stream', id: stream, }));
+  return selectedStreams.map(stream => Immutable.Map({ type: 'stream', id: stream }));
 };
 
 export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ListenerMethods } from 'reflux';
-import { isEqualWith, isFunction } from 'lodash';
+import { isFunction } from 'lodash';
 import * as Immutable from 'immutable';
 import isDeepEqual from './isDeepEqual';
 

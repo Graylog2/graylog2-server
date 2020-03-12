@@ -1,7 +1,7 @@
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { get, isEqualWith } from 'lodash';
+import { get } from 'lodash';
 
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';

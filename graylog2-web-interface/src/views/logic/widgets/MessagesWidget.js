@@ -27,7 +27,7 @@ export default class MessagesWidget extends Widget {
     return false;
   }
 
-  equals(other: any) {
+  equalsForSearch(other: any) {
     if (other instanceof MessagesWidget) {
       return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every(key => isEqualForSearch(this._value[key], other[key]));
     }
