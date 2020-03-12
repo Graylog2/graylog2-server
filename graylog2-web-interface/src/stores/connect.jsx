@@ -1,18 +1,16 @@
-import React from 'react';
-import { ListenerMethods } from 'reflux';
+// @flow strict
+import * as React from 'react';
 import { isFunction } from 'lodash';
-import * as Immutable from 'immutable';
 import isDeepEqual from './isDeepEqual';
 
-const _isEqual = (first, second) => {
-  if (first && first.equals && isFunction(first.equals)) {
-    return Immutable.is(first, second);
-  }
-  if (Immutable.is(first, second)) {
-    return true;
-  }
-  return undefined;
+type StoreType<State> = {
+  getInitialState: () => State,
+  listen: ((State) => mixed) => (() => void),
 };
+
+type ExtractStoreState = <V, Store: StoreType<V>>(Store) => V;
+
+type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
 
 /**
  * Generating a higher order component wrapping an ES6 React component class, connecting it to the supplied stores.
@@ -40,44 +38,44 @@ const _isEqual = (first, second) => {
  *
  */
 
-export default (Component, stores, mapProps = props => props) => {
+function connect<Stores: Object, PropsBefore, MappedProps>(
+  Component: React.ComponentType<PropsBefore>,
+  stores: Stores,
+  mapProps: (ResultType<Stores>) => MappedProps = props => props,
+): React.ComponentType<$Diff<PropsBefore, MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
-  class ConnectStoresWrapper extends React.Component {
+  class ConnectStoresWrapper extends React.Component<$Diff<PropsBefore, MappedProps>> {
+    state: ResultType<Stores>;
+
+    unsubscribes: Array<() => void>;
+
     constructor(props) {
       super(props);
 
-      if (!this.state) {
-        this.state = {};
-      }
-
-      Object.keys(ListenerMethods).forEach((listenerMethod) => {
-        this[listenerMethod] = ListenerMethods[listenerMethod].bind(this);
-      });
-      this.componentWillUnmount = ListenerMethods.stopListeningToAll.bind(this);
-
       // Retrieving initial state from each configured store
-      Object.keys(stores).forEach((key) => {
+      const storeStates = Object.keys(stores).map((key) => {
         const store = stores[key];
-        if (store === undefined) {
+        if (store === undefined || !isFunction(store.getInitialState)) {
           // eslint-disable-next-line no-console
-          console.error(`Error: The store passed for the \`${key}\` property is not defined. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
-        } else if (isFunction(store.getInitialState)) {
-          this.state[key] = store.getInitialState();
+          console.error(`Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
+          return [key, undefined];
         }
-      });
+        const state = store.getInitialState();
+        return [key, state];
+      }).reduce((prev, [key, state]) => ({ ...prev, [key]: state }), {});
+
+      this.state = { ...this.state, ...storeStates };
     }
 
     componentDidMount() {
-      // Listening to each store.
-      Object.keys(stores).forEach((key) => {
+      this.unsubscribes = Object.keys(stores).map((key) => {
         const store = stores[key];
-        const cb = (v) => {
-          const newState = {};
-          newState[key] = v;
-          this.setState(newState);
-        };
-
-        this.listenTo(store, cb);
+        if (store === undefined || !isFunction(store.listen)) {
+          // eslint-disable-next-line no-console
+          console.error(`Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
+          return () => {};
+        }
+        return store.listen(partialState => this.setState(state => ({ ...state, [key]: partialState })));
       });
     }
 
@@ -85,10 +83,14 @@ export default (Component, stores, mapProps = props => props) => {
       const thisChildProps = this._genProps(this.state);
       const nextChildProps = this._genProps(nextState);
 
-      return !(isDeepEqual(thisChildProps, nextChildProps) && isDeepEqual(this.props, nextProps, _isEqual));
+      return !(isDeepEqual(thisChildProps, nextChildProps) && isDeepEqual(this.props, nextProps));
     }
 
-    _genProps = (state) => {
+    componentWillUnmount() {
+      this.unsubscribes.forEach(unsub => unsub());
+    }
+
+    _genProps = (state: ResultType<Stores>): MappedProps => {
       const storeProps = {};
       Object.keys(stores).forEach((key) => {
         storeProps[key] = state[key];
@@ -98,11 +100,14 @@ export default (Component, stores, mapProps = props => props) => {
 
     render() {
       const nextProps = this._genProps(this.state);
+      const { key, ref, ...componentProps } = this.props;
 
-      return <Component {...nextProps} {...this.props} />;
+      return <Component {...nextProps} {...componentProps} />;
     }
   }
-  ConnectStoresWrapper.displayName = `ConnectStoresWrapper[${wrappedComponentName}] stores=${Object.keys(stores)}`;
+  ConnectStoresWrapper.displayName = `ConnectStoresWrapper[${wrappedComponentName}] stores=${Object.keys(stores).join(',')}`;
 
   return ConnectStoresWrapper;
-};
+}
+
+export default connect;
