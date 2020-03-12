@@ -76,7 +76,7 @@ jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardS
 jest.mock('views/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
 jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
 jest.mock('views/logic/withPluginEntities', () => x => x);
-jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
+jest.mock('views/components/views/CurrentViewTypeProvider', () => ({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
 
 const mockPromise = (res) => {
   const promise = Promise.resolve(res);
@@ -106,7 +106,6 @@ describe('ExtendedSearchPage', () => {
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     // $FlowFixMe: Somehow flow does not see the `listen` property.
     SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
-    CurrentViewTypeProvider.mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 
   const SimpleExtendedSearchPage = props => (
