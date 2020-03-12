@@ -36,7 +36,7 @@ describe('<Spinner />', () => {
     expect(container.firstChild).toHaveStyle('visibility: visible');
   });
 
-  it('should forward its props to its icon', () => {
+  it('should forward additional props to its icon', () => {
     const { getByTestId } = render(<Spinner data-testid="icon-test-id" />);
     expect(getByTestId('icon-test-id')).not.toBeNull();
   });
