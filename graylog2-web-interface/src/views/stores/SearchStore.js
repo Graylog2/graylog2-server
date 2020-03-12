@@ -16,7 +16,7 @@ import Search from 'views/logic/search/Search';
 import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { MessageListOptions } from 'views/logic/search/GlobalOverride';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import SearchExecutionState, { type ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { WidgetMapping } from 'views/logic/views/types';
@@ -119,7 +119,7 @@ export const SearchStore = singletonStore(
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
-    reexecuteSearchTypes(searchTypes: MessageListOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+    reexecuteSearchTypes(parameterBindings: ParameterBindings, searchTypes: MessageListOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
       const searchTypeIds = Object.keys(searchTypes);
       const globalOverride: GlobalOverride = new GlobalOverride(
         effectiveTimerange,
@@ -127,7 +127,7 @@ export const SearchStore = singletonStore(
         searchTypeIds,
         searchTypes,
       );
-      const executionState = new SearchExecutionState(undefined, globalOverride);
+      const executionState = new SearchExecutionState(parameterBindings, globalOverride);
       const handleSearchResult = (searchResult: SearchResult): SearchResult => {
         const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
         const updatedResult = this.result.updateSearchTypes(updatedSearchTypes);

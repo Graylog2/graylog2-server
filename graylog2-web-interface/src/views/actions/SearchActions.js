@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 
 import Search from 'views/logic/search/Search';
 import SearchResult from 'views/logic/SearchResult';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import SearchExecutionState, { type ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import Parameter from 'views/logic/parameters/Parameter';
 import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
@@ -27,7 +27,11 @@ export type SearchExecutionResult = {
 type SearchActionsType = RefluxActions<{
   create: (Search) => Promise<CreateSearchResponse>,
   execute: (SearchExecutionState) => Promise<SearchExecutionResult>,
-  reexecuteSearchTypes: (searchTypes: {[searchTypeId: string]: { limit: number, offset: number }}, effectiveTimeRange?: TimeRange) => Promise<SearchExecutionResult>,
+  reexecuteSearchTypes: (
+    parameterBindings: ParameterBindings,
+    searchTypes: {[searchTypeId: string]: { limit: number, offset: number }},
+    effectiveTimeRange?: TimeRange,
+  ) => Promise<SearchExecutionResult>,
   executeWithCurrentState: () => Promise<SearchExecutionResult>,
   refresh: () => Promise<void>,
   get: (SearchId) => Promise<SearchJson>,

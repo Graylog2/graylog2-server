@@ -13,6 +13,7 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import * as messageList from 'views/components/messagelist';
 import InputsStore from 'stores/inputs/InputsStore';
 import MessageList from './MessageList';
@@ -29,8 +30,23 @@ const MessageTableEntry = () => (
   </AdditionalContext.Consumer>
 );
 
+const mockEffectiveTimeRange = {
+  from: '2019-11-15T14:40:48.666Z',
+  to: '2019-11-29T14:40:48.666Z',
+  type: 'absolute',
+};
+
 jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
 jest.mock('stores/search/SearchStore', () => MockStore('searchSurroundingMessages'));
+jest.mock('views/stores/SearchExecutionStateStore', () => ({
+  SearchExecutionStateActions: {},
+  SearchExecutionStateStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(() => ({
+      parameterBindings: {},
+    })),
+  },
+}));
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
     'listen',
@@ -55,7 +71,7 @@ jest.mock('views/stores/SearchStore', () => ({
           somequery: {
             searchTypes: {
               'search-type-id': {
-                effectiveTimerange: { from: '2019-11-15T14:40:48.666Z', to: '2019-11-29T14:40:48.666Z', type: 'absolute' },
+                effectiveTimerange: mockEffectiveTimeRange,
               },
             },
           },
@@ -92,6 +108,7 @@ describe('MessageList', () => {
     ],
     total: 1,
   };
+  const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
   beforeEach(() => {
     // eslint-disable-next-line import/namespace
     messageList.MessageTableEntry = MessageTableEntry;
@@ -162,19 +179,28 @@ describe('MessageList', () => {
   it('reexecute query for search type, when using pagination', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
-    const effectiveTimerange = {
-      from: '2019-11-15T14:40:48.666Z',
-      to: '2019-11-29T14:40:48.666Z',
-      type: 'absolute',
-    };
+
     const wrapper = mount(<MessageList editing
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
-    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, effectiveTimerange);
+    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith({}, searchTypePayload, mockEffectiveTimeRange);
+  });
+
+  it.only('reexecute query for search type, with provided parameter bindings when using pagination', () => {
+    const executionState = { parameterBindings: { newParameter: { type: 'value', value: 'example.org' } } };
+    SearchExecutionStateStore.getInitialState.mockImplementationOnce(() => executionState);
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const secondPageSize = 10;
+    const wrapper = mount(<MessageList editing
+                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                       fields={Immutable.List([])}
+                                       config={config}
+                                       setLoadingState={() => {}} />);
+    wrapper.find('[aria-label="Next"]').simulate('click');
+    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(executionState.parameterBindings, searchTypePayload, mockEffectiveTimeRange);
   });
 
   it('disables refresh actions, when using pagination', () => {
