@@ -27,7 +27,7 @@ type Props = {
   onUpdate: () => void,
   configuration: {},
   currentUser: {permissions: Array<string>},
-  urlType: 'regex' | 'literal',
+  urlType: 'regex' | 'literal' | '',
 };
 
 
