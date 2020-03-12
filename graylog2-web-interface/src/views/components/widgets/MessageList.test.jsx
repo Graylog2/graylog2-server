@@ -179,7 +179,6 @@ describe('MessageList', () => {
   it('reexecute query for search type, when using pagination', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-
     const wrapper = mount(<MessageList editing
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
@@ -189,7 +188,7 @@ describe('MessageList', () => {
     expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith({}, searchTypePayload, mockEffectiveTimeRange);
   });
 
-  it.only('reexecute query for search type, with provided parameter bindings when using pagination', () => {
+  it('reexecute query for search type, with provided parameter bindings when using pagination', () => {
     const executionState = { parameterBindings: { newParameter: { type: 'value', value: 'example.org' } } };
     SearchExecutionStateStore.getInitialState.mockImplementationOnce(() => executionState);
     const config = MessagesWidgetConfig.builder().fields([]).build();
