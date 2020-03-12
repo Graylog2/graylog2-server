@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import Bluebird from 'bluebird';
 import { debounce, get, isEqual } from 'lodash';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -16,14 +16,14 @@ import Search from 'views/logic/search/Search';
 import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { MessageListOptions } from 'views/logic/search/GlobalOverride';
-import SearchExecutionState, { type ParameterBindings } from 'views/logic/search/SearchExecutionState';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'views/logic/singleton';
 
-const createSearchUrl = URLUtils.qualifyUrl('/views/search');
+const createSearchUrl = qualifyUrl('/views/search');
 
 const displayError = (error) => {
   // eslint-disable-next-line no-console
@@ -32,7 +32,7 @@ const displayError = (error) => {
 
 Bluebird.config({ cancellation: true });
 
-const searchUrl = URLUtils.qualifyUrl('/views/search');
+const searchUrl = qualifyUrl('/views/search');
 
 export { SearchActions };
 
