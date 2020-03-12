@@ -109,26 +109,48 @@ describe('connect()', () => {
   });
 
   describe('generates `shouldComponentUpdate`', () => {
-    const Component = () => <span>Hello!</span>;
+    // $FlowFixMe: Treating this as a component
+    const Component: React.ComponentType<{}> = jest.fn(() => <span>Hello!</span>);
     const SimplestStore = ({
       getInitialState: jest.fn(),
       listen: jest.fn(() => () => {}),
     });
+    afterEach(() => { jest.clearAllMocks(); });
+
     it('comparing empty values properly', () => {
       const ComponentClass = connect(Component, {});
-      const component = new ComponentClass({});
 
-      expect(component.shouldComponentUpdate({}, {})).toBeFalsy();
+      const wrapper = mount(<ComponentClass />);
+      wrapper.setProps({});
+
+      expect(Component).toHaveBeenCalledTimes(1);
     });
     const verifyShouldComponentUpdate = ({ initial, next, result }) => {
       asMock(SimplestStore.getInitialState).mockReturnValue(initial);
       const ComponentClass = connect(Component, { foo: SimplestStore });
 
-      const component = new ComponentClass({});
-      expect(component.shouldComponentUpdate({}, { foo: next })).toBe(result);
+      mount(<ComponentClass />);
+      const update = asMock(SimplestStore.listen).mock.calls[0][0];
+      Component.mockClear();
 
-      const componentWithProps = new ComponentClass({ someProp: initial });
-      expect(componentWithProps.shouldComponentUpdate({ someProp: next }, { foo: initial })).toBe(result);
+      update(next);
+
+      if (result) {
+        expect(Component).toHaveBeenCalled();
+      } else {
+        expect(Component).not.toHaveBeenCalled();
+      }
+
+      const wrapper = mount(<ComponentClass someProp={initial} />);
+      Component.mockClear();
+
+      wrapper.setProps({ someProp: next });
+
+      if (result) {
+        expect(Component).toHaveBeenCalled();
+      } else {
+        expect(Component).not.toHaveBeenCalled();
+      }
     };
     it.each`
     initial                  | next                     | result    | description
