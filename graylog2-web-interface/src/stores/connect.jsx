@@ -9,6 +9,7 @@ type StoreType<State> = {
 };
 
 type ExtractStoreState = <V, Store: StoreType<V>>(Store) => V;
+type ExtractComponentProps = <Props>(React.ComponentType<Props>) => Props;
 
 type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
 
@@ -38,13 +39,13 @@ type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
  *
  */
 
-function connect<Stores: Object, PropsBefore, MappedProps>(
-  Component: React.ComponentType<PropsBefore>,
+function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props>, MappedProps>(
+  Component: ComponentType,
   stores: Stores,
   mapProps: (ResultType<Stores>) => MappedProps = props => props,
-): React.ComponentType<$Diff<PropsBefore, MappedProps>> {
+): React.ComponentType<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
-  class ConnectStoresWrapper extends React.Component<$Diff<PropsBefore, MappedProps>> {
+  class ConnectStoresWrapper extends React.Component<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
     state: ResultType<Stores>;
 
     unsubscribes: Array<() => void>;
