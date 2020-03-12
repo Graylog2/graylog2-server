@@ -15,6 +15,8 @@ import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { TimeRange } from 'views/logic/queries/Query';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
 
 import { PaginatedList } from 'components/common';
 import CustomPropTypes from 'views/components/CustomPropTypes';
@@ -23,7 +25,6 @@ import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
-import type { FieldTypeMappingsList } from '../../stores/FieldTypesStore';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 
@@ -56,12 +57,7 @@ type State = {
 
 type Props = {
   config: MessagesWidgetConfig,
-  currentView: {
-    activeQuery: string,
-    view: {
-      id: number,
-    },
-  },
+  currentView: ViewStoreState,
   data: { messages: Array<Object>, total: number, id: string },
   editing: boolean,
   fields: FieldTypeMappingsList,
