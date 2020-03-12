@@ -41,9 +41,7 @@ jest.mock('stores/search/SearchStore', () => MockStore('searchSurroundingMessage
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateStore: {
     listen: jest.fn(),
-    getInitialState: jest.fn(() => ({
-      parameterBindings: {},
-    })),
+    getInitialState: jest.fn(() => ({})),
   },
 }));
 jest.mock('views/stores/ViewStore', () => ({
@@ -187,8 +185,11 @@ describe('MessageList', () => {
     expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith({}, searchTypePayload, mockEffectiveTimeRange);
   });
 
-  it('reexecute query for search type, with provided parameter bindings when using pagination', () => {
-    const executionState = { parameterBindings: { newParameter: { type: 'value', value: 'example.org' } } };
+  it('considere current execution state when using pagination', () => {
+    const executionState = {
+      parameterBindings: { mainDomain: { type: 'value', value: 'example.org' } },
+      globalOverride: { query: { type: 'elasticsearch', query_string: 'http_method:GET' } },
+    };
     SearchExecutionStateStore.getInitialState.mockImplementationOnce(() => executionState);
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
@@ -198,7 +199,7 @@ describe('MessageList', () => {
                                        config={config}
                                        setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
-    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(executionState.parameterBindings, searchTypePayload, mockEffectiveTimeRange);
+    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(executionState, searchTypePayload, mockEffectiveTimeRange);
   });
 
   it('disables refresh actions, when using pagination', () => {

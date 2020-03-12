@@ -120,12 +120,12 @@ class MessageList extends React.Component<Props, State> {
 
   _handlePageChange = (pageNo: number) => {
     // execute search with new offset
-    const { pageSize, searchTypes, data: { id: searchTypeId }, executionState: { parameterBindings }, setLoadingState } = this.props;
+    const { pageSize, searchTypes, data: { id: searchTypeId }, executionState, setLoadingState } = this.props;
     const { effectiveTimerange } = searchTypes[searchTypeId];
     const searchTypePayload = { [searchTypeId]: { limit: pageSize, offset: pageSize * (pageNo - 1) } };
     RefreshActions.disable();
     setLoadingState(true);
-    SearchActions.reexecuteSearchTypes(parameterBindings, searchTypePayload, effectiveTimerange).then((response) => {
+    SearchActions.reexecuteSearchTypes(executionState, searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
       this.setState({
         errors: response.result.errors,
