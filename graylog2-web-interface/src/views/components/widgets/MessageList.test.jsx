@@ -39,7 +39,6 @@ const mockEffectiveTimeRange = {
 jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
 jest.mock('stores/search/SearchStore', () => MockStore('searchSurroundingMessages'));
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateActions: {},
   SearchExecutionStateStore: {
     listen: jest.fn(),
     getInitialState: jest.fn(() => ({
