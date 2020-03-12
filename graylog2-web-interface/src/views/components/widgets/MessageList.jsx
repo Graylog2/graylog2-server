@@ -66,13 +66,13 @@ type Props = {
   },
   data: { messages: Array<Object>, total: number, id: string },
   editing: boolean,
+  executionState: SearchExecutionState,
   fields: FieldTypeMappingsList,
   onConfigChange: (MessagesWidgetConfig) => Promise<void>,
   pageSize: number,
   searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
   selectedFields?: Immutable.Set<string>,
   setLoadingState: (loading: boolean) => void,
-  executionState: SearchExecutionState
 };
 
 class MessageList extends React.Component<Props, State> {
@@ -85,13 +85,13 @@ class MessageList extends React.Component<Props, State> {
       id: PropTypes.string.isRequired,
     }).isRequired,
     editing: PropTypes.bool.isRequired,
+    executionState: PropTypes.object.isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onConfigChange: PropTypes.func,
     pageSize: PropTypes.number,
     searchTypes: PropTypes.object.isRequired,
     selectedFields: PropTypes.object,
     setLoadingState: PropTypes.func.isRequired,
-    executionState: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
