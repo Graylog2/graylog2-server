@@ -27,7 +27,7 @@ type EventResult = {
   name: 'events',
 };
 
-export type VisualizationComponentProps = {|
+export type VisualizationComponentProps = {
   config: AggregationWidgetConfig,
   data: { [string]: Rows, events?: Events },
   editing?: boolean,
@@ -37,11 +37,18 @@ export type VisualizationComponentProps = {|
   onChange: OnVisualizationConfigChange,
   width: number,
   toggleEdit: () => void,
-|};
+};
 
 export type VisualizationComponent =
-  { type?: string, propTypes?: any }
+  { type: string, propTypes?: any }
   & React.ComponentType<VisualizationComponentProps>;
+
+export const makeVisualization = (component: React.ComponentType<VisualizationComponentProps>, type: string): VisualizationComponent => {
+  // $FlowFixMe: Casting by force
+  const visualizationComponent: VisualizationComponent = component;
+  visualizationComponent.type = type;
+  return visualizationComponent;
+};
 
 const _visualizationForType = (type: string): VisualizationComponent => {
   const visualizationTypes = PluginStore.exports('visualizationTypes');

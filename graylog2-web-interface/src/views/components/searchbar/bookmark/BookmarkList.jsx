@@ -29,13 +29,12 @@ type State = {
 class BookmarkList extends React.Component<Props, State> {
   static propTypes = {
     toggleModal: PropTypes.func.isRequired,
-    deleteBookmark: PropTypes.func,
+    deleteBookmark: PropTypes.func.isRequired,
     views: PropTypes.object,
   };
 
   static defaultProps = {
     views: {},
-    deleteBookmark: () => {},
   };
 
   constructor(props) {

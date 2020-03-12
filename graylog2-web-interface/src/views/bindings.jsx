@@ -92,14 +92,10 @@ import UnknownWidget from './components/widgets/UnknownWidget';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
-// $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
-// $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
-// $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
-// $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);

@@ -7,6 +7,7 @@ import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolatio
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
 import { chartData } from '../ChartData';
@@ -22,7 +23,7 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
 
-const AreaVisualization: VisualizationComponent = ({ config, data, effectiveTimerange }: VisualizationComponentProps) => {
+const AreaVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange }: VisualizationComponentProps) => {
   // $FlowFixMe: We need to assume it is a LineVisualizationConfig instance
   const visualizationConfig: AreaVisualizationConfig = config.visualizationConfig || AreaVisualizationConfig.empty();
   const { interpolation = 'linear' } = visualizationConfig;
@@ -51,13 +52,11 @@ const AreaVisualization: VisualizationComponent = ({ config, data, effectiveTime
             setChartColor={setChartColor}
             chartData={chartDataResult} />
   );
-};
+}, 'area');
 
 AreaVisualization.propTypes = {
   config: AggregationType.isRequired,
   data: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object)).isRequired,
 };
-
-AreaVisualization.type = 'area';
 
 export default AreaVisualization;

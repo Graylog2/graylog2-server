@@ -7,6 +7,7 @@ import type {
   VisualizationComponent,
   VisualizationComponentProps,
 } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';
@@ -60,17 +61,15 @@ const setChartColor = (chart, colorMap) => {
   return { marker: { colors } };
 };
 
-const PieVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (
+const PieVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => (
   <GenericPlot chartData={chartData(config, data.chart || Object.values(data)[0], 'pie', _generateSeries)}
                getChartColor={getChartColor}
                setChartColor={setChartColor} />
-);
+), 'pie');
 
 PieVisualization.propTypes = {
   config: AggregationType.isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
-
-PieVisualization.type = 'pie';
 
 export default PieVisualization;

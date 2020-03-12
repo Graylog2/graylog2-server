@@ -41,6 +41,22 @@ describe('DataTable', () => {
   const rowPivot = new Pivot('timestamp', 'time', { interval: 'auto' });
   const series = new Series('count()');
 
+  const SimplifiedDataTable = props => (
+    <DataTable config={AggregationWidgetConfig.builder().build()}
+               currentView={currentView}
+               data={{}}
+               fields={Immutable.List([])}
+               effectiveTimerange={{
+                 type: 'relative',
+                 range: 300,
+               }}
+               toggleEdit={() => {}}
+               onChange={() => {}}
+               height={200}
+               width={300}
+               {...props} />
+  );
+
   it('should render with empty data', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([])
@@ -50,11 +66,8 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const wrapper = mount(<DataTable config={config}
-                                     currentView={currentView}
-                                     data={{}}
-                                     fields={Immutable.List([])} />);
-    expect(wrapper).toMatchSnapshot();
+    const wrapper = mount(<SimplifiedDataTable config={config} />);
+    expect(wrapper.children()).toMatchSnapshot();
   });
 
   it('should render with filled data with rollup', () => {
@@ -66,11 +79,9 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const wrapper = mount(<DataTable config={config}
-                                     currentView={currentView}
-                                     data={data}
-                                     fields={Immutable.List([])} />);
-    expect(wrapper).toMatchSnapshot();
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               data={data} />);
+    expect(wrapper.children()).toMatchSnapshot();
   });
 
   it('should render for legacy search result with id as key', () => {
@@ -83,10 +94,8 @@ describe('DataTable', () => {
       .rollup(true)
       .build();
 
-    const wrapper = mount(<DataTable config={config}
-                                     currentView={currentView}
-                                     data={{ 'd8e311db-276c-46e4-ba75-57bf1e0b4d35': rows }}
-                                     fields={Immutable.List([])} />);
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               data={{ 'd8e311db-276c-46e4-ba75-57bf1e0b4d35': rows }} />);
     expect(wrapper).toIncludeText('hulud.net');
   });
 
@@ -99,11 +108,9 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(false)
       .build();
-    const wrapper = mount(<DataTable config={config}
-                                     currentView={currentView}
-                                     data={data}
-                                     fields={Immutable.List([])} />);
-    expect(wrapper).toMatchSnapshot();
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               data={data} />);
+    expect(wrapper.children()).toMatchSnapshot();
   });
 
   it('renders column pivot header without offset when rollup is disabled', () => {
@@ -130,11 +137,9 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(false)
       .build();
-    const wrapper = mount(<DataTable config={config}
-                                     currentView={currentView}
-                                     data={protocolData}
-                                     fields={Immutable.List([])} />);
-    expect(wrapper).toMatchSnapshot();
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               data={protocolData} />);
+    expect(wrapper.children()).toMatchSnapshot();
   });
 
   it('passes inferred types to fields', () => {
@@ -191,10 +196,9 @@ describe('DataTable', () => {
       FieldTypeMapping.create('bytes', FieldTypes.LONG()),
       FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
     ]);
-    const wrapper = mount(<DataTable config={config}
-                                     currentView={currentView}
-                                     data={dataWithMoreSeries}
-                                     fields={fields} />);
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               fields={fields}
+                                               data={dataWithMoreSeries} />);
 
     const expectFieldType = (elem, type) => expect(wrapper.find(elem).props().type).toEqual(type);
 
@@ -217,16 +221,10 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const Component = () => (
-      <DataTable config={config}
-                 currentView={currentView}
-                 data={[]}
-                 fields={Immutable.List([])} />
-    );
     const onRenderComplete = jest.fn();
     mount((
       <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <Component />
+        <SimplifiedDataTable config={config} />
       </RenderCompletionCallback.Provider>
     ));
     expect(onRenderComplete).toHaveBeenCalled();
