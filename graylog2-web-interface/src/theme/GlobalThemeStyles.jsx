@@ -684,25 +684,6 @@ const GlobalThemeStyles = createGlobalStyle`
     text-align: right;
   }
 
-  .dynatable-per-page-label {
-    font-size: 14px;
-  }
-
-  .dynatable-search {
-    font-size: 14px;
-  }
-
-  .dynatable-search input,
-  .dynatable-per-page select {
-    position: relative;
-    top: 3px;
-    margin-left: 3px;
-  }
-
-  .dynatable-pagination-links li:first-child {
-    display: none;
-  }
-
   .parse-error {
     background-color: #f2dede;
     color: #a94442;
@@ -1221,11 +1202,6 @@ const GlobalThemeStyles = createGlobalStyle`
 
   nav.navbar-fixed-top ul.dropdown-menu li.divider {
     padding: 0;
-  }
-
-  .indexer-failures-body select.dynatable-per-page-select {
-    position: relative;
-    top: 0;
   }
 
   table.indexer-failures {
