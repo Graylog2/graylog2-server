@@ -108,7 +108,7 @@ describe('BigDisplayModeConfiguration', () => {
 
     it('on form submit', () => {
       const { getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
-      const form = getByTestId('display-mode-config-form');
+      const form = getByTestId('modal-form');
       expect(form).not.toBeNull();
 
       fireEvent.submit(form);
@@ -124,7 +124,7 @@ describe('BigDisplayModeConfiguration', () => {
 
       fireEvent.change(refreshInterval, { target: { value: 42 } });
 
-      const form = getByTestId('display-mode-config-form');
+      const form = getByTestId('modal-form');
       fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
@@ -137,7 +137,7 @@ describe('BigDisplayModeConfiguration', () => {
       const cycleInterval = getByLabelText('Tab cycle interval');
       fireEvent.change(cycleInterval, { target: { value: 4242 } });
 
-      const form = getByTestId('display-mode-config-form');
+      const form = getByTestId('modal-form');
       fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
@@ -151,7 +151,7 @@ describe('BigDisplayModeConfiguration', () => {
       const query1 = getByLabelText('Query#1');
       fireEvent.click(query1);
 
-      const form = getByTestId('display-mode-config-form');
+      const form = getByTestId('modal-form');
       fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');

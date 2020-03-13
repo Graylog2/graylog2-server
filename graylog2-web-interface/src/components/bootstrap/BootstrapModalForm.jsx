@@ -103,7 +103,7 @@ class BootstrapModalForm extends React.Component {
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
-        <form ref={(c) => { this.form = c; }} onSubmit={this.submit} {...formProps}>
+        <form ref={(c) => { this.form = c; }} onSubmit={this.submit} {...formProps} data-testid="modal-form">
           <Modal.Body>
             {body}
           </Modal.Body>
