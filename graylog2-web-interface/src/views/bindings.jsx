@@ -109,7 +109,7 @@ ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
-const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => !!analysisDisabledFields.includes(field);
+const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
 
 export default {
   pages: {
