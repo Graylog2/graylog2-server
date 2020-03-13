@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { isEqual } from 'lodash';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import DataTableElement from './DataTableElement';
 
@@ -123,7 +124,7 @@ class DataTable extends React.Component {
   _getEffectiveRows = () => {
     const { filteredRows } = this.state;
     const { filterKeys, rows } = this.props;
-    return (filterKeys.length === 0 ? rows : filteredRows.filter(row => rows.includes(row)));
+    return (filterKeys.length === 0 ? rows : filteredRows.filter(row => rows.some(r => isEqual(r, row))));
   };
 
   render() {

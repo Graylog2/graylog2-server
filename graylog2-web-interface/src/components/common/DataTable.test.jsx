@@ -1,5 +1,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+import { cloneDeep } from 'lodash';
 
 import DataTable from 'components/common/DataTable';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
@@ -93,7 +94,9 @@ describe('<DataTable />', () => {
     expect(wrapper.state('filteredRows')).toEqual(filteredRows);
     expect(wrapper.find('tbody tr')).toHaveLength(filteredRows.length);
 
-    const [, ...nextRows] = filteredRows;
+    // Ensure this also works with deep comparison
+    const clonedRows = cloneDeep(filteredRows);
+    const [, ...nextRows] = clonedRows;
     wrapper.setProps({ rows: nextRows });
     const nextFilteredRows = filterRows(nextRows, /Row/);
     // Check that we don't render the row we deleted, even if filtering is done by a children and needs an update
