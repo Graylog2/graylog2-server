@@ -25,6 +25,7 @@ import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import ConfigurationsStore from 'stores/configurations/ConfigurationsStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -126,7 +127,11 @@ const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
 const SearchBarWithStatus = WithSearchStatus(SearchBar);
 const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
-const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
+const ViewAdditionalContextProvider = connect(
+  AdditionalContext.Provider,
+  { view: ViewStore, configs: ConfigurationsStore },
+  ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
+);
 
 const useStyle = () => {
   useEffect(() => {
