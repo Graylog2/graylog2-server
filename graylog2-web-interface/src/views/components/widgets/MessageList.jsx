@@ -87,7 +87,7 @@ class MessageList extends React.Component<Props, State> {
   };
 
   static defaultProps = {
-    onConfigChange: () => {},
+    onConfigChange: () => Promise.resolve(),
     pageSize: Messages.DEFAULT_LIMIT,
     selectedFields: Immutable.Set(),
   };
