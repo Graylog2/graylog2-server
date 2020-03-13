@@ -21,11 +21,10 @@ import { Grid } from 'components/graylog';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { SearchConfigActions } from 'views/stores/SearchConfigStore';
+import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import ConfigurationsStore from 'stores/configurations/ConfigurationsStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -129,7 +128,7 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
 const ViewAdditionalContextProvider = connect(
   AdditionalContext.Provider,
-  { view: ViewStore, configs: ConfigurationsStore },
+  { view: ViewStore, configs: SearchConfigStore },
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
