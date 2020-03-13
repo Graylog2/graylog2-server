@@ -22,7 +22,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
 import java.net.UnknownHostException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -31,7 +31,7 @@ import java.util.Set;
 public class IPSubnetConverter implements Converter<Set<IpSubnet>> {
     @Override
     public Set<IpSubnet> convertFrom(String value) {
-        final Set<IpSubnet> converted = new HashSet<>();
+        final Set<IpSubnet> converted = new LinkedHashSet<>();
         if (value != null) {
             Iterable<String> subnets = Splitter.on(',').trimResults().split(value);
             for (String subnet : subnets) {
