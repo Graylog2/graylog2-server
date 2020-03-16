@@ -119,7 +119,8 @@ export const SearchStore = singletonStore(
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
-    reexecuteSearchTypes({ parameterBindings, globalOverride }: SearchExecutionState, searchTypes: MessageListOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+    reexecuteSearchTypes(searchTypes: MessageListOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+      const { parameterBindings, globalOverride } = this.executionState;
       const searchTypeIds = Object.keys(searchTypes);
       const globalQuery = globalOverride && globalOverride.query ? globalOverride.query : undefined;
 

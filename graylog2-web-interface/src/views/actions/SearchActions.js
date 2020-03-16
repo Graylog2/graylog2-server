@@ -28,7 +28,6 @@ type SearchActionsType = RefluxActions<{
   create: (Search) => Promise<CreateSearchResponse>,
   execute: (SearchExecutionState) => Promise<SearchExecutionResult>,
   reexecuteSearchTypes: (
-    executionState: SearchExecutionState,
     searchTypes: {[searchTypeId: string]: { limit: number, offset: number }},
     effectiveTimeRange?: TimeRange,
   ) => Promise<SearchExecutionResult>,

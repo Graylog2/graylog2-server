@@ -13,7 +13,6 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import * as messageList from 'views/components/messagelist';
 import InputsStore from 'stores/inputs/InputsStore';
 import MessageList from './MessageList';
@@ -38,12 +37,6 @@ const mockEffectiveTimeRange = {
 
 jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
 jest.mock('stores/search/SearchStore', () => MockStore('searchSurroundingMessages'));
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({})),
-  },
-}));
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
     'listen',
@@ -105,7 +98,6 @@ describe('MessageList', () => {
     ],
     total: 1,
   };
-  const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
   beforeEach(() => {
     // eslint-disable-next-line import/namespace
     messageList.MessageTableEntry = MessageTableEntry;
@@ -174,6 +166,7 @@ describe('MessageList', () => {
   });
 
   it('reexecute query for search type, when using pagination', () => {
+    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
     const wrapper = mount(<MessageList editing
@@ -182,24 +175,7 @@ describe('MessageList', () => {
                                        config={config}
                                        setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
-    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith({}, searchTypePayload, mockEffectiveTimeRange);
-  });
-
-  it('considere current execution state when using pagination', () => {
-    const executionState = {
-      parameterBindings: { mainDomain: { type: 'value', value: 'example.org' } },
-      globalOverride: { query: { type: 'elasticsearch', query_string: 'http_method:GET' } },
-    };
-    SearchExecutionStateStore.getInitialState.mockImplementationOnce(() => executionState);
-    const config = MessagesWidgetConfig.builder().fields([]).build();
-    const secondPageSize = 10;
-    const wrapper = mount(<MessageList editing
-                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
-                                       fields={Immutable.List([])}
-                                       config={config}
-                                       setLoadingState={() => {}} />);
-    wrapper.find('[aria-label="Next"]').simulate('click');
-    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(executionState, searchTypePayload, mockEffectiveTimeRange);
+    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange);
   });
 
   it('disables refresh actions, when using pagination', () => {

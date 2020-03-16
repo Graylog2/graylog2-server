@@ -13,8 +13,6 @@ import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { TimeRange } from 'views/logic/queries/Query';
 
@@ -66,7 +64,6 @@ type Props = {
   },
   data: { messages: Array<Object>, total: number, id: string },
   editing: boolean,
-  executionState: SearchExecutionState,
   fields: FieldTypeMappingsList,
   onConfigChange: (MessagesWidgetConfig) => Promise<void>,
   pageSize: number,
@@ -85,7 +82,6 @@ class MessageList extends React.Component<Props, State> {
       id: PropTypes.string.isRequired,
     }).isRequired,
     editing: PropTypes.bool.isRequired,
-    executionState: PropTypes.object.isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onConfigChange: PropTypes.func,
     pageSize: PropTypes.number,
@@ -120,12 +116,12 @@ class MessageList extends React.Component<Props, State> {
 
   _handlePageChange = (pageNo: number) => {
     // execute search with new offset
-    const { pageSize, searchTypes, data: { id: searchTypeId }, executionState, setLoadingState } = this.props;
+    const { pageSize, searchTypes, data: { id: searchTypeId }, setLoadingState } = this.props;
     const { effectiveTimerange } = searchTypes[searchTypeId];
     const searchTypePayload = { [searchTypeId]: { limit: pageSize, offset: pageSize * (pageNo - 1) } };
     RefreshActions.disable();
     setLoadingState(true);
-    SearchActions.reexecuteSearchTypes(executionState, searchTypePayload, effectiveTimerange).then((response) => {
+    SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
       this.setState({
         errors: response.result.errors,
@@ -198,7 +194,6 @@ export default connect(MessageList,
     selectedFields: SelectedFieldsStore,
     currentView: ViewStore,
     searches: SearchStore,
-    executionState: SearchExecutionStateStore,
   }, props => Object.assign(
     {},
     props,
