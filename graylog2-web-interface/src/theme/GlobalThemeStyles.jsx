@@ -119,36 +119,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     padding-left: 50px;
   }
 
-  .content p.description-tooltips-small .fa-stack {
-    margin-right: 1px;
-    position: relative;
-    top: -1px;
-  }
-
   .content p.description-tooltips {
     margin-top: 10px;
-  }
-
-  .content-col {
-    padding: 15px 10px;
-    background-color: ${theme.color.global.contentBackground};
-    border: 1px solid ${theme.color.gray[80]};
-    margin-top: 15px;
-  }
-
-  #main-row {
-    margin-bottom: 0;
-  }
-
-  #main-content {
-    margin-top: 10px;
-    padding: 5px 25px;
-  }
-
-  .support-sources ul {
-    margin: 0;
-    padding: 0;
-    margin-top: 5px;
   }
 
   .notifications-none {
@@ -168,37 +140,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
   }
 
-  .selected-resolution {
-    font-weight: bold;
-  }
-
   .modal form {
     margin-bottom: 0;
   }
 
-  .input-new {
-    margin-bottom: 8px;
-  }
-
   .alert-bar {
     margin: 10px -20px 0;
-  }
-
-  .xtrc-new-example {
-    margin-bottom: 5px;
-    font-family: monospace;
-    font-size: 14px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-
-  .xtrc-no-example {
-    margin-top: 15px;
-    margin-bottom: 12px;
-  }
-
-  #create-extractor {
-    margin-top: 10px;
   }
 
   .xtrc-converter-subfields {
@@ -221,25 +168,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .timerange-selector select {
     margin-bottom: 0;
-  }
-
-  .timerange-chooser {
-    float: left;
-    margin-right: 5px;
-  }
-
-  .timerange-chooser .btn {
-    padding: 6px 7px;
-    line-height: 15px;
-    font-size: 12px;
-  }
-
-  .timerange-chooser .btn .caret {
-    margin-left: 1px;
-  }
-
-  .timerange-chooser .selected a {
-    font-weight: bold;
   }
 
   .master-node {
@@ -266,49 +194,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-left: 10px;
   }
 
-  .alpha80 {
-    background: rgb(0, 0, 0) transparent;
-    background: rgba(0, 0, 0, 0.8);
-    filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
-  }
-
-  #scroll-to-hint {
-    position: fixed;
-    left: 50%;
-    margin-left: -125px;
-    top: 50px;
-    color: ${theme.color.global.textAlt};
-    font-size: 80px;
-    padding: 25px;
-    z-index: 2000;
-    width: 200px;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 10px;
-  }
-
-  .graph-range-selector {
-    outline: 1px solid ${theme.color.gray[90]};
-    background: rgba(0, 0, 0, 0.3);
-    position: absolute;
-    top: 0;
-    z-index: 1;
-    cursor: pointer;
-    pointer-events: none;
-  }
-
-  .detail_swatch {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    margin: 0 4px 0 0;
-  }
-
-  #field-graphs .spinner {
-    margin-bottom: 10px;
-    text-align: center;
-  }
-
   .sources.overlay {
     background-color: ${theme.color.gray[60]};
     height: 200px;
@@ -317,44 +202,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     position: absolute;
     text-align: center;
     font-size: 50px;
-  }
-
-  ul.index-list {
-    margin-left: 25px;
-    margin-top: 5px;
-    list-style-type: square;
-  }
-
-  .metric-list {
-    padding: 0;
-  }
-
-  .metric-list li {
-    margin-bottom: 5px;
-  }
-
-  .metric-list li .prefix {
-    color: ${theme.color.gray[60]};
-  }
-
-  .metric-list li .name {
-    font-size: 13px;
-    font-family: monospace;
-    word-break: break-all;
-  }
-
-  .metric-list li .metric {
-    margin-left: 10px;
-    padding: 10px;
-  }
-
-  .metric-list li .metric h3 {
-    margin-bottom: 5px;
-  }
-
-  .metric-list dl {
-    margin-top: 0;
-    margin-bottom: 0;
   }
 
   .metrics-filter {
@@ -383,10 +230,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   dl.metric-histogram dd {
     margin-left: 125px;
-  }
-
-  .metric-list li .name .open:hover {
-    text-decoration: none;
   }
 
   #user-list th.user-type {
@@ -742,39 +585,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     display: inline-block;
   }
 
-  .card {
-    padding: 12px 20px;
-    font-size: 15px;
-    font-weight: 300;
-    background-color: ${theme.color.gray[100]};
-    border: 1px solid ${theme.color.gray[90]};
-    border-radius: 2px;
-    margin: 10px;
-  }
-
-  .card h1 {
-    margin-bottom: 5px;
-    font-size: 28px;
-    line-height: 1;
-    letter-spacing: -1;
-  }
-
-  .card label {
-    font-weight: inherit;
-  }
-
-  .card div {
-    margin-left: 0;
-  }
-
-  .card ul li {
-    margin-bottom: 5px;
-  }
-
-  .card.info p {
-    margin: 0;
-  }
-
   .form-inline label {
     margin-right: 10px;
   }
@@ -941,11 +751,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
   }
 
-  .react-input-metrics {
-    margin-top: 5px;
-    font-size: 13px;
-  }
-
   .filter .form-inline .form-group {
     display: inline-block;
     margin-bottom: 0;
@@ -969,11 +774,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid ${theme.color.gray[90]};
-  }
-
-  /* // Ensure that the stream start/pause buttons have the same size. */
-  .toggle-stream-button {
-    width: 8.5em;
   }
 
   .threaddump {

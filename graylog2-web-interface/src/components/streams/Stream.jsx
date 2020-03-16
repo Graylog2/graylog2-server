@@ -62,6 +62,10 @@ const StreamListItem = styled.li`
   }
 `;
 
+const ToggleButton = styled(Button)`
+  width: 8.5em;
+`;
+
 const Stream = createReactClass({
   displayName: 'Stream',
 
@@ -176,23 +180,21 @@ const Stream = createReactClass({
       if (stream.disabled) {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-            <Button bsStyle="success"
-                    className="toggle-stream-button"
-                    onClick={this._onResume}
-                    disabled={isDefaultStream || loading}>
+            <ToggleButton bsStyle="success"
+                          onClick={this._onResume}
+                          disabled={isDefaultStream || loading}>
               {loading ? 'Starting...' : 'Start Stream'}
-            </Button>
+            </ToggleButton>
           </OverlayElement>
         );
       } else {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-            <Button bsStyle="primary"
-                    className="toggle-stream-button"
-                    onClick={this._onPause}
-                    disabled={isDefaultStream || loading}>
+            <ToggleButton bsStyle="primary"
+                          onClick={this._onPause}
+                          disabled={isDefaultStream || loading}>
               {loading ? 'Pausing...' : 'Pause Stream'}
-            </Button>
+            </ToggleButton>
           </OverlayElement>
         );
       }

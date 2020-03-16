@@ -1,7 +1,44 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Metric } from 'components/metrics';
+
+const MetricListWrap = styled.ul`
+  padding: 0;
+
+  li {
+    margin-bottom: 5px;
+
+    .prefix {
+      color: #aaa;
+    }
+
+    .name {
+      font-size: 13px;
+      font-family: monospace;
+      word-break: break-all;
+
+      .open:hover {
+        text-decoration: none;
+      }
+    }
+
+    .metric {
+      margin-left: 10px;
+      padding: 10px;
+
+      h3 {
+        margin-bottom: 5px;
+      }
+    }
+  }
+
+  dl {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+`;
 
 class MetricsList extends React.Component {
   static propTypes = {
@@ -24,9 +61,9 @@ class MetricsList extends React.Component {
       .map(metric => this._formatMetric(metric));
 
     return (
-      <ul className="metric-list">
+      <MetricListWrap>
         {metrics.length > 0 ? metrics : <li>No metrics match the given filter. Please ensure you use a valid regular expression</li>}
-      </ul>
+      </MetricListWrap>
     );
   }
 }

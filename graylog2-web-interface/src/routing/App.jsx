@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Navigation from 'components/navigation/Navigation';
 import { Scratchpad, Icon, Spinner } from 'components/common';
@@ -13,6 +14,24 @@ import 'stylesheets/typeahead.less';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
+const ScrollToHint = styled.div(({ theme }) => css`
+  position: fixed;
+  left: 50%;
+  margin-left: -125px;
+  top: 50px;
+  color: ${theme.color.global.textAlt};
+  font-size: 80px;
+  padding: 25px;
+  z-index: 2000;
+  width: 200px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 10px;
+  display: none;
+  background: rgba(0, 0, 0, 0.8);
+  filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+`);
+
 const App = ({ children, currentUser, location }) => {
   if (!currentUser) {
     return <Spinner />;
@@ -24,9 +43,9 @@ const App = ({ children, currentUser, location }) => {
                   fullName={currentUser.full_name}
                   loginName={currentUser.username}
                   permissions={currentUser.permissions} />
-      <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
+      <ScrollToHint id="scroll-to-hint">
         <Icon name="arrow-up" />
-      </div>
+      </ScrollToHint>
       <Scratchpad />
       <AppErrorBoundary>
         {children}
