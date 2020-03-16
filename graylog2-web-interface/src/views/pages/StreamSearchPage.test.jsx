@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
+import { act } from 'react-dom/test-utils';
 
 import asMock from 'helpers/mocking/AsMock';
 
@@ -45,6 +46,9 @@ jest.mock('views/logic/views/ViewLoader', () => {
 });
 
 describe('StreamSearchPage', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
   const mockRouter = {
     getCurrentLocation: jest.fn(() => ({ pathname: '/search', search: '?q=&rangetype=relative&relative=300' })),
   };
@@ -72,6 +76,7 @@ describe('StreamSearchPage', () => {
 
   it('shows loading spinner before rendering page', async () => {
     const { getByText } = render(<SimpleStreamSearchPage />);
+    act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Loading...')).not.toBeNull();
     await waitForElement(() => getByText('Extended search page'));

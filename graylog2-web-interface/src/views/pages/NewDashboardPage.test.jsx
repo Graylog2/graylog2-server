@@ -10,6 +10,7 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 
 import NewDashboardPage from './NewDashboardPage';
+import { act } from "react-dom/test-utils";
 
 jest.mock('./ExtendedSearchPage', () => () => <div>Extended search page</div>);
 jest.mock('views/stores/ViewStore', () => ({
@@ -22,6 +23,9 @@ jest.mock('views/logic/views/ViewLoader', () => ({
 describe('NewDashboardPage', () => {
   const SimpleNewDashboardPage = props => <NewDashboardPage route={{}} location={{}} {...props} />;
 
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
@@ -30,6 +34,7 @@ describe('NewDashboardPage', () => {
   it('shows loading spinner before rendering page', async () => {
     const { getByText } = render(<SimpleNewDashboardPage />);
 
+    act(() => jest.advanceTimersByTime(200));
     expect(getByText('Loading...')).not.toBeNull();
     await waitForElement(() => getByText('Extended search page'));
   });

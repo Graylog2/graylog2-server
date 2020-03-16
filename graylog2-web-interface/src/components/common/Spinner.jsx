@@ -6,7 +6,7 @@ import Icon from './Icon';
 import Delayed from './Delayed';
 
 type Props = {
-  delay?: number,
+  delay: number,
   name?: string,
   text?: string,
 }

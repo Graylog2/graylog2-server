@@ -14,6 +14,7 @@ import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 import NewSearchPage from './NewSearchPage';
+import { act } from "react-dom/test-utils";
 
 const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);
 const mockView = View.create()
@@ -59,6 +60,9 @@ describe('NewSearchPage', () => {
   };
   const SimpleNewSearchPage = props => <NewSearchPage route={{}} router={mockRouter} location={{}} {...props} />;
 
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
@@ -71,6 +75,7 @@ describe('NewSearchPage', () => {
 
   it('should show spinner while loading view', () => {
     const { getByText } = render(<SimpleNewSearchPage />);
+    act(() => jest.advanceTimersByTime(200));
     expect(getByText('Loading...')).not.toBeNull();
   });
 
