@@ -56,12 +56,7 @@ type State = {
 
 type Props = {
   config: MessagesWidgetConfig,
-  currentView: {
-    activeQuery: string,
-    view: {
-      id: number,
-    },
-  },
+  activeQuery: string,
   data: { messages: Array<Object>, total: number, id: string },
   editing: boolean,
   fields: FieldTypeMappingsList,
@@ -75,7 +70,7 @@ type Props = {
 class MessageList extends React.Component<Props, State> {
   static propTypes = {
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-    currentView: PropTypes.object.isRequired,
+    activeQuery: PropTypes.string.isRequired,
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
       total: PropTypes.number.isRequired,
@@ -153,7 +148,7 @@ class MessageList extends React.Component<Props, State> {
   render() {
     const {
       config,
-      currentView: { activeQuery: activeQueryId },
+      activeQuery: activeQueryId,
       data: { messages, total: totalMessages },
       editing,
       fields,
@@ -194,10 +189,7 @@ export default connect(MessageList,
     selectedFields: SelectedFieldsStore,
     currentView: ViewStore,
     searches: SearchStore,
-  }, props => Object.assign(
-    {},
-    props,
-    {
-      searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']),
-    },
-  ));
+  }, ({ currentView: { activeQuery } = {}, searches }) => ({
+    activeQuery,
+    searchTypes: get(searches, ['result', 'results', activeQuery, 'searchTypes']),
+  }));
