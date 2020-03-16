@@ -1,18 +1,19 @@
 // @flow strict
 import styled, { type StyledComponent, css } from 'styled-components';
+import { type ThemeInterface } from 'theme';
 
 type StyleProps = {
   isSelected: boolean,
   expandRight: boolean,
 };
 
-export const Title: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div(({ isSelected, expandRight, theme }) => css`
+export const Title: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> = styled.div(({ isSelected, expandRight, theme }) => css`
   padding: 9px 10px;
   display: flex;
   align-items: center;
   cursor: pointer;
   position: relative;
-  color: ${isSelected ? '#FF3633' : 'inherit'};
+  color: ${isSelected ? theme.color.variant.danger : 'inherit'};
   background: ${isSelected ? theme.color.gray[10] : 'tranparent'};
   ${((isSelected && expandRight) && css`
 
