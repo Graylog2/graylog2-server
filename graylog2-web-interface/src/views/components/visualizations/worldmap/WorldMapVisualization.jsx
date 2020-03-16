@@ -9,6 +9,7 @@ import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import MapVisualization from './MapVisualization';
 import { extractSeries, formatSeries, getLeafsFromRows, getXLabelsFromLeafs } from '../ChartData';
@@ -38,7 +39,7 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   });
 };
 
-const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
+const WorldMapVisualization: VisualizationComponent = makeVisualization(({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const onRenderComplete = useContext(RenderCompletionCallback);
   const hasMetric = !isEmpty(config.series);
@@ -77,7 +78,7 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
                       markerRadiusSize={markerRadiusSize}
                       onChange={_onChange} />
   );
-};
+}, 'map');
 
 WorldMapVisualization.propTypes = {
   config: AggregationType.isRequired,
@@ -85,7 +86,5 @@ WorldMapVisualization.propTypes = {
   onChange: PropTypes.func.isRequired,
   width: PropTypes.number.isRequired,
 };
-
-WorldMapVisualization.type = 'map';
 
 export default WorldMapVisualization;

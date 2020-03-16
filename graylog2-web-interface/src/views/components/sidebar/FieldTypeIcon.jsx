@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import { Icon } from 'components/common';
 
+import FieldType from 'views/logic/fieldtypes/FieldType';
 import styles from './FieldTypeIcon.css';
-import FieldType from '../../logic/fieldtypes/FieldType';
 
 const iconClass = (type) => {
   switch (type) {

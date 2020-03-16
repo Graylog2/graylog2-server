@@ -106,7 +106,7 @@ describe('ExtendedSearchPage', () => {
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     // $FlowFixMe: Somehow flow does not see the `listen` property.
     SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
-    CurrentViewTypeProvider.mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
+    asMock(CurrentViewTypeProvider).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 
   const SimpleExtendedSearchPage = props => (

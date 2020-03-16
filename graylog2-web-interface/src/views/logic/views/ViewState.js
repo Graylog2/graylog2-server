@@ -1,6 +1,7 @@
 // @flow strict
-import { List, Map, fromJS, is } from 'immutable';
+import { List, Map, fromJS } from 'immutable';
 
+import isDeepEqual from 'stores/isDeepEqual';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
@@ -118,16 +119,12 @@ export default class ViewState {
       return false;
     }
 
-    if (this.fields !== other.fields
-      || !is(this.titles, other.titles)
-      || this.widgets !== other.widgets
-      || !is(this.widgetMapping, other.widgetMapping)
-      || this.widgetPositions !== other.widgetPositions
-      || !is(this.formatting !== other.formatting)) {
-      return false;
-    }
-
-    return true;
+    return isDeepEqual(this.fields, other.fields)
+      && isDeepEqual(this.titles, other.titles)
+      && isDeepEqual(this.widgets, other.widgets)
+      && isDeepEqual(this.widgetMapping, other.widgetMapping)
+      && isDeepEqual(this.widgetPositions, other.widgetPositions)
+      && isDeepEqual(this.formatting, other.formatting);
   }
 
   toJSON() {

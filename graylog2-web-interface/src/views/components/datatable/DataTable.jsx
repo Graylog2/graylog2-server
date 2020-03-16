@@ -1,11 +1,12 @@
 // @flow strict
-import React, { useContext, useEffect } from 'react';
+import * as React from 'react';
+import { useContext, useEffect } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
 
+import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import connect from 'stores/connect';
 
 import { ViewStore } from 'views/stores/ViewStore';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -18,6 +19,8 @@ import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import type { VisualizationComponent } from '../aggregationbuilder/AggregationBuilder';
+import { makeVisualization } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = {
   config: AggregationWidgetConfig,
@@ -118,7 +121,6 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   );
 };
 
-const ConnectedDataTable = connect(DataTable, { currentView: ViewStore });
-ConnectedDataTable.type = 'table';
+const ConnectedDataTable: VisualizationComponent = makeVisualization(connect(DataTable, { currentView: ViewStore }), 'table');
 
 export default ConnectedDataTable;

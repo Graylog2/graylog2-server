@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
-
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
+import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
 
@@ -29,7 +30,7 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
 
-const BarVisualization: VisualizationComponent = ({ config, data, effectiveTimerange }: VisualizationComponentProps) => {
+const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange }: VisualizationComponentProps) => {
   const { visualizationConfig } = config;
   const layout = {};
 
@@ -58,13 +59,11 @@ const BarVisualization: VisualizationComponent = ({ config, data, effectiveTimer
             setChartColor={setChartColor}
             plotLayout={layout} />
   );
-};
+}, 'bar');
 
 BarVisualization.propTypes = {
   config: AggregationType.isRequired,
   data: PropTypes.object.isRequired,
 };
-
-BarVisualization.type = 'bar';
 
 export default BarVisualization;

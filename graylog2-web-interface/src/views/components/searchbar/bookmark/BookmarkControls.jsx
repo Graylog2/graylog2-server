@@ -56,11 +56,7 @@ class BookmarkControls extends React.Component<Props, State> {
     viewStoreState: PropTypes.object.isRequired,
     currentUser: PropTypes.shape({
       username: PropTypes.string.isRequired,
-    }),
-  };
-
-  static defaultProps = {
-    currentUser: undefined,
+    }).isRequired,
   };
 
   constructor(props: Props) {

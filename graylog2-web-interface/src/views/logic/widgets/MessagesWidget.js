@@ -1,6 +1,8 @@
 // @flow strict
-import { Map, is } from 'immutable';
+import { Map } from 'immutable';
 
+import isDeepEqual from 'stores/isDeepEqual';
+import isEqualForSearch from 'views/stores/isEqualForSearch';
 import Widget from './Widget';
 import MessagesWidgetConfig from './MessagesWidgetConfig';
 import type { QueryString, TimeRange } from '../queries/Query';
@@ -20,7 +22,14 @@ export default class MessagesWidget extends Widget {
 
   equals(other: any) {
     if (other instanceof MessagesWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every(key => is(this._value[key], other[key]));
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every(key => isDeepEqual(this._value[key], other[key]));
+    }
+    return false;
+  }
+
+  equalsForSearch(other: any) {
+    if (other instanceof MessagesWidget) {
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every(key => isEqualForSearch(this._value[key], other[key]));
     }
     return false;
   }

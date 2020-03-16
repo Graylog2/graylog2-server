@@ -2,6 +2,19 @@
 
 exports[`NumberVisualization should render a number visualization 1`] = `
 <NumberVisualization
+  config={
+    Object {
+      "column_pivots": Array [],
+      "event_annotation": false,
+      "formatting_settings": undefined,
+      "rollup": true,
+      "row_pivots": Array [],
+      "series": Array [],
+      "sort": Array [],
+      "visualization": undefined,
+      "visualization_config": undefined,
+    }
+  }
   currentView={
     Object {
       "activeQuery": "dead-beef",
@@ -27,6 +40,12 @@ exports[`NumberVisualization should render a number visualization 1`] = `
       ],
     }
   }
+  effectiveTimerange={
+    Object {
+      "range": 300,
+      "type": "relative",
+    }
+  }
   fields={
     Immutable.List [
       FieldTypeMapping {
@@ -47,6 +66,8 @@ exports[`NumberVisualization should render a number visualization 1`] = `
     ]
   }
   height={200}
+  onChange={[Function]}
+  toggleEdit={[Function]}
   width={200}
 >
   <NumberVisualization__SingleItemGrid>

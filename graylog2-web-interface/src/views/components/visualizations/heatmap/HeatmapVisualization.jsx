@@ -6,6 +6,7 @@ import { values, merge, fill, find, isEmpty, get } from 'lodash';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 
 import GenericPlot from '../GenericPlot';
@@ -117,20 +118,18 @@ const _chartLayout = (heatmapData) => {
 
 const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
 
-const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
+const HeatmapVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = data.chart || Object.values(data)[0];
   const heatmapData = chartData(config, rows, 'heatmap', _generateSeries, _formatSeries, _leafSourceMatcher);
   const layout = _chartLayout(heatmapData);
   return (
     <GenericPlot chartData={heatmapData} layout={layout} />
   );
-};
+}, 'heatmap');
 
 HeatmapVisualization.propTypes = {
   config: AggregationType.isRequired,
   data: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object)).isRequired,
 };
-
-HeatmapVisualization.type = 'heatmap';
 
 export default HeatmapVisualization;
