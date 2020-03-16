@@ -2,7 +2,6 @@
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import { util } from 'theme';
 import navTabsStyles from './styles/nav-tabs';
 
 const Nav = styled(BootstrapNav)(({ theme }) => css`

@@ -148,7 +148,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Nav-dzawzr-0",
                         "isStatic": false,
-                        "lastClassName": "duFnPf",
+                        "lastClassName": "iXtvrR",
                         "rules": Array [
                           [Function],
                         ],
@@ -172,7 +172,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     activeKey="selection"
                     bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 duFnPf"
+                    className="Nav-dzawzr-0 iXtvrR"
                     justified={false}
                     onSelect={[Function]}
                     pullLeft={false}
@@ -180,7 +180,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     stacked={true}
                   >
                     <ul
-                      className="Nav-dzawzr-0 duFnPf nav nav-pills nav-stacked"
+                      className="Nav-dzawzr-0 iXtvrR nav nav-pills nav-stacked"
                       role={null}
                     >
                       <NavItem
@@ -2459,7 +2459,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Nav-dzawzr-0",
                         "isStatic": false,
-                        "lastClassName": "duFnPf",
+                        "lastClassName": "iXtvrR",
                         "rules": Array [
                           [Function],
                         ],
@@ -2483,7 +2483,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     activeKey="selection"
                     bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 duFnPf"
+                    className="Nav-dzawzr-0 iXtvrR"
                     justified={false}
                     onSelect={[Function]}
                     pullLeft={false}
@@ -2491,7 +2491,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     stacked={true}
                   >
                     <ul
-                      className="Nav-dzawzr-0 duFnPf nav nav-pills nav-stacked"
+                      className="Nav-dzawzr-0 iXtvrR nav nav-pills nav-stacked"
                       role={null}
                     >
                       <NavItem
