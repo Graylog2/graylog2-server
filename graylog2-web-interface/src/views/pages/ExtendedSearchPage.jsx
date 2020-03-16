@@ -57,6 +57,8 @@ const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
     -ms-grid-rows: 1fr;
     grid-template-columns: 50px 1fr;
     -ms-grid-columns: 50px 1fr;
+    grid-template-areas: "sidebar search";
+    margin-bottom: 0;
   ` : '')}
 `;
 
@@ -172,7 +174,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       <InteractiveContext.Consumer>
         {(interactive) => (
           <ViewAdditionalContextProvider>
-            <GridContainer id="main-row" interactive={interactive}>
+            <GridContainer interactive={interactive}>
               <IfInteractive>
                 <ConnectedSideBar>
                   <ConnectedFieldList />
