@@ -6,6 +6,9 @@ import { act } from 'react-dom/test-utils';
 import Delayed from './Delayed';
 
 describe('Delayed', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
   afterEach(cleanup);
 
   const HelloWorld = () => <span>Hello World!</span>;
@@ -27,9 +30,7 @@ describe('Delayed', () => {
     ));
     expect(queryByText('Hello World!')).toBeNull();
 
-    act(() => {
-      jest.advanceTimersByTime(200);
-    });
+    act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Hello World!')).not.toBeNull();
   });
