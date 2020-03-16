@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
+import { act } from 'react-dom/test-utils';
 import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -14,7 +15,6 @@ import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 import NewSearchPage from './NewSearchPage';
-import { act } from "react-dom/test-utils";
 
 const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);
 const mockView = View.create()

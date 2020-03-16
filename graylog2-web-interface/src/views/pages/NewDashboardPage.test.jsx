@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { render, cleanup, waitForElement, wait } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
+import { act } from 'react-dom/test-utils';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -10,7 +11,6 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 
 import NewDashboardPage from './NewDashboardPage';
-import { act } from "react-dom/test-utils";
 
 jest.mock('./ExtendedSearchPage', () => () => <div>Extended search page</div>);
 jest.mock('views/stores/ViewStore', () => ({
