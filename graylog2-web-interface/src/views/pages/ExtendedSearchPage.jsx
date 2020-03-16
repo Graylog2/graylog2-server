@@ -180,39 +180,38 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       </IfInteractive>
       <InteractiveContext.Consumer>
         {interactive => (
-          <GridContainer id="main-row" interactive={interactive}>
-            <IfInteractive>
-              <ConnectedSideBar>
-                <ConnectedFieldList />
-              </ConnectedSideBar>
-            </IfInteractive>
-            <SearchArea>
-              <SearchGrid>
-                <IfInteractive>
-                  <HeaderElements />
-                  <IfDashboard>
-                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfDashboard>
-                  <IfSearch>
-                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfSearch>
+          <ViewAdditionalContextProvider>
+            <GridContainer id="main-row" interactive={interactive}>
+              <IfInteractive>
+                <ConnectedSideBar>
+                  <ConnectedFieldList />
+                </ConnectedSideBar>
+              </IfInteractive>
+              <SearchArea>
+                <SearchGrid>
+                  <IfInteractive>
+                    <HeaderElements />
+                    <IfDashboard>
+                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfDashboard>
+                    <IfSearch>
+                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfSearch>
 
-                  <QueryBarElements />
+                    <QueryBarElements />
 
-                  <IfDashboard>
-                    <QueryBar />
-                  </IfDashboard>
-                </IfInteractive>
-
-                <ViewAdditionalContextProvider>
+                    <IfDashboard>
+                      <QueryBar />
+                    </IfDashboard>
+                  </IfInteractive>
                   <HighlightMessageInQuery query={location.query}>
                     <SearchResult />
                   </HighlightMessageInQuery>
-                </ViewAdditionalContextProvider>
-                <Footer />
-              </SearchGrid>
-            </SearchArea>
-          </GridContainer>
+                  <Footer />
+                </SearchGrid>
+              </SearchArea>
+            </GridContainer>
+          </ViewAdditionalContextProvider>
         )}
       </InteractiveContext.Consumer>
     </CurrentViewTypeProvider>
