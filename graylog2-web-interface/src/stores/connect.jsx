@@ -101,7 +101,7 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
 
     render() {
       const nextProps = this._genProps(this.state);
-      const { key, ref, ...componentProps } = this.props;
+      const { ref, ...componentProps } = this.props;
 
       return <Component {...nextProps} {...componentProps} />;
     }
