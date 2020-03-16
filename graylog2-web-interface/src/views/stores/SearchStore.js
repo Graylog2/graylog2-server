@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import Bluebird from 'bluebird';
 import { debounce, get, isEqual } from 'lodash';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -23,7 +23,7 @@ import type { WidgetMapping } from 'views/logic/views/types';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'views/logic/singleton';
 
-const createSearchUrl = URLUtils.qualifyUrl('/views/search');
+const createSearchUrl = qualifyUrl('/views/search');
 
 const displayError = (error) => {
   // eslint-disable-next-line no-console
@@ -32,7 +32,7 @@ const displayError = (error) => {
 
 Bluebird.config({ cancellation: true });
 
-const searchUrl = URLUtils.qualifyUrl('/views/search');
+const searchUrl = qualifyUrl('/views/search');
 
 export { SearchActions };
 
@@ -120,14 +120,18 @@ export const SearchStore = singletonStore(
     },
 
     reexecuteSearchTypes(searchTypes: MessageListOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+      const { parameterBindings, globalOverride } = this.executionState;
       const searchTypeIds = Object.keys(searchTypes);
-      const globalOverride: GlobalOverride = new GlobalOverride(
+      const globalQuery = globalOverride && globalOverride.query ? globalOverride.query : undefined;
+
+      const newGlobalOverride: GlobalOverride = new GlobalOverride(
         effectiveTimerange,
-        undefined,
+        globalQuery,
         searchTypeIds,
         searchTypes,
       );
-      const executionState = new SearchExecutionState(undefined, globalOverride);
+
+      const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
       const handleSearchResult = (searchResult: SearchResult): SearchResult => {
         const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
         const updatedResult = this.result.updateSearchTypes(updatedSearchTypes);
