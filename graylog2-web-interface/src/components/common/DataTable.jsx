@@ -83,14 +83,6 @@ class DataTable extends React.Component {
     };
   }
 
-  componentDidUpdate(previousProps) {
-    // We update the state with row if the filterKeys is empty other than that typeahead is handling the state
-    const { filterKeys, rows } = this.props;
-    if (filterKeys.length === 0 && !isEqual(previousProps.rows, rows)) {
-      this._updateState();
-    }
-  }
-
   getFormattedHeaders = () => {
     let i = 0;
     const { headerCellFormatter, headers } = this.props;
@@ -106,7 +98,7 @@ class DataTable extends React.Component {
   getFormattedDataRows = () => {
     let i = 0;
     const { sortByKey, sortBy, dataRowFormatter } = this.props;
-    let { filteredRows: sortedDataRows } = this.state;
+    let sortedDataRows = this._getEffectiveRows();
     if (sortByKey) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
         return a[sortByKey].localeCompare(b[sortByKey]);
@@ -129,12 +121,11 @@ class DataTable extends React.Component {
     this.setState({ filteredRows });
   };
 
-  _updateState() {
-    const { rows } = this.props;
-    this.setState({
-      filteredRows: rows,
-    });
-  }
+  _getEffectiveRows = () => {
+    const { filteredRows } = this.state;
+    const { filterKeys, rows } = this.props;
+    return (filterKeys.length === 0 ? rows : filteredRows.filter(row => rows.some(r => isEqual(r, row))));
+  };
 
   render() {
     let filter;
@@ -152,7 +143,7 @@ class DataTable extends React.Component {
       useResponsiveTable,
       rows,
     } = this.props;
-    const { filteredRows } = this.state;
+    const effectiveRows = this._getEffectiveRows();
     if (filterKeys.length !== 0) {
       filter = (
         <div className="row">
@@ -176,7 +167,7 @@ class DataTable extends React.Component {
     let data;
     if (rows.length === 0) {
       data = <p>{noDataText}</p>;
-    } else if (filteredRows.length === 0) {
+    } else if (effectiveRows.length === 0) {
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
