@@ -131,7 +131,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
                             "isStatic": false,
-                            "lastClassName": "hCBNCb",
+                            "lastClassName": "kxWRDS",
                             "rules": Array [
                               [Function],
                             ],
@@ -150,10 +150,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 hCBNCb"
+                        className="HelpBlock-i8is92-0 kxWRDS"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 hCBNCb help-block"
+                          className="HelpBlock-i8is92-0 kxWRDS help-block"
                         >
                           Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk.
                         </span>
@@ -202,7 +202,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "kojzoH",
+              "lastClassName": "iWqiEF",
               "rules": Array [
                 [Function],
               ],
@@ -226,12 +226,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 kojzoH"
+          className="Button__StyledButton-c9cbmb-0 iWqiEF"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -255,7 +255,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           "componentStyle": ComponentStyle {
             "componentId": "UrlWhiteListForm__StyledTable-sc-1nddwv6-0",
             "isStatic": false,
-            "lastClassName": "emNaqs",
+            "lastClassName": "hssHQE",
             "rules": Array [
               [Function],
               "margin-top:10px;",
@@ -279,14 +279,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       <Table
         bordered={true}
         bsClass="table"
-        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 emNaqs"
+        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hssHQE"
         condensed={false}
         hover={false}
         responsive={false}
         striped={true}
       >
         <table
-          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 emNaqs table table-striped table-bordered"
+          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hssHQE table table-striped table-bordered"
         >
           <thead>
             <tr>
@@ -414,7 +414,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -440,7 +440,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       defaultValue="testam"
                                       inputRef={[Function]}
@@ -452,7 +452,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         defaultValue="testam"
                                         id="title-input0"
                                         label=""
@@ -567,7 +567,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -593,7 +593,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -605,7 +605,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input0"
                                         label=""
@@ -2184,7 +2184,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "kojzoH",
+                            "lastClassName": "iWqiEF",
                             "rules": Array [
                               [Function],
                             ],
@@ -2207,12 +2207,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 kojzoH"
+                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -2341,7 +2341,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2367,7 +2367,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       defaultValue="test"
                                       inputRef={[Function]}
@@ -2379,7 +2379,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         defaultValue="test"
                                         id="title-input1"
                                         label=""
@@ -2494,7 +2494,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2520,7 +2520,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -2532,7 +2532,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input1"
                                         label=""
@@ -4111,7 +4111,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "kojzoH",
+                            "lastClassName": "iWqiEF",
                             "rules": Array [
                               [Function],
                             ],
@@ -4134,12 +4134,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 kojzoH"
+                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -4268,7 +4268,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -4294,7 +4294,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       defaultValue="test"
                                       inputRef={[Function]}
@@ -4306,7 +4306,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         defaultValue="test"
                                         id="title-input2"
                                         label=""
@@ -4421,7 +4421,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -4447,7 +4447,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -4459,7 +4459,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input2"
                                         label=""
@@ -6038,7 +6038,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "kojzoH",
+                            "lastClassName": "iWqiEF",
                             "rules": Array [
                               [Function],
                             ],
@@ -6061,12 +6061,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 kojzoH"
+                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -6128,7 +6128,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "kojzoH",
+              "lastClassName": "iWqiEF",
               "rules": Array [
                 [Function],
               ],
@@ -6152,12 +6152,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 kojzoH"
+          className="Button__StyledButton-c9cbmb-0 iWqiEF"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"

@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-
 import styled from 'styled-components';
 import ClipboardJS from 'clipboard';
-import { readableColor } from 'polished';
 
+import { util } from 'theme';
 import { OverlayTrigger, Tooltip } from 'components/graylog';
 
 const Name = styled.div`
@@ -22,7 +21,7 @@ const Swatch = styled.div(({ color }) => `
   height: 60px;
   background-color: ${color};
   border: 1px solid #222;
-  color: ${readableColor(color)};
+  color: ${util.readableColor(color)};
   display: flex;
   padding: 3px;
   flex-direction: column;

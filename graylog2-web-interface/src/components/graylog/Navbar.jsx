@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { Navbar as BootstrapNavbar } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { darken, lighten } from 'polished';
+import chroma from 'chroma-js';
 
 import { breakpoint, util } from 'theme';
 
@@ -59,8 +59,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, theme.color.variant.info)};
-          background-color: ${darken(0.065, theme.color.gray[90])};
+          color: ${chroma(theme.color.variant.info).darken(0.15)};
+          background-color: ${chroma(theme.color.gray[90]).darken(0.065)};
         }
       }
 
@@ -72,7 +72,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
             &:hover,
             &:focus {
-              color: ${darken(0.25, theme.color.variant.info)};
+              color: ${chroma(theme.color.variant.info).darken(0.25)};
               background-color: transparent;
             }
           }
@@ -81,8 +81,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
             &,
             &:hover,
             &:focus {
-              color: ${darken(0.15, theme.color.variant.info)};
-              background-color: ${darken(0.065, theme.color.gray[90])};
+              color: ${chroma(theme.color.variant.info).darken(0.15)};
+              background-color: ${chroma(theme.color.gray[90]).darken(0.065)};
             }
           }
 
@@ -107,20 +107,20 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       }
 
       .icon-bar {
-        background-color: ${darken(0.25, theme.color.gray[80])};
+        background-color: ${chroma(theme.color.gray[80]).darken(0.25)};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${darken(0.065, theme.color.gray[90])};
+      border-color: ${chroma(theme.color.gray[90]).darken(0.065)};
     }
 
     .navbar-link {
       color: ${theme.color.variant.info};
 
       &:hover {
-        color: ${darken(0.25, theme.color.variant.info)};
+        color: ${chroma(theme.color.variant.info).darken(0.25)};
       }
     }
 
@@ -147,7 +147,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     border: 0;
 
     .navbar-brand {
-      color: ${lighten(0.15, theme.color.variant.info)};
+      color: ${chroma(theme.color.variant.info).brighten(0.15)};
       padding: 12px 15px 0 15px;
 
       &:hover,
@@ -158,7 +158,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     }
 
     .navbar-text {
-      color: ${lighten(0.15, theme.color.global.textDefault)};
+      color: ${chroma(theme.color.global.textDefault).brighten(0.15)};
     }
 
     .navbar-nav {
@@ -186,7 +186,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         &,
         &:hover,
         &:focus {
-          color: ${lighten(0.50, theme.color.global.textDefault)};
+          color: ${chroma(theme.color.global.textDefault).brighten(0.50)};
           background-color: transparent;
         }
       }
@@ -234,7 +234,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
             &,
             &:hover,
             &:focus {
-              color: ${lighten(0.50, theme.color.global.textDefault)};
+              color: ${chroma(theme.color.global.textDefault).brighten(0.50)};
               background-color: transparent;
             }
           }
@@ -261,7 +261,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     }
 
     .navbar-link {
-      color: ${lighten(0.15, theme.color.variant.info)};
+      color: ${chroma(theme.color.variant.info).brighten(0.15)};
 
       &:hover {
         color: ${theme.color.global.textAlt};
@@ -269,7 +269,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     }
 
     .btn-link {
-      color: ${lighten(0.15, theme.color.variant.info)};
+      color: ${chroma(theme.color.variant.info).brighten(0.15)};
 
       &:hover,
       &:focus {
@@ -280,7 +280,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${lighten(0.50, theme.color.global.textDefault)};
+          color: ${chroma(theme.color.global.textDefault).brighten(0.50)};
         }
       }
     }

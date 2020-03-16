@@ -5,7 +5,6 @@ module.exports = [
   'leaflet',
   'moment-timezone',
   'moment',
-  'polished',
   'react-addons-pure-render-mixin',
   'react-bootstrap',
   'react-dom',
