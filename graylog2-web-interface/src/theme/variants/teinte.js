@@ -14,8 +14,6 @@ while (i <= 100) {
   i += 10;
 }
 
-console.log('grays', gray);
-
 const global = {
   textDefault: gray[0],
   textAlt: gray[100],
