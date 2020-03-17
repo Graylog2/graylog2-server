@@ -4,7 +4,7 @@ import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
 import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/graylog';
-import styles from './BookmarkForm.css';
+import styles from './SavedSearchForm.css';
 
 type Props = {
   onChangeTitle: (SyntheticInputEvent<HTMLInputElement>) => void,
@@ -17,7 +17,7 @@ type Props = {
   target: any,
 };
 
-const BookmarkForm = (props: Props) => {
+const SavedSearchForm = (props: Props) => {
   const {
     isCreateNew,
     disableCreateNew,
@@ -36,7 +36,7 @@ const BookmarkForm = (props: Props) => {
       <Position container={document.body}
                 placement="left"
                 target={target}>
-        <Popover title="Name of search" id="bookmark-popover">
+        <Popover title="Name of search" id="saved-search-popover">
           <form>
             <FormGroup>
               <ControlLabel>Title</ControlLabel>
@@ -72,4 +72,4 @@ const BookmarkForm = (props: Props) => {
   );
 };
 
-export default BookmarkForm;
+export default SavedSearchForm;

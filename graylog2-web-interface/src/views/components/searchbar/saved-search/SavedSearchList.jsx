@@ -15,21 +15,21 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {
   toggleModal: () => void,
-  deleteBookmark: (View) => Promise<View>,
+  deleteSavedSearch: (View) => Promise<View>,
   views: SavedSearchesState,
 }
 
 type State = {
-  selectedBookmark?: string,
+  selectedSavedSearch?: string,
   query: string,
   page: number,
   perPage: number,
 }
 
-class BookmarkList extends React.Component<Props, State> {
+class SavedSearchList extends React.Component<Props, State> {
   static propTypes = {
     toggleModal: PropTypes.func.isRequired,
-    deleteBookmark: PropTypes.func.isRequired,
+    deleteSavedSearch: PropTypes.func.isRequired,
     views: PropTypes.object,
   };
 
@@ -41,7 +41,7 @@ class BookmarkList extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selectedBookmark: undefined,
+      selectedSavedSearch: undefined,
       query: '',
       page: 1,
       perPage: 5,
@@ -69,29 +69,29 @@ class BookmarkList extends React.Component<Props, State> {
     this.setState({ query: '', page: 1 }, this.execSearch);
   };
 
-  onLoad = (selectedBookmark, loadFunc) => {
+  onLoad = (selectedSavedSearch, loadFunc) => {
     const { toggleModal } = this.props;
-    if (!selectedBookmark || !loadFunc) {
+    if (!selectedSavedSearch || !loadFunc) {
       return;
     }
-    loadFunc(selectedBookmark).then(() => {
-      browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedBookmark));
+    loadFunc(selectedSavedSearch).then(() => {
+      browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedSavedSearch));
     });
     toggleModal();
   };
 
-  onDelete = (selectedBookmark) => {
-    const { views, deleteBookmark } = this.props;
+  onDelete = (selectedSavedSearch) => {
+    const { views, deleteSavedSearch } = this.props;
     const { list } = views;
     if (list) {
-      const viewIndex = list.findIndex(v => v.id === selectedBookmark);
+      const viewIndex = list.findIndex(v => v.id === selectedSavedSearch);
       if (viewIndex < 0) {
         return;
       }
 
       // eslint-disable-next-line no-alert
       if (window.confirm(`You are about to delete saved search: "${list[viewIndex].title}". Are you sure?`)) {
-        deleteBookmark(list[viewIndex]).then(() => {
+        deleteSavedSearch(list[viewIndex]).then(() => {
           this.execSearch();
         });
       }
@@ -101,20 +101,20 @@ class BookmarkList extends React.Component<Props, State> {
   render() {
     const { views, toggleModal } = this.props;
     const { total, page, perPage = 5 } = views.pagination;
-    const { selectedBookmark } = this.state;
-    const bookmarkList = (views.list || []).map((bookmark) => {
+    const { selectedSavedSearch } = this.state;
+    const savedSearchList = (views.list || []).map((savedSearch) => {
       return (
-        <ListGroupItem active={selectedBookmark === bookmark.id}
-                       onClick={() => this.setState({ selectedBookmark: bookmark.id })}
-                       key={bookmark.id}>
-          {bookmark.title}
+        <ListGroupItem active={selectedSavedSearch === savedSearch.id}
+                       onClick={() => this.setState({ selectedSavedSearch: savedSearch.id })}
+                       key={savedSearch.id}>
+          {savedSearch.title}
         </ListGroupItem>
       );
     });
 
     const renderResult = (views && views.list) && views.list.length > 0
-      ? (<ListGroup>{bookmarkList}</ListGroup>)
-      : (<span>No bookmarks found</span>);
+      ? (<ListGroup>{savedSearchList}</ListGroup>)
+      : (<span>No saved searches found</span>);
 
     return (
       <Modal show>
@@ -132,15 +132,15 @@ class BookmarkList extends React.Component<Props, State> {
         <Modal.Footer>
           <ViewLoaderContext.Consumer>
             {loaderFunc => (
-              <Button disabled={!selectedBookmark}
+              <Button disabled={!selectedSavedSearch}
                       bsStyle="primary"
-                      onClick={() => { this.onLoad(selectedBookmark, loaderFunc); }}>
+                      onClick={() => { this.onLoad(selectedSavedSearch, loaderFunc); }}>
                 Load
               </Button>
             )}
           </ViewLoaderContext.Consumer>
-          <Button disabled={!selectedBookmark}
-                  onClick={() => { this.onDelete(selectedBookmark); }}>
+          <Button disabled={!selectedSavedSearch}
+                  onClick={() => { this.onDelete(selectedSavedSearch); }}>
             Delete
           </Button>
           <Button onClick={toggleModal}>Cancel</Button>
@@ -150,4 +150,4 @@ class BookmarkList extends React.Component<Props, State> {
   }
 }
 
-export default connect(BookmarkList, { views: SavedSearchesStore });
+export default connect(SavedSearchList, { views: SavedSearchesStore });

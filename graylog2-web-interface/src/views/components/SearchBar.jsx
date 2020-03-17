@@ -10,7 +10,7 @@ import { Spinner, Icon } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
 import SearchButton from 'views/components/searchbar/SearchButton';
-import BookmarkControls from 'views/components/searchbar/bookmark/BookmarkControls';
+import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
@@ -100,7 +100,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                             onExecute={performSearch} />
               </Col>
               <Col md={3} xs={4} className="pull-right">
-                <BookmarkControls />
+                <SavedSearchControls />
               </Col>
             </Row>
           </form>
