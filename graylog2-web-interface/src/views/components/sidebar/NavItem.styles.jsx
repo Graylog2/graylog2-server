@@ -13,7 +13,7 @@ export const Title: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> 
   align-items: center;
   cursor: pointer;
   position: relative;
-  color: ${isSelected ? theme.color.variant.danger : 'inherit'};
+  color: ${isSelected ? theme.color.variant.light.danger : 'inherit'};
   background: ${isSelected ? theme.color.gray[10] : 'tranparent'};
   ${((isSelected && expandRight) && css`
 

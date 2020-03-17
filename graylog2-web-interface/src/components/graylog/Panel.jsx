@@ -70,7 +70,7 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
 `);
 
 const deprecatedVariantStyles = hex => css(({ theme }) => {
-  const backgroundColor = theme.color.gray[90];
+  const backgroundColor = theme.color.global.background;
   const borderColor = theme.color.gray[80];
 
   return css`
