@@ -2,14 +2,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
+import styled, { css, type StyledComponent } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
 import connect from 'stores/connect';
-import { Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
-import { PaginatedList, SearchForm } from 'components/common';
+import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
+import { Icon, PaginatedList, SearchForm } from 'components/common';
 import View from 'views/logic/views/View';
+import { type ThemeInterface } from 'theme';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
@@ -25,6 +27,17 @@ type State = {
   page: number,
   perPage: number,
 }
+
+const AlertIcon: StyledComponent<{}, ThemeInterface, *> = styled(Icon)(({ theme }) => css`
+  margin-right: 6px;
+  color: ${theme.color.tertiary.quattro};
+`);
+
+const NoSavedSearches: StyledComponent<{}, ThemeInterface, *> = styled(Alert)`
+  clear: right;
+  display: flex;
+  align-items: center;
+`;
 
 class SavedSearchList extends React.Component<Props, State> {
   static propTypes = {
@@ -112,22 +125,29 @@ class SavedSearchList extends React.Component<Props, State> {
       );
     });
 
-    const renderResult = (views && views.list) && views.list.length > 0
-      ? (<ListGroup>{savedSearchList}</ListGroup>)
-      : (<span>No saved searches found</span>);
+    const renderResult = ((views && views.list) && views.list.length > 0)
+      ? (
+        <PaginatedList onChange={this.handlePageChange}
+                       activePage={page}
+                       totalItems={total}
+                       pageSize={perPage}
+                       pageSizes={[5, 10, 15]}>
+          <ListGroup>{savedSearchList}</ListGroup>
+        </PaginatedList>
+      )
+      : (
+        <NoSavedSearches>
+          <AlertIcon name="exclamation-triangle" size="lg" />
+          <span>No saved searches found.</span>
+        </NoSavedSearches>
+      );
 
     return (
       <Modal show>
         <Modal.Body>
           <SearchForm onSearch={this.handleSearch}
                       onReset={this.handleSearchReset} />
-          <PaginatedList onChange={this.handlePageChange}
-                         activePage={page}
-                         totalItems={total}
-                         pageSize={perPage}
-                         pageSizes={[5, 10, 15]}>
-            {renderResult}
-          </PaginatedList>
+          {renderResult}
         </Modal.Body>
         <Modal.Footer>
           <ViewLoaderContext.Consumer>
