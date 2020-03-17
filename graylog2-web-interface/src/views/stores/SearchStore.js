@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import Bluebird from 'bluebird';
 import { debounce, get, isEqual } from 'lodash';
 
-import { qualifyUrl } from 'util/URLUtils';
+import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -23,7 +23,7 @@ import type { WidgetMapping } from 'views/logic/views/View';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'views/logic/singleton';
 
-const createSearchUrl = qualifyUrl('/views/search');
+const createSearchUrl = URLUtils.qualifyUrl('/views/search');
 
 const displayError = (error) => {
   // eslint-disable-next-line no-console
@@ -32,7 +32,7 @@ const displayError = (error) => {
 
 Bluebird.config({ cancellation: true });
 
-const searchUrl = qualifyUrl('/views/search');
+const searchUrl = URLUtils.qualifyUrl('/views/search');
 
 export { SearchActions };
 
