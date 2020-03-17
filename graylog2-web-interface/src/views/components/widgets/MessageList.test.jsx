@@ -29,6 +29,12 @@ const MessageTableEntry = () => (
   </AdditionalContext.Consumer>
 );
 
+const mockEffectiveTimeRange = {
+  from: '2019-11-15T14:40:48.666Z',
+  to: '2019-11-29T14:40:48.666Z',
+  type: 'absolute',
+};
+
 jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
 jest.mock('stores/search/SearchStore', () => MockStore('searchSurroundingMessages'));
 jest.mock('views/stores/ViewStore', () => ({
@@ -55,7 +61,7 @@ jest.mock('views/stores/SearchStore', () => ({
           somequery: {
             searchTypes: {
               'search-type-id': {
-                effectiveTimerange: { from: '2019-11-15T14:40:48.666Z', to: '2019-11-29T14:40:48.666Z', type: 'absolute' },
+                effectiveTimerange: mockEffectiveTimeRange,
               },
             },
           },
@@ -161,21 +167,16 @@ describe('MessageList', () => {
   });
 
   it('reexecute query for search type, when using pagination', () => {
+    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
-    const effectiveTimerange = {
-      from: '2019-11-15T14:40:48.666Z',
-      to: '2019-11-29T14:40:48.666Z',
-      type: 'absolute',
-    };
     const wrapper = mount(<MessageList editing
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
-    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, effectiveTimerange);
+    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange);
   });
 
   it('disables refresh actions, when using pagination', () => {
