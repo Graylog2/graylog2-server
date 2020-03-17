@@ -28,6 +28,7 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { TimeRange } from 'views/logic/queries/Query';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import CSVExportModal from 'views/components/searchbar/CSVExportModal';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -68,6 +69,7 @@ type State = {
   loading: boolean;
   oldWidget?: WidgetModel,
   showCopyToDashboard: boolean,
+  showCsvExport: boolean
 };
 
 export type Result = {
@@ -134,6 +136,7 @@ class Widget extends React.Component<Props, State> {
       editing,
       loading: false,
       showCopyToDashboard: false,
+      showCsvExport: false,
     };
     if (editing) {
       this.state = { ...this.state, oldWidget: props.widget };
@@ -206,6 +209,13 @@ class Widget extends React.Component<Props, State> {
     });
   };
 
+  _onToggleCSVExport = () => {
+    const { showCsvExport } = this.state;
+    this.setState({
+      showCsvExport: !showCsvExport,
+    });
+  }
+
   _onCancelEdit = () => {
     const { oldWidget } = this.state;
     if (oldWidget) {
@@ -250,8 +260,8 @@ class Widget extends React.Component<Props, State> {
 
   // TODO: Clean up different code paths for normal/edit modes
   render() {
-    const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
-    const { editing, loading, showCopyToDashboard } = this.state;
+    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
+    const { editing, loading, showCopyToDashboard, showCsvExport } = this.state;
     const { config } = widget;
     const visualization = this.visualize();
     if (editing) {
@@ -304,18 +314,20 @@ class Widget extends React.Component<Props, State> {
                   <WidgetActionDropdown>
                     <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                     <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                    <MenuItem onSelect={() => this._onToggleCSVExport(id)}>CSV Export</MenuItem>
                     <IfSearch>
                       <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                     </IfSearch>
                     <MenuItem divider />
                     <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                   </WidgetActionDropdown>
-                  {showCopyToDashboard
-                    && (
-                      <CopyToDashboard widgetId={id}
-                                       onSubmit={this._onCopyToDashboard}
-                                       onCancel={this._onToggleCopyToDashboard} />
-                    )}
+                  {showCopyToDashboard && (
+                    <CopyToDashboard widgetId={id}
+                                     onSubmit={this._onCopyToDashboard}
+                                     onCancel={this._onToggleCopyToDashboard} />
+                  )}
+                  {showCsvExport && <CSVExportModal view={view} currentWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
+
                 </IfInteractive>
               </WidgetHeader>
             )}
