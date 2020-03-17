@@ -1,9 +1,9 @@
 import { darken, lighten, tint } from 'polished';
 
 const brand = {
-  primary: '#FF3633',
-  secondary: '#FFF',
-  tertiary: '#1F1F1F',
+  primary: '#ff3633',
+  secondary: '#fff',
+  tertiary: '#1f1f1f',
 };
 
 const gray = {};
@@ -13,6 +13,8 @@ while (i <= 100) {
   gray[i] = tint((i / 100), darkestGray);
   i += 10;
 }
+
+console.log('grays', gray);
 
 const global = {
   textDefault: gray[0],
@@ -24,12 +26,12 @@ const global = {
 };
 
 const variant = {
-  danger: '#AD0707',
-  default: '#1F1F1F',
-  info: '#0063BE',
+  danger: '#ad0707',
+  default: '#1f1f1f',
+  info: '#0063be',
   primary: '#702785',
-  success: '#00AE42',
-  warning: '#FFD200',
+  success: '#00ae42',
+  warning: '#ffd200',
 };
 
 const variantLight = {};

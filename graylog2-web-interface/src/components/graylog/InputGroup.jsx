@@ -11,7 +11,7 @@ const StyledBootstrapInputAddon = ({ className, ...rest }) => {
 
 export const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
   color: ${theme.color.gray[30]};
-  background-color: ${theme.color.gray[100]};
+  background-color: ${theme.color.global.contentBackground};
   border-color: ${theme.color.gray[80]};
 `);
 

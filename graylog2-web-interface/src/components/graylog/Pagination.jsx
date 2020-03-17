@@ -13,8 +13,8 @@ export const paginationStyles = css(({ theme }) => css`
     > li {
       > a,
       > span {
-        color: ${util.readableColor(theme.color.gray[100])};
-        background-color: ${theme.color.gray[100]};
+        color: ${util.readableColor(theme.color.global.contentBackground)};
+        background-color: ${theme.color.global.contentBackground};
         border-color: ${theme.color.gray[80]};
 
         &:hover,

@@ -5,7 +5,7 @@ import { Jumbotron as BootstrapJumbotron } from 'react-bootstrap';
 
 export const StyledJumbotron = styled(BootstrapJumbotron)(({ theme }) => css`
   color: ${theme.color.global.textDefault};
-  background-color: ${theme.color.global.background};
+  background-color: ${theme.color.global.contentBackground};
 `);
 
 const Jumbotron = forwardRef((props, ref) => {

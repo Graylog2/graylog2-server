@@ -6,7 +6,7 @@ import { transparentize } from 'polished';
 const FormControl = styled(BootstrapFormControl)(({ theme }) => {
   return css`
     color: ${theme.color.global.textDefault};
-    background-color: ${theme.color.gray[100]};
+    background-color: ${theme.color.global.contentBackground};
     border-color: ${theme.color.gray[80]};
 
     &::placeholder {
