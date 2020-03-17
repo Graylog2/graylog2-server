@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { render, cleanup, waitForElement, wait } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
+import { act } from 'react-dom/test-utils';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -22,6 +23,9 @@ jest.mock('views/logic/views/ViewLoader', () => ({
 describe('NewDashboardPage', () => {
   const SimpleNewDashboardPage = props => <NewDashboardPage route={{}} location={{}} {...props} />;
 
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
@@ -30,6 +34,7 @@ describe('NewDashboardPage', () => {
   it('shows loading spinner before rendering page', async () => {
     const { getByText } = render(<SimpleNewDashboardPage />);
 
+    act(() => jest.advanceTimersByTime(200));
     expect(getByText('Loading...')).not.toBeNull();
     await waitForElement(() => getByText('Extended search page'));
   });

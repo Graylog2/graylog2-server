@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
+import { act } from 'react-dom/test-utils';
 import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -59,6 +60,9 @@ describe('NewSearchPage', () => {
   };
   const SimpleNewSearchPage = props => <NewSearchPage route={{}} router={mockRouter} location={{}} {...props} />;
 
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
@@ -71,6 +75,7 @@ describe('NewSearchPage', () => {
 
   it('should show spinner while loading view', () => {
     const { getByText } = render(<SimpleNewSearchPage />);
+    act(() => jest.advanceTimersByTime(200));
     expect(getByText('Loading...')).not.toBeNull();
   });
 

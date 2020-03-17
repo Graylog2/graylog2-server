@@ -12,19 +12,19 @@ describe('<Spinner />', () => {
   });
 
   it('should render without props', () => {
-    const { getByText } = render(<Spinner />);
+    const { getByText } = render(<Spinner delay={0} />);
     expect(getByText('Loading...')).not.toBeNull();
   });
 
   it('should render with a different text string', () => {
     const text = 'Hello world!';
-    const { getByText } = render(<Spinner text={text} />);
+    const { getByText } = render(<Spinner text={text} delay={0} />);
     expect(getByText(text)).not.toBeNull();
   });
 
   it('should not be visible initially', () => {
-    const { container } = render(<Spinner />);
-    expect(container.firstChild).toHaveStyle('visibility: hidden');
+    const { queryByText } = render(<Spinner />);
+    expect(queryByText('Loading ...')).toBeNull();
   });
 
   it('should be visible after when delay is completed', () => {
@@ -34,10 +34,5 @@ describe('<Spinner />', () => {
     });
 
     expect(container.firstChild).toHaveStyle('visibility: visible');
-  });
-
-  it('should forward additional props to its icon', () => {
-    const { getByTestId } = render(<Spinner data-testid="icon-test-id" />);
-    expect(getByTestId('icon-test-id')).not.toBeNull();
   });
 });

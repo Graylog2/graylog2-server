@@ -1,4 +1,5 @@
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 
 import { render, cleanup } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
@@ -53,6 +54,9 @@ jest.mock('views/stores/SearchLoadingStateStore', () => ({
 }));
 
 describe('SearchResult', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
   beforeEach(() => {
     cleanup();
     jest.clearAllMocks();
@@ -61,16 +65,19 @@ describe('SearchResult', () => {
   it('should show spinner while loading field types', () => {
     asMock(FieldTypesStore.getInitialState).mockReturnValueOnce(undefined);
     const { getByText } = render(<SearchResult />);
+    act(() => jest.advanceTimersByTime(200));
     expect(getByText('Loading...')).not.toBeNull();
   });
-  it('should show spinner when ther are no search results', () => {
+  it('should show spinner when there are no search results', () => {
     asMock(FieldTypesStore.getInitialState).mockReturnValueOnce(undefined);
     const { getByText } = render(<SearchResult />);
+    act(() => jest.advanceTimersByTime(200));
     expect(getByText('Loading...')).not.toBeNull();
   });
   it('should display loading indicator, when search is loading ', () => {
-    asMock(SearchLoadingStateStore.getInitialState).mockReturnValueOnce({ isLoading: true });
+    asMock(SearchLoadingStateStore.getInitialState).mockImplementation(() => ({ isLoading: true }));
     const { getByText } = render(<SearchResult />);
+    act(() => jest.advanceTimersByTime(500));
     expect(getByText('Updating search results...')).not.toBeNull();
   });
   it('should hide loading indicator, when search is not loading', () => {
