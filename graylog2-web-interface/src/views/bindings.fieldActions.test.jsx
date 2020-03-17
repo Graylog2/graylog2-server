@@ -48,6 +48,15 @@ describe('Views bindings field actions', () => {
       }))
         .toEqual(false);
     });
+    it('should be disabled when field analisys is disabled', () => {
+      expect(isEnabled({
+        ...defaultArguments,
+        field: 'something',
+        type: FieldTypes.STRING(),
+        contexts: { analysisDisabledFields: ['something'] },
+      }))
+        .toEqual(false);
+    });
   });
   describe('Statistics', () => {
     // $FlowFixMe: We are assuming here it is generally present
@@ -75,11 +84,12 @@ describe('Views bindings field actions', () => {
       }))
         .toEqual(true);
     });
-    it('should be disabled for decorated fields', () => {
+    it('should be disabled when field analisys is disabled', () => {
       expect(isEnabled({
         ...defaultArguments,
         field: 'something',
-        type: FieldType.create('string', [Properties.Decorated]),
+        type: FieldTypes.STRING(),
+        contexts: { analysisDisabledFields: ['something'] },
       }))
         .toEqual(false);
     });
@@ -118,6 +128,15 @@ describe('Views bindings field actions', () => {
       }))
         .toEqual(false);
     });
+    it('should be enabled when field analisys is disabled', () => {
+      expect(isEnabled({
+        ...defaultArguments,
+        field: 'something',
+        type: FieldTypes.STRING(),
+        contexts: { analysisDisabledFields: ['something'] },
+      }))
+        .toEqual(true);
+    });
   });
   describe('RemoveFromAllTables', () => {
     // $FlowFixMe: We are assuming here it is generally present
@@ -152,6 +171,15 @@ describe('Views bindings field actions', () => {
         type: FieldType.create('string', [Properties.Decorated]),
       }))
         .toEqual(false);
+    });
+    it('should be enabled when field analisys is disabled', () => {
+      expect(isEnabled({
+        ...defaultArguments,
+        field: 'something',
+        type: FieldTypes.STRING(),
+        contexts: { analysisDisabledFields: ['something'] },
+      }))
+        .toEqual(true);
     });
   });
 });
