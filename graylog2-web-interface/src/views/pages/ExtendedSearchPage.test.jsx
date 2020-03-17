@@ -65,6 +65,15 @@ jest.mock('views/stores/FieldTypesStore', () => ({
     })],
   ),
 }));
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: {
+    listen: () => jest.fn(),
+    getInitialState: () => ({
+      searchesClusterConfig: {},
+    }),
+  },
+  SearchConfigActions: {},
+}));
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
@@ -73,7 +82,6 @@ jest.mock('views/components/common/WindowLeaveMessage', () => mockComponent('Win
 jest.mock('views/components/WithSearchStatus', () => x => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
-jest.mock('views/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
 jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
 jest.mock('views/logic/withPluginEntities', () => x => x);
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
