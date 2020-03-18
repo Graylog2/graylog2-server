@@ -46,7 +46,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "Tabs-sc-1hzj2zf-0",
               "isStatic": false,
-              "lastClassName": "euCZaO",
+              "lastClassName": "bMePaf",
               "rules": Array [
                 [Function],
                 ";",
@@ -83,13 +83,13 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
       >
         <ForwardRef
           animation={false}
-          className="Tabs-sc-1hzj2zf-0 euCZaO"
+          className="Tabs-sc-1hzj2zf-0 bMePaf"
           defaultActiveKey={1}
           id="permissionSelectorTabs"
         >
           <Uncontrolled(Tabs)
             animation={false}
-            className="Tabs-sc-1hzj2zf-0 euCZaO"
+            className="Tabs-sc-1hzj2zf-0 bMePaf"
             defaultActiveKey={1}
             id="permissionSelectorTabs"
             innerRef={null}
@@ -99,7 +99,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
               animation={false}
               bsClass="tab"
               bsStyle="tabs"
-              className="Tabs-sc-1hzj2zf-0 euCZaO"
+              className="Tabs-sc-1hzj2zf-0 bMePaf"
               id="permissionSelectorTabs"
               mountOnEnter={false}
               onSelect={[Function]}
@@ -107,12 +107,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
             >
               <TabContainer
                 activeKey={1}
-                className="Tabs-sc-1hzj2zf-0 euCZaO"
+                className="Tabs-sc-1hzj2zf-0 bMePaf"
                 id="permissionSelectorTabs"
                 onSelect={[Function]}
               >
                 <div
-                  className="Tabs-sc-1hzj2zf-0 euCZaO"
+                  className="Tabs-sc-1hzj2zf-0 bMePaf"
                   id="permissionSelectorTabs"
                 >
                   <Nav
@@ -2964,7 +2964,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "Tabs-sc-1hzj2zf-0",
               "isStatic": false,
-              "lastClassName": "euCZaO",
+              "lastClassName": "bMePaf",
               "rules": Array [
                 [Function],
                 ";",
@@ -3001,13 +3001,13 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
       >
         <ForwardRef
           animation={false}
-          className="Tabs-sc-1hzj2zf-0 euCZaO"
+          className="Tabs-sc-1hzj2zf-0 bMePaf"
           defaultActiveKey={1}
           id="permissionSelectorTabs"
         >
           <Uncontrolled(Tabs)
             animation={false}
-            className="Tabs-sc-1hzj2zf-0 euCZaO"
+            className="Tabs-sc-1hzj2zf-0 bMePaf"
             defaultActiveKey={1}
             id="permissionSelectorTabs"
             innerRef={null}
@@ -3017,7 +3017,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
               animation={false}
               bsClass="tab"
               bsStyle="tabs"
-              className="Tabs-sc-1hzj2zf-0 euCZaO"
+              className="Tabs-sc-1hzj2zf-0 bMePaf"
               id="permissionSelectorTabs"
               mountOnEnter={false}
               onSelect={[Function]}
@@ -3025,12 +3025,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
             >
               <TabContainer
                 activeKey={1}
-                className="Tabs-sc-1hzj2zf-0 euCZaO"
+                className="Tabs-sc-1hzj2zf-0 bMePaf"
                 id="permissionSelectorTabs"
                 onSelect={[Function]}
               >
                 <div
-                  className="Tabs-sc-1hzj2zf-0 euCZaO"
+                  className="Tabs-sc-1hzj2zf-0 bMePaf"
                   id="permissionSelectorTabs"
                 >
                   <Nav
@@ -3929,12 +3929,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         block={false}
                                                                         bsClass="btn"
                                                                         bsStyle="info"
-                                                                        className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                                                                        className="Button__StyledButton-c9cbmb-0 feAZhf"
                                                                         disabled={false}
                                                                         onClick={[Function]}
                                                                       >
                                                                         <button
-                                                                          className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info active"
+                                                                          className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-info active"
                                                                           disabled={false}
                                                                           onClick={[Function]}
                                                                           type="button"
@@ -4330,12 +4330,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         block={false}
                                                                         bsClass="btn"
                                                                         bsStyle="info"
-                                                                        className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                                                                        className="Button__StyledButton-c9cbmb-0 feAZhf"
                                                                         disabled={false}
                                                                         onClick={[Function]}
                                                                       >
                                                                         <button
-                                                                          className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info active"
+                                                                          className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-info active"
                                                                           disabled={false}
                                                                           onClick={[Function]}
                                                                           type="button"
@@ -5595,12 +5595,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         block={false}
                                                                         bsClass="btn"
                                                                         bsStyle="info"
-                                                                        className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                                                                        className="Button__StyledButton-c9cbmb-0 feAZhf"
                                                                         disabled={false}
                                                                         onClick={[Function]}
                                                                       >
                                                                         <button
-                                                                          className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info active"
+                                                                          className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-info active"
                                                                           disabled={false}
                                                                           onClick={[Function]}
                                                                           type="button"

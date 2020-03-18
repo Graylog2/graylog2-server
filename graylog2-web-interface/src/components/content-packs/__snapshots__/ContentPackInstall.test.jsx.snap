@@ -664,7 +664,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -747,7 +747,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -977,7 +977,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "cAlWKw",
+                                                    "lastClassName": "feAZhf",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1001,12 +1001,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="info"
-                                                className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                                                className="Button__StyledButton-c9cbmb-0 feAZhf"
                                                 disabled={false}
                                                 onClick={[Function]}
                                               >
                                                 <button
-                                                  className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-xs btn-info"
+                                                  className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-xs btn-info"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   type="button"

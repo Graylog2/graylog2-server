@@ -77,7 +77,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
               </form>
             </div>
             <div
-              class="SavedSearchList__NoSavedSearches-sc-1r3qvm6-1 gmJDqJ Alert-sc-1yucn9g-0 gUqrlY alert alert-info"
+              class="SavedSearchList__NoSavedSearches-sc-1r3qvm6-1 gmJDqJ Alert-sc-1yucn9g-0 hgeIGJ alert alert-info"
               role="alert"
             >
               <i

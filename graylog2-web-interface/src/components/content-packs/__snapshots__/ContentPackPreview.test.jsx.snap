@@ -343,7 +343,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -426,7 +426,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -635,7 +635,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -718,7 +718,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -862,7 +862,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "cAlWKw",
+                        "lastClassName": "feAZhf",
                         "rules": Array [
                           [Function],
                         ],
@@ -942,7 +942,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "cAlWKw",
+                          "lastClassName": "feAZhf",
                           "rules": Array [
                             [Function],
                           ],
@@ -966,13 +966,13 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="info"
-                      className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                      className="Button__StyledButton-c9cbmb-0 feAZhf"
                       disabled={false}
                       id="download"
                       onClick={[Function]}
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info"
+                        className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-info"
                         disabled={false}
                         id="download"
                         onClick={[Function]}
@@ -1395,7 +1395,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1478,7 +1478,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1687,7 +1687,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1770,7 +1770,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "cAlWKw",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1914,7 +1914,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "cAlWKw",
+                        "lastClassName": "feAZhf",
                         "rules": Array [
                           [Function],
                         ],
@@ -1994,7 +1994,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "cAlWKw",
+                          "lastClassName": "feAZhf",
                           "rules": Array [
                             [Function],
                           ],
@@ -2018,13 +2018,13 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="info"
-                      className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                      className="Button__StyledButton-c9cbmb-0 feAZhf"
                       disabled={false}
                       id="download"
                       onClick={[Function]}
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info"
+                        className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-info"
                         disabled={false}
                         id="download"
                         onClick={[Function]}

@@ -221,7 +221,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "cAlWKw",
+                                        "lastClassName": "feAZhf",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -295,7 +295,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "cAlWKw",
+                                        "lastClassName": "feAZhf",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -319,12 +319,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 cAlWKw"
+                                    className="Button__StyledButton-c9cbmb-0 feAZhf"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-sm btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"

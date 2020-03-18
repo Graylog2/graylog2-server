@@ -42,7 +42,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               "componentStyle": ComponentStyle {
                 "componentId": "Button__StyledButton-c9cbmb-0",
                 "isStatic": false,
-                "lastClassName": "dRMLmK",
+                "lastClassName": "bnjehA",
                 "rules": Array [
                   [Function],
                 ],
@@ -66,13 +66,13 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
             block={false}
             bsClass="btn"
             bsStyle="success"
-            className="button Button__StyledButton-c9cbmb-0 dRMLmK"
+            className="button Button__StyledButton-c9cbmb-0 bnjehA"
             disabled={false}
             id="upload-content-pack-button"
             onClick={[Function]}
           >
             <button
-              className="button Button__StyledButton-c9cbmb-0 dRMLmK btn btn-success"
+              className="button Button__StyledButton-c9cbmb-0 bnjehA btn btn-success"
               disabled={false}
               id="upload-content-pack-button"
               onClick={[Function]}

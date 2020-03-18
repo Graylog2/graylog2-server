@@ -33,9 +33,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                   Object {
                     "color": Object {
                       "brand": Object {
-                        "primary": "#FF3633",
-                        "secondary": "#FFF",
-                        "tertiary": "#1F1F1F",
+                        "primary": "#ff3633",
+                        "secondary": "#fff",
+                        "tertiary": "#1f1f1f",
                       },
                       "global": Object {
                         "background": "#e8e8e8",
@@ -59,7 +59,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         "90": "#e8e8e8",
                       },
                       "variant": Object {
-                        "danger": "#AD0707",
+                        "danger": "#ad0707",
                         "dark": Object {
                           "danger": "#5a0404",
                           "default": "#000",
@@ -68,8 +68,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                           "success": "#005721",
                           "warning": "#a88b00",
                         },
-                        "default": "#1F1F1F",
-                        "info": "#0063BE",
+                        "default": "#1f1f1f",
+                        "info": "#0063be",
                         "light": Object {
                           "danger": "#f96464",
                           "default": "#737373",
@@ -79,8 +79,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                           "warning": "#fff0a8",
                         },
                         "primary": "#702785",
-                        "success": "#00AE42",
-                        "warning": "#FFD200",
+                        "success": "#00ae42",
+                        "warning": "#ffd200",
                       },
                     },
                     "mode": "teinte",
@@ -367,13 +367,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="button Button__StyledButton-c9cbmb-0 cAlWKw"
+                                    className="button Button__StyledButton-c9cbmb-0 feAZhf"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info"
+                                      className="button Button__StyledButton-c9cbmb-0 feAZhf btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -506,9 +506,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                   Object {
                     "color": Object {
                       "brand": Object {
-                        "primary": "#FF3633",
-                        "secondary": "#FFF",
-                        "tertiary": "#1F1F1F",
+                        "primary": "#ff3633",
+                        "secondary": "#fff",
+                        "tertiary": "#1f1f1f",
                       },
                       "global": Object {
                         "background": "#e8e8e8",
@@ -532,7 +532,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                         "90": "#e8e8e8",
                       },
                       "variant": Object {
-                        "danger": "#AD0707",
+                        "danger": "#ad0707",
                         "dark": Object {
                           "danger": "#5a0404",
                           "default": "#000",
@@ -541,8 +541,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                           "success": "#005721",
                           "warning": "#a88b00",
                         },
-                        "default": "#1F1F1F",
-                        "info": "#0063BE",
+                        "default": "#1f1f1f",
+                        "info": "#0063be",
                         "light": Object {
                           "danger": "#f96464",
                           "default": "#737373",
@@ -552,8 +552,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                           "warning": "#fff0a8",
                         },
                         "primary": "#702785",
-                        "success": "#00AE42",
-                        "warning": "#FFD200",
+                        "success": "#00ae42",
+                        "warning": "#ffd200",
                       },
                     },
                     "mode": "teinte",
@@ -917,13 +917,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="button Button__StyledButton-c9cbmb-0 cAlWKw"
+                                    className="button Button__StyledButton-c9cbmb-0 feAZhf"
                                     disabled={true}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info"
+                                      className="button Button__StyledButton-c9cbmb-0 feAZhf btn btn-info"
                                       disabled={true}
                                       onClick={[Function]}
                                       type="submit"
@@ -1056,9 +1056,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                   Object {
                     "color": Object {
                       "brand": Object {
-                        "primary": "#FF3633",
-                        "secondary": "#FFF",
-                        "tertiary": "#1F1F1F",
+                        "primary": "#ff3633",
+                        "secondary": "#fff",
+                        "tertiary": "#1f1f1f",
                       },
                       "global": Object {
                         "background": "#e8e8e8",
@@ -1082,7 +1082,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                         "90": "#e8e8e8",
                       },
                       "variant": Object {
-                        "danger": "#AD0707",
+                        "danger": "#ad0707",
                         "dark": Object {
                           "danger": "#5a0404",
                           "default": "#000",
@@ -1091,8 +1091,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                           "success": "#005721",
                           "warning": "#a88b00",
                         },
-                        "default": "#1F1F1F",
-                        "info": "#0063BE",
+                        "default": "#1f1f1f",
+                        "info": "#0063be",
                         "light": Object {
                           "danger": "#f96464",
                           "default": "#737373",
@@ -1102,8 +1102,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                           "warning": "#fff0a8",
                         },
                         "primary": "#702785",
-                        "success": "#00AE42",
-                        "warning": "#FFD200",
+                        "success": "#00ae42",
+                        "warning": "#ffd200",
                       },
                     },
                     "mode": "teinte",
@@ -1467,13 +1467,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="button Button__StyledButton-c9cbmb-0 cAlWKw"
+                                    className="button Button__StyledButton-c9cbmb-0 feAZhf"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 cAlWKw btn btn-info"
+                                      className="button Button__StyledButton-c9cbmb-0 feAZhf btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
