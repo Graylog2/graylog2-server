@@ -328,7 +328,6 @@ class Widget extends React.Component<Props, State> {
                                      onCancel={this._onToggleCopyToDashboard} />
                   )}
                   {showCsvExport && <CSVExportModal view={view} currentWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
-
                 </IfInteractive>
               </WidgetHeader>
             )}
