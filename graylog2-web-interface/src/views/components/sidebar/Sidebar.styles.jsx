@@ -1,5 +1,6 @@
 // @flow strict
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
+import { util, type ThemeInterface } from 'theme';
 import { Title as NavItemTitle } from './NavItem.styles';
 
 const sidebarWidth = {
@@ -7,14 +8,14 @@ const sidebarWidth = {
   closed: '100%', // width is defined in parent container
 };
 
-export const Container: StyledComponent<{ open: boolean }, {}, HTMLDivElement> = styled.div`
+export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   grid-row: 1;
   -ms-grid-row: 1;
   grid-column: 1;
   -ms-grid-column: 1;
-  background: #393939;
-  color: #9e9e9e;
-  height: 100%;
+  background: ${theme.color.gray[10]};
+  color: ${util.contrastingColor(theme.color.gray[10], 'AA')};
+  height: calc(100vh - 50px);
   padding-top: 20px;
   position: ${props => (props.open ? 'fixed' : 'static')};
   top: 50px;
@@ -23,7 +24,7 @@ export const Container: StyledComponent<{ open: boolean }, {}, HTMLDivElement> =
 
   /* z-index is needed for ie11 */
   z-index: ${props => (props.open ? 20 : 'auto')};
-`;
+`);
 
 export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   position: fixed;

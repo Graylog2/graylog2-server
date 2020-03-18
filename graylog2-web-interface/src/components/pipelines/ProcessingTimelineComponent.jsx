@@ -1,11 +1,12 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Button } from 'components/graylog';
+import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
 
+import { Alert, Button } from 'components/graylog';
 import { DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
@@ -17,6 +18,13 @@ import PipelineConnectionsList from './PipelineConnectionsList';
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 const { StreamsStore } = CombinedProvider.get('Streams');
+
+const StyledAlert = styled(Alert)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px;
+`;
 
 const ProcessingTimelineComponent = createReactClass({
   displayName: 'ProcessingTimelineComponent',
@@ -129,7 +137,7 @@ const ProcessingTimelineComponent = createReactClass({
     }
 
     const addNewPipelineButton = (
-      <div className="pull-right">
+      <div>
         <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
           <Button bsStyle="success">Add new pipeline</Button>
         </LinkContainer>
@@ -139,10 +147,11 @@ const ProcessingTimelineComponent = createReactClass({
     if (this.state.pipelines.length === 0) {
       return (
         <div>
-          {addNewPipelineButton}
-          <Alert>
-            There are no pipelines configured in your system. Create one to start processing your messages.
-          </Alert>
+          <StyledAlert>
+            <span>There are no pipelines configured in your system. Create one to start processing your messages.</span>
+
+            {addNewPipelineButton}
+          </StyledAlert>
         </div>
       );
     }

@@ -5,33 +5,33 @@ import { util } from 'theme';
 const menuItemStyles = css(({ theme }) => css`
   .dropdown-menu {
     > li > a {
-      color: ${theme.color.primary.tre};
+      color: ${theme.color.global.textDefault};
 
       :hover,
       :focus {
-        color: ${util.contrastingColor(theme.color.secondary.due)};
-        background-color: ${theme.color.secondary.due};
+        color: ${util.contrastingColor(theme.color.gray[90])};
+        background-color: ${theme.color.gray[90]};
       }
     }
 
     > .active > a {
-      background-color: ${theme.color.tertiary.due};
-      color: ${util.contrastingColor(theme.color.tertiary.due)};
+      color: ${util.contrastingColor(theme.color.variant.light.info)};
+      background-color: ${theme.color.variant.light.info};
 
       :hover,
       :focus {
-        background-color: ${theme.color.tertiary.uno};
-        color: ${util.contrastingColor(theme.color.tertiary.uno)};
+        color: ${util.contrastingColor(theme.color.variant.info)};
+        background-color: ${theme.color.variant.info};
       }
     }
 
     > .disabled > a {
-      color: ${util.contrastingColor(theme.color.primary.tre, 'AA')};
+      color: ${util.contrastingColor(theme.color.gray[90], 'AA')};
+      background-color: ${theme.color.gray[90]};
 
       :hover,
       :focus {
-        background-color: ${theme.color.secondary.due};
-        color: ${util.contrastingColor(theme.color.primary.tre, 'AAA')};
+        color: ${util.contrastingColor(theme.color.gray[90], 'AA')};
       }
     }
   }

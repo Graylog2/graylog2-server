@@ -1,34 +1,35 @@
-import { memo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { FormControl as BootstrapFormControl } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { lighten, transparentize } from 'polished';
+import { transparentize } from 'polished';
 
-const FormControl = memo(styled(BootstrapFormControl)(({ theme }) => css`
-  color: ${theme.color.primary.tre};
-  background-color: ${theme.color.primary.due};
-  border-color: ${theme.color.secondary.tre};
+const FormControl = styled(BootstrapFormControl)(({ theme }) => {
+  return css`
+    color: ${theme.color.global.textDefault};
+    background-color: ${theme.color.global.contentBackground};
+    border-color: ${theme.color.gray[80]};
 
-  &::placeholder {
-    color: ${lighten(0.6, theme.color.primary.tre)};
-  }
+    &::placeholder {
+      color: ${theme.color.gray[60]};
+    }
 
-  &:focus {
-    border-color: ${theme.color.tertiary.due};
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
-      0 0 8px ${transparentize(0.6, theme.color.tertiary.due)};
-  }
+    &:focus {
+      border-color: ${theme.color.variant.light.info};
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+        0 0 8px ${transparentize(0.6, theme.color.variant.light.info)};
+    }
 
-  &[disabled],
-  &[readonly],
-  fieldset[disabled] & {
-    background-color: ${theme.color.secondary.tre};
-  }
+    &[disabled],
+    &[readonly],
+    fieldset[disabled] & {
+      background-color: ${theme.color.gray[80]};
+    }
 
-  ~ .form-control-feedback.glyphicon {
-    display: none;
-  }
-`));
+    ~ .form-control-feedback.glyphicon {
+      display: none;
+    }
+  `;
+});
 
 FormControl.Static = BootstrapFormControl.Static;
 FormControl.Feedback = BootstrapFormControl.Feedback;

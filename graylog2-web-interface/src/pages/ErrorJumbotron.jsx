@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'components/graylog';
-import { StyledJumbotron } from 'components/graylog/Jumbotron';
 import styled, { createGlobalStyle, css } from 'styled-components';
-import { rgba } from 'polished';
+import { transparentize } from 'polished';
 
+import { Col, Jumbotron, Row } from 'components/graylog';
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 
 const GlobalStyle = createGlobalStyle`
@@ -18,8 +17,8 @@ const ContainerRow = styled(Row)`
   height: 82vh;
 `;
 
-const StyledErrorJumbotron = styled(StyledJumbotron)(({ theme }) => css`
-  background-color: ${rgba(theme.color.primary.due, 0.8)};
+const StyledErrorJumbotron = styled(Jumbotron)(({ theme }) => css`
+  background-color: ${transparentize(0.2, theme.color.global.contentBackground)};
   text-align: center;
 `);
 

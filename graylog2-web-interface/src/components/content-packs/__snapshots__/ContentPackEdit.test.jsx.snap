@@ -148,7 +148,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Nav-dzawzr-0",
                         "isStatic": false,
-                        "lastClassName": "hlreIC",
+                        "lastClassName": "dCRNtw",
                         "rules": Array [
                           [Function],
                         ],
@@ -172,7 +172,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     activeKey="selection"
                     bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 hlreIC"
+                    className="Nav-dzawzr-0 dCRNtw"
                     justified={false}
                     onSelect={[Function]}
                     pullLeft={false}
@@ -180,7 +180,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     stacked={true}
                   >
                     <ul
-                      className="Nav-dzawzr-0 hlreIC nav nav-pills nav-stacked"
+                      className="Nav-dzawzr-0 dCRNtw nav nav-pills nav-stacked"
                       role={null}
                     >
                       <NavItem
@@ -305,7 +305,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                         disabled={true}
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="small"
                           bsStyle="info"
                           disabled={true}
@@ -334,17 +334,17 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "gZfKUo",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -360,12 +360,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button-c9cbmb-0 gZfKUo"
+                              className="Button__StyledButton-c9cbmb-0 feAZhf"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -374,7 +374,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </div>
                   </Col>
@@ -393,7 +393,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                         disabled={true}
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="small"
                           bsStyle="info"
                           disabled={true}
@@ -422,17 +422,17 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "gZfKUo",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -448,12 +448,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button-c9cbmb-0 gZfKUo"
+                              className="Button__StyledButton-c9cbmb-0 feAZhf"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -462,7 +462,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </div>
                   </Col>
@@ -598,7 +598,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -617,11 +617,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="name"
                                                 >
                                                   Name
@@ -658,7 +658,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -686,7 +686,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -699,7 +699,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -722,7 +722,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -741,10 +741,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Give a descriptive name for this content pack.
                                                     </span>
@@ -832,7 +832,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -851,11 +851,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="summary"
                                                 >
                                                   Summary
@@ -892,7 +892,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -920,7 +920,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -933,7 +933,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -956,7 +956,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -975,10 +975,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Give a short summary of the content pack.
                                                     </span>
@@ -1065,7 +1065,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1084,11 +1084,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="description"
                                                 >
                                                   Description
@@ -1124,7 +1124,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1151,7 +1151,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -1163,7 +1163,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -1185,7 +1185,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1204,10 +1204,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Give a long description of the content pack in markdown.
                                                     </span>
@@ -1295,7 +1295,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1314,11 +1314,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="vendor"
                                                 >
                                                   Vendor
@@ -1355,7 +1355,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1383,7 +1383,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -1396,7 +1396,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -1419,7 +1419,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1438,10 +1438,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                                     </span>
@@ -1528,7 +1528,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1547,11 +1547,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="url"
                                                 >
                                                   URL
@@ -1587,7 +1587,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1614,7 +1614,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -1626,7 +1626,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -1648,7 +1648,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1667,10 +1667,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Where can I find the content pack. e.g. github url
                                                     </span>
@@ -1794,7 +1794,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     disabled={false}
                                     type="submit"
                                   >
-                                    <Button
+                                    <Button__StyledButton
                                       bsStyle="default"
                                       className="submit-button"
                                       disabled={false}
@@ -1823,17 +1823,17 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             ],
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
-                                              "componentId": "Button-c9cbmb-0",
+                                              "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iKWoaE",
+                                              "lastClassName": "kojzoH",
                                               "rules": Array [
                                                 [Function],
                                               ],
                                             },
-                                            "displayName": "Button",
+                                            "displayName": "Button__StyledButton",
                                             "foldedComponentIds": Array [],
                                             "render": [Function],
-                                            "styledComponentId": "Button-c9cbmb-0",
+                                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                             "target": [Function],
                                             "toString": [Function],
                                             "warnTooManyClasses": [Function],
@@ -1848,12 +1848,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="submit-button Button-c9cbmb-0 iKWoaE"
+                                          className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                            className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -1861,7 +1861,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           </button>
                                         </Button>
                                       </StyledComponent>
-                                    </Button>
+                                    </Button__StyledButton>
                                   </ForwardRef>
                                 </div>
                                 <div
@@ -1878,7 +1878,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     onClick={[Function]}
                                     type="reset"
                                   >
-                                    <Button
+                                    <Button__StyledButton
                                       bsStyle="default"
                                       className="reset-button"
                                       onClick={[Function]}
@@ -1906,17 +1906,17 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             ],
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
-                                              "componentId": "Button-c9cbmb-0",
+                                              "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iKWoaE",
+                                              "lastClassName": "kojzoH",
                                               "rules": Array [
                                                 [Function],
                                               ],
                                             },
-                                            "displayName": "Button",
+                                            "displayName": "Button__StyledButton",
                                             "foldedComponentIds": Array [],
                                             "render": [Function],
-                                            "styledComponentId": "Button-c9cbmb-0",
+                                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                             "target": [Function],
                                             "toString": [Function],
                                             "warnTooManyClasses": [Function],
@@ -1932,13 +1932,13 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="reset-button Button-c9cbmb-0 iKWoaE"
+                                          className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                            className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -1947,7 +1947,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           </button>
                                         </Button>
                                       </StyledComponent>
-                                    </Button>
+                                    </Button__StyledButton>
                                   </ForwardRef>
                                 </div>
                               </form>
@@ -2459,7 +2459,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Nav-dzawzr-0",
                         "isStatic": false,
-                        "lastClassName": "hlreIC",
+                        "lastClassName": "dCRNtw",
                         "rules": Array [
                           [Function],
                         ],
@@ -2483,7 +2483,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     activeKey="selection"
                     bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 hlreIC"
+                    className="Nav-dzawzr-0 dCRNtw"
                     justified={false}
                     onSelect={[Function]}
                     pullLeft={false}
@@ -2491,7 +2491,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     stacked={true}
                   >
                     <ul
-                      className="Nav-dzawzr-0 hlreIC nav nav-pills nav-stacked"
+                      className="Nav-dzawzr-0 dCRNtw nav nav-pills nav-stacked"
                       role={null}
                     >
                       <NavItem
@@ -2610,7 +2610,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                         disabled={true}
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="small"
                           bsStyle="info"
                           disabled={true}
@@ -2639,17 +2639,17 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "gZfKUo",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -2665,12 +2665,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button-c9cbmb-0 gZfKUo"
+                              className="Button__StyledButton-c9cbmb-0 feAZhf"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -2679,7 +2679,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </div>
                   </Col>
@@ -2698,7 +2698,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                         disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="small"
                           bsStyle="info"
                           disabled={false}
@@ -2727,17 +2727,17 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "gZfKUo",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -2753,12 +2753,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button-c9cbmb-0 gZfKUo"
+                              className="Button__StyledButton-c9cbmb-0 feAZhf"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -2767,7 +2767,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </div>
                   </Col>
@@ -2944,7 +2944,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -2963,11 +2963,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="name"
                                                 >
                                                   Name
@@ -3004,7 +3004,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3032,7 +3032,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -3045,7 +3045,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Content Pack the movie"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -3068,7 +3068,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3087,10 +3087,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Give a descriptive name for this content pack.
                                                     </span>
@@ -3178,7 +3178,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -3197,11 +3197,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="summary"
                                                 >
                                                   Summary
@@ -3238,7 +3238,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3266,7 +3266,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -3279,7 +3279,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="A old content pack"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -3302,7 +3302,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3321,10 +3321,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Give a short summary of the content pack.
                                                     </span>
@@ -3411,7 +3411,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -3430,11 +3430,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="description"
                                                 >
                                                   Description
@@ -3470,7 +3470,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3497,7 +3497,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -3509,7 +3509,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="## No one dares"
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -3531,7 +3531,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3550,10 +3550,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Give a long description of the content pack in markdown.
                                                     </span>
@@ -3641,7 +3641,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -3660,11 +3660,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="vendor"
                                                 >
                                                   Vendor
@@ -3701,7 +3701,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3729,7 +3729,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -3742,7 +3742,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Beinstein"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -3765,7 +3765,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3784,10 +3784,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                                     </span>
@@ -3874,7 +3874,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "iZJNbd",
+                                                    "lastClassName": "hCskeX",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -3893,11 +3893,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                                                   htmlFor="url"
                                                 >
                                                   URL
@@ -3933,7 +3933,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eOArng",
+                                                        "lastClassName": "igyPGR",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3960,7 +3960,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 eOArng"
+                                                    className="FormControl-sc-1amoaox-0 igyPGR"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -3972,7 +3972,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="http://beinstein.com"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 eOArng form-control"
+                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -3994,7 +3994,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "huFHQV",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -4013,10 +4013,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 huFHQV"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Where can I find the content pack. e.g. github url
                                                     </span>
@@ -4140,7 +4140,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     disabled={false}
                                     type="submit"
                                   >
-                                    <Button
+                                    <Button__StyledButton
                                       bsStyle="default"
                                       className="submit-button"
                                       disabled={false}
@@ -4169,17 +4169,17 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             ],
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
-                                              "componentId": "Button-c9cbmb-0",
+                                              "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iKWoaE",
+                                              "lastClassName": "kojzoH",
                                               "rules": Array [
                                                 [Function],
                                               ],
                                             },
-                                            "displayName": "Button",
+                                            "displayName": "Button__StyledButton",
                                             "foldedComponentIds": Array [],
                                             "render": [Function],
-                                            "styledComponentId": "Button-c9cbmb-0",
+                                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                             "target": [Function],
                                             "toString": [Function],
                                             "warnTooManyClasses": [Function],
@@ -4194,12 +4194,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="submit-button Button-c9cbmb-0 iKWoaE"
+                                          className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                            className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -4207,7 +4207,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           </button>
                                         </Button>
                                       </StyledComponent>
-                                    </Button>
+                                    </Button__StyledButton>
                                   </ForwardRef>
                                 </div>
                                 <div
@@ -4224,7 +4224,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     onClick={[Function]}
                                     type="reset"
                                   >
-                                    <Button
+                                    <Button__StyledButton
                                       bsStyle="default"
                                       className="reset-button"
                                       onClick={[Function]}
@@ -4252,17 +4252,17 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             ],
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
-                                              "componentId": "Button-c9cbmb-0",
+                                              "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iKWoaE",
+                                              "lastClassName": "kojzoH",
                                               "rules": Array [
                                                 [Function],
                                               ],
                                             },
-                                            "displayName": "Button",
+                                            "displayName": "Button__StyledButton",
                                             "foldedComponentIds": Array [],
                                             "render": [Function],
-                                            "styledComponentId": "Button-c9cbmb-0",
+                                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                             "target": [Function],
                                             "toString": [Function],
                                             "warnTooManyClasses": [Function],
@@ -4278,13 +4278,13 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="reset-button Button-c9cbmb-0 iKWoaE"
+                                          className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                            className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -4293,7 +4293,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           </button>
                                         </Button>
                                       </StyledComponent>
-                                    </Button>
+                                    </Button__StyledButton>
                                   </ForwardRef>
                                 </div>
                               </form>
@@ -4599,7 +4599,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Well-sc-19gs1oc-0",
                                             "isStatic": false,
-                                            "lastClassName": "kezSPd",
+                                            "lastClassName": "hnzchw",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -4618,10 +4618,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     >
                                       <Well
                                         bsClass="well"
-                                        className="Well-sc-19gs1oc-0 kezSPd"
+                                        className="Well-sc-19gs1oc-0 hnzchw"
                                       >
                                         <div
-                                          className="Well-sc-19gs1oc-0 kezSPd well"
+                                          className="Well-sc-19gs1oc-0 hnzchw well"
                                         >
                                           <div
                                             dangerouslySetInnerHTML={

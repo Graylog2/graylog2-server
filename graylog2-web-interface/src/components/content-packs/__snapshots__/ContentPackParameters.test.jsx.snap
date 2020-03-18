@@ -143,7 +143,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   onClick={[Function]}
                   title="Edit Modal"
                 >
-                  <Button
+                  <Button__StyledButton
                     bsSize="small"
                     bsStyle="info"
                     onClick={[Function]}
@@ -171,17 +171,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           ],
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
-                            "componentId": "Button-c9cbmb-0",
+                            "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "gZfKUo",
+                            "lastClassName": "feAZhf",
                             "rules": Array [
                               [Function],
                             ],
                           },
-                          "displayName": "Button",
+                          "displayName": "Button__StyledButton",
                           "foldedComponentIds": Array [],
                           "render": [Function],
-                          "styledComponentId": "Button-c9cbmb-0",
+                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                           "target": [Function],
                           "toString": [Function],
                           "warnTooManyClasses": [Function],
@@ -198,13 +198,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         bsClass="btn"
                         bsSize="small"
                         bsStyle="info"
-                        className="Button-c9cbmb-0 gZfKUo"
+                        className="Button__StyledButton-c9cbmb-0 feAZhf"
                         disabled={false}
                         onClick={[Function]}
                         title="Edit Modal"
                       >
                         <button
-                          className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                          className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
                           disabled={false}
                           onClick={[Function]}
                           title="Edit Modal"
@@ -214,7 +214,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         </button>
                       </Button>
                     </StyledComponent>
-                  </Button>
+                  </Button__StyledButton>
                 </ForwardRef>
                 <BootstrapModalWrapper
                   backdrop="static"
@@ -251,7 +251,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Modal-nuree8-0",
                             "isStatic": false,
-                            "lastClassName": "bmCcvm",
+                            "lastClassName": "fWOZMp",
                             "rules": Array [
                               [Function],
                             ],
@@ -276,7 +276,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         backdrop="static"
                         bsClass="modal"
                         bsSize="large"
-                        className="Modal-nuree8-0 bmCcvm"
+                        className="Modal-nuree8-0 fWOZMp"
                         dialogComponentClass={[Function]}
                         enforceFocus={true}
                         keyboard={true}
@@ -397,7 +397,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           disabled={false}
                           type="submit"
                         >
-                          <Button
+                          <Button__StyledButton
                             bsStyle="default"
                             className="submit-button"
                             disabled={false}
@@ -426,17 +426,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   ],
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "Button-c9cbmb-0",
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
                                   },
-                                  "displayName": "Button",
+                                  "displayName": "Button__StyledButton",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "Button-c9cbmb-0",
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                   "target": [Function],
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -451,12 +451,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -464,7 +464,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 </button>
                               </Button>
                             </StyledComponent>
-                          </Button>
+                          </Button__StyledButton>
                         </ForwardRef>
                       </div>
                       <div
@@ -481,7 +481,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           onClick={[Function]}
                           type="reset"
                         >
-                          <Button
+                          <Button__StyledButton
                             bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
@@ -509,17 +509,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   ],
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "Button-c9cbmb-0",
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
                                   },
-                                  "displayName": "Button",
+                                  "displayName": "Button__StyledButton",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "Button-c9cbmb-0",
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                   "target": [Function],
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -535,13 +535,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -550,7 +550,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 </button>
                               </Button>
                             </StyledComponent>
-                          </Button>
+                          </Button__StyledButton>
                         </ForwardRef>
                       </div>
                     </form>
@@ -791,7 +791,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                           onClick={[Function]}
                                           title="Delete Parameter"
                                         >
-                                          <Button
+                                          <Button__StyledButton
                                             bsSize="xs"
                                             bsStyle="primary"
                                             disabled={false}
@@ -821,17 +821,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   ],
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
-                                                    "componentId": "Button-c9cbmb-0",
+                                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "ghlLDE",
+                                                    "lastClassName": "feAZhf",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
                                                   },
-                                                  "displayName": "Button",
+                                                  "displayName": "Button__StyledButton",
                                                   "foldedComponentIds": Array [],
                                                   "render": [Function],
-                                                  "styledComponentId": "Button-c9cbmb-0",
+                                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                                   "target": [Function],
                                                   "toString": [Function],
                                                   "warnTooManyClasses": [Function],
@@ -848,13 +848,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="primary"
-                                                className="Button-c9cbmb-0 ghlLDE"
+                                                className="Button__StyledButton-c9cbmb-0 dYxYaY"
                                                 disabled={false}
                                                 onClick={[Function]}
                                                 title="Delete Parameter"
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                                  className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-xs btn-primary"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   title="Delete Parameter"
@@ -864,7 +864,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 </button>
                                               </Button>
                                             </StyledComponent>
-                                          </Button>
+                                          </Button__StyledButton>
                                         </ForwardRef>
                                         <ForwardRef
                                           bsSize="xsmall"
@@ -872,7 +872,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                           onClick={[Function]}
                                           title="Edit Modal"
                                         >
-                                          <Button
+                                          <Button__StyledButton
                                             bsSize="xsmall"
                                             bsStyle="info"
                                             onClick={[Function]}
@@ -900,17 +900,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   ],
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
-                                                    "componentId": "Button-c9cbmb-0",
+                                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "gZfKUo",
+                                                    "lastClassName": "feAZhf",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
                                                   },
-                                                  "displayName": "Button",
+                                                  "displayName": "Button__StyledButton",
                                                   "foldedComponentIds": Array [],
                                                   "render": [Function],
-                                                  "styledComponentId": "Button-c9cbmb-0",
+                                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                                   "target": [Function],
                                                   "toString": [Function],
                                                   "warnTooManyClasses": [Function],
@@ -927,13 +927,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xsmall"
                                                 bsStyle="info"
-                                                className="Button-c9cbmb-0 gZfKUo"
+                                                className="Button__StyledButton-c9cbmb-0 feAZhf"
                                                 disabled={false}
                                                 onClick={[Function]}
                                                 title="Edit Modal"
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 gZfKUo btn btn-xs btn-info"
+                                                  className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-xs btn-info"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   title="Edit Modal"
@@ -943,7 +943,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 </button>
                                               </Button>
                                             </StyledComponent>
-                                          </Button>
+                                          </Button__StyledButton>
                                         </ForwardRef>
                                         <BootstrapModalWrapper
                                           backdrop="static"
@@ -980,7 +980,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Modal-nuree8-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "bmCcvm",
+                                                    "lastClassName": "fWOZMp",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1005,7 +1005,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 backdrop="static"
                                                 bsClass="modal"
                                                 bsSize="large"
-                                                className="Modal-nuree8-0 bmCcvm"
+                                                className="Modal-nuree8-0 fWOZMp"
                                                 dialogComponentClass={[Function]}
                                                 enforceFocus={true}
                                                 keyboard={true}
@@ -1117,7 +1117,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Modal-nuree8-0",
                           "isStatic": false,
-                          "lastClassName": "bmCcvm",
+                          "lastClassName": "fWOZMp",
                           "rules": Array [
                             [Function],
                           ],
@@ -1141,7 +1141,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       autoFocus={true}
                       backdrop="static"
                       bsClass="modal"
-                      className="Modal-nuree8-0 bmCcvm"
+                      className="Modal-nuree8-0 fWOZMp"
                       dialogComponentClass={[Function]}
                       enforceFocus={true}
                       keyboard={true}
@@ -1342,7 +1342,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           disabled={false}
                           type="submit"
                         >
-                          <Button
+                          <Button__StyledButton
                             bsStyle="default"
                             className="submit-button"
                             disabled={false}
@@ -1371,17 +1371,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   ],
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "Button-c9cbmb-0",
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
                                   },
-                                  "displayName": "Button",
+                                  "displayName": "Button__StyledButton",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "Button-c9cbmb-0",
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                   "target": [Function],
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -1396,12 +1396,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -1409,7 +1409,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 </button>
                               </Button>
                             </StyledComponent>
-                          </Button>
+                          </Button__StyledButton>
                         </ForwardRef>
                       </div>
                       <div
@@ -1426,7 +1426,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           onClick={[Function]}
                           type="reset"
                         >
-                          <Button
+                          <Button__StyledButton
                             bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
@@ -1454,17 +1454,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   ],
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "Button-c9cbmb-0",
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "feAZhf",
                                     "rules": Array [
                                       [Function],
                                     ],
                                   },
-                                  "displayName": "Button",
+                                  "displayName": "Button__StyledButton",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "Button-c9cbmb-0",
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                   "target": [Function],
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -1480,13 +1480,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -1495,7 +1495,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 </button>
                               </Button>
                             </StyledComponent>
-                          </Button>
+                          </Button__StyledButton>
                         </ForwardRef>
                       </div>
                     </form>
@@ -1723,7 +1723,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                           disabled={false}
                                           onClick={[Function]}
                                         >
-                                          <Button
+                                          <Button__StyledButton
                                             bsSize="xs"
                                             bsStyle="primary"
                                             disabled={false}
@@ -1752,17 +1752,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   ],
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
-                                                    "componentId": "Button-c9cbmb-0",
+                                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "ghlLDE",
+                                                    "lastClassName": "feAZhf",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
                                                   },
-                                                  "displayName": "Button",
+                                                  "displayName": "Button__StyledButton",
                                                   "foldedComponentIds": Array [],
                                                   "render": [Function],
-                                                  "styledComponentId": "Button-c9cbmb-0",
+                                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                                   "target": [Function],
                                                   "toString": [Function],
                                                   "warnTooManyClasses": [Function],
@@ -1778,12 +1778,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="primary"
-                                                className="Button-c9cbmb-0 ghlLDE"
+                                                className="Button__StyledButton-c9cbmb-0 dYxYaY"
                                                 disabled={false}
                                                 onClick={[Function]}
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                                  className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-xs btn-primary"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   type="button"
@@ -1792,14 +1792,14 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 </button>
                                               </Button>
                                             </StyledComponent>
-                                          </Button>
+                                          </Button__StyledButton>
                                         </ForwardRef>
                                         <ForwardRef
                                           bsSize="xs"
                                           bsStyle="info"
                                           onClick={[Function]}
                                         >
-                                          <Button
+                                          <Button__StyledButton
                                             bsSize="xs"
                                             bsStyle="info"
                                             onClick={[Function]}
@@ -1826,17 +1826,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   ],
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
-                                                    "componentId": "Button-c9cbmb-0",
+                                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "gZfKUo",
+                                                    "lastClassName": "feAZhf",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
                                                   },
-                                                  "displayName": "Button",
+                                                  "displayName": "Button__StyledButton",
                                                   "foldedComponentIds": Array [],
                                                   "render": [Function],
-                                                  "styledComponentId": "Button-c9cbmb-0",
+                                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                                   "target": [Function],
                                                   "toString": [Function],
                                                   "warnTooManyClasses": [Function],
@@ -1852,12 +1852,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="info"
-                                                className="Button-c9cbmb-0 gZfKUo"
+                                                className="Button__StyledButton-c9cbmb-0 feAZhf"
                                                 disabled={false}
                                                 onClick={[Function]}
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 gZfKUo btn btn-xs btn-info"
+                                                  className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-xs btn-info"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   type="button"
@@ -1866,7 +1866,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 </button>
                                               </Button>
                                             </StyledComponent>
-                                          </Button>
+                                          </Button__StyledButton>
                                         </ForwardRef>
                                       </div>
                                     </ButtonToolbar>
@@ -1906,7 +1906,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "bmCcvm",
+                                              "lastClassName": "fWOZMp",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1931,7 +1931,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 bmCcvm"
+                                          className="Modal-nuree8-0 fWOZMp"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -2020,7 +2020,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "bmCcvm",
+                                              "lastClassName": "fWOZMp",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2045,7 +2045,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 bmCcvm"
+                                          className="Modal-nuree8-0 fWOZMp"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -2169,7 +2169,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   onClick={[Function]}
                   title="Edit Modal"
                 >
-                  <Button
+                  <Button__StyledButton
                     bsSize="small"
                     bsStyle="info"
                     onClick={[Function]}
@@ -2197,17 +2197,17 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           ],
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
-                            "componentId": "Button-c9cbmb-0",
+                            "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "gZfKUo",
+                            "lastClassName": "kojzoH",
                             "rules": Array [
                               [Function],
                             ],
                           },
-                          "displayName": "Button",
+                          "displayName": "Button__StyledButton",
                           "foldedComponentIds": Array [],
                           "render": [Function],
-                          "styledComponentId": "Button-c9cbmb-0",
+                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                           "target": [Function],
                           "toString": [Function],
                           "warnTooManyClasses": [Function],
@@ -2224,13 +2224,13 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         bsClass="btn"
                         bsSize="small"
                         bsStyle="info"
-                        className="Button-c9cbmb-0 gZfKUo"
+                        className="Button__StyledButton-c9cbmb-0 feAZhf"
                         disabled={false}
                         onClick={[Function]}
                         title="Edit Modal"
                       >
                         <button
-                          className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                          className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
                           disabled={false}
                           onClick={[Function]}
                           title="Edit Modal"
@@ -2240,7 +2240,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         </button>
                       </Button>
                     </StyledComponent>
-                  </Button>
+                  </Button__StyledButton>
                 </ForwardRef>
                 <BootstrapModalWrapper
                   backdrop="static"
@@ -2277,7 +2277,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Modal-nuree8-0",
                             "isStatic": false,
-                            "lastClassName": "bmCcvm",
+                            "lastClassName": "fWOZMp",
                             "rules": Array [
                               [Function],
                             ],
@@ -2302,7 +2302,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         backdrop="static"
                         bsClass="modal"
                         bsSize="large"
-                        className="Modal-nuree8-0 bmCcvm"
+                        className="Modal-nuree8-0 fWOZMp"
                         dialogComponentClass={[Function]}
                         enforceFocus={true}
                         keyboard={true}
@@ -2423,7 +2423,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           disabled={false}
                           type="submit"
                         >
-                          <Button
+                          <Button__StyledButton
                             bsStyle="default"
                             className="submit-button"
                             disabled={false}
@@ -2452,17 +2452,17 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                   ],
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "Button-c9cbmb-0",
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "kojzoH",
                                     "rules": Array [
                                       [Function],
                                     ],
                                   },
-                                  "displayName": "Button",
+                                  "displayName": "Button__StyledButton",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "Button-c9cbmb-0",
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                   "target": [Function],
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -2477,12 +2477,12 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -2490,7 +2490,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 </button>
                               </Button>
                             </StyledComponent>
-                          </Button>
+                          </Button__StyledButton>
                         </ForwardRef>
                       </div>
                       <div
@@ -2507,7 +2507,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           onClick={[Function]}
                           type="reset"
                         >
-                          <Button
+                          <Button__StyledButton
                             bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
@@ -2535,17 +2535,17 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                   ],
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "Button-c9cbmb-0",
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "kojzoH",
                                     "rules": Array [
                                       [Function],
                                     ],
                                   },
-                                  "displayName": "Button",
+                                  "displayName": "Button__StyledButton",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "Button-c9cbmb-0",
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                   "target": [Function],
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -2561,13 +2561,13 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -2576,7 +2576,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 </button>
                               </Button>
                             </StyledComponent>
-                          </Button>
+                          </Button__StyledButton>
                         </ForwardRef>
                       </div>
                     </form>
@@ -2674,7 +2674,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Modal-nuree8-0",
                           "isStatic": false,
-                          "lastClassName": "bmCcvm",
+                          "lastClassName": "fWOZMp",
                           "rules": Array [
                             [Function],
                           ],
@@ -2698,7 +2698,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                       autoFocus={true}
                       backdrop="static"
                       bsClass="modal"
-                      className="Modal-nuree8-0 bmCcvm"
+                      className="Modal-nuree8-0 fWOZMp"
                       dialogComponentClass={[Function]}
                       enforceFocus={true}
                       keyboard={true}
@@ -2853,7 +2853,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           disabled={false}
                           type="submit"
                         >
-                          <Button
+                          <Button__StyledButton
                             bsStyle="default"
                             className="submit-button"
                             disabled={false}
@@ -2882,17 +2882,17 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                   ],
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "Button-c9cbmb-0",
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "kojzoH",
                                     "rules": Array [
                                       [Function],
                                     ],
                                   },
-                                  "displayName": "Button",
+                                  "displayName": "Button__StyledButton",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "Button-c9cbmb-0",
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                   "target": [Function],
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -2907,12 +2907,12 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -2920,7 +2920,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 </button>
                               </Button>
                             </StyledComponent>
-                          </Button>
+                          </Button__StyledButton>
                         </ForwardRef>
                       </div>
                       <div
@@ -2937,7 +2937,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           onClick={[Function]}
                           type="reset"
                         >
-                          <Button
+                          <Button__StyledButton
                             bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
@@ -2965,17 +2965,17 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                   ],
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "Button-c9cbmb-0",
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "kojzoH",
                                     "rules": Array [
                                       [Function],
                                     ],
                                   },
-                                  "displayName": "Button",
+                                  "displayName": "Button__StyledButton",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "Button-c9cbmb-0",
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                   "target": [Function],
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -2991,13 +2991,13 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -3006,7 +3006,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 </button>
                               </Button>
                             </StyledComponent>
-                          </Button>
+                          </Button__StyledButton>
                         </ForwardRef>
                       </div>
                     </form>

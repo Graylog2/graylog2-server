@@ -1,6 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import styled, { css } from 'styled-components';
 
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -15,6 +16,14 @@ import CombinedProvider from 'injection/CombinedProvider';
 import RuleHelperStyle from './RuleHelper.css';
 
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
+
+const TabWrap = styled(Tab)(({ theme }) => css`
+  background-color: ${theme.color.global.contentBackground};
+  border: 1px solid ${theme.color.variant.info};
+  border-top: 0;
+  border-radius: 0 0 4px 4px;
+  padding: 9px;
+`);
 
 const RuleHelper = createReactClass({
   displayName: 'RuleHelper',
@@ -174,7 +183,7 @@ end`,
         <Row className="row-sm">
           <Col md={12}>
             <Tabs id="functionsHelper" defaultActiveKey={1} animation={false}>
-              <Tab eventKey={1} title="Functions">
+              <TabWrap eventKey={1} title="Functions">
                 <Row>
                   <Col sm={12}>
                     <p className={RuleHelperStyle.marginTab}>
@@ -209,15 +218,15 @@ end`,
                     </div>
                   </Col>
                 </Row>
-              </Tab>
-              <Tab eventKey={2} title="Example">
+              </TabWrap>
+              <TabWrap eventKey={2} title="Example">
                 <p className={RuleHelperStyle.marginTab}>
                   Do you want to see how a pipeline rule looks like? Take a look at this example:
                 </p>
                 <pre className={`${RuleHelperStyle.marginTab} ${RuleHelperStyle.exampleFunction}`}>
                   {this.ruleTemplate}
                 </pre>
-              </Tab>
+              </TabWrap>
             </Tabs>
           </Col>
         </Row>

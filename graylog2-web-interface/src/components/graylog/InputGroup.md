@@ -1,10 +1,13 @@
 ```js
 import { FormControl, FormGroup, InputGroup, Button, DropdownButton, MenuItem } from 'components/graylog';
 import Icon from 'components/common/Icon';
+
 class FormExample extends React.Component {
   constructor(props, context) {
     super(props, context);
+
     this.handleChange = this.handleChange.bind(this);
+
     this.state = {
       value: ''
     };
@@ -40,6 +43,7 @@ class FormExample extends React.Component {
             <InputGroup.Addon>.00</InputGroup.Addon>
           </InputGroup>
         </FormGroup>
+
         <FormGroup>
           <InputGroup>
             <InputGroup.Addon>$</InputGroup.Addon>
@@ -47,6 +51,7 @@ class FormExample extends React.Component {
             <InputGroup.Addon>.00</InputGroup.Addon>
           </InputGroup>
         </FormGroup>
+
         <FormGroup>
           <InputGroup>
             <FormControl type="text" />
@@ -55,6 +60,7 @@ class FormExample extends React.Component {
             </InputGroup.Addon>
           </InputGroup>
         </FormGroup>
+
         <FormGroup>
           <InputGroup>
             <InputGroup.Button>
@@ -75,6 +81,7 @@ class FormExample extends React.Component {
             </DropdownButton>
           </InputGroup>
         </FormGroup>
+
         <FormGroup>
           <InputGroup>
             <InputGroup.Addon>

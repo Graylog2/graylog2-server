@@ -3,66 +3,65 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Panel as BootstrapPanel } from 'react-bootstrap';
-import { adjustHue, darken } from 'polished';
 
 import { DEPRECATION_NOTICE } from 'util/constants';
 import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
-const backgroundColor = hex => util.colorLevel(hex, -9);
-const borderColor = hex => darken(0.05, adjustHue(-10, hex));
-
 const PanelHeading = styled(BootstrapPanel.Heading)``;
 
 const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
-  background-color: ${theme.color.secondary.tre};
-  border-top-color: ${theme.color.secondary.due};
+  background-color: ${theme.color.gray[80]};
+  border-top-color: ${theme.color.gray[90]};
 `);
 
-const panelVariantStyles = hex => css`
-  border-color: ${borderColor(hex)};
+const panelVariantStyles = (hex, variant) => css(({ theme }) => {
+  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], -9);
+  const borderColor = util.colorLevel(theme.color.variant.dark[variant], -10);
 
-  ${PanelHeading} {
-    color: ${util.colorLevel(backgroundColor(hex), 9)};
-    background-color: ${backgroundColor(hex)};
-    border-color: ${borderColor(hex)};
+  return css`
+    border-color: ${borderColor};
 
-    > .panel-title,
-    > .panel-title > * {
-      font-size: 16px;
+    & > ${PanelHeading} {
+      color: ${util.colorLevel(backgroundColor, 9)};
+      background-color: ${backgroundColor};
+      border-color: ${borderColor};
+
+      > .panel-title,
+      > .panel-title > * {
+        font-size: 16px;
+      }
+
+      + .panel-collapse > .panel-body {
+        border-top-color: ${borderColor};
+      }
+
+      .badge {
+        color: ${backgroundColor};
+        background-color: ${hex};
+      }
     }
 
-    + .panel-collapse > .panel-body {
-      border-top-color: ${borderColor(hex)};
+    & > ${PanelFooter} {
+      + .panel-collapse > .panel-body {
+        border-bottom-color: ${borderColor};
+      }
     }
-
-    .badge {
-      color: ${backgroundColor(hex)};
-      background-color: ${hex};
-    }
-  }
-
-  & > ${PanelFooter} {
-    + .panel-collapse > .panel-body {
-      border-bottom-color: ${borderColor(hex)};
-    }
-  }
-`;
+  `;
+});
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
-  background-color: ${theme.color.primary.due};
-
   .panel-group {
     ${PanelHeading} {
       + .panel-collapse > .panel-body,
       + .panel-collapse > .list-group {
-        border-top-color: ${theme.color.secondary.due};
+        border-top-color: ${theme.color.gray[90]};
       }
     }
 
     ${PanelFooter} {
       + .panel-collapse .panel-body {
-        border-bottom-color: ${theme.color.secondary.due};
+        border-bottom-color: ${theme.color.gray[90]};
       }
     }
   }
@@ -70,57 +69,62 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   ${bsStyleThemeVariant(panelVariantStyles)};
 `);
 
-const deprecatedVariantStyles = hex => css`
-  /** NOTE: Deprecated & should be removed in 4.0 */
-  border-color: ${borderColor(hex)};
+const deprecatedVariantStyles = hex => css(({ theme }) => {
+  const backgroundColor = theme.color.global.background;
+  const borderColor = theme.color.gray[80];
 
-  & > .panel-heading {
-    color: ${util.colorLevel(backgroundColor(hex), 9)};
-    background-color: ${backgroundColor(hex)};
-    border-color: ${borderColor(hex)};
+  return css`
+    /** NOTE: Deprecated & should be removed in 4.0 */
+    border-color: ${borderColor};
 
-    > .panel-title,
-    > .panel-title > * {
-      font-size: 16px;
+    & > .panel-heading {
+      color: ${util.colorLevel(backgroundColor, 9)};
+      background-color: ${backgroundColor};
+      border-color: ${borderColor};
+
+      > .panel-title,
+      > .panel-title > * {
+        font-size: 16px;
+      }
+
+      + .panel-collapse > .panel-body {
+        border-top-color: ${borderColor};
+      }
+
+      .badge {
+        color: ${backgroundColor};
+        background-color: ${hex};
+      }
     }
 
-    + .panel-collapse > .panel-body {
-      border-top-color: ${borderColor(hex)};
+    & > .panel-footer {
+      + .panel-collapse > .panel-body {
+        border-bottom-color: ${borderColor};
+      }
     }
+  `;
+});
 
-    .badge {
-      color: ${backgroundColor(hex)};
-      background-color: ${hex};
-    }
-  }
-
-  & > .panel-footer {
-    + .panel-collapse > .panel-body {
-      border-bottom-color: ${borderColor(hex)};
-    }
-  }
-`;
-
-/** NOTE: Deprecated & should be removed in 4.0 */
 const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
-  background-color: ${theme.color.primary.due};
+  /** NOTE: Deprecated & should be removed in 4.0 */
+  background-color: ${theme.color.global.background};
 
   .panel-footer {
-    background-color: ${theme.color.secondary.tre};
-    border-top-color: ${theme.color.secondary.due};
+    background-color: ${theme.color.gray[80]};
+    border-top-color: ${theme.color.gray[90]};
   }
 
   .panel-group {
     .panel-heading {
       + .panel-collapse > .panel-body,
       + .panel-collapse > .list-group {
-        border-top-color: ${theme.color.secondary.due};
+        border-top-color: ${theme.color.gray[90]};
       }
     }
 
     .panel-footer {
       + .panel-collapse .panel-body {
-        border-bottom-color: ${theme.color.secondary.due};
+        border-bottom-color: ${theme.color.gray[90]};
       }
     }
   }

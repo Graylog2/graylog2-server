@@ -2,40 +2,34 @@
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import { util } from 'theme';
+import navTabsStyles from './styles/nav-tabs';
 
-const Nav = styled(BootstrapNav)(({ theme }) => {
-  const borderColor = util.colorLevel(theme.color.tertiary.quattro, -3);
-
-  return css`
-    &.nav {
-      .open > a {
-        &,
+const Nav = styled(BootstrapNav)(({ theme }) => css`
+  &.nav {
+    > li {
+      > a {
         &:hover,
         &:focus {
-          background-color: ${util.colorLevel(theme.color.secondary.due, -3)};
-          border-color: ${borderColor};
+          background-color: ${theme.color.gray[90]};
         }
       }
 
-      > li {
-        > a {
-          color: ${theme.color.tertiary.quattro};
+      &.disabled > a {
+        color: ${theme.color.gray[60]};
 
-          &:hover,
-          &:focus {
-            background-color: ${util.colorLevel(theme.color.secondary.due, -3)};
-          }
+        &:hover,
+        &:focus {
+          color: ${theme.color.gray[60]};
         }
+      }
+    }
 
-        &.disabled > a {
-          color: ${theme.color.secondary.tre};
-
-          &:hover,
-          &:focus {
-            color: ${theme.color.secondary.tre};
-          }
-        }
+    .open > a {
+      &,
+      &:hover,
+      &:focus {
+        background-color: ${theme.color.gray[90]};
+        border-color: ${theme.color.variant.primary};
       }
     }
 
@@ -45,14 +39,16 @@ const Nav = styled(BootstrapNav)(({ theme }) => {
           &,
           &:hover,
           &:focus {
-            color: ${util.readableColor(theme.color.tertiary.quattro)};
-            background-color: ${theme.color.tertiary.quattro};
+            color: ${theme.color.global.textAlt};
+            background-color: ${theme.color.variant.primary};
           }
         }
       }
     }
-  `;
-});
+
+    ${navTabsStyles};
+  }
+`);
 
 /** @component */
 export default Nav;

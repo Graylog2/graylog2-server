@@ -19,7 +19,8 @@ type Props = {
 };
 
 const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
-  const bgColor = trend && trend === TREND_GOOD ? theme.color.tertiary.tre : theme.color.tertiary.quattro;
+  const { variant } = theme.color;
+  const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
   return css`
     text-align: right;

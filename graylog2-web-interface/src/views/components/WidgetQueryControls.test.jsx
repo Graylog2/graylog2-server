@@ -10,6 +10,7 @@ import WrappingContainer from 'WrappingContainer';
 import WidgetQueryControls from './WidgetQueryControls';
 import { WidgetActions } from '../stores/WidgetStore';
 
+
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     timerange: jest.fn(),
@@ -51,8 +52,12 @@ describe('WidgetQueryControls', () => {
   const emptyGlobalOverride = {};
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
-  const renderSUT = (props = {}) => render(<WidgetQueryControls {...defaultProps}
-                                                                {...props} />);
+  const renderSUT = (props = {}) => render(
+    <WrappingContainer>
+      <WidgetQueryControls {...defaultProps}
+                           {...props} />
+    </WrappingContainer>,
+  );
   it('should do something', () => {
     const { container } = renderSUT();
     expect(container).toMatchSnapshot();

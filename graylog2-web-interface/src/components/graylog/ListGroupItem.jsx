@@ -7,10 +7,9 @@ import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
-const listGroupItemStyles = (hex, variant) => {
-  const backgroundColor = util.colorLevel(hex, -9);
-  const backgroundColorHover = util.colorLevel(hex, -8);
-  const textColor = util.colorLevel(hex, 6);
+const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
+  const backgroundColor = util.colorLevel(theme.color.variant[variant], -9);
+  const textColor = util.readableColor(backgroundColor);
 
   return css`
     &.list-group-item-${variant} {
@@ -29,24 +28,24 @@ const listGroupItemStyles = (hex, variant) => {
         &:hover,
         &:focus {
           color: ${textColor};
-          background-color: ${backgroundColorHover};
+          background-color: ${theme.color.variant.light[variant]};
         }
 
         &.active,
         &.active:hover,
         &.active:focus {
-          color: ${util.readableColor(textColor)};
-          background-color: ${textColor};
-          border-color: ${textColor};
+          color: ${util.readableColor(theme.color.variant.light[variant])};
+          background-color: ${theme.color.variant.light[variant]};
+          border-color: ${theme.color.variant.light[variant]};
         }
       }
     }
   `;
-};
+});
 
 const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
-  background-color: ${theme.color.primary.due};
-  border-color: ${theme.color.secondary.tre};
+  background-color: ${theme.color.global.contentBackground};
+  border-color: ${theme.color.gray[80]};
 
   .list-group-item-heading {
     font-weight: bold;
@@ -55,8 +54,8 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   &.disabled,
   &.disabled:hover,
   &.disabled:focus {
-    color: ${util.contrastingColor(theme.color.secondary.due, 'AA')};
-    background-color: ${theme.color.secondary.due};
+    color: ${theme.color.gray[60]};
+    background-color: ${theme.color.gray[90]};
 
     .list-group-item-heading {
       color: inherit;
@@ -64,16 +63,16 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     }
 
     .list-group-item-text {
-      color: ${util.contrastingColor(theme.color.secondary.due, 'AA')};
+      color: ${theme.color.gray[60]};
     }
   }
 
   &.active,
   &.active:hover,
   &.active:focus {
-    color: ${util.readableColor(theme.color.tertiary.quattro)};
-    border-color: ${theme.color.tertiary.quattro};
-    background-color: ${theme.color.tertiary.quattro};
+    color: ${theme.color.gray[100]};
+    background-color: ${theme.color.variant.primary};
+    border-color: ${theme.color.variant.light.primary};
 
     .list-group-item-heading,
     .list-group-item-heading > small,
@@ -83,28 +82,28 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     }
 
     .list-group-item-text {
-      color: ${util.contrastingColor(theme.color.tertiary.quattro)};
+      color: ${theme.color.variant.light.primary};
     }
   }
 
   a&,
   button& {
-    color: ${theme.color.primary.tre};
+    color: ${theme.color.global.link};
 
     .list-group-item-heading {
-      color: ${util.readableColor(theme.color.primary.due)};
+      color: ${theme.color.gray[20]};
       font-weight: bold;
     }
 
     &:hover:not(.disabled),
     &:focus:not(.disabled) {
-      background-color: ${theme.color.secondary.due};
-      color: ${util.readableColor(theme.color.secondary.due, theme.color.tertiary.quattro)};
+      background-color: ${theme.color.gray[20]};
+      color: ${util.readableColor(theme.color.gray[20], theme.color.variant.primary)};
 
       &.active {
-        color: ${util.readableColor(theme.color.tertiary.quattro)};
-        border-color: ${theme.color.tertiary.quattro};
-        background-color: ${theme.color.tertiary.quattro};
+        color: ${util.readableColor(theme.color.variant.primary)};
+        border-color: ${theme.color.variant.primary};
+        background-color: ${theme.color.variant.primary};
       }
     }
   }
@@ -117,7 +116,6 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
 });
 
 ListGroupItem.propTypes = {
-  /* Bootstrap `bsStyle` variant name */
   bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info']),
 };
 

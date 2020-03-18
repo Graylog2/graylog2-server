@@ -16,7 +16,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 bmCcvm in modal"
+      class="fade Modal-nuree8-0 fWOZMp in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -57,7 +57,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                    class="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                    class="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -84,14 +84,14 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
               >
                 <label
-                  class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                  class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                   for="page-size"
                 >
                   Show:
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 eOArng form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 igyPGR form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -198,14 +198,14 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button-c9cbmb-0 ghlLDE btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-primary"
               disabled=""
               type="button"
             >
               Select
             </button>
             <button
-              class="Button-c9cbmb-0 iKWoaE btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
               type="button"
             >
               Cancel
@@ -234,7 +234,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 bmCcvm in modal"
+      class="fade Modal-nuree8-0 fWOZMp in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -275,7 +275,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                    class="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                     type="submit"
                   >
                     Search
@@ -286,7 +286,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                    class="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -302,14 +302,14 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
               >
                 <label
-                  class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                  class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
                   for="page-size"
                 >
                   Show:
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 eOArng form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 igyPGR form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -340,7 +340,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               class="list-group"
             >
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cWvmoN list-group-item"
                 type="button"
               >
                 <h4
@@ -353,7 +353,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 />
               </button>
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 dvkPPN list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cWvmoN list-group-item"
                 type="button"
               >
                 <h4
@@ -453,14 +453,14 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button-c9cbmb-0 ghlLDE btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-primary"
               disabled=""
               type="button"
             >
               Select
             </button>
             <button
-              class="Button-c9cbmb-0 iKWoaE btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
               type="button"
             >
               Cancel

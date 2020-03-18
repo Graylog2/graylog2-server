@@ -2,21 +2,21 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { darken, opacify, transparentize } from 'polished';
+import { opacify, transparentize } from 'polished';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
 const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
-  const borderColor = transparentize(0.8, theme.color.primary.tre);
+  const borderColor = transparentize(0.8, theme.color.gray[0]);
 
   return css`
-    background-color: ${theme.color.primary.due};
+    background-color: ${theme.color.global.contentBackground};
     border-color: ${borderColor};
 
     &.top > .arrow {
       border-top-color: ${opacify(0.05, borderColor)};
 
       &::after {
-        border-top-color: ${theme.color.primary.due};
+        border-top-color: ${theme.color.gray[100]};
       }
     }
 
@@ -24,7 +24,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
       border-right-color: ${opacify(0.05, borderColor)};
 
       &::after {
-        border-right-color: ${theme.color.primary.due};
+        border-right-color: ${theme.color.gray[100]};
       }
     }
 
@@ -32,7 +32,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
       border-bottom-color: ${opacify(0.05, borderColor)};
 
       &::after {
-        border-bottom-color: ${theme.color.primary.due};
+        border-bottom-color: ${theme.color.gray[100]};
       }
     }
 
@@ -40,12 +40,12 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
       border-left-color: ${opacify(0.05, borderColor)};
 
       &::after {
-        border-left-color: ${theme.color.primary.due};
+        border-left-color: ${theme.color.gray[100]};
       }
     }
 
     .popover-title {
-      background-color: ${darken(0.03, theme.color.primary.due)};
+      background-color: ${theme.color.gray[90]};
     }
   `;
 });

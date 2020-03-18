@@ -1,12 +1,12 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 
-const GlobalThemeStyles = createGlobalStyle`
+const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   #editor {
     height: 256px;
   }
 
   body {
-    background-color: #e3e3e3;
+    background-color: ${theme.color.global.background};
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 12px;
     overflow-x: hidden;
@@ -24,7 +24,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   hr {
-    border-top: 1px solid #e3e3e3;
+    border-top: 1px solid ${theme.color.global.background};
   }
 
   h1,
@@ -36,7 +36,7 @@ const GlobalThemeStyles = createGlobalStyle`
     font-weight: normal;
     padding: 0;
     margin: 0;
-    color: #333;
+    color: ${theme.color.global.textDefault};
   }
 
   h1 {
@@ -57,7 +57,11 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   a {
-    color: #16ace3;
+    color: ${theme.color.global.link};
+  }
+
+  a:hover {
+    color: ${theme.color.global.linkHover};
   }
 
   /* Remove boostrap outline */
@@ -74,7 +78,7 @@ const GlobalThemeStyles = createGlobalStyle`
   input.form-control,
   select.form-control,
   textarea.form-control {
-    color: #666;
+    color: ${theme.color.gray[30]};
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
     &:hover {
@@ -87,7 +91,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   legend small {
-    color: #aaa;
+    color: ${theme.color.gray[60]};
     margin-left: 5px;
   }
 
@@ -99,14 +103,14 @@ const GlobalThemeStyles = createGlobalStyle`
   .content {
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: #fff;
-    border: 1px solid #d1d1d1;
+    background-color: ${theme.color.global.contentBackground};
+    border: 1px solid ${theme.color.gray[80]};
     margin-bottom: 10px;
   }
 
   .content p.description {
     margin-top: 3px;
-    color: #939393;
+    color: ${theme.color.gray[50]};
   }
 
   .actions-lg .actions-container {
@@ -127,8 +131,8 @@ const GlobalThemeStyles = createGlobalStyle`
 
   .content-col {
     padding: 15px 10px;
-    background-color: #fff;
-    border: 1px solid #d1d1d1;
+    background-color: ${theme.color.global.contentBackground};
+    border: 1px solid ${theme.color.gray[80]};
     margin-top: 15px;
   }
 
@@ -202,7 +206,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .u-light {
-    border-bottom: 1px dotted #bbb;
+    border-bottom: 1px dotted ${theme.color.gray[70]};
     margin-bottom: 5px;
     padding-bottom: 5px;
   }
@@ -273,7 +277,7 @@ const GlobalThemeStyles = createGlobalStyle`
     left: 50%;
     margin-left: -125px;
     top: 50px;
-    color: #fff;
+    color: ${theme.color.global.textAlt};
     font-size: 80px;
     padding: 25px;
     z-index: 2000;
@@ -284,7 +288,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .graph-range-selector {
-    outline: 1px solid #eee;
+    outline: 1px solid ${theme.color.gray[90]};
     background: rgba(0, 0, 0, 0.3);
     position: absolute;
     top: 0;
@@ -306,7 +310,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .sources.overlay {
-    background-color: #aaa;
+    background-color: ${theme.color.gray[60]};
     height: 200px;
     line-height: 200px;
     opacity: 0.2;
@@ -330,7 +334,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .metric-list li .prefix {
-    color: #aaa;
+    color: ${theme.color.gray[60]};
   }
 
   .metric-list li .name {
@@ -400,7 +404,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .dashboard {
-    color: #333;
+    color: ${theme.color.global.textDefault};
     margin: 0;
     width: 100%;
   }
@@ -433,12 +437,12 @@ const GlobalThemeStyles = createGlobalStyle`
   .dashboard .widget .reloading {
     margin-right: 2px;
     font-weight: bold;
-    color: #0085a7;
+    color: ${theme.color.variant.dark.info};
     display: none;
   }
 
   .dashboard .widget .loading-failed {
-    color: #ff4646 !important;
+    color: ${theme.color.variant.danger} !important;
   }
 
   .tooltip .tooltip-inner {
@@ -450,7 +454,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .tooltip .tooltip-inner .datapoint-info .date {
-    color: #e3e5e5;
+    color: ${theme.color.gray[90]};
   }
 
   .dashboard .widget .dc-chart {
@@ -466,7 +470,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .dashboard .widget .load-error {
-    color: #ff3b00;
+    color: ${theme.color.variant.danger};
     margin-right: 5px;
   }
 
@@ -603,13 +607,13 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .shard-routing .shards .shard-unassigned {
-    background-color: #c3c3c3;
+    background-color: ${theme.color.gray[70]};
   }
 
   .shard-routing .shards .shard-primary .id {
     font-weight: bold;
     margin-bottom: 3px;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid ${theme.color.gray[0]};
   }
 
   .shard-routing .description {
@@ -675,7 +679,7 @@ const GlobalThemeStyles = createGlobalStyle`
 
   .sources th {
     background-color: #333;
-    color: #fff;
+    color: ${theme.color.global.textAlt};
     font-weight: normal;
   }
 
@@ -696,7 +700,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .alert-type-form .help-text {
-    color: #939393;
+    color: ${theme.color.gray[50]};
     font-size: 12px;
     margin-left: 10px;
   }
@@ -741,8 +745,8 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .alerts th {
-    background-color: #333;
-    color: #fff;
+    background-color: ${theme.color.gray[10]};
+    color: ${theme.color.global.textAlt};
     font-weight: normal;
   }
 
@@ -751,11 +755,11 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .alerts th a:focus {
-    color: #fff;
+    color: ${theme.color.global.textAlt};
   }
 
   .alert-condition .in-grace {
-    color: #8c8e86;
+    color: ${theme.color.gray[40]};
   }
 
   .query-exception {
@@ -768,7 +772,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .widget .replay-link {
-    color: #000;
+    color: ${theme.color.gray[0]};
   }
 
   .widget .replay-link:hover {
@@ -777,18 +781,18 @@ const GlobalThemeStyles = createGlobalStyle`
 
   .zeroclipboard-is-hover {
     /* // via .btn-default:hover from bootstrap */
-    color: #333;
-    background-color: #d7d9d9;
-    border-color: #c3c8c8; /* // bootstrap copy end */
+    color: ${theme.color.global.textDefault};
+    background-color: ${theme.color.gray[80]};
+    border-color: ${theme.color.gray[70]}; /* // bootstrap copy end */
     cursor: move;
   }
 
   .zeroclipboard-is-active {
-    color: #1a5273;
+    color: ${theme.color.variant.dark.info};
   }
 
   .result-highlight-colored {
-    background-color: #ffec3d;
+    background-color: ${theme.color.variant.warning};
   }
 
   .result-highlight-control label {
@@ -868,8 +872,8 @@ const GlobalThemeStyles = createGlobalStyle`
     padding: 12px 20px;
     font-size: 15px;
     font-weight: 300;
-    background-color: #fafafa;
-    border: 1px solid #ececec;
+    background-color: ${theme.color.gray[100]};
+    border: 1px solid ${theme.color.gray[90]};
     border-radius: 2px;
     margin: 10px;
   }
@@ -898,26 +902,26 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .card .configuration-bundles .bundle-preview {
-    border: 1px solid #ececec;
+    border: 1px solid ${theme.color.gray[90]};
     border-radius: 2px;
-    background-color: #fff;
+    background-color: ${theme.color.global.contentBackground};
     padding: 20px;
   }
 
   .card .configuration-bundles .bundle-preview pre {
-    background-color: #f5f5f5;
+    background-color: ${theme.color.gray[90]};
   }
 
   .configuration-bundles .accordion {
-    background-color: #fff;
-    border: 1px solid #ececec;
+    background-color: ${theme.color.global.contentBackground};
+    border: 1px solid ${theme.color.gray[90]};
     border-radius: 2px;
   }
 
   .configuration-bundles .accordion-group {
     margin: 0;
     border: 0;
-    border-bottom: 1px solid #ececec;
+    border-bottom: 1px solid ${theme.color.gray[90]};
     border-radius: 0;
   }
 
@@ -930,8 +934,8 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .configuration-bundles .bundle-preview {
-    background-color: #f5f5f5;
-    border: 1px solid #e3e3e3;
+    background-color: ${theme.color.global.contentBackground};
+    border: 1px solid ${theme.color.global.background};
     border-radius: 3px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
     padding: 10px;
@@ -948,7 +952,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .configuration-bundles .bundle-preview pre {
-    background-color: #cfcfcf;
+    background-color: ${theme.color.gray[70]};
   }
 
   .configuration-bundles .bundle-preview dd {
@@ -1076,7 +1080,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   ul.streams li.stream:not(:last-child) {
-    border-bottom: 1px solid #6dcff6;
+    border-bottom: 1px solid ${theme.color.variant.light.info};
   }
 
   ul.streams li.stream .stream-data {
@@ -1135,7 +1139,7 @@ const GlobalThemeStyles = createGlobalStyle`
     }
 
     li.entity-list-item:not(:last-child) {
-      border-bottom: 1px solid #6dcff6;
+      border-bottom: 1px solid ${theme.color.variant.light.info};
     }
   }
 
@@ -1156,7 +1160,7 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   dl.message-details-fields span:not(:last-child) dd {
-    border-bottom: 1px solid #ececec;
+    border-bottom: 1px solid ${theme.color.gray[90]};
   }
 
   dl.message-details-fields dd {
@@ -1282,7 +1286,7 @@ const GlobalThemeStyles = createGlobalStyle`
   .alarm-callbacks li:not(:last-child) {
     margin-bottom: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #ececec;
+    border-bottom: 1px solid ${theme.color.gray[90]};
   }
 
   /* // Ensure that the stream start/pause buttons have the same size. */
@@ -1301,7 +1305,7 @@ const GlobalThemeStyles = createGlobalStyle`
   p.failure-exception {
     margin-top: 5px;
     margin-bottom: 10px;
-    color: #aaa;
+    color: ${theme.color.gray[60]};
   }
 
   i.error-icon {
@@ -1359,14 +1363,14 @@ const GlobalThemeStyles = createGlobalStyle`
   }
 
   .pill {
-    color: #333;
-    background-color: #e3e5e5;
+    color: ${theme.color.global.textDefault};
+    background-color: ${theme.color.gray[90]};
     padding: 6px 12px;
   }
 
   .tag-remove,
   .pill-remove {
-    color: #333;
+    color: ${theme.color.global.textDefault};
     cursor: pointer;
     margin-left: 5px;
   }
@@ -1394,6 +1398,6 @@ const GlobalThemeStyles = createGlobalStyle`
     padding: 0 15px !important;
     font-weight: bold;
   }
-`;
+`);
 
 export default GlobalThemeStyles;

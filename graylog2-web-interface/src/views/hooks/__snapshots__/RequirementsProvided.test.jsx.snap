@@ -109,7 +109,7 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                 onClick={[Function]}
                 type="submit"
               >
-                <Button
+                <Button__StyledButton
                   action="push"
                   bsStyle="success"
                   onClick={[Function]}
@@ -137,17 +137,17 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                         ],
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
-                          "componentId": "Button-c9cbmb-0",
+                          "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "jKsGyd",
+                          "lastClassName": "bnjehA",
                           "rules": Array [
                             [Function],
                           ],
                         },
-                        "displayName": "Button",
+                        "displayName": "Button__StyledButton",
                         "foldedComponentIds": Array [],
                         "render": [Function],
-                        "styledComponentId": "Button-c9cbmb-0",
+                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                         "target": [Function],
                         "toString": [Function],
                         "warnTooManyClasses": [Function],
@@ -164,14 +164,14 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                       block={false}
                       bsClass="btn"
                       bsStyle="success"
-                      className="Button-c9cbmb-0 jKsGyd"
+                      className="Button__StyledButton-c9cbmb-0 bnjehA"
                       disabled={false}
                       onClick={[Function]}
                       type="submit"
                     >
                       <button
                         action="push"
-                        className="Button-c9cbmb-0 jKsGyd btn btn-success"
+                        className="Button__StyledButton-c9cbmb-0 bnjehA btn btn-success"
                         disabled={false}
                         onClick={[Function]}
                         type="submit"
@@ -180,7 +180,7 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                       </button>
                     </Button>
                   </StyledComponent>
-                </Button>
+                </Button__StyledButton>
               </ForwardRef>
             </LinkContainer>
           </div>

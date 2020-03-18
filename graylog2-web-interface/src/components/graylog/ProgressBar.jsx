@@ -34,7 +34,7 @@ const DEFAULT_BAR = {
 };
 
 const boxShadow = meta => css`
-  box-shadow: ${meta} ${props => transparentize(0.9, props.theme.color.primary.tre)};
+  box-shadow: ${meta} ${({ theme }) => transparentize(0.9, theme.color.brand.secondary)};
 `;
 
 const animatedStripes = keyframes`
@@ -56,7 +56,7 @@ const ProgressWrap: StyledComponent<{}, ThemeInterface, *> = styled.div(({ theme
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
-  background-color: ${theme.color.secondary.due};
+  background-color: ${theme.color.gray[90]};
   border-radius: 4px;
   ${boxShadow('inset 0 1px 2px')};
   display: flex;
@@ -64,7 +64,7 @@ const ProgressWrap: StyledComponent<{}, ThemeInterface, *> = styled.div(({ theme
 `);
 
 const Bar: StyledComponent<BarProps, ThemeInterface, *> = styled.div(({ animated, striped, theme, value }) => {
-  const defaultStripColor = transparentize(0.75, theme.color.primary.due);
+  const defaultStripColor = transparentize(0.75, theme.color.global.contentBackground);
 
   return css`
     height: 100%;
