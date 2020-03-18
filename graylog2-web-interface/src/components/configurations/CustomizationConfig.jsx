@@ -25,8 +25,8 @@ class CustomizationConfig extends React.Component {
 
   static defaultProps = {
     config: {
-      badge_text: 'PROD',
-      badge_color: '#AD0707',
+      badge_text: '',
+      badge_color: '',
       badge_enable: false,
     },
     warning: {
@@ -108,8 +108,8 @@ class CustomizationConfig extends React.Component {
       : <span>No badge defined</span>;
 
     const SelectBackgroundButton = styled(({ selectedBgColor, ...props }) => <Button {...props} />)`
-      background-color: ${props => (props.selectedBgColor)}; 
-      color: ${props => (util.contrastingColor(props.selectedBgColor))};
+      background-color: ${props => (props.selectedBgColor || props.theme.color.tertiary.uno)};
+      color: ${props => (util.contrastingColor(props.selectedBgColor || props.theme.color.tertiary.uno))};
     `;
 
     return (
