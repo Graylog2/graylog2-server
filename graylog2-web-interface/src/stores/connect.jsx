@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { isFunction } from 'lodash';
 import isDeepEqual from './isDeepEqual';
 
@@ -12,6 +13,12 @@ type ExtractStoreState = <V, Store: StoreType<V>>(Store) => V;
 type ExtractComponentProps = <Props>(React.ComponentType<Props>) => Props;
 
 type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
+
+export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: ((V) => R)): R {
+  const [storeState, setStoreState] = useState(() => propsMapper(store.getInitialState()));
+  useEffect(() => store.listen(newState => setStoreState(propsMapper(newState))), [store]);
+  return storeState;
+}
 
 /**
  * Generating a higher order component wrapping an ES6 React component class, connecting it to the supplied stores.

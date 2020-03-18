@@ -1,11 +1,13 @@
 // @flow strict
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 import { mount } from 'wrappedEnzyme';
 import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
 
 import { asMock } from 'helpers/mocking/index';
+import type { Store } from 'stores/StoreTypes';
 import {
   arrayOfMaps,
   listWithObject,
@@ -16,12 +18,17 @@ import {
   NeverEqual,
   NonValueClass,
 } from './EqualityCheck.fixtures';
-
-import connect from '../connect';
+import connect, { useStore } from '../connect';
 
 const SimpleComponentWithoutStores = () => <span>Hello World!</span>;
 
-const SimpleStore = Reflux.createStore({
+type Actions = {
+  setValue: (number) => void,
+  reset: () => void,
+  noop: () => void,
+};
+
+const SimpleStore: Store<{ value: number }> & Actions = Reflux.createStore({
   getInitialState() {
     return this.state;
   },
@@ -54,6 +61,9 @@ SimpleComponentWithDummyStore.defaultProps = {
 };
 
 describe('connect()', () => {
+  beforeEach(() => {
+    SimpleStore.reset();
+  });
   it('does not do anything if no stores are provided', () => {
     const Component = connect(SimpleComponentWithoutStores, {});
     const wrapper = mount(<Component />);
@@ -61,7 +71,6 @@ describe('connect()', () => {
   });
 
   it('connects component to store without state', () => {
-    SimpleStore.reset();
     const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
     const wrapper = mount(<Component />);
     expect(wrapper).toHaveText('No value.');
@@ -77,7 +86,6 @@ describe('connect()', () => {
   it('reflects state changes in store', () => {
     const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
     const wrapper = mount(<Component />);
-    SimpleStore.reset();
     expect(wrapper).toHaveText('No value.');
     SimpleStore.setValue(42);
     expect(wrapper).toHaveText('Value is: 42');
@@ -184,5 +192,44 @@ describe('connect()', () => {
     ${arrayOfMaps()}         | ${arrayOfMaps()}         | ${false}  | ${'arrays containing immutable maps'}
     ${mixedMapsAndObjects()} | ${mixedMapsAndObjects()} | ${false}  | ${'nested immutable maps and objects'}
   `('compares $description and returns $result', verifyShouldComponentUpdate);
+  });
+});
+
+describe('useStore', () => {
+  const SimpleComponent = () => {
+    const { value } = useStore(SimpleStore, x => x) || {};
+    return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
+  };
+
+  beforeEach(() => {
+    act(() => SimpleStore.reset());
+  });
+  it('renders state from store', () => {
+    const wrapper = mount(<SimpleComponent />);
+    expect(wrapper).toHaveText('No value.');
+  });
+  it('connects component to store with state', () => {
+    act(() => SimpleStore.setValue(42));
+    const wrapper = mount(<SimpleComponent />);
+    expect(wrapper).toHaveText('Value is: 42');
+  });
+  it('reflects state changes from store', () => {
+    const wrapper = mount(<SimpleComponent />);
+    expect(wrapper).toHaveText('No value.');
+    act(() => SimpleStore.setValue(42));
+    expect(wrapper).toHaveText('Value is: 42');
+    act(() => SimpleStore.noop());
+    expect(wrapper).toHaveText('Value is: 42');
+    act(() => SimpleStore.reset());
+    expect(wrapper).toHaveText('No value.');
+  });
+  it('allows mangling of props before passing them', () => {
+    const Component = () => {
+      const { value } = useStore(SimpleStore, ({ value: v } = {}) => ({ value: v * 2 })) || {};
+      return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
+    };
+    const wrapper = mount(<Component />);
+    act(() => SimpleStore.setValue(42));
+    expect(wrapper).toHaveText('Value is: 84');
   });
 });
