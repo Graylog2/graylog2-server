@@ -133,7 +133,7 @@ export default {
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<*>) => data[0],
       searchTypes: MessageConfigGenerator,
-      titleGenerator: () => 'Untitled Message Table',
+      titleGenerator: () => MessagesWidget.defaultTitle,
     },
     {
       type: 'AGGREGATION',

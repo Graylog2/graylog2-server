@@ -15,6 +15,8 @@ export default class MessagesWidget extends Widget {
 
   static type = 'messages';
 
+  static defaultTitle = 'Untitled Message Table';
+
   static fromJSON(value: WidgetState) {
     const { id, config, filter, timerange, query, streams } = value;
     return new MessagesWidget(id, MessagesWidgetConfig.fromJSON(config), filter, timerange, query, streams);
