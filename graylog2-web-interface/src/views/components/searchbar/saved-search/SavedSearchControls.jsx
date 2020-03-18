@@ -187,7 +187,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const { currentUser, viewStoreState } = this.props;
     const { view, dirty } = viewStoreState;
     const csvExport = showCSVExport && (
-      <CSVExportModal view={viewStoreState} closeModal={this.toggleCSVExport} />
+      <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
     );
 
     const shareSearch = showShareSearch && (

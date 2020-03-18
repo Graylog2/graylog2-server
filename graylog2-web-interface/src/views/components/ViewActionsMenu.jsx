@@ -4,17 +4,18 @@ import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { withRouter } from 'react-router';
 
-import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
-import { Icon } from 'components/common';
-
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import PermissionsMixin from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 
+import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
+import { Icon } from 'components/common';
+import CSVExportModal from 'views/components/searchbar/CSVExportModal';
+import DebugOverlay from 'views/components/DebugOverlay';
+
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';
-import DebugOverlay from 'views/components/DebugOverlay';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
@@ -38,6 +39,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
   const [editViewOpen, setEditViewOpen] = useState(false);
+  const [csvExportOpen, setCsvExportOpen] = useState(false);
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
@@ -67,6 +69,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
         <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="share-alt" /> Share
         </MenuItem>
+        <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download" /> Export to CSV</MenuItem>
         {debugOverlay}
         <IfDashboard>
           <MenuItem divider />
@@ -89,6 +92,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
                              onSave={(updatedView) => onSaveView(updatedView, router)} />
       )}
       {shareViewOpen && <ShareViewModal show view={view} onClose={() => setShareViewOpen(false)} />}
+      {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} allwaysShowWidgetSelection />}
     </ButtonGroup>
   );
 };
