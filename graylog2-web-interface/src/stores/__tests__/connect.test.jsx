@@ -197,7 +197,7 @@ describe('connect()', () => {
 
 describe('useStore', () => {
   const SimpleComponent = () => {
-    const { value } = useStore(SimpleStore, x => x) || {};
+    const { value } = useStore(SimpleStore) || {};
     return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
   };
 

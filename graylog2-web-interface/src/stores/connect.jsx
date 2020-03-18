@@ -14,7 +14,14 @@ type ExtractComponentProps = <Props>(React.ComponentType<Props>) => Props;
 
 type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
 
-export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: ((V) => R)): R {
+type PropsMapper<V, R> = (V) => R;
+
+function id<V, R>(x: V) {
+  // $FlowFixMe: Casting by force
+  return (x: R);
+}
+
+export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: PropsMapper<V, R> = id): R {
   const [storeState, setStoreState] = useState(() => propsMapper(store.getInitialState()));
   useEffect(() => store.listen(newState => setStoreState(propsMapper(newState))), [store]);
   return storeState;
