@@ -12,7 +12,7 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as Permissions from 'views/Permissions';
 
-import BookmarkControls from './BookmarkControls';
+import SavedSearchControls from './SavedSearchControls';
 
 const mockUser = {
   username: 'someone',
@@ -25,7 +25,7 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   get: jest.fn(() => mockUser),
 }));
 
-describe('BookmarkControls', () => {
+describe('SavedSearchControls', () => {
   const createViewStoreState = (dirty = true, id) => ({
     activeQuery: '',
     view: View.builder()
@@ -46,7 +46,7 @@ describe('BookmarkControls', () => {
       });
       const wrapper = mount((
         <NewViewLoaderContext.Provider value={loadNewView}>
-          <BookmarkControls viewStoreState={createViewStoreState()} />
+          <SavedSearchControls viewStoreState={createViewStoreState()} />
         </NewViewLoaderContext.Provider>
       ));
       wrapper.find('a[data-testid="reset-search"]').simulate('click');
@@ -59,7 +59,7 @@ describe('BookmarkControls', () => {
       });
       const wrapper = mount(
         <ViewLoaderContext.Provider value={onLoadView}>
-          <BookmarkControls viewStoreState={createViewStoreState(false)} />
+          <SavedSearchControls viewStoreState={createViewStoreState(false)} />
         </ViewLoaderContext.Provider>,
       );
       wrapper.find('button[title="Save search"]').simulate('click');
@@ -72,13 +72,13 @@ describe('BookmarkControls', () => {
     });
     describe('has "Share search" option', () => {
       it('includes the option to share the current search', () => {
-        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
         expect(wrapper.find('MenuItem[title="Share search"]')).toExist();
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', () => {
-        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -90,7 +90,7 @@ describe('BookmarkControls', () => {
           permissions: [],
         };
         asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
-        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -102,7 +102,7 @@ describe('BookmarkControls', () => {
           permissions: [Permissions.View.Edit('some-id')],
         };
         asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
-        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -114,7 +114,7 @@ describe('BookmarkControls', () => {
           permissions: ['*'],
         };
         asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
-        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -126,7 +126,7 @@ describe('BookmarkControls', () => {
           permissions: ['*'],
         };
         asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
-        const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false)} />);
+        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false)} />);
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -135,9 +135,9 @@ describe('BookmarkControls', () => {
     });
   });
 
-  describe('render the BookmarkControls', () => {
+  describe('render the SavedSearchControls', () => {
     it('should render not dirty with unsaved view', () => {
-      const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false)} />);
+      const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false)} />);
       const saveButton = wrapper.find('button[title="Save search"]');
       expect(saveButton).toMatchSnapshot();
     });
@@ -153,7 +153,7 @@ describe('BookmarkControls', () => {
           .build(),
         dirty: false,
       };
-      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
+      const wrapper = mount(<SavedSearchControls viewStoreState={viewStoreState} />);
       const saveButton = wrapper.find('button[title="Saved search"]');
       expect(saveButton).toMatchSnapshot();
     });
@@ -170,7 +170,7 @@ describe('BookmarkControls', () => {
         view: view,
         dirty: true,
       };
-      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
+      const wrapper = mount(<SavedSearchControls viewStoreState={viewStoreState} />);
       const saveButton = wrapper.find('button[title="Unsaved changes"]');
       expect(saveButton).toMatchSnapshot();
     });

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = `
+exports[`SavedSearchControls render the SavedSearchControls should render dirty 1`] = `
 <button
   className="Button-c9cbmb-0 iKWoaE btn btn-default"
   disabled={false}
@@ -33,7 +33,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
 </button>
 `;
 
-exports[`BookmarkControls render the BookmarkControls should render not dirty 1`] = `
+exports[`SavedSearchControls render the SavedSearchControls should render not dirty 1`] = `
 <button
   className="Button-c9cbmb-0 iKWoaE btn btn-default"
   disabled={false}
@@ -66,7 +66,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
 </button>
 `;
 
-exports[`BookmarkControls render the BookmarkControls should render not dirty with unsaved view 1`] = `
+exports[`SavedSearchControls render the SavedSearchControls should render not dirty with unsaved view 1`] = `
 <button
   className="Button-c9cbmb-0 iKWoaE btn btn-default"
   disabled={false}

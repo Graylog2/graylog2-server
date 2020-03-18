@@ -6,7 +6,7 @@ import Routes from 'routing/Routes';
 
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import BookmarkList from './BookmarkList';
+import SavedSearchList from './SavedSearchList';
 
 const createViewsResponse = (count = 1) => {
   const views = [];
@@ -33,26 +33,26 @@ const createViewsResponse = (count = 1) => {
   };
 };
 
-describe('BookmarkList', () => {
-  describe('render the BookmarkList', () => {
+describe('SavedSearchList', () => {
+  describe('render the SavedSearchList', () => {
     afterEach(() => {
       cleanup();
     });
     it('should render empty', () => {
       const views = createViewsResponse(0);
-      const { baseElement } = render(<BookmarkList toggleModal={() => {}}
-                                                   showModal
-                                                   deleteBookmark={() => {}}
-                                                   views={views} />);
+      const { baseElement } = render(<SavedSearchList toggleModal={() => {}}
+                                                      showModal
+                                                      deleteSavedSearch={() => {}}
+                                                      views={views} />);
       expect(baseElement).toMatchSnapshot();
     });
 
     it('should render with views', () => {
       const views = createViewsResponse(1);
-      const { baseElement } = render(<BookmarkList toggleModal={() => {}}
-                                                   showModal
-                                                   deleteBookmark={() => {}}
-                                                   views={views} />);
+      const { baseElement } = render(<SavedSearchList toggleModal={() => {}}
+                                                      showModal
+                                                      deleteSavedSearch={() => {}}
+                                                      views={views} />);
       expect(baseElement).toMatchSnapshot();
     });
 
@@ -60,10 +60,10 @@ describe('BookmarkList', () => {
       const onToggleModal = jest.fn();
       const views = createViewsResponse(1);
 
-      const { getByText } = render(<BookmarkList toggleModal={onToggleModal}
-                                                 showModal
-                                                 deleteBookmark={() => {}}
-                                                 views={views} />);
+      const { getByText } = render(<SavedSearchList toggleModal={onToggleModal}
+                                                    showModal
+                                                    deleteSavedSearch={() => {}}
+                                                    views={views} />);
 
       const cancel = getByText('Cancel');
       fireEvent.click(cancel);
@@ -76,10 +76,10 @@ describe('BookmarkList', () => {
         return new Promise(() => {});
       });
       const views = createViewsResponse(1);
-      const { getByText } = render(<BookmarkList toggleModal={() => {}}
-                                                 showModal
-                                                 deleteBookmark={onDelete}
-                                                 views={views} />);
+      const { getByText } = render(<SavedSearchList toggleModal={() => {}}
+                                                    showModal
+                                                    deleteSavedSearch={onDelete}
+                                                    views={views} />);
       const listItem = getByText('test-0');
       fireEvent.click(listItem);
       const deleteBtn = getByText('Delete');
@@ -94,10 +94,10 @@ describe('BookmarkList', () => {
 
       const { getByText } = render(
         <ViewLoaderContext.Provider value={onLoad}>
-          <BookmarkList toggleModal={() => {}}
-                        showModal
-                        deleteBookmark={() => {}}
-                        views={views} />
+          <SavedSearchList toggleModal={() => {}}
+                           showModal
+                           deleteSavedSearch={() => {}}
+                           views={views} />
         </ViewLoaderContext.Provider>,
       );
       const listItem = getByText('test-0');
@@ -107,7 +107,7 @@ describe('BookmarkList', () => {
       expect(onLoad).toBeCalledTimes(1);
     });
   });
-  describe('load new bookmark', () => {
+  describe('load new saved search', () => {
     afterEach(() => {
       cleanup();
     });
@@ -119,10 +119,10 @@ describe('BookmarkList', () => {
 
       const { getByText } = render(
         <ViewLoaderContext.Provider value={onLoad}>
-          <BookmarkList toggleModal={() => {}}
-                        showModal
-                        deleteBookmark={() => {}}
-                        views={views} />
+          <SavedSearchList toggleModal={() => {}}
+                           showModal
+                           deleteSavedSearch={() => {}}
+                           views={views} />
         </ViewLoaderContext.Provider>,
       );
       const listItem = getByText('test-0');

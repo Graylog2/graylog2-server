@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 
 import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import { newDashboardsPath } from 'views/Constants';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -21,10 +21,8 @@ import CSVExportModal from 'views/components/searchbar/CSVExportModal';
 import ShareViewModal from 'views/components/views/ShareViewModal';
 import * as Permissions from 'views/Permissions';
 
-import BookmarkForm from './BookmarkForm';
-import BookmarkList from './BookmarkList';
-
-const { isPermitted } = PermissionsMixin;
+import SavedSearchForm from './SavedSearchForm';
+import SavedSearchList from './SavedSearchList';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -49,7 +47,7 @@ const _isAllowedToEdit = (view: View, currentUser = {}) => (
   || isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)])
 );
 
-class BookmarkControls extends React.Component<Props, State> {
+class SavedSearchControls extends React.Component<Props, State> {
   formTarget: any;
 
   static propTypes = {
@@ -152,11 +150,11 @@ class BookmarkControls extends React.Component<Props, State> {
       .catch(error => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
-  loadBookmark = () => {
+  loadSavedSearch = () => {
     this.toggleListModal();
   };
 
-  deleteBookmark = (deletedView) => {
+  deleteSavedSearch = (deletedView) => {
     const { viewStoreState } = this.props;
     const { view } = viewStoreState;
     return ViewManagementActions.delete(deletedView)
@@ -197,17 +195,17 @@ class BookmarkControls extends React.Component<Props, State> {
       <ShareViewModal show view={view} onClose={this.toggleShareSearch} />
     );
 
-    const bookmarkList = showList && (
-      <BookmarkList loadBookmark={this.loadBookmark}
-                    deleteBookmark={this.deleteBookmark}
-                    toggleModal={this.toggleListModal} />
+    const savedSearchList = showList && (
+      <SavedSearchList loadSavedSearch={this.loadSavedSearch}
+                       deleteSavedSearch={this.deleteSavedSearch}
+                       toggleModal={this.toggleListModal} />
     );
 
     const loaded = (view && view.id);
-    const bookmarkStyle = loaded ? 'star' : 'star-o';
-    let bookmarkColor: string = '';
+    const savedSearchStyle = loaded ? 'star' : 'star-o';
+    let savedSearchColor: string = '';
     if (loaded) {
-      bookmarkColor = dirty ? '#ffc107' : '#007bff';
+      savedSearchColor = dirty ? '#ffc107' : '#007bff';
     }
 
     const disableReset = !(dirty || loaded);
@@ -218,15 +216,15 @@ class BookmarkControls extends React.Component<Props, State> {
       title = loaded ? 'Saved search' : 'Save search';
     }
 
-    const bookmarkForm = showForm && (
-      <BookmarkForm onChangeTitle={this.onChangeTitle}
-                    target={this.formTarget}
-                    saveSearch={this.saveSearch}
-                    saveAsSearch={this.saveAsSearch}
-                    disableCreateNew={newTitle === view.title}
-                    isCreateNew={!view.id}
-                    toggleModal={this.toggleFormModal}
-                    value={newTitle} />
+    const savedSearchForm = showForm && (
+      <SavedSearchForm onChangeTitle={this.onChangeTitle}
+                       target={this.formTarget}
+                       saveSearch={this.saveSearch}
+                       saveAsSearch={this.saveAsSearch}
+                       disableCreateNew={newTitle === view.title}
+                       isCreateNew={!view.id}
+                       toggleModal={this.toggleFormModal}
+                       value={newTitle} />
     );
 
     return (
@@ -236,15 +234,15 @@ class BookmarkControls extends React.Component<Props, State> {
             <ButtonGroup>
               <React.Fragment>
                 <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-                  <Icon style={{ color: bookmarkColor }} name={bookmarkStyle} /> Save
+                  <Icon style={{ color: savedSearchColor }} name={savedSearchStyle} /> Save
                 </Button>
-                {bookmarkForm}
+                {savedSearchForm}
               </React.Fragment>
               <Button title="Load a previously saved search"
                       onClick={this.toggleListModal}>
                 <Icon name="folder-o" /> Load
               </Button>
-              {bookmarkList}
+              {savedSearchList}
               <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
                 <MenuItem onSelect={this.loadAsDashboard}><Icon name="dashboard" /> Export to dashboard</MenuItem>
                 <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download" /> Export to CSV</MenuItem>
@@ -267,7 +265,7 @@ class BookmarkControls extends React.Component<Props, State> {
 }
 
 export default connect(
-  BookmarkControls,
+  SavedSearchControls,
   {
     currentUser: CurrentUserStore,
     viewStoreState: ViewStore,

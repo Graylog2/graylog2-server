@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
-<BookmarkForm
+exports[`SavedSearchForm render the SavedSearchForm should render create new 1`] = `
+<SavedSearchForm
   disableCreateNew={false}
   isCreateNew={true}
   onChangeTitle={[Function]}
@@ -24,7 +24,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
           target={[Function]}
         >
           <Popover
-            id="bookmark-popover"
+            id="saved-search-popover"
             title="Name of search"
           >
             <GraylogThemeProvider>
@@ -56,7 +56,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                 }
               >
                 <Popover__StyledPopover
-                  id="bookmark-popover"
+                  id="saved-search-popover"
                   title="Name of search"
                 >
                   <StyledComponent
@@ -83,19 +83,19 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                       }
                     }
                     forwardedRef={null}
-                    id="bookmark-popover"
+                    id="saved-search-popover"
                     title="Name of search"
                   >
                     <Popover
                       bsClass="popover"
                       className="Popover__StyledPopover-wd1j0g-0 lbOgZZ"
-                      id="bookmark-popover"
+                      id="saved-search-popover"
                       placement="right"
                       title="Name of search"
                     >
                       <div
                         className="Popover__StyledPopover-wd1j0g-0 lbOgZZ popover right"
-                        id="bookmark-popover"
+                        id="saved-search-popover"
                         role="tooltip"
                         style={
                           Object {
@@ -438,11 +438,11 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
       </MockPosition>
     </mock-portal>
   </MockPortal>
-</BookmarkForm>
+</SavedSearchForm>
 `;
 
-exports[`BookmarkForm render the BookmarkForm should render disabled create new 1`] = `
-<BookmarkForm
+exports[`SavedSearchForm render the SavedSearchForm should render disabled create new 1`] = `
+<SavedSearchForm
   disableCreateNew={true}
   isCreateNew={false}
   onChangeTitle={[Function]}
@@ -465,7 +465,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
           target={[Function]}
         >
           <Popover
-            id="bookmark-popover"
+            id="saved-search-popover"
             title="Name of search"
           >
             <GraylogThemeProvider>
@@ -497,7 +497,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                 }
               >
                 <Popover__StyledPopover
-                  id="bookmark-popover"
+                  id="saved-search-popover"
                   title="Name of search"
                 >
                   <StyledComponent
@@ -524,19 +524,19 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                       }
                     }
                     forwardedRef={null}
-                    id="bookmark-popover"
+                    id="saved-search-popover"
                     title="Name of search"
                   >
                     <Popover
                       bsClass="popover"
                       className="Popover__StyledPopover-wd1j0g-0 lbOgZZ"
-                      id="bookmark-popover"
+                      id="saved-search-popover"
                       placement="right"
                       title="Name of search"
                     >
                       <div
                         className="Popover__StyledPopover-wd1j0g-0 lbOgZZ popover right"
-                        id="bookmark-popover"
+                        id="saved-search-popover"
                         role="tooltip"
                         style={
                           Object {
@@ -956,11 +956,11 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
       </MockPosition>
     </mock-portal>
   </MockPortal>
-</BookmarkForm>
+</SavedSearchForm>
 `;
 
-exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
-<BookmarkForm
+exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
+<SavedSearchForm
   disableCreateNew={false}
   isCreateNew={false}
   onChangeTitle={[Function]}
@@ -983,7 +983,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
           target={[Function]}
         >
           <Popover
-            id="bookmark-popover"
+            id="saved-search-popover"
             title="Name of search"
           >
             <GraylogThemeProvider>
@@ -1015,7 +1015,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                 }
               >
                 <Popover__StyledPopover
-                  id="bookmark-popover"
+                  id="saved-search-popover"
                   title="Name of search"
                 >
                   <StyledComponent
@@ -1042,19 +1042,19 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                       }
                     }
                     forwardedRef={null}
-                    id="bookmark-popover"
+                    id="saved-search-popover"
                     title="Name of search"
                   >
                     <Popover
                       bsClass="popover"
                       className="Popover__StyledPopover-wd1j0g-0 lbOgZZ"
-                      id="bookmark-popover"
+                      id="saved-search-popover"
                       placement="right"
                       title="Name of search"
                     >
                       <div
                         className="Popover__StyledPopover-wd1j0g-0 lbOgZZ popover right"
-                        id="bookmark-popover"
+                        id="saved-search-popover"
                         role="tooltip"
                         style={
                           Object {
@@ -1474,5 +1474,5 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
       </MockPosition>
     </mock-portal>
   </MockPortal>
-</BookmarkForm>
+</SavedSearchForm>
 `;

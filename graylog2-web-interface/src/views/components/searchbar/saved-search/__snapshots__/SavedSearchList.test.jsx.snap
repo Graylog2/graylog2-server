@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BookmarkList render the BookmarkList should render empty 1`] = `
+exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
 <body
   class="modal-open"
   style="padding-right: 0px;"
@@ -77,121 +77,15 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
               </form>
             </div>
             <div
-              class="form-inline page-size"
-              style="float: right;"
+              class="SavedSearchList__NoSavedSearches-sc-1r3qvm6-1 gmJDqJ Alert-sc-1yucn9g-0 hvlYMM alert alert-info"
+              role="alert"
             >
-              <div
-                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
-              >
-                <label
-                  class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                  for="page-size"
-                >
-                  Show:
-                </label>
-                <span>
-                  <select
-                    class="FormControl-sc-1amoaox-0 eOArng form-control input-sm"
-                    id="page-size"
-                    label="Show:"
-                    name="page-size"
-                    placeholder=""
-                    type="select"
-                  >
-                    <option
-                      value="5"
-                    >
-                      5
-                    </option>
-                    <option
-                      value="10"
-                    >
-                      10
-                    </option>
-                    <option
-                      value="15"
-                    >
-                      15
-                    </option>
-                  </select>
-                  
-                </span>
-              </div>
-            </div>
-            <span>
-              No bookmarks found
-            </span>
-            <div
-              class="text-center pagination-wrapper"
-            >
-              <ul
-                class="pagination pagination-sm"
-              >
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="First"
-                    >
-                      «
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Previous"
-                    >
-                      ‹
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Next"
-                    >
-                      ›
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Last"
-                    >
-                      »
-                    </span>
-                  </a>
-                </li>
-              </ul>
+              <i
+                class="fa fa-exclamation-triangle SavedSearchList__AlertIcon-sc-1r3qvm6-0 gQjhqx fa-lg"
+              />
+              <span>
+                No saved searches found.
+              </span>
             </div>
           </div>
           <div
@@ -225,7 +119,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
 </body>
 `;
 
-exports[`BookmarkList render the BookmarkList should render with views 1`] = `
+exports[`SavedSearchList render the SavedSearchList should render with views 1`] = `
 <body
   class="modal-open"
   style="padding-right: 0px;"
