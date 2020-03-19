@@ -109,6 +109,8 @@ ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
+const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
+
 export default {
   pages: {
     search: { component: NewSearchPage },
@@ -202,12 +204,12 @@ export default {
       type: 'aggregate',
       title: 'Show top values',
       handler: AggregateActionHandler,
-      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields)): ActionHandlerCondition),
     },
     {
       type: 'statistics',
       title: 'Statistics',
-      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: (({ field, type, contexts: { analysisDisabledFields } }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields)): ActionHandlerCondition),
       handler: FieldStatisticsHandler,
     },
     {
