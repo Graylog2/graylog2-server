@@ -5,14 +5,14 @@ import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRa
 import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 
-export default function TimeRangeInput({ disabled, rangeType, rangeParams, config, onChange }) {
+export default function TimeRangeInput({ disabled, rangeType, rangeParams, config, onChange, onSubmit }) {
   switch (rangeType) {
     case 'relative':
-      return <RelativeTimeRangeSelector disabled={disabled} value={rangeParams} config={config} onChange={onChange} />;
+      return <RelativeTimeRangeSelector disabled={disabled} value={rangeParams} config={config} onChange={onChange} onSubmit={onSubmit} />;
     case 'absolute':
-      return <AbsoluteTimeRangeSelector disabled={disabled} value={rangeParams} onChange={onChange} />;
+      return <AbsoluteTimeRangeSelector disabled={disabled} value={rangeParams} onChange={onChange} onSubmit={onSubmit} />;
     case 'keyword':
-      return <KeywordTimeRangeSelector disabled={disabled} value={rangeParams} onChange={onChange} />;
+      return <KeywordTimeRangeSelector disabled={disabled} value={rangeParams} onChange={onChange} onSubmit={onSubmit} />;
     default:
       throw new Error(`Unsupported range type ${rangeType}`);
   }
