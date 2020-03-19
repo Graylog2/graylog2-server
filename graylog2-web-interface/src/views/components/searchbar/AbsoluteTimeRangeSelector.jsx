@@ -47,7 +47,10 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
   constructor(props, context) {
     super(props, context);
 
-    this.state = _extractStateFromProps(props);
+    this.state = {
+      ..._extractStateFromProps(props),
+      validation: {},
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -62,19 +65,47 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
     // eslint-disable-next-line react/destructuring-assignment
     const value = this.state[key];
 
-    if (_isValidDateString(value)) {
+    const valid = _isValidDateString(value);
+
+    this.setState(({ validation }) => ({
+      validation: {
+        ...validation,
+        [key]: (valid ? 'success' : 'error'),
+      },
+    }));
+
+    if (valid) {
       onChange(key, _formattedDateStringInUserTZ(value).toISOString());
     }
   };
 
   onChange = (key, value) => {
+    const { onChange } = this.props;
     this.setState({ [key]: value });
+
+    const valid = _isValidDateString(value);
+
+    this.setState(({ validation }) => ({
+      validation: {
+        ...validation,
+        [key]: (valid ? 'success' : 'error'),
+      },
+    }));
+
+    if (valid) {
+      onChange(key, _formattedDateStringInUserTZ(value).toISOString());
+    }
   };
 
-  onExecute = (e) => {
-    const { onExecute } = this.props;
+  onSubmit = (e) => {
+    const { onSubmit } = this.props;
+    const { validation } = this.state;
     e.preventDefault();
-    onExecute();
+    e.stopPropagation();
+
+    if (!Object.values(validation).find(v => v === 'error')) {
+      onSubmit();
+    }
   };
 
   render() {
@@ -82,7 +113,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
     const { disabled, onChange } = this.props;
 
     return (
-      <form className={`timerange-selector absolute ${styles.selectorContainer}`} onSubmit={this.onExecute}>
+      <form className={`timerange-selector absolute ${styles.selectorContainer}`} onSubmit={this.onSubmit}>
         <input type="hidden" name="from" />
         <div className={styles.inputWidth}>
           <DatePicker id="searchFromDatePicker"
@@ -135,6 +166,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    required />
           </DatePicker>
         </div>
+        <input type="submit" style={{ display: 'none' }} />
       </form>
     );
   }
@@ -144,6 +176,7 @@ AbsoluteTimeRangeSelector.propTypes = {
   disabled: PropTypes.bool,
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 AbsoluteTimeRangeSelector.defaultProps = {
