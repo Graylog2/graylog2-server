@@ -15,9 +15,9 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 
-type ExportSettingsType = {
+type CSVExportSettingsType = {
   fields: List<FieldTypeMapping>,
-  selectedWidget: Widget,
+  selectedWidget: ?Widget,
   selectField: ({ label: string, value: string }[]) => void,
   selectedFields: ?{field: string}[],
   setSelectedSort: (Array<*>) => any,
@@ -26,24 +26,30 @@ type ExportSettingsType = {
   widgetTitles: Map<string, string>,
 }
 
-const ExportSettings = ({ fields, selectedWidget, selectField, selectedFields, setSelectedSort, selectedSortDirection, selectedSort, widgetTitles }: ExportSettingsType) => {
+const SelectedWidgetInfo = ({ selectedWidget, widgetTitles }: {selectedWidget: Widget, widgetTitles: Map<string, string>}) => {
+  const selectedWidgetTitle = widgetTitles.get(selectedWidget.id) || MessagesWidget.defaultTitle;
+  return (
+    <Row>
+      <i>
+        <IfSearch>
+          {selectedWidget && `The following settings are based on the message table: ${selectedWidgetTitle}`}<br />
+        </IfSearch>
+        <IfDashboard>
+          {selectedWidget && `You are currently exporting the search results for the message table: ${selectedWidgetTitle}`}<br />
+        </IfDashboard>
+      </i>
+    </Row>
+  );
+};
+
+const CSVExportSettings = ({ fields, selectedWidget, selectField, selectedFields, setSelectedSort, selectedSortDirection, selectedSort, widgetTitles }: CSVExportSettingsType) => {
   const onSortDirectionChange = (newDirection) => {
     const newSort = selectedSort.map(sort => sort.toBuilder().direction(newDirection).build());
     setSelectedSort(newSort);
   };
-  const selectedWidgetTitle = widgetTitles.get(selectedWidget.id) || MessagesWidget.defaultTitle;
   return (
     <>
-      <Row>
-        <i>
-          <IfSearch>
-            {selectedWidget && `The following settings are based on the message table: ${selectedWidgetTitle}`}<br />
-          </IfSearch>
-          <IfDashboard>
-            {selectedWidget && `You are currently exporting the search results for the message table: ${selectedWidgetTitle}`}<br />
-          </IfDashboard>
-        </i>
-      </Row>
+      {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} widgetTitles={widgetTitles} />}
       <Row>
         Define the fields and sorting for your CSV file. You can change the field order with drag and drop.<br />
         When you have finished the configuration, click on &quot;Start Download&quot;.
@@ -68,4 +74,4 @@ const ExportSettings = ({ fields, selectedWidget, selectField, selectedFields, s
   );
 };
 
-export default ExportSettings;
+export default CSVExportSettings;
