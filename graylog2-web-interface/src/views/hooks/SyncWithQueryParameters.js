@@ -48,7 +48,7 @@ export const syncWithQueryParameters = (query: string, action: (string) => mixed
         .reduce((prev, [key, value]) => prev.setSearch(key, value), baseUri);
       const currentStreams = filtersToStreamSet(filter);
       const uri = currentStreams.isEmpty()
-        ? uriWithTimerange.toString()
+        ? uriWithTimerange.removeSearch('streams').toString()
         : uriWithTimerange.setSearch('streams', currentStreams.join(',')).toString();
       if (query !== uri) {
         action(uri);
