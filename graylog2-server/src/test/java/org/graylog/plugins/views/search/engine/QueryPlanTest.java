@@ -28,14 +28,13 @@ import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
+import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.streams.StreamService;
 import org.junit.Test;
 
 import javax.inject.Provider;
@@ -61,8 +60,7 @@ public class QueryPlanTest {
         ElasticsearchBackend backend = new ElasticsearchBackend(handlers,
                 queryStringParser,
                 null,
-                mock(IndexRangeService.class),
-                mock(StreamService.class),
+                mock(IndexLookup.class),
                 new ESQueryDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup));
         queryEngine = new QueryEngine(ImmutableMap.of("elasticsearch", backend), Collections.emptySet());
