@@ -1,17 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+
 import { Col, Row } from 'components/graylog';
 import Footer from 'components/layout/Footer';
+
+const StyledRow = styled(Row)`
+  margin-bottom: 0;
+`;
+
+const StyledCol = styled(Col)`
+  margin-top: 10px;
+  padding: 5px 25px;
+
+  @media print {
+    width: 100%;
+  }
+`;
 
 const AppWithoutSearchBar = (props) => {
   const { children } = props;
   return (
     <div className="container-fluid">
-      <Row id="main-row">
-        <Col md={12} id="main-content">
+      <StyledRow>
+        <StyledCol md={12}>
           {children}
-        </Col>
-      </Row>
+        </StyledCol>
+      </StyledRow>
       <Footer />
     </div>
   );

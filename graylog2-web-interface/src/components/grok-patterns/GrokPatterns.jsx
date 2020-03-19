@@ -1,7 +1,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col, Button } from 'components/graylog';
+import styled from 'styled-components';
 
+import { Row, Col, Button } from 'components/graylog';
 import PageHeader from 'components/common/PageHeader';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
@@ -10,6 +11,16 @@ import IfPermitted from 'components/common/IfPermitted';
 import StoreProvider from 'injection/StoreProvider';
 
 const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
+
+const GrokPatternsList = styled(DataTable)`
+  th.name {
+    min-width: 200px;
+  }
+
+  td {
+    word-break: break-all;
+  }
+`;
 
 const GrokPatterns = createReactClass({
   displayName: 'GrokPatterns',
@@ -140,15 +151,15 @@ const GrokPatterns = createReactClass({
         <Row className="content">
           <Col md={12}>
             <IfPermitted permissions="inputs:read">
-              <DataTable id="grok-pattern-list"
-                         className="table-striped table-hover"
-                         headers={headers}
-                         headerCellFormatter={this._headerCellFormatter}
-                         sortByKey="name"
-                         rows={this.state.patterns}
-                         dataRowFormatter={this._patternFormatter}
-                         filterLabel="Filter patterns"
-                         filterKeys={filterKeys} />
+              <GrokPatternsList id="grok-pattern-list"
+                                className="table-striped table-hover"
+                                headers={headers}
+                                headerCellFormatter={this._headerCellFormatter}
+                                sortByKey="name"
+                                rows={this.state.patterns}
+                                dataRowFormatter={this._patternFormatter}
+                                filterLabel="Filter patterns"
+                                filterKeys={filterKeys} />
             </IfPermitted>
           </Col>
         </Row>

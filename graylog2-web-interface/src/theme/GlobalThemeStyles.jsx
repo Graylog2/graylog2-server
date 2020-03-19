@@ -119,36 +119,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     padding-left: 50px;
   }
 
-  .content p.description-tooltips-small .fa-stack {
-    margin-right: 1px;
-    position: relative;
-    top: -1px;
-  }
-
   .content p.description-tooltips {
     margin-top: 10px;
-  }
-
-  .content-col {
-    padding: 15px 10px;
-    background-color: ${theme.color.global.contentBackground};
-    border: 1px solid ${theme.color.gray[80]};
-    margin-top: 15px;
-  }
-
-  #main-row {
-    margin-bottom: 0;
-  }
-
-  #main-content {
-    margin-top: 10px;
-    padding: 5px 25px;
-  }
-
-  .support-sources ul {
-    margin: 0;
-    padding: 0;
-    margin-top: 5px;
   }
 
   .notifications-none {
@@ -168,37 +140,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
   }
 
-  .selected-resolution {
-    font-weight: bold;
-  }
-
   .modal form {
     margin-bottom: 0;
   }
 
-  .input-new {
-    margin-bottom: 8px;
-  }
-
   .alert-bar {
     margin: 10px -20px 0;
-  }
-
-  .xtrc-new-example {
-    margin-bottom: 5px;
-    font-family: monospace;
-    font-size: 14px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-
-  .xtrc-no-example {
-    margin-top: 15px;
-    margin-bottom: 12px;
-  }
-
-  #create-extractor {
-    margin-top: 10px;
   }
 
   .xtrc-converter-subfields {
@@ -221,25 +168,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .timerange-selector select {
     margin-bottom: 0;
-  }
-
-  .timerange-chooser {
-    float: left;
-    margin-right: 5px;
-  }
-
-  .timerange-chooser .btn {
-    padding: 6px 7px;
-    line-height: 15px;
-    font-size: 12px;
-  }
-
-  .timerange-chooser .btn .caret {
-    margin-left: 1px;
-  }
-
-  .timerange-chooser .selected a {
-    font-weight: bold;
   }
 
   .master-node {
@@ -266,49 +194,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-left: 10px;
   }
 
-  .alpha80 {
-    background: rgb(0, 0, 0) transparent;
-    background: rgba(0, 0, 0, 0.8);
-    filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
-  }
-
-  #scroll-to-hint {
-    position: fixed;
-    left: 50%;
-    margin-left: -125px;
-    top: 50px;
-    color: ${theme.color.global.textAlt};
-    font-size: 80px;
-    padding: 25px;
-    z-index: 2000;
-    width: 200px;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 10px;
-  }
-
-  .graph-range-selector {
-    outline: 1px solid ${theme.color.gray[90]};
-    background: rgba(0, 0, 0, 0.3);
-    position: absolute;
-    top: 0;
-    z-index: 1;
-    cursor: pointer;
-    pointer-events: none;
-  }
-
-  .detail_swatch {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    margin: 0 4px 0 0;
-  }
-
-  #field-graphs .spinner {
-    margin-bottom: 10px;
-    text-align: center;
-  }
-
   .sources.overlay {
     background-color: ${theme.color.gray[60]};
     height: 200px;
@@ -317,44 +202,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     position: absolute;
     text-align: center;
     font-size: 50px;
-  }
-
-  ul.index-list {
-    margin-left: 25px;
-    margin-top: 5px;
-    list-style-type: square;
-  }
-
-  .metric-list {
-    padding: 0;
-  }
-
-  .metric-list li {
-    margin-bottom: 5px;
-  }
-
-  .metric-list li .prefix {
-    color: ${theme.color.gray[60]};
-  }
-
-  .metric-list li .name {
-    font-size: 13px;
-    font-family: monospace;
-    word-break: break-all;
-  }
-
-  .metric-list li .metric {
-    margin-left: 10px;
-    padding: 10px;
-  }
-
-  .metric-list li .metric h3 {
-    margin-bottom: 5px;
-  }
-
-  .metric-list dl {
-    margin-top: 0;
-    margin-bottom: 0;
   }
 
   .metrics-filter {
@@ -383,10 +230,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   dl.metric-histogram dd {
     margin-left: 125px;
-  }
-
-  .metric-list li .name .open:hover {
-    text-decoration: none;
   }
 
   #user-list th.user-type {
@@ -586,42 +429,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
   }
 
-  .shard-routing .shards .shard {
-    padding: 10px;
-    margin: 5px;
-    width: 50px;
-    float: left;
-    text-align: center;
-  }
-
-  .shard-routing .shards .shard-started {
-    background-color: #dff0d8;
-  }
-
-  .shard-routing .shards .shard-relocating {
-    background-color: #de9df4;
-  }
-
-  .shard-routing .shards .shard-initializing {
-    background-color: #f4ddbc;
-  }
-
-  .shard-routing .shards .shard-unassigned {
-    background-color: ${theme.color.gray[70]};
-  }
-
-  .shard-routing .shards .shard-primary .id {
-    font-weight: bold;
-    margin-bottom: 3px;
-    border-bottom: 1px solid ${theme.color.gray[0]};
-  }
-
-  .shard-routing .description {
-    font-size: 11px;
-    margin-top: 2px;
-    margin-left: 6px;
-  }
-
   .system-system dt {
     float: left;
   }
@@ -699,43 +506,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 0;
   }
 
-  .alert-type-form .help-text {
-    color: ${theme.color.gray[50]};
-    font-size: 12px;
-    margin-left: 10px;
-  }
-
-  .alert-type-form input[type=number],
-  .alert-type-form input[type=text],
-  .alert-type-form select {
-    padding: 0 0 0 5px;
-    height: 25px;
-    vertical-align: baseline;
-    width: 50px;
-  }
-
-  .alert-type-form input[type=text] {
-    width: 200px;
-  }
-
-  .alert-type-form input.alert-type-title {
-    width: 300px;
-  }
-
-  .add-alert-destination-type {
-    margin-bottom: 0;
-  }
-
-  .alert-destination-form {
-    display: none;
-    font-size: 14px;
-    margin-top: 15px;
-  }
-
-  .alert-receivers {
-    padding-left: 10px;
-  }
-
   .alerts {
     margin-top: 15px;
   }
@@ -758,66 +528,13 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     color: ${theme.color.global.textAlt};
   }
 
-  .alert-condition .in-grace {
-    color: ${theme.color.gray[40]};
-  }
-
-  .query-exception {
-    margin-bottom: 0;
-  }
-
-  input.required-input-highlight {
-    border-color: rgb(233, 50, 45);
-    color: rgb(233, 50, 45);
-  }
-
-  .widget .replay-link {
-    color: ${theme.color.gray[0]};
-  }
-
-  .widget .replay-link:hover {
-    text-decoration: none;
-  }
-
-  .zeroclipboard-is-hover {
-    /* // via .btn-default:hover from bootstrap */
-    color: ${theme.color.global.textDefault};
-    background-color: ${theme.color.gray[80]};
-    border-color: ${theme.color.gray[70]}; /* // bootstrap copy end */
-    cursor: move;
-  }
-
-  .zeroclipboard-is-active {
-    color: ${theme.color.variant.dark.info};
-  }
-
   .result-highlight-colored {
     background-color: ${theme.color.variant.warning};
-  }
-
-  .result-highlight-control label {
-    display: inline-block;
-    font-size: 1em;
-    line-height: 20px;
-  }
-
-  .node-state {
-    cursor: help;
   }
 
   .annotation .content {
     margin-bottom: 10px;
     cursor: auto !important;
-  }
-
-  textarea.textarea-xlarge {
-    width: 95%;
-    height: 300px;
-  }
-
-  .extractor-json {
-    font-family: monospace;
-    font-size: 13px;
   }
 
   .scrollable-table {
@@ -868,118 +585,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     display: inline-block;
   }
 
-  .card {
-    padding: 12px 20px;
-    font-size: 15px;
-    font-weight: 300;
-    background-color: ${theme.color.gray[100]};
-    border: 1px solid ${theme.color.gray[90]};
-    border-radius: 2px;
-    margin: 10px;
-  }
-
-  .card h1 {
-    margin-bottom: 5px;
-    font-size: 28px;
-    line-height: 1;
-    letter-spacing: -1;
-  }
-
-  .card label {
-    font-weight: inherit;
-  }
-
-  .card div {
-    margin-left: 0;
-  }
-
-  .card ul li {
-    margin-bottom: 5px;
-  }
-
-  .card.info p {
-    margin: 0;
-  }
-
-  .card .configuration-bundles .bundle-preview {
-    border: 1px solid ${theme.color.gray[90]};
-    border-radius: 2px;
-    background-color: ${theme.color.global.contentBackground};
-    padding: 20px;
-  }
-
-  .card .configuration-bundles .bundle-preview pre {
-    background-color: ${theme.color.gray[90]};
-  }
-
-  .configuration-bundles .accordion {
-    background-color: ${theme.color.global.contentBackground};
-    border: 1px solid ${theme.color.gray[90]};
-    border-radius: 2px;
-  }
-
-  .configuration-bundles .accordion-group {
-    margin: 0;
-    border: 0;
-    border-bottom: 1px solid ${theme.color.gray[90]};
-    border-radius: 0;
-  }
-
-  .configuration-bundles .accordion-inner {
-    padding-left: 30px;
-  }
-
-  .configuration-bundles .accordion-inner .upload input[type="file"] {
-    height: 32px;
-  }
-
-  .configuration-bundles .bundle-preview {
-    background-color: ${theme.color.global.contentBackground};
-    border: 1px solid ${theme.color.global.background};
-    border-radius: 3px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
-    padding: 10px;
-  }
-
-  .configuration-bundles .bundle-preview .preview-actions form {
-    display: inline-block;
-    margin-left: 20px;
-    margin-bottom: 0;
-  }
-
-  .configuration-bundles .bundle-preview .preview-actions form:first-child {
-    margin-left: 0;
-  }
-
-  .configuration-bundles .bundle-preview pre {
-    background-color: ${theme.color.gray[70]};
-  }
-
-  .configuration-bundles .bundle-preview dd {
-    margin-bottom: 10px;
-  }
-
-  .bundle-preview ul,
-  .bundle-preview ol {
-    margin: 0 0 10px 25px;
-  }
-
-  .bundle-preview ul {
-    list-style-type: circle;
-  }
-
-  .build-content-pack button.select-all {
-    margin-top: 7px;
-    padding: 0;
-  }
-
-  #react-configuration-bundles {
-    font-size: 14px;
-    font-weight: normal;
-    line-height: 20px;
-    margin-top: 15px;
-  }
-
   .form-inline label {
     margin-right: 10px;
   }
@@ -999,40 +604,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-left: 20px;
   }
 
-  .sources-title {
-    height: 22px;
-    line-height: 22px;
-    vertical-align: top;
-  }
-
-  .sources-filtering {
-    margin-top: 10px;
-  }
-
-  .sources-filtering .control-group {
-    margin-bottom: 0;
-  }
-
-  #dc-sources-pie-chart svg {
-    margin-top: 20px;
-  }
-
-  #dc-sources-pie-chart g.pie-slice.highlighted {
-    fill-opacity: 0.8;
-  }
-
-  .form-horizontal .control-group .controls .checkbox-control:first-child {
-    padding-top: 5px;
-  }
-
-  .form-horizontal .control-group .controls .checkbox-control label.checkbox {
-    display: inline-block;
-  }
-
-  .form-horizontal .control-group .controls .checkbox-control span.help-inline {
-    vertical-align: top;
-  }
-
   form.extractor-form .control-group label {
     display: inline-block;
   }
@@ -1050,14 +621,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     width: 110px;
   }
 
-  #grok-pattern-list th.name {
-    min-width: 200px;
-  }
-
-  #grok-pattern-list td {
-    word-break: break-all;
-  }
-
   .btn-text {
     font-family: 'Open Sans', sans-serif;
     font-size: 12px;
@@ -1067,48 +630,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .message-loader-form input {
     margin-right: 5px;
-  }
-
-  ul.streams {
-    padding: 0;
-    margin: 0;
-  }
-
-  ul.streams li.stream {
-    display: block;
-    padding: 15px 0;
-  }
-
-  ul.streams li.stream:not(:last-child) {
-    border-bottom: 1px solid ${theme.color.variant.light.info};
-  }
-
-  ul.streams li.stream .stream-data {
-    margin-top: 8px;
-  }
-
-  ul.streams li.stream .stream-data .stream-actions {
-    position: relative;
-    float: right;
-    right: 0;
-    bottom: 20px;
-  }
-
-  ul.streams li.stream .stream-data .stream-actions form.action-form {
-    display: inline-block;
-  }
-
-  ul.streams li.stream .stream-data .stream-actions .btn-delete {
-    margin-left: 15px;
-    margin-right: 15px;
-  }
-
-  ul.streams li.stream .stream-data .stream-actions .btn-delete.last {
-    margin-right: 0;
-  }
-
-  ul.streams li.stream .stream-description {
-    margin-bottom: 3px;
   }
 
   ul.entity-list {
@@ -1226,42 +747,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-bottom: 0;
   }
 
-  .graylog-input {
-    margin-top: 15px;
-    border-bottom: 1px;
-  }
-
   .graylog-input-metrics {
     margin-top: 5px;
-  }
-
-  .react-input-metrics {
-    margin-top: 5px;
-    font-size: 13px;
-  }
-
-  .alert-type-form label.radio-inline {
-    margin-right: 0;
-    vertical-align: baseline;
-  }
-
-  .alert-type-form .radio-inline input[type=radio] {
-    position: relative;
-    margin-left: -20px;
-    margin-right: 5px;
-  }
-
-  .alert-type-form div.well {
-    margin-bottom: 0;
-  }
-
-  .alert-type-form .threshold-type {
-    margin: 0 5px;
-    vertical-align: baseline;
-  }
-
-  .form-inline .alert-type-form .form-control {
-    vertical-align: baseline;
   }
 
   .filter .form-inline .form-group {
@@ -1289,32 +776,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     border-bottom: 1px solid ${theme.color.gray[90]};
   }
 
-  /* // Ensure that the stream start/pause buttons have the same size. */
-  .toggle-stream-button {
-    width: 8.5em;
-  }
-
   .threaddump {
     font-size: 11px;
   }
 
   h2.extractor-title {
     margin-bottom: 2px;
-  }
-
-  p.failure-exception {
-    margin-top: 5px;
-    margin-bottom: 10px;
-    color: ${theme.color.gray[60]};
-  }
-
-  i.error-icon {
-    position: relative;
-    top: -3px;
-  }
-
-  .stream-description .fa-cube {
-    margin-right: 5px;
   }
 
   .stream-loader {
@@ -1380,23 +847,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     content: "×";
   }
 
-  .field-analyzer {
-    margin-left: 0 !important;
-    margin-top: 10px !important;
-  }
-
   .save-button-margin {
     margin-right: 5px;
   }
 
   .form-control.message-id-input {
     width: 300px;
-  }
-
-  .dropdown-header {
-    text-transform: uppercase;
-    padding: 0 15px !important;
-    font-weight: bold;
   }
 `);
 

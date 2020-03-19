@@ -1,11 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
+import styled from 'styled-components';
+
 import { Alert } from 'components/graylog';
 import { Icon } from 'components/common';
-
 import PermissionsMixin from 'util/PermissionsMixin';
+
 import Stream from './Stream';
+
+const StreamsList = styled.ul`
+  padding: 0;
+  margin: 0;
+`;
 
 const StreamList = createReactClass({
   displayName: 'StreamList',
@@ -44,9 +51,9 @@ const StreamList = createReactClass({
       const streamList = this.props.streams.sort(this._sortByTitle).map(this._formatStream);
 
       return (
-        <ul className="streams">
+        <StreamsList>
           {streamList}
-        </ul>
+        </StreamsList>
       );
     }
     return (

@@ -3,6 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
 import { Button, Tooltip } from 'components/graylog';
 import { OverlayElement, Icon } from 'components/common';
@@ -17,10 +18,53 @@ import StreamMetaData from './StreamMetaData';
 import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
 
-import style from './Stream.css';
-
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
+
+const StreamListItem = styled.li`
+  display: block;
+  padding: 15px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #6dcff6;
+  }
+
+  .stream-data {
+    margin-top: 8px;
+
+    .stream-actions {
+      position: relative;
+      float: right;
+      right: 0;
+      bottom: 20px;
+
+      form.action-form {
+        display: inline-block;
+      }
+
+      .btn-delete {
+        margin-left: 15px;
+        margin-right: 15px;
+
+        &.last {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  .stream-description {
+    margin-bottom: 3px;
+
+    .fa-cube {
+      margin-right: 5px;
+    }
+  }
+`;
+
+const ToggleButton = styled(Button)`
+  width: 8.5em;
+`;
 
 const Stream = createReactClass({
   displayName: 'Stream',
@@ -136,23 +180,21 @@ const Stream = createReactClass({
       if (stream.disabled) {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-            <Button bsStyle="success"
-                    className="toggle-stream-button"
-                    onClick={this._onResume}
-                    disabled={isDefaultStream || loading}>
+            <ToggleButton bsStyle="success"
+                          onClick={this._onResume}
+                          disabled={isDefaultStream || loading}>
               {loading ? 'Starting...' : 'Start Stream'}
-            </Button>
+            </ToggleButton>
           </OverlayElement>
         );
       } else {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-            <Button bsStyle="primary"
-                    className="toggle-stream-button"
-                    onClick={this._onPause}
-                    disabled={isDefaultStream || loading}>
+            <ToggleButton bsStyle="primary"
+                          onClick={this._onPause}
+                          disabled={isDefaultStream || loading}>
               {loading ? 'Pausing...' : 'Pause Stream'}
-            </Button>
+            </ToggleButton>
           </OverlayElement>
         );
       }
@@ -179,7 +221,7 @@ const Stream = createReactClass({
     const indexSetDetails = this.isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
 
     return (
-      <li className="stream">
+      <StreamListItem>
         <div className="stream-actions pull-right">
           {editRulesLink}{' '}
           {manageOutputsLink}{' '}
@@ -189,7 +231,7 @@ const Stream = createReactClass({
           {streamControls}
         </div>
 
-        <h2 className={style.streamTitle}>
+        <h2>
           <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
           {' '}
           <small>{indexSetDetails}<StreamStateBadge stream={stream} /></small>
@@ -210,7 +252,7 @@ const Stream = createReactClass({
                         title="New Stream Rule"
                         onSubmit={this._onSaveStreamRule}
                         streamRuleTypes={streamRuleTypes} />
-      </li>
+      </StreamListItem>
     );
   },
 });

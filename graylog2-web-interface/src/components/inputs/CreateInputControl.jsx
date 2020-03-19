@@ -1,6 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import styled from 'styled-components';
 
 import { Col, Row, Button } from 'components/graylog';
 import { ExternalLinkButton, Select } from 'components/common';
@@ -15,6 +16,10 @@ import { InputForm } from 'components/inputs';
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 const InputTypesStore = StoreProvider.getStore('InputTypes');
+
+const NewInputRow = styled(Row)`
+  margin-bottom: 8px;
+`;
 
 const CreateInputControl = createReactClass({
   displayName: 'CreateInputControl',
@@ -96,7 +101,7 @@ const CreateInputControl = createReactClass({
     }
 
     return (
-      <Row className="content input-new">
+      <NewInputRow className="content">
         <Col md={12}>
           <form className="form-inline" onSubmit={this._openModal}>
             <div className="form-group" style={{ width: 300 }}>
@@ -116,7 +121,7 @@ const CreateInputControl = createReactClass({
           </form>
           {inputModal || customInputsComponent}
         </Col>
-      </Row>
+      </NewInputRow>
     );
   },
 });

@@ -2,6 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
 import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
@@ -13,6 +14,13 @@ import ContentPackUploadControls from 'components/content-packs/ContentPackUploa
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
+
+const ConfigurationBundles = styled.div`
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 20px;
+  margin-top: 15px;
+`;
 
 const ContentPacksPage = createReactClass({
   displayName: 'ContentPacksPage',
@@ -81,12 +89,12 @@ const ContentPacksPage = createReactClass({
 
           <Row className="content">
             <Col md={12}>
-              <div id="react-configuration-bundles">
+              <ConfigurationBundles>
                 <ContentPacksList contentPacks={contentPacks}
                                   contentPackMetadata={contentPackMetadata}
                                   onDeletePack={this._deleteContentPack}
                                   onInstall={this._installContentPack} />
-              </div>
+              </ConfigurationBundles>
             </Col>
           </Row>
         </span>

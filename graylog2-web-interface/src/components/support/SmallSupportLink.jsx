@@ -1,6 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
+
 import { Icon } from 'components/common';
+
+const IconStack = styled.span`
+  margin-right: 1px;
+  position: relative;
+  top: -1px;
+`;
 
 class SmallSupportLink extends React.Component {
   static propTypes = {
@@ -9,11 +17,11 @@ class SmallSupportLink extends React.Component {
 
   render() {
     return (
-      <p className="description-tooltips description-tooltips-small">
-        <span className="fa-stack">
+      <p className="description-tooltips">
+        <IconStack className="fa-stack">
           <Icon name="circle" className="fa-stack-2x" />
           <Icon name="lightbulb-o" className="fa-stack-1x" inverse />
-        </span>
+        </IconStack>
         <strong>
           {this.props.children}
         </strong>
