@@ -20,10 +20,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
+import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.export.ChunkedResult;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.MessagesResult;
 import org.graylog.plugins.views.search.export.SearchTypeExporter;
 import org.graylog.plugins.views.search.export.SearchTypeOverrides;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -50,6 +53,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
+    @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
     public Response retrieve(@ApiParam @NotNull MessagesRequest request) {
         MessagesResult result = exporter.export(request);
         return okResultFrom(result);
@@ -58,6 +62,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Path("{search-id}/{search-type-id}")
     @Produces(MoreMediaTypes.TEXT_CSV)
+    @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
     public Response retrieveForSearchType(
             @ApiParam @PathParam("search-id") String searchId,
             @ApiParam @PathParam("search-type-id") String searchTypeId,
