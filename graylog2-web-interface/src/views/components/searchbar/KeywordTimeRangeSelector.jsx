@@ -23,11 +23,18 @@ const KeywordInput = styled(FormControl)`
   font-size: 14px;
 `;
 
+const _parseKeywordPreview = (data) => {
+  const from = DateTime.fromUTCDateTime(data.from).toString();
+  const to = DateTime.fromUTCDateTime(data.to).toString();
+  return Immutable.Map({ from, to });
+};
+
 export default class KeywordTimeRangeSelector extends React.Component {
   static propTypes = {
     disabled: PropTypes.bool,
     value: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -47,37 +54,39 @@ export default class KeywordTimeRangeSelector extends React.Component {
     };
 
     ToolsStore.testNaturalDate(keyword)
-      .then((data) => {
-        this.setState({ validationState: null }, () => this._onKeywordPreviewLoaded(data));
-      })
-      .catch(() => this.setState({ validationState: 'error' }, this._resetKeywordPreview));
+      .then(this._setSuccessfullPreview)
+      .catch(this._setFailedPreview);
   }
 
-  _onKeywordPreviewLoaded = (data) => {
-    const from = DateTime.fromUTCDateTime(data.from).toString();
-    const to = DateTime.fromUTCDateTime(data.to).toString();
-    this.setState({ keywordPreview: Immutable.Map({ from, to }) });
-  };
+  _setSuccessfullPreview = response => this.setState({ validationState: null, keywordPreview: _parseKeywordPreview(response) });
 
-  _resetKeywordPreview = () => {
-    this.setState({ keywordPreview: Immutable.Map() });
-  };
+  _setFailedPreview = () => this.setState({ validationState: 'error', keywordPreview: Immutable.Map() });
 
   _keywordSearchChanged = (event) => {
     const { value } = event.target;
     this.setState({ value, validationState: 'warning' });
 
     if (value === '') {
-      this.setState({ validationState: 'error' });
-      this._resetKeywordPreview();
+      this._setFailedPreview();
     } else {
       ToolsStore.testNaturalDate(value)
-        .then((data) => {
+        .then((response) => {
           const { onChange } = this.props;
           onChange('keyword', value);
-          this.setState({ validationState: null }, () => this._onKeywordPreviewLoaded(data));
+          this._setSuccessfullPreview(response);
         })
-        .catch(() => this.setState({ validationState: 'error' }, this._resetKeywordPreview));
+        .catch(this._setFailedPreview);
+    }
+  };
+
+  onSubmit = (e) => {
+    const { onSubmit } = this.props;
+    const { validationState } = this.state;
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!validationState) {
+      onSubmit();
     }
   };
 
@@ -85,14 +94,14 @@ export default class KeywordTimeRangeSelector extends React.Component {
     const { keywordPreview, validationState, value } = this.state;
     const { disabled } = this.props;
     const { from, to } = keywordPreview.toObject();
-    const keywordPreviewElement = keywordPreview.size > 0 && (
+    const keywordPreviewElement = !keywordPreview.isEmpty() && (
       <KeywordPreview bsStyle="info">
         <strong style={{ marginRight: 8 }}>Preview:</strong>
         {from} to {to}
       </KeywordPreview>
     );
     return (
-      <div className="timerange-selector keyword">
+      <form className="timerange-selector keyword" onSubmit={this.onSubmit}>
         <Row className="no-bm" style={{ marginLeft: 50 }}>
           <Col xs={3} style={{ padding: 0 }}>
             <FormGroup controlId="form-inline-keyword" style={{ marginRight: 5, width: '100%' }} validationState={validationState}>
@@ -112,7 +121,8 @@ export default class KeywordTimeRangeSelector extends React.Component {
             {keywordPreviewElement}
           </Col>
         </Row>
-      </div>
+        <input type="submit" style={{ display: 'none' }} />
+      </form>
     );
   }
 }
