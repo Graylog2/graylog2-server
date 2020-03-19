@@ -28,10 +28,12 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
   const toggleTarget = React.createRef();
 
   const handleOverlayEntering = (dropdownElem) => {
-    const dropdownLeft = dropdownElem.offsetLeft;
+    const dropdownOffsetLeft = dropdownElem.offsetLeft;
     const dropdownWidth = dropdownElem.offsetWidth;
-
-    if (dropdownLeft + dropdownWidth >= document.body.clientWidth) {
+    const overflowRight = dropdownOffsetLeft + dropdownWidth >= document.body.clientWidth;
+    const overflowLeft = dropdownOffsetLeft < 0;
+    const trimmedDropdown = (overflowLeft && currentPlacement === 'left') || (overflowRight && currentPlacement === 'right');
+    if (trimmedDropdown) {
       setCurrentPlacement(oppositePlacement[currentPlacement]);
     }
   };
