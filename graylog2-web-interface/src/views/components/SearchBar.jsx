@@ -65,26 +65,24 @@ const migrateTimeRangeToNewType = (oldTimerange: TimeRange, type: string): TimeR
   }
 };
 
+const timerangeReducer = (state, action) => {
+  const { type, ...rest } = state;
+  switch (action.type) {
+    case 'type':
+      return migrateTimeRangeToNewType(state, action.rangeType);
+    case 'key':
+      return { ...rest, type, [action.key]: action.value };
+    default:
+      return state;
+  }
+};
+
 const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
 
-  const [timerange, dispatch] = useReducer(
-    (state, action) => {
-      const { type, ...rest } = state;
-      switch (action.type) {
-        case 'type':
-          return migrateTimeRangeToNewType(state, action.rangeType);
-        case 'key':
-          return { ...rest, type, [action.key]: action.value };
-        default:
-          return state;
-      }
-    },
-    currentQuery,
-    q => q.timerange,
-  );
+  const [timerange, dispatch] = useReducer(timerangeReducer, currentQuery, q => q.timerange);
 
   const { id, query } = currentQuery;
 
