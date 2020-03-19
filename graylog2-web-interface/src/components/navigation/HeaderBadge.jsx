@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -11,33 +10,28 @@ const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Con
 
 const CUSTOMIZATION_CONFIG = 'org.graylog2.configuration.Customization';
 
-const HeaderBadge = ({ configuration }) => {
-  useEffect(() => {
-    ConfigurationsActions.list(CUSTOMIZATION_CONFIG);
-  }, []);
+const HeaderBadge = () => {
+  const [badgeEnabled, setBadgeEnabled] = useState(false);
+  const [badgeConfig, setBadgeConfig] = useState({});
 
-  const config = configuration[CUSTOMIZATION_CONFIG];
-  const badgeEnabled = config && config.badge_enable;
+  useEffect(() => {
+    ConfigurationsActions.list(CUSTOMIZATION_CONFIG).then((configs) => {
+      setBadgeEnabled(configs.badge_enable);
+      setBadgeConfig(configs);
+    });
+  }, []);
 
   if (badgeEnabled) {
     const StyledBadge = styled(Badge)`
-      background-color: ${config.badge_color};
+      background-color: ${badgeConfig.badge_color};
     `;
 
-    return (<StyledBadge className="dev-badge">{config.badge_text}</StyledBadge>);
+    return (<StyledBadge className="dev-badge">{badgeConfig.badge_text}</StyledBadge>);
   }
 
   return AppConfig.gl2DevMode()
     ? <Badge className="dev-badge" bsStyle="danger">DEV</Badge>
     : null;
-};
-
-HeaderBadge.propTypes = {
-  configuration: PropTypes.object,
-};
-
-HeaderBadge.defaultProps = {
-  configuration: {},
 };
 
 export default connect(HeaderBadge, { configurations: ConfigurationsStore }, ({ configurations, ...otherProps }) => ({

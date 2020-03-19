@@ -56,26 +56,10 @@ class CustomizationConfig extends React.Component {
     this.setState({ config: ObjectUtils.clone(newProps.config) });
   }
 
-  _openModal = () => {
-    this.configModal.open();
-  };
-
-  _closeModal = () => {
-    this.configModal.close();
-  };
-
-  _resetConfig = () => {
-    const { config } = this.props;
-    // Reset to initial state when the modal is closed without saving.
-    this.setState({ config, warning: {} });
-  };
-
   _saveConfig = () => {
     const { config } = this.state;
     const { updateConfig } = this.props;
-    updateConfig(config).then(() => {
-      this._closeModal();
-    });
+    updateConfig(config);
   };
 
   _onUpdate = (field) => {
@@ -158,6 +142,8 @@ class CustomizationConfig extends React.Component {
           </InputGroup>
 
           <HelpBlock>{warning.badge_text ? warning.badge_text : 'The text of the badge. Not more than five characters.'}</HelpBlock>
+
+          <Button bsSize="xsmall" bsStyle="info" onClick={this._saveConfig}>Update Badge</Button>
         </FormGroup>
 
       </div>

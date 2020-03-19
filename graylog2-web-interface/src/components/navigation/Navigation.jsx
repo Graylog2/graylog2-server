@@ -8,7 +8,7 @@ import naturalSort from 'javascript-natural-sort';
 
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 
 import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
@@ -30,7 +30,6 @@ import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const { isPermitted } = PermissionsMixin;
 
 const _isActive = (requestPath, prefix) => {
   return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
