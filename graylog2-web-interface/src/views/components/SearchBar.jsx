@@ -24,8 +24,8 @@ import { QueriesActions } from 'views/stores/QueriesStore';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersActions, QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import Query from '../logic/queries/Query';
-import type { TimeRange } from '../logic/queries/Query';
+import Query, { filtersToStreamSet } from '../logic/queries/Query';
+import type { FilterType, QueryId, TimeRange } from '../logic/queries/Query';
 
 type Props = {
   availableStreams: Array<*>,
@@ -33,7 +33,7 @@ type Props = {
   currentQuery: Query,
   disableSearch: boolean,
   onExecute: () => void,
-  queryFilters: Immutable.Map<any, any>,
+  queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
 const migrateTimeRangeToNewType = (oldTimerange: TimeRange, type: string): TimeRange => {
@@ -103,9 +103,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 
   const rangeParams = useMemo(() => Immutable.Map(rest), [rest]);
 
-  const streams = queryFilters.getIn([id, 'filters'], Immutable.List())
-    .filter((f) => f.get('type') === 'stream')
-    .map((f) => f.get('id'))
+  const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map()))
     .toJS();
 
   return (
