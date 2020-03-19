@@ -3,12 +3,20 @@ import React from 'react';
 import styled from 'styled-components';
 import { util } from 'theme';
 
-import { Badge, Button } from 'components/graylog';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { ColorPickerPopover, IfPermitted, Icon } from 'components/common';
+import connect from 'stores/connect';
+import { Button, FormGroup, InputGroup, FormControl, HelpBlock } from 'components/graylog';
+import { ColorPickerPopover, Icon } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
-import StringUtils from 'util/StringUtils';
+
+import StoreProvider from 'injection/StoreProvider';
+import { isPermitted } from 'util/PermissionsMixin';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+
+const Header = styled.h4`
+  margin: 15px 0 3px;
+`;
 
 class CustomizationConfig extends React.Component {
   static propTypes = {
@@ -17,6 +25,7 @@ class CustomizationConfig extends React.Component {
       badge_color: PropTypes.string,
       badge_enable: PropTypes.bool,
     }),
+    currentUser: PropTypes.object.isRequired,
     warning: PropTypes.shape({
       badge_text: PropTypes.string,
     }),
@@ -103,9 +112,8 @@ class CustomizationConfig extends React.Component {
 
   render() {
     const { warning = {}, config } = this.state;
-    const badge = config.badge_text
-      ? <Badge style={{ backgroundColor: config.badge_color }} className={config.badge_color}><span>{config.badge_text}</span></Badge>
-      : <span>No badge defined</span>;
+    const { currentUser } = this.props;
+    const isDisabled = !isPermitted(currentUser.permissions, 'clusterconfigentry:edit');
 
     const SelectBackgroundButton = styled(({ selectedBgColor, ...props }) => <Button {...props} />)`
       background-color: ${props => (props.selectedBgColor || props.theme.color.tertiary.uno)};
@@ -115,48 +123,46 @@ class CustomizationConfig extends React.Component {
     return (
       <div>
         <h2>UI Customization</h2>
-        <dl className="deflist">
-          <dt>Badge Enabled</dt>
-          <dd>{StringUtils.capitalizeFirstLetter(config.badge_enable.toString())}</dd>
-          <dt>Badge</dt>
-          <dd>{badge}</dd>
-        </dl>
 
-        <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
-        </IfPermitted>
+        <Header>Header Badge</Header>
+        <FormGroup validationState={warning.badge_text ? 'warning' : null}>
+          <InputGroup>
+            <InputGroup.Addon>
+              <input type="checkbox"
+                     id="badge-enable"
+                     checked={config.badge_enable}
+                     onChange={this._onUpdate('badge_enable')}
+                     disabled={isDisabled} />
+            </InputGroup.Addon>
 
-        <BootstrapModalForm ref={(node) => { this.configModal = node; }}
-                            title="Update UI Customization Configuration"
-                            onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
-                            submitButtonText="Save">
-          <Input type="checkbox"
-                 id="badge-enable"
-                 label="Enable Header Badge"
-                 checked={config.badge_enable}
-                 onChange={this._onUpdate('badge_enable')}
-                 help="Activate Header Badge" />
-          <Input type="text"
-                 id="badge-text"
-                 label="Badge Text"
-                 bsStyle={warning.badge_text ? 'warning' : null}
-                 value={config.badge_text}
-                 onChange={this._onUpdate('badge_text')}
-                 help={warning.badge_text ? warning.badge_text : 'The text of the badge. Not more than five characters.'} />
-          <ColorPickerPopover id="badge-color"
-                              placement="right"
-                              color={config.badge_color}
-                              triggerNode={(
-                                <SelectBackgroundButton selectedBgColor={config.badge_color}>
-                                  <Icon name="paint-brush" /> Background
-                                </SelectBackgroundButton>
+            <FormControl type="text"
+                         id="badge-text"
+                         label="Badge Text"
+                         value={config.badge_text}
+                         onChange={this._onUpdate('badge_text')}
+                         help={warning.badge_text ? warning.badge_text : 'The text of the badge. Not more than five characters.'}
+                         disabled={isDisabled} />
+
+            <InputGroup.Button>
+              <ColorPickerPopover id="badge-color"
+                                  placement="top"
+                                  color={config.badge_color}
+                                  triggerNode={(
+                                    <SelectBackgroundButton selectedBgColor={config.badge_color}
+                                                            disabled={isDisabled}>
+                                      <Icon name="paint-brush" /> Color
+                                    </SelectBackgroundButton>
                               )}
-                              onChange={this.handleColorChange} />
-        </BootstrapModalForm>
+                                  onChange={this.handleColorChange} />
+            </InputGroup.Button>
+          </InputGroup>
+
+          <HelpBlock>{warning.badge_text ? warning.badge_text : 'The text of the badge. Not more than five characters.'}</HelpBlock>
+        </FormGroup>
+
       </div>
     );
   }
 }
 
-export default CustomizationConfig;
+export default connect(CustomizationConfig, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ currentUser: currentUser ? currentUser.currentUser : currentUser }));
