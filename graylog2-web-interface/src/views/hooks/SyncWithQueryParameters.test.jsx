@@ -116,6 +116,15 @@ describe('SyncWithQueryParameters', () => {
       expect(history.push)
         .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=300&streams=stream1%2Cstream2');
     });
+    it('removes list of streams to query if they become empty', () => {
+      const viewWithStreams = createView(createSearch(lastFiveMinutes, []));
+      asMock(ViewStore.getInitialState).mockReturnValueOnce({ view: viewWithStreams });
+
+      syncWithQueryParameters('/search?q=foo%3A42&rangetype=relative&relative=300&streams=stream1%2Cstream2');
+
+      expect(history.push)
+        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=300');
+    });
   });
   describe('useSyncWithQueryParameters', () => {
     afterEach(cleanup);
