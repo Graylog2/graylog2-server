@@ -33,7 +33,7 @@ const WidgetSelection = ({ selectWidget, widgets, widgetTitles }: WidgetSelectio
         </IfDashboard>
       </Row>
       <Row>
-        <span>Select message table</span>
+        <span>Select message table:</span>
         <Select placeholder="Select message table"
                 onChange={selectWidget}
                 options={widgetOptions} />
