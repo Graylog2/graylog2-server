@@ -21,7 +21,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
-import org.graylog.plugins.views.search.export.ChunkedResult;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.MessagesResult;
 import org.graylog.plugins.views.search.export.SearchTypeExporter;
