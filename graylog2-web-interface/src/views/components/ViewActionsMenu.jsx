@@ -6,7 +6,7 @@ import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
@@ -27,7 +27,6 @@ import IfDashboard from './dashboard/IfDashboard';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const { isPermitted } = PermissionsMixin;
 
 const _isAllowedToEdit = (view: View, currentUser) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)])
   || (view.type === View.Type.Dashboard && isPermitted(currentUser.permissions, [`dashboards:edit:${view.id}`]));
