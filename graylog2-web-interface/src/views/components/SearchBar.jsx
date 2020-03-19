@@ -1,7 +1,9 @@
 // @flow strict
 import * as React from 'react';
+import { useCallback, useReducer, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+import moment from 'moment';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -22,34 +24,85 @@ import { QueriesActions } from 'views/stores/QueriesStore';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersActions, QueryFiltersStore } from 'views/stores/QueryFiltersStore';
+import Query from '../logic/queries/Query';
+import type { TimeRange } from '../logic/queries/Query';
 
 type Props = {
   availableStreams: Array<*>,
   config: any,
-  currentQuery: {
-    id: string,
-    timerange: any,
-    query: {
-      query_string: string,
-    },
-  },
+  currentQuery: Query,
   disableSearch: boolean,
   onExecute: () => void,
   queryFilters: Immutable.Map<any, any>,
+};
+
+const migrateTimeRangeToNewType = (oldTimerange: TimeRange, type: string): TimeRange => {
+  const oldType = oldTimerange.type;
+
+  if (type === oldType) {
+    return oldTimerange;
+  }
+
+  switch (type) {
+    case 'absolute':
+      return {
+        type,
+        from: moment().subtract(oldTimerange.type === 'relative' ? oldTimerange.range : 300, 'seconds').toISOString(),
+        to: moment().toISOString(),
+      };
+    case 'relative':
+      return {
+        type,
+        range: 300,
+      };
+    case 'keyword':
+      return {
+        type,
+        keyword: 'Last five Minutes',
+      };
+    default: throw new Error(`Invalid time range type: ${type}`);
+  }
 };
 
 const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
-  const submitForm = (event) => {
+
+  const [timerange, dispatch] = useReducer(
+    (state, action) => {
+      const { type, ...rest } = state;
+      switch (action.type) {
+        case 'type':
+          console.log('type', action);
+          return migrateTimeRangeToNewType(state, action.rangeType);
+        case 'key':
+          console.log('key', action);
+          return { ...rest, type, [action.key]: action.value };
+        default:
+          return state;
+      }
+    },
+    currentQuery,
+    q => q.timerange,
+  );
+
+  const { id, query } = currentQuery;
+
+  const submitForm = useCallback((event) => {
+    console.log('Form submitted!');
     event.preventDefault();
     performSearch();
-  };
-  const { timerange, query, id } = currentQuery;
-  const { type, ...rest } = timerange;
-  const rangeParams = Immutable.Map(rest);
-  const rangeType = type;
+  }, [timerange, performSearch]);
+
+  const { type: rangeType, ...rest } = timerange;
+
+  const setRangeType = useCallback(newType => dispatch({ type: 'type', rangeType: newType }), [dispatch]);
+  const setRangeParam = useCallback((key, value) => dispatch({ type: 'key', key, value }), [dispatch]);
+  const setTimeRange = useCallback(() => QueriesActions.timerange(id, timerange), [id, timerange]);
+
+  const rangeParams = useMemo(() => Immutable.Map(rest), [rest]);
+
   const streams = queryFilters.getIn([id, 'filters'], Immutable.List())
     .filter((f) => f.get('type') === 'stream')
     .map((f) => f.get('id'))
@@ -59,12 +112,13 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
     <ScrollToHint value={query.query_string}>
       <Row className="content">
         <Col md={12}>
-          <form method="GET" onSubmit={submitForm}>
+          <form onSubmit={submitForm}>
             <Row className="no-bm extended-search-query-metadata">
               <Col md={4}>
-                <TimeRangeTypeSelector onSelect={(newRangeType) => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
+                <TimeRangeTypeSelector onSelect={setRangeType}
                                        value={rangeType} />
-                <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
+                <TimeRangeInput onChange={setRangeParam}
+                                onExecute={setTimeRange}
                                 rangeType={rangeType}
                                 rangeParams={rangeParams}
                                 config={config} />

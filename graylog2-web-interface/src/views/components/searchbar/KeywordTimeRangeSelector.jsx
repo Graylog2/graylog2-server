@@ -18,7 +18,7 @@ const KeywordPreview = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const TimeRangeInput = styled(FormControl)`
+const KeywordInput = styled(FormControl)`
   min-height: 34px;
   font-size: 14px;
 `;
@@ -65,7 +65,7 @@ export default class KeywordTimeRangeSelector extends React.Component {
 
   _keywordSearchChanged = (event) => {
     const { value } = event.target;
-    this.setState({ value });
+    this.setState({ value, validationState: 'warning' });
 
     if (value === '') {
       this.setState({ validationState: 'error' });
@@ -97,14 +97,14 @@ export default class KeywordTimeRangeSelector extends React.Component {
           <Col xs={3} style={{ padding: 0 }}>
             <FormGroup controlId="form-inline-keyword" style={{ marginRight: 5, width: '100%' }} validationState={validationState}>
               <InputGroup>
-                <TimeRangeInput type="text"
-                                className="input-sm"
-                                name="keyword"
-                                disabled={disabled}
-                                placeholder="Last week"
-                                onChange={this._keywordSearchChanged}
-                                required
-                                value={value} />
+                <KeywordInput type="text"
+                              className="input-sm"
+                              name="keyword"
+                              disabled={disabled}
+                              placeholder="Last week"
+                              onChange={this._keywordSearchChanged}
+                              required
+                              value={value} />
               </InputGroup>
             </FormGroup>
           </Col>

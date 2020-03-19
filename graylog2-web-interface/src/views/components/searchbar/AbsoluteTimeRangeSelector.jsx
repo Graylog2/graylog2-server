@@ -71,12 +71,18 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
     this.setState({ [key]: value });
   };
 
+  onExecute = (e) => {
+    const { onExecute } = this.props;
+    e.preventDefault();
+    onExecute();
+  };
+
   render() {
     const { from, to } = this.state;
     const { disabled, onChange } = this.props;
 
     return (
-      <div className={`timerange-selector absolute ${styles.selectorContainer}`}>
+      <form className={`timerange-selector absolute ${styles.selectorContainer}`} onSubmit={this.onExecute}>
         <input type="hidden" name="from" />
         <div className={styles.inputWidth}>
           <DatePicker id="searchFromDatePicker"
@@ -129,7 +135,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    required />
           </DatePicker>
         </div>
-      </div>
+      </form>
     );
   }
 }
