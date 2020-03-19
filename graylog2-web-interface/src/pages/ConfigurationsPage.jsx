@@ -32,6 +32,8 @@ class ConfigurationsPage extends React.Component {
     loaded: false,
   }
 
+  checkLoadedTimer = undefined
+
   componentDidMount() {
     style.use();
     const { currentUser: { permissions } } = this.props;
@@ -51,6 +53,7 @@ class ConfigurationsPage extends React.Component {
 
   componentWillUnmount() {
     style.unuse();
+    this._clearTimeout();
   }
 
   _getConfig = (configType) => {
@@ -110,15 +113,21 @@ class ConfigurationsPage extends React.Component {
 
   _checkConfig = () => {
     const { configuration } = this.props;
-    setInterval(() => {
+    this.checkLoadedTimer = setTimeout(() => {
       if (Object.keys(configuration).length > 0) {
-        this.setState({ loaded: true });
+        this.setState({ loaded: true }, this._clearTimeout);
         return;
       }
 
       this._checkConfig();
     }, 100);
   };
+
+  _clearTimeout = () => {
+    if (this.checkLoadedTimer) {
+      clearTimeout(this.checkLoadedTimer);
+    }
+  }
 
   render() {
     const { loaded } = this.state;
