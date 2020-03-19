@@ -1,7 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import styled, { css } from 'styled-components';
 
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -9,21 +8,12 @@ import { Row, Col, Panel, Table, Tabs, Tab } from 'components/graylog';
 import { Icon, PaginatedList, Spinner, SearchForm } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-
 import DocsHelper from 'util/DocsHelper';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import RuleHelperStyle from './RuleHelper.css';
 
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
-
-const TabWrap = styled(Tab)(({ theme }) => css`
-  background-color: ${theme.color.global.contentBackground};
-  border: 1px solid ${theme.color.variant.info};
-  border-top: 0;
-  border-radius: 0 0 4px 4px;
-  padding: 9px;
-`);
 
 const RuleHelper = createReactClass({
   displayName: 'RuleHelper',
@@ -183,7 +173,7 @@ end`,
         <Row className="row-sm">
           <Col md={12}>
             <Tabs id="functionsHelper" defaultActiveKey={1} animation={false}>
-              <TabWrap eventKey={1} title="Functions">
+              <Tab eventKey={1} title="Functions">
                 <Row>
                   <Col sm={12}>
                     <p className={RuleHelperStyle.marginTab}>
@@ -218,15 +208,15 @@ end`,
                     </div>
                   </Col>
                 </Row>
-              </TabWrap>
-              <TabWrap eventKey={2} title="Example">
+              </Tab>
+              <Tab eventKey={2} title="Example">
                 <p className={RuleHelperStyle.marginTab}>
                   Do you want to see how a pipeline rule looks like? Take a look at this example:
                 </p>
                 <pre className={`${RuleHelperStyle.marginTab} ${RuleHelperStyle.exampleFunction}`}>
                   {this.ruleTemplate}
                 </pre>
-              </TabWrap>
+              </Tab>
             </Tabs>
           </Col>
         </Row>
