@@ -15,7 +15,7 @@ const { SessionActions } = CombinedProvider.get('Session');
 
 const LoginPage = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
-  const [lastError, setLastError] = useState(false);
+  const [lastError, setLastError] = useState(undefined);
 
   useEffect(() => {
     const sessionPromise = SessionActions.validate().then((response) => {
@@ -28,20 +28,16 @@ const LoginPage = () => {
     };
   }, []);
 
-  const handleErrorChange = (nextError) => {
-    setLastError(nextError);
-  };
-
   const resetLastError = () => {
-    handleErrorChange(undefined);
+    setLastError(undefined);
   };
 
-  const formatLastError = (error) => {
-    if (error) {
+  const formatLastError = () => {
+    if (lastError) {
       return (
         <div className="form-group">
           <Alert bsStyle="danger">
-            <button type="button" className="close" onClick={resetLastError}>&times;</button>{error}
+            <button type="button" className="close" onClick={resetLastError}>&times;</button>{lastError}
           </Alert>
         </div>
       );
@@ -54,11 +50,11 @@ const LoginPage = () => {
 
     if (loginComponent.length === 1) {
       return React.createElement(loginComponent[0].formComponent, {
-        onErrorChange: handleErrorChange,
+        onErrorChange: setLastError,
       });
     }
 
-    return <LoginForm onErrorChange={handleErrorChange} />;
+    return <LoginForm onErrorChange={setLastError} />;
   };
 
   if (!didValidateSession) {
@@ -67,13 +63,12 @@ const LoginPage = () => {
     );
   }
 
-  const alert = formatLastError(lastError);
   return (
     <DocumentTitle title="Sign in">
       <AuthThemeStyles />
       <LoginBox>
         <legend><Icon name="group" /> Welcome to Graylog</legend>
-        {alert}
+        {formatLastError()}
         {renderLoginForm()}
       </LoginBox>
     </DocumentTitle>
