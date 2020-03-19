@@ -61,6 +61,9 @@ const ExportSettings = ({ fields, selectedWidget, selectField, selectedFields, s
         <SortDirectionSelect direction={selectedSortDirection ? selectedSortDirection.direction : null}
                              onChange={onSortDirectionChange} />
       </Row>
+      <Row>
+        <span>Please note: selecting any sort will result in a slower export.</span>
+      </Row>
     </>
   );
 };
