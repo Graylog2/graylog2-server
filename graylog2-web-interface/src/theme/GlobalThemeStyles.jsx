@@ -285,18 +285,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     text-overflow: ellipsis;
   }
 
-  .tooltip .tooltip-inner {
-    max-width: 300px;
-  }
-
-  .tooltip .tooltip-inner .datapoint-info {
-    text-align: left;
-  }
-
-  .tooltip .tooltip-inner .datapoint-info .date {
-    color: ${theme.color.gray[90]};
-  }
-
   .configuration-field-optional {
     margin-left: 5px;
     font-size: 11px;
