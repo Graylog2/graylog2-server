@@ -1,11 +1,11 @@
 // @flow strict
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
+import ApiRoutes from 'routing/ApiRoutes';
+import { qualifyUrl } from 'util/URLUtils';
 
 import { type QueryString, type TimeRange } from 'views/logic/queries/Query';
 import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
-
-const MESSAGES_EXPORT_PATH = 'views/search/messages';
 
 export type ExportPayload = {
   timerange?: ?TimeRange,
@@ -16,11 +16,13 @@ export type ExportPayload = {
 }
 
 export const exportAllMessages = (exportPayload: ExportPayload) => {
-  fetch('POST', `${MESSAGES_EXPORT_PATH}`, JSON.stringify(exportPayload))
+  const { url } = ApiRoutes.MessagesController.exportAll();
+  fetch('POST', qualifyUrl(url), JSON.stringify(exportPayload))
     .catch(() => { UserNotification.error('CSV Export failed'); });
 };
 
 export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string) => {
-  fetch('POST', `${MESSAGES_EXPORT_PATH}/${searchId}/${searchTypeId}`, JSON.stringify(exportPayload))
+  const { url } = ApiRoutes.MessagesController.exportSearchType(searchId, searchTypeId);
+  fetch('POST', qualifyUrl(url), JSON.stringify(exportPayload))
     .catch(() => { UserNotification.error('CSV Export for widget failed'); });
 };
