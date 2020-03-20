@@ -1,7 +1,4 @@
-import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useEffect, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DocumentTitle, Icon } from 'components/common';
@@ -14,80 +11,68 @@ import AuthThemeStyles from 'theme/styles/authStyles';
 import CombinedProvider from 'injection/CombinedProvider';
 import LoadingPage from './LoadingPage';
 
-const { SessionStore, SessionActions } = CombinedProvider.get('Session');
+const { SessionActions } = CombinedProvider.get('Session');
 
-const LoginPage = createReactClass({
-  displayName: 'LoginPage',
-  mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
+const LoginPage = () => {
+  const [didValidateSession, setDidValidateSession] = useState(false);
+  const [lastError, setLastError] = useState(undefined);
 
-  getInitialState() {
-    return {
-      didValidateSession: false,
-    };
-  },
-
-  componentDidMount() {
-    SessionActions.validate().then((response) => {
-      this.setState({ didValidateSession: true });
+  useEffect(() => {
+    const sessionPromise = SessionActions.validate().then((response) => {
+      setDidValidateSession(true);
       return response;
     });
-  },
 
-  handleErrorChange(nextError) {
-    this.setState({ lastError: nextError });
-  },
+    return () => {
+      sessionPromise.cancel();
+    };
+  }, []);
 
-  resetLastError() {
-    this.handleErrorChange(undefined);
-  },
+  const resetLastError = () => {
+    setLastError(undefined);
+  };
 
-  formatLastError(error) {
-    if (error) {
+  const formatLastError = () => {
+    if (lastError) {
       return (
         <div className="form-group">
           <Alert bsStyle="danger">
-            <button type="button" className="close" onClick={this.resetLastError}>&times;</button>{error}
+            <button type="button" className="close" onClick={resetLastError}>&times;</button>{lastError}
           </Alert>
         </div>
       );
     }
     return null;
-  },
+  };
 
-  renderLoginForm() {
+  const renderLoginForm = () => {
     const loginComponent = PluginStore.exports('loginProviderType');
 
     if (loginComponent.length === 1) {
       return React.createElement(loginComponent[0].formComponent, {
-        onErrorChange: this.handleErrorChange,
+        onErrorChange: setLastError,
       });
     }
 
-    return <LoginForm onErrorChange={this.handleErrorChange} />;
-  },
+    return <LoginForm onErrorChange={setLastError} />;
+  };
 
-  render() {
-    const { lastError, didValidateSession } = this.state;
-
-    if (!didValidateSession) {
-      return (
-        <LoadingPage />
-      );
-    }
-
-    const alert = this.formatLastError(lastError);
+  if (!didValidateSession) {
     return (
-      <DocumentTitle title="Sign in">
-        <AuthThemeStyles />
-        <LoginBox>
-          <legend><Icon name="group" /> Welcome to Graylog</legend>
-          {alert}
-
-          {this.renderLoginForm()}
-        </LoginBox>
-      </DocumentTitle>
+      <LoadingPage />
     );
-  },
-});
+  }
+
+  return (
+    <DocumentTitle title="Sign in">
+      <AuthThemeStyles />
+      <LoginBox>
+        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        {formatLastError()}
+        {renderLoginForm()}
+      </LoginBox>
+    </DocumentTitle>
+  );
+};
 
 export default LoginPage;
