@@ -7,10 +7,10 @@ import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfi
 
 const MESSAGES_EXPORT_PATH = 'views/search/messages';
 
-type ExportPayload = {
-  timerange: TimeRange,
-  query_string: QueryString,
-  streams: ?string[],
+export type ExportPayload = {
+  timerange?: ?TimeRange,
+  query_string?: QueryString,
+  streams?: string[],
   fields_in_order: ?string[],
   sort: MessageSortConfig[]
 }
