@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
+import { SizeMe } from 'react-sizeme';
 import styled, { css } from 'styled-components';
 
 import connect from 'stores/connect';
@@ -155,10 +156,16 @@ class WidgetGrid extends React.Component {
       </ReactGridContainer>
     ) : <span />;
     return (
-      <DashboardWrap>
-        {grid}
-        {staticWidgets}
-      </DashboardWrap>
+      <SizeMe monitorWidth refreshRate={100}>
+        {({ size }) => {
+          return (
+            <DashboardWrap>
+              {React.cloneElement(grid, { width: size.width })}
+              {staticWidgets}
+            </DashboardWrap>
+          );
+        }}
+      </SizeMe>
     );
   }
 }
