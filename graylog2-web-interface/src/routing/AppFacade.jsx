@@ -6,6 +6,7 @@ import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+import CustomUiProvider from 'contexts/CustomUi';
 
 import 'bootstrap/less/bootstrap.less';
 import 'opensans-npm-webfont';
@@ -42,10 +43,10 @@ export const AppFacade = ({ currentUser, server, sessionId }) => {
   }
 
   return (
-    <>
+    <CustomUiProvider>
       <GlobalThemeStyles />
       {Page}
-    </>
+    </CustomUiProvider>
   );
 };
 

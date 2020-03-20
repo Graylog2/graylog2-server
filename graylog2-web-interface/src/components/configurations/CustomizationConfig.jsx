@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-import { util } from 'theme';
+import { isEqual } from 'lodash';
 
 import connect from 'stores/connect';
 import { Button, FormGroup, InputGroup, FormControl, HelpBlock } from 'components/graylog';
 import { ColorPickerPopover, Icon } from 'components/common';
+import { CustomUiContext } from 'contexts/CustomUi';
+import StoreProvider from 'injection/StoreProvider';
 import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
-
-import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -43,66 +43,67 @@ class CustomizationConfig extends React.Component {
     },
   };
 
-  constructor(props) {
-    super(props);
-
-    const { config } = props;
-    this.state = {
-      config: ObjectUtils.clone(config),
-    };
-  }
-
-  componentWillReceiveProps(newProps) {
-    this.setState({ config: ObjectUtils.clone(newProps.config) });
+  state = {
+    hasChanged: false,
+    warning: {},
   }
 
   _saveConfig = () => {
-    const { config } = this.state;
+    const { badgeConfig } = this.context;
     const { updateConfig } = this.props;
-    updateConfig(config);
+
+    this.setState({ hasChanged: false });
+    updateConfig(badgeConfig);
   };
 
   _onUpdate = (field) => {
-    const { config } = this.state;
+    const { badgeConfig, badgeUpdate } = this.context;
+    const { config } = this.props;
+
     return (value) => {
-      const update = ObjectUtils.clone(config);
+      const update = ObjectUtils.clone(badgeConfig);
+
       if (typeof value === 'object') {
         update[field] = FormUtils.getValueFromInput(value.target);
       } else {
         update[field] = value;
       }
-      this.setState({ config: update }, this.validate);
+
+      this.setState({ hasChanged: !isEqual(config, update) });
+      badgeUpdate(update);
+      this.validate();
     };
   };
 
   handleColorChange = (color, _, hidePopover) => {
-    const { config } = this.state;
+    const { badgeConfig, badgeUpdate } = this.context;
+    const { config } = this.props;
+
+    this.setState({ hasChanged: config.badge_color !== color });
     hidePopover();
-    const update = ObjectUtils.clone(config);
-    update.badge_color = color;
-    this.setState({ config: update });
+    badgeUpdate({ ...badgeConfig, badge_color: color });
   };
 
   validate = () => {
-    const { warning = {}, config } = this.state;
+    const { badgeConfig } = this.context;
+    const { warning = {} } = this.state;
 
-    if (config.badge_text.length > 5) {
+    if (badgeConfig.badge_text.length > 5) {
       warning.badge_text = 'Should be maximum 5 characters long';
     } else {
       warning.badge_text = null;
     }
+
     this.setState({ warning });
   };
 
+  static contextType = CustomUiContext;
+
   render() {
-    const { warning = {}, config } = this.state;
+    const { badgeConfig } = this.context;
+    const { hasChanged, warning = {} } = this.state;
     const { currentUser } = this.props;
     const isDisabled = !isPermitted(currentUser.permissions, 'clusterconfigentry:edit');
-
-    const SelectBackgroundButton = styled(({ selectedBgColor, ...props }) => <Button {...props} />)`
-      background-color: ${props => (props.selectedBgColor || props.theme.color.tertiary.uno)};
-      color: ${props => (util.contrastingColor(props.selectedBgColor || props.theme.color.tertiary.uno))};
-    `;
 
     return (
       <div>
@@ -114,7 +115,7 @@ class CustomizationConfig extends React.Component {
             <InputGroup.Addon>
               <input type="checkbox"
                      id="badge-enable"
-                     checked={config.badge_enable}
+                     checked={badgeConfig.badge_enable}
                      onChange={this._onUpdate('badge_enable')}
                      disabled={isDisabled} />
             </InputGroup.Addon>
@@ -122,7 +123,7 @@ class CustomizationConfig extends React.Component {
             <FormControl type="text"
                          id="badge-text"
                          label="Badge Text"
-                         value={config.badge_text}
+                         value={badgeConfig.badge_text}
                          onChange={this._onUpdate('badge_text')}
                          help={warning.badge_text ? warning.badge_text : 'The text of the badge. Not more than five characters.'}
                          disabled={isDisabled} />
@@ -130,12 +131,11 @@ class CustomizationConfig extends React.Component {
             <InputGroup.Button>
               <ColorPickerPopover id="badge-color"
                                   placement="top"
-                                  color={config.badge_color}
+                                  color={badgeConfig.badge_color}
                                   triggerNode={(
-                                    <SelectBackgroundButton selectedBgColor={config.badge_color}
-                                                            disabled={isDisabled}>
+                                    <Button disabled={isDisabled}>
                                       <Icon name="paint-brush" /> Color
-                                    </SelectBackgroundButton>
+                                    </Button>
                               )}
                                   onChange={this.handleColorChange} />
             </InputGroup.Button>
@@ -143,12 +143,16 @@ class CustomizationConfig extends React.Component {
 
           <HelpBlock>{warning.badge_text ? warning.badge_text : 'The text of the badge. Not more than five characters.'}</HelpBlock>
 
-          <Button bsSize="xsmall" bsStyle="info" onClick={this._saveConfig}>Update Badge</Button>
+          {!isDisabled && <Button bsSize="xsmall" bsStyle="info" onClick={this._saveConfig} disabled={!hasChanged}>Update Badge</Button>}
         </FormGroup>
-
       </div>
     );
   }
 }
 
-export default connect(CustomizationConfig, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ currentUser: currentUser ? currentUser.currentUser : currentUser }));
+export default connect(CustomizationConfig,
+  { currentUser: CurrentUserStore },
+  ({ currentUser, ...otherProps }) => ({
+    currentUser: currentUser ? currentUser.currentUser : currentUser,
+    ...otherProps,
+  }));

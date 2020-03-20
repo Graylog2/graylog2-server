@@ -1,27 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
-import CombinedProvider from 'injection/CombinedProvider';
 import AppConfig from 'util/AppConfig';
 import { Badge } from 'components/graylog';
-import connect from 'stores/connect';
-
-const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
-
-const CUSTOMIZATION_CONFIG = 'org.graylog2.configuration.Customization';
+import { CustomUiContext } from 'contexts/CustomUi';
 
 const HeaderBadge = () => {
-  const [badgeEnabled, setBadgeEnabled] = useState(false);
-  const [badgeConfig, setBadgeConfig] = useState({});
+  const { badgeConfig } = useContext(CustomUiContext);
 
-  useEffect(() => {
-    ConfigurationsActions.list(CUSTOMIZATION_CONFIG).then((configs) => {
-      setBadgeEnabled(configs.badge_enable);
-      setBadgeConfig(configs);
-    });
-  }, []);
-
-  if (badgeEnabled) {
+  if (badgeConfig.badge_enable) {
     const StyledBadge = styled(Badge)`
       background-color: ${badgeConfig.badge_color};
     `;
@@ -34,7 +21,4 @@ const HeaderBadge = () => {
     : null;
 };
 
-export default connect(HeaderBadge, { configurations: ConfigurationsStore }, ({ configurations, ...otherProps }) => ({
-  ...configurations,
-  ...otherProps,
-}));
+export default HeaderBadge;
