@@ -30,9 +30,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,10 +57,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
     private JestClient jestClient;
 
     @Mock
-    private IndexRangeService indexRangeService;
-
-    @Mock
-    private StreamService streamService;
+    protected IndexLookup indexLookup;
 
     @Mock
     private MultiSearchResult result;
@@ -83,12 +78,11 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 ),
                 new QueryStringParser(),
                 jestClient,
-                indexRangeService,
-                streamService,
+                indexLookup,
                 new ESQueryDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup)
         );
-        when(streamService.loadByIds(any())).thenReturn(Collections.emptySet());
+        when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 
         final SearchType searchType1 = mock(SearchType.class);
         when(searchType1.id()).thenReturn("deadbeef");

@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
-import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -24,11 +24,10 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.streams.Stream;
-import org.joda.time.DateTime;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,12 +38,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
@@ -96,24 +92,13 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
     }
 
     @Test
-    public void timerangeOverridesAffectIndicesSelection() throws IOException {
-        final Stream stream1 = mock(Stream.class);
-        when(stream1.getId()).thenReturn("stream1");
-        when(streamService.loadByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton(stream1));
+    public void timerangeOverridesAffectIndicesSelection() throws IOException, InvalidRangeParametersException {
+        when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), timeRangeForTest()))
+                .thenReturn(ImmutableSet.of("queryIndex"));
 
-        final IndexRange queryIndexRange = mock(IndexRange.class);
-        when(queryIndexRange.indexName()).thenReturn("queryIndex");
-        when(queryIndexRange.streamIds()).thenReturn(Collections.singletonList("stream1"));
-        final SortedSet<IndexRange> queryIndexRanges = sortedSetOf(queryIndexRange);
-        when(indexRangeService.find(eq(timeRangeForTest().getFrom()), eq(timeRangeForTest().getTo())))
-                .thenReturn(queryIndexRanges);
-
-        final IndexRange searchTypeIndexRange = mock(IndexRange.class);
-        when(searchTypeIndexRange.indexName()).thenReturn("searchTypeIndex");
-        when(searchTypeIndexRange.streamIds()).thenReturn(Collections.singletonList("stream1"));
-        final SortedSet<IndexRange> searchTypeIndexRanges = sortedSetOf(searchTypeIndexRange);
-        when(indexRangeService.find(eq(DateTime.parse("2019-09-11T10:31:52.819Z")), eq(DateTime.parse("2019-09-11T10:36:52.823Z"))))
-                .thenReturn(searchTypeIndexRanges);
+        TimeRange tr = AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z");
+        when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
+                .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
         final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
         when(jestClient.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulMultiSearchResponse.json")));

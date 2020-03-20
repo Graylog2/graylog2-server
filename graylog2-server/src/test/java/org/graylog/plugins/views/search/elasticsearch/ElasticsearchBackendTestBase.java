@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
-import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import java.io.IOException;
@@ -30,11 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -78,15 +73,5 @@ abstract class ElasticsearchBackendTestBase {
                     return null;
                 })
                 .collect(Collectors.toList());
-    }
-
-    SortedSet<IndexRange> sortedSetOf(IndexRange... indexRanges) {
-        final Comparator<IndexRange> indexRangeComparator = Comparator.comparing(IndexRange::indexName);
-
-        final TreeSet<IndexRange> indexRangeSets = new TreeSet<>(indexRangeComparator);
-
-        indexRangeSets.addAll(Arrays.asList(indexRanges));
-
-        return indexRangeSets;
     }
 }
