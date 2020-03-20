@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
 import { SizeMe } from 'react-sizeme';
+import styled, { css } from 'styled-components';
 
 import connect from 'stores/connect';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -17,6 +18,12 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
+
+const DashboardWrap = styled.div(({ theme }) => css`
+  color: ${theme.color.global.textDefault};
+  margin: 0;
+  width: 100%;
+`);
 
 const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
@@ -144,10 +151,10 @@ class WidgetGrid extends React.Component {
       <SizeMe monitorWidth refreshRate={100}>
         {({ size }) => {
           return (
-            <div className="dashboard">
+            <DashboardWrap>
               {React.cloneElement(grid, { width: size.width })}
               {staticWidgets}
-            </div>
+            </DashboardWrap>
           );
         }}
       </SizeMe>

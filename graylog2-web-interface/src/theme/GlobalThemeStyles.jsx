@@ -285,48 +285,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     text-overflow: ellipsis;
   }
 
-  .dashboard {
-    color: ${theme.color.global.textDefault};
-    margin: 0;
-    width: 100%;
-  }
-
-  .dashboard .widget {
-    height: inherit;
-    margin: 0;
-    padding: 20px;
-    display: grid;
-    display: -ms-grid;
-    grid-template-rows: auto minmax(10px, 1fr);
-    -ms-grid-rows: auto minmax(10px, 1fr);
-    -ms-grid-columns: 1fr;
-  }
-
-  .dashboard .widget .widget-top {
-    position: relative;
-    margin-bottom: -15px;
-    top: -5px;
-    font-size: 11px;
-    line-height: 11px;
-  }
-
-  .dashboard .widget .controls {
-    display: none;
-    position: relative;
-    left: -3px;
-  }
-
-  .dashboard .widget .reloading {
-    margin-right: 2px;
-    font-weight: bold;
-    color: ${theme.color.variant.dark.info};
-    display: none;
-  }
-
-  .dashboard .widget .loading-failed {
-    color: ${theme.color.variant.danger} !important;
-  }
-
   .tooltip .tooltip-inner {
     max-width: 300px;
   }
@@ -337,78 +295,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .tooltip .tooltip-inner .datapoint-info .date {
     color: ${theme.color.gray[90]};
-  }
-
-  .dashboard .widget .dc-chart {
-    float: none;
-  }
-
-  .dashboard .widget .widget-title {
-    font-size: 18px;
-    height: 25px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .dashboard .widget .load-error {
-    color: ${theme.color.variant.danger};
-    margin-right: 5px;
-  }
-
-  .dashboard .widget .widget-update-info {
-    text-align: left;
-    float: left;
-    font-size: 11px;
-    position: absolute;
-    bottom: 10px;
-    width: 130px;
-  }
-
-  .dashboard .widget .configuration dt {
-    text-transform: capitalize;
-  }
-
-  .dashboard .widget svg {
-    overflow: hidden;
-  }
-
-  .dashboard .widget .quickvalues-graph {
-    text-align: center;
-  }
-
-  .dashboard .widget .graph.scatterplot path.line {
-    display: none;
-  }
-
-  .dashboard .widget .actions {
-    position: absolute;
-    right: 15px;
-    bottom: 10px;
-  }
-
-  .dashboard .widget .actions div {
-    display: inline-block;
-    margin-left: 5px;
-  }
-
-  .dashboard .widget .actions button {
-    padding: 0 5px 0 5px;
-  }
-
-  .dashboard .widget .not-available {
-    font-size: 70px;
-  }
-
-  .dashboard .widget .loading,
-  .dashboard .widget .not-available {
-    line-height: 100px;
-    text-align: center;
-  }
-
-  .dashboard .widget .loading .spinner,
-  .dashboard .widget .not-available .spinner {
-    vertical-align: middle;
   }
 
   .configuration-field-optional {

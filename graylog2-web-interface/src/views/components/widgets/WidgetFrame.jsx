@@ -1,5 +1,114 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
+
+const WidgetWrap = styled.div(({ theme }) => css`
+  height: inherit;
+  margin: 0;
+  padding: 20px;
+  display: grid;
+  display: -ms-grid;
+  grid-template-rows: auto minmax(10px, 1fr);
+  -ms-grid-rows: auto minmax(10px, 1fr);
+  -ms-grid-columns: 1fr;
+
+  .widget-top {
+    position: relative;
+    margin-bottom: -15px;
+    top: -5px;
+    font-size: 11px;
+    line-height: 11px;
+  }
+
+  .dc-chart {
+    float: none;
+  }
+
+  .controls {
+    display: none;
+    position: relative;
+    left: -3px;
+  }
+
+  .reloading {
+    margin-right: 2px;
+    font-weight: bold;
+    color: ${theme.color.variant.dark.info};
+    display: none;
+  }
+
+  .loading-failed {
+    color: ${theme.color.variant.danger} !important;
+  }
+
+  .widget-title {
+    font-size: 18px;
+    height: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .load-error {
+    color: ${theme.color.variant.danger};
+    margin-right: 5px;
+  }
+
+  .widget-update-info {
+    text-align: left;
+    float: left;
+    font-size: 11px;
+    position: absolute;
+    bottom: 10px;
+    width: 130px;
+  }
+
+  .configuration dt {
+    text-transform: capitalize;
+  }
+
+  svg {
+    overflow: hidden;
+  }
+
+  .quickvalues-graph {
+    text-align: center;
+  }
+
+  .graph.scatterplot path.line {
+    display: none;
+  }
+
+  .actions {
+    position: absolute;
+    right: 15px;
+    bottom: 10px;
+
+    div {
+      display: inline-block;
+      margin-left: 5px;
+    }
+
+    button {
+      padding: 0 5px 0 5px;
+    }
+  }
+
+  .not-available {
+    font-size: 70px;
+  }
+
+  .loading,
+  .not-available {
+    line-height: 100px;
+    text-align: center;
+  }
+
+  .loading .spinner,
+  .not-available .spinner {
+    vertical-align: middle;
+  }
+`);
 
 export default class extends React.Component {
   WIDGET_HEADER_HEIGHT = 25;
@@ -46,9 +155,11 @@ export default class extends React.Component {
   render() {
     const { children, widgetId } = this.props;
     return (
-      <div className="widget" ref={(elem) => { this._widgetNode = elem; }} style={{ overflow: 'hidden' }} data-widget-id={widgetId}>
+      <WidgetWrap ref={(elem) => { this._widgetNode = elem; }}
+                  style={{ overflow: 'hidden' }}
+                  data-widget-id={widgetId}>
         {children}
-      </div>
+      </WidgetWrap>
     );
   }
 }
