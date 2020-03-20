@@ -72,14 +72,6 @@ class IndexLookupTest {
         assertThat(result).containsExactly(matchingIndexRange.indexName());
     }
 
-    private RelativeRange someTimeRange() {
-        try {
-            return RelativeRange.create(1);
-        } catch (InvalidRangeParametersException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Test
     void returnsEmptySetForEmptyStreamIds() {
         Set<String> result = sut.indexNamesForStreamsInTimeRange(emptySet(), someTimeRange());
@@ -96,6 +88,14 @@ class IndexLookupTest {
         Set<String> result = sut.indexNamesForStreamsInTimeRange(streamIds, someTimeRange());
 
         assertThat(result).isEmpty();
+    }
+
+    private RelativeRange someTimeRange() {
+        try {
+            return RelativeRange.create(1);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<IndexRange> mockSomeIndexRanges() {
