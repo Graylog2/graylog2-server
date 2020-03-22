@@ -91,7 +91,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
                              onSave={(updatedView) => onSaveView(updatedView, router)} />
       )}
       {shareViewOpen && <ShareViewModal show view={view} onClose={() => setShareViewOpen(false)} />}
-      {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} allwaysAllowWidgetSelection />}
+      {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
     </ButtonGroup>
   );
 };

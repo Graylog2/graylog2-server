@@ -5,7 +5,7 @@ import { Map } from 'immutable';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import Widget from 'views/logic/widgets/Widget';
 
-import { Row } from 'components/graylog';
+import { Row, Alert } from 'components/graylog';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import Select from 'views/components/Select';
@@ -32,12 +32,18 @@ const WidgetSelection = ({ selectWidget, widgets, widgetTitles }: WidgetSelectio
           Selecting a message table equals using the option &quot;Export to CSV&quot; in a message table action menu.
         </IfDashboard>
       </Row>
-      <Row>
-        <span>Select message table:</span>
-        <Select placeholder="Select message table"
-                onChange={selectWidget}
-                options={widgetOptions} />
-      </Row>
+      {widgets.size !== 0 ? (
+        <Row>
+          <span>Select message table:</span>
+          <Select placeholder="Select message table"
+                  onChange={selectWidget}
+                  options={widgetOptions} />
+        </Row>
+      ) : (
+        <Row>
+          <Alert bsStyle="warning">You need create a message table widget to export its result.</Alert>
+        </Row>
+      )}
     </>
   );
 };
