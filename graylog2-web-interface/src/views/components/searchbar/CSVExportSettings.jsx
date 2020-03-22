@@ -52,7 +52,7 @@ const CSVExportSettings = ({ fields, selectedWidget, selectField, selectedFields
       {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} widgetTitles={widgetTitles} />}
       <Row>
         Define the fields and sorting for your CSV file. You can change the field order with drag and drop.<br />
-        When you have finished the configuration, click on &quot;Start Download&quot;.
+        When you&apos;ve finished the configuration, click on &quot;Start Download&quot;.
       </Row>
       <Row>
         <span>Select fields to export:</span>
@@ -63,12 +63,9 @@ const CSVExportSettings = ({ fields, selectedWidget, selectField, selectedFields
         <FieldSortSelect fields={fields} sort={selectedSort} onChange={setSelectedSort} />
       </Row>
       <Row>
-        <span>Select sort direction:</span>
+        <span>Select sort direction (removing the sort will result in a faster export):</span>
         <SortDirectionSelect direction={selectedSortDirection ? selectedSortDirection.direction : null}
                              onChange={onSortDirectionChange} />
-      </Row>
-      <Row>
-        <span>Please note: selecting any sort will result in a slower export.</span>
       </Row>
     </>
   );

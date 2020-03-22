@@ -10,7 +10,6 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import Select from 'views/components/Select';
 
-
 type WidgetSelectionProps = {
   selectWidget: {label: string, value: Widget} => void,
   widgets: Map<string, Widget>,
@@ -25,7 +24,7 @@ const WidgetSelection = ({ selectWidget, widgets, widgetTitles }: WidgetSelectio
       <Row>
         <IfSearch>
           The CSV file will contain all messages for your current search.<br />
-          Please select a message table to adopt it&apos;s fields and sort. You can adjust all settings in the next step.
+          Please select a message table to adopt its fields and sort. You can adjust all settings in the next step.
         </IfSearch>
         <IfDashboard>
           Please select the message table you want to export the search results for. You can adjust it&apos;s fields and sort in the next step.<br />
@@ -41,7 +40,7 @@ const WidgetSelection = ({ selectWidget, widgets, widgetTitles }: WidgetSelectio
         </Row>
       ) : (
         <Row>
-          <Alert bsStyle="warning">You need create a message table widget to export its result.</Alert>
+          <Alert bsStyle="warning">You need to create a message table widget to export its result.</Alert>
         </Row>
       )}
     </>
