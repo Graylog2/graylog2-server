@@ -24,6 +24,9 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import javax.validation.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,26 +43,51 @@ public abstract class MessagesRequest {
 
     public abstract Optional<Set<Sort>> sort();
 
-    public static MessagesRequest.Builder builder() {
-        return MessagesRequest.Builder.create();
+    public static MessagesRequest empty() {
+        return builder().build();
+    }
+
+    public static Builder builder() {
+        return Builder.create();
+    }
+
+    public abstract Builder toBuilder();
+
+    public void ensureCompleteness() {
+        List<String> missingFields = new ArrayList<>();
+        if (!timeRange().isPresent())
+            missingFields.add("timeRange");
+        if (!queryString().isPresent())
+            missingFields.add("queryString");
+        if (!streams().isPresent())
+            missingFields.add("streams");
+        if (!fieldsInOrder().isPresent())
+            missingFields.add("fieldsInOrder");
+        if (!sort().isPresent())
+            missingFields.add("sort");
+
+        if (!missingFields.isEmpty()) {
+            String message = "Missing fields: " + missingFields;
+            throw new ValidationException(message);
+        }
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty
-        public abstract MessagesRequest.Builder timeRange(TimeRange timeRange);
+        public abstract Builder timeRange(TimeRange timeRange);
 
         @JsonProperty
-        public abstract MessagesRequest.Builder streams(Set<String> streams);
+        public abstract Builder streams(Set<String> streams);
 
         @JsonProperty("query_string")
-        public abstract MessagesRequest.Builder queryString(BackendQuery queryString);
+        public abstract Builder queryString(BackendQuery queryString);
 
         @JsonProperty("fields_in_order")
-        public abstract MessagesRequest.Builder fieldsInOrder(Set<String> fieldsInOrder);
+        public abstract Builder fieldsInOrder(Set<String> fieldsInOrder);
 
         @JsonProperty
-        public abstract MessagesRequest.Builder sort(Set<Sort> sort);
+        public abstract Builder sort(Set<Sort> sort);
 
         abstract MessagesRequest autoBuild();
 
@@ -68,7 +96,7 @@ public abstract class MessagesRequest {
         }
 
         @JsonCreator
-        public static MessagesRequest.Builder create() {
+        public static Builder create() {
             return new AutoValue_MessagesRequest.Builder();
         }
     }

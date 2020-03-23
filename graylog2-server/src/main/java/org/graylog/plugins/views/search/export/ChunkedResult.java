@@ -16,28 +16,5 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import com.google.auto.value.AutoValue;
-
-@AutoValue
-public abstract class MessagesResult {
-    public abstract String filename();
-
-    public abstract ChunkedResult messages();
-
-    public static MessagesResult.Builder builder() {
-        return new AutoValue_MessagesResult.Builder();
-    }
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-        public abstract MessagesResult.Builder filename(String filename);
-
-        public abstract MessagesResult.Builder messages(ChunkedResult messages);
-
-        abstract MessagesResult autoBuild();
-
-        public MessagesResult build() {
-            return autoBuild();
-        }
-    }
+public class ChunkedResult {
 }

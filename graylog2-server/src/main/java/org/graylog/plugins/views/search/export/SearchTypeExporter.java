@@ -16,19 +16,32 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import javax.inject.Inject;
+
 public class SearchTypeExporter {
+    private final Defaults defaults;
+    private final ExportBackend backend;
+
+    @Inject
+    public SearchTypeExporter(Defaults defaults, ExportBackend backend) {
+        this.defaults = defaults;
+        this.backend = backend;
+    }
+
     public MessagesResult export(MessagesRequest request) {
-        return stubResult();
+        MessagesRequest fullRequest = defaults.fillInIfNecessary(request);
+        ChunkedResult messages = backend.run(fullRequest);
+        return resultFrom(messages);
     }
 
     public MessagesResult export(String searchId, String searchTypeId, SearchTypeOverrides overrides) {
-        return stubResult();
+        return resultFrom(null);
     }
 
-    public MessagesResult stubResult() {
+    public MessagesResult resultFrom(ChunkedResult messages) {
         return MessagesResult.builder()
                 .filename("affenmann.csv")
-                .fileContents("alle,sind,heut,nackidei")
+                .messages(messages)
                 .build();
     }
 }

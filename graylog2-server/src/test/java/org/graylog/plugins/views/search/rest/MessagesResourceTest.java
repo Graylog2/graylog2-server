@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import org.graylog.plugins.views.search.export.ChunkedResult;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.MessagesResult;
 import org.graylog.plugins.views.search.export.SearchTypeExporter;
@@ -80,9 +81,13 @@ public class MessagesResourceTest {
     }
 
     private MessagesResult mockResultFor(MessagesRequest request) {
-        MessagesResult result = MessagesResult.builder().filename("hasi").fileContents("mausi").build();
+        MessagesResult result = someValidResult();
         when(exporter.export(request)).thenReturn(result);
         return result;
+    }
+
+    private MessagesResult someValidResult() {
+        return MessagesResult.builder().filename("hasi").messages(mock(ChunkedResult.class)).build();
     }
 
     private MessagesRequest validRequest() {
@@ -90,7 +95,7 @@ public class MessagesResourceTest {
     }
 
     private MessagesResult mockResultFor(SearchTypeOverrides overrides) {
-        MessagesResult result = MessagesResult.builder().filename("hasi").fileContents("mausi").build();
+        MessagesResult result = someValidResult();
         when(exporter.export(any(), any(), eq(overrides))).thenReturn(result);
         return result;
     }

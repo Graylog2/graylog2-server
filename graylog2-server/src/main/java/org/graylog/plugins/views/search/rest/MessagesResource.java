@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.export.ChunkedResult;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.MessagesResult;
 import org.graylog.plugins.views.search.export.SearchTypeExporter;
@@ -71,17 +72,17 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     private Response okResultFrom(MessagesResult result) {
-        ChunkedOutput<String> chunkedOutput = chunkedOutputFrom(result);
+        ChunkedOutput<ChunkedResult> chunkedOutput = chunkedOutputFrom(result);
         return Response
                 .ok(chunkedOutput)
                 .header("Content-Disposition", "attachment; filename=" + result.filename())
                 .build();
     }
 
-    private ChunkedOutput<String> chunkedOutputFrom(MessagesResult result) {
-        ChunkedOutput<String> output = new ChunkedOutput<>(String.class);
+    private ChunkedOutput<ChunkedResult> chunkedOutputFrom(MessagesResult result) {
+        ChunkedOutput<ChunkedResult> output = new ChunkedOutput<>(ChunkedResult.class);
         try {
-            output.write(result.fileContents());
+            output.write(result.messages());
             output.close();
         } catch (IOException e) {
             throw new RuntimeException("Failed to create ChunkedOutput for " + result, e);

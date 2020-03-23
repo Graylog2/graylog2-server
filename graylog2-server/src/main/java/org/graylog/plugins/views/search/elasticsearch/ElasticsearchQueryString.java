@@ -30,6 +30,10 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
 
     public static final String NAME = "elasticsearch";
 
+    public static ElasticsearchQueryString empty() {
+        return ElasticsearchQueryString.builder().queryString("").build();
+    }
+
     @Override
     public abstract String type();
 
@@ -62,6 +66,10 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
     @Override
     public String toString() {
         return type() + ": " + queryString();
+    }
+
+    public boolean isEmpty() {
+        return queryString().isEmpty() || queryString().equals("*");
     }
 
     @AutoValue.Builder

@@ -1,0 +1,67 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_1",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Hi",
+            "timestamp": "2015-01-01 01:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "1"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Ho",
+            "timestamp": "2015-01-01 02:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "2"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Ha",
+            "timestamp": "2015-01-02 01:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
