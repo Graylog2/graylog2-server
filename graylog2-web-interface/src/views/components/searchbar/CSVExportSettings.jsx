@@ -4,9 +4,9 @@ import { List, Map } from 'immutable';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Widget from 'views/logic/widgets/Widget';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 
 import { Row } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
