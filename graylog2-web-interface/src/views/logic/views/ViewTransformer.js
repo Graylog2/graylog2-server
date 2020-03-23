@@ -30,11 +30,14 @@ const ViewTransformer = (searchView: View): View => {
       .widgets(widgets)
       .build();
   });
+  const newQueries = searchView.search.queries.map(query => query.toBuilder().query({ ...query.query, query_string: '' }).build());
+  const newSearch = searchView.search.toBuilder().queries(newQueries).build();
 
   return searchView.toBuilder()
     .newId()
     .type(View.Type.Dashboard)
     .state(newViewStateMap)
+    .search(newSearch)
     .build();
 };
 
