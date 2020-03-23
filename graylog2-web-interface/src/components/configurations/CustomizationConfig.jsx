@@ -35,7 +35,7 @@ class CustomizationConfig extends React.Component {
   static defaultProps = {
     config: {
       badge_text: '',
-      badge_color: '',
+      badge_color: '#689f38',
       badge_enable: false,
     },
     warning: {

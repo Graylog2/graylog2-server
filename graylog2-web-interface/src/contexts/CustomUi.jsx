@@ -5,17 +5,27 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { ConfigurationsActions } = CombinedProvider.get('Configurations');
 
-const DEFAULT_UI_CONTEXT = {};
+const DEFAULT_UI_CONTEXT = {
+  badgeConfig: {
+    badge_enable: false,
+    badge_color: '#689f38',
+    badge_text: '',
+  },
+};
 const CUSTOMIZATION_CONFIG = 'org.graylog2.configuration.Customization';
 
 export const CustomUiContext = createContext(DEFAULT_UI_CONTEXT);
 
 const CustomUiProvider = ({ children }) => {
-  const [badgeConfig, setBadgeConfig] = useState(DEFAULT_UI_CONTEXT);
+  const [badgeConfig, setBadgeConfig] = useState(DEFAULT_UI_CONTEXT.badgeConfig);
 
   useEffect(() => {
     ConfigurationsActions.list(CUSTOMIZATION_CONFIG).then((configs) => {
-      setBadgeConfig(configs);
+      if (configs) {
+        setBadgeConfig(configs);
+      } else {
+        setBadgeConfig(DEFAULT_UI_CONTEXT.badgeConfig);
+      }
     });
   }, []);
 

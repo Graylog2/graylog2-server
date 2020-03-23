@@ -64,12 +64,12 @@ class ConfigurationsPage extends React.Component {
     this._clearTimeout();
   }
 
-  _getConfig = (configType) => {
+  _getConfig = (configType, fallback = null) => {
     const { configuration } = this.props;
     if (configuration && configuration[configType]) {
       return configuration[configType];
     }
-    return null;
+    return fallback;
   };
 
   _onUpdate = (configType) => {
@@ -155,7 +155,8 @@ class ConfigurationsPage extends React.Component {
       const sidecarConfig = this._getConfig(CONFIG.SIDECAR);
       const eventsConfig = this._getConfig(CONFIG.EVENTS);
       const urlWhiteListConfig = this._getConfig(CONFIG.URL_WHITELIST);
-      const customizationConfig = this._getConfig(CONFIG.CUSTOMIZATION);
+      const customizationConfig = this._getConfig(CONFIG.CUSTOMIZATION, {});
+      console.log("ConfigurationPage", customizationConfig);
 
       Output = (
         <>
