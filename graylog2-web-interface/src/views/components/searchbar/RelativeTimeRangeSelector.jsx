@@ -1,10 +1,18 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import Input from 'components/bootstrap/Input';
+import type { SearchesConfig } from 'components/search/SearchConfig';
+import { Field } from 'formik';
 
-export default function RelativeTimeRangeSelector({ config, disabled, value, onChange }) {
+type Props = {
+  disabled: boolean,
+  config: SearchesConfig,
+};
+
+export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
   const availableOptions = config.relative_timerange_options;
   const timeRangeLimit = moment.duration(config.query_time_range_limit);
   let options;
@@ -14,7 +22,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, value, onC
     options = Object.keys(availableOptions).map((key) => {
       const seconds = moment.duration(key).asSeconds();
 
-      if (timeRangeLimit > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
+      if (timeRangeLimit.seconds() > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
         return null;
       }
 
@@ -36,18 +44,22 @@ export default function RelativeTimeRangeSelector({ config, disabled, value, onC
   }
 
   return (
-    <div className="timerange-selector relative"
-         style={{ marginLeft: 50 }}>
-      <Input id="relative-timerange-selector"
-             disabled={disabled}
-             type="select"
-             value={value.get('range')}
-             className="relative"
-             name="relative"
-             onChange={(event) => onChange('range', event.target.value)}>
-        {options}
-      </Input>
-    </div>
+    <Field name="timerange.range">
+      {({ field: { name, value, onChange } }) => (
+        <div className="timerange-selector relative"
+             style={{ marginLeft: 50 }}>
+          <Input id="relative-timerange-selector"
+                 disabled={disabled}
+                 type="select"
+                 value={value}
+                 className="relative"
+                 name={name}
+                 onChange={onChange}>
+            {options}
+          </Input>
+        </div>
+      )}
+    </Field>
   );
 }
 
@@ -57,8 +69,6 @@ RelativeTimeRangeSelector.propTypes = {
     query_time_range_limit: PropTypes.string.isRequired,
   }).isRequired,
   disabled: PropTypes.bool,
-  value: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
 };
 
 RelativeTimeRangeSelector.defaultProps = {

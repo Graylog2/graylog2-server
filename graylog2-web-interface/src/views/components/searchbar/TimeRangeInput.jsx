@@ -1,20 +1,35 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
+import type { SearchesConfig } from 'components/search/SearchConfig';
 import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
 import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 
-export default function TimeRangeInput({ disabled, rangeType, rangeParams, config, onChange, onSubmit }) {
-  switch (rangeType) {
+type Props = {
+  disabled: boolean,
+  type: string,
+  config: SearchesConfig,
+};
+
+export default function TimeRangeInput({ disabled, type, config }: Props) {
+  switch (type) {
     case 'relative':
-      return <RelativeTimeRangeSelector disabled={disabled} value={rangeParams} config={config} onChange={onChange} onSubmit={onSubmit} />;
+      return (
+        <RelativeTimeRangeSelector disabled={disabled}
+                                   config={config} />
+      );
     case 'absolute':
-      return <AbsoluteTimeRangeSelector disabled={disabled} value={rangeParams} onChange={onChange} onSubmit={onSubmit} />;
+      return (
+        <AbsoluteTimeRangeSelector disabled={disabled} />
+      );
     case 'keyword':
-      return <KeywordTimeRangeSelector disabled={disabled} value={rangeParams} onChange={onChange} onSubmit={onSubmit} />;
+      return (
+        <KeywordTimeRangeSelector disabled={disabled} />
+      );
     default:
-      throw new Error(`Unsupported range type ${rangeType}`);
+      throw new Error(`Unsupported time range type ${type}`);
   }
 }
 
@@ -24,8 +39,7 @@ TimeRangeInput.propTypes = {
   }).isRequired,
   disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
-  rangeParams: PropTypes.object.isRequired,
-  rangeType: PropTypes.string.isRequired,
+  timerange: PropTypes.object.isRequired,
 };
 
 TimeRangeInput.defaultProps = {

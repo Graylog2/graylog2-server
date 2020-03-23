@@ -124,10 +124,8 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
             <TimeRangeTypeSelector onSelect={(newRangeType) => _updateRangeType(timerange, id, newRangeType)}
                                    disabled={isGloballyOverridden}
                                    value={rangeType} />
-            <TimeRangeInput onChange={(key, value) => _updateRangeParams(rangeType, timerange, id, { [key]: value })}
-                            disabled={isGloballyOverridden}
-                            rangeType={rangeType}
-                            rangeParams={rangeParams}
+            <TimeRangeInput disabled={isGloballyOverridden}
+                            type={rangeType}
                             config={config} />
           </Col>
 

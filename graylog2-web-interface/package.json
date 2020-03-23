@@ -79,6 +79,7 @@
     "clipboard": "^2.0.0",
     "crossfilter": "1.3.x",
     "deep-equal": "^1.0.1",
+    "formik": "^2.1.4",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "immutable": "^3.8.1",
     "interactjs": "^1.4.0-rc.13",

@@ -1,9 +1,10 @@
 // @flow strict
 import * as React from 'react';
-import { useCallback, useReducer, useMemo } from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import moment from 'moment';
+import { Formik, Form, Field } from 'formik';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -26,7 +27,6 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersActions, QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { filtersToStreamSet } from 'views/logic/queries/Query';
 import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
-import isEqualForSearch from 'views/stores/isEqualForSearch';
 
 type Props = {
   availableStreams: Array<*>,
@@ -65,94 +65,82 @@ const migrateTimeRangeToNewType = (oldTimerange: TimeRange, type: string): TimeR
   }
 };
 
-const timerangeReducer = (state, action) => {
-  const { type, ...rest } = state;
-  switch (action.type) {
-    case 'type':
-      return migrateTimeRangeToNewType(state, action.rangeType);
-    case 'key':
-      return { ...rest, type, [action.key]: action.value };
-    default:
-      return state;
-  }
-};
-
 const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
 
-  const [timerange, dispatch] = useReducer(timerangeReducer, currentQuery, q => q.timerange);
+  const { id, query, timerange } = currentQuery;
 
-  const { id, query } = currentQuery;
+  const setTimeRange = useCallback((newTimerange: TimeRange) => QueriesActions.timerange(id, newTimerange), [id]);
 
-  const setRangeType = useCallback(newType => dispatch({ type: 'type', rangeType: newType }), [dispatch]);
-  const setRangeParam = useCallback((key, value) => dispatch({ type: 'key', key, value }), [dispatch]);
-  const setTimeRange = useCallback(() => QueriesActions.timerange(id, timerange), [id, timerange]);
+  const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  const submitForm = useCallback((event) => {
-    event.preventDefault();
-    return isEqualForSearch(currentQuery.timerange, timerange) ? performSearch() : setTimeRange();
-  }, [timerange, performSearch]);
-
-  const { type: rangeType, ...rest } = timerange;
-
-  const rangeParams = useMemo(() => Immutable.Map(rest), [rest]);
-
-  const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map()))
-    .toJS();
+  const setStreams = useCallback(value => setTimeRange(timerange).then(() => QueryFiltersActions.streams(id, value)), [id, timerange, setTimeRange]);
+  const setQueryString = useCallback(value => setTimeRange(timerange).then(() => QueriesActions.query(id, value)), [id, timerange, setTimeRange]);
 
   return (
     <ScrollToHint value={query.query_string}>
       <Row className="content">
         <Col md={12}>
-          <form onSubmit={submitForm}>
-            <Row className="no-bm extended-search-query-metadata">
-              <Col md={4}>
-                <TimeRangeTypeSelector onSelect={setRangeType}
-                                       value={rangeType} />
-                <TimeRangeInput onChange={setRangeParam}
-                                onSubmit={setTimeRange}
-                                rangeType={rangeType}
-                                rangeParams={rangeParams}
-                                config={config} />
-              </Col>
+          <Formik initialValues={{ timerange }}
+                  validate={(values) => {
+                    console.log('Validating: ', values);
+                  }}
+                  onSubmit={(values) => {
+                    console.log('Submitting: ', values);
+                    return QueriesActions.timerange(currentQuery.id, values.timerange);
+                  }}>
+            {({ values, isSubmitting, errors }) => (
+              <Form>
+                <Row className="no-bm extended-search-query-metadata">
+                  <Col md={4}>
+                    <Field name="timerange.type">
+                      {({ field: { value, onChange } }) => (
+                        <TimeRangeTypeSelector onSelect={newType => onChange({ target: { value: migrateTimeRangeToNewType(values.timerange, newType), name: 'timerange' } })}
+                                               value={value} />
+                      )}
+                    </Field>
+                    <TimeRangeInput type={values.timerange.type}
+                                    config={config} />
+                  </Col>
 
-              <Col mdHidden lgHidden>
-                <HorizontalSpacer />
-              </Col>
+                  <Col mdHidden lgHidden>
+                    <HorizontalSpacer />
+                  </Col>
 
-              <Col md={5} xs={8}>
-                <StreamsFilter value={streams}
-                               streams={availableStreams}
-                               onChange={(value) => QueryFiltersActions.streams(id, value)} />
-              </Col>
+                  <Col md={5} xs={8}>
+                    <StreamsFilter value={streams}
+                                   streams={availableStreams}
+                                   onChange={setStreams} />
+                  </Col>
 
-              <Col md={3} xs={4}>
-                <RefreshControls />
-              </Col>
-            </Row>
+                  <Col md={3} xs={4}>
+                    <RefreshControls />
+                  </Col>
+                </Row>
 
-            <Row className="no-bm">
-              <Col md={9} xs={8}>
-                <div className="pull-right search-help">
-                  <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                     title="Search query syntax documentation"
-                                     text={<Icon name="lightbulb-o" />} />
-                </div>
-                <SearchButton disabled={disableSearch} />
+                <Row className="no-bm">
+                  <Col md={9} xs={8}>
+                    <div className="pull-right search-help">
+                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                         title="Search query syntax documentation"
+                                         text={<Icon name="lightbulb-o" />} />
+                    </div>
+                    <SearchButton disabled={disableSearch || isSubmitting || Object.keys(errors).length > 0} />
 
-                <QueryInput value={query.query_string}
-                            placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                            onChange={(value) => QueriesActions.query(id, value)}
-                            onExecute={performSearch} />
-              </Col>
-              <Col md={3} xs={4} className="pull-right">
-                <SavedSearchControls />
-              </Col>
-            </Row>
-          </form>
-
+                    <QueryInput value={query.query_string}
+                                placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                                onChange={setQueryString}
+                                onExecute={performSearch} />
+                  </Col>
+                  <Col md={3} xs={4} className="pull-right">
+                    <SavedSearchControls />
+                  </Col>
+                </Row>
+              </Form>
+            )}
+          </Formik>
         </Col>
       </Row>
     </ScrollToHint>
