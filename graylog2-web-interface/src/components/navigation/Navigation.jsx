@@ -62,7 +62,14 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 };
 
 const Navigation = ({ permissions, fullName, location, loginName }) => {
-  const pluginNavigations = PluginStore.exports('navigation')
+  const pluginExports = PluginStore.exports('navigation');
+  if (!pluginExports.find(value => value.description.toLowerCase() === "enterprise")) {
+    // no enterprise plugin menu, so we will add one
+    pluginExports.push({
+      path: '/system/enterprise', description: 'Enterprise', enterprise: undefined
+    });
+  }
+  const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(pluginRoute => formatPluginRoute(pluginRoute, permissions, location));
 
