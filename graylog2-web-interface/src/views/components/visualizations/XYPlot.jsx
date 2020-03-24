@@ -59,8 +59,11 @@ const XYPlot = ({
   onZoom = OnZoom,
 }: Props) => {
   const yaxis = { fixedrange: true, rangemode: 'tozero' };
-  const legend = height ? { y: yLegendPosition(height) } : {};
-  const layout = merge({}, { yaxis, legend }, plotLayout);
+  const defaultLayout: {yaxis: Object, legend?: Object} = { yaxis };
+  if (height) {
+    defaultLayout.legend = { y: yLegendPosition(height) };
+  }
+  const layout = merge({}, defaultLayout, plotLayout);
   const viewType = useContext(ViewTypeContext);
   const _onZoom = useCallback(config.isTimeline
     ? (from, to) => onZoom(currentQuery, from, to, viewType)
