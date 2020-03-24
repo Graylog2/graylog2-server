@@ -40,10 +40,10 @@ const yLegendPosition = (containerHeight: number) => {
   if (containerHeight < 150) {
     return -0.6;
   }
-  if (containerHeight > 350) {
-    return -0.14;
+  if (containerHeight < 400) {
+    return -0.2;
   }
-  return -0.2;
+  return -0.14;
 };
 
 const XYPlot = ({
