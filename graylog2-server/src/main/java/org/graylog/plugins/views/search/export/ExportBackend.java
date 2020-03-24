@@ -16,6 +16,9 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import java.util.LinkedHashSet;
+import java.util.function.Consumer;
+
 public interface ExportBackend {
-    ChunkedResult run(MessagesRequest request);
+    ChunkedResult run(MessagesRequest request, Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector);
 }

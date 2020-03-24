@@ -34,7 +34,7 @@ public class Defaults {
     public static final BackendQuery DEFAULT_QUERY = ElasticsearchQueryString.empty();
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of(); //TODO: use all permitted streams
     public static final Set<String> DEFAULT_FIELDS = ImmutableSet.of("timestamp", "source", "message");
-    public static final Set<Sort> DEFAULT_SORT = ImmutableSet.of(Sort.create("_doc", SortOrder.ASC));
+    public static final Set<Sort> DEFAULT_SORT = ImmutableSet.of(Sort.create("timestamp", SortOrder.DESC));
 
     private static RelativeRange lastFiveMinutes() {
         try {
@@ -42,6 +42,10 @@ public class Defaults {
         } catch (InvalidRangeParametersException e) {
             throw new RuntimeException("Error creating default time range", e);
         }
+    }
+
+    public static MessagesRequest createDefaultMessagesRequest() {
+        return new Defaults().fillInIfNecessary(MessagesRequest.empty());
     }
 
     public MessagesRequest fillInIfNecessary(MessagesRequest request) {

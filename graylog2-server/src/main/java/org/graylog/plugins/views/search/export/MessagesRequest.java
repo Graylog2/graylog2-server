@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -85,6 +86,10 @@ public abstract class MessagesRequest {
 
         @JsonProperty("fields_in_order")
         public abstract Builder fieldsInOrder(Set<String> fieldsInOrder);
+
+        public Builder fieldsInOrder(String... fieldsInOrder) {
+            return fieldsInOrder(ImmutableSet.copyOf(fieldsInOrder));
+        }
 
         @JsonProperty
         public abstract Builder sort(Set<Sort> sort);

@@ -21,10 +21,9 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
-import org.graylog.plugins.views.search.export.ChunkedResult;
+import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.MessagesResult;
-import org.graylog.plugins.views.search.export.SearchTypeExporter;
 import org.graylog.plugins.views.search.export.SearchTypeOverrides;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -44,10 +43,10 @@ import java.io.IOException;
 @Path("/views/search/messages")
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
-    private final SearchTypeExporter exporter;
+    private final MessagesExporter exporter;
 
     @Inject
-    public MessagesResource(SearchTypeExporter exporter) {
+    public MessagesResource(MessagesExporter exporter) {
         this.exporter = exporter;
     }
 
@@ -72,15 +71,16 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     private Response okResultFrom(MessagesResult result) {
-        ChunkedOutput<ChunkedResult> chunkedOutput = chunkedOutputFrom(result);
+        ChunkedOutput<String> chunkedOutput = chunkedOutputFrom(result);
         return Response
                 .ok(chunkedOutput)
                 .header("Content-Disposition", "attachment; filename=" + result.filename())
                 .build();
     }
 
-    private ChunkedOutput<ChunkedResult> chunkedOutputFrom(MessagesResult result) {
-        ChunkedOutput<ChunkedResult> output = new ChunkedOutput<>(ChunkedResult.class);
+    private ChunkedOutput<String> chunkedOutputFrom(MessagesResult result) {
+        ChunkedOutput<String> output = new ChunkedOutput<>(String.class);
+
         try {
             output.write(result.messages());
             output.close();

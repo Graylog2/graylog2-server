@@ -17,31 +17,42 @@
 package org.graylog.plugins.views.search.export;
 
 import javax.inject.Inject;
+import java.util.LinkedHashSet;
 
-public class SearchTypeExporter {
+public class MessagesExporter {
     private final Defaults defaults;
     private final ExportBackend backend;
 
     @Inject
-    public SearchTypeExporter(Defaults defaults, ExportBackend backend) {
+    public MessagesExporter(Defaults defaults, ExportBackend backend) {
         this.defaults = defaults;
         this.backend = backend;
     }
 
     public MessagesResult export(MessagesRequest request) {
         MessagesRequest fullRequest = defaults.fillInIfNecessary(request);
-        ChunkedResult messages = backend.run(fullRequest);
-        return resultFrom(messages);
+
+        LinkedHashSet<String> totalResult = new LinkedHashSet<>();
+
+        backend.run(fullRequest, h -> collect(h, totalResult));
+        return resultFrom(totalResult);
+    }
+
+    private void collect(LinkedHashSet<LinkedHashSet<String>> hits, LinkedHashSet<String> totalResult) {
+        hits.stream()
+                .map(row -> String.join(" ", row))
+                .forEach(totalResult::add);
     }
 
     public MessagesResult export(String searchId, String searchTypeId, SearchTypeOverrides overrides) {
         return resultFrom(null);
     }
 
-    public MessagesResult resultFrom(ChunkedResult messages) {
+    public MessagesResult resultFrom(LinkedHashSet<String> messages) {
+        String joinedMessages = String.join("\r\n", messages);
         return MessagesResult.builder()
                 .filename("affenmann.csv")
-                .messages(messages)
+                .messages(joinedMessages)
                 .build();
     }
 }

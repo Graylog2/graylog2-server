@@ -22,7 +22,7 @@ import com.google.auto.value.AutoValue;
 public abstract class MessagesResult {
     public abstract String filename();
 
-    public abstract ChunkedResult messages();
+    public abstract String messages();
 
     public static MessagesResult.Builder builder() {
         return new AutoValue_MessagesResult.Builder();
@@ -32,7 +32,7 @@ public abstract class MessagesResult {
     public abstract static class Builder {
         public abstract MessagesResult.Builder filename(String filename);
 
-        public abstract MessagesResult.Builder messages(ChunkedResult messages);
+        public abstract MessagesResult.Builder messages(String messages);
 
         abstract MessagesResult autoBuild();
 

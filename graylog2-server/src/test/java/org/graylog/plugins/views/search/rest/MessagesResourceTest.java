@@ -16,10 +16,9 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import org.graylog.plugins.views.search.export.ChunkedResult;
+import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.MessagesResult;
-import org.graylog.plugins.views.search.export.SearchTypeExporter;
 import org.graylog.plugins.views.search.export.SearchTypeOverrides;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,12 +36,12 @@ import static org.mockito.Mockito.when;
 public class MessagesResourceTest {
 
     private MessagesResource sut;
-    private SearchTypeExporter exporter;
+    private MessagesExporter exporter;
 
     @BeforeEach
     void setUp() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
-        exporter = mock(SearchTypeExporter.class);
+        exporter = mock(MessagesExporter.class);
         sut = new MessagesResource(exporter);
     }
 
@@ -87,7 +86,7 @@ public class MessagesResourceTest {
     }
 
     private MessagesResult someValidResult() {
-        return MessagesResult.builder().filename("hasi").messages(mock(ChunkedResult.class)).build();
+        return MessagesResult.builder().filename("hasi").messages("").build();
     }
 
     private MessagesRequest validRequest() {
