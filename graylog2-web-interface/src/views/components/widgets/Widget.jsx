@@ -29,7 +29,7 @@ import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { TimeRange } from 'views/logic/queries/Query';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import CSVExportModal from 'views/components/searchbar/CSVExportModal';
+import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';

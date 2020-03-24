@@ -11,7 +11,7 @@ import AppConfig from 'util/AppConfig';
 
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
 import { Icon } from 'components/common';
-import CSVExportModal from 'views/components/searchbar/CSVExportModal';
+import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
 
 import onSaveView from 'views/logic/views/OnSaveViewAction';

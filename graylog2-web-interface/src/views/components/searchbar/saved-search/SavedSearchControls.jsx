@@ -17,7 +17,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import CSVExportModal from 'views/components/searchbar/CSVExportModal';
+import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import ShareViewModal from 'views/components/views/ShareViewModal';
 import * as Permissions from 'views/Permissions';
 
