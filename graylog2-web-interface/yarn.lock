@@ -7836,7 +7836,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   dependencies:
     "@babel/preset-env" "7.9.0"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-3.3.0-SNAPSHOT-71f195d5-f01a-4648-9360-856566c6c76d-1585586494900/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-3.3.0-SNAPSHOT-6e0437cb-8dbb-414c-8f02-b7148490e362-1585587890513/node_modules/eslint-config-graylog"
     html-webpack-plugin "4.0.2"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"
