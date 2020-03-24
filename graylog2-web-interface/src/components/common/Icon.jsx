@@ -16,7 +16,7 @@ const cleanIconName = (icon) => {
 
   if (replacedIcon) {
     /* eslint-disable-next-line no-console */
-    console.warn(DEPRECATION_NOTICE, 'You have used a deprecated `Icon` name, please check the documentation to use the latest `name`.');
+    console.warn(DEPRECATION_NOTICE, `You have used a deprecated \`Icon\` name. \`${icon}\` should be \`${replacedIcon.v5}\``);
     return replacedIcon.v5;
   }
 
@@ -31,16 +31,16 @@ const cleanIconName = (icon) => {
  * Visit [React FontAwesome Features](https://github.com/FortAwesome/react-fontawesome#features) for more information.
  */
 
-const Icon = React.forwardRef(({ name, ...props }, ref) => {
+const Icon = ({ name, ...props }) => {
   let icon = name;
   if (isString(name)) {
     icon = cleanIconName(name.replace(/^fa-/, '')); // remove "fa-" prefix if it exists
   }
 
   return (
-    <FontAwesomeIcon {...props} icon={icon} ref={ref} />
+    <FontAwesomeIcon {...props} icon={icon} />
   );
-});
+};
 
 Icon.propTypes = {
   /** Name of Font Awesome 5 Icon without `fa-` prefix */
