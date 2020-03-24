@@ -51,9 +51,11 @@ import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class ElasticsearchExportBackend implements ExportBackend {
 
+    private static final int CHUNK_SIZE = 1000;
+    private static final String TIEBREAKER_FIELD = "gl2_message_id";
+
     private final JestClient jestClient;
     private final IndexLookup indexLookup;
-    private static final int CHUNK_SIZE = 2;
 
     @Inject
     public ElasticsearchExportBackend(JestClient jestClient, IndexLookup indexLookup) {
@@ -72,27 +74,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
     private void getChunksRecursively(MessagesRequest request, Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector, Object[] searchAfterValues) {
 
-        Set<String> indices = indicesFor(request);
-        QueryBuilder query = queryFrom(request);
-
-        SearchSourceBuilder ssb = new SearchSourceBuilder()
-                .query(query)
-                .size(CHUNK_SIZE);
-
-        for (Sort sort : request.sort().get())
-            ssb.sort(SortBuilders.fieldSort(sort.field()).order(sort.order()));
-
-        ssb.sort(SortBuilders.fieldSort("gl2_message_id").order(SortOrder.ASC).unmappedType("string"));
-
-        if (searchAfterValues != null)
-            ssb.searchAfter(searchAfterValues);
-
-        Search search = new Search.Builder(ssb.toString())
-                .addType(IndexMapping.TYPE_MESSAGE)
-                .allowNoIndices(false)
-                .ignoreUnavailable(false)
-                .addIndex(indices)
-                .build();
+        Search search = buildSearchRequest(request, searchAfterValues);
 
         SearchResult result = JestUtils.execute(jestClient, search, () -> "");
 
@@ -106,6 +88,30 @@ public class ElasticsearchExportBackend implements ExportBackend {
         Object[] lastHitSort = lastHitSortFrom(hits);
 
         getChunksRecursively(request, chunkCollector, lastHitSort);
+    }
+
+    private Search buildSearchRequest(MessagesRequest request, Object[] searchAfterValues) {
+        Set<String> indices = indicesFor(request);
+        QueryBuilder query = queryFrom(request);
+
+        SearchSourceBuilder ssb = new SearchSourceBuilder()
+                .query(query)
+                .size(CHUNK_SIZE);
+
+        for (Sort sort : request.sort().get())
+            ssb.sort(SortBuilders.fieldSort(sort.field()).order(sort.order()));
+
+        ssb.sort(SortBuilders.fieldSort(TIEBREAKER_FIELD).order(SortOrder.ASC).unmappedType("string"));
+
+        if (searchAfterValues != null)
+            ssb.searchAfter(searchAfterValues);
+
+        return new Search.Builder(ssb.toString())
+                .addType(IndexMapping.TYPE_MESSAGE)
+                .allowNoIndices(false)
+                .ignoreUnavailable(false)
+                .addIndex(indices)
+                .build();
     }
 
     private Object[] lastHitSortFrom(List<SearchResult.Hit<Map, Void>> hits) {

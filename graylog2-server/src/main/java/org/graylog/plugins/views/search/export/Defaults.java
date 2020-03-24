@@ -25,16 +25,19 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
 public class Defaults {
     public static final TimeRange DEFAULT_TIME_RANGE = lastFiveMinutes();
     public static final BackendQuery DEFAULT_QUERY = ElasticsearchQueryString.empty();
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of(); //TODO: use all permitted streams
-    public static final Set<String> DEFAULT_FIELDS = ImmutableSet.of("timestamp", "source", "message");
-    public static final Set<Sort> DEFAULT_SORT = ImmutableSet.of(Sort.create("timestamp", SortOrder.DESC));
+    public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
+    public static final LinkedHashSet<Sort> DEFAULT_SORT = linkedHashSetOf(Sort.create("timestamp", SortOrder.DESC));
 
     private static RelativeRange lastFiveMinutes() {
         try {

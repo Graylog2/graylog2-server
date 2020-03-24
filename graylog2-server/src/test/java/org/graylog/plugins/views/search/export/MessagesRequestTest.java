@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static com.google.common.collect.Sets.newLinkedHashSet;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class MessagesRequestTest {
@@ -43,8 +44,8 @@ class MessagesRequestTest {
         result.put("timeRange", b -> b.timeRange(someTimeRange()));
         result.put("queryString", b -> b.queryString(ElasticsearchQueryString.empty()));
         result.put("streams", b -> b.streams(ImmutableSet.of("some-stream")));
-        result.put("fieldsInOrder", b -> b.fieldsInOrder(ImmutableSet.of("some-field")));
-        result.put("sort", b -> b.sort(ImmutableSet.of()));
+        result.put("fieldsInOrder", b -> b.fieldsInOrder("some-field"));
+        result.put("sort", b -> b.sort(newLinkedHashSet()));
         return result;
     }
 

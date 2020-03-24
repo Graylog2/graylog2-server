@@ -33,6 +33,7 @@ import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
+import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,14 +57,19 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .streams(ImmutableSet.of("stream-01", "stream-02"))
                 .build();
 
-        when(indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get()))
-                .thenReturn(ImmutableSet.of("graylog_0", "graylog_1"));
+        mockIndexLookupFor(request, "graylog_0", "graylog_1");
 
         runWithExpectedResult(request,
                 "2015-01-01 04:00:00.000 source-2 Ho",
                 "2015-01-01 02:00:00.000 source-2 He",
                 "2015-01-01 01:00:00.000 source-1 Ha"
         );
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    public void mockIndexLookupFor(MessagesRequest request, String... indexNames) {
+        when(indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get()))
+                .thenReturn(ImmutableSet.copyOf(indexNames));
     }
 
     @Test
@@ -114,7 +120,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         importFixture("messages.json");
 
         MessagesRequest request = defaultRequestBuilder()
-                .sort(ImmutableSet.of(Sort.create("source", SortOrder.ASC), Sort.create("timestamp", SortOrder.DESC)))
+                .sort(linkedHashSetOf(Sort.create("source", SortOrder.ASC), Sort.create("timestamp", SortOrder.DESC)))
                 .build();
 
         runWithExpectedResult(request,

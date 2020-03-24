@@ -20,16 +20,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = MessagesRequest.Builder.class)
@@ -40,9 +42,9 @@ public abstract class MessagesRequest {
 
     public abstract Optional<Set<String>> streams();
 
-    public abstract Optional<Set<String>> fieldsInOrder();
+    public abstract Optional<LinkedHashSet<String>> fieldsInOrder();
 
-    public abstract Optional<Set<Sort>> sort();
+    public abstract Optional<LinkedHashSet<Sort>> sort();
 
     public static MessagesRequest empty() {
         return builder().build();
@@ -85,14 +87,15 @@ public abstract class MessagesRequest {
         public abstract Builder queryString(BackendQuery queryString);
 
         @JsonProperty("fields_in_order")
-        public abstract Builder fieldsInOrder(Set<String> fieldsInOrder);
+        public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
 
         public Builder fieldsInOrder(String... fieldsInOrder) {
-            return fieldsInOrder(ImmutableSet.copyOf(fieldsInOrder));
+            LinkedHashSet<String> fields = Arrays.stream(fieldsInOrder).collect(Collectors.toCollection(LinkedHashSet::new));
+            return fieldsInOrder(fields);
         }
 
         @JsonProperty
-        public abstract Builder sort(Set<Sort> sort);
+        public abstract Builder sort(LinkedHashSet<Sort> sort);
 
         abstract MessagesRequest autoBuild();
 
