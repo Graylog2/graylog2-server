@@ -1,5 +1,5 @@
 
-import { mix } from 'polished';
+import chroma from 'chroma-js';
 import { teinte } from 'theme/colors';
 
 export default function colorLevel(colorHex, level = 0) {
@@ -15,5 +15,5 @@ export default function colorLevel(colorHex, level = 0) {
   const upperLevel = absLevel > 1 ? 1 : absLevel;
   const mixLevel = absLevel < 0 ? 0 : upperLevel;
 
-  return mix(mixLevel, colorBase, colorHex);
+  return chroma.mix(colorBase, colorHex, mixLevel).css();
 }

@@ -2,18 +2,20 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { opacify, transparentize } from 'polished';
+import chroma from 'chroma-js';
+
+import { util } from 'theme';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
 const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
-  const borderColor = transparentize(0.8, theme.color.gray[0]);
+  const borderColor = chroma(theme.color.gray[10]).alpha(0.2).css();
 
   return css`
     background-color: ${theme.color.global.contentBackground};
     border-color: ${borderColor};
 
     &.top > .arrow {
-      border-top-color: ${opacify(0.05, borderColor)};
+      border-top-color: ${util.opacify(borderColor, 0.05)};
 
       &::after {
         border-top-color: ${theme.color.gray[100]};
@@ -21,7 +23,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.right > .arrow {
-      border-right-color: ${opacify(0.05, borderColor)};
+      border-right-color: ${util.opacify(borderColor, 0.05)};
 
       &::after {
         border-right-color: ${theme.color.gray[100]};
@@ -29,7 +31,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.bottom > .arrow {
-      border-bottom-color: ${opacify(0.05, borderColor)};
+      border-bottom-color: ${util.opacify(borderColor, 0.05)};
 
       &::after {
         border-bottom-color: ${theme.color.gray[100]};
@@ -37,7 +39,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.left > .arrow {
-      border-left-color: ${opacify(0.05, borderColor)};
+      border-left-color: ${util.opacify(borderColor, 0.05)};
 
       &::after {
         border-left-color: ${theme.color.gray[100]};

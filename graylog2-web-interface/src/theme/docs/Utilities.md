@@ -70,7 +70,7 @@ const { textDefault } = color.teinte.global;
 ```
 
 ## readableColor
-Generating a readable color following W3C specs using [polished](https://polished.js.org/docs/#readablecolor)
+Generating a readable color following [W3C specs for readability](https://www.w3.org/TR/WCAG20-TECHS/G18.html).
 
 **`color`**
   - any string that represents a color (ex: "#f00" or "rgb(255, 0, 0)")

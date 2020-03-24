@@ -3,7 +3,7 @@
 exports[`<ProgressBar /> properly renders with animated 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 crfMkH"
+    class="ProgressBar__ProgressWrap-fsyx32-0 lfGGHy"
   >
     <div
       aria-valuemax="100"
@@ -20,7 +20,7 @@ exports[`<ProgressBar /> properly renders with animated 1`] = `
 exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 crfMkH"
+    class="ProgressBar__ProgressWrap-fsyx32-0 lfGGHy"
   >
     <div
       aria-valuemax="100"
@@ -37,7 +37,7 @@ exports[`<ProgressBar /> properly renders with bsStyle variant 1`] = `
 exports[`<ProgressBar /> properly renders with label 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 crfMkH"
+    class="ProgressBar__ProgressWrap-fsyx32-0 lfGGHy"
   >
     <div
       aria-valuemax="100"
@@ -57,7 +57,7 @@ exports[`<ProgressBar /> properly renders with label 1`] = `
 exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 crfMkH"
+    class="ProgressBar__ProgressWrap-fsyx32-0 lfGGHy"
   >
     <div
       aria-valuemax="100"
@@ -82,7 +82,7 @@ exports[`<ProgressBar /> properly renders with multiple bars 1`] = `
 exports[`<ProgressBar /> properly renders with no props 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 crfMkH"
+    class="ProgressBar__ProgressWrap-fsyx32-0 lfGGHy"
   >
     <div
       aria-valuemax="100"
@@ -99,7 +99,7 @@ exports[`<ProgressBar /> properly renders with no props 1`] = `
 exports[`<ProgressBar /> properly renders with one bar 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 crfMkH"
+    class="ProgressBar__ProgressWrap-fsyx32-0 lfGGHy"
   >
     <div
       aria-valuemax="100"
@@ -116,7 +116,7 @@ exports[`<ProgressBar /> properly renders with one bar 1`] = `
 exports[`<ProgressBar /> properly renders with striped 1`] = `
 <div>
   <div
-    class="ProgressBar__ProgressWrap-fsyx32-0 crfMkH"
+    class="ProgressBar__ProgressWrap-fsyx32-0 lfGGHy"
   >
     <div
       aria-valuemax="100"

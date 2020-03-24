@@ -1,5 +1,5 @@
 import { css } from 'styled-components';
-import { darken, lighten, getLuminance } from 'polished';
+import chroma from 'chroma-js';
 
 import { util } from 'theme';
 import bsStyleThemeVariant from '../variants/bsStyle';
@@ -16,31 +16,27 @@ const cssBuilder = (hex, variant) => {
   };
 
   const shouldMix = (value, originalColor) => {
-    if (isLink) {
-      return originalColor;
-    }
-
-    const mixFunc = value < 0 ? lighten : darken;
     const absValue = Math.abs(value);
+    const mixColor = absValue < 0 ? '#fff' : '#000';
 
-    return mixFunc(absValue, originalColor);
+    return isLink ? originalColor : chroma.mix(originalColor, mixColor, absValue);
   };
 
   const linkBackground = 'transparent';
   const linkBorder = 'transparent';
-  const buttonColorAdjust = getLuminance(hex) > 0.5 ? darken : lighten;
+  const buttonAdjustColor = chroma(hex).luminance() > 0.5 ? '#000' : '#fff';
 
   const defaultBackground = isLink ? linkBackground : hex;
-  const defaultBorder = isLink ? linkBorder : buttonColorAdjust(0.05, hex);
+  const defaultBorder = isLink ? linkBorder : chroma.mix(hex, buttonAdjustColor, 0.05);
   const defaultColor = fontContrast(hex);
 
-  const activeBackground = isLink ? linkBackground : buttonColorAdjust(0.10, hex);
-  const activeBorder = isLink ? linkBorder : buttonColorAdjust(0.15, hex);
-  const activeColor = fontContrast(buttonColorAdjust(0.10, hex));
+  const activeBackground = isLink ? linkBackground : chroma.mix(hex, buttonAdjustColor, 0.10);
+  const activeBorder = isLink ? linkBorder : chroma.mix(hex, buttonAdjustColor, 0.15);
+  const activeColor = fontContrast(chroma.mix(hex, buttonAdjustColor, 0.10));
 
-  const disabledBackground = isLink ? linkBackground : buttonColorAdjust(0.20, hex);
-  const disabledBorder = isLink ? linkBorder : buttonColorAdjust(0.15, hex);
-  const disabledColor = fontContrast(buttonColorAdjust(0.20, hex));
+  const disabledBackground = isLink ? linkBackground : chroma.mix(hex, buttonAdjustColor, 0.20);
+  const disabledBorder = isLink ? linkBorder : chroma.mix(hex, buttonAdjustColor, 0.15);
+  const disabledColor = fontContrast(chroma.mix(hex, buttonAdjustColor, 0.20));
 
   return css`
     background-color: ${defaultBackground};
