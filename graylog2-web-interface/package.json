@@ -76,7 +76,6 @@
     "clipboard": "^2.0.0",
     "crossfilter": "1.3.x",
     "deep-equal": "^1.0.1",
-    "font-awesome": "^4.7.0",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "immutable": "^3.8.1",
     "interactjs": "^1.4.0-rc.13",
