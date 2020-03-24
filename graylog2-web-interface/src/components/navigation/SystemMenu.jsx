@@ -53,9 +53,6 @@ const _systemTitle = (pathname) => {
   if (_isActive(pathname, '/system/pipelines')) {
     return `${prefix} / Pipelines`;
   }
-  if (_isActive(pathname, '/system/enterprise')) {
-    return `${prefix} / Enterprise`;
-  }
   if (_isActive(pathname, '/system/sidecars')) {
     return `${prefix} / Sidecars`;
   }
@@ -114,7 +111,6 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['inputs:create']}>
         <NavigationLink path={Routes.SYSTEM.PIPELINES.OVERVIEW} description="Pipelines" />
       </IfPermitted>
-      <NavigationLink path={Routes.SYSTEM.ENTERPRISE} description="Enterprise" />
       <IfPermitted permissions={['inputs:edit']}>
         <NavigationLink path={Routes.SYSTEM.SIDECARS.OVERVIEW} description="Sidecars" />
       </IfPermitted>
