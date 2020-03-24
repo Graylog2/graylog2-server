@@ -816,20 +816,54 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       />
                       <td>
                         <span>
-                          <ForwardRef
+                          <Icon
                             className="contentPackEntity"
-                            fixedWidth={false}
-                            inverse={false}
                             name="archive"
-                            pulse={false}
-                            spin={false}
                             title="Content Pack"
                           >
-                            <i
-                              className="fa fa-archive contentPackEntity"
+                            <FontAwesomeIcon
+                              border={false}
+                              className="contentPackEntity"
+                              fixedWidth={false}
+                              flip={null}
+                              icon="archive"
+                              inverse={false}
+                              listItem={false}
+                              mask={null}
+                              pull={null}
+                              pulse={false}
+                              rotation={null}
+                              size={null}
+                              spin={false}
+                              swapOpacity={false}
+                              symbol={false}
                               title="Content Pack"
-                            />
-                          </ForwardRef>
+                              transform={null}
+                            >
+                              <svg
+                                aria-labelledby="svg-inline--fa-title-DXRHHq27Z1A4"
+                                className="svg-inline--fa fa-archive fa-w-16 contentPackEntity"
+                                data-icon="archive"
+                                data-prefix="fas"
+                                role="img"
+                                style={Object {}}
+                                viewBox="0 0 512 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <title
+                                  id="svg-inline--fa-title-DXRHHq27Z1A4"
+                                  style={Object {}}
+                                >
+                                  Content Pack
+                                </title>
+                                <path
+                                  d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"
+                                  fill="currentColor"
+                                  style={Object {}}
+                                />
+                              </svg>
+                            </FontAwesomeIcon>
+                          </Icon>
                         </span>
                       </td>
                       <td>
@@ -1279,19 +1313,53 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       />
                       <td>
                         <span>
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="server"
-                            pulse={false}
-                            spin={false}
                             title="Server"
                           >
-                            <i
-                              className="fa fa-server"
+                            <FontAwesomeIcon
+                              border={false}
+                              className=""
+                              fixedWidth={false}
+                              flip={null}
+                              icon="server"
+                              inverse={false}
+                              listItem={false}
+                              mask={null}
+                              pull={null}
+                              pulse={false}
+                              rotation={null}
+                              size={null}
+                              spin={false}
+                              swapOpacity={false}
+                              symbol={false}
                               title="Server"
-                            />
-                          </ForwardRef>
+                              transform={null}
+                            >
+                              <svg
+                                aria-labelledby="svg-inline--fa-title-M9qAWCELEywI"
+                                className="svg-inline--fa fa-server fa-w-16 "
+                                data-icon="server"
+                                data-prefix="fas"
+                                role="img"
+                                style={Object {}}
+                                viewBox="0 0 512 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <title
+                                  id="svg-inline--fa-title-M9qAWCELEywI"
+                                  style={Object {}}
+                                >
+                                  Server
+                                </title>
+                                <path
+                                  d="M480 160H32c-17.673 0-32-14.327-32-32V64c0-17.673 14.327-32 32-32h448c17.673 0 32 14.327 32 32v64c0 17.673-14.327 32-32 32zm-48-88c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-64 0c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm112 248H32c-17.673 0-32-14.327-32-32v-64c0-17.673 14.327-32 32-32h448c17.673 0 32 14.327 32 32v64c0 17.673-14.327 32-32 32zm-48-88c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-64 0c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm112 248H32c-17.673 0-32-14.327-32-32v-64c0-17.673 14.327-32 32-32h448c17.673 0 32 14.327 32 32v64c0 17.673-14.327 32-32 32zm-48-88c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-64 0c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24z"
+                                  fill="currentColor"
+                                  style={Object {}}
+                                />
+                              </svg>
+                            </FontAwesomeIcon>
+                          </Icon>
                         </span>
                       </td>
                       <td>

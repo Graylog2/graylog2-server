@@ -192,17 +192,47 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                                 <span
                                   className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="times"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-times"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      border={false}
+                                      className=""
+                                      fixedWidth={false}
+                                      flip={null}
+                                      icon="times"
+                                      inverse={false}
+                                      listItem={false}
+                                      mask={null}
+                                      pull={null}
+                                      pulse={false}
+                                      rotation={null}
+                                      size={null}
+                                      spin={false}
+                                      swapOpacity={false}
+                                      symbol={false}
+                                      title=""
+                                      transform={null}
+                                    >
+                                      <svg
+                                        aria-hidden="true"
+                                        className="svg-inline--fa fa-times fa-w-11 "
+                                        data-icon="times"
+                                        data-prefix="fas"
+                                        focusable="false"
+                                        role="img"
+                                        style={Object {}}
+                                        viewBox="0 0 352 512"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                                          fill="currentColor"
+                                          style={Object {}}
+                                        />
+                                      </svg>
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -274,17 +304,47 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                                 <span
                                   className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="check"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-check"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      border={false}
+                                      className=""
+                                      fixedWidth={false}
+                                      flip={null}
+                                      icon="check"
+                                      inverse={false}
+                                      listItem={false}
+                                      mask={null}
+                                      pull={null}
+                                      pulse={false}
+                                      rotation={null}
+                                      size={null}
+                                      spin={false}
+                                      swapOpacity={false}
+                                      symbol={false}
+                                      title=""
+                                      transform={null}
+                                    >
+                                      <svg
+                                        aria-hidden="true"
+                                        className="svg-inline--fa fa-check fa-w-16 "
+                                        data-icon="check"
+                                        data-prefix="fas"
+                                        focusable="false"
+                                        role="img"
+                                        style={Object {}}
+                                        viewBox="0 0 512 512"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
+                                          fill="currentColor"
+                                          style={Object {}}
+                                        />
+                                      </svg>
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -490,17 +550,47 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                                 <span
                                   className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="check"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-check"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      border={false}
+                                      className=""
+                                      fixedWidth={false}
+                                      flip={null}
+                                      icon="check"
+                                      inverse={false}
+                                      listItem={false}
+                                      mask={null}
+                                      pull={null}
+                                      pulse={false}
+                                      rotation={null}
+                                      size={null}
+                                      spin={false}
+                                      swapOpacity={false}
+                                      symbol={false}
+                                      title=""
+                                      transform={null}
+                                    >
+                                      <svg
+                                        aria-hidden="true"
+                                        className="svg-inline--fa fa-check fa-w-16 "
+                                        data-icon="check"
+                                        data-prefix="fas"
+                                        focusable="false"
+                                        role="img"
+                                        style={Object {}}
+                                        viewBox="0 0 512 512"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
+                                          fill="currentColor"
+                                          style={Object {}}
+                                        />
+                                      </svg>
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -572,17 +662,47 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                                 <span
                                   className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="check"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-check"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      border={false}
+                                      className=""
+                                      fixedWidth={false}
+                                      flip={null}
+                                      icon="check"
+                                      inverse={false}
+                                      listItem={false}
+                                      mask={null}
+                                      pull={null}
+                                      pulse={false}
+                                      rotation={null}
+                                      size={null}
+                                      spin={false}
+                                      swapOpacity={false}
+                                      symbol={false}
+                                      title=""
+                                      transform={null}
+                                    >
+                                      <svg
+                                        aria-hidden="true"
+                                        className="svg-inline--fa fa-check fa-w-16 "
+                                        data-icon="check"
+                                        data-prefix="fas"
+                                        focusable="false"
+                                        role="img"
+                                        style={Object {}}
+                                        viewBox="0 0 512 512"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
+                                          fill="currentColor"
+                                          style={Object {}}
+                                        />
+                                      </svg>
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -788,17 +908,47 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                                 <span
                                   className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="times"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-times"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      border={false}
+                                      className=""
+                                      fixedWidth={false}
+                                      flip={null}
+                                      icon="times"
+                                      inverse={false}
+                                      listItem={false}
+                                      mask={null}
+                                      pull={null}
+                                      pulse={false}
+                                      rotation={null}
+                                      size={null}
+                                      spin={false}
+                                      swapOpacity={false}
+                                      symbol={false}
+                                      title=""
+                                      transform={null}
+                                    >
+                                      <svg
+                                        aria-hidden="true"
+                                        className="svg-inline--fa fa-times fa-w-11 "
+                                        data-icon="times"
+                                        data-prefix="fas"
+                                        focusable="false"
+                                        role="img"
+                                        style={Object {}}
+                                        viewBox="0 0 352 512"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                                          fill="currentColor"
+                                          style={Object {}}
+                                        />
+                                      </svg>
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -870,17 +1020,47 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                                 <span
                                   className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="times"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-times"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      border={false}
+                                      className=""
+                                      fixedWidth={false}
+                                      flip={null}
+                                      icon="times"
+                                      inverse={false}
+                                      listItem={false}
+                                      mask={null}
+                                      pull={null}
+                                      pulse={false}
+                                      rotation={null}
+                                      size={null}
+                                      spin={false}
+                                      swapOpacity={false}
+                                      symbol={false}
+                                      title=""
+                                      transform={null}
+                                    >
+                                      <svg
+                                        aria-hidden="true"
+                                        className="svg-inline--fa fa-times fa-w-11 "
+                                        data-icon="times"
+                                        data-prefix="fas"
+                                        focusable="false"
+                                        role="img"
+                                        style={Object {}}
+                                        viewBox="0 0 352 512"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                                          fill="currentColor"
+                                          style={Object {}}
+                                        />
+                                      </svg>
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>

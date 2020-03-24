@@ -133,17 +133,47 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="caret-left"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-caret-left"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              border={false}
+                              className=""
+                              fixedWidth={false}
+                              flip={null}
+                              icon="caret-left"
+                              inverse={false}
+                              listItem={false}
+                              mask={null}
+                              pull={null}
+                              pulse={false}
+                              rotation={null}
+                              size={null}
+                              spin={false}
+                              swapOpacity={false}
+                              symbol={false}
+                              title=""
+                              transform={null}
+                            >
+                              <svg
+                                aria-hidden="true"
+                                className="svg-inline--fa fa-caret-left fa-w-6 "
+                                data-icon="caret-left"
+                                data-prefix="fas"
+                                focusable="false"
+                                role="img"
+                                style={Object {}}
+                                viewBox="0 0 192 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M192 127.338v257.324c0 17.818-21.543 26.741-34.142 14.142L29.196 270.142c-7.81-7.81-7.81-20.474 0-28.284l128.662-128.662c12.599-12.6 34.142-3.676 34.142 14.142z"
+                                  fill="currentColor"
+                                  style={Object {}}
+                                />
+                              </svg>
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>
@@ -217,17 +247,47 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="caret-right"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-caret-right"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              border={false}
+                              className=""
+                              fixedWidth={false}
+                              flip={null}
+                              icon="caret-right"
+                              inverse={false}
+                              listItem={false}
+                              mask={null}
+                              pull={null}
+                              pulse={false}
+                              rotation={null}
+                              size={null}
+                              spin={false}
+                              swapOpacity={false}
+                              symbol={false}
+                              title=""
+                              transform={null}
+                            >
+                              <svg
+                                aria-hidden="true"
+                                className="svg-inline--fa fa-caret-right fa-w-6 "
+                                data-icon="caret-right"
+                                data-prefix="fas"
+                                focusable="false"
+                                role="img"
+                                style={Object {}}
+                                viewBox="0 0 192 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"
+                                  fill="currentColor"
+                                  style={Object {}}
+                                />
+                              </svg>
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>
@@ -533,17 +593,47 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="caret-left"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-caret-left"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              border={false}
+                              className=""
+                              fixedWidth={false}
+                              flip={null}
+                              icon="caret-left"
+                              inverse={false}
+                              listItem={false}
+                              mask={null}
+                              pull={null}
+                              pulse={false}
+                              rotation={null}
+                              size={null}
+                              spin={false}
+                              swapOpacity={false}
+                              symbol={false}
+                              title=""
+                              transform={null}
+                            >
+                              <svg
+                                aria-hidden="true"
+                                className="svg-inline--fa fa-caret-left fa-w-6 "
+                                data-icon="caret-left"
+                                data-prefix="fas"
+                                focusable="false"
+                                role="img"
+                                style={Object {}}
+                                viewBox="0 0 192 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M192 127.338v257.324c0 17.818-21.543 26.741-34.142 14.142L29.196 270.142c-7.81-7.81-7.81-20.474 0-28.284l128.662-128.662c12.599-12.6 34.142-3.676 34.142 14.142z"
+                                  fill="currentColor"
+                                  style={Object {}}
+                                />
+                              </svg>
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>
@@ -617,17 +707,47 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="caret-right"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-caret-right"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              border={false}
+                              className=""
+                              fixedWidth={false}
+                              flip={null}
+                              icon="caret-right"
+                              inverse={false}
+                              listItem={false}
+                              mask={null}
+                              pull={null}
+                              pulse={false}
+                              rotation={null}
+                              size={null}
+                              spin={false}
+                              swapOpacity={false}
+                              symbol={false}
+                              title=""
+                              transform={null}
+                            >
+                              <svg
+                                aria-hidden="true"
+                                className="svg-inline--fa fa-caret-right fa-w-6 "
+                                data-icon="caret-right"
+                                data-prefix="fas"
+                                focusable="false"
+                                role="img"
+                                style={Object {}}
+                                viewBox="0 0 192 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"
+                                  fill="currentColor"
+                                  style={Object {}}
+                                />
+                              </svg>
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>

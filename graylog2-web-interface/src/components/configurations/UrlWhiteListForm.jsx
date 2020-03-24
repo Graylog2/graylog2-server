@@ -172,7 +172,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
           </td>
           <td>
             <Button onClick={event => _onRemove(event, idx)}>
-              <Icon name="trash" />
+              <Icon name="trash-alt" />
             </Button>
           </td>
         </tr>
