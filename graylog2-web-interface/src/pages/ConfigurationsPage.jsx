@@ -156,7 +156,6 @@ class ConfigurationsPage extends React.Component {
       const eventsConfig = this._getConfig(CONFIG.EVENTS);
       const urlWhiteListConfig = this._getConfig(CONFIG.URL_WHITELIST);
       const customizationConfig = this._getConfig(CONFIG.CUSTOMIZATION, {});
-      console.log("ConfigurationPage", customizationConfig);
 
       Output = (
         <>
