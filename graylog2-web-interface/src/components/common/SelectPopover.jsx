@@ -15,6 +15,14 @@ import Icon from 'components/common/Icon';
 
 import style from './SelectPopover.css';
 
+
+const pickPopoverProps = (props) => {
+  // eslint-disable-next-line react/forbid-foreign-prop-types
+  const popoverPropKeys = Object.keys(Popover.target.propTypes);
+
+  return lodash.pick(props, popoverPropKeys);
+};
+
 /**
  * Component that displays a list of items in a popover and enable users to pick one of
  * the options with the mouse. The component can (optionally) filter options with a text input
@@ -97,17 +105,17 @@ class SelectPopover extends React.Component {
     }
   }
 
-  handleSelectionChange(nextSelection) {
+  handleSelectionChange = (nextSelection) => {
     const { onItemSelect } = this.props;
     this.setState({ selectedItems: nextSelection });
     onItemSelect(nextSelection, () => this.overlay.hide());
-  }
+  };
 
-  clearItemSelection() {
+  clearItemSelection = () => {
     this.handleSelectionChange([]);
-  }
+  };
 
-  handleItemSelection(item) {
+  handleItemSelection = (item) => {
     return () => {
       const { multiple } = this.props;
       const { selectedItems } = this.state;
@@ -122,29 +130,21 @@ class SelectPopover extends React.Component {
 
       this.handleSelectionChange(nextSelectedItems);
     };
-  }
+  };
 
-  filterData(filterText, items) {
+  filterData = (filterText, items) => {
     const newFilteredItems = items.filter(item => item.match(new RegExp(filterText, 'i')));
     this.setState({ filterText: filterText, filteredItems: newFilteredItems });
-  }
+  };
 
-  handleFilterChange(items) {
+  handleFilterChange = (items) => {
     return (event) => {
       const filterText = event.target.value.trim();
       this.filterData(filterText, items);
     };
-  }
+  };
 
-  // eslint-disable-next-line class-methods-use-this
-  pickPopoverProps(props) {
-    // eslint-disable-next-line react/forbid-foreign-prop-types
-    const popoverPropKeys = Object.keys(Popover.target.propTypes);
-
-    return lodash.pick(props, popoverPropKeys);
-  }
-
-  renderDataFilter(items) {
+  renderDataFilter = (items) => {
     const { filterPlaceholder } = this.props;
     const { filterText } = this.state;
 
@@ -156,9 +156,9 @@ class SelectPopover extends React.Component {
                      onChange={this.handleFilterChange(items)} />
       </FormGroup>
     );
-  }
+  };
 
-  renderClearSelectionItem() {
+  renderClearSelectionItem = () => {
     const { clearSelectionText } = this.props;
 
     return (
@@ -166,7 +166,7 @@ class SelectPopover extends React.Component {
         <Icon name="times" fixedWidth className="text-danger" /> {clearSelectionText}
       </ListGroupItem>
     );
-  }
+  };
 
   render() {
     const {
@@ -180,7 +180,7 @@ class SelectPopover extends React.Component {
       ...otherProps
     } = this.props;
     const { filteredItems, selectedItems } = this.state;
-    const popoverProps = this.pickPopoverProps(otherProps);
+    const popoverProps = pickPopoverProps(otherProps);
 
     const popover = (
       <Popover {...popoverProps} className={style.customPopover}>
