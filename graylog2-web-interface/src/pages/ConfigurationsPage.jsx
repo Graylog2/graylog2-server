@@ -161,7 +161,7 @@ class ConfigurationsPage extends React.Component {
           </Col>
           <Col md={6}>
             <EventsConfig config={eventsConfig}
-                          updateConfig={this._onUpdate(this.EVENTS_CONFIG)} />
+                          updateConfig={this._onUpdate(EVENTS_CONFIG)} />
           </Col>
           {isPermitted(permissions, ['urlwhitelist:read']) && (
           <Col md={6}>
