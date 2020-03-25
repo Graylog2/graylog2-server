@@ -93,8 +93,12 @@ public class GraylogBackend {
         es.importFixtureResource(resourcePath, testClass);
     }
 
-    public String apiAddress() {
-        return node.getApiAddress();
+    public String getUri() {
+        return node.getUri();
+    }
+
+    public int getApiPort() {
+        return node.getApiPort();
     }
 
     public void printServerLog() {

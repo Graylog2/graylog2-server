@@ -18,8 +18,7 @@ package org.graylog.testing.fullbackend;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
-import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -29,14 +28,11 @@ import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
-import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
@@ -45,38 +41,34 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 class BackendStartupIT {
 
     private final GraylogBackend sut;
+    private final RequestSpecification requestSpec;
 
-    public BackendStartupIT(GraylogBackend sut) {
+    public BackendStartupIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
-    }
-
-    @BeforeAll
-    static void beforeAll() {
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-        RestAssured.requestSpecification =
-                new RequestSpecBuilder().build()
-                        .accept(JSON)
-                        .contentType(JSON)
-                        .header("X-Requested-By", "peterchen")
-                        .auth().basic("admin", "admin");
+        this.requestSpec = requestSpec;
     }
 
     @Test
     void canReachApi() {
-        when()
-                .get(sut.apiAddress())
+        given()
+                .spec(requestSpec)
+                .when()
+                .get()
                 .then()
                 .statusCode(200);
     }
 
     @Test
     void loadsDefaultPlugins() {
-        List<Object> pluginNames = when()
-                .get(sut.apiAddress() + "/system/plugins")
-                .then()
-                .statusCode(200)
-                .extract().jsonPath()
-                .getList("plugins.name");
+        List<Object> pluginNames =
+                given()
+                        .spec(requestSpec)
+                        .when()
+                        .get("/system/plugins")
+                        .then()
+                        .statusCode(200)
+                        .extract().jsonPath()
+                        .getList("plugins.name");
 
         assertThat(pluginNames).containsExactlyInAnyOrder(
                 "Threat Intelligence Plugin",
@@ -90,13 +82,16 @@ class BackendStartupIT {
 
         String body = searchAllMessages();
 
-        List<String> allMessages = given().when()
-                .body(body)
-                .post(sut.apiAddress() + "/views/search/sync")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath().getList(allMessagesJsonPath("query-id", "message-list-id"), String.class);
+        List<String> allMessages =
+                given()
+                        .spec(requestSpec)
+                        .when()
+                        .body(body)
+                        .post("/views/search/sync")
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .jsonPath().getList(allMessagesJsonPath("query-id", "message-list-id"), String.class);
 
         assertThat(allMessages).containsExactly("hello from es fixture");
     }

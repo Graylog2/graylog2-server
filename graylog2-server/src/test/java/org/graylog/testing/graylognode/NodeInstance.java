@@ -49,8 +49,12 @@ public class NodeInstance {
         LOG.info("Restarted node container in " + sw.elapsed(TimeUnit.SECONDS));
     }
 
-    public String getApiAddress() {
-        return String.format(Locale.US, "http://%s:%d/api", container.getContainerIpAddress(), container.getFirstMappedPort());
+    public String getUri() {
+        return String.format(Locale.US, "http://%s", container.getContainerIpAddress());
+    }
+
+    public int getApiPort() {
+        return container.getFirstMappedPort();
     }
 
     public void printLog() {

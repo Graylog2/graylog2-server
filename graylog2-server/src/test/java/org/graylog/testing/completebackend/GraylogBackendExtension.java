@@ -17,6 +17,10 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableSet;
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -28,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
+import static io.restassured.http.ContentType.JSON;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
 
@@ -41,6 +46,9 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
     @Override
     public void beforeAll(ExtensionContext context) {
+
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+
         Stopwatch sw = Stopwatch.createStarted();
 
         lifecycle = Lifecycle.from(context);
@@ -64,11 +72,31 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(GraylogBackend.class);
+        ImmutableSet<Class<?>> supportedTypes = ImmutableSet.of(GraylogBackend.class, RequestSpecification.class);
+
+        return supportedTypes.contains(parameterContext.getParameter().getType());
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return extensionContext.getStore(NAMESPACE).get(extensionContext.getRequiredTestClass().getName());
+        Class<?> paramType = parameterContext.getParameter().getType();
+
+        if (paramType.equals(GraylogBackend.class)) {
+            return extensionContext.getStore(NAMESPACE).get(extensionContext.getRequiredTestClass().getName());
+        } else if (paramType.equals(RequestSpecification.class)) {
+            return requestSpec();
+        }
+        throw new RuntimeException("Unsupported parameter type: " + paramType);
+    }
+
+    private RequestSpecification requestSpec() {
+        return new RequestSpecBuilder().build()
+                .baseUri(backend.getUri())
+                .port(backend.getApiPort())
+                .basePath("/api")
+                .accept(JSON)
+                .contentType(JSON)
+                .header("X-Requested-By", "peterchen")
+                .auth().basic("admin", "admin");
     }
 }
