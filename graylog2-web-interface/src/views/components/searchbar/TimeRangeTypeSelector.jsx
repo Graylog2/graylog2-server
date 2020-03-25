@@ -17,7 +17,7 @@ const migrationStrategies = {
     from: new DateTime(moment().subtract(oldTimerange.type === 'relative' ? oldTimerange.range : 300, 'seconds')),
     to: new DateTime(moment()),
   }),
-  relative: () => ({ type: 'absolute', range: 300 }),
+  relative: () => ({ type: 'relative', range: 300 }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
 };
 
@@ -37,6 +37,7 @@ type Props = {
 
 export default function TimeRangeTypeSelector({ disabled }: Props) {
   const [{ value, onChange, name }] = useField('timerange');
+  const { type } = value;
   const onSelect = useCallback(newType => onChange({
     target: {
       value: migrateTimeRangeToNewType(value, newType),
@@ -51,15 +52,15 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
                       onSelect={onSelect}
                       id="dropdown-timerange-selector">
         <MenuItem eventKey="relative"
-                  active={value === 'relative'}>
+                  active={type === 'relative'}>
           Relative
         </MenuItem>
         <MenuItem eventKey="absolute"
-                  active={value === 'absolute'}>
+                  active={type === 'absolute'}>
           Absolute
         </MenuItem>
         <MenuItem eventKey="keyword"
-                  active={value === 'keyword'}>
+                  active={type === 'keyword'}>
           Keyword
         </MenuItem>
       </DropdownButton>
