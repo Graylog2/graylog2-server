@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.joda.time.Duration;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @JsonDeserialize(builder = AutoValue_EventsConfiguration.Builder.class)
 @AutoValue
@@ -70,7 +72,7 @@ public abstract class EventsConfiguration {
         public abstract Builder eventNotificationsBacklog(long defaultBacklog);
 
         @JsonProperty(FIELD_CATCHUP_WINDOW)
-        public abstract Builder eventCatchupWindow(long catchupWindow);
+        public abstract Builder eventCatchupWindow(@Nullable long catchupWindow);
 
         public abstract EventsConfiguration build();
     }
