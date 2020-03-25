@@ -35,6 +35,7 @@ public class NodeContainerFactory {
 
     @SuppressWarnings("OctalInteger")
     private static final int EXECUTABLE_MODE = 0100755;
+    // sha2 for password "admin"
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
     private static final int API_PORT = 9000;
     private static final int DEBUG_PORT = 5005;
@@ -82,6 +83,8 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
                 .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:9000")
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
+                .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
+                .withEnv("GRAYLOG_VERSIONCHECKS", "false")
                 .waitingFor(Wait.forHttp("/api"))
                 .withExposedPorts(API_PORT);
 
