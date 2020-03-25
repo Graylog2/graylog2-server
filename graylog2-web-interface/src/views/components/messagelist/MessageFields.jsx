@@ -1,6 +1,8 @@
 // @flow strict
 import * as React from 'react';
 
+import { MessageDetailsDefinitionList } from 'components/graylog';
+
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
@@ -36,9 +38,9 @@ const MessageFields = ({ message, fields }: Props) => {
     });
 
   return (
-    <dl className={`message-details message-details-fields ${styles.messageFields}`}>
+    <MessageDetailsDefinitionList className={`message-details-fields ${styles.messageFields}`}>
       {renderedFields}
-    </dl>
+    </MessageDetailsDefinitionList>
   );
 };
 

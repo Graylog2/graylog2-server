@@ -11,6 +11,7 @@ import Jumbotron from './Jumbotron';
 import Label from './Label';
 import ListGroup from './ListGroup';
 import ListGroupItem from './ListGroupItem';
+import MessageDetailsDefinitionList from './MessageDetailsDefinitionList';
 import Modal from './Modal';
 import Nav from './Nav';
 import Navbar from './Navbar';
@@ -40,6 +41,7 @@ export {
   Label,
   ListGroup,
   ListGroupItem,
+  MessageDetailsDefinitionList,
   Modal,
   Nav,
   Navbar,

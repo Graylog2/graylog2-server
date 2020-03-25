@@ -541,54 +541,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-right: 5px;
   }
 
-  dl.message-details {
-    margin-top: 10px;
-    margin-bottom: 0;
-  }
-
-  dl.message-details dt {
-    font-weight: bold;
-    margin-left: 1px;
-  }
-
-  dl.message-details dd {
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-    margin-left: 1px; /* Ensures that italic text is not cut */
-  }
-
-  dl.message-details-fields span:not(:last-child) dd {
-    border-bottom: 1px solid ${theme.color.gray[90]};
-  }
-
-  dl.message-details-fields dd {
-    white-space: pre-wrap;
-  }
-
-  dl.message-details-fields .field-value {
-    font-family: monospace;
-  }
-
-  dl.message-details-fields dd.message-field .field-value {
-    max-height: 500px;
-    overflow: auto;
-  }
-
-  dl.message-details dd.stream-list ul {
-    list-style-type: disc;
-    padding-left: 25px;
-  }
-
-  dl.message-details dd.stream-list ul li {
-    margin-top: 3px;
-  }
-
-  dl.message-details dd div.message-field-actions {
-    padding-left: 10px;
-    position: relative;
-    top: -10px;
-  }
-
   nav.navbar-fixed-top ul.dropdown-menu li a {
     font-size: 12px;
   }
