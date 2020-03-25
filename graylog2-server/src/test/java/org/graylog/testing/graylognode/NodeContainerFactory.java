@@ -81,7 +81,7 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
                 .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?")
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
-                .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:9000")
+                .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:" + API_PORT)
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
                 .withEnv("GRAYLOG_VERSIONCHECKS", "false")
