@@ -1,10 +1,10 @@
 // @flow strict
-import UserNotification from 'util/UserNotification';
-import { fetchFile } from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
-import { qualifyUrl } from 'util/URLUtils';
-// $FlowFixMe: flow-typed definition required
 import download from 'downloadjs';
+
+import { fetchFile } from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import UserNotification from 'util/UserNotification';
+import ApiRoutes from 'routing/ApiRoutes';
 
 import { type QueryString, type TimeRange } from 'views/logic/queries/Query';
 import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
