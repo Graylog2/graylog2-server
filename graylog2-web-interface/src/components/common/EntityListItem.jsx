@@ -1,7 +1,36 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
+
 import { Row, Col } from 'components/graylog';
 import Icon from './Icon';
+
+const StyledListItem = styled.li(({ theme }) => `
+  display: block;
+  padding: 15px 0;
+
+  h2 .label {
+    margin-left: 5px;
+    line-height: 2;
+    vertical-align: bottom;
+  }
+
+  .item-description {
+    min-height: 17px;
+    margin: 5px 0;
+  }
+
+  .item-actions > .btn,
+  .item-actions > .btn-group,
+  .item-actions > span > .btn {
+    margin-left: 5px;
+    margin-bottom: 5px;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${theme.color.variant.light.info};
+  }
+`);
 
 /**
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.
@@ -43,7 +72,7 @@ class EntityListItem extends React.Component {
     );
 
     return (
-      <li className="entity-list-item">
+      <StyledListItem>
         <Row className="row-sm">
           <Col md={12}>
             <div className="pull-right hidden-xs">
@@ -68,7 +97,7 @@ class EntityListItem extends React.Component {
         <Row className="row-sm">
           {this.props.contentRow}
         </Row>
-      </li>
+      </StyledListItem>
     );
   }
 }

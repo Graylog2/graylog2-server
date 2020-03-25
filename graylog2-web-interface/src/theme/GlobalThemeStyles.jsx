@@ -541,38 +541,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-right: 5px;
   }
 
-  ul.entity-list {
-    padding: 0;
-    margin: 0;
-
-    li.entity-list-item {
-      display: block;
-      padding: 15px 0;
-
-      h2 .label {
-        margin-left: 5px;
-        line-height: 2;
-        vertical-align: bottom;
-      }
-
-      .item-description {
-        min-height: 17px;
-        margin: 5px 0;
-      }
-
-      .item-actions > .btn,
-      .item-actions > .btn-group,
-      .item-actions > span > .btn {
-        margin-left: 5px;
-        margin-bottom: 5px;
-      }
-    }
-
-    li.entity-list-item:not(:last-child) {
-      border-bottom: 1px solid ${theme.color.variant.light.info};
-    }
-  }
-
   dl.message-details {
     margin-top: 10px;
     margin-bottom: 0;
