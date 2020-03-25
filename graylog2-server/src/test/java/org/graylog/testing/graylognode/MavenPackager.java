@@ -91,12 +91,23 @@ public class MavenPackager {
     }
 
     private static void ensureZeroExitCode(Process p, int exitCode) {
-        if (exitCode > 0) {
-            new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.defaultCharset())).lines()
-                    .forEach(System.out::println);
+        if (exitCode == 0) {
+            return;
+        }
+        if (exitCode == 127) {
+            String msg = String.format(Locale.US, "/bin/sh couldn't find Maven on your PATH when attempting to run [%s]", MVN_COMMAND);
+            throw new RuntimeException(msg);
+        }
+
+        printOutputFrom(p);
 
         String msg = String.format(Locale.US, "Maven exited with %s after running [%s]. ", exitCode, MVN_COMMAND);
         throw new RuntimeException(msg);
 
+    }
+
+    private static void printOutputFrom(Process p) {
+        new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.defaultCharset())).lines()
+                .forEach(System.out::println);
     }
 }
