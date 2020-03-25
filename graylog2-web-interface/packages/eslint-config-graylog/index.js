@@ -17,6 +17,7 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
+    'max-classes-per-file': 'off',
     'max-len': 'off',
     'new-cap': 'off',
     'no-else-return': 'warn',
