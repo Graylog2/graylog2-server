@@ -80,58 +80,59 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
       <Row className="content">
         <Col md={12}>
           <Formik initialValues={{ timerange, streams, queryString }}
-                  onSubmit={_onSubmit}
-                  render={({ values, isSubmitting, isValid, handleSubmit }) => (
-                    <Form>
-                      <Row className="no-bm extended-search-query-metadata">
-                        <Col md={4}>
-                          <TimeRangeTypeSelector />
-                          <TimeRangeInput config={config} />
-                        </Col>
+                  onSubmit={_onSubmit}>
+            {({ isSubmitting, isValid, handleSubmit }) => (
+              <Form>
+                <Row className="no-bm extended-search-query-metadata">
+                  <Col md={4}>
+                    <TimeRangeTypeSelector />
+                    <TimeRangeInput config={config} />
+                  </Col>
 
-                        <Col mdHidden lgHidden>
-                          <HorizontalSpacer />
-                        </Col>
+                  <Col mdHidden lgHidden>
+                    <HorizontalSpacer />
+                  </Col>
 
-                        <Col md={5} xs={8}>
-                          <Field name="streams">
-                            {({ field: { name, value, onChange } }) => (
-                              <StreamsFilter value={value}
-                                             streams={availableStreams}
-                                             onChange={newStreams => onChange({ target: { value: newStreams, name } })} />
-                            )}
-                          </Field>
-                        </Col>
+                  <Col md={5} xs={8}>
+                    <Field name="streams">
+                      {({ field: { name, value, onChange } }) => (
+                        <StreamsFilter value={value}
+                                       streams={availableStreams}
+                                       onChange={newStreams => onChange({ target: { value: newStreams, name } })} />
+                      )}
+                    </Field>
+                  </Col>
 
-                        <Col md={3} xs={4}>
-                          <RefreshControls />
-                        </Col>
-                      </Row>
+                  <Col md={3} xs={4}>
+                    <RefreshControls />
+                  </Col>
+                </Row>
 
-                      <Row className="no-bm">
-                        <Col md={9} xs={8}>
-                          <div className="pull-right search-help">
-                            <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                               title="Search query syntax documentation"
-                                               text={<Icon name="lightbulb-o" />} />
-                          </div>
-                          <SearchButton disabled={disableSearch || isSubmitting || !isValid} />
+                <Row className="no-bm">
+                  <Col md={9} xs={8}>
+                    <div className="pull-right search-help">
+                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                         title="Search query syntax documentation"
+                                         text={<Icon name="lightbulb-o" />} />
+                    </div>
+                    <SearchButton disabled={disableSearch || isSubmitting || !isValid} />
 
-                          <Field name="queryString">
-                            {({ field: { name, value, onChange } }) => (
-                              <QueryInput value={value}
-                                          placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                          onChange={newQuery => onChange({ target: { value: newQuery, name } })}
-                                          onExecute={handleSubmit} />
-                            )}
-                          </Field>
-                        </Col>
-                        <Col md={3} xs={4} className="pull-right">
-                          <SavedSearchControls />
-                        </Col>
-                      </Row>
-                    </Form>
-                  )} />
+                    <Field name="queryString">
+                      {({ field: { name, value, onChange } }) => (
+                        <QueryInput value={value}
+                                    placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                                    onChange={newQuery => onChange({ target: { value: newQuery, name } })}
+                                    onExecute={handleSubmit} />
+                      )}
+                    </Field>
+                  </Col>
+                  <Col md={3} xs={4} className="pull-right">
+                    <SavedSearchControls />
+                  </Col>
+                </Row>
+              </Form>
+            )}
+          </Formik>
         </Col>
       </Row>
     </ScrollToHint>
