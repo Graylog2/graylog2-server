@@ -26,6 +26,11 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * This annotation can be used to extend JUnit 5 test classes or methods with {@link GraylogBackendExtension},
+ * which manages instantiating the backend and allows access to necessary settings like the URI necessary
+ * to reach the API.
+ */
 @Target({TYPE, METHOD})
 @ExtendWith(GraylogBackendExtension.class)
 @Retention(RUNTIME)
