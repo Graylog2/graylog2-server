@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback } from 'react';
-import { useField, useFormikContext } from 'formik';
+import { useField } from 'formik';
 import moment from 'moment';
 
 import DateTime from 'logic/datetimes/DateTime';
@@ -70,8 +70,6 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
 
 TimeRangeTypeSelector.propTypes = {
   disabled: PropTypes.bool,
-  onSelect: PropTypes.func.isRequired,
-  value: PropTypes.TimeRangeType.isRequired,
 };
 
 TimeRangeTypeSelector.defaultProps = {

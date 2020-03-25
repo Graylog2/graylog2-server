@@ -86,8 +86,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                       <Row className="no-bm extended-search-query-metadata">
                         <Col md={4}>
                           <TimeRangeTypeSelector />
-                          <TimeRangeInput timerange={values.timerange}
-                                          config={config} />
+                          <TimeRangeInput config={config} />
                         </Col>
 
                         <Col mdHidden lgHidden>

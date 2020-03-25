@@ -8,16 +8,13 @@ import DateTime from 'logic/datetimes/DateTime';
 import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
-import type { TimeRange } from 'views/logic/queries/Query';
 
 type Props = {
   disabled: boolean,
-  timerange: TimeRange,
   config: SearchesConfig,
 };
 
 const _isValidDateString = (dateString: string) => {
-  console.log('Validating field: ', dateString);
   return (DateTime.isValidDateString(dateString)
     ? undefined
     : `Invalid date: ${dateString}`);
@@ -53,16 +50,10 @@ const timerangeStrategies = {
   },
 };
 
-const _validateTimerange = (timerange) => {
-  const { validate } = timerangeStrategies[timerange.type];
-  const timerangeErrors = validate(timerange);
-  return Object.keys(timerangeErrors).length > 0 ? timerangeErrors : undefined;
-};
-
-export default function TimeRangeInput({ disabled, timerange, config }: Props) {
+export default function TimeRangeInput({ disabled, config }: Props) {
+  const [{ value: timerange }] = useField('timerange');
   const { component: Component } = timerangeStrategies[timerange.type];
-  const [{ value }] = useField('timerange');
-  return <Component disabled={disabled} timerange={value} config={config} />;
+  return <Component disabled={disabled} timerange={timerange} config={config} />;
 }
 
 TimeRangeInput.propTypes = {
@@ -70,7 +61,6 @@ TimeRangeInput.propTypes = {
     relative_timerange_options: PropTypes.objectOf(PropTypes.string).isRequired,
   }).isRequired,
   disabled: PropTypes.bool,
-  timerange: PropTypes.object.isRequired,
 };
 
 TimeRangeInput.defaultProps = {
