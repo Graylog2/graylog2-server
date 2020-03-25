@@ -1,11 +1,14 @@
 // @flow strict
 import { flatten } from 'lodash';
+import { Set } from 'immutable';
 
 import { exportAllMessages, exportSearchTypeMessages, type ExportPayload } from 'util/MessagesExportUtils';
 
 import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import Query from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
+import Widget from 'views/logic/widgets/Widget';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 
 const _exportOnDashboard = (defaultExportPayload: ExportPayload, searchType: any, searchId: string) => {
   if (!searchType) {

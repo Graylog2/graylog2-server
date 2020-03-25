@@ -1,6 +1,8 @@
 // @flow strict
-import View from 'views/logic/views/View';
 import { Map } from 'immutable';
+
+import View, { type ViewType } from 'views/logic/views/View';
+import Widget from 'views/logic/widgets/Widget';
 
 type ExportStrategy = {
     title: string,
@@ -38,7 +40,7 @@ const DashboardExportStrategy: ExportStrategy = {
   initialWidget: (widget, directExportWidgetId) => (directExportWidgetId ? _getWidgetById(widget, directExportWidgetId) : null),
 };
 
-const createExportStrategy = (viewType) => {
+const createExportStrategy = (viewType: ViewType) => {
   switch (viewType) {
     case View.Type.Dashboard:
       return DashboardExportStrategy;
