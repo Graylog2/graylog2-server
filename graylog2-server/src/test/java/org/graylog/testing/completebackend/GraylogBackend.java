@@ -24,11 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 
 public class GraylogBackend {
 
@@ -50,32 +49,28 @@ public class GraylogBackend {
         return instance;
     }
 
-    // Assuming that parallel start works, because
-    // - mongodb and es are independent
-    // - node will retry connections to mongodb and es until they are there
+    // Starting ES instance in parallel thread to save time.
+    // MongoDB and the node have to be started in sequence however, because the the node might crash,
+    // if a MongoDb instance isn't already present while it's starting up.
     private static GraylogBackend createStartedBackend() {
         Network network = Network.newNetwork();
 
-        ExecutorService executor = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder().setNameFormat("build-api-it-containers-%d").build());
+        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
 
-        FutureTask<ElasticsearchInstance> esTask = runTask(executor, () -> ElasticsearchInstance.create(network));
-        FutureTask<MongoDBInstance> mongodbTask = runTask(executor, () -> MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS));
-        FutureTask<NodeInstance> nodeTask = runTask(executor, () -> NodeInstance.createStarted(network, MongoDBInstance.internalUri(), ElasticsearchInstance.internalUri()));
+        Future<ElasticsearchInstance> esFuture = executor.submit(() -> ElasticsearchInstance.create(network));
+
+        MongoDBInstance mongoDB = MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
+
+        NodeInstance node = NodeInstance.createStarted(network, MongoDBInstance.internalUri(), ElasticsearchInstance.internalUri());
 
         try {
-            return new GraylogBackend(esTask.get(), mongodbTask.get(), nodeTask.get());
+            return new GraylogBackend(esFuture.get(), mongoDB, node);
         } catch (InterruptedException | ExecutionException e) {
             LOG.error("Container creation aborted", e);
             throw new RuntimeException(e);
         } finally {
             executor.shutdown();
         }
-    }
-
-    private static <T> FutureTask<T> runTask(ExecutorService executor, Callable<T> callable) {
-        FutureTask<T> task = new FutureTask<>(callable);
-        executor.execute(task);
-        return task;
     }
 
     private GraylogBackend(ElasticsearchInstance es, MongoDBInstance mongodb, NodeInstance node) {
