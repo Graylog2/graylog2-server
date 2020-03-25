@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MavenPackager {
@@ -70,7 +71,7 @@ public class MavenPackager {
         try {
             return new ProcessBuilder().command("sh", "-c", MVN_COMMAND).directory(new File(pomDir)).start();
         } catch (IOException e) {
-            String msg = String.format("Failed to start maven process with command [%s].", MVN_COMMAND);
+            String msg = String.format(Locale.US, "Failed to start maven process with command [%s].", MVN_COMMAND);
             throw new RuntimeException(msg, e);
         }
     }
@@ -80,7 +81,7 @@ public class MavenPackager {
             new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.defaultCharset())).lines()
                     .forEach(System.out::println);
 
-            String msg = String.format("Maven exited with %s after running [%s]. ", exitCode, MVN_COMMAND);
+            String msg = String.format(Locale.US, "Maven exited with %s after running [%s]. ", exitCode, MVN_COMMAND);
             throw new RuntimeException(msg);
         }
     }

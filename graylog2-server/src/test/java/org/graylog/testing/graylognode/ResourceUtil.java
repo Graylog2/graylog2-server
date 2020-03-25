@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 public class ResourceUtil {
     static File resourceToTmpFile(@SuppressWarnings("SameParameterValue") String resourceName) {
@@ -44,7 +45,7 @@ public class ResourceUtil {
     }
 
     private static File createTempFile(String resourceName) {
-        String filename = String.format("graylog-test-resource-file_%s", Paths.get(resourceName).getFileName());
+        String filename = String.format(Locale.US, "graylog-test-resource-file_%s", Paths.get(resourceName).getFileName());
 
         try {
             File f = File.createTempFile(filename, null);
