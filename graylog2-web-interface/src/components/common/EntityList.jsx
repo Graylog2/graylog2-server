@@ -34,18 +34,20 @@ class EntityList extends React.Component {
   };
 
   render() {
-    if (this.props.items.length === 0) {
+    const { bsNoItemsStyle, items, noItemsText } = this.props;
+
+    if (items.length === 0) {
       return (
-        <Alert bsStyle={this.props.bsNoItemsStyle}>
+        <Alert bsStyle={bsNoItemsStyle}>
           <Icon name="info-circle" />&nbsp;
-          {this.props.noItemsText}
+          {noItemsText}
         </Alert>
       );
     }
 
     return (
       <StyledList>
-        {this.props.items}
+        {items}
       </StyledList>
     );
   }
