@@ -145,13 +145,13 @@ class MessageDetail extends React.Component {
 
               { streamIds.size > 0 && <dt>Routed into streams</dt> }
               { streamIds.size > 0
-            && (
-            <dd className="stream-list">
-              <ul>
-                {streams}
-              </ul>
-            </dd>
-            )}
+              && (
+              <dd className="stream-list">
+                <ul>
+                  {streams}
+                </ul>
+              </dd>
+              )}
             </MessageDetailsDefinitionList>
           </Col>
           <Col md={9}>
