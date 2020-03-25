@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
-    private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build -Dforbiddenapis.skip=true";
+    private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true";
 
     static void packageJarIfNecessary(String projectDir) {
         if (isRunFromMaven()) {
@@ -41,6 +41,7 @@ public class MavenPackager {
     }
 
     private static boolean isRunFromMaven() {
+        // surefire-related properties should only be present when the tests are started from surefire, i.e. maven
         return System.getProperty("surefire.test.class.path") != null;
     }
 
@@ -52,7 +53,7 @@ public class MavenPackager {
         int exitCode = waitForExit(p);
 
         sw.stop();
-        LOG.info("Finished packaging after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
+        LOG.info("Finished packaging after {} seconds", sw.elapsed(TimeUnit.SECONDS));
 
         ensureZeroExitCode(p, exitCode);
     }
@@ -69,7 +70,8 @@ public class MavenPackager {
         try {
             return new ProcessBuilder().command("sh", "-c", MVN_COMMAND).directory(new File(pomDir)).start();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to start process for mvn package", e);
+            String msg = String.format("Failed to start maven process with command [%s].", MVN_COMMAND);
+            throw new RuntimeException(msg, e);
         }
     }
 
@@ -78,7 +80,8 @@ public class MavenPackager {
             new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.defaultCharset())).lines()
                     .forEach(System.out::println);
 
-            throw new RuntimeException("mvn package exited with " + exitCode);
+            String msg = String.format("Maven exited with %s after running [%s]. ", exitCode, MVN_COMMAND);
+            throw new RuntimeException(msg);
         }
     }
 }
