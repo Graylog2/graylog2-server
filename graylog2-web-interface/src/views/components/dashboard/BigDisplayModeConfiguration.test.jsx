@@ -77,9 +77,9 @@ describe('BigDisplayModeConfiguration', () => {
     const viewWithQueries = createViewWithQueries();
     const { getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
 
-    expect(getByText('Query#1')).not.toBeNull();
+    expect(getByText('Page#1')).not.toBeNull();
     expect(getByText('My awesome Query tab')).not.toBeNull();
-    expect(getByText('Query#3')).not.toBeNull();
+    expect(getByText('Page#3')).not.toBeNull();
   });
 
   it('should not allow strings for the refresh interval', () => {
@@ -148,7 +148,7 @@ describe('BigDisplayModeConfiguration', () => {
       const viewWithQueries = createViewWithQueries();
       const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
 
-      const query1 = getByLabelText('Query#1');
+      const query1 = getByLabelText('Page#1');
       fireEvent.click(query1);
 
       const form = getByTestId('modal-form');
