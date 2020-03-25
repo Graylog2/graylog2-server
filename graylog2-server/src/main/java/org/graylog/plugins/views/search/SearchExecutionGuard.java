@@ -20,6 +20,7 @@ import com.google.common.base.Joiner;
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,13 +53,14 @@ public class SearchExecutionGuard {
         final Set<String> forbiddenStreams = streamIds.stream().filter(isForbidden).collect(Collectors.toSet());
 
         if (!forbiddenStreams.isEmpty()) {
-            throwExceptionWithoutMentioningStreamIds(forbiddenStreams);
+            throwExceptionMentioningStreamIds(forbiddenStreams);
         }
     }
 
-    private void throwExceptionWithoutMentioningStreamIds(Set<String> forbiddenStreams) {
+    private void throwExceptionMentioningStreamIds(Set<String> forbiddenStreams) {
         LOG.warn("Not executing search, it is referencing inaccessible streams: [" + Joiner.on(',').join(forbiddenStreams) + "]");
-        throw new ForbiddenException("The search is referencing at least one stream you are not permitted to see.");
+        throw new MissingStreamPermissionException("The search is referencing at least one stream you are not permitted to see.",
+                forbiddenStreams);
     }
 
     private void checkMissingRequirements(Search search) {
