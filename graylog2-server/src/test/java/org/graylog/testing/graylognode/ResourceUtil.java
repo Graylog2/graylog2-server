@@ -29,9 +29,9 @@ public class ResourceUtil {
 
         InputStream resource = ResourceUtil.class.getClassLoader().getResourceAsStream(resourceName);
 
-        if (resource == null)
+        if (resource == null) {
             throw new RuntimeException("Couldn't load resource " + resourceName);
-
+        }
         File f = new File("/tmp/" + UUID.randomUUID().toString() + "-" + Paths.get(resourceName).getFileName());
 
         try {

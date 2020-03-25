@@ -40,11 +40,11 @@ public class NodeContainerFactory {
     private static final int DEBUG_PORT = 5005;
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
-        if (!config.skipPackaging)
+        if (!config.skipPackaging) {
             MavenPackager.packageJarIfNecessary(property("server_project_dir"));
-        else
+        } else {
             LOG.info("Skipping packaging");
-
+        }
         ImageFromDockerfile image = createImage(config);
 
         return createRunningContainer(config, image);
@@ -61,9 +61,9 @@ public class NodeContainerFactory {
                 .withFileFromPath("graylog.conf", pathTo("graylog_config"))
                 .withFileFromClasspath("log4j2.xml", "log4j2.xml")
                 .withFileFromPath("sigar", pathTo("sigar_dir"));
-        if (config.enableDebugging)
+        if (config.enableDebugging) {
             image.withBuildArg("DEBUG_OPTS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005");
-
+        }
         return image;
     }
 
@@ -89,9 +89,9 @@ public class NodeContainerFactory {
             container.addExposedPort(DEBUG_PORT);
             container.start();
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
-        } else
+        } else {
             container.start();
-
+        }
         return container;
     }
 
