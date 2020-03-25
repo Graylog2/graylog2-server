@@ -49,7 +49,7 @@ describe('ViewTransformer', () => {
       expect(dashboardView.type).toBe(View.Type.Dashboard);
     });
 
-    it('should change the type', () => {
+    it('should change the id', () => {
       const query = Query.builder()
         .id('query-id')
         .timerange({ type: 'relative', range: 365 })
@@ -144,6 +144,27 @@ describe('ViewTransformer', () => {
       expect(dashboardView.state.get('query-id').widgets.first().timerange).toBeUndefined();
       expect(dashboardView.state.get('query-id').widgets.first().query).toBeUndefined();
       expect(dashboardView.state.get('query-id').widgets.first().streams).toStrictEqual(['1234-abcd']);
+    });
+
+    it('should remove the query_string from search queries', async () => {
+      const query = Query.builder()
+        .id('query-id')
+        .query({ type: 'elasticsearch', query_string: 'author: "Karl Marx"' })
+        .build();
+
+      const search = Search.builder()
+        .id('search-id')
+        .queries([query])
+        .build();
+
+      const searchView = View.builder()
+        .type(View.Type.Search)
+        .search(search)
+        .build();
+
+      const dashboardView = viewTransformer(searchView);
+
+      expect(dashboardView.search.queries.first().query).toEqual({ type: 'elasticsearch', query_string: '' });
     });
   });
 
