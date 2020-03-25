@@ -384,7 +384,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // This allows us to run aggregations over larger time ranges than the searchWithin time.
         // The results will be received in time buckets of the searchWithin time size.
         final Time interval = Time.builder().interval(TimeUnitInterval.Builder.builder()
-                .timeunit(String.valueOf(searchWithinMs) + "ms")
+                .timeunit(String.valueOf(searchWithinMs / 1000) + "s")
                 .build()).field("timestamp").build();
         final List<BucketSpec> groupBy = new ArrayList<>();
         groupBy.add(interval);
