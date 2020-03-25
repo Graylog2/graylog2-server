@@ -3,14 +3,13 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import { Formik, Form, Field } from 'formik';
+import { Field } from 'formik';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { Spinner, Icon } from 'components/common';
 import { Col, Row } from 'components/graylog';
-import DateTime from 'logic/datetimes/DateTime';
 
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
@@ -26,7 +25,8 @@ import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
-import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
+import type { FilterType, QueryId } from 'views/logic/queries/Query';
+import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
   availableStreams: Array<*>,
@@ -37,25 +37,9 @@ type Props = {
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
-const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
-  switch (timerange.type) {
-    case 'absolute':
-      return {
-        type: timerange.type,
-        from: DateTime.parseFromString(timerange.from).toISOString(),
-        to: DateTime.parseFromString(timerange.to).toISOString(),
-      };
-    case 'relative':
-    case 'keyword':
-      return timerange;
-    default: throw new Error(`Invalid time range type: ${timerange.type}`);
-  }
-};
-
 const onSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
-  const newTimerange = onSubmittingTimerange(timerange);
   const newQuery = currentQuery.toBuilder()
-    .timerange(newTimerange)
+    .timerange(timerange)
     .filter(filtersForQuery(streams))
     .query(createElasticsearchQueryString(queryString))
     .build();
@@ -63,7 +47,7 @@ const onSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   return QueriesActions.update(newQuery.id, newQuery);
 };
 
-const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
+const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, queryFilters }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -79,10 +63,10 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
     <ScrollToHint value={query.query_string}>
       <Row className="content">
         <Col md={12}>
-          <Formik initialValues={{ timerange, streams, queryString }}
-                  onSubmit={_onSubmit}>
+          <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                         onSubmit={_onSubmit}>
             {({ isSubmitting, isValid, handleSubmit }) => (
-              <Form>
+              <>
                 <Row className="no-bm extended-search-query-metadata">
                   <Col md={4}>
                     <TimeRangeTypeSelector />
@@ -130,9 +114,9 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                     <SavedSearchControls />
                   </Col>
                 </Row>
-              </Form>
+              </>
             )}
-          </Formik>
+          </SearchBarForm>
         </Col>
       </Row>
     </ScrollToHint>

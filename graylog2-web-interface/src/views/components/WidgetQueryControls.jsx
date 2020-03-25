@@ -2,10 +2,9 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { Field, Form, Formik } from 'formik';
+import { Field } from 'formik';
 
 import connect from 'stores/connect';
-import DateTime from 'logic/datetimes/DateTime';
 import { Col, Row } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -16,17 +15,17 @@ import Widget from 'views/logic/widgets/Widget';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { WidgetActions } from 'views/stores/WidgetStore';
-import type { TimeRange } from 'views/logic/queries/Query';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
 import { DEFAULT_TIMERANGE } from '../Constants';
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
   availableStreams: Array<any>,
@@ -69,27 +68,11 @@ const ResetOverrideHint = () => (
   </CenteredBox>
 );
 
-const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
-  switch (timerange.type) {
-    case 'absolute':
-      return {
-        type: timerange.type,
-        from: DateTime.parseFromString(timerange.from).toISOString(),
-        to: DateTime.parseFromString(timerange.to).toISOString(),
-      };
-    case 'relative':
-    case 'keyword':
-      return timerange;
-    default: throw new Error(`Invalid time range type: ${timerange.type}`);
-  }
-};
-
 const onSubmit = (values, widget: Widget) => {
-  const { timerange, streams, query } = values;
-  const newTimerange = onSubmittingTimerange(timerange);
+  const { timerange, streams, queryString } = values;
   const newWidget = widget.toBuilder()
-    .timerange(newTimerange)
-    .query(query)
+    .timerange(timerange)
+    .query(createElasticsearchQueryString(queryString))
     .streams(streams)
     .build();
 
@@ -111,10 +94,10 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
     <>
       {isGloballyOverridden && <ResetOverrideHint />}
       <Wrapper>
-        <Formik initialValues={{ timerange, streams, queryString }}
-                onSubmit={_onSubmit}>
+        <SearchBarForm initialValues={{ timerange, streams, queryString }}
+                       onSubmit={_onSubmit}>
           {({ isSubmitting, isValid, handleSubmit }) => (
-            <Form>
+            <>
               <Row className="no-bm extended-search-query-metadata">
                 <Col md={4}>
                   <TimeRangeTypeSelector disabled={isGloballyOverridden} />
@@ -153,9 +136,9 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                   </Field>
                 </Col>
               </Row>
-            </Form>
+            </>
           )}
-        </Formik>
+        </SearchBarForm>
       </Wrapper>
     </>
   );
