@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "eslint": "5.16.0",
-    "eslint-config-airbnb": "18.0.1",
+    "eslint-config-airbnb": "18.1.0",
     "eslint-import-resolver-webpack": "0.12.1",
     "eslint-plugin-flowtype": "^4.5.2",
     "eslint-plugin-import": "2.20.1",
