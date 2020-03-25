@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 public class ResourceUtil {
     static File resourceToTmpFile(@SuppressWarnings("SameParameterValue") String resourceName) {
@@ -32,7 +31,8 @@ public class ResourceUtil {
         if (resource == null) {
             throw new RuntimeException("Couldn't load resource " + resourceName);
         }
-        File f = new File("/tmp/" + UUID.randomUUID().toString() + "-" + Paths.get(resourceName).getFileName());
+
+        File f = createTempFile(resourceName);
 
         try {
             FileUtils.copyInputStreamToFile(resource, f);
@@ -41,5 +41,17 @@ public class ResourceUtil {
         }
 
         return f;
+    }
+
+    private static File createTempFile(String resourceName) {
+        String filename = String.format("graylog-test-resource-file_%s", Paths.get(resourceName).getFileName());
+
+        try {
+            File f = File.createTempFile(filename, null);
+            f.deleteOnExit();
+            return f;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create temp resource file " + filename, e);
+        }
     }
 }
