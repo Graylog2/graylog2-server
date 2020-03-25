@@ -189,7 +189,7 @@ class Builder {
     return new Builder(this.value.set('timerange', value));
   }
 
-  filter(value: FilterType): Builder {
+  filter(value: ?FilterType): Builder {
     return new Builder(this.value.set('filter', Immutable.fromJS(value)));
   }
 
