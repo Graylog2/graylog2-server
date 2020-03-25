@@ -60,6 +60,11 @@ class DateTime {
     return new DateTime(parsedDateTime);
   }
 
+  static isValidDateString(dateTimeString) {
+    const parsedDateTime = moment.tz(DateTime._cleanDateTimeString(dateTimeString), DateTime.getAcceptedFormats(), true, DateTime.getUserTimezone());
+    return parsedDateTime.isValid();
+  }
+
   static getUserTimezone() {
     if (currentUser && currentUser.timezone) {
       return currentUser.timezone;

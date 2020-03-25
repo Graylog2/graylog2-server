@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import { Field, useFormikContext } from 'formik';
 
 import Input from 'components/bootstrap/Input';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import { Field } from 'formik';
 
 type Props = {
   disabled: boolean,
@@ -45,7 +46,7 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
 
   return (
     <Field name="timerange.range">
-      {({ field: { name, value, onChange } }) => (
+      {({ field: { name, value, onChange }, form: { handleSubmit } }) => (
         <div className="timerange-selector relative"
              style={{ marginLeft: 50 }}>
           <Input id="relative-timerange-selector"
@@ -54,7 +55,7 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
                  value={value}
                  className="relative"
                  name={name}
-                 onChange={onChange}>
+                 onChange={e => { onChange(e); handleSubmit(); }}>
             {options}
           </Input>
         </div>
