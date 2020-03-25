@@ -37,13 +37,27 @@ public class MavenPackager {
             LOG.info("Running from Maven. Assuming jars are current.");
         } else {
             LOG.info("Running from outside Maven. Packaging server jar now...");
-            MavenPackager.packageJar(projectDir);
+            makeSureMavenExecutableIsFound();
+            packageJar(projectDir);
         }
     }
 
     private static boolean isRunFromMaven() {
         // surefire-related properties should only be present when the tests are started from surefire, i.e. maven
         return System.getProperty("surefire.test.class.path") != null;
+    }
+
+    private static void makeSureMavenExecutableIsFound() {
+        String mavenExecutable = "mvn";
+        String path = System.getenv("PATH");
+        for (String dirname : path.split(File.pathSeparator)) {
+            File file = new File(dirname, mavenExecutable);
+            if (file.isFile() && file.canExecute()) {
+                LOG.info("Found Maven executable at " + file.getAbsolutePath());
+                return;
+            }
+        }
+        throw new RuntimeException(String.format(Locale.US, "Could not find Maven executable in PATH [%s]", path));
     }
 
     static void packageJar(String pomDir) {
@@ -69,7 +83,7 @@ public class MavenPackager {
 
     private static Process startProcess(String pomDir) {
         try {
-            return new ProcessBuilder().command("sh", "-c", MVN_COMMAND).directory(new File(pomDir)).start();
+            return new ProcessBuilder().command("sh", "-c", "echo $PATH").directory(new File(pomDir)).start();
         } catch (IOException e) {
             String msg = String.format(Locale.US, "Failed to start maven process with command [%s].", MVN_COMMAND);
             throw new RuntimeException(msg, e);
