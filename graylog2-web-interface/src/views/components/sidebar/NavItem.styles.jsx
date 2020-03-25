@@ -1,21 +1,22 @@
-import * as React from 'react';
-import styled, { css } from 'styled-components';
+// @flow strict
+import styled, { type StyledComponent, css } from 'styled-components';
+import { type ThemeInterface } from 'theme';
 
 type StyleProps = {
   isSelected: boolean,
   expandRight: boolean,
 };
 
-export const Title: React.ComponentType<StyleProps> = styled.div(({ isSelected, expandRight }) => css`
+export const Title: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> = styled.div(({ isSelected, expandRight, theme }) => css`
   padding: 9px 10px;
   display: flex;
   align-items: center;
   cursor: pointer;
   position: relative;
-  color: ${isSelected ? '#FF3633' : 'inherit'};
-  background: ${isSelected ? '#393939' : 'tranparent'};
-  
+  color: ${isSelected ? theme.color.variant.light.danger : 'inherit'};
+  background: ${isSelected ? theme.color.gray[10] : 'tranparent'};
   ${((isSelected && expandRight) && css`
+
     &::after {
       content: ' ';
       display: block;
@@ -30,7 +31,7 @@ export const Title: React.ComponentType<StyleProps> = styled.div(({ isSelected, 
   `)}
 `);
 
-export const TitleText = styled.div`
+export const TitleText: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   font-size: 16px;
   display: inline;
   margin-left: 10px;
@@ -38,26 +39,24 @@ export const TitleText = styled.div`
   white-space: nowrap;
 `;
 
-export const TitleIcon = styled.div`
+export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   width: 25px;
   text-align: center;
   font-size: 20px;
   cursor: pointer;
 `;
 
-export const Content: React.ComponentType<StyleProps> = styled.div(({ isSelected, expandRight }) => css`
-  color: #666666;
-  background: #FFFFFF;
+export const Content: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div(({ isSelected, expandRight }) => css`
+  color: #666;
+  background: #fff;
   box-shadow:
-      inset 0px 13px 5px -10px #CCC,
-      inset 0px -13px 5px -10px #CCC;
-  
+    inset 0 13px 5px -10px #ccc,
+    inset 0 -13px 5px -10px #ccc;
   ${(isSelected ? css`
     padding: 20px;
   ` : css`
     max-height: 0;
   `)}
-  
   ${(isSelected && expandRight) && css`
     position: absolute !important;
     top: 0;
@@ -65,7 +64,7 @@ export const Content: React.ComponentType<StyleProps> = styled.div(({ isSelected
     border: 0;
     bottom: 0;
     padding: 20px;
-    width: 300px;
+    width: 450px;
     overflow-y: hidden;
   `}
 `);

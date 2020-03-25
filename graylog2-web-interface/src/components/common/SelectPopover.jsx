@@ -136,14 +136,6 @@ class SelectPopover extends React.Component {
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  pickPopoverProps(props) {
-    // eslint-disable-next-line react/forbid-foreign-prop-types
-    const popoverPropKeys = Object.keys(Popover.target.propTypes);
-
-    return lodash.pick(props, popoverPropKeys);
-  }
-
   renderDataFilter(items) {
     const { filterPlaceholder } = this.props;
     const { filterText } = this.state;
@@ -177,13 +169,15 @@ class SelectPopover extends React.Component {
       triggerAction,
       triggerNode,
       disabled,
-      ...otherProps
+      id,
+      title,
     } = this.props;
     const { filteredItems, selectedItems } = this.state;
-    const popoverProps = this.pickPopoverProps(otherProps);
-
     const popover = (
-      <Popover {...popoverProps} className={style.customPopover}>
+      <Popover id={id}
+               title={title}
+               placement={placement}
+               className={style.customPopover}>
         {displayDataFilter && this.renderDataFilter(items)}
         {selectedItems.length > 0 && this.renderClearSelectionItem()}
         <IsolatedScroll className={style.scrollableList}>

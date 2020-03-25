@@ -1,72 +1,106 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
+import isDeepEqual from 'stores/isDeepEqual';
+import isEqualForSearch from 'views/stores/isEqualForSearch';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import type { SortConfigJson } from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+
 import WidgetConfig from './WidgetConfig';
 
+export type Decorator = {
+  id: string,
+  type: string,
+  config: any,
+  stream: ?string,
+  order: number,
+};
+
 type InternalState = {
+  decorators: Array<Decorator>,
   fields: Array<string>,
+  sort: Array<SortConfig>,
   showMessageRow: boolean,
 };
 
 export type MessagesWidgetConfigJSON = {
+  decorators: Array<Decorator>,
   fields: Array<string>,
+  sort: Array<SortConfigJson>,
   show_message_row: boolean,
 };
+
+export const defaultSortDirection = Direction.Descending;
+const defaultSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', defaultSortDirection)];
 
 export default class MessagesWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
-  constructor(fields: Array<string>, showMessageRow: boolean) {
+  constructor(fields: Array<string>, showMessageRow: boolean, decorators: Array<Decorator>, sort: Array<SortConfig>) {
     super();
-    this._value = { fields: fields.slice(0), showMessageRow };
+    this._value = { decorators, fields: fields.slice(0), showMessageRow, sort: sort && sort.length > 0 ? sort : defaultSort };
+  }
+
+  get decorators() {
+    return this._value.decorators;
   }
 
   get fields() {
     return this._value.fields;
   }
 
+  get sort() {
+    return this._value.sort;
+  }
+
   get showMessageRow() {
     return this._value.showMessageRow;
   }
 
-  toObject() {
-    const { fields, showMessageRow } = this._value;
-    const copiedFields: Array<string> = fields.slice(0);
-    return {
-      fields: copiedFields,
-      showMessageRow,
-    };
-  }
-
   toBuilder() {
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map(this._value));
+    return new Builder(Immutable.Map((this._value: { [string]: any })));
   }
 
   toJSON() {
-    const { fields, showMessageRow } = this._value;
+    const { decorators, fields, showMessageRow, sort } = this._value;
     return {
+      decorators,
       fields,
       show_message_row: showMessageRow,
+      sort,
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  equals(other: any) : boolean {
-    return other instanceof MessagesWidgetConfig;
+  equals(other: any): boolean {
+    return other instanceof MessagesWidgetConfig
+      && isDeepEqual(this.decorators, other.decorators)
+      && isDeepEqual(this.fields, other.fields)
+      && isDeepEqual(this.sort, other.sort)
+      && this.showMessageRow === other.showMessageRow;
+  }
+
+  equalsForSearch(other: any): boolean {
+    return other instanceof MessagesWidgetConfig
+      && isEqualForSearch(other.decorators, this.decorators)
+      && isEqualForSearch(other.sort, this.sort);
   }
 
   // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
-      .fields([]);
+      .decorators([])
+      .fields([])
+      .sort([]);
   }
 
   static fromJSON(value: MessagesWidgetConfigJSON) {
     // eslint-disable-next-line camelcase
-    const { show_message_row, fields } = value;
+    const { decorators, show_message_row, fields, sort } = value;
 
-    return new MessagesWidgetConfig(fields, show_message_row);
+    return new MessagesWidgetConfig(fields, show_message_row, decorators, sort.map(SortConfig.fromJSON));
   }
 }
 
@@ -78,6 +112,10 @@ class Builder {
     this.value = value;
   }
 
+  decorators(value: Array<Decorator>) {
+    return new Builder(this.value.set('decorators', value.slice(0)));
+  }
+
   fields(value: Array<string>) {
     return new Builder(this.value.set('fields', value.slice(0)));
   }
@@ -86,8 +124,12 @@ class Builder {
     return new Builder(this.value.set('showMessageRow', value));
   }
 
+  sort(sorts: Array<SortConfig>) {
+    return new Builder(this.value.set('sort', sorts));
+  }
+
   build() {
-    const { fields, showMessageRow } = this.value.toObject();
-    return new MessagesWidgetConfig(fields, showMessageRow);
+    const { decorators, fields, showMessageRow, sort } = this.value.toObject();
+    return new MessagesWidgetConfig(fields, showMessageRow, decorators, sort);
   }
 }

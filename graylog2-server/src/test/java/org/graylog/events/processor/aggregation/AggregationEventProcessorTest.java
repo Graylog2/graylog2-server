@@ -341,6 +341,7 @@ public class AggregationEventProcessorTest {
         verify(moreSearch, times(1)).scrollQuery(
                 eq(config.query()),
                 eq(config.streams()),
+                eq(config.queryParameters()),
                 eq(parameters.timerange()),
                 eq(parameters.batchSize()),
                 any(MoreSearch.ScrollCallback.class)
@@ -387,6 +388,7 @@ public class AggregationEventProcessorTest {
         verify(moreSearch, times(1)).scrollQuery(
                 eq(config.query()),
                 eq(config.streams()),
+                eq(config.queryParameters()),
                 eq(parameters.timerange()),
                 eq(parameters.batchSize()),
                 any(MoreSearch.ScrollCallback.class)
@@ -409,6 +411,7 @@ public class AggregationEventProcessorTest {
         verify(moreSearch, never()).scrollQuery(
                 eq(config.query()),
                 eq(config.streams()),
+                eq(config.queryParameters()),
                 eq(parameters.timerange()),
                 eq(parameters.batchSize()),
                 any(MoreSearch.ScrollCallback.class)

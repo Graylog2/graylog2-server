@@ -1,17 +1,26 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import * as Immutable from 'immutable';
+import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
 import Headers from './Headers';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
 jest.mock('logic/datetimes/DateTime', () => 'DateTime');
+
+const seriesWithName = (fn, name) => Series.forFunction(fn)
+  .toBuilder()
+  .config(SeriesConfig.empty()
+    .toBuilder()
+    .name(name)
+    .build())
+  .build();
 
 describe('Headers', () => {
   /* eslint-disable react/require-default-props */
@@ -21,7 +30,7 @@ describe('Headers', () => {
     series?: Array<Series>,
     rollup?: boolean,
     actualColumnPivotFields?: Array<Array<string>>,
-    fields?: FieldTypeMappingsList,
+    fields?: Array<FieldTypeMapping>,
   };
   /* eslint-enable react/require-default-props */
 
@@ -41,7 +50,7 @@ describe('Headers', () => {
                  series={series}
                  rollup={rollup}
                  actualColumnPivotFields={actualColumnPivotFields}
-                 fields={fields} />
+                 fields={Immutable.List(fields)} />
       </thead>
     </table>
   );
@@ -56,23 +65,54 @@ describe('Headers', () => {
     expect(fields).toHaveLength(2);
   });
 
-  it('passes the correct, inferred type for series', () => {
-    const wrapper = mount(<RenderHeaders series={[
-      Series.forFunction('count()'),
-      Series.forFunction('avg(foo)'),
-      Series.forFunction('min(foo)'),
-    ]}
-                                         fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />);
-    expect(wrapper).not.toBeEmptyRender();
-    const fields = wrapper.find('Field');
+  describe('infers types properly', () => {
+    const expectCorrectTypes = (wrapper) => {
+      const countField = wrapper.find('Field[name="count()"]');
+      expect(countField).toHaveProp('type', FieldTypes.LONG());
 
-    const countField = fields.at(0);
-    expect(countField.props().type).toEqual(FieldTypes.LONG());
+      const avgField = wrapper.find('Field[name="avg(foo)"]');
+      expect(avgField).toHaveProp('type', FieldTypes.DATE());
 
-    const avgField = fields.at(1);
-    expect(avgField.props().type).toEqual(FieldTypes.DATE());
+      const minField = wrapper.find('Field[name="min(foo)"]');
+      expect(minField).toHaveProp('type', FieldTypes.DATE());
+    };
 
-    const minField = fields.at(2);
-    expect(minField.props().type).toEqual(FieldTypes.DATE());
+    it('for non-renamed series', () => {
+      const series = [
+        Series.forFunction('count()'),
+        Series.forFunction('avg(foo)'),
+        Series.forFunction('min(foo)'),
+      ];
+      const wrapper = mount((
+        <RenderHeaders series={series}
+                       fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />
+      ));
+      expectCorrectTypes(wrapper);
+    });
+
+
+    it('for renamed series', () => {
+      const series = [
+        seriesWithName('count()', 'Total Count'),
+        seriesWithName('avg(foo)', 'Average Foness'),
+        seriesWithName('min(foo)', 'Minimal Fooness'),
+      ];
+      const wrapper = mount((
+        <RenderHeaders series={series}
+                       fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />
+      ));
+      expectCorrectTypes(wrapper);
+    });
+    it('renders with `null` fields', () => {
+      const series = [
+        seriesWithName('foo', 'Total Count'),
+        seriesWithName('avg(foo)', 'Average Foness'),
+      ];
+      mount((
+        <RenderHeaders series={series}
+                       // $FlowFixMe: Passing `null` fields on purpose
+                       fields={null} />
+      ));
+    });
   });
 });

@@ -1,43 +1,284 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SeriesConfiguration renders the configuration dialog 1`] = `
-<span>
-  <div
-    className="form-group"
-  >
-    <label
-      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-    >
-      Name
-    </label>
-    <input
-      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-      onChange={[Function]}
-      type="text"
-      value="count()"
-    />
-    <span
-      className="HelpBlock-i8is92-0 huFHQV help-block"
-    >
-      The name of the series as it appears in the chart.
-    </span>
-  </div>
-  <div
-    className="pull-right"
-    style={
-      Object {
-        "marginBottom": "10px",
-      }
+<SeriesConfiguration
+  onClose={[Function]}
+  series={
+    Object {
+      "config": Object {
+        "name": undefined,
+      },
+      "function": "count()",
     }
-  >
-    <button
-      className="Button-c9cbmb-0 GLfOY btn btn-success"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
+  }
+  usedNames={Array []}
+>
+  <span>
+    <Component
+      validationState={null}
     >
-      Done
-    </button>
-  </div>
-</span>
+      <FormGroup__StyledFormGroup
+        validationState={null}
+      >
+        <StyledComponent
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "SIZES": Array [
+                "large",
+                "small",
+              ],
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                "isStatic": false,
+                "lastClassName": "ekazNr",
+                "rules": Array [
+                  [Function],
+                  ";",
+                ],
+              },
+              "displayName": "FormGroup__StyledFormGroup",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          validationState={null}
+        >
+          <FormGroup
+            bsClass="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+            validationState={null}
+          >
+            <div
+              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+            >
+              <ControlLabel>
+                <StyledComponent
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "ControlLabel-sc-1edmum5-0",
+                        "isStatic": false,
+                        "lastClassName": "hCskeX",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "ControlLabel",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                >
+                  <ControlLabel
+                    bsClass="control-label"
+                    className="ControlLabel-sc-1edmum5-0 hCskeX"
+                    srOnly={false}
+                  >
+                    <label
+                      className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                    >
+                      Name
+                    </label>
+                  </ControlLabel>
+                </StyledComponent>
+              </ControlLabel>
+              <FormControl
+                onChange={[Function]}
+                type="text"
+                value="count()"
+              >
+                <StyledComponent
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "Feedback": [Function],
+                      "SIZES": Array [
+                        "small",
+                        "large",
+                      ],
+                      "Static": [Function],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "FormControl-sc-1amoaox-0",
+                        "isStatic": false,
+                        "lastClassName": "fcGLmv",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "FormControl",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "FormControl-sc-1amoaox-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onChange={[Function]}
+                  type="text"
+                  value="count()"
+                >
+                  <FormControl
+                    bsClass="form-control"
+                    className="FormControl-sc-1amoaox-0 fcGLmv"
+                    componentClass="input"
+                    onChange={[Function]}
+                    type="text"
+                    value="count()"
+                  >
+                    <input
+                      className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                      onChange={[Function]}
+                      type="text"
+                      value="count()"
+                    />
+                  </FormControl>
+                </StyledComponent>
+              </FormControl>
+              <HelpBlock>
+                <StyledComponent
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "HelpBlock-i8is92-0",
+                        "isStatic": false,
+                        "lastClassName": "kxWRDS",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "HelpBlock",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "HelpBlock-i8is92-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                >
+                  <HelpBlock
+                    bsClass="help-block"
+                    className="HelpBlock-i8is92-0 kxWRDS"
+                  >
+                    <span
+                      className="HelpBlock-i8is92-0 kxWRDS help-block"
+                    >
+                      The name of the series as it appears in the chart.
+                    </span>
+                  </HelpBlock>
+                </StyledComponent>
+              </HelpBlock>
+            </div>
+          </FormGroup>
+        </StyledComponent>
+      </FormGroup__StyledFormGroup>
+    </Component>
+    <div
+      className="pull-right"
+      style={
+        Object {
+          "marginBottom": "10px",
+        }
+      }
+    >
+      <ForwardRef
+        bsStyle="success"
+        disabled={false}
+        onClick={[Function]}
+      >
+        <Button__StyledButton
+          bsStyle="success"
+          disabled={false}
+          onClick={[Function]}
+        >
+          <StyledComponent
+            bsStyle="success"
+            disabled={false}
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "SIZES": Array [
+                  "large",
+                  "small",
+                  "xsmall",
+                ],
+                "STYLES": Array [
+                  "success",
+                  "warning",
+                  "danger",
+                  "info",
+                  "default",
+                  "primary",
+                  "link",
+                ],
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Button__StyledButton-c9cbmb-0",
+                  "isStatic": false,
+                  "lastClassName": "gxhWww",
+                  "rules": Array [
+                    [Function],
+                  ],
+                },
+                "displayName": "Button__StyledButton",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+            onClick={[Function]}
+          >
+            <Button
+              active={false}
+              block={false}
+              bsClass="btn"
+              bsStyle="success"
+              className="Button__StyledButton-c9cbmb-0 gxhWww"
+              disabled={false}
+              onClick={[Function]}
+            >
+              <button
+                className="Button__StyledButton-c9cbmb-0 gxhWww btn btn-success"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                Done
+              </button>
+            </Button>
+          </StyledComponent>
+        </Button__StyledButton>
+      </ForwardRef>
+    </div>
+  </span>
+</SeriesConfiguration>
 `;

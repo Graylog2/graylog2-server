@@ -1,18 +1,16 @@
-import React, { forwardRef, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { forwardRef, memo } from 'react';
+import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Button as BootstrapButton } from 'react-bootstrap';
 
 import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
-const Button = forwardRef((props, ref) => {
-  const { active, bsStyle, disabled } = props;
-  const StyledButton = useMemo(
-    () => styled(BootstrapButton)`${buttonStyles(props)}`,
-    [active, bsStyle, disabled],
-  );
+const StyledButton = memo(styled(BootstrapButton)(({ theme }) => css`
+  ${buttonStyles(theme.color)};
+`));
 
+const Button = forwardRef((props, ref) => {
   return (
     <StyledButton ref={ref} {...props} />
   );

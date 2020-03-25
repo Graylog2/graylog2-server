@@ -1,10 +1,12 @@
 // @flow strict
-import Immutable, { is } from 'immutable';
+import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
+
+import isDeepEqual from 'stores/isDeepEqual';
 
 export type QueryId = string;
 
-type FilterType = Immutable.Map<string, any>;
+export type FilterType = Immutable.Map<string, any>;
 type SearchTypeList = Array<any>;
 type InternalBuilderState = Immutable.Map<string, any>;
 
@@ -29,25 +31,54 @@ export type ElasticsearchQueryString = {
   query_string: string,
 };
 
+export const createElasticsearchQueryString = (query: string = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
+
+const _streamFilters = (selectedStreams: Array<string>): Array<Immutable.Map<string, string>> => {
+  return selectedStreams.map(stream => Immutable.Map({ type: 'stream', id: stream }));
+};
+
+export const filtersForQuery = (streams: ?Array<string>): ?FilterType => {
+  if (!streams || streams.length === 0) {
+    return null;
+  }
+  const streamFilters = _streamFilters(streams);
+  return Immutable.Map({
+    type: 'or',
+    filters: streamFilters,
+  });
+};
+
+export const filtersToStreamSet = (filter: ?Immutable.Map<string, any>): Immutable.Set<string> => {
+  if (!filter) {
+    return Immutable.Set();
+  }
+  const type = filter.get('type');
+  if (type === 'stream') {
+    return Immutable.Set([filter.get('id')]);
+  }
+  const filters = filter.get('filters', Immutable.List());
+  return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
+};
+
 export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 
-export type RelativeTimeRange = {
+export type RelativeTimeRange = {|
   type: 'relative',
   range: number,
-};
+|};
 
-export type AbsoluteTimeRange = {
+export type AbsoluteTimeRange = {|
   type: 'absolute',
   from: string,
   to: string,
-};
+|};
 
-export type KeywordTimeRange = {
+export type KeywordTimeRange = {|
   type: 'keyword',
   keyword: string,
-};
+|};
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
@@ -82,9 +113,12 @@ export default class Query {
   toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
     // eslint-disable-next-line no-use-before-define
-    return Query.builder().id(id).query(query).timerange(timerange)
-      .filter(filter)
+    const builder = Query.builder()
+      .id(id)
+      .query(query)
+      .timerange(timerange)
       .searchTypes(searchTypes);
+    return filter ? builder.filter(filter) : builder;
   }
 
   equals(other: any): boolean {
@@ -95,7 +129,11 @@ export default class Query {
       return false;
     }
 
-    if (this.id !== other.id || !is(this.query, other.query) || !is(this.timerange, other.timerange) || !is(this.filter, other.filter) || !is(this.searchTypes, other.searchTypes)) {
+    if (this.id !== other.id
+      || !isDeepEqual(this.query, other.query)
+      || !isDeepEqual(this.timerange, other.timerange)
+      || !isDeepEqual(this.filter, other.filter)
+      || !isDeepEqual(this.searchTypes, other.searchTypes)) {
       return false;
     }
 

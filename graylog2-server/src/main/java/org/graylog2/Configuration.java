@@ -21,11 +21,13 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
+import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
@@ -33,6 +35,7 @@ import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
@@ -138,6 +141,15 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "user_password_bcrypt_salt_size", validator = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
 
+    @Parameter(value = "content_packs_loader_enabled")
+    private boolean contentPacksLoaderEnabled = false;
+
+    @Parameter(value = "content_packs_dir")
+    private Path contentPacksDir = DEFAULT_DATA_DIR.resolve("contentpacks");
+
+    @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
+    private Set<String> contentPacksAutoInstall = Collections.emptySet();
+
     @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
 
@@ -146,6 +158,11 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "deactivated_builtin_authentication_providers", converter = StringSetConverter.class)
     private Set<String> deactivatedBuiltinAuthenticationProviders = Collections.emptySet();
+
+    // Defaults to TLS protocols that are currently considered secure
+    @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
+    private Set<String> enabledTlsProtocols = ImmutableSet.of("TLSv1.2", "TLSv1.3");
+
 
     public boolean isMaster() {
         return isMaster;
@@ -274,6 +291,18 @@ public class Configuration extends BaseConfiguration {
         return userPasswordBCryptSaltSize;
     }
 
+    public boolean isContentPacksLoaderEnabled() {
+        return contentPacksLoaderEnabled;
+    }
+
+    public Path getContentPacksDir() {
+        return contentPacksDir;
+    }
+
+    public Set<String> getContentPacksAutoInstall() {
+        return contentPacksAutoInstall;
+    }
+
     public Duration getIndexRangesCleanupInterval() {
         return indexRangesCleanupInterval;
     }
@@ -288,6 +317,10 @@ public class Configuration extends BaseConfiguration {
 
     public Set<String> getDeactivatedBuiltinAuthenticationProviders() {
         return deactivatedBuiltinAuthenticationProviders;
+    }
+
+    public Set<String> getEnabledTlsProtocols() {
+        return enabledTlsProtocols;
     }
 
     @ValidatorMethod

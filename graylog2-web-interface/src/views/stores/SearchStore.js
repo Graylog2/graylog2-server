@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import Bluebird from 'bluebird';
 import { debounce, get, isEqual } from 'lodash';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -14,13 +14,16 @@ import SearchResult from 'views/logic/SearchResult';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
+import type { MessageListOptions } from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
-import type { WidgetMapping } from 'views/logic/views/View';
+import type { WidgetMapping } from 'views/logic/views/types';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'views/logic/singleton';
 
-const createSearchUrl = URLUtils.qualifyUrl('/views/search');
+const createSearchUrl = qualifyUrl('/views/search');
 
 const displayError = (error) => {
   // eslint-disable-next-line no-console
@@ -29,11 +32,11 @@ const displayError = (error) => {
 
 Bluebird.config({ cancellation: true });
 
-const searchUrl = URLUtils.qualifyUrl('/views/search');
+const searchUrl = qualifyUrl('/views/search');
 
 export { SearchActions };
 
-type InternalState = {
+export type SearchStoreState = {
   search: Search,
   result: SearchResult,
   widgetMapping: WidgetMapping,
@@ -111,23 +114,31 @@ export const SearchStore = singletonStore(
     },
 
     execute(executionState: SearchExecutionState): Promise<SearchExecutionResult> {
-      if (this.executePromise && this.executePromise.cancel) {
-        this.executePromise.cancel();
-      }
-      if (this.search) {
-        const { widgetMapping, search } = this.view;
-        this.executePromise = this.trackJob(search, executionState)
-          .then((result) => {
-            this.result = result;
-            this.widgetMapping = widgetMapping;
-            this._trigger();
-            this.executePromise = undefined;
-            return { result, widgetMapping };
-          }, displayError);
-        SearchActions.execute.promise(this.executePromise);
-        return this.executePromise;
-      }
-      throw new Error('Unable to execute search when no search is loaded!');
+      const handleSearchResult = (searchResult: SearchResult) => searchResult;
+      const startActionPromise = executePromise => SearchActions.execute.promise(executePromise);
+      return this._executePromise(executionState, startActionPromise, handleSearchResult);
+    },
+
+    reexecuteSearchTypes(searchTypes: MessageListOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+      const { parameterBindings, globalOverride } = this.executionState;
+      const searchTypeIds = Object.keys(searchTypes);
+      const globalQuery = globalOverride && globalOverride.query ? globalOverride.query : undefined;
+
+      const newGlobalOverride: GlobalOverride = new GlobalOverride(
+        effectiveTimerange,
+        globalQuery,
+        searchTypeIds,
+        searchTypes,
+      );
+
+      const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
+      const handleSearchResult = (searchResult: SearchResult): SearchResult => {
+        const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
+        const updatedResult = this.result.updateSearchTypes(updatedSearchTypes);
+        return updatedResult;
+      };
+      const startActionPromise = executePromise => SearchActions.reexecuteSearchTypes.promise(executePromise);
+      return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
     executeWithCurrentState(): Promise<SearchExecutionResult> {
@@ -142,9 +153,31 @@ export const SearchStore = singletonStore(
       SearchActions.parameters.promise(promise);
       return promise;
     },
-    _state(): InternalState {
+
+    _executePromise(executionState: SearchExecutionState, startActionPromise: (promise: Promise<SearchResult>) => void, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
+      if (this.executePromise && this.executePromise.cancel) {
+        this.executePromise.cancel();
+      }
+      if (this.search) {
+        const { widgetMapping, search } = this.view;
+        this.executePromise = this.trackJob(search, executionState)
+          .then((result: SearchResult) => {
+            this.result = handleSearchResult(result);
+            this.widgetMapping = widgetMapping;
+            this._trigger();
+            this.executePromise = undefined;
+            return { result, widgetMapping };
+          }, displayError);
+        startActionPromise(this.executePromise);
+        return this.executePromise;
+      }
+      throw new Error('Unable to execute search when no search is loaded!');
+    },
+
+    _state(): SearchStoreState {
       return { search: this.search, result: this.result, widgetMapping: this.widgetMapping };
     },
+
     _trigger() {
       this.trigger(this._state());
     },

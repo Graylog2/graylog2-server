@@ -11,12 +11,13 @@ import { SearchStore } from 'views/stores/SearchStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import LoadingIndicator from 'components/common/LoadingIndicator';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
-import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import TSearchResult from 'views/logic/SearchResult';
+import LoadingIndicator from 'components/common/LoadingIndicator';
+import { Row, Col } from 'components/graylog';
+import type { FieldTypesStoreState } from '../stores/FieldTypesStore';
 
 const SearchLoadingIndicator = connect(
   ({ searchLoadingState }) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
@@ -26,7 +27,7 @@ const SearchLoadingIndicator = connect(
 const QueryWithWidgets = connect(Query, { widgets: WidgetStore });
 
 type Props = {
-  fieldTypes: FieldTypeMappingsList,
+  fieldTypes: FieldTypesStoreState,
   queryId: QueryId,
   searches: TSearchResult,
   viewState: {
@@ -58,10 +59,12 @@ const SearchResult = React.memo(({ fieldTypes, queryId, searches, viewState }: P
   ) : <Spinner />;
 
   return (
-    <React.Fragment>
-      {content}
-      <SearchLoadingIndicator />
-    </React.Fragment>
+    <Row>
+      <Col>
+        {content}
+        <SearchLoadingIndicator />
+      </Col>
+    </Row>
   );
 });
 

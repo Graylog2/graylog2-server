@@ -3,36 +3,33 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
+import type { OnVisualizationConfigChange, WidgetProps } from '../widgets/Widget';
 
 const defaultVisualizationType = 'table';
 
-type OnVisualizationConfigChange = (VisualizationConfig) => void;
-
-type Result = {
+type RowResult = {
+  type: 'pivot',
   total: number,
   rows: Rows,
   effective_timerange: TimeRange,
 };
 
-type Props = {
-  config: AggregationWidgetConfig,
-  data: { [string]: Result },
-  editing?: boolean,
-  toggleEdit: () => void,
-  fields: FieldTypeMappingsList,
-  onVisualizationConfigChange: OnVisualizationConfigChange,
+type EventResult = {
+  events: Events,
+  type: 'events',
+  name: 'events',
 };
 
-export type VisualizationComponentProps = {|
+export type VisualizationComponentProps = {
   config: AggregationWidgetConfig,
-  data: { [string]: Rows },
+  data: { [string]: Rows, events?: Events },
   editing?: boolean,
   effectiveTimerange: TimeRange,
   fields: FieldTypeMappingsList,
@@ -40,11 +37,18 @@ export type VisualizationComponentProps = {|
   onChange: OnVisualizationConfigChange,
   width: number,
   toggleEdit: () => void,
-|};
+};
 
 export type VisualizationComponent =
-  { type?: string, propTypes?: any }
+  { type: string, propTypes?: any }
   & React.ComponentType<VisualizationComponentProps>;
+
+export const makeVisualization = (component: React.ComponentType<VisualizationComponentProps>, type: string): VisualizationComponent => {
+  // $FlowFixMe: Casting by force
+  const visualizationComponent: VisualizationComponent = component;
+  visualizationComponent.type = type;
+  return visualizationComponent;
+};
 
 const _visualizationForType = (type: string): VisualizationComponent => {
   const visualizationTypes = PluginStore.exports('visualizationTypes');
@@ -55,19 +59,26 @@ const _visualizationForType = (type: string): VisualizationComponent => {
   return visualization.component;
 };
 
-const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: Props) => {
+const getResult = (value: RowResult | EventResult): Rows | Events => {
+  if (value.type === 'events') {
+    return value.events;
+  }
+  return value.rows;
+};
+
+const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: WidgetProps) => {
   if (!config || config.isEmpty) {
     return <EmptyAggregationContent toggleEdit={toggleEdit} editing={editing} />;
   }
 
   const VisComponent = _visualizationForType(config.visualization || defaultVisualizationType);
-  const { effective_timerange: effectiveTimerange } = data && data.chart ? data.chart : {};
+  const { effective_timerange: effectiveTimerange } = data.chart || Object.values(data)[0] || {};
   const rows = Object.entries(data)
     .map(
-      // $FlowFixMe: map claims it's `mixed`, we know it's `Result`
-      ([key, value]: [string, Result]) => [
+      // $FlowFixMe: map claims it's `mixed`, we know it's `RowResult`
+      ([key, value]: [string, RowResult] | ['events', EventResult]) => [
         key,
-        value.rows,
+        getResult(value),
       ],
     )
     .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});

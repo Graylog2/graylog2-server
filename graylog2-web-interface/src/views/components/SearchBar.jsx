@@ -10,7 +10,7 @@ import { Spinner, Icon } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
 import SearchButton from 'views/components/searchbar/SearchButton';
-import BookmarkControls from 'views/components/searchbar/bookmark/BookmarkControls';
+import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
@@ -35,7 +35,7 @@ type Props = {
   },
   disableSearch: boolean,
   onExecute: () => void,
-  queryFilters: Immutable.Map,
+  queryFilters: Immutable.Map<any, any>,
 };
 
 const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
@@ -57,58 +57,54 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 
   return (
     <ScrollToHint value={query.query_string}>
-      <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+      <Row className="content">
         <Col md={12}>
-          <Row className="no-bm">
-            <Col md={12}>
-              <form method="GET" onSubmit={submitForm}>
+          <form method="GET" onSubmit={submitForm}>
+            <Row className="no-bm extended-search-query-metadata">
+              <Col md={4}>
+                <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
+                                       value={rangeType} />
+                <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
+                                rangeType={rangeType}
+                                rangeParams={rangeParams}
+                                config={config} />
+              </Col>
 
-                <Row className="no-bm extended-search-query-metadata">
-                  <Col md={4}>
-                    <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
-                                           value={rangeType} />
-                    <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
-                                    rangeType={rangeType}
-                                    rangeParams={rangeParams}
-                                    config={config} />
-                  </Col>
+              <Col mdHidden lgHidden>
+                <HorizontalSpacer />
+              </Col>
 
-                  <Col mdHidden lgHidden>
-                    <HorizontalSpacer />
-                  </Col>
+              <Col md={5} xs={8}>
+                <StreamsFilter value={streams}
+                               streams={availableStreams}
+                               onChange={value => QueryFiltersActions.streams(id, value)} />
+              </Col>
 
-                  <Col md={5} xs={8}>
-                    <StreamsFilter value={streams}
-                                   streams={availableStreams}
-                                   onChange={value => QueryFiltersActions.streams(id, value)} />
-                  </Col>
+              <Col md={3} xs={4}>
+                <RefreshControls />
+              </Col>
+            </Row>
 
-                  <Col md={3} xs={4}>
-                    <RefreshControls />
-                  </Col>
-                </Row>
+            <Row className="no-bm">
+              <Col md={9} xs={8}>
+                <div className="pull-right search-help">
+                  <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                     title="Search query syntax documentation"
+                                     text={<Icon name="lightbulb-o" />} />
+                </div>
+                <SearchButton disabled={disableSearch} />
 
-                <Row className="no-bm">
-                  <Col md={10} xs={9}>
-                    <div className="pull-right search-help">
-                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                         title="Search query syntax documentation"
-                                         text={<Icon name="lightbulb-o" />} />
-                    </div>
-                    <SearchButton disabled={disableSearch} />
+                <QueryInput value={query.query_string}
+                            placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                            onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
+                            onExecute={performSearch} />
+              </Col>
+              <Col md={3} xs={4} className="pull-right">
+                <SavedSearchControls />
+              </Col>
+            </Row>
+          </form>
 
-                    <QueryInput value={query.query_string}
-                                placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
-                                onExecute={performSearch} />
-                  </Col>
-                  <Col md={2} xs={3}>
-                    <BookmarkControls />
-                  </Col>
-                </Row>
-              </form>
-            </Col>
-          </Row>
         </Col>
       </Row>
     </ScrollToHint>

@@ -26,6 +26,7 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -144,7 +145,62 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
     }
     protected abstract LookupResult doGet(Object key);
 
+    @Deprecated
     public abstract void set(Object key, Object value);
+
+    /**
+     * Update a value for the given key in a DataAdapter.
+     * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
+     * @param key       The key that should be updated.
+     * @param value     The new value.
+     * @return A LookupResult containing the updated value or an error
+     */
+    public LookupResult setValue(Object key, Object value) {
+        return resultWithError;
+    }
+
+    /**
+     * Update all list entries for the given key in a DataAdapter.
+     * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
+     * @param key           The key that should be updated.
+     * @param listValue     The new list values.
+     * @return A LookupResult containing the updated list or an error
+     */
+    public LookupResult setStringList(Object key, List<String> listValue) {
+        return resultWithError;
+    }
+
+    /**
+     * Merge / append all list entries for the given key in a DataAdapter.
+     * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
+     * @param key             The key that should be updated.
+     * @param listValue       The list values that should be merged / appended.
+     * @param keepDuplicates  Controls whether duplicated entries should be unified.
+     * @return A LookupResult containing the updated list or an error
+     */
+    public LookupResult addStringList(Object key, List<String> listValue, boolean keepDuplicates) {
+        return resultWithError;
+    }
+
+    /**
+     * Remove all matching list entries for the given key in a DataAdapter.
+     * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
+     * @param key           The key that should be updated.
+     * @param listValue     The list values that should be removed.
+     * @return A LookupResult containing the updated list or an error
+     */
+    public LookupResult removeStringList(Object key, List<String> listValue) {
+        return resultWithError;
+    }
+
+    /**
+     * Clear (remove) the given key from the lookup table.
+     *
+     * @param key The key that should be cleared.
+     */
+    public void clearKey(Object key) {
+        // This cannot be abstract due to backwards compatibility with version < 3.2.0
+    }
 
     public LookupDataAdapterConfiguration getConfig() {
         return config;

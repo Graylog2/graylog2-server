@@ -40,12 +40,8 @@ public class V20181220133700_AddViewsAdminRole extends Migration {
     @Override
     public void upgrade() {
         helpers.ensureBuiltinRole("Views Manager", "Allows reading and writing all views and extended searches (built-in)", ImmutableSet.of(
-                ViewsRestPermissions.VIEW_USE,
-                ViewsRestPermissions.VIEW_CREATE,
                 ViewsRestPermissions.VIEW_READ,
-                ViewsRestPermissions.VIEW_EDIT,
-                ViewsRestPermissions.EXTENDEDSEARCH_USE,
-                ViewsRestPermissions.EXTENDEDSEARCH_CREATE
+                ViewsRestPermissions.VIEW_EDIT
         ));
     }
 }

@@ -1,9 +1,0 @@
-:local(.filterInput) {
-    padding-bottom: 4px;
-    border: 1px solid #eee;
-    border-radius: 6px;
-}
-
-:local(.flavorText) {
-    margin-bottom: 15px;
-}

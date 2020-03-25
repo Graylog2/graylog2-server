@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, waitForElement } from '@testing-library/react';
+import { render, waitForElement } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
@@ -14,6 +14,7 @@ describe('WidgetErrorBoundary', () => {
     ));
     await waitForElement(() => getByText('Hello World!'));
   });
+
   it('renders helpful error message if child throws error', async () => {
     jest.spyOn(console, 'error');
     // eslint-disable-next-line no-console
@@ -30,5 +31,15 @@ describe('WidgetErrorBoundary', () => {
 
     // eslint-disable-next-line no-console
     asMock(console.error).mockRestore();
+  });
+
+  it('passes own props to its children', () => {
+    const Component = props => <div data-testid="child-component-test-id" {...props} />;
+    const { getByTestId } = render((
+      <WidgetErrorBoundary extraProp="The extra prop">
+        <Component />
+      </WidgetErrorBoundary>
+    ));
+    expect(getByTestId('child-component-test-id')).toHaveAttribute('extraProp', 'The extra prop');
   });
 });

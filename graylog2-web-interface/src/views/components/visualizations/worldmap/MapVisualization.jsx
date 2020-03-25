@@ -4,7 +4,11 @@ import React from 'react';
 import { CircleMarker, Map, Popup, TileLayer } from 'react-leaflet';
 import chroma from 'chroma-js';
 import { flatten } from 'lodash';
-import style from 'components/maps/widgets/MapVisualization.css';
+
+import style from './MapVisualization.css';
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import leafletStyles from '!style/useable!css!leaflet/dist/leaflet.css';
 
 const DEFAULT_VIEWPORT = {
   center: [0, 0],
@@ -51,6 +55,7 @@ class MapVisualization extends React.Component {
 
   componentDidMount() {
     this._forceMapUpdate();
+    leafletStyles.use();
   }
 
   componentDidUpdate(prevProps) {
@@ -58,6 +63,10 @@ class MapVisualization extends React.Component {
     if (height !== prevProps.height || width !== prevProps.width) {
       this._forceMapUpdate();
     }
+  }
+
+  componentWillUnmount() {
+    leafletStyles.unuse();
   }
 
   // Workaround to avoid wrong placed markers or empty tiles if the map container size changed.

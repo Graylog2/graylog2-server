@@ -1,8 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import ConfirmLeaveDialog from './ConfirmLeaveDialog';
 
 jest.mock('react-router', () => ({ withRouter: x => x }));

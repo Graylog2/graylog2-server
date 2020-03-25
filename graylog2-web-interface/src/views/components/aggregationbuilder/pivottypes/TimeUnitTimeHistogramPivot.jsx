@@ -4,6 +4,7 @@ import { DropdownButton, FormControl, HelpBlock, InputGroup, MenuItem } from 'co
 
 import FormsUtils from 'util/FormsUtils';
 
+import { TimeUnits } from 'views/Constants';
 import type { Interval, TimeUnitInterval } from './Interval';
 
 import styles from './TimeUnitTimeHistogramPivot.css';
@@ -13,15 +14,6 @@ type OnChange = (Interval) => void;
 type Props = {
   interval: TimeUnitInterval,
   onChange: OnChange,
-};
-
-const units = {
-  seconds: 'Seconds',
-  minutes: 'Minutes',
-  hours: 'Hours',
-  days: 'Days',
-  weeks: 'Weeks',
-  months: 'Months',
 };
 
 const _changeValue = (event: SyntheticInputEvent<HTMLInputElement>, interval: TimeUnitInterval, onChange: OnChange) => {
@@ -38,12 +30,14 @@ const TimeUnitTimeHistogramPivot = ({ interval, onChange }: Props) => (
     <InputGroup className={styles.useFullWidth}>
       <FormControl type="number"
                    value={interval.value}
+                   step="1"
+                   min="1"
                    onChange={e => _changeValue(e, interval, onChange)} />
       <DropdownButton componentClass={InputGroup.Button}
                       id="input-dropdown-addon"
-                      title={units[interval.unit] || ''}
+                      title={TimeUnits[interval.unit] || ''}
                       onChange={newUnit => _changeUnit(newUnit, interval, onChange)}>
-        {Object.keys(units).map(unit => <MenuItem key={unit} onSelect={() => _changeUnit(unit, interval, onChange)}>{units[unit]}</MenuItem>)}
+        {Object.keys(TimeUnits).map(unit => <MenuItem key={unit} onSelect={() => _changeUnit(unit, interval, onChange)}>{TimeUnits[unit]}</MenuItem>)}
       </DropdownButton>
     </InputGroup>
     <HelpBlock>The size of the buckets for this timestamp type.</HelpBlock>

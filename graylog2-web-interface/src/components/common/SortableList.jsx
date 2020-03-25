@@ -1,10 +1,40 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled, { css } from 'styled-components';
+
 import { ListGroup } from 'components/graylog';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 import SortableListItem from './SortableListItem';
+
+const SortableListGroup = styled(ListGroup)(({ disableDragging }) => css`
+  cursor: ${disableDragging ? 'default' : 'move'};
+  margin: 0 0 15px;
+
+  .dragging {
+    opacity: 0.5;
+  }
+
+  .over {
+    border: 1px dashed #8c8e86;
+  }
+
+  .list-group-item {
+    border-radius: 0;
+  }
+
+  & > div:first-child .list-group-item {
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+  }
+
+  & > div:last-child .list-group-item {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    margin-bottom: 0;
+  }
+`);
 
 /**
  * Component that renders a list of elements and let users manually
@@ -68,9 +98,9 @@ class SortableList extends React.Component {
     });
 
     return (
-      <ListGroup className={this.props.disableDragging ? 'sortable-list' : 'sortable-list sortable-list-cursor'}>
+      <SortableListGroup disableDragging={this.props.disableDragging}>
         {formattedItems}
-      </ListGroup>
+      </SortableListGroup>
     );
   }
 }

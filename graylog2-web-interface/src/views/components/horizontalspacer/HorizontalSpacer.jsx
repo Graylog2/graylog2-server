@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 /**
  * Component to display horisontal space.
@@ -16,7 +16,7 @@ type Props = {
   className?: string,
 };
 
-const Spacer: React.ComponentType<Props> = styled.div`
+const Spacer: StyledComponent<Props, {}, HTMLDivElement> = styled.div`
   width: 100%;
   height: ${props => props.height}px;
 `;

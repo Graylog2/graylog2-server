@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, wait, fireEvent, cleanup } from '@testing-library/react';
+import { render, wait, fireEvent, cleanup, waitForElement } from 'wrappedTestingLibrary';
 import { browserHistory } from 'react-router';
 import { Map } from 'immutable';
 import Routes from 'routing/Routes';
@@ -56,6 +56,11 @@ jest.mock('graylog-web-plugin/plugin', () => ({
           return <button onClick={() => onChange({ foo: 23 })}>Click me</button>;
         },
       },
+      {
+        type: 'default',
+        visualizationComponent: () => <span>Unknown widget</span>,
+        editComponent: () => <span>Unknown widget in edit mode</span>,
+      },
     ]),
   },
 }));
@@ -82,7 +87,7 @@ describe('<Widget />', () => {
   const search = View.builder()
     .search(searchSearch)
     .type(View.Type.Dashboard)
-    .state(Map.of('query-id', viewState))
+    .state(Map({ 'query-id': viewState }))
     .id('search-1')
     .title('search 1')
     .build();
@@ -109,7 +114,6 @@ describe('<Widget />', () => {
       count: 2,
     },
   };
-
 
   const DummyWidget = props => (
     <Widget widget={widget}
@@ -154,6 +158,39 @@ describe('<Widget />', () => {
     expect(queryAllByTestId('loading-widget')).toHaveLength(0);
     expect(queryAllByTitle('Widget Title')).toHaveLength(2);
   });
+  it('renders placeholder if widget type is unknown', async () => {
+    const unknownWidget = { config: {}, id: 'widgetId', type: 'i-dont-know-this-widget-type' };
+    const UnknownWidget = props => (
+      <Widget widget={unknownWidget}
+              id="widgetId"
+              fields={[]}
+              onPositionsChange={() => {}}
+              onSizeChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props} />
+
+    );
+    const { getByText } = render(<UnknownWidget data={[]} />);
+    await waitForElement(() => getByText('Unknown widget'));
+  });
+  it('renders placeholder in edit mode if widget type is unknown', async () => {
+    const unknownWidget = { config: {}, id: 'widgetId', type: 'i-dont-know-this-widget-type' };
+    const UnknownWidget = props => (
+      <Widget widget={unknownWidget}
+              editing
+              id="widgetId"
+              fields={[]}
+              onPositionsChange={() => {}}
+              onSizeChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props} />
+
+    );
+    const { getByText } = render(<UnknownWidget data={[]} />);
+    await waitForElement(() => getByText('Unknown widget in edit mode'));
+  });
 
   it('copies title when duplicating widget', (done) => {
     const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" />);
@@ -192,6 +229,7 @@ describe('<Widget />', () => {
     const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
     WidgetActions.updateConfig = mockAction(jest.fn());
+    WidgetActions.update = mockAction(jest.fn());
     const onChangeBtn = getByText('Click me');
     fireEvent.click(onChangeBtn);
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
@@ -199,12 +237,14 @@ describe('<Widget />', () => {
     const cancelButton = getByText('Cancel');
     fireEvent.click(cancelButton);
 
-    expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 42 });
+    expect(WidgetActions.update).toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });
-  it('does not restores original state of widget config when clicking "Finish Editing"', () => {
+  it('does not restore original state of widget config when clicking "Finish Editing"', () => {
     const widgetWithConfig = { config: { foo: 42 }, id: 'widgetId', type: 'dummy' };
     const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
+    WidgetActions.updateConfig = mockAction(jest.fn());
+    WidgetActions.update = mockAction(jest.fn());
     const onChangeBtn = getByText('Click me');
     fireEvent.click(onChangeBtn);
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
@@ -212,7 +252,7 @@ describe('<Widget />', () => {
     const saveButton = getByText('Save');
     fireEvent.click(saveButton);
 
-    expect(WidgetActions.updateConfig).not.toHaveBeenCalledWith('widgetId', { foo: 42 });
+    expect(WidgetActions.update).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });
 
   describe('copy widget to dashboard', () => {

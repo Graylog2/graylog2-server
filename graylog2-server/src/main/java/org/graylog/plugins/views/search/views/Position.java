@@ -19,12 +19,12 @@ package org.graylog.plugins.views.search.views;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-class Position {
+public class Position {
     private static Position infinity() {
         return new Infinity();
     }
 
-    private static Position fromInt(int value) {
+    public static Position fromInt(int value) {
         return new NumberPosition(value);
     }
 

@@ -1,310 +1,1701 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
-<div>
-  <h2>
-    Entity list
-  </h2>
-  <br />
-  <div
-    className="search"
-    style={
-      Object {
-        "marginTop": 15,
-      }
+<ContentPackEntitiesList
+  appliedParameter={Object {}}
+  contentPack={
+    Object {
+      "entities": Array [],
     }
-  >
-    <form
-      className="form-inline"
-      onSubmit={[Function]}
-    >
-      <div
-        className="form-group has-feedback"
-      >
-        <input
-          autoComplete="off"
-          className="query form-control"
-          id="common-search-form-query-input"
-          onChange={[Function]}
-          placeholder="Enter search query..."
-          spellCheck="false"
-          style={
-            Object {
-              "width": "auto",
-            }
-          }
-          type="text"
-          value=""
-        />
-      </div>
-      <div
-        className="form-group"
-        style={
-          Object {
-            "marginLeft": 5,
-          }
-        }
-      >
-        <button
-          className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
-          disabled={false}
-          type="submit"
-        >
-          Filter
-        </button>
-      </div>
-      <div
-        className="form-group"
-        style={
-          Object {
-            "marginLeft": 5,
-          }
-        }
-      >
-        <button
-          className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
-          disabled={false}
-          onClick={[Function]}
-          type="reset"
-        >
-          Reset
-        </button>
-      </div>
-    </form>
-  </div>
+  }
+  onParameterApply={[Function]}
+  onParameterClear={[Function]}
+  readOnly={true}
+>
   <div>
-    <div
-      className="row "
+    <h2>
+      Entity list
+    </h2>
+    <br />
+    <SearchForm
+      buttonLeftMargin={5}
+      label={null}
+      loadingLabel="Loading..."
+      onQueryChange={[Function]}
+      onReset={[Function]}
+      onSearch={[Function]}
+      placeholder="Enter search query..."
+      query=""
+      queryHelpComponent={null}
+      queryWidth="auto"
+      resetButtonLabel="Reset"
+      searchBsStyle="default"
+      searchButtonLabel="Filter"
+      topMargin={15}
+      useLoadingState={false}
+      wrapperClass="search"
     >
       <div
-        className="col-md-12"
+        className="search"
+        style={
+          Object {
+            "marginTop": 15,
+          }
+        }
       >
-        <div
-          className="data-table table-responsive"
-          id="entity-list"
+        <form
+          className="form-inline"
+          onSubmit={[Function]}
         >
-          <p>
-            No data available.
-          </p>
+          <div
+            className="form-group has-feedback"
+          >
+            <input
+              autoComplete="off"
+              className="query form-control"
+              id="common-search-form-query-input"
+              onChange={[Function]}
+              placeholder="Enter search query..."
+              spellCheck="false"
+              style={
+                Object {
+                  "width": "auto",
+                }
+              }
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            className="form-group"
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+          >
+            <ForwardRef
+              bsStyle="default"
+              className="submit-button"
+              disabled={false}
+              type="submit"
+            >
+              <Button__StyledButton
+                bsStyle="default"
+                className="submit-button"
+                disabled={false}
+                type="submit"
+              >
+                <StyledComponent
+                  bsStyle="default"
+                  className="submit-button"
+                  disabled={false}
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "iWqiEF",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  type="submit"
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                    disabled={false}
+                    type="submit"
+                  >
+                    <button
+                      className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                      disabled={false}
+                      type="submit"
+                    >
+                      Filter
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
+            </ForwardRef>
+          </div>
+          <div
+            className="form-group"
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+          >
+            <ForwardRef
+              bsStyle="default"
+              className="reset-button"
+              onClick={[Function]}
+              type="reset"
+            >
+              <Button__StyledButton
+                bsStyle="default"
+                className="reset-button"
+                onClick={[Function]}
+                type="reset"
+              >
+                <StyledComponent
+                  bsStyle="default"
+                  className="reset-button"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "iWqiEF",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                  type="reset"
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="reset"
+                  >
+                    <button
+                      className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="reset"
+                    >
+                      Reset
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
+            </ForwardRef>
+          </div>
+        </form>
+      </div>
+    </SearchForm>
+    <DataTable
+      className="scrollable"
+      dataRowFormatter={[Function]}
+      displayKey="value"
+      filterBy=""
+      filterKeys={Array []}
+      filterLabel="Filter"
+      filterSuggestions={Array []}
+      headerCellFormatter={[Function]}
+      headers={
+        Array [
+          "Title",
+          "Type",
+          "Description",
+          "Action",
+        ]
+      }
+      id="entity-list"
+      noDataText="No data available."
+      rowClassName=""
+      rows={Array []}
+      sortBy={[Function]}
+      useResponsiveTable={true}
+    >
+      <div>
+        <div
+          className="row "
+        >
+          <div
+            className="col-md-12"
+          >
+            <div
+              className="data-table table-responsive"
+              id="entity-list"
+            >
+              <p>
+                No data available.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </DataTable>
   </div>
-</div>
+</ContentPackEntitiesList>
 `;
 
 exports[`<ContentPackEntitiesList /> should render with entities and parameters without readOnly 1`] = `
-<div>
-  <h2>
-    Entity list
-  </h2>
-  <br />
-  <div
-    className="search"
-    style={
-      Object {
-        "marginTop": 15,
-      }
+<ContentPackEntitiesList
+  appliedParameter={
+    Object {
+      "111-beef": Array [
+        Object {
+          "configKey": "title",
+          "paramName": "A parameter name",
+        },
+      ],
     }
-  >
-    <form
-      className="form-inline"
-      onSubmit={[Function]}
-    >
-      <div
-        className="form-group has-feedback"
-      >
-        <input
-          autoComplete="off"
-          className="query form-control"
-          id="common-search-form-query-input"
-          onChange={[Function]}
-          placeholder="Enter search query..."
-          spellCheck="false"
-          style={
-            Object {
-              "width": "auto",
-            }
-          }
-          type="text"
-          value=""
-        />
-      </div>
-      <div
-        className="form-group"
-        style={
-          Object {
-            "marginLeft": 5,
-          }
-        }
-      >
-        <button
-          className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
-          disabled={false}
-          type="submit"
-        >
-          Filter
-        </button>
-      </div>
-      <div
-        className="form-group"
-        style={
-          Object {
-            "marginLeft": 5,
-          }
-        }
-      >
-        <button
-          className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
-          disabled={false}
-          onClick={[Function]}
-          type="reset"
-        >
-          Reset
-        </button>
-      </div>
-    </form>
-  </div>
+  }
+  contentPack={
+    Object {
+      "description": "",
+      "entities": Array [
+        Object {
+          "constraints": Array [],
+          "data": Object {
+            "configuration": Object {
+              "listen_address": Object {
+                "@type": "string",
+                "@value": "1.2.3.4",
+              },
+              "port": Object {
+                "@type": "integer",
+                "@value": "23",
+              },
+            },
+            "title": Object {
+              "@type": "parameter",
+              "@value": "TITLE",
+            },
+          },
+          "id": "111-beef",
+          "type": Object {
+            "name": "Input",
+            "version": "1",
+          },
+          "v": "1.0",
+        },
+        Object {
+          "constraints": Array [],
+          "data": Object {
+            "configuration": Object {
+              "listen_address": Object {
+                "@type": "string",
+                "@value": "1.2.3.4",
+              },
+              "port": Object {
+                "@type": "integer",
+                "@value": "22",
+              },
+            },
+            "name": Object {
+              "@type": "string",
+              "@value": "BadInput",
+            },
+            "title": Object {
+              "@type": "string",
+              "@value": "A bad input",
+            },
+          },
+          "id": "121-beef",
+          "type": Object {
+            "name": "Input",
+            "version": "1",
+          },
+          "v": "1.0",
+        },
+      ],
+      "id": "dead-beef",
+      "name": "",
+      "parameters": Array [
+        Object {
+          "default_value": "test",
+          "description": "A parameter descriptions",
+          "name": "TITLE",
+          "title": "A parameter name",
+          "type": "string",
+        },
+      ],
+      "rev": 1,
+      "summary": "",
+      "url": "",
+      "v": 1,
+      "vendor": "",
+    }
+  }
+  onParameterApply={[Function]}
+  onParameterClear={[Function]}
+  readOnly={false}
+>
   <div>
-    <div
-      className="row "
+    <h2>
+      Entity list
+    </h2>
+    <br />
+    <SearchForm
+      buttonLeftMargin={5}
+      label={null}
+      loadingLabel="Loading..."
+      onQueryChange={[Function]}
+      onReset={[Function]}
+      onSearch={[Function]}
+      placeholder="Enter search query..."
+      query=""
+      queryHelpComponent={null}
+      queryWidth="auto"
+      resetButtonLabel="Reset"
+      searchBsStyle="default"
+      searchButtonLabel="Filter"
+      topMargin={15}
+      useLoadingState={false}
+      wrapperClass="search"
     >
       <div
-        className="col-md-12"
+        className="search"
+        style={
+          Object {
+            "marginTop": 15,
+          }
+        }
       >
-        <div
-          className="data-table table-responsive"
-          id="entity-list"
+        <form
+          className="form-inline"
+          onSubmit={[Function]}
         >
-          <table
-            className="table scrollable"
+          <div
+            className="form-group has-feedback"
           >
-            <thead>
-              <tr>
-                <th>
-                  Title
-                </th>
-                <th>
-                  Type
-                </th>
-                <th>
-                  Description
-                </th>
-                <th>
-                  Origin
-                </th>
-                <th>
-                  Used Parameters
-                </th>
-                <th>
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td
-                  className="bigColumns"
+            <input
+              autoComplete="off"
+              className="query form-control"
+              id="common-search-form-query-input"
+              onChange={[Function]}
+              placeholder="Enter search query..."
+              spellCheck="false"
+              style={
+                Object {
+                  "width": "auto",
+                }
+              }
+              type="text"
+              value=""
+            />
+          </div>
+          <div
+            className="form-group"
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+          >
+            <ForwardRef
+              bsStyle="default"
+              className="submit-button"
+              disabled={false}
+              type="submit"
+            >
+              <Button__StyledButton
+                bsStyle="default"
+                className="submit-button"
+                disabled={false}
+                type="submit"
+              >
+                <StyledComponent
+                  bsStyle="default"
+                  className="submit-button"
+                  disabled={false}
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "pSZqX",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  type="submit"
                 >
-                  test
-                </td>
-                <td>
-                  Input
-                </td>
-                <td
-                  className="bigColumns"
-                >
-                  
-                </td>
-                <td>
-                  <span>
-                    <i
-                      className="fa fa-archive contentPackEntity"
-                      title="Content Pack"
-                    />
-                  </span>
-                </td>
-                <td>
-                  1
-                </td>
-                <td>
-                  <div
-                    className="btn-toolbar"
-                    role="toolbar"
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                    disabled={false}
+                    type="submit"
                   >
                     <button
-                      className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
+                      className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                       disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                      type="submit"
                     >
-                      Edit
+                      Filter
                     </button>
-                    <button
-                      className="Button-c9cbmb-0 GLfOY btn btn-xs btn-info"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
-                    >
-                      Show
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  className="bigColumns"
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
+            </ForwardRef>
+          </div>
+          <div
+            className="form-group"
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+          >
+            <ForwardRef
+              bsStyle="default"
+              className="reset-button"
+              onClick={[Function]}
+              type="reset"
+            >
+              <Button__StyledButton
+                bsStyle="default"
+                className="reset-button"
+                onClick={[Function]}
+                type="reset"
+              >
+                <StyledComponent
+                  bsStyle="default"
+                  className="reset-button"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "pSZqX",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                  type="reset"
                 >
-                  A bad input
-                </td>
-                <td>
-                  Input
-                </td>
-                <td
-                  className="bigColumns"
-                >
-                  
-                </td>
-                <td>
-                  <span>
-                    <i
-                      className="fa fa-server"
-                      title="Server"
-                    />
-                  </span>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  <div
-                    className="btn-toolbar"
-                    role="toolbar"
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="reset"
                   >
                     <button
-                      className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
+                      className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                       disabled={false}
                       onClick={[Function]}
-                      type="button"
+                      type="reset"
                     >
-                      Edit
+                      Reset
                     </button>
-                    <button
-                      className="Button-c9cbmb-0 GLfOY btn btn-xs btn-info"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
+            </ForwardRef>
+          </div>
+        </form>
+      </div>
+    </SearchForm>
+    <DataTable
+      className="scrollable"
+      dataRowFormatter={[Function]}
+      displayKey="value"
+      filterBy=""
+      filterKeys={Array []}
+      filterLabel="Filter"
+      filterSuggestions={Array []}
+      headerCellFormatter={[Function]}
+      headers={
+        Array [
+          "Title",
+          "Type",
+          "Description",
+          "Origin",
+          "Used Parameters",
+          "Action",
+        ]
+      }
+      id="entity-list"
+      noDataText="No data available."
+      rowClassName=""
+      rows={
+        Array [
+          Object {
+            "constraints": Array [],
+            "data": Object {
+              "configuration": Object {
+                "listen_address": Object {
+                  "@type": "string",
+                  "@value": "1.2.3.4",
+                },
+                "port": Object {
+                  "@type": "integer",
+                  "@value": "23",
+                },
+              },
+              "title": Object {
+                "@type": "parameter",
+                "@value": "TITLE",
+              },
+            },
+            "id": "111-beef",
+            "type": Object {
+              "name": "Input",
+              "version": "1",
+            },
+            "v": "1.0",
+          },
+          Object {
+            "constraints": Array [],
+            "data": Object {
+              "configuration": Object {
+                "listen_address": Object {
+                  "@type": "string",
+                  "@value": "1.2.3.4",
+                },
+                "port": Object {
+                  "@type": "integer",
+                  "@value": "22",
+                },
+              },
+              "name": Object {
+                "@type": "string",
+                "@value": "BadInput",
+              },
+              "title": Object {
+                "@type": "string",
+                "@value": "A bad input",
+              },
+            },
+            "id": "121-beef",
+            "type": Object {
+              "name": "Input",
+              "version": "1",
+            },
+            "v": "1.0",
+          },
+        ]
+      }
+      sortBy={[Function]}
+      useResponsiveTable={true}
+    >
+      <div>
+        <div
+          className="row "
+        >
+          <div
+            className="col-md-12"
+          >
+            <div
+              className="data-table table-responsive"
+              id="entity-list"
+            >
+              <table
+                className="table scrollable"
+              >
+                <thead>
+                  <tr>
+                    <DataTableElement
+                      element="Title"
+                      formatter={[Function]}
+                      index={0}
+                      key="header-0"
                     >
-                      Show
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                      <th>
+                        Title
+                      </th>
+                    </DataTableElement>
+                    <DataTableElement
+                      element="Type"
+                      formatter={[Function]}
+                      index={1}
+                      key="header-1"
+                    >
+                      <th>
+                        Type
+                      </th>
+                    </DataTableElement>
+                    <DataTableElement
+                      element="Description"
+                      formatter={[Function]}
+                      index={2}
+                      key="header-2"
+                    >
+                      <th>
+                        Description
+                      </th>
+                    </DataTableElement>
+                    <DataTableElement
+                      element="Origin"
+                      formatter={[Function]}
+                      index={3}
+                      key="header-3"
+                    >
+                      <th>
+                        Origin
+                      </th>
+                    </DataTableElement>
+                    <DataTableElement
+                      element="Used Parameters"
+                      formatter={[Function]}
+                      index={4}
+                      key="header-4"
+                    >
+                      <th>
+                        Used Parameters
+                      </th>
+                    </DataTableElement>
+                    <DataTableElement
+                      element="Action"
+                      formatter={[Function]}
+                      index={5}
+                      key="header-5"
+                    >
+                      <th>
+                        Action
+                      </th>
+                    </DataTableElement>
+                  </tr>
+                </thead>
+                <tbody>
+                  <DataTableElement
+                    element={
+                      Object {
+                        "constraints": Array [],
+                        "data": Object {
+                          "configuration": Object {
+                            "listen_address": Object {
+                              "@type": "string",
+                              "@value": "1.2.3.4",
+                            },
+                            "port": Object {
+                              "@type": "integer",
+                              "@value": "23",
+                            },
+                          },
+                          "title": Object {
+                            "@type": "parameter",
+                            "@value": "TITLE",
+                          },
+                        },
+                        "id": "111-beef",
+                        "type": Object {
+                          "name": "Input",
+                          "version": "1",
+                        },
+                        "v": "1.0",
+                      }
+                    }
+                    formatter={[Function]}
+                    index={0}
+                    key="row-0"
+                  >
+                    <tr
+                      key="111-beef"
+                    >
+                      <td
+                        className="bigColumns"
+                      >
+                        test
+                      </td>
+                      <td>
+                        Input
+                      </td>
+                      <td
+                        className="bigColumns"
+                      />
+                      <td>
+                        <span>
+                          <ForwardRef
+                            className="contentPackEntity"
+                            fixedWidth={false}
+                            inverse={false}
+                            name="archive"
+                            pulse={false}
+                            spin={false}
+                            title="Content Pack"
+                          >
+                            <i
+                              className="fa fa-archive contentPackEntity"
+                              title="Content Pack"
+                            />
+                          </ForwardRef>
+                        </span>
+                      </td>
+                      <td>
+                        1
+                      </td>
+                      <td>
+                        <ButtonToolbar
+                          bsClass="btn-toolbar"
+                        >
+                          <div
+                            className="btn-toolbar"
+                            role="toolbar"
+                          >
+                            <ForwardRef
+                              bsSize="xs"
+                              bsStyle="primary"
+                              disabled={false}
+                              onClick={[Function]}
+                            >
+                              <Button__StyledButton
+                                bsSize="xs"
+                                bsStyle="primary"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xs"
+                                  bsStyle="primary"
+                                  disabled={false}
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "pSZqX",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xs"
+                                    bsStyle="primary"
+                                    className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Edit
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                            <ForwardRef
+                              bsSize="xs"
+                              bsStyle="info"
+                              onClick={[Function]}
+                            >
+                              <Button__StyledButton
+                                bsSize="xs"
+                                bsStyle="info"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xs"
+                                  bsStyle="info"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "pSZqX",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xs"
+                                    bsStyle="info"
+                                    className="Button__StyledButton-c9cbmb-0 pSZqX"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-xs btn-info"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Show
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                          </div>
+                        </ButtonToolbar>
+                      </td>
+                      <BootstrapModalWrapper
+                        backdrop="static"
+                        bsSize="large"
+                        onClose={[Function]}
+                        onHide={[Function]}
+                        onOpen={[Function]}
+                        showModal={false}
+                      >
+                        <Modal
+                          backdrop="static"
+                          bsSize="large"
+                          onHide={[Function]}
+                          show={false}
+                        >
+                          <StyledComponent
+                            backdrop="static"
+                            bsSize="large"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "BACKDROP_TRANSITION_DURATION": 150,
+                                "Body": [Function],
+                                "Dialog": [Function],
+                                "Footer": [Function],
+                                "Header": [Function],
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                ],
+                                "TRANSITION_DURATION": 300,
+                                "Title": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "Modal-nuree8-0",
+                                  "isStatic": false,
+                                  "lastClassName": "DnwXA",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "Modal",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "Modal-nuree8-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            onHide={[Function]}
+                            show={false}
+                          >
+                            <Modal
+                              animation={true}
+                              autoFocus={true}
+                              backdrop="static"
+                              bsClass="modal"
+                              bsSize="large"
+                              className="Modal-nuree8-0 DnwXA"
+                              dialogComponentClass={[Function]}
+                              enforceFocus={true}
+                              keyboard={true}
+                              manager={
+                                ModalManager {
+                                  "add": [Function],
+                                  "containers": Array [],
+                                  "data": Array [],
+                                  "handleContainerOverflow": true,
+                                  "hideSiblingNodes": true,
+                                  "isTopModal": [Function],
+                                  "modals": Array [],
+                                  "remove": [Function],
+                                }
+                              }
+                              onHide={[Function]}
+                              renderBackdrop={[Function]}
+                              restoreFocus={true}
+                              show={false}
+                            >
+                              <Modal
+                                autoFocus={true}
+                                backdrop="static"
+                                backdropClassName="modal-backdrop"
+                                backdropTransition={[Function]}
+                                containerClassName="modal-open"
+                                enforceFocus={true}
+                                keyboard={true}
+                                manager={
+                                  ModalManager {
+                                    "add": [Function],
+                                    "containers": Array [],
+                                    "data": Array [],
+                                    "handleContainerOverflow": true,
+                                    "hideSiblingNodes": true,
+                                    "isTopModal": [Function],
+                                    "modals": Array [],
+                                    "remove": [Function],
+                                  }
+                                }
+                                onEntering={[Function]}
+                                onExited={[Function]}
+                                onHide={[Function]}
+                                onMouseUp={[Function]}
+                                renderBackdrop={[Function]}
+                                restoreFocus={true}
+                                show={false}
+                                transition={[Function]}
+                              />
+                            </Modal>
+                          </StyledComponent>
+                        </Modal>
+                      </BootstrapModalWrapper>
+                      <BootstrapModalWrapper
+                        backdrop="static"
+                        bsSize="large"
+                        onClose={[Function]}
+                        onHide={[Function]}
+                        onOpen={[Function]}
+                        showModal={false}
+                      >
+                        <Modal
+                          backdrop="static"
+                          bsSize="large"
+                          onHide={[Function]}
+                          show={false}
+                        >
+                          <StyledComponent
+                            backdrop="static"
+                            bsSize="large"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "BACKDROP_TRANSITION_DURATION": 150,
+                                "Body": [Function],
+                                "Dialog": [Function],
+                                "Footer": [Function],
+                                "Header": [Function],
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                ],
+                                "TRANSITION_DURATION": 300,
+                                "Title": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "Modal-nuree8-0",
+                                  "isStatic": false,
+                                  "lastClassName": "DnwXA",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "Modal",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "Modal-nuree8-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            onHide={[Function]}
+                            show={false}
+                          >
+                            <Modal
+                              animation={true}
+                              autoFocus={true}
+                              backdrop="static"
+                              bsClass="modal"
+                              bsSize="large"
+                              className="Modal-nuree8-0 DnwXA"
+                              dialogComponentClass={[Function]}
+                              enforceFocus={true}
+                              keyboard={true}
+                              manager={
+                                ModalManager {
+                                  "add": [Function],
+                                  "containers": Array [],
+                                  "data": Array [],
+                                  "handleContainerOverflow": true,
+                                  "hideSiblingNodes": true,
+                                  "isTopModal": [Function],
+                                  "modals": Array [],
+                                  "remove": [Function],
+                                }
+                              }
+                              onHide={[Function]}
+                              renderBackdrop={[Function]}
+                              restoreFocus={true}
+                              show={false}
+                            >
+                              <Modal
+                                autoFocus={true}
+                                backdrop="static"
+                                backdropClassName="modal-backdrop"
+                                backdropTransition={[Function]}
+                                containerClassName="modal-open"
+                                enforceFocus={true}
+                                keyboard={true}
+                                manager={
+                                  ModalManager {
+                                    "add": [Function],
+                                    "containers": Array [],
+                                    "data": Array [],
+                                    "handleContainerOverflow": true,
+                                    "hideSiblingNodes": true,
+                                    "isTopModal": [Function],
+                                    "modals": Array [],
+                                    "remove": [Function],
+                                  }
+                                }
+                                onEntering={[Function]}
+                                onExited={[Function]}
+                                onHide={[Function]}
+                                onMouseUp={[Function]}
+                                renderBackdrop={[Function]}
+                                restoreFocus={true}
+                                show={false}
+                                transition={[Function]}
+                              />
+                            </Modal>
+                          </StyledComponent>
+                        </Modal>
+                      </BootstrapModalWrapper>
+                    </tr>
+                  </DataTableElement>
+                  <DataTableElement
+                    element={
+                      Object {
+                        "constraints": Array [],
+                        "data": Object {
+                          "configuration": Object {
+                            "listen_address": Object {
+                              "@type": "string",
+                              "@value": "1.2.3.4",
+                            },
+                            "port": Object {
+                              "@type": "integer",
+                              "@value": "22",
+                            },
+                          },
+                          "name": Object {
+                            "@type": "string",
+                            "@value": "BadInput",
+                          },
+                          "title": Object {
+                            "@type": "string",
+                            "@value": "A bad input",
+                          },
+                        },
+                        "id": "121-beef",
+                        "type": Object {
+                          "name": "Input",
+                          "version": "1",
+                        },
+                        "v": "1.0",
+                      }
+                    }
+                    formatter={[Function]}
+                    index={1}
+                    key="row-1"
+                  >
+                    <tr
+                      key="121-beef"
+                    >
+                      <td
+                        className="bigColumns"
+                      >
+                        A bad input
+                      </td>
+                      <td>
+                        Input
+                      </td>
+                      <td
+                        className="bigColumns"
+                      />
+                      <td>
+                        <span>
+                          <ForwardRef
+                            fixedWidth={false}
+                            inverse={false}
+                            name="server"
+                            pulse={false}
+                            spin={false}
+                            title="Server"
+                          >
+                            <i
+                              className="fa fa-server"
+                              title="Server"
+                            />
+                          </ForwardRef>
+                        </span>
+                      </td>
+                      <td>
+                        0
+                      </td>
+                      <td>
+                        <ButtonToolbar
+                          bsClass="btn-toolbar"
+                        >
+                          <div
+                            className="btn-toolbar"
+                            role="toolbar"
+                          >
+                            <ForwardRef
+                              bsSize="xs"
+                              bsStyle="primary"
+                              disabled={false}
+                              onClick={[Function]}
+                            >
+                              <Button__StyledButton
+                                bsSize="xs"
+                                bsStyle="primary"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xs"
+                                  bsStyle="primary"
+                                  disabled={false}
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "pSZqX",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xs"
+                                    bsStyle="primary"
+                                    className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Edit
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                            <ForwardRef
+                              bsSize="xs"
+                              bsStyle="info"
+                              onClick={[Function]}
+                            >
+                              <Button__StyledButton
+                                bsSize="xs"
+                                bsStyle="info"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xs"
+                                  bsStyle="info"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "pSZqX",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xs"
+                                    bsStyle="info"
+                                    className="Button__StyledButton-c9cbmb-0 pSZqX"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-xs btn-info"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Show
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                          </div>
+                        </ButtonToolbar>
+                      </td>
+                      <BootstrapModalWrapper
+                        backdrop="static"
+                        bsSize="large"
+                        onClose={[Function]}
+                        onHide={[Function]}
+                        onOpen={[Function]}
+                        showModal={false}
+                      >
+                        <Modal
+                          backdrop="static"
+                          bsSize="large"
+                          onHide={[Function]}
+                          show={false}
+                        >
+                          <StyledComponent
+                            backdrop="static"
+                            bsSize="large"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "BACKDROP_TRANSITION_DURATION": 150,
+                                "Body": [Function],
+                                "Dialog": [Function],
+                                "Footer": [Function],
+                                "Header": [Function],
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                ],
+                                "TRANSITION_DURATION": 300,
+                                "Title": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "Modal-nuree8-0",
+                                  "isStatic": false,
+                                  "lastClassName": "DnwXA",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "Modal",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "Modal-nuree8-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            onHide={[Function]}
+                            show={false}
+                          >
+                            <Modal
+                              animation={true}
+                              autoFocus={true}
+                              backdrop="static"
+                              bsClass="modal"
+                              bsSize="large"
+                              className="Modal-nuree8-0 DnwXA"
+                              dialogComponentClass={[Function]}
+                              enforceFocus={true}
+                              keyboard={true}
+                              manager={
+                                ModalManager {
+                                  "add": [Function],
+                                  "containers": Array [],
+                                  "data": Array [],
+                                  "handleContainerOverflow": true,
+                                  "hideSiblingNodes": true,
+                                  "isTopModal": [Function],
+                                  "modals": Array [],
+                                  "remove": [Function],
+                                }
+                              }
+                              onHide={[Function]}
+                              renderBackdrop={[Function]}
+                              restoreFocus={true}
+                              show={false}
+                            >
+                              <Modal
+                                autoFocus={true}
+                                backdrop="static"
+                                backdropClassName="modal-backdrop"
+                                backdropTransition={[Function]}
+                                containerClassName="modal-open"
+                                enforceFocus={true}
+                                keyboard={true}
+                                manager={
+                                  ModalManager {
+                                    "add": [Function],
+                                    "containers": Array [],
+                                    "data": Array [],
+                                    "handleContainerOverflow": true,
+                                    "hideSiblingNodes": true,
+                                    "isTopModal": [Function],
+                                    "modals": Array [],
+                                    "remove": [Function],
+                                  }
+                                }
+                                onEntering={[Function]}
+                                onExited={[Function]}
+                                onHide={[Function]}
+                                onMouseUp={[Function]}
+                                renderBackdrop={[Function]}
+                                restoreFocus={true}
+                                show={false}
+                                transition={[Function]}
+                              />
+                            </Modal>
+                          </StyledComponent>
+                        </Modal>
+                      </BootstrapModalWrapper>
+                      <BootstrapModalWrapper
+                        backdrop="static"
+                        bsSize="large"
+                        onClose={[Function]}
+                        onHide={[Function]}
+                        onOpen={[Function]}
+                        showModal={false}
+                      >
+                        <Modal
+                          backdrop="static"
+                          bsSize="large"
+                          onHide={[Function]}
+                          show={false}
+                        >
+                          <StyledComponent
+                            backdrop="static"
+                            bsSize="large"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "BACKDROP_TRANSITION_DURATION": 150,
+                                "Body": [Function],
+                                "Dialog": [Function],
+                                "Footer": [Function],
+                                "Header": [Function],
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                ],
+                                "TRANSITION_DURATION": 300,
+                                "Title": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "Modal-nuree8-0",
+                                  "isStatic": false,
+                                  "lastClassName": "DnwXA",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "Modal",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "Modal-nuree8-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            onHide={[Function]}
+                            show={false}
+                          >
+                            <Modal
+                              animation={true}
+                              autoFocus={true}
+                              backdrop="static"
+                              bsClass="modal"
+                              bsSize="large"
+                              className="Modal-nuree8-0 DnwXA"
+                              dialogComponentClass={[Function]}
+                              enforceFocus={true}
+                              keyboard={true}
+                              manager={
+                                ModalManager {
+                                  "add": [Function],
+                                  "containers": Array [],
+                                  "data": Array [],
+                                  "handleContainerOverflow": true,
+                                  "hideSiblingNodes": true,
+                                  "isTopModal": [Function],
+                                  "modals": Array [],
+                                  "remove": [Function],
+                                }
+                              }
+                              onHide={[Function]}
+                              renderBackdrop={[Function]}
+                              restoreFocus={true}
+                              show={false}
+                            >
+                              <Modal
+                                autoFocus={true}
+                                backdrop="static"
+                                backdropClassName="modal-backdrop"
+                                backdropTransition={[Function]}
+                                containerClassName="modal-open"
+                                enforceFocus={true}
+                                keyboard={true}
+                                manager={
+                                  ModalManager {
+                                    "add": [Function],
+                                    "containers": Array [],
+                                    "data": Array [],
+                                    "handleContainerOverflow": true,
+                                    "hideSiblingNodes": true,
+                                    "isTopModal": [Function],
+                                    "modals": Array [],
+                                    "remove": [Function],
+                                  }
+                                }
+                                onEntering={[Function]}
+                                onExited={[Function]}
+                                onHide={[Function]}
+                                onMouseUp={[Function]}
+                                renderBackdrop={[Function]}
+                                restoreFocus={true}
+                                show={false}
+                                transition={[Function]}
+                              />
+                            </Modal>
+                          </StyledComponent>
+                        </Modal>
+                      </BootstrapModalWrapper>
+                    </tr>
+                  </DataTableElement>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </DataTable>
   </div>
-</div>
+</ContentPackEntitiesList>
 `;

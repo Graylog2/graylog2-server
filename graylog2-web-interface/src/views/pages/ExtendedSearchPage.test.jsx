@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
@@ -15,7 +15,6 @@ import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
@@ -23,7 +22,9 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
+jest.mock('react-router', () => ({ withRouter: x => x }));
 jest.mock('components/layout/Footer', () => <div />);
+jest.mock('util/History', () => ({ push: jest.fn() }));
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
     ['listen', () => jest.fn()],
@@ -64,6 +65,15 @@ jest.mock('views/stores/FieldTypesStore', () => ({
     })],
   ),
 }));
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: {
+    listen: () => jest.fn(),
+    getInitialState: () => ({
+      searchesClusterConfig: {},
+    }),
+  },
+  SearchConfigActions: {},
+}));
 jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
@@ -72,7 +82,6 @@ jest.mock('views/components/common/WindowLeaveMessage', () => mockComponent('Win
 jest.mock('views/components/WithSearchStatus', () => x => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
-jest.mock('views/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
 jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
 jest.mock('views/logic/withPluginEntities', () => x => x);
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
@@ -105,15 +114,13 @@ describe('ExtendedSearchPage', () => {
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     // $FlowFixMe: Somehow flow does not see the `listen` property.
     SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
-    CurrentViewTypeProvider.mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
+    asMock(CurrentViewTypeProvider).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 
   const SimpleExtendedSearchPage = props => (
     <ExtendedSearchPage route={{}}
-                        executionState={SearchExecutionState.empty()}
-                        headerElements={[]}
+                        location={{ query: {} }}
                         searchRefreshHooks={[]}
-                        queryBarElements={[]}
                         {...props} />
   );
 
@@ -176,6 +183,11 @@ describe('ExtendedSearchPage', () => {
   });
   it('registers to ViewActions.search.completed upon mount', () => {
     mount(<SimpleExtendedSearchPage />);
+
+    expect(ViewActions.search.completed.listen).toHaveBeenCalled();
+  });
+  it('registers to ViewActions.search.completed even if search refresh condition fails', () => {
+    mount(<SimpleExtendedSearchPage searchRefreshHools={[() => false]} />);
 
     expect(ViewActions.search.completed.listen).toHaveBeenCalled();
   });

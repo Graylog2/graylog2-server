@@ -2,7 +2,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import { ColorPickerPopover, Icon } from 'components/common';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';

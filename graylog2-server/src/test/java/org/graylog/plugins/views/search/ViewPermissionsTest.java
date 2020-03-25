@@ -108,7 +108,7 @@ public class ViewPermissionsTest {
 
         mockSomeViewsIncluding(permittedView);
 
-        boolean result = sut.isSearchPermitted("some-id", mock(User.class), id -> id.equals(permittedView.id()));
+        boolean result = sut.isSearchPermitted("some-id", mock(User.class), view -> view.id().equals(permittedView.id()));
 
         assertThat(result).isTrue();
     }

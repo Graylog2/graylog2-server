@@ -59,7 +59,7 @@ public abstract class PivotDTO {
         public abstract PivotDTO build();
 
         @JsonCreator
-        static Builder builder() {
+        public static Builder builder() {
             return new AutoValue_PivotDTO.Builder();
         }
     }

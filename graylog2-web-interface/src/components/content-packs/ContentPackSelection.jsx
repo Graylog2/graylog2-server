@@ -251,7 +251,7 @@ class ContentPackSelection extends React.Component {
                        value={this.state.contentPack.vendor}
                        onChange={this._bindValue}
                        label="Vendor"
-                       help={errors.vendor ? errors.vendor : 'Required. Who did this content pack and how can he be reached. e.g Name and eMail'}
+                       help={errors.vendor ? errors.vendor : 'Required. Who did this content pack and how can they be reached, e.g. Name and email.'}
                        required />
                 <Input name="url"
                        id="url"

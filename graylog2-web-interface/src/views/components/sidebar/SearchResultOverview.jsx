@@ -14,9 +14,7 @@ const SearchResultOverview = ({ results }) => {
   const { timestamp } = results;
   return (
     <span>
-      Found <strong>{numeral(results.documentCount).format('0,0')} messages</strong> in {numeral(results.duration).format('0,0')}ms.
-      <br />
-      Query executed at <UserTimestamp dateTime={timestamp} format={DateTime.Formats.DATETIME} />.
+      Query executed in {numeral(results.duration).format('0,0')}ms at <UserTimestamp dateTime={timestamp} format={DateTime.Formats.DATETIME} />.
     </span>
   );
 };

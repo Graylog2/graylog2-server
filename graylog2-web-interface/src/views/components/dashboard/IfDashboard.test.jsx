@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import View from 'views/logic/views/View';
@@ -9,7 +9,7 @@ import IfDashboard from './IfDashboard';
 
 describe('IfDashboard', () => {
   it('should render children with dashboard context', () => {
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <span>I must not fear.</span>
         <IfDashboard>
@@ -21,7 +21,7 @@ describe('IfDashboard', () => {
   });
 
   it('should not render children without dashboard context', () => {
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <span>I must not fear.</span>
         <IfDashboard>
@@ -35,7 +35,7 @@ describe('IfDashboard', () => {
 
 
   it('should not render children without context', () => {
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <div>
         <span>I must not fear.</span>
         <IfDashboard>

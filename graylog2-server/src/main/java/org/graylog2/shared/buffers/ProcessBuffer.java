@@ -21,11 +21,13 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.plugin.GlobalMetricNames;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.journal.RawMessage;
@@ -49,6 +51,7 @@ public class ProcessBuffer extends Buffer {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
     private final Meter incomingMessages;
+    private final ProcessBufferProcessor[] processors;
 
     @Inject
     public ProcessBuffer(MetricRegistry metricRegistry,
@@ -83,7 +86,7 @@ public class ProcessBuffer extends Buffer {
         LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>.",
                 ringBufferSize, waitStrategy.getClass().getSimpleName());
 
-        final ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processorCount];
+        processors = new ProcessBufferProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
             processors[i] = bufferProcessorFactory.create(decodingProcessorFactory.create(decodeTime, parseTime));
         }
@@ -111,5 +114,14 @@ public class ProcessBuffer extends Buffer {
     @Override
     protected void afterInsert(int n) {
         incomingMessages.mark(n);
+    }
+
+    public ImmutableMap<String,String> getDump() {
+        final ImmutableMap.Builder<String, String> processBufferDump = ImmutableMap.builder();
+        for (int i = 0, processorsLength = processors.length; i < processorsLength; i++) {
+            final ProcessBufferProcessor proc = processors[i];
+            processBufferDump.put("ProcessBufferProcessor #" + i, proc.getCurrentMessage().map(Message::toString).orElse("idle"));
+        }
+        return processBufferDump.build();
     }
 }

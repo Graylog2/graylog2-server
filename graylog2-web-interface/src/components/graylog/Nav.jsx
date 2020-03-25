@@ -2,40 +2,34 @@
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import teinte from 'theme/teinte';
-import { colorLevel } from 'theme/util';
 import navTabsStyles from './styles/nav-tabs';
 
-const Nav = styled(BootstrapNav)(() => {
-  const borderColor = colorLevel(teinte.tertiary.due, -3);
-
-  return css`
-    &.nav {
-      > li {
-        > a {
-          &:hover,
-          &:focus {
-            background-color: ${colorLevel(teinte.secondary.due, -3)};
-          }
-        }
-
-        &.disabled > a {
-          color: ${teinte.secondary.tre};
-
-          &:hover,
-          &:focus {
-            color: ${teinte.secondary.tre};
-          }
+const Nav = styled(BootstrapNav)(({ theme }) => css`
+  &.nav {
+    > li {
+      > a {
+        &:hover,
+        &:focus {
+          background-color: ${theme.color.gray[90]};
         }
       }
 
-      .open > a {
-        &,
+      &.disabled > a {
+        color: ${theme.color.gray[60]};
+
         &:hover,
         &:focus {
-          background-color: ${colorLevel(teinte.secondary.due, -3)};
-          border-color: ${borderColor};
+          color: ${theme.color.gray[60]};
         }
+      }
+    }
+
+    .open > a {
+      &,
+      &:hover,
+      &:focus {
+        background-color: ${theme.color.gray[90]};
+        border-color: ${theme.color.variant.primary};
       }
     }
 
@@ -45,15 +39,16 @@ const Nav = styled(BootstrapNav)(() => {
           &,
           &:hover,
           &:focus {
-            color: ${teinte.primary.due};
-            background-color: ${borderColor};
+            color: ${theme.color.global.textAlt};
+            background-color: ${theme.color.variant.primary};
           }
         }
       }
     }
 
-    &${navTabsStyles()}
-  `;
-});
+    ${navTabsStyles};
+  }
+`);
 
+/** @component */
 export default Nav;

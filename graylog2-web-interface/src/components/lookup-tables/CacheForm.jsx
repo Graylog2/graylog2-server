@@ -16,6 +16,8 @@ const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 class CacheForm extends React.Component {
   validationCheckTimer = undefined;
 
+  _input = undefined;
+
   static propTypes = {
     type: PropTypes.string.isRequired,
     saved: PropTypes.func.isRequired,
@@ -46,6 +48,7 @@ class CacheForm extends React.Component {
   }
 
   componentDidMount() {
+    this._input.getInputDOMNode().focus();
     const { create, cache } = this.props;
 
     if (!create) {
@@ -54,18 +57,25 @@ class CacheForm extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
+    const { type: currentType } = this.props;
+    if (prevProps.type !== currentType) {
+      this._input.getInputDOMNode().focus();
+    }
     const { cache } = this.props;
-
-    if (_.isEqual(cache, nextProps.cache)) {
+    if (_.isEqual(cache, prevProps.cache)) {
       // props haven't change, don't update our state from them
       return;
     }
-    this.setState(this._initialState(nextProps.cache));
+    this.updateState(cache);
   }
 
   componentWillUnmount() {
     this._clearTimer();
+  }
+
+  updateState = (cache) => {
+    this.setState(this._initialState(cache));
   }
 
   _initialState = (c) => {
@@ -245,6 +255,7 @@ class CacheForm extends React.Component {
                        onChange={this._onChange}
                        help="A short title for this cache."
                        value={cache.title}
+                       ref={(ref) => { this._input = ref; }}
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9" />
 

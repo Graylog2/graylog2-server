@@ -1,10 +1,63 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Alert, Col, Row, Button } from 'components/graylog';
 import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import { IfPermitted, Spinner, Icon } from 'components/common';
+
+const NodeRow = styled.div`
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  margin-top: 0;
+
+  .hostname {
+    font-size: 12px;
+  }
+
+  .well {
+    margin-bottom: 0;
+    margin-top: 3px;
+    font-family: monospace;
+    font-size: 11px;
+  }
+
+  .xtrc-converters {
+    margin-top: 10px;
+  }
+
+  .xtrc-config li {
+    margin-left: 10px;
+  }
+
+  .xtrc-converters li {
+    margin-left: 10px;
+  }
+
+  .xtrc-converter-config li {
+    margin-left: 20px;
+  }
+
+  .dropdown-menu a.selected {
+    font-weight: bold;
+  }
+`;
+
+const NodeRowInfo = styled.div`
+  position: relative;
+  top: 2px;
+
+  form {
+    display: inline;
+  }
+
+  .text {
+    position: relative;
+    top: 3px;
+  }
+`;
 
 class Output extends React.Component {
   static propTypes = {
@@ -81,7 +134,7 @@ class Output extends React.Component {
     }
 
     return (
-      <div key={output.id} className="row content node-row">
+      <NodeRow key={output.id} className="row content">
         <Col md={12}>
           <Row className="row-sm">
             <Col md={6}>
@@ -92,7 +145,7 @@ class Output extends React.Component {
               Type: {output.type}
             </Col>
             <Col md={6}>
-              <div className="text-right node-row-info">
+              <NodeRowInfo className="text-right">
                 <IfPermitted permissions="outputs:edit">
                   <EditOutputButton disabled={this._typeNotAvailable()}
                                     output={output}
@@ -106,7 +159,7 @@ class Output extends React.Component {
                     Delete globally
                   </Button>
                 </IfPermitted>
-              </div>
+              </NodeRowInfo>
             </Col>
           </Row>
           <Row>
@@ -116,7 +169,7 @@ class Output extends React.Component {
             </Col>
           </Row>
         </Col>
-      </div>
+      </NodeRow>
     );
   }
 }

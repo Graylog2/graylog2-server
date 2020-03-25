@@ -11,7 +11,6 @@ const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotific
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
-const DashboardsPage = loadAsync(() => import('./DashboardsPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
@@ -36,7 +35,6 @@ const IndexSetPage = loadAsync(() => import('./IndexSetPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
-const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" */ 'pages/LoggedInPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
@@ -54,7 +52,6 @@ const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
 const ShowAlertPage = loadAsync(() => import('./ShowAlertPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
-const ShowDashboardPage = loadAsync(() => import('./ShowDashboardPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
 const ShowMetricsPage = loadAsync(() => import('./ShowMetricsPage'));
 const ShowNodePage = loadAsync(() => import('./ShowNodePage'));
@@ -67,16 +64,15 @@ const SidecarNewConfigurationPage = loadAsync(() => import('pages/SidecarNewConf
 const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
-const SourcesPage = loadAsync(() => import('./SourcesPage'));
 const StartPage = loadAsync(() => import('./StartPage'));
 const StreamAlertsOverviewPage = loadAsync(() => import('pages/StreamAlertsOverviewPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
 const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
-const StreamSearchPage = loadAsync(() => import('./StreamSearchPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
 const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
+const ProcessBufferDumpPage = loadAsync(() => import('./ProcessBufferDumpPage'));
 const UsersPage = loadAsync(() => import('./UsersPage'));
 
 export {
@@ -91,7 +87,6 @@ export {
   CreateContentPackPage,
   CreateExtractorsPage,
   CreateUsersPage,
-  DashboardsPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
@@ -116,7 +111,6 @@ export {
   IndicesPage,
   InputsPage,
   LoadingPage,
-  LoggedInPage,
   LoggersPage,
   LoginPage,
   LUTCachesPage,
@@ -129,12 +123,12 @@ export {
   NotFoundPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
+  ProcessBufferDumpPage,
   RolesPage,
   RuleDetailsPage,
   RulesPage,
   ShowAlertPage,
   ShowContentPackPage,
-  ShowDashboardPage,
   ShowMessagePage,
   ShowMetricsPage,
   ShowNodePage,
@@ -147,12 +141,10 @@ export {
   SidecarsPage,
   SidecarStatusPage,
   SimulatorPage,
-  SourcesPage,
   StartPage,
   StreamAlertsOverviewPage,
   StreamEditPage,
   StreamOutputsPage,
-  StreamSearchPage,
   StreamsPage,
   SystemOutputsPage,
   SystemOverviewPage,

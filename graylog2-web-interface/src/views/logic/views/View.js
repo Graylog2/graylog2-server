@@ -5,6 +5,8 @@ import ObjectID from 'bson-objectid';
 import ViewState from './ViewState';
 import Search from '../search/Search';
 import type { QueryId } from '../queries/Query';
+import type { WidgetMapping } from './types';
+import type { ViewStateJson } from './ViewState';
 
 export type Properties = Immutable.List<any>;
 
@@ -15,7 +17,9 @@ export type PluginMetadata = {
 export type Requirements = { [string]: PluginMetadata };
 export type ViewStateMap = Immutable.Map<QueryId, ViewState>;
 
-export type ViewType = 'SEARCH' | 'DASHBOARD';
+export type SearchType = 'SEARCH';
+export type DashboardType = 'DASHBOARD';
+export type ViewType = SearchType | DashboardType;
 
 type InternalState = {
   id: string,
@@ -31,7 +35,6 @@ type InternalState = {
   requires: Requirements,
 };
 
-export type WidgetMapping = Immutable.Map<string, string>;
 export type ViewJson = {
   id: string,
   type: ViewType,
@@ -40,14 +43,14 @@ export type ViewJson = {
   description: string,
   search_id: string,
   properties: Properties,
-  state: { [QueryId]: ViewState },
+  state: { [QueryId]: ViewStateJson },
   created_at: Date,
   owner: string,
   requires: Requirements,
 };
 
 export default class View {
-  static Type: { [string]: ViewType } = {
+  static Type: { Search: SearchType, Dashboard: DashboardType } = {
     Search: 'SEARCH',
     Dashboard: 'DASHBOARD',
   };
@@ -130,7 +133,7 @@ export default class View {
   }
 
   get requires(): Requirements {
-    return this._value.requires;
+    return this._value.requires || {};
   }
 
   // eslint-disable-next-line no-use-before-define
@@ -195,10 +198,11 @@ export default class View {
   }
 }
 
+type InternalBuilderState = Immutable.Map<string, any>
 class Builder {
-  value: Immutable.Map<string, any>;
+  value: InternalBuilderState;
 
-  constructor(value: Immutable.Map = Immutable.Map()) {
+  constructor(value: InternalBuilderState = Immutable.Map()) {
     this.value = value;
   }
 
@@ -238,8 +242,8 @@ class Builder {
     return new Builder(this.value.set('properties', value));
   }
 
-  state(value: ViewStateMap): Builder {
-    return new Builder(this.value.set('state', Immutable.fromJS(value)));
+  state(value: (ViewStateMap | { [QueryId]: ViewState })): Builder {
+    return new Builder(this.value.set('state', Immutable.Map(value)));
   }
 
   createdAt(value: Date): Builder {

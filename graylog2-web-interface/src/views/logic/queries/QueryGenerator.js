@@ -1,13 +1,15 @@
 // @flow strict
 import uuid from 'uuid/v4';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
-import Query from './Query';
+import Query, { createElasticsearchQueryString, filtersForQuery } from './Query';
 import type { QueryId } from './Query';
 
-export default (id: QueryId = uuid()): Query => {
-  return Query.builder()
+export default (streamId: ?string, id: QueryId = uuid()): Query => {
+  const streamIds = streamId ? [streamId] : null;
+  const streamFilter = filtersForQuery(streamIds);
+  const builder = Query.builder()
     .id(id)
-    .query({ type: 'elasticsearch', query_string: '' })
-    .timerange(DEFAULT_TIMERANGE)
-    .build();
+    .query(createElasticsearchQueryString())
+    .timerange(DEFAULT_TIMERANGE);
+  return streamFilter ? builder.filter(streamFilter).build() : builder.build();
 };

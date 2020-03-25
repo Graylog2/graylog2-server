@@ -5,15 +5,16 @@ import Widget from 'views/logic/widgets/Widget';
 
 import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
+import type { WidgetMapping } from '../views/types';
 
 const filterForWidget = widget => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 
 export type ResultType = {
   searchTypes: Immutable.Set<Immutable.Map<string, any>>,
-  widgetMapping: Immutable.Map<string, Immutable.Set<string>>,
+  widgetMapping: WidgetMapping,
 };
 
-export default (widgets: Array<Widget>): ResultType => {
+export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType => {
   let widgetMapping = Immutable.Map();
   const searchTypes = widgets
     .map(widget => widgetDefinition(widget.type)
@@ -34,19 +35,10 @@ export default (widgets: Array<Widget>): ResultType => {
         console.warn(`Unable to find type definition or defaults for search type ${searchType.type} - skipping!`);
       }
       const { defaults = {} } = typeDefinition || {};
-      const { config, filter, timerange, query, streams } = searchType;
-      const filterMap = filter ? { filter } : {};
-      const timerangeMap = timerange ? { timerange } : {};
-      const queryMap = query ? { query } : {};
-      const streamsMap = streams ? { streams } : {};
-      const nameMap = searchType.name ? { name: searchType.name } : {};
-      return new Immutable.Map(defaults)
+      const { config, widgetId, ...rest } = searchType;
+      return Immutable.Map(defaults)
+        .merge(rest)
         .merge(config)
-        .merge(filterMap)
-        .merge(timerangeMap)
-        .merge(queryMap)
-        .merge(streamsMap)
-        .merge(nameMap)
         .merge(
           {
             id: searchType.id,

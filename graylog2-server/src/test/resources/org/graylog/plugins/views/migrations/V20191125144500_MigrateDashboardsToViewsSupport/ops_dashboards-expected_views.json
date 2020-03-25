@@ -1,0 +1,2846 @@
+[ {
+  "id" : "5ddf8ed6b2d44b2e044729a2",
+  "type" : "DASHBOARD",
+  "title" : "Ops - Bots",
+  "summary" : "This dashboard was migrated automatically.",
+  "description" : "This dashboard helps to detect and investigate bot traffic. Detailed breakdowns by bot type, country, request URIs and user agents are also provided.",
+  "search_id" : "5de0e98900002a0017000002",
+  "state" : {
+    "0000016e-b690-42a3-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-4296-0000-016eb690426f" : "Top Bot Countries",
+          "0000016e-b690-4294-0000-016eb690426f" : "Bot Traffic Over Time",
+          "0000016e-b690-4299-0000-016eb690426f" : "Top Bot User Agents",
+          "0000016e-b690-4295-0000-016eb690426f" : "Total Bot Requests",
+          "0000016e-b690-4298-0000-016eb690426f" : "Bad Bot Requests",
+          "0000016e-b690-4297-0000-016eb690426f" : "Top Bots by Country",
+          "0000016e-b690-4292-0000-016eb690426f" : "Top Bot Cities",
+          "0000016e-b690-4293-0000-016eb690426f" : "Top Bot URIs"
+        },
+        "tab" : {
+          "title" : "Ops - Bots"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-4292-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Bot:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeoCityCode",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4293-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Bot:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestURI",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4294-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "BadBot:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : 1.0
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : "Messages"
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "bar",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4295-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Bot:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4296-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Bot:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeoCountry",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4297-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Bot:false"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeolocation",
+            "type" : "values",
+            "config" : {
+              "limit" : 15
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "map",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4298-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "BadBot:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(BadBot)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4299-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Bot:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestUserAgent",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-4296-0000-016eb690426f" : [ "0000016e-b690-429f-0000-016eb690426f" ],
+        "0000016e-b690-4294-0000-016eb690426f" : [ "0000016e-b690-429c-0000-016eb690426f" ],
+        "0000016e-b690-4299-0000-016eb690426f" : [ "0000016e-b690-42a2-0000-016eb690426f" ],
+        "0000016e-b690-4298-0000-016eb690426f" : [ "0000016e-b690-42a1-0000-016eb690426f" ],
+        "0000016e-b690-4295-0000-016eb690426f" : [ "0000016e-b690-429d-0000-016eb690426f", "0000016e-b690-429e-0000-016eb690426f" ],
+        "0000016e-b690-4297-0000-016eb690426f" : [ "0000016e-b690-42a0-0000-016eb690426f" ],
+        "0000016e-b690-4292-0000-016eb690426f" : [ "0000016e-b690-429a-0000-016eb690426f" ],
+        "0000016e-b690-4293-0000-016eb690426f" : [ "0000016e-b690-429b-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-4296-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 5,
+          "height" : 3,
+          "width" : 2
+        },
+        "0000016e-b690-4294-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 3,
+          "height" : 2,
+          "width" : 8
+        },
+        "0000016e-b690-4299-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 9,
+          "height" : 4,
+          "width" : 8
+        },
+        "0000016e-b690-4298-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 1,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4295-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4297-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 5,
+          "height" : 3,
+          "width" : 4
+        },
+        "0000016e-b690-4292-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 5,
+          "height" : 3,
+          "width" : 2
+        },
+        "0000016e-b690-4293-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 11,
+          "height" : 2,
+          "width" : 8
+        }
+      },
+      "selected_fields" : null,
+      "static_message_list_id" : null,
+      "display_mode_settings" : {
+        "positions" : { }
+      }
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:42.241Z",
+  "requires" : { },
+  "properties" : [ ]
+}, {
+  "id" : "5ddf8ed8b2d44b2e044729d8",
+  "type" : "DASHBOARD",
+  "title" : "Ops - Snapshot",
+  "summary" : "This dashboard was migrated automatically.",
+  "description" : "This dashboard provides a high-level overview of the most important Ops log metrics including a breakdown of request and caching details. More detailed metrics by content type, IP, location, protocol, and request method are also provided.",
+  "search_id" : "5de0e98900002a0017000005",
+  "state" : {
+    "0000016e-b690-42f3-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-42dc-0000-016eb690426f" : "Protocols",
+          "0000016e-b690-42df-0000-016eb690426f" : "Request Methods",
+          "0000016e-b690-42d6-0000-016eb690426f" : "Top Cities Traffic",
+          "0000016e-b690-42e2-0000-016eb690426f" : "Top Countries Traffic",
+          "0000016e-b690-42db-0000-016eb690426f" : "Request URIs",
+          "0000016e-b690-42d8-0000-016eb690426f" : "Cached Requests",
+          "0000016e-b690-42e0-0000-016eb690426f" : "Content Types",
+          "0000016e-b690-42d5-0000-016eb690426f" : "Countries Traffic Map",
+          "0000016e-b690-42de-0000-016eb690426f" : "Cached Bandwidth (bytes)",
+          "0000016e-b690-42d9-0000-016eb690426f" : "Bandwidth Over Time (bytes)",
+          "0000016e-b690-42dd-0000-016eb690426f" : "Total Number of Requests",
+          "0000016e-b690-42d7-0000-016eb690426f" : "Device Types",
+          "0000016e-b690-42e1-0000-016eb690426f" : "Total Bandwidth (bytes)",
+          "0000016e-b690-42da-0000-016eb690426f" : "Client Request Referrers"
+        },
+        "tab" : {
+          "title" : "Ops - Snapshot"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-42d5-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeolocation",
+            "type" : "values",
+            "config" : {
+              "limit" : 15
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "map",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42d6-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeoCityCode",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42d7-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientDeviceType",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42d8-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42d9-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : 1.0
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(EdgeResponseBytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "area",
+          "visualization_config" : {
+            "interpolation" : "linear"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42da-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestReferer",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42db-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestURI",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42dc-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestProtocol",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42dd-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42de-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "sum(CacheResponseBytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42df-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestMethod",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42e0-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "EdgeResponseContentType",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42e1-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "sum(EdgeResponseBytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42e2-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeoCountry",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-42dc-0000-016eb690426f" : [ "0000016e-b690-42eb-0000-016eb690426f" ],
+        "0000016e-b690-42df-0000-016eb690426f" : [ "0000016e-b690-42ef-0000-016eb690426f" ],
+        "0000016e-b690-42e2-0000-016eb690426f" : [ "0000016e-b690-42f2-0000-016eb690426f" ],
+        "0000016e-b690-42d6-0000-016eb690426f" : [ "0000016e-b690-42e4-0000-016eb690426f" ],
+        "0000016e-b690-42db-0000-016eb690426f" : [ "0000016e-b690-42ea-0000-016eb690426f" ],
+        "0000016e-b690-42e0-0000-016eb690426f" : [ "0000016e-b690-42f0-0000-016eb690426f" ],
+        "0000016e-b690-42d8-0000-016eb690426f" : [ "0000016e-b690-42e6-0000-016eb690426f", "0000016e-b690-42e7-0000-016eb690426f" ],
+        "0000016e-b690-42d5-0000-016eb690426f" : [ "0000016e-b690-42e3-0000-016eb690426f" ],
+        "0000016e-b690-42de-0000-016eb690426f" : [ "0000016e-b690-42ee-0000-016eb690426f" ],
+        "0000016e-b690-42d9-0000-016eb690426f" : [ "0000016e-b690-42e8-0000-016eb690426f" ],
+        "0000016e-b690-42dd-0000-016eb690426f" : [ "0000016e-b690-42ec-0000-016eb690426f", "0000016e-b690-42ed-0000-016eb690426f" ],
+        "0000016e-b690-42e1-0000-016eb690426f" : [ "0000016e-b690-42f1-0000-016eb690426f" ],
+        "0000016e-b690-42d7-0000-016eb690426f" : [ "0000016e-b690-42e5-0000-016eb690426f" ],
+        "0000016e-b690-42da-0000-016eb690426f" : [ "0000016e-b690-42e9-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-42dc-0000-016eb690426f" : {
+          "col" : 3,
+          "row" : 8,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42df-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 8,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42d6-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 5,
+          "height" : 3,
+          "width" : 2
+        },
+        "0000016e-b690-42e2-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 5,
+          "height" : 3,
+          "width" : 2
+        },
+        "0000016e-b690-42db-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 10,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-42d8-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 1,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42e0-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 8,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42d5-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 5,
+          "height" : 3,
+          "width" : 4
+        },
+        "0000016e-b690-42de-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 1,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42d9-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 3,
+          "height" : 2,
+          "width" : 8
+        },
+        "0000016e-b690-42dd-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42d7-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 8,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42e1-0000-016eb690426f" : {
+          "col" : 3,
+          "row" : 1,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42da-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 10,
+          "height" : 2,
+          "width" : 4
+        }
+      },
+      "selected_fields" : null,
+      "static_message_list_id" : null,
+      "display_mode_settings" : {
+        "positions" : { }
+      }
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:44.200Z",
+  "requires" : { },
+  "properties" : [ ]
+}, {
+  "id" : "5ddf8ed8b2d44b2e044729d2",
+  "type" : "DASHBOARD",
+  "title" : "Ops - Security",
+  "summary" : "This dashboard was migrated automatically.",
+  "description" : "This dashboard provides an analysis of Ops threat traffic including the total number of requests and threats stopped. More detailed metrics by country, city, IP, threat type, and user agent are also provided.",
+  "search_id" : "5de0e98900002a0017000004",
+  "state" : {
+    "0000016e-b690-42d4-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-42c7-0000-016eb690426f" : "Top Threat IPs",
+          "0000016e-b690-42be-0000-016eb690426f" : "Threat Types by IP",
+          "0000016e-b690-42c5-0000-016eb690426f" : "Top Threats Over Time",
+          "0000016e-b690-42bf-0000-016eb690426f" : "Top Threats by City",
+          "0000016e-b690-42c2-0000-016eb690426f" : "Top Threat Types",
+          "0000016e-b690-42c1-0000-016eb690426f" : "Threats Country Map",
+          "0000016e-b690-42c6-0000-016eb690426f" : "Top Threat User Agents",
+          "0000016e-b690-42c3-0000-016eb690426f" : "Threats by Country",
+          "0000016e-b690-42c4-0000-016eb690426f" : "Total Threats Stopped",
+          "0000016e-b690-42c0-0000-016eb690426f" : "Total Requests"
+        },
+        "tab" : {
+          "title" : "Ops - Security"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-42be-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Threat:true"
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ThreatType",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          }, {
+            "field" : "ClientIP",
+            "type" : "values",
+            "config" : {
+              "limit" : 15
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42bf-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Threat:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeoCityCode",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42c0-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42c1-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "EdgePathingOp:ban OR EdgePathingOp:wl"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeolocation",
+            "type" : "values",
+            "config" : {
+              "limit" : 15
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "map",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42c2-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Threat:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ThreatType",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42c3-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Threat:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIpGeoCountry",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42c4-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Threat:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42c5-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Threat:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : 1.0
+              }
+            }
+          } ],
+          "column_pivots" : [ {
+            "field" : "ThreatType",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "ThreatType",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "bar",
+          "visualization_config" : {
+            "barmode" : "stack"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42c6-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Threat:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestUserAgent",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42c7-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "Threat:true"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientIP",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-42c7-0000-016eb690426f" : [ "0000016e-b690-42d3-0000-016eb690426f" ],
+        "0000016e-b690-42be-0000-016eb690426f" : [ "0000016e-b690-42c8-0000-016eb690426f" ],
+        "0000016e-b690-42c5-0000-016eb690426f" : [ "0000016e-b690-42d1-0000-016eb690426f" ],
+        "0000016e-b690-42bf-0000-016eb690426f" : [ "0000016e-b690-42c9-0000-016eb690426f" ],
+        "0000016e-b690-42c2-0000-016eb690426f" : [ "0000016e-b690-42cd-0000-016eb690426f" ],
+        "0000016e-b690-42c1-0000-016eb690426f" : [ "0000016e-b690-42cc-0000-016eb690426f" ],
+        "0000016e-b690-42c6-0000-016eb690426f" : [ "0000016e-b690-42d2-0000-016eb690426f" ],
+        "0000016e-b690-42c3-0000-016eb690426f" : [ "0000016e-b690-42ce-0000-016eb690426f" ],
+        "0000016e-b690-42c4-0000-016eb690426f" : [ "0000016e-b690-42cf-0000-016eb690426f", "0000016e-b690-42d0-0000-016eb690426f" ],
+        "0000016e-b690-42c0-0000-016eb690426f" : [ "0000016e-b690-42ca-0000-016eb690426f", "0000016e-b690-42cb-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-42c7-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 7,
+          "height" : 3,
+          "width" : 4
+        },
+        "0000016e-b690-42be-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 10,
+          "height" : 3,
+          "width" : 8
+        },
+        "0000016e-b690-42c5-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 5,
+          "height" : 2,
+          "width" : 8
+        },
+        "0000016e-b690-42bf-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 2,
+          "height" : 3,
+          "width" : 2
+        },
+        "0000016e-b690-42c2-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 7,
+          "height" : 3,
+          "width" : 4
+        },
+        "0000016e-b690-42c1-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 2,
+          "height" : 3,
+          "width" : 4
+        },
+        "0000016e-b690-42c6-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 13,
+          "height" : 3,
+          "width" : 8
+        },
+        "0000016e-b690-42c3-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 2,
+          "height" : 3,
+          "width" : 2
+        },
+        "0000016e-b690-42c4-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 1,
+          "height" : 1,
+          "width" : 4
+        },
+        "0000016e-b690-42c0-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 1,
+          "width" : 4
+        }
+      },
+      "selected_fields" : null,
+      "static_message_list_id" : null,
+      "display_mode_settings" : {
+        "positions" : { }
+      }
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:44.150Z",
+  "requires" : { },
+  "properties" : [ ]
+}, {
+  "id" : "5ddf8ed7b2d44b2e044729b1",
+  "type" : "DASHBOARD",
+  "title" : "Ops - Reliability",
+  "summary" : "This dashboard was migrated automatically.",
+  "description" : "This dashboard provides insights into application/site reliability with an overview of request successes and errors. More details breakdowns by HTTP status codes, and request URIs are also provided.",
+  "search_id" : "5de0e98900002a0017000003",
+  "state" : {
+    "0000016e-b690-42bd-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-42a4-0000-016eb690426f" : "Cache Response Status Over Time",
+          "0000016e-b690-42a6-0000-016eb690426f" : "Origin Response Statuses Over Time",
+          "0000016e-b690-42a8-0000-016eb690426f" : "Origin Response Error Ratios",
+          "0000016e-b690-42a9-0000-016eb690426f" : "3xx Responses",
+          "0000016e-b690-42af-0000-016eb690426f" : "Top 4xx Request URIs",
+          "0000016e-b690-42ab-0000-016eb690426f" : "4xx Responses",
+          "0000016e-b690-42a5-0000-016eb690426f" : "Total Responses",
+          "0000016e-b690-42ae-0000-016eb690426f" : "Top 5xx Request URIs",
+          "0000016e-b690-42ac-0000-016eb690426f" : "Edge Response Error/Success Ratios",
+          "0000016e-b690-42aa-0000-016eb690426f" : "5xx Responses",
+          "0000016e-b690-42a7-0000-016eb690426f" : "Origin Response Error Ratios",
+          "0000016e-b690-42ad-0000-016eb690426f" : "Edge Response Error/Success Ratios"
+        },
+        "tab" : {
+          "title" : "Ops - Reliability"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-42a4-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            }
+          } ],
+          "column_pivots" : [ {
+            "field" : "CacheResponseStatusClass",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "CacheResponseStatusClass",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "bar",
+          "visualization_config" : {
+            "barmode" : "stack"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42a5-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42a6-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            }
+          } ],
+          "column_pivots" : [ {
+            "field" : "OriginResponseStatusClass",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "OriginResponseStatusClass",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "bar",
+          "visualization_config" : {
+            "barmode" : "stack"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42a7-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "OriginResponseStatusClass",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "pie",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42a8-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "OriginResponseStatusClass",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42a9-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "EdgeResponseStatusClass:3xx"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(EdgeResponseStatusClass)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42aa-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "EdgeResponseStatusClass:5xx"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(EdgeResponseStatusClass)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42ab-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "EdgeResponseStatusClass:4xx"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(EdgeResponseStatusClass)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42ac-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "EdgeResponseStatusClass",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "pie",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42ad-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "EdgeResponseStatusClass",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42ae-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "EdgeResponseStatusClass:4xx"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestURI",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-42af-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "EdgeResponseStatusClass:4xx"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestURI",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-42a4-0000-016eb690426f" : [ "0000016e-b690-42b0-0000-016eb690426f" ],
+        "0000016e-b690-42a6-0000-016eb690426f" : [ "0000016e-b690-42b3-0000-016eb690426f" ],
+        "0000016e-b690-42a8-0000-016eb690426f" : [ "0000016e-b690-42b5-0000-016eb690426f" ],
+        "0000016e-b690-42af-0000-016eb690426f" : [ "0000016e-b690-42bc-0000-016eb690426f" ],
+        "0000016e-b690-42a9-0000-016eb690426f" : [ "0000016e-b690-42b6-0000-016eb690426f" ],
+        "0000016e-b690-42ab-0000-016eb690426f" : [ "0000016e-b690-42b8-0000-016eb690426f" ],
+        "0000016e-b690-42a5-0000-016eb690426f" : [ "0000016e-b690-42b1-0000-016eb690426f", "0000016e-b690-42b2-0000-016eb690426f" ],
+        "0000016e-b690-42ae-0000-016eb690426f" : [ "0000016e-b690-42bb-0000-016eb690426f" ],
+        "0000016e-b690-42ac-0000-016eb690426f" : [ "0000016e-b690-42b9-0000-016eb690426f" ],
+        "0000016e-b690-42aa-0000-016eb690426f" : [ "0000016e-b690-42b7-0000-016eb690426f" ],
+        "0000016e-b690-42a7-0000-016eb690426f" : [ "0000016e-b690-42b4-0000-016eb690426f" ],
+        "0000016e-b690-42ad-0000-016eb690426f" : [ "0000016e-b690-42ba-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-42a4-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 2,
+          "height" : 4,
+          "width" : 6
+        },
+        "0000016e-b690-42a6-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 6,
+          "height" : 4,
+          "width" : 6
+        },
+        "0000016e-b690-42a8-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 8,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42a9-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 1,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-42af-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 13,
+          "height" : 3,
+          "width" : 8
+        },
+        "0000016e-b690-42ab-0000-016eb690426f" : {
+          "col" : 3,
+          "row" : 1,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-42a5-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-42ae-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 10,
+          "height" : 3,
+          "width" : 8
+        },
+        "0000016e-b690-42ac-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 2,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42aa-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 1,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-42a7-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 6,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-42ad-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 4,
+          "height" : 2,
+          "width" : 2
+        }
+      },
+      "selected_fields" : null,
+      "static_message_list_id" : null,
+      "display_mode_settings" : {
+        "positions" : { }
+      }
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:43.076Z",
+  "requires" : { },
+  "properties" : [ ]
+}, {
+  "id" : "5ddf8ed5b2d44b2e04472992",
+  "type" : "DASHBOARD",
+  "title" : "Ops - Performance",
+  "summary" : "This dashboard was migrated automatically.",
+  "description" : "This dashboard provides an analysis to help identify and resolve performance-related issues. Detailed breakdowns by response time, caching status, content type, host name, request method, protocol, and request URIs are also provided.",
+  "search_id" : "5de0e98900002a0017000001",
+  "state" : {
+    "0000016e-b690-4291-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-427c-0000-016eb690426f" : "Cached Bandwidth (bytes)",
+          "0000016e-b690-4270-0000-016eb690426f" : "Cached Request by Method",
+          "0000016e-b690-4277-0000-016eb690426f" : "Cached Requests by Protocol",
+          "0000016e-b690-426f-0000-016eb690426f" : "Response Time - Max (ms)",
+          "0000016e-b690-4279-0000-016eb690426f" : "Cached Requests by Content Type",
+          "0000016e-b690-4273-0000-016eb690426f" : "Uncached Requests",
+          "0000016e-b690-4276-0000-016eb690426f" : "Cached Requests by Hostname",
+          "0000016e-b690-4275-0000-016eb690426f" : "Cached Requests",
+          "0000016e-b690-427a-0000-016eb690426f" : "Response Time (ms)",
+          "0000016e-b690-4271-0000-016eb690426f" : "Top Cached URIs",
+          "0000016e-b690-4278-0000-016eb690426f" : "Response Time - Deviation (ms)",
+          "0000016e-b690-427e-0000-016eb690426f" : "Uncached Bandwidth (bytes)",
+          "0000016e-b690-4274-0000-016eb690426f" : "Response Time - Average (ms)",
+          "0000016e-b690-427b-0000-016eb690426f" : "Total Request Bandwidth (bytes)",
+          "0000016e-b690-427d-0000-016eb690426f" : "Total Requests",
+          "0000016e-b690-4272-0000-016eb690426f" : "Cached Status Ratio"
+        },
+        "tab" : {
+          "title" : "Ops - Performance"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-426f-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "max(OriginResponseTimeMillis)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4270-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            }
+          } ],
+          "column_pivots" : [ {
+            "field" : "ClientRequestMethod",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "ClientRequestMethod",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "bar",
+          "visualization_config" : {
+            "barmode" : "stack"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4271-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "ClientRequestURI",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4272-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "CacheCacheStatus",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4273-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "NOT CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4274-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "avg(OriginResponseTimeMillis)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4275-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "card(CacheCacheStatus)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4276-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            }
+          } ],
+          "column_pivots" : [ {
+            "field" : "EdgeRequestHost",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "EdgeRequestHost",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "bar",
+          "visualization_config" : {
+            "barmode" : "stack"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4277-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            }
+          } ],
+          "column_pivots" : [ {
+            "field" : "ClientRequestProtocol",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "ClientRequestProtocol",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "bar",
+          "visualization_config" : {
+            "barmode" : "stack"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4278-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "stddev(OriginResponseTimeMillis)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4279-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            }
+          } ],
+          "column_pivots" : [ {
+            "field" : "EdgeResponseContentType",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "EdgeResponseContentType",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "bar",
+          "visualization_config" : {
+            "barmode" : "stack"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427a-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : 1.0
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(OriginResponseTimeMillis)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "area",
+          "visualization_config" : {
+            "interpolation" : "linear"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427b-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(EdgeResponseBytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427c-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(CacheResponseBytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427d-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427e-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 3600
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "NOT CacheCacheStatus:hit"
+        },
+        "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(EdgeResponseBytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-427c-0000-016eb690426f" : [ "0000016e-b690-428d-0000-016eb690426f" ],
+        "0000016e-b690-4277-0000-016eb690426f" : [ "0000016e-b690-4288-0000-016eb690426f" ],
+        "0000016e-b690-4270-0000-016eb690426f" : [ "0000016e-b690-4280-0000-016eb690426f" ],
+        "0000016e-b690-426f-0000-016eb690426f" : [ "0000016e-b690-427f-0000-016eb690426f" ],
+        "0000016e-b690-4279-0000-016eb690426f" : [ "0000016e-b690-428a-0000-016eb690426f" ],
+        "0000016e-b690-4276-0000-016eb690426f" : [ "0000016e-b690-4287-0000-016eb690426f" ],
+        "0000016e-b690-4273-0000-016eb690426f" : [ "0000016e-b690-4283-0000-016eb690426f", "0000016e-b690-4284-0000-016eb690426f" ],
+        "0000016e-b690-4275-0000-016eb690426f" : [ "0000016e-b690-4286-0000-016eb690426f" ],
+        "0000016e-b690-427a-0000-016eb690426f" : [ "0000016e-b690-428b-0000-016eb690426f" ],
+        "0000016e-b690-427e-0000-016eb690426f" : [ "0000016e-b690-4290-0000-016eb690426f" ],
+        "0000016e-b690-4278-0000-016eb690426f" : [ "0000016e-b690-4289-0000-016eb690426f" ],
+        "0000016e-b690-4271-0000-016eb690426f" : [ "0000016e-b690-4281-0000-016eb690426f" ],
+        "0000016e-b690-427b-0000-016eb690426f" : [ "0000016e-b690-428c-0000-016eb690426f" ],
+        "0000016e-b690-4274-0000-016eb690426f" : [ "0000016e-b690-4285-0000-016eb690426f" ],
+        "0000016e-b690-427d-0000-016eb690426f" : [ "0000016e-b690-428e-0000-016eb690426f", "0000016e-b690-428f-0000-016eb690426f" ],
+        "0000016e-b690-4272-0000-016eb690426f" : [ "0000016e-b690-4282-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-427c-0000-016eb690426f" : {
+          "col" : 3,
+          "row" : 5,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-4270-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 8,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4277-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 8,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-426f-0000-016eb690426f" : {
+          "col" : 3,
+          "row" : 2,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-4279-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 6,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4276-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 6,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4273-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 1,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-4275-0000-016eb690426f" : {
+          "col" : 3,
+          "row" : 1,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-427a-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 3,
+          "height" : 2,
+          "width" : 8
+        },
+        "0000016e-b690-4271-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 10,
+          "height" : 3,
+          "width" : 8
+        },
+        "0000016e-b690-4278-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 2,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-427e-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 5,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-427b-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 5,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-4274-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 2,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-427d-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 1,
+          "width" : 2
+        },
+        "0000016e-b690-4272-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 1,
+          "height" : 2,
+          "width" : 2
+        }
+      },
+      "selected_fields" : null,
+      "static_message_list_id" : null,
+      "display_mode_settings" : {
+        "positions" : { }
+      }
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:41.688Z",
+  "requires" : { },
+  "properties" : [ ]
+} ]

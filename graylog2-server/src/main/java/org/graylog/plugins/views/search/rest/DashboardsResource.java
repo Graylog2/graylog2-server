@@ -32,6 +32,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
@@ -69,7 +70,7 @@ public class DashboardsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get a list of all views")
+    @ApiOperation("Get a list of all dashboards")
     public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                             @ApiParam(name = "sort",
@@ -92,6 +93,7 @@ public class DashboardsResource extends RestResource {
                         final Optional<ViewSharing> viewSharing = viewSharingService.forView(view.id());
 
                         return isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
+                                || isPermitted(RestPermissions.DASHBOARDS_READ, view.id())
                                 || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false);
                     },
                     order,

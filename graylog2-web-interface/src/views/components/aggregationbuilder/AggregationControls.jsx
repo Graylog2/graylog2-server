@@ -4,21 +4,23 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import styled, { type StyledComponent } from 'styled-components';
 
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
+import CustomPropTypes from 'views/components/CustomPropTypes';
+import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
 import RowPivotSelect from './RowPivotSelect';
 import ColumnPivotSelect from './ColumnPivotSelect';
-import SortDirectionSelect from './SortDirectionSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
 import DescriptionBox from './DescriptionBox';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
+import EventListConfiguration from './EventListConfiguration';
 
 type Props = {
   children: React.Node,
@@ -30,6 +32,31 @@ type Props = {
 type State = {
   config: AggregationWidgetConfig,
 };
+
+const Container: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+  display: grid;
+  display: -ms-grid;
+  grid-template-rows: auto minmax(10px, 1fr);
+  -ms-grid-rows: auto minmax(10px, 1fr);
+  grid-template-columns: 1fr;
+  -ms-grid-columns: 1fr;
+  height: 100%;
+`;
+
+const TopRow = styled(Row)`
+  grid-column: 1;
+  -ms-grid-column: 1;
+  grid-row: 1;
+  -ms-grid-row: 1;
+`;
+
+const BottomRow = styled(Row)`
+  overflow-x: hidden;
+  grid-column: 1;
+  -ms-grid-column: 1;
+  grid-row: 2;
+  -ms-grid-row: 2;
+`;
 
 const _visualizationConfigFor = (type: string) => PluginStore.exports('visualizationConfigTypes')
   .find(visualizationConfigType => visualizationConfigType && visualizationConfigType.type === type);
@@ -75,6 +102,11 @@ export default class AggregationControls extends React.Component<Props, State> {
     }));
   };
 
+  _onSetEventAnnotation = (value: boolean) => {
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().eventAnnotation(value).build() }));
+  };
+
+  // eslint-disable-next-line no-undef
   _onRollupChange = (rollup: $PropertyType<$PropertyType<Props, 'config'>, 'rollup'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().rollup(rollup).build() }));
   };
@@ -103,18 +135,21 @@ export default class AggregationControls extends React.Component<Props, State> {
     const sortDirection = Immutable.Set(sort.map(s => s.direction)).first();
 
     const formattedFields = fields
-      .map(fieldType => fieldType.name)
-      .valueSeq()
-      .toJS()
-      .sort(defaultCompare);
+      ? fields
+        .map(fieldType => fieldType.name)
+        .valueSeq()
+        .toJS()
+        .sort(defaultCompare)
+      : [];
     const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
     const suggester = new SeriesFunctionsSuggester(formattedFields);
 
+    const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter', 'area'].findIndex(x => x === visualization) >= 0;
     const childrenWithCallback = React.Children.map(children, child => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     const VisualizationConfigType = _visualizationConfigFor(visualization);
     return (
-      <span>
-        <Row>
+      <Container>
+        <TopRow>
           <Col md={2} style={{ paddingRight: '2px', paddingLeft: '10px' }}>
             <DescriptionBox description="Visualization Type">
               <VisualizationTypeSelect value={visualization} onChange={this._onVisualizationChange} />
@@ -144,12 +179,18 @@ export default class AggregationControls extends React.Component<Props, State> {
                                    onChange={this._onSortDirectionChange} />
             </DescriptionBox>
           </Col>
-        </Row>
-        <Row style={{ height: 'calc(100% - 110px)' }}>
-          <Col md={2} style={{ paddingRight: '2px', paddingLeft: '10px' }}>
-            <DescriptionBox description="Metrics" help="The unit which is tracked for every row and subcolumn.">
+        </TopRow>
+        <BottomRow>
+          <Col md={2} style={{ paddingRight: '2px', paddingLeft: '10px', height: '100%', overflowY: 'auto' }}>
+            <DescriptionBox description="Metrics" help="The unit which is tracked for every row and subcolumn." style={{ marginTop: 0 }}>
               <SeriesSelect onChange={this._onSeriesChange} series={series} suggester={suggester} />
             </DescriptionBox>
+            {showEventConfiguration && (
+              <DescriptionBox description="Event Annotations"
+                              help="Configuration to render event annotations to a timebased widget">
+                <EventListConfiguration enabled={config.eventAnnotation} onChange={this._onSetEventAnnotation} />
+              </DescriptionBox>
+            )}
             {VisualizationConfigType && (
               <DescriptionBox description="Visualization config" help="Configuration specifically for the selected visualization type.">
                 <VisualizationConfigType.component onChange={this._onVisualizationConfigChange}
@@ -157,11 +198,11 @@ export default class AggregationControls extends React.Component<Props, State> {
               </DescriptionBox>
             )}
           </Col>
-          <Col md={10} style={{ height: '100%', paddingLeft: '7px', marginTop: '5px' }}>
+          <Col md={10} style={{ height: '100%', paddingLeft: '7px' }}>
             {childrenWithCallback}
           </Col>
-        </Row>
-      </span>
+        </BottomRow>
+      </Container>
     );
   }
 }

@@ -26,7 +26,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
@@ -39,6 +38,7 @@ import org.graylog.plugins.views.search.SearchMetadata;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -73,11 +73,10 @@ import java.util.concurrent.TimeoutException;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-@Api(value = "Enterprise/Search")
+@Api(value = "Search")
 @Path("/views/search")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@RequiresPermissions(ViewsRestPermissions.EXTENDEDSEARCH_USE)
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
@@ -117,7 +116,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
-    @RequiresPermissions(ViewsRestPermissions.EXTENDEDSEARCH_CREATE)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
         final String username = username();
@@ -149,8 +147,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
     }
 
-    private boolean hasViewReadPermission(String viewId) {
-        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId);
+    private boolean hasViewReadPermission(ViewDTO view) {
+        final String viewId = view.id();
+        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId)
+                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, viewId));
     }
 
     @GET

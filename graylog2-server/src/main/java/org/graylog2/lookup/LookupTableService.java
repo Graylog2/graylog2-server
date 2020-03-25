@@ -16,6 +16,7 @@
  */
 package org.graylog2.lookup;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -47,6 +48,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -61,6 +63,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.util.concurrent.Uninterruptibles.awaitUninterruptibly;
 import static java.lang.Math.toIntExact;
+import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.ExceptionUtils.getRootCauseMessage;
 import static org.graylog2.utilities.ObjectUtils.objectId;
 
@@ -458,7 +461,8 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     @Nullable
-    private LookupTable getTable(String name) {
+    @VisibleForTesting
+    public LookupTable getTable(String name) {
         final LookupTable lookupTable = liveTables.get(name);
         if (lookupTable == null) {
             LOG.warn("Lookup table <{}> does not exist", name);
@@ -553,6 +557,58 @@ public class LookupTableService extends AbstractIdleService {
             }
 
             return result;
+        }
+
+        private Object requireValidKey(Object key) {
+            return requireNonNull(key, "key cannot be null");
+        }
+
+        private List<String> requireValidStringList(List<String> values) {
+            return requireNonNull(values, "values cannot be null")
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .filter(v -> !v.isEmpty())
+                    .collect(Collectors.toList());
+        }
+
+        public LookupResult setValue(Object key, Object value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.setValue(requireValidKey(key), requireNonNull(value, "value cannot be null"));
+        }
+
+        public LookupResult setStringList(Object key, List<String> value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.setStringList(requireValidKey(key), requireValidStringList(value));
+        }
+
+        public LookupResult addStringList(Object key, List<String> value, boolean keepDuplicates) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.addStringList(requireValidKey(key), requireValidStringList(value), keepDuplicates);
+        }
+
+        public LookupResult removeStringList(Object key, List<String> value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.removeStringList(requireValidKey(key), requireValidStringList(value));
+        }
+
+        public void clearKey(Object key) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return;
+            }
+            lookupTable.clearKey(requireValidKey(key));
         }
 
         public LookupTable getTable() {

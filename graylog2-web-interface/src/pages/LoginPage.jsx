@@ -1,106 +1,78 @@
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useEffect, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DocumentTitle, Icon } from 'components/common';
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert } from 'components/graylog';
 import LoginForm from 'components/login/LoginForm';
+import LoginBox from 'components/login/LoginBox';
+
+import AuthThemeStyles from 'theme/styles/authStyles';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import LoadingPage from './LoadingPage';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import authStyle from '!style/useable!css!less!stylesheets/auth.less';
+const { SessionActions } = CombinedProvider.get('Session');
 
-const { SessionStore, SessionActions } = CombinedProvider.get('Session');
+const LoginPage = () => {
+  const [didValidateSession, setDidValidateSession] = useState(false);
+  const [lastError, setLastError] = useState(undefined);
 
-const LoginPage = createReactClass({
-  displayName: 'LoginPage',
-  mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
-
-  getInitialState() {
-    return {
-      didValidateSession: false,
-    };
-  },
-
-  componentDidMount() {
-    disconnectedStyle.use();
-    authStyle.use();
-    SessionActions.validate().then((response) => {
-      this.setState({ didValidateSession: true });
+  useEffect(() => {
+    const sessionPromise = SessionActions.validate().then((response) => {
+      setDidValidateSession(true);
       return response;
     });
-  },
 
-  componentWillUnmount() {
-    disconnectedStyle.unuse();
-    authStyle.unuse();
-  },
+    return () => {
+      sessionPromise.cancel();
+    };
+  }, []);
 
-  handleErrorChange(nextError) {
-    this.setState({ lastError: nextError });
-  },
+  const resetLastError = () => {
+    setLastError(undefined);
+  };
 
-  resetLastError() {
-    this.handleErrorChange(undefined);
-  },
-
-  formatLastError(error) {
-    if (error) {
+  const formatLastError = () => {
+    if (lastError) {
       return (
         <div className="form-group">
           <Alert bsStyle="danger">
-            <button type="button" className="close" onClick={this.resetLastError}>&times;</button>{error}
+            <button type="button" className="close" onClick={resetLastError}>&times;</button>{lastError}
           </Alert>
         </div>
       );
     }
     return null;
-  },
+  };
 
-  renderLoginForm() {
+  const renderLoginForm = () => {
     const loginComponent = PluginStore.exports('loginProviderType');
 
     if (loginComponent.length === 1) {
       return React.createElement(loginComponent[0].formComponent, {
-        onErrorChange: this.handleErrorChange,
+        onErrorChange: setLastError,
       });
     }
 
-    return <LoginForm onErrorChange={this.handleErrorChange} />;
-  },
+    return <LoginForm onErrorChange={setLastError} />;
+  };
 
-  render() {
-    const { lastError, didValidateSession } = this.state;
-
-    if (!didValidateSession) {
-      return (
-        <LoadingPage />
-      );
-    }
-
-    const alert = this.formatLastError(lastError);
+  if (!didValidateSession) {
     return (
-      <DocumentTitle title="Sign in">
-        <div>
-          <div className="container" id="login-box">
-            <Row>
-              <Col md={4} mdOffset={4} id="login-box-content" className="well">
-                <legend><Icon name="group" /> Welcome to Graylog</legend>
-                {alert}
-
-                {this.renderLoginForm()}
-              </Col>
-            </Row>
-          </div>
-        </div>
-      </DocumentTitle>
+      <LoadingPage />
     );
-  },
-});
+  }
+
+  return (
+    <DocumentTitle title="Sign in">
+      <AuthThemeStyles />
+      <LoginBox>
+        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        {formatLastError()}
+        {renderLoginForm()}
+      </LoginBox>
+    </DocumentTitle>
+  );
+};
 
 export default LoginPage;

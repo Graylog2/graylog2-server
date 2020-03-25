@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { mount, shallow } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import IfPermitted from './IfPermitted';

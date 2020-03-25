@@ -18,9 +18,6 @@ package org.graylog.events.legacy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.notifications.DBNotificationService;
@@ -41,9 +38,10 @@ import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -70,11 +68,9 @@ import static org.mockito.Mockito.verify;
 public class LegacyAlertConditionMigratorTest {
     private static final int CHECK_INTERVAL = 60;
 
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -103,7 +99,7 @@ public class LegacyAlertConditionMigratorTest {
         objectMapper.registerSubtypes(new NamedType(EventNotificationExecutionJob.Config.class, EventNotificationExecutionJob.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoConnection mongoConnection = mongoRule.getMongoConnection();
+        final MongoConnection mongoConnection = mongodb.mongoConnection();
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoConnection, mongoJackObjectMapperProvider);
         final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoConnection, mongoJackObjectMapperProvider, mock(NodeId.class), clock);
@@ -116,7 +112,7 @@ public class LegacyAlertConditionMigratorTest {
     }
 
     @Test
-    @UsingDataSet(locations = "legacy-alert-conditions.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("legacy-alert-conditions.json")
     public void run() {
         final int migratedConditions = 10;
         final int migratedCallbacks = 4;
@@ -591,7 +587,7 @@ public class LegacyAlertConditionMigratorTest {
     }
 
     @Test
-    @UsingDataSet(locations = "legacy-alert-conditions.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("legacy-alert-conditions.json")
     public void runWithMigrationStatus() {
         final int migratedConditions = 9; // Only 8 because we pass one migrated condition in
         final int migratedCallbacks = 3;  // Only 2 because we pass one migrated callback in

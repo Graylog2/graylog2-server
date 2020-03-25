@@ -1,91 +1,87 @@
+// @flow strict
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Immutable from 'immutable';
-import MessageShow from 'components/search/MessageShow';
-import DocumentTitle from 'components/common/DocumentTitle';
-import Spinner from 'components/common/Spinner';
+import React, { useEffect, useMemo, useState } from 'react';
+import * as Immutable from 'immutable';
 
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
-import connect from 'stores/connect';
+import DocumentTitle from 'components/common/DocumentTitle';
+import Spinner from 'components/common/Spinner';
+import { Col, Row } from 'components/graylog';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import MessageDetail from 'views/components/messagelist/MessageDetail';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
-const NodesStore = StoreProvider.getStore('Nodes');
 const StreamsStore = StoreProvider.getStore('Streams');
 
-const ConnectedMessageShow = connect(MessageShow, { nodes: NodesStore }, ({ nodes }) => ({ nodes: Immutable.Map(nodes.nodes) }));
-
-const ShowMessagePage = createReactClass({
-  displayName: 'ShowMessagePage',
-
-  propTypes: {
-    params: PropTypes.shape({
-      index: PropTypes.string.isRequired,
-      messageId: PropTypes.string.isRequired,
-    }).isRequired,
-    searchConfig: PropTypes.object.isRequired,
+type Props = {
+  params: {
+    index: string,
+    messageId: string,
   },
-
-  getInitialState() {
-    return {
-      streams: Immutable.Map(),
-      message: undefined,
-      inputs: Immutable.Map(),
-    };
-  },
-
-  componentDidMount() {
-    const { params: { index, messageId } } = this.props;
+};
+const ShowMessagePage = ({ params: { index, messageId }, params }: Props) => {
+  const [message, setMessage] = useState();
+  const [inputs, setInputs] = useState(Immutable.Map);
+  const [streams, setStreams] = useState();
+  const [allStreams, setAllStreams] = useState();
+  useEffect(() => { NodesActions.list(); }, []);
+  useEffect(() => {
     MessagesActions.loadMessage(index, messageId)
-      .then((message) => {
-        this.setState({ message });
-        return message.source_input_id ? InputsActions.get(message.source_input_id) : Promise.resolve();
+      .then((_message) => {
+        setMessage(_message);
+        return _message.source_input_id ? InputsActions.get(_message.source_input_id) : Promise.resolve();
       })
-      .then(this._formatInput);
-    StreamsStore.listStreams().then((streams) => {
-      const streamsMap = {};
-      if (streams) {
-        streams.forEach((stream) => {
-          streamsMap[stream.id] = stream;
-        });
-        this.setState({ streams: Immutable.Map(streamsMap) });
+      .then((input) => {
+        if (input) {
+          const newInputs = Immutable.Map({ [input.id]: input });
+          setInputs(newInputs);
+        }
+      });
+  }, [index, messageId, setMessage, setInputs]);
+  useEffect(() => {
+    StreamsStore.listStreams().then((newStreams) => {
+      if (newStreams) {
+        const streamsMap = newStreams.reduce((prev, stream) => ({ ...prev, [stream.id]: stream }), {});
+        setStreams(Immutable.Map(streamsMap));
+        setAllStreams(Immutable.List(newStreams));
       }
     });
-    NodesActions.list();
-  },
+  }, [setStreams, setAllStreams]);
+  const isLoaded = useMemo(() => (message !== undefined
+    && streams !== undefined
+    && inputs !== undefined
+    && allStreams !== undefined), [message, streams, inputs, allStreams]);
 
-  _formatInput(input) {
-    if (input) {
-      const inputs = Immutable.Map({ [input.id]: input });
-      this.setState({ inputs });
-    }
-  },
+  if (isLoaded) {
+    return (
+      <DocumentTitle title={`Message ${params.messageId} on ${params.index}`}>
+        <Row className="content">
+          <Col md={12}>
+            <InteractiveContext.Provider value={false}>
+              <MessageDetail fields={Immutable.Map()}
+                             streams={streams}
+                             allStreams={allStreams}
+                             disableSurroundingSearch
+                             disableFieldActions
+                             inputs={inputs}
+                             message={message} />
+            </InteractiveContext.Provider>
+          </Col>
+        </Row>
+      </DocumentTitle>
+    );
+  }
+  return <Spinner data-testid="spinner" />;
+};
 
-  _isLoaded() {
-    const { message, streams, inputs } = this.state;
-    return message && streams && inputs;
-  },
-
-  render() {
-    if (this._isLoaded()) {
-      const { params, searchConfig } = this.props;
-      const { streams, inputs, message } = this.state;
-      return (
-        <DocumentTitle title={`Message ${params.messageId} on ${params.index}`}>
-          <ConnectedMessageShow message={message}
-                                inputs={inputs}
-                                streams={streams}
-                                allStreamsLoaded
-                                searchConfig={searchConfig} />
-        </DocumentTitle>
-      );
-    }
-    return <Spinner />;
-  },
-});
+ShowMessagePage.propTypes = {
+  params: PropTypes.shape({
+    index: PropTypes.string.isRequired,
+    messageId: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default ShowMessagePage;

@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackInstallEntityList from './ContentPackInstallEntityList';
@@ -12,22 +12,22 @@ describe('<ContentPackInstallEntityList />', () => {
   ];
 
   it('should render without entities', () => {
-    const wrapper = renderer.create(<ContentPackInstallEntityList />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackInstallEntityList />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with entities', () => {
-    const wrapper = renderer.create(<ContentPackInstallEntityList entities={entities} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackInstallEntityList entities={entities} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with empty entities', () => {
-    const wrapper = renderer.create(<ContentPackInstallEntityList entities={[]} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackInstallEntityList entities={[]} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with uninstall and entities', () => {
-    const wrapper = renderer.create(<ContentPackInstallEntityList uninstall entities={entities} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackInstallEntityList uninstall entities={entities} />);
+    expect(wrapper).toMatchSnapshot();
   });
 });

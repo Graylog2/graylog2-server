@@ -4,14 +4,10 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import styled from 'styled-components';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { Icon, Pluralize } from 'components/common';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
 
 const ControlsContainer = styled.div`
@@ -20,8 +16,8 @@ const ControlsContainer = styled.div`
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
+
   > .btn-group {
-    max-width: calc(100% - 34px);
     .btn:first-child {
       max-width: 100%;
     }
@@ -51,16 +47,6 @@ class RefreshControls extends React.Component<Props> {
     refreshConfig: PropTypes.object.isRequired,
   };
 
-  static INTERVAL_OPTIONS : Array<[string, number]> = [
-    ['1 Second', 1000],
-    ['2 Seconds', 2000],
-    ['5 Seconds', 5000],
-    ['10 Seconds', 10000],
-    ['30 Seconds', 30000],
-    ['1 Minute', 60000],
-    ['5 Minutes', 300000],
-  ];
-
   componentWillUnmount(): void {
     RefreshActions.disable();
   }
@@ -85,6 +71,16 @@ class RefreshControls extends React.Component<Props> {
     }
     return <ButtonLabel>{buttonText}</ButtonLabel>;
   }
+
+  static INTERVAL_OPTIONS: Array<[string, number]> = [
+    ['1 Second', 1000],
+    ['2 Seconds', 2000],
+    ['5 Seconds', 5000],
+    ['10 Seconds', 10000],
+    ['30 Seconds', 30000],
+    ['1 Minute', 60000],
+    ['5 Minutes', 300000],
+  ];
 
   render() {
     const { refreshConfig } = this.props;

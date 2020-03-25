@@ -3,23 +3,8 @@ import Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import { filtersForQuery } from 'views/logic/queries/Query';
 import { QueriesActions, QueriesStore } from './QueriesStore';
-
-const _streamFilters = (selectedStreams) => {
-  return selectedStreams.map(stream => ({ type: 'stream', id: stream }));
-};
-
-const _filtersForQuery = (streams) => {
-  const streamFilters = _streamFilters(streams);
-  if (streamFilters.length === 0) {
-    return null;
-  }
-
-  return {
-    type: 'or',
-    filters: streamFilters,
-  };
-};
 
 export const QueryFiltersActions = singletonActions(
   'views.QueryFilters',
@@ -51,7 +36,7 @@ export const QueryFiltersStore = singletonStore(
     },
 
     streams(queryId, streams) {
-      const streamFilter = _filtersForQuery(streams);
+      const streamFilter = filtersForQuery(streams);
       const newQuery = this.queries.get(queryId).toBuilder().filter(streamFilter).build();
       const promise = QueriesActions.update(queryId, newQuery);
       QueryFiltersActions.streams.promise(promise);

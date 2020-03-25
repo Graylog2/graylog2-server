@@ -17,22 +17,18 @@
 package org.graylog2.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
@@ -40,16 +36,13 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClusterEventCleanupPeriodicalTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
 
-    @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -61,10 +54,10 @@ public class ClusterEventCleanupPeriodicalTest {
     public void setUpService() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
 
-        this.mongoConnection = mongoRule.getMongoConnection();
+        this.mongoConnection = mongodb.mongoConnection();
 
         MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
-        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(provider, mongoRule.getMongoConnection());
+        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(provider, mongodb.mongoConnection());
     }
 
     @After
@@ -74,7 +67,6 @@ public class ClusterEventCleanupPeriodicalTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testDoRun() throws Exception {
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(insertEvent(collection, 0L)).isTrue();
@@ -96,6 +88,6 @@ public class ClusterEventCleanupPeriodicalTest {
                 .add("event_class", String.class.getCanonicalName())
                 .add("payload", "Test" + timestamp)
                 .get();
-        return collection.save(event).getN() == 1;
+        return collection.save(event).wasAcknowledged();
     }
 }

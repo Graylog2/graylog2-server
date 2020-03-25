@@ -31,11 +31,11 @@ import org.mockito.junit.MockitoRule;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class NotificationResourceHandlerTest {
     @Rule
@@ -84,7 +84,7 @@ public class NotificationResourceHandlerTest {
 
         assertThat(captor.getValue()).satisfies(ctx -> {
             assertThat(ctx.event().message()).isEqualTo("Notification test message triggered from user <testUser>");
-            assertThat(ctx.notificationId()).isEqualTo("1234");
+            assertThat(ctx.notificationId()).isEqualTo(NotificationTestData.TEST_NOTIFICATION_ID);
             assertThat(ctx.notificationConfig().type()).isEqualTo(HTTPEventNotificationConfig.TYPE_NAME);
             assertThat(ctx.eventDefinition().get().title()).isEqualTo("Event Definition Test Title");
         });

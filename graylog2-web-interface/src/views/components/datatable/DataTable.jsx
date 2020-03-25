@@ -1,22 +1,26 @@
 // @flow strict
-import React, { useContext, useEffect } from 'react';
+import * as React from 'react';
+import { useContext, useEffect } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
 
+import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-import connect from 'stores/connect';
 
 import { ViewStore } from 'views/stores/ViewStore';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import DataTableEntry from './DataTableEntry';
+import MessagesTable from './MessagesTable';
 
 import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import type { VisualizationComponent } from '../aggregationbuilder/AggregationBuilder';
+import { makeVisualization } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = {
   config: AggregationWidgetConfig,
@@ -68,13 +72,13 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   useEffect(onRenderComplete, [onRenderComplete]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
-  const { chart: rows = [] } = data || {};
+  const rows = data.chart || Object.values(data)[0] || [];
 
-  const rowFieldNames = rowPivots.map(pivot => pivot.field);
+  const rowFieldNames = rowPivots.map<string>(pivot => pivot.field);
   const columnFieldNames = columnPivots.map(pivot => pivot.field);
 
   const seriesToMerge = rollup ? series : [];
-  const effectiveFields = new Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({ effectiveName }) => effectiveName));
+  const effectiveFields = Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({ effectiveName }) => effectiveName));
 
   const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter(r => r.source === 'leaf'));
 
@@ -98,24 +102,25 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   });
 
   return (
-    <div className={`messages-container ${styles.container}`}>
-      <table className="table table-condensed messages">
-        <thead>
-          <Headers activeQuery={currentView.activeQuery}
-                   actualColumnPivotFields={actualColumnPivotFields}
-                   columnPivots={columnPivots}
-                   fields={fields}
-                   rollup={rollup}
-                   rowPivots={rowPivots}
-                   series={series} />
-        </thead>
-        {formattedRows}
-      </table>
+    <div className={styles.container}>
+      <div className={styles.scrollContainer}>
+        <MessagesTable>
+          <thead>
+            <Headers activeQuery={currentView.activeQuery}
+                     actualColumnPivotFields={actualColumnPivotFields}
+                     columnPivots={columnPivots}
+                     fields={fields}
+                     rollup={rollup}
+                     rowPivots={rowPivots}
+                     series={series} />
+          </thead>
+          {formattedRows}
+        </MessagesTable>
+      </div>
     </div>
   );
 };
 
-const ConnectedDataTable = connect(DataTable, { currentView: ViewStore });
-ConnectedDataTable.type = 'table';
+const ConnectedDataTable: VisualizationComponent = makeVisualization(connect(DataTable, { currentView: ViewStore }), 'table');
 
 export default ConnectedDataTable;

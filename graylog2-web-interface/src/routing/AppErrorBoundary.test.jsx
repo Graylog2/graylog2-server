@@ -1,21 +1,11 @@
+// @flow strict
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
+import suppressConsole from 'helpers/suppressConsole';
 import AppErrorBoundary from './AppErrorBoundary';
 
 jest.mock('react-router', () => ({ withRouter: x => x }));
-
-const suppressConsole = (fn) => {
-  /* eslint-disable no-console */
-  const originalConsoleError = console.error;
-  console.error = () => {
-  };
-
-  fn();
-
-  console.error = originalConsoleError;
-  /* eslint-enable no-console */
-};
 
 const ErroneusComponent = () => {
   // eslint-disable-next-line no-throw-literal
@@ -87,7 +77,7 @@ describe('AppErrorBoundary', () => {
         message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
         stack: 'This the stack trace.',
       });
-      expect(errorPage).toHaveProp('info', { componentStack: '\n    in ErroneusComponent\n    in AppErrorBoundary (created by WrapperComponent)\n    in WrapperComponent' });
+      expect(errorPage).toHaveProp('info', { componentStack: '\n    in ErroneusComponent\n    in AppErrorBoundary (created by WrapperComponent)\n    in RootFinder (created by WrapperComponent)\n    in ThemeProvider (created by GraylogThemeProvider)\n    in GraylogThemeProvider (created by WrappingContainer)\n    in WrappingContainer (created by WrapperComponent)\n    in WrapperComponent' });
     });
   });
 

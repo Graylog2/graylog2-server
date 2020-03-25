@@ -3,7 +3,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import { cleanup, waitForElement, render, fireEvent } from '@testing-library/react';
+import { cleanup, waitForElement, render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
@@ -13,6 +13,22 @@ import AppRouter from 'routing/AppRouter';
 
 import viewsBindings from 'views/bindings';
 
+jest.mock('views/stores/DashboardsStore', () => ({
+  DashboardsActions: {
+    search: jest.fn(() => Promise.resolve()),
+  },
+  DashboardsStore: MockStore(
+    ['listen', () => jest.fn()],
+    ['getInitialState', () => ({
+      listen: [],
+      pagination: {
+        total: 100,
+        page: 1,
+        perPage: 20,
+      },
+    })],
+  ),
+}));
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
   ['listen', () => jest.fn()],
   'get',
@@ -43,15 +59,19 @@ describe('Create a new dashboard', () => {
     PluginStore.register(new PluginManifest({}, viewsBindings));
   });
 
+  beforeEach(() => {
+    jest.setTimeout(30000);
+  });
+
   afterEach(cleanup);
 
   it('using Dashboards Page', async () => {
     const { getByText, getAllByText } = render(<AppRouter />);
     history.push(Routes.DASHBOARDS);
 
-    const button = await waitForElement(() => getAllByText('Create new dashboard')[0]);
+    const button = await waitForElement(() => getAllByText('Create new dashboard')[0], { timeout: 15000 });
     fireEvent.click(button);
-    await waitForElement(() => getByText(/This dashboard has no widgets yet/));
+    await waitForElement(() => getByText(/This dashboard has no widgets yet/), { timeout: 15000 });
   });
 
   it('by going to the new dashboards endpoint', async () => {
@@ -59,6 +79,6 @@ describe('Create a new dashboard', () => {
 
     history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
 
-    await waitForElement(() => getByText(/This dashboard has no widgets yet/));
+    await waitForElement(() => getByText(/This dashboard has no widgets yet/), { timeout: 15000 });
   });
 });

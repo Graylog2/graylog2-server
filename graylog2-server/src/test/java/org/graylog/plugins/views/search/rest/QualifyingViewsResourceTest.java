@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.collect.ImmutableList;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.views.QualifyingViewsService;
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
 import org.graylog.plugins.views.search.views.sharing.AllUsersOfInstance;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
@@ -100,9 +101,11 @@ public class QualifyingViewsResourceTest {
     public void returnsNoViewsIfNoneArePermitted() {
         final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
         when(view1.id()).thenReturn("view1");
+        when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view1")).thenReturn(false);
         final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
         when(view2.id()).thenReturn("view2");
+        when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view2")).thenReturn(false);
         when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
 
@@ -115,9 +118,11 @@ public class QualifyingViewsResourceTest {
     public void returnsSomeViewsIfSomeArePermitted() {
         final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
         when(view1.id()).thenReturn("view1");
+        when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view1")).thenReturn(false);
         final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
         when(view2.id()).thenReturn("view2");
+        when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view2")).thenReturn(true);
         when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
 
@@ -145,9 +150,11 @@ public class QualifyingViewsResourceTest {
     public void returnsViewIfNotPermittedButSharedWithUser() {
         final ViewParameterSummaryDTO view1 = mock(ViewParameterSummaryDTO.class);
         when(view1.id()).thenReturn("view1");
+        when(view1.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view1")).thenReturn(false);
         final ViewParameterSummaryDTO view2 = mock(ViewParameterSummaryDTO.class);
         when(view2.id()).thenReturn("view2");
+        when(view2.type()).thenReturn(ViewDTO.Type.SEARCH);
         when(subject.isPermitted(ViewsRestPermissions.VIEW_READ + ":view2")).thenReturn(false);
         when(qualifyingViewsService.forValue()).thenReturn(ImmutableList.of(view1, view2));
         final ViewSharing allUsersOfInstance = AllUsersOfInstance.create("view1");

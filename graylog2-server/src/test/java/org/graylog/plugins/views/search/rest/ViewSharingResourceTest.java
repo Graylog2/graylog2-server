@@ -88,7 +88,7 @@ public class ViewSharingResourceTest {
 
         final Set<UserShortSummary> users = this.viewSharingResource.summarizeUsers("viewId");
 
-        assertThat(users).containsExactly(
+        assertThat(users).containsExactlyInAnyOrder(
                 UserShortSummary.create("franz", "Franz Josef Strauss"),
                 UserShortSummary.create("friedrich", "Friedrich Merz")
         );
@@ -111,7 +111,7 @@ public class ViewSharingResourceTest {
 
         final Set<UserShortSummary> users = this.viewSharingResource.summarizeUsers("viewId");
 
-        assertThat(users).containsExactly(
+        assertThat(users).containsExactlyInAnyOrder(
                 UserShortSummary.create("franz", "Franz Josef Strauss"),
                 UserShortSummary.create("friedrich", "Friedrich Merz"),
                 UserShortSummary.create("peter", "Peter Altmaier")

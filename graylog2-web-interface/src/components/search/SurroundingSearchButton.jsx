@@ -1,67 +1,70 @@
+// @flow strict
+import * as React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
-import { DropdownButton, MenuItem } from 'components/graylog';
+import moment from 'moment';
 import naturalSort from 'javascript-natural-sort';
 
-import StoreProvider from 'injection/StoreProvider';
+import { DropdownButton, MenuItem } from 'components/graylog';
+import DrilldownContext from 'views/components/contexts/DrilldownContext';
+import type { SearchesConfig } from './SearchConfig';
+import SearchLink from './SearchLink';
 
-import moment from 'moment';
+const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }) => Object.entries(surroundingTimerangeOptions)
+  .reduce((prev, [key, value]) => ({ ...prev, [moment.duration(key).asSeconds()]: value }), {});
 
-const SearchStore = StoreProvider.getStore('Search');
+const buildFilterFields = (messageFields, searchConfig) => {
+  const { surrounding_filter_fields: surroundingFilterFields = [] } = searchConfig;
 
-class SurroundingSearchButton extends React.Component {
-  static propTypes = {
-    id: PropTypes.string.isRequired,
-    timestamp: PropTypes.number.isRequired,
-    searchConfig: PropTypes.object.isRequired,
-    messageFields: PropTypes.object.isRequired,
-  };
+  return surroundingFilterFields.reduce((prev, cur) => ({ ...prev, [cur]: messageFields[cur] }), {});
+};
 
-  _buildTimeRangeOptions = (searchConfig) => {
-    const options = {};
+const buildSearchLink = (id, from, to, fields, filterFields, streams) => SearchLink.builder()
+  .timerange({ type: 'absolute', from, to })
+  .streams(streams)
+  .filterFields(filterFields)
+  .highlightedMessage(id)
+  .build()
+  .toURL();
 
-    Object.keys(searchConfig.surrounding_timerange_options).forEach((key) => {
-      options[moment.duration(key).asSeconds()] = searchConfig.surrounding_timerange_options[key];
-    });
+const searchLink = (range, timestamp, id, messageFields, searchConfig, streams) => {
+  const fromTime = moment(timestamp).subtract(Number(range), 'seconds').toISOString();
+  const toTime = moment(timestamp).add(Number(range), 'seconds').toISOString();
+  const filterFields = buildFilterFields(messageFields, searchConfig);
 
-    return options;
-  };
+  return buildSearchLink(id, fromTime, toTime, [], filterFields, streams);
+};
 
-  _buildFilterFields = () => {
-    const fields = {};
+type Props = {
+  searchConfig: SearchesConfig,
+  timestamp: string,
+  id: string,
+  messageFields: { [string]: mixed },
+};
 
-    if (this.props.searchConfig) {
-      this.props.searchConfig.surrounding_filter_fields.forEach((field) => {
-        fields[field] = this.props.messageFields[field];
-      });
-    }
+const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }: Props) => {
+  const { streams } = useContext(DrilldownContext);
+  const timeRangeOptions = buildTimeRangeOptions(searchConfig);
+  const menuItems = Object.keys(timeRangeOptions)
+    .sort((a, b) => naturalSort(a, b))
+    .map(range => (
+      <MenuItem key={range} href={searchLink(range, timestamp, id, messageFields, searchConfig, streams)} target="_blank" rel="noopener noreferrer">
+        {timeRangeOptions[range]}
+      </MenuItem>
+    ));
 
-    return fields;
-  };
+  return (
+    <DropdownButton title="Show surrounding messages" bsSize="small" id="surrounding-search-dropdown">
+      {menuItems}
+    </DropdownButton>
+  );
+};
 
-  _searchLink = (range) => {
-    const fromTime = moment.unix(this.props.timestamp - Number(range)).toISOString();
-    const toTime = moment.unix(this.props.timestamp + Number(range)).toISOString();
-
-    return SearchStore.searchSurroundingMessages(this.props.id, fromTime, toTime, this._buildFilterFields());
-  };
-
-  render() {
-    const timeRangeOptions = this._buildTimeRangeOptions(this.props.searchConfig);
-    const menuItems = Object.keys(timeRangeOptions)
-      .sort((a, b) => naturalSort(a, b))
-      .map((key, idx) => {
-        return (
-          <MenuItem key={idx} href={this._searchLink(key)}>{timeRangeOptions[key]}</MenuItem>
-        );
-      });
-
-    return (
-      <DropdownButton title="Show surrounding messages" bsSize="small" id="surrounding-search-dropdown">
-        {menuItems}
-      </DropdownButton>
-    );
-  }
-}
+SurroundingSearchButton.propTypes = {
+  id: PropTypes.string.isRequired,
+  timestamp: PropTypes.string.isRequired,
+  searchConfig: PropTypes.object.isRequired,
+  messageFields: PropTypes.object.isRequired,
+};
 
 export default SurroundingSearchButton;

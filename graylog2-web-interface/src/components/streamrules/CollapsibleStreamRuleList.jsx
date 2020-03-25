@@ -1,41 +1,35 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Collapse } from 'components/graylog';
+import styled from 'styled-components';
 
-import StreamRuleList from 'components/streamrules//StreamRuleList';
+import { Collapse } from 'components/graylog';
+import StreamRuleList from 'components/streamrules/StreamRuleList';
 
-class CollapsibleStreamRuleList extends React.Component {
-  static propTypes = {
-    permissions: PropTypes.array.isRequired,
-    stream: PropTypes.object.isRequired,
-    streamRuleTypes: PropTypes.array.isRequired,
-  };
+const RuleWrapper = styled.div`
+  margin: 12px 0 0;
+`;
 
-  state = {
-    expanded: false,
-  };
+const CollapsibleStreamRuleList = ({ expanded, permissions, stream, streamRuleTypes }) => {
+  return (
+    <Collapse in={expanded} timeout={0}>
+      <RuleWrapper>
+        <StreamRuleList stream={stream}
+                        streamRuleTypes={streamRuleTypes}
+                        permissions={permissions} />
+      </RuleWrapper>
+    </Collapse>
+  );
+};
 
-  _onHandleToggle = (e) => {
-    e.preventDefault();
-    this.setState({ expanded: !this.state.expanded });
-  };
+CollapsibleStreamRuleList.propTypes = {
+  expanded: PropTypes.bool,
+  permissions: PropTypes.array.isRequired,
+  stream: PropTypes.object.isRequired,
+  streamRuleTypes: PropTypes.array.isRequired,
+};
 
-  render() {
-    const text = this.state.expanded ? 'Hide' : 'Show';
-
-    return (
-      <span className="stream-rules-link">
-        <a href="#" onClick={this._onHandleToggle}>{text} stream rules</a>
-        <Collapse in={this.state.expanded} timeout={0}>
-          <Alert>
-            <StreamRuleList stream={this.props.stream}
-                            streamRuleTypes={this.props.streamRuleTypes}
-                            permissions={this.props.permissions} />
-          </Alert>
-        </Collapse>
-      </span>
-    );
-  }
-}
+CollapsibleStreamRuleList.defaultProps = {
+  expanded: false,
+};
 
 export default CollapsibleStreamRuleList;

@@ -1,7 +1,5 @@
 import View from './View';
 
-jest.mock('routing/Routes', () => ({ VIEWS: { VIEWID: viewId => `/views/${viewId}` } }));
-
 // eslint-disable-next-line global-require
 const loadSUT = () => require('./OnSaveAsViewAction');
 
@@ -52,7 +50,7 @@ describe('OnSaveAsViewAction', () => {
 
     return onSaveAsView(view, router).then(() => {
       expect(router).toHaveLength(1);
-      expect(router).toEqual(['/views/deadbeef']);
+      expect(router).toEqual(['/dashboards/deadbeef']);
     });
   });
 

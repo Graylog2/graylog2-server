@@ -1,21 +1,20 @@
 // @flow strict
 import * as React from 'react';
-// $FlowFixMe: imports from core need to be fixed in flow
+import * as Immutable from 'immutable';
+
 import { LinkContainer } from 'react-router-bootstrap';
-// $FlowFixMe: imports from core need to be fixed in flow
 import Routes from 'routing/Routes';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { ClipboardButton } from 'components/common';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
-// $FlowFixMe: imports from core need to be fixed in flow
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 
 type Props = {
   index: string,
   id: string,
   fields: {
     timestamp: string,
+    [string]: mixed,
   },
   decorationStats: ?any,
   disabled: boolean,
@@ -23,8 +22,8 @@ type Props = {
   disableTestAgainstStream: boolean,
   showOriginal: boolean,
   toggleShowOriginal: () => void,
-  streams: Array<*>,
-  searchConfig: *,
+  streams: Immutable.List<any>,
+  searchConfig: SearchesConfig,
 };
 
 const _getTestAgainstStreamButton = (streams, index, id) => {
@@ -58,11 +57,13 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
 
   const messageUrl = index ? Routes.message_show(index, id) : '#';
 
+  const { timestamp, ...remainingFields } = fields;
+
   const surroundingSearchButton = disableSurroundingSearch || (
     <SurroundingSearchButton id={id}
-                             timestamp={fields.timestamp}
+                             timestamp={timestamp}
                              searchConfig={searchConfig}
-                             messageFields={fields} />
+                             messageFields={remainingFields} />
   );
 
   const showChanges = decorationStats && <Button onClick={toggleShowOriginal} active={showOriginal}>Show changes</Button>;

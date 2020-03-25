@@ -1,721 +1,2046 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
-<div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-sm-6"
+<ContentPackPreview
+  contentPack={
+    Object {
+      "description": "",
+      "entities": Array [],
+      "id": "dead-beef",
+      "name": "",
+      "parameters": Array [],
+      "rev": 1,
+      "summary": "",
+      "url": "",
+      "v": 1,
+      "vendor": "",
+    }
+  }
+  onSave={[Function]}
+>
+  <div>
+    <Row
+      bsClass="row"
+      componentClass="div"
     >
       <div
         className="row"
       >
-        <div
-          className="col-sm-9 col-sm-offset-1"
+        <Col
+          bsClass="col"
+          componentClass="div"
+          sm={6}
         >
           <div
-            id="content-pack-details"
+            className="col-sm-6"
           >
-            <h2>
-              Details
-            </h2>
-            <br />
-            <div>
-              <dl
-                className="deflist"
+            <ContentPackDetails
+              constraints={Array []}
+              contentPack={
+                Object {
+                  "description": "",
+                  "entities": Array [],
+                  "id": "dead-beef",
+                  "name": "",
+                  "parameters": Array [],
+                  "rev": 1,
+                  "summary": "",
+                  "url": "",
+                  "v": 1,
+                  "vendor": "",
+                }
+              }
+              offset={1}
+              showConstraints={false}
+              verbose={false}
+            >
+              <Row
+                bsClass="row"
+                componentClass="div"
               >
-                <dt>
-                  Version:
-                </dt>
-                 
-                <dd>
-                  1
-                </dd>
-                <dt>
-                  Name:
-                </dt>
-                 
-                <dd>
-                  
-                   
-                </dd>
-                <dt>
-                  Summary:
-                </dt>
-                 
-                <dd>
-                  
-                   
-                </dd>
-                <dt>
-                  Vendor:
-                </dt>
-                 
-                <dd>
-                  
-                   
-                </dd>
-                <dt>
-                  URL:
-                </dt>
-                 
-                <dd>
-                  <a
-                    href=""
+                <div
+                  className="row"
+                >
+                  <Col
+                    bsClass="col"
+                    componentClass="div"
+                    sm={9}
+                    smOffset={1}
                   >
-                    
-                  </a>
-                   
-                </dd>
-                <span>
-                  <dt>
-                    ID:
-                  </dt>
-                   
-                  <dd>
-                    <code>
-                      dead-beef
-                    </code>
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    Parameters:
-                  </dt>
-                   
-                  <dd>
-                    0
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    Entities:
-                  </dt>
-                   
-                  <dd>
-                    0
-                  </dd>
-                </span>
-              </dl>
-            </div>
-            
-            <br />
-            <br />
-            <br />
+                    <div
+                      className="col-sm-9 col-sm-offset-1"
+                    >
+                      <div
+                        id="content-pack-details"
+                      >
+                        <h2>
+                          Details
+                        </h2>
+                        <br />
+                        <div>
+                          <dl
+                            className="deflist"
+                          >
+                            <dt>
+                              Version:
+                            </dt>
+                             
+                            <dd>
+                              1
+                            </dd>
+                            <dt>
+                              Name:
+                            </dt>
+                             
+                            <dd>
+                               
+                            </dd>
+                            <dt>
+                              Summary:
+                            </dt>
+                             
+                            <dd>
+                               
+                            </dd>
+                            <dt>
+                              Vendor:
+                            </dt>
+                             
+                            <dd>
+                               
+                            </dd>
+                            <dt>
+                              URL:
+                            </dt>
+                             
+                            <dd>
+                              <a
+                                href=""
+                              />
+                               
+                            </dd>
+                            <span>
+                              <dt>
+                                ID:
+                              </dt>
+                               
+                              <dd>
+                                <code>
+                                  dead-beef
+                                </code>
+                              </dd>
+                            </span>
+                            <span>
+                              <dt>
+                                Parameters:
+                              </dt>
+                               
+                              <dd>
+                                0
+                              </dd>
+                            </span>
+                            <span>
+                              <dt>
+                                Entities:
+                              </dt>
+                               
+                              <dd>
+                                0
+                              </dd>
+                            </span>
+                          </dl>
+                        </div>
+                        <br />
+                        <br />
+                        <br />
+                      </div>
+                    </div>
+                  </Col>
+                </div>
+              </Row>
+            </ContentPackDetails>
           </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="col-sm-6"
-    >
-      <div>
-        <h2>
-          Constraints
-        </h2>
-        <br />
-        <br />
-        <div>
-          <div
-            className="row "
-          >
-            <div
-              className="col-md-12"
-            >
-              <div
-                className="data-table table-responsive"
-                id="content-packs-constraints"
-              >
-                <p>
-                  No data available.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <h2>
-          Entity list
-        </h2>
-        <br />
-        <div
-          className="search"
-          style={
-            Object {
-              "marginTop": 15,
-            }
-          }
+        </Col>
+        <Col
+          bsClass="col"
+          componentClass="div"
+          sm={6}
         >
-          <form
-            className="form-inline"
-            onSubmit={[Function]}
+          <div
+            className="col-sm-6"
           >
-            <div
-              className="form-group has-feedback"
+            <ContentPackConstraints
+              constraints={Immutable.Set []}
+              isFulfilled={true}
             >
-              <input
-                autoComplete="off"
-                className="query form-control"
-                id="common-search-form-query-input"
-                onChange={[Function]}
-                placeholder="Enter search query..."
-                spellCheck="false"
-                style={
-                  Object {
-                    "width": "auto",
+              <div>
+                <h2>
+                  Constraints
+                </h2>
+                <br />
+                <br />
+                <DataTable
+                  className=""
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Name",
+                      "Type",
+                      "Version",
+                      "Fulfilled",
+                    ]
                   }
-                }
-                type="text"
-                value=""
-              />
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
-                disabled={false}
-                type="submit"
-              >
-                Filter
-              </button>
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
-                disabled={false}
-                onClick={[Function]}
-                type="reset"
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-        </div>
-        <div>
-          <div
-            className="row "
-          >
-            <div
-              className="col-md-12"
-            >
-              <div
-                className="data-table table-responsive"
-                id="entity-list"
-              >
-                <p>
-                  No data available.
-                </p>
+                  id="content-packs-constraints"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={Array []}
+                  sortBy={[Function]}
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+                      <div
+                        className="col-md-12"
+                      >
+                        <div
+                          className="data-table table-responsive"
+                          id="content-packs-constraints"
+                        >
+                          <p>
+                            No data available.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DataTable>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <h2>
-          Parameters list
-        </h2>
-        <br />
-        <div
-          className="search"
-          style={
-            Object {
-              "marginTop": 15,
-            }
-          }
-        >
-          <form
-            className="form-inline"
-            onSubmit={[Function]}
-          >
-            <div
-              className="form-group has-feedback"
+            </ContentPackConstraints>
+            <ContentPackEntitiesList
+              appliedParameter={Object {}}
+              contentPack={
+                Object {
+                  "description": "",
+                  "entities": Array [],
+                  "id": "dead-beef",
+                  "name": "",
+                  "parameters": Array [],
+                  "rev": 1,
+                  "summary": "",
+                  "url": "",
+                  "v": 1,
+                  "vendor": "",
+                }
+              }
+              onParameterApply={[Function]}
+              onParameterClear={[Function]}
+              readOnly={true}
             >
-              <input
-                autoComplete="off"
-                className="query form-control"
-                id="common-search-form-query-input"
-                onChange={[Function]}
-                placeholder="Enter search query..."
-                spellCheck="false"
-                style={
-                  Object {
-                    "width": "auto",
+              <div>
+                <h2>
+                  Entity list
+                </h2>
+                <br />
+                <SearchForm
+                  buttonLeftMargin={5}
+                  label={null}
+                  loadingLabel="Loading..."
+                  onQueryChange={[Function]}
+                  onReset={[Function]}
+                  onSearch={[Function]}
+                  placeholder="Enter search query..."
+                  query=""
+                  queryHelpComponent={null}
+                  queryWidth="auto"
+                  resetButtonLabel="Reset"
+                  searchBsStyle="default"
+                  searchButtonLabel="Filter"
+                  topMargin={15}
+                  useLoadingState={false}
+                  wrapperClass="search"
+                >
+                  <div
+                    className="search"
+                    style={
+                      Object {
+                        "marginTop": 15,
+                      }
+                    }
+                  >
+                    <form
+                      className="form-inline"
+                      onSubmit={[Function]}
+                    >
+                      <div
+                        className="form-group has-feedback"
+                      >
+                        <input
+                          autoComplete="off"
+                          className="query form-control"
+                          id="common-search-form-query-input"
+                          onChange={[Function]}
+                          placeholder="Enter search query..."
+                          spellCheck="false"
+                          style={
+                            Object {
+                              "width": "auto",
+                            }
+                          }
+                          type="text"
+                          value=""
+                        />
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+                          }
+                        }
+                      >
+                        <ForwardRef
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          type="submit"
+                        >
+                          <Button__StyledButton
+                            bsStyle="default"
+                            className="submit-button"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <StyledComponent
+                              bsStyle="default"
+                              className="submit-button"
+                              disabled={false}
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "pSZqX",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              type="submit"
+                            >
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                disabled={false}
+                                type="submit"
+                              >
+                                <button
+                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  disabled={false}
+                                  type="submit"
+                                >
+                                  Filter
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+                          }
+                        }
+                      >
+                        <ForwardRef
+                          bsStyle="default"
+                          className="reset-button"
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button__StyledButton
+                            bsStyle="default"
+                            className="reset-button"
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <StyledComponent
+                              bsStyle="default"
+                              className="reset-button"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "pSZqX",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                disabled={false}
+                                onClick={[Function]}
+                                type="reset"
+                              >
+                                <button
+                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                  type="reset"
+                                >
+                                  Reset
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Type",
+                      "Description",
+                      "Action",
+                    ]
                   }
-                }
-                type="text"
-                value=""
-              />
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
-                disabled={false}
-                type="submit"
-              >
-                Filter
-              </button>
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
-                disabled={false}
-                onClick={[Function]}
-                type="reset"
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-        </div>
-        <div>
-          <div
-            className="row "
-          >
-            <div
-              className="col-md-12"
-            >
-              <div
-                className="data-table table-responsive"
-                id="parameter-list"
-              >
-                <p>
-                  To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
-                </p>
+                  id="entity-list"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={Array []}
+                  sortBy={[Function]}
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+                      <div
+                        className="col-md-12"
+                      >
+                        <div
+                          className="data-table table-responsive"
+                          id="entity-list"
+                        >
+                          <p>
+                            No data available.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DataTable>
               </div>
-            </div>
+            </ContentPackEntitiesList>
+            <ContentPackParameterList
+              appliedParameter={Object {}}
+              contentPack={
+                Object {
+                  "description": "",
+                  "entities": Array [],
+                  "id": "dead-beef",
+                  "name": "",
+                  "parameters": Array [],
+                  "rev": 1,
+                  "summary": "",
+                  "url": "",
+                  "v": 1,
+                  "vendor": "",
+                }
+              }
+              onAddParameter={[Function]}
+              onDeleteParameter={[Function]}
+              readOnly={true}
+            >
+              <div>
+                <h2>
+                  Parameters list
+                </h2>
+                <br />
+                <SearchForm
+                  buttonLeftMargin={5}
+                  label={null}
+                  loadingLabel="Loading..."
+                  onQueryChange={[Function]}
+                  onReset={[Function]}
+                  onSearch={[Function]}
+                  placeholder="Enter search query..."
+                  query=""
+                  queryHelpComponent={null}
+                  queryWidth="auto"
+                  resetButtonLabel="Reset"
+                  searchBsStyle="default"
+                  searchButtonLabel="Filter"
+                  topMargin={15}
+                  useLoadingState={false}
+                  wrapperClass="search"
+                >
+                  <div
+                    className="search"
+                    style={
+                      Object {
+                        "marginTop": 15,
+                      }
+                    }
+                  >
+                    <form
+                      className="form-inline"
+                      onSubmit={[Function]}
+                    >
+                      <div
+                        className="form-group has-feedback"
+                      >
+                        <input
+                          autoComplete="off"
+                          className="query form-control"
+                          id="common-search-form-query-input"
+                          onChange={[Function]}
+                          placeholder="Enter search query..."
+                          spellCheck="false"
+                          style={
+                            Object {
+                              "width": "auto",
+                            }
+                          }
+                          type="text"
+                          value=""
+                        />
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+                          }
+                        }
+                      >
+                        <ForwardRef
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          type="submit"
+                        >
+                          <Button__StyledButton
+                            bsStyle="default"
+                            className="submit-button"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <StyledComponent
+                              bsStyle="default"
+                              className="submit-button"
+                              disabled={false}
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "pSZqX",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              type="submit"
+                            >
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                disabled={false}
+                                type="submit"
+                              >
+                                <button
+                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  disabled={false}
+                                  type="submit"
+                                >
+                                  Filter
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+                          }
+                        }
+                      >
+                        <ForwardRef
+                          bsStyle="default"
+                          className="reset-button"
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button__StyledButton
+                            bsStyle="default"
+                            className="reset-button"
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <StyledComponent
+                              bsStyle="default"
+                              className="reset-button"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "pSZqX",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                disabled={false}
+                                onClick={[Function]}
+                                type="reset"
+                              >
+                                <button
+                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                  type="reset"
+                                >
+                                  Reset
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Name",
+                      "Description",
+                      "Value Type",
+                      "Default Value",
+                      "Used",
+                    ]
+                  }
+                  id="parameter-list"
+                  noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+                  rowClassName=""
+                  rows={Array []}
+                  sortByKey="title"
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+                      <div
+                        className="col-md-12"
+                      >
+                        <div
+                          className="data-table table-responsive"
+                          id="parameter-list"
+                        >
+                          <p>
+                            To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DataTable>
+              </div>
+            </ContentPackParameterList>
           </div>
-        </div>
+        </Col>
       </div>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-sm-6"
+    </Row>
+    <Row
+      bsClass="row"
+      componentClass="div"
     >
-      <button
-        className="Button-c9cbmb-0 GLfOY btn btn-primary"
-        disabled={false}
-        id="create"
-        onClick={[Function]}
-        type="button"
+      <div
+        className="row"
       >
-        Create
-      </button>
-       
-      <a
-        download="content-pack-dead-beef-1.json"
-        href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22%22%2C%0A%20%20%22summary%22%3A%20%22%22%2C%0A%20%20%22description%22%3A%20%22%22%2C%0A%20%20%22vendor%22%3A%20%22%22%2C%0A%20%20%22url%22%3A%20%22%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
-      >
-        <button
-          className="Button-c9cbmb-0 GLfOY btn btn-info"
-          disabled={false}
-          id="download"
-          onClick={[Function]}
-          type="button"
+        <Col
+          bsClass="col"
+          componentClass="div"
+          sm={6}
         >
-          Create and Download
-        </button>
-      </a>
-    </div>
+          <div
+            className="col-sm-6"
+          >
+            <ForwardRef
+              bsStyle="primary"
+              id="create"
+              onClick={[Function]}
+            >
+              <Button__StyledButton
+                bsStyle="primary"
+                id="create"
+                onClick={[Function]}
+              >
+                <StyledComponent
+                  bsStyle="primary"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "pSZqX",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  id="create"
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="primary"
+                    className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                    disabled={false}
+                    id="create"
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+                      disabled={false}
+                      id="create"
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Create
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
+            </ForwardRef>
+             
+            <a
+              download="content-pack-dead-beef-1.json"
+              href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22%22%2C%0A%20%20%22summary%22%3A%20%22%22%2C%0A%20%20%22description%22%3A%20%22%22%2C%0A%20%20%22vendor%22%3A%20%22%22%2C%0A%20%20%22url%22%3A%20%22%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
+            >
+              <ForwardRef
+                bsStyle="info"
+                id="download"
+                onClick={[Function]}
+              >
+                <Button__StyledButton
+                  bsStyle="info"
+                  id="download"
+                  onClick={[Function]}
+                >
+                  <StyledComponent
+                    bsStyle="info"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                          "xsmall",
+                        ],
+                        "STYLES": Array [
+                          "success",
+                          "warning",
+                          "danger",
+                          "info",
+                          "default",
+                          "primary",
+                          "link",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Button__StyledButton-c9cbmb-0",
+                          "isStatic": false,
+                          "lastClassName": "pSZqX",
+                          "rules": Array [
+                            [Function],
+                          ],
+                        },
+                        "displayName": "Button__StyledButton",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    id="download"
+                    onClick={[Function]}
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="info"
+                      className="Button__StyledButton-c9cbmb-0 pSZqX"
+                      disabled={false}
+                      id="download"
+                      onClick={[Function]}
+                    >
+                      <button
+                        className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-info"
+                        disabled={false}
+                        id="download"
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Create and Download
+                      </button>
+                    </Button>
+                  </StyledComponent>
+                </Button__StyledButton>
+              </ForwardRef>
+            </a>
+          </div>
+        </Col>
+      </div>
+    </Row>
   </div>
-</div>
+</ContentPackPreview>
 `;
 
 exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
-<div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-sm-6"
+<ContentPackPreview
+  contentPack={
+    Object {
+      "description": "descr",
+      "entities": Array [],
+      "id": "dead-beef",
+      "name": "name",
+      "parameters": Array [],
+      "rev": 1,
+      "summary": "summary",
+      "url": "http://example.com",
+      "v": 1,
+      "vendor": "vendor",
+    }
+  }
+  onSave={[Function]}
+>
+  <div>
+    <Row
+      bsClass="row"
+      componentClass="div"
     >
       <div
         className="row"
       >
-        <div
-          className="col-sm-9 col-sm-offset-1"
+        <Col
+          bsClass="col"
+          componentClass="div"
+          sm={6}
         >
           <div
-            id="content-pack-details"
+            className="col-sm-6"
           >
-            <h2>
-              Details
-            </h2>
-            <br />
-            <div>
-              <dl
-                className="deflist"
-              >
-                <dt>
-                  Version:
-                </dt>
-                 
-                <dd>
-                  1
-                </dd>
-                <dt>
-                  Name:
-                </dt>
-                 
-                <dd>
-                  name
-                   
-                </dd>
-                <dt>
-                  Summary:
-                </dt>
-                 
-                <dd>
-                  summary
-                   
-                </dd>
-                <dt>
-                  Vendor:
-                </dt>
-                 
-                <dd>
-                  vendor
-                   
-                </dd>
-                <dt>
-                  URL:
-                </dt>
-                 
-                <dd>
-                  <a
-                    href="http://example.com"
-                  >
-                    http://example.com
-                  </a>
-                   
-                </dd>
-                <span>
-                  <dt>
-                    ID:
-                  </dt>
-                   
-                  <dd>
-                    <code>
-                      dead-beef
-                    </code>
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    Parameters:
-                  </dt>
-                   
-                  <dd>
-                    0
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    Entities:
-                  </dt>
-                   
-                  <dd>
-                    0
-                  </dd>
-                </span>
-              </dl>
-            </div>
-            <div>
-              <h2>
-                Description
-              </h2>
-              <br />
-              <div
-                className="Well-sc-19gs1oc-0 kezSPd well"
+            <ContentPackDetails
+              constraints={Array []}
+              contentPack={
+                Object {
+                  "description": "descr",
+                  "entities": Array [],
+                  "id": "dead-beef",
+                  "name": "name",
+                  "parameters": Array [],
+                  "rev": 1,
+                  "summary": "summary",
+                  "url": "http://example.com",
+                  "v": 1,
+                  "vendor": "vendor",
+                }
+              }
+              offset={1}
+              showConstraints={false}
+              verbose={false}
+            >
+              <Row
+                bsClass="row"
+                componentClass="div"
               >
                 <div
-                  dangerouslySetInnerHTML={
+                  className="row"
+                >
+                  <Col
+                    bsClass="col"
+                    componentClass="div"
+                    sm={9}
+                    smOffset={1}
+                  >
+                    <div
+                      className="col-sm-9 col-sm-offset-1"
+                    >
+                      <div
+                        id="content-pack-details"
+                      >
+                        <h2>
+                          Details
+                        </h2>
+                        <br />
+                        <div>
+                          <dl
+                            className="deflist"
+                          >
+                            <dt>
+                              Version:
+                            </dt>
+                             
+                            <dd>
+                              1
+                            </dd>
+                            <dt>
+                              Name:
+                            </dt>
+                             
+                            <dd>
+                              name
+                               
+                            </dd>
+                            <dt>
+                              Summary:
+                            </dt>
+                             
+                            <dd>
+                              summary
+                               
+                            </dd>
+                            <dt>
+                              Vendor:
+                            </dt>
+                             
+                            <dd>
+                              vendor
+                               
+                            </dd>
+                            <dt>
+                              URL:
+                            </dt>
+                             
+                            <dd>
+                              <a
+                                href="http://example.com"
+                              >
+                                http://example.com
+                              </a>
+                               
+                            </dd>
+                            <span>
+                              <dt>
+                                ID:
+                              </dt>
+                               
+                              <dd>
+                                <code>
+                                  dead-beef
+                                </code>
+                              </dd>
+                            </span>
+                            <span>
+                              <dt>
+                                Parameters:
+                              </dt>
+                               
+                              <dd>
+                                0
+                              </dd>
+                            </span>
+                            <span>
+                              <dt>
+                                Entities:
+                              </dt>
+                               
+                              <dd>
+                                0
+                              </dd>
+                            </span>
+                          </dl>
+                        </div>
+                        <div>
+                          <h2>
+                            Description
+                          </h2>
+                          <br />
+                          <Well>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Well-sc-19gs1oc-0",
+                                    "isStatic": false,
+                                    "lastClassName": "eWEWxV",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Well",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Well-sc-19gs1oc-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <Well
+                                bsClass="well"
+                                className="Well-sc-19gs1oc-0 eWEWxV"
+                              >
+                                <div
+                                  className="Well-sc-19gs1oc-0 eWEWxV well"
+                                >
+                                  <div
+                                    dangerouslySetInnerHTML={
+                                      Object {
+                                        "__html": "<p>descr</p>",
+                                      }
+                                    }
+                                  />
+                                </div>
+                              </Well>
+                            </StyledComponent>
+                          </Well>
+                        </div>
+                        <br />
+                        <br />
+                        <br />
+                      </div>
+                    </div>
+                  </Col>
+                </div>
+              </Row>
+            </ContentPackDetails>
+          </div>
+        </Col>
+        <Col
+          bsClass="col"
+          componentClass="div"
+          sm={6}
+        >
+          <div
+            className="col-sm-6"
+          >
+            <ContentPackConstraints
+              constraints={Immutable.Set []}
+              isFulfilled={true}
+            >
+              <div>
+                <h2>
+                  Constraints
+                </h2>
+                <br />
+                <br />
+                <DataTable
+                  className=""
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Name",
+                      "Type",
+                      "Version",
+                      "Fulfilled",
+                    ]
+                  }
+                  id="content-packs-constraints"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={Array []}
+                  sortBy={[Function]}
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+                      <div
+                        className="col-md-12"
+                      >
+                        <div
+                          className="data-table table-responsive"
+                          id="content-packs-constraints"
+                        >
+                          <p>
+                            No data available.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DataTable>
+              </div>
+            </ContentPackConstraints>
+            <ContentPackEntitiesList
+              appliedParameter={Object {}}
+              contentPack={
+                Object {
+                  "description": "descr",
+                  "entities": Array [],
+                  "id": "dead-beef",
+                  "name": "name",
+                  "parameters": Array [],
+                  "rev": 1,
+                  "summary": "summary",
+                  "url": "http://example.com",
+                  "v": 1,
+                  "vendor": "vendor",
+                }
+              }
+              onParameterApply={[Function]}
+              onParameterClear={[Function]}
+              readOnly={true}
+            >
+              <div>
+                <h2>
+                  Entity list
+                </h2>
+                <br />
+                <SearchForm
+                  buttonLeftMargin={5}
+                  label={null}
+                  loadingLabel="Loading..."
+                  onQueryChange={[Function]}
+                  onReset={[Function]}
+                  onSearch={[Function]}
+                  placeholder="Enter search query..."
+                  query=""
+                  queryHelpComponent={null}
+                  queryWidth="auto"
+                  resetButtonLabel="Reset"
+                  searchBsStyle="default"
+                  searchButtonLabel="Filter"
+                  topMargin={15}
+                  useLoadingState={false}
+                  wrapperClass="search"
+                >
+                  <div
+                    className="search"
+                    style={
+                      Object {
+                        "marginTop": 15,
+                      }
+                    }
+                  >
+                    <form
+                      className="form-inline"
+                      onSubmit={[Function]}
+                    >
+                      <div
+                        className="form-group has-feedback"
+                      >
+                        <input
+                          autoComplete="off"
+                          className="query form-control"
+                          id="common-search-form-query-input"
+                          onChange={[Function]}
+                          placeholder="Enter search query..."
+                          spellCheck="false"
+                          style={
+                            Object {
+                              "width": "auto",
+                            }
+                          }
+                          type="text"
+                          value=""
+                        />
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+                          }
+                        }
+                      >
+                        <ForwardRef
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          type="submit"
+                        >
+                          <Button__StyledButton
+                            bsStyle="default"
+                            className="submit-button"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <StyledComponent
+                              bsStyle="default"
+                              className="submit-button"
+                              disabled={false}
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "pSZqX",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              type="submit"
+                            >
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                disabled={false}
+                                type="submit"
+                              >
+                                <button
+                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  disabled={false}
+                                  type="submit"
+                                >
+                                  Filter
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+                          }
+                        }
+                      >
+                        <ForwardRef
+                          bsStyle="default"
+                          className="reset-button"
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button__StyledButton
+                            bsStyle="default"
+                            className="reset-button"
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <StyledComponent
+                              bsStyle="default"
+                              className="reset-button"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "pSZqX",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                disabled={false}
+                                onClick={[Function]}
+                                type="reset"
+                              >
+                                <button
+                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                  type="reset"
+                                >
+                                  Reset
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Type",
+                      "Description",
+                      "Action",
+                    ]
+                  }
+                  id="entity-list"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={Array []}
+                  sortBy={[Function]}
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+                      <div
+                        className="col-md-12"
+                      >
+                        <div
+                          className="data-table table-responsive"
+                          id="entity-list"
+                        >
+                          <p>
+                            No data available.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DataTable>
+              </div>
+            </ContentPackEntitiesList>
+            <ContentPackParameterList
+              appliedParameter={Object {}}
+              contentPack={
+                Object {
+                  "description": "descr",
+                  "entities": Array [],
+                  "id": "dead-beef",
+                  "name": "name",
+                  "parameters": Array [],
+                  "rev": 1,
+                  "summary": "summary",
+                  "url": "http://example.com",
+                  "v": 1,
+                  "vendor": "vendor",
+                }
+              }
+              onAddParameter={[Function]}
+              onDeleteParameter={[Function]}
+              readOnly={true}
+            >
+              <div>
+                <h2>
+                  Parameters list
+                </h2>
+                <br />
+                <SearchForm
+                  buttonLeftMargin={5}
+                  label={null}
+                  loadingLabel="Loading..."
+                  onQueryChange={[Function]}
+                  onReset={[Function]}
+                  onSearch={[Function]}
+                  placeholder="Enter search query..."
+                  query=""
+                  queryHelpComponent={null}
+                  queryWidth="auto"
+                  resetButtonLabel="Reset"
+                  searchBsStyle="default"
+                  searchButtonLabel="Filter"
+                  topMargin={15}
+                  useLoadingState={false}
+                  wrapperClass="search"
+                >
+                  <div
+                    className="search"
+                    style={
+                      Object {
+                        "marginTop": 15,
+                      }
+                    }
+                  >
+                    <form
+                      className="form-inline"
+                      onSubmit={[Function]}
+                    >
+                      <div
+                        className="form-group has-feedback"
+                      >
+                        <input
+                          autoComplete="off"
+                          className="query form-control"
+                          id="common-search-form-query-input"
+                          onChange={[Function]}
+                          placeholder="Enter search query..."
+                          spellCheck="false"
+                          style={
+                            Object {
+                              "width": "auto",
+                            }
+                          }
+                          type="text"
+                          value=""
+                        />
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+                          }
+                        }
+                      >
+                        <ForwardRef
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          type="submit"
+                        >
+                          <Button__StyledButton
+                            bsStyle="default"
+                            className="submit-button"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <StyledComponent
+                              bsStyle="default"
+                              className="submit-button"
+                              disabled={false}
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "pSZqX",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              type="submit"
+                            >
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                disabled={false}
+                                type="submit"
+                              >
+                                <button
+                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  disabled={false}
+                                  type="submit"
+                                >
+                                  Filter
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+                          }
+                        }
+                      >
+                        <ForwardRef
+                          bsStyle="default"
+                          className="reset-button"
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button__StyledButton
+                            bsStyle="default"
+                            className="reset-button"
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <StyledComponent
+                              bsStyle="default"
+                              className="reset-button"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "pSZqX",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                disabled={false}
+                                onClick={[Function]}
+                                type="reset"
+                              >
+                                <button
+                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                  type="reset"
+                                >
+                                  Reset
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Name",
+                      "Description",
+                      "Value Type",
+                      "Default Value",
+                      "Used",
+                    ]
+                  }
+                  id="parameter-list"
+                  noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+                  rowClassName=""
+                  rows={Array []}
+                  sortByKey="title"
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+                      <div
+                        className="col-md-12"
+                      >
+                        <div
+                          className="data-table table-responsive"
+                          id="parameter-list"
+                        >
+                          <p>
+                            To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </DataTable>
+              </div>
+            </ContentPackParameterList>
+          </div>
+        </Col>
+      </div>
+    </Row>
+    <Row
+      bsClass="row"
+      componentClass="div"
+    >
+      <div
+        className="row"
+      >
+        <Col
+          bsClass="col"
+          componentClass="div"
+          sm={6}
+        >
+          <div
+            className="col-sm-6"
+          >
+            <ForwardRef
+              bsStyle="primary"
+              id="create"
+              onClick={[Function]}
+            >
+              <Button__StyledButton
+                bsStyle="primary"
+                id="create"
+                onClick={[Function]}
+              >
+                <StyledComponent
+                  bsStyle="primary"
+                  forwardedComponent={
                     Object {
-                      "__html": "<p>descr</p>",
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "pSZqX",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
                     }
                   }
-                />
-              </div>
-            </div>
-            <br />
-            <br />
-            <br />
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="col-sm-6"
-    >
-      <div>
-        <h2>
-          Constraints
-        </h2>
-        <br />
-        <br />
-        <div>
-          <div
-            className="row "
-          >
-            <div
-              className="col-md-12"
+                  forwardedRef={null}
+                  id="create"
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="primary"
+                    className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                    disabled={false}
+                    id="create"
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+                      disabled={false}
+                      id="create"
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Create
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
+            </ForwardRef>
+             
+            <a
+              download="content-pack-dead-beef-1.json"
+              href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22name%22%2C%0A%20%20%22summary%22%3A%20%22summary%22%2C%0A%20%20%22description%22%3A%20%22descr%22%2C%0A%20%20%22vendor%22%3A%20%22vendor%22%2C%0A%20%20%22url%22%3A%20%22http%3A%2F%2Fexample.com%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
             >
-              <div
-                className="data-table table-responsive"
-                id="content-packs-constraints"
-              >
-                <p>
-                  No data available.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <h2>
-          Entity list
-        </h2>
-        <br />
-        <div
-          className="search"
-          style={
-            Object {
-              "marginTop": 15,
-            }
-          }
-        >
-          <form
-            className="form-inline"
-            onSubmit={[Function]}
-          >
-            <div
-              className="form-group has-feedback"
-            >
-              <input
-                autoComplete="off"
-                className="query form-control"
-                id="common-search-form-query-input"
-                onChange={[Function]}
-                placeholder="Enter search query..."
-                spellCheck="false"
-                style={
-                  Object {
-                    "width": "auto",
-                  }
-                }
-                type="text"
-                value=""
-              />
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
-                disabled={false}
-                type="submit"
-              >
-                Filter
-              </button>
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
-                disabled={false}
+              <ForwardRef
+                bsStyle="info"
+                id="download"
                 onClick={[Function]}
-                type="reset"
               >
-                Reset
-              </button>
-            </div>
-          </form>
-        </div>
-        <div>
-          <div
-            className="row "
-          >
-            <div
-              className="col-md-12"
-            >
-              <div
-                className="data-table table-responsive"
-                id="entity-list"
-              >
-                <p>
-                  No data available.
-                </p>
-              </div>
-            </div>
+                <Button__StyledButton
+                  bsStyle="info"
+                  id="download"
+                  onClick={[Function]}
+                >
+                  <StyledComponent
+                    bsStyle="info"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                          "xsmall",
+                        ],
+                        "STYLES": Array [
+                          "success",
+                          "warning",
+                          "danger",
+                          "info",
+                          "default",
+                          "primary",
+                          "link",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Button__StyledButton-c9cbmb-0",
+                          "isStatic": false,
+                          "lastClassName": "pSZqX",
+                          "rules": Array [
+                            [Function],
+                          ],
+                        },
+                        "displayName": "Button__StyledButton",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    id="download"
+                    onClick={[Function]}
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="info"
+                      className="Button__StyledButton-c9cbmb-0 pSZqX"
+                      disabled={false}
+                      id="download"
+                      onClick={[Function]}
+                    >
+                      <button
+                        className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-info"
+                        disabled={false}
+                        id="download"
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Create and Download
+                      </button>
+                    </Button>
+                  </StyledComponent>
+                </Button__StyledButton>
+              </ForwardRef>
+            </a>
           </div>
-        </div>
+        </Col>
       </div>
-      <div>
-        <h2>
-          Parameters list
-        </h2>
-        <br />
-        <div
-          className="search"
-          style={
-            Object {
-              "marginTop": 15,
-            }
-          }
-        >
-          <form
-            className="form-inline"
-            onSubmit={[Function]}
-          >
-            <div
-              className="form-group has-feedback"
-            >
-              <input
-                autoComplete="off"
-                className="query form-control"
-                id="common-search-form-query-input"
-                onChange={[Function]}
-                placeholder="Enter search query..."
-                spellCheck="false"
-                style={
-                  Object {
-                    "width": "auto",
-                  }
-                }
-                type="text"
-                value=""
-              />
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
-                disabled={false}
-                type="submit"
-              >
-                Filter
-              </button>
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
-                disabled={false}
-                onClick={[Function]}
-                type="reset"
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-        </div>
-        <div>
-          <div
-            className="row "
-          >
-            <div
-              className="col-md-12"
-            >
-              <div
-                className="data-table table-responsive"
-                id="parameter-list"
-              >
-                <p>
-                  To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </Row>
   </div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-sm-6"
-    >
-      <button
-        className="Button-c9cbmb-0 GLfOY btn btn-primary"
-        disabled={false}
-        id="create"
-        onClick={[Function]}
-        type="button"
-      >
-        Create
-      </button>
-       
-      <a
-        download="content-pack-dead-beef-1.json"
-        href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22name%22%2C%0A%20%20%22summary%22%3A%20%22summary%22%2C%0A%20%20%22description%22%3A%20%22descr%22%2C%0A%20%20%22vendor%22%3A%20%22vendor%22%2C%0A%20%20%22url%22%3A%20%22http%3A%2F%2Fexample.com%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
-      >
-        <button
-          className="Button-c9cbmb-0 GLfOY btn btn-info"
-          disabled={false}
-          id="download"
-          onClick={[Function]}
-          type="button"
-        >
-          Create and Download
-        </button>
-      </a>
-    </div>
-  </div>
-</div>
+</ContentPackPreview>
 `;

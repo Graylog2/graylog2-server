@@ -13,6 +13,7 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
+import ViewState from '../logic/views/ViewState';
 
 type CurrentViewStateActionsType = RefluxActions<{
   fields: (Immutable.Set<string>) => Promise<*>,
@@ -83,23 +84,23 @@ export const CurrentViewStateStore = singletonStore(
       CurrentViewStateActions.titles.promise(promise);
     },
 
-    widgets(newWidgets) {
+    widgets(nextWidgets) {
       const positionsMap = Immutable.Map(this._activeState().widgetPositions);
-      const widgetsWithoutPositions = newWidgets.filter((widget) => {
-        return !positionsMap.get(widget.id);
-      });
+      const newWidgets = nextWidgets.filter(widget => !positionsMap.get(widget.id));
+      const nextWidgetIds = nextWidgets.map(({ id }) => id);
+      const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId));
 
-      const newPositionMap = widgetsWithoutPositions.reduce((nextPositionsMap, widget) => {
+      const newPositionMap = newWidgets.reduce((nextPositionsMap, widget) => {
         const widgetDef = widgetDefinition(widget.type);
         const result = nextPositionsMap.reduce((newPosMap, position, id) => {
           const pos = position.toBuilder().row(position.row + widgetDef.defaultHeight).build();
           return newPosMap.set(id, pos);
         }, Immutable.Map());
         return result.set(widget.id, new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth));
-      }, positionsMap);
+      }, cleanedPositionsMap);
 
       const newActiveState = this._activeState().toBuilder()
-        .widgets(newWidgets)
+        .widgets(nextWidgets)
         .widgetPositions(newPositionMap.toObject())
         .build();
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
@@ -118,7 +119,7 @@ export const CurrentViewStateStore = singletonStore(
       CurrentViewStateActions.formatting.promise(promise);
     },
 
-    _activeState() {
+    _activeState(): ViewState {
       return this.states.get(this.activeQuery);
     },
 

@@ -17,10 +17,8 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
-import org.graylog2.database.MongoConnectionRule;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
@@ -28,7 +26,6 @@ import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -38,16 +35,12 @@ import org.mockito.junit.MockitoRule;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class InputServiceImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("inputs-test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -70,7 +63,7 @@ public class InputServiceImplTest {
     public void setUp() throws Exception {
         clusterEventBus = new ClusterEventBus("inputs-test", Executors.newSingleThreadExecutor());
         inputService = new InputServiceImpl(
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 extractorFactory,
                 converterFactory,
                 messageInputFactory,
@@ -79,28 +72,28 @@ public class InputServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void allReturnsAllInputs() {
         final List<Input> inputs = inputService.all();
         assertThat(inputs).hasSize(3);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void allOfThisNodeReturnsAllLocalAndGlobalInputs() {
         final List<Input> inputs = inputService.allOfThisNode("cd03ee44-b2a7-cafe-babe-0000deadbeef");
         assertThat(inputs).hasSize(3);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void allOfThisNodeReturnsGlobalInputsIfNodeIDDoesNotExist() {
         final List<Input> inputs = inputService.allOfThisNode("cd03ee44-b2a7-0000-0000-000000000000");
         assertThat(inputs).hasSize(1);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void findByIdsReturnsRequestedInputs() {
         assertThat(inputService.findByIds(ImmutableSet.of())).isEmpty();
         assertThat(inputService.findByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
@@ -110,33 +103,33 @@ public class InputServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void findReturnsExistingInput() throws NotFoundException {
         final Input input = inputService.find("54e3deadbeefdeadbeef0002");
         assertThat(input.getId()).isEqualTo("54e3deadbeefdeadbeef0002");
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void findThrowsNotFoundExceptionIfInputDoesNotExist() {
         assertThatThrownBy(() -> inputService.find("54e300000000000000000000"))
                 .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void globalCountReturnsNumberOfGlobalInputs() {
         assertThat(inputService.globalCount()).isEqualTo(1);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void localCountReturnsNumberOfLocalInputs() {
         assertThat(inputService.localCount()).isEqualTo(2);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void localCountForNodeReturnsNumberOfLocalInputs() {
         assertThat(inputService.localCountForNode("cd03ee44-b2a7-cafe-babe-0000deadbeef")).isEqualTo(2);
         assertThat(inputService.localCountForNode("cd03ee44-b2a7-0000-0000-000000000000")).isEqualTo(0);

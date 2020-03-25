@@ -26,13 +26,16 @@ export const FieldTypesActions: FieldTypesActionsType = singletonActions(
 export type FieldTypeMappingsList = Immutable.List<FieldTypeMapping>;
 export type FieldTypesStoreState = {
   all: FieldTypeMappingsList,
-  queryFields: Immutable.Map<String, FieldTypeMappingsList>,
+  queryFields: Immutable.Map<string, FieldTypeMappingsList>,
 };
 
 export const FieldTypesStore = singletonStore(
   'views.FieldTypes',
   () => Reflux.createStore({
     listenables: [FieldTypesActions],
+
+    _all: Immutable.List<FieldTypeMapping>(),
+    _queryFields: Immutable.Map<String, FieldTypeMappingsList>(),
 
     init() {
       this.all();
@@ -60,7 +63,7 @@ export const FieldTypesStore = singletonStore(
         results.forEach(({ queryId, response }) => {
           combinedResult[queryId] = response;
         });
-        this.queryFields = Immutable.fromJS(combinedResult);
+        this._queryFields = Immutable.fromJS(combinedResult);
         this._trigger();
       });
     },
@@ -69,7 +72,7 @@ export const FieldTypesStore = singletonStore(
       const promise = fetch('GET', fieldTypesUrl)
         .then(this._deserializeFieldTypes)
         .then((response) => {
-          this.all = Immutable.fromJS(response);
+          this._all = Immutable.fromJS(response);
           this._trigger();
         });
 
@@ -90,8 +93,8 @@ export const FieldTypesStore = singletonStore(
 
     _state(): FieldTypesStoreState {
       return {
-        all: this.all,
-        queryFields: this.queryFields,
+        all: this._all,
+        queryFields: this._queryFields,
       };
     },
     _trigger() {

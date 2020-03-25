@@ -20,10 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
@@ -32,22 +31,18 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 public class ViewServiceTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ViewService dbService;
     private ClusterConfigServiceImpl clusterConfigService;
@@ -68,13 +63,13 @@ public class ViewServiceTest {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProviderForTest(new ObjectMapper());
         this.clusterConfigService = new ClusterConfigServiceImpl(
                 objectMapperProvider,
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 mock(NodeId.class),
                 new ChainingClassLoader(getClass().getClassLoader()),
                 new ClusterEventBus()
         );
         this.dbService = new ViewService(
-                mongoRule.getMongoConnection(),
+                mongodb.mongoConnection(),
                 objectMapperProvider,
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view)
@@ -84,7 +79,7 @@ public class ViewServiceTest {
 
     @After
     public void tearDown() {
-        mongoRule.getMongoConnection().getMongoDatabase().drop();
+        mongodb.mongoConnection().getMongoDatabase().drop();
     }
 
     private void hasValidId(ViewDTO dto) {

@@ -1,0 +1,20 @@
+{
+  "saved_searches": [
+    {
+      "_id": {
+        "$oid": "5c7e5499f38ed7e1d8d6a613"
+      },
+      "creator_user_id": "admin",
+      "created_at": {
+        "$date": "2019-03-05T10:51:05.900Z"
+      },
+      "title": "Sophon",
+      "query": {
+        "rangeType": "relative",
+        "fields": "message,source",
+        "relative": 3600,
+        "query": "source:sophon.home.int"
+      }
+    }
+  ]
+}

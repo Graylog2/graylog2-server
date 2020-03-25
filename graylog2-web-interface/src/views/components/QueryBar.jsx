@@ -1,14 +1,11 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
-import onSaveView from 'views/logic/views/OnSaveViewAction';
-import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
@@ -37,7 +34,7 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   return promise.then(() => QueriesActions.remove(queryId)).then(() => ViewStatesActions.remove(queryId));
 };
 
-const QueryBar = ({ children, queries, queryTitles, router, viewMetadata }) => {
+const QueryBar = ({ children, queries, queryTitles, viewMetadata }) => {
   const { activeQuery } = viewMetadata;
   const childrenWithQueryId = React.Children.map(children, child => React.cloneElement(child, { queryId: activeQuery }));
   const selectQueryAndExecute = queryId => onSelectQuery(queryId);
@@ -47,8 +44,6 @@ const QueryBar = ({ children, queries, queryTitles, router, viewMetadata }) => {
                titles={queryTitles}
                onSelect={selectQueryAndExecute}
                onTitleChange={onTitleChange}
-               onSaveView={view => onSaveView(view, router)}
-               onSaveAsView={view => onSaveAsView(view, router)}
                onRemove={queryId => onCloseTab(queryId, activeQuery, queries)}>
       {childrenWithQueryId}
     </QueryTabs>
@@ -59,7 +54,6 @@ QueryBar.propTypes = {
   children: CustomPropTypes.node,
   queries: PropTypes.object.isRequired,
   queryTitles: PropTypes.object.isRequired,
-  router: PropTypes.any.isRequired,
   viewMetadata: PropTypes.shape({
     activeQuery: PropTypes.string.isRequired,
   }).isRequired,
@@ -69,4 +63,4 @@ QueryBar.defaultProps = {
   children: null,
 };
 
-export default withRouter(connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore }));
+export default connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore });

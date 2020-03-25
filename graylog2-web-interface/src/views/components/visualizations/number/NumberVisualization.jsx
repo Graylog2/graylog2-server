@@ -1,6 +1,6 @@
 // @flow strict
-import React, { type AbstractComponent, useContext, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import React, { useContext, useEffect, useRef } from 'react';
+import styled, { type StyledComponent } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -12,17 +12,21 @@ import DecoratedValue from 'views/components/messagelist/decoration/DecoratedVal
 import CustomHighlighting from 'views/components/messagelist/CustomHighlighting';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type {
+  VisualizationComponent,
+  VisualizationComponentProps,
+} from 'views/components/aggregationbuilder/AggregationBuilder';
+import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
 import type { CurrentViewType } from '../../CustomPropTypes';
 
-const GridContainer: AbstractComponent<{}> = styled.div`
+const GridContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 4fr 1fr;
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
   height: 100%;
   width: 100%;
 `;
@@ -31,8 +35,8 @@ const SingleItemGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
   height: 100%;
   width: 100%;
 `;
@@ -123,7 +127,6 @@ const NumberVisualization = ({ config: { visualizationConfig = NumberVisualizati
   );
 };
 
-const ConnectedNumberVisualization = connect(NumberVisualization, { currentView: ViewStore });
-ConnectedNumberVisualization.type = 'numeric';
+const ConnectedNumberVisualization: VisualizationComponent = makeVisualization(connect(NumberVisualization, { currentView: ViewStore }), 'numeric');
 
 export default ConnectedNumberVisualization;

@@ -10,7 +10,6 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import MessageDetail from './MessageDetail';
@@ -19,39 +18,30 @@ import DecoratedValue from './decoration/DecoratedValue';
 import CustomHighlighting from './CustomHighlighting';
 
 import style from './MessageTableEntry.css';
+import type { Message } from './Types';
 
-const { NodesStore } = CombinedProvider.get('Nodes');
 const { InputsStore } = CombinedProvider.get('Inputs');
 
 const ConnectedMessageDetail = connect(
   MessageDetail,
   {
     availableInputs: InputsStore,
-    availableNodes: NodesStore,
     availableStreams: StreamsStore,
     configurations: SearchConfigStore,
   },
-  ({ availableStreams = {}, availableNodes = {}, availableInputs = {}, configurations = {}, ...rest }) => {
+  ({ availableStreams = {}, availableInputs = {}, configurations = {}, ...rest }) => {
     const { streams = [] } = availableStreams;
-    const { nodes } = availableNodes;
     const { inputs = [] } = availableInputs;
     const { searchesClusterConfig } = configurations;
     return ({
       ...rest,
       allStreams: Immutable.List(streams),
       streams: Immutable.Map(streams.map(stream => [stream.id, stream])),
-      nodes: Immutable.Map(nodes),
       inputs: Immutable.Map(inputs.map(input => [input.id, input])),
       searchConfig: searchesClusterConfig,
     });
   },
 );
-
-type Message = {|
-  id: string,
-  index: string,
-  fields: { [string]: any },
-|};
 
 type Props = {
   disableSurroundingSearch?: boolean,
@@ -64,6 +54,13 @@ type Props = {
   showMessageRow?: boolean,
   toggleDetail: (string) => void,
 };
+
+const isDecoratedField = (field, decorationStats) => decorationStats
+  && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
+
+const fieldType = (fieldName, { decoration_stats: decorationStats }, fields) => (isDecoratedField(fieldName, decorationStats)
+  ? FieldType.Decorated
+  : ((fields && fields.find(f => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
 const MessageTableEntry = ({
   disableSurroundingSearch,
@@ -96,12 +93,11 @@ const MessageTableEntry = ({
   if (message.id === highlightMessage) {
     classes += ' message-highlight';
   }
-  const messageFieldType = fields.find(type => type.name === 'message', undefined, FieldTypeMapping.create('message', FieldType.Unknown)).type;
   return (
     <tbody className={classes}>
       <tr className="fields-row" onClick={_toggleDetail}>
         { selectedFields.toArray().map((selectedFieldName, idx) => {
-          const { type } = fields.find(t => t.name === selectedFieldName, undefined, FieldTypeMapping.create(selectedFieldName, FieldType.Unknown));
+          const type = fieldType(selectedFieldName, message, fields);
           return (
             <td className={style.fieldsRowField} key={selectedFieldName}>
               {_renderStrong(
@@ -124,7 +120,7 @@ const MessageTableEntry = ({
           <td colSpan={colSpanFixup}>
             <div className="message-wrapper">
               <CustomHighlighting field="message" value={message.fields.message}>
-                <DecoratedValue field="message" value={message.fields.message} type={messageFieldType} />
+                <TypeSpecificValue field="message" value={message.fields.message} type={fieldType('message', message, fields)} render={DecoratedValue} />
               </CustomHighlighting>
             </div>
           </td>
@@ -156,6 +152,11 @@ MessageTableEntry.propTypes = {
     highlight_ranges: PropTypes.object,
     id: PropTypes.string.isRequired,
     index: PropTypes.string.isRequired,
+    decoration_stats: PropTypes.shape({
+      added_fields: PropTypes.object,
+      changed_fields: PropTypes.object,
+      removed_fields: PropTypes.object,
+    }),
   }).isRequired,
   selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
   showMessageRow: PropTypes.bool,

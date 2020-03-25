@@ -1,17 +1,20 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 import { StoreMock as MockStore } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
 
+import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { TIMESTAMP_FIELD } from 'views/Constants';
 import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
-import InputsStore from 'stores/inputs/InputsStore';
+import { SearchActions } from 'views/stores/SearchStore';
+import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
+import InputsStore from 'stores/inputs/InputsStore';
 import MessageList from './MessageList';
 import RenderCompletionCallback from './RenderCompletionCallback';
 import InputsActions from '../../../actions/inputs/InputsActions';
@@ -25,6 +28,12 @@ const MessageTableEntry = () => (
     )}
   </AdditionalContext.Consumer>
 );
+
+const mockEffectiveTimeRange = {
+  from: '2019-11-15T14:40:48.666Z',
+  to: '2019-11-29T14:40:48.666Z',
+  type: 'absolute',
+};
 
 jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
 jest.mock('stores/search/SearchStore', () => MockStore('searchSurroundingMessages'));
@@ -43,13 +52,38 @@ jest.mock('views/stores/SelectedFieldsStore', () => ({
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),
 }));
-jest.mock('legacy/result-histogram', () => 'Histogram');
-jest.mock('components/search/MessageTablePaginator', () => 'message-table-paginator');
+jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    'listen',
+    ['getInitialState', () => ({
+      result: {
+        results: {
+          somequery: {
+            searchTypes: {
+              'search-type-id': {
+                effectiveTimerange: mockEffectiveTimeRange,
+              },
+            },
+          },
+        },
+      },
+    })],
+  ),
+  SearchActions: {
+    reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve({ result: { errors: [] } })),
+    execute: { completed: { listen: jest.fn() } },
+  },
+}));
+jest.mock('views/stores/RefreshStore', () => ({
+  RefreshActions: {
+    disable: jest.fn(),
+  },
+}));
 jest.mock('views/components/messagelist');
 
 describe('MessageList', () => {
   const data = {
-    id: '6ec30961-2519-45f5-80b6-849e3deb1c32',
+    id: 'search-type-id',
     type: 'messages',
     messages: [
       {
@@ -60,46 +94,62 @@ describe('MessageList', () => {
           file_name: 'frank.txt',
           timestamp: '2018-09-26T12:42:49.234Z',
         },
-      }],
+      },
+    ],
+    total: 1,
   };
   beforeEach(() => {
     // eslint-disable-next-line import/namespace
     messageList.MessageTableEntry = MessageTableEntry;
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should render with and without fields', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
+    const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
     const wrapper1 = mount(<MessageList editing
                                         data={data}
-                                        fields={Immutable.List(fields)} />);
+                                        config={config}
+                                        fields={Immutable.List(fields)}
+                                        setLoadingState={() => {}} />);
 
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
 
+    const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
     const wrapper2 = mount(<MessageList editing
                                         data={data}
-                                        fields={Immutable.List(fields)} />);
+                                        config={emptyConfig}
+                                        fields={Immutable.List(fields)}
+                                        setLoadingState={() => {}} />);
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
   });
+
   it('provides a message context for each individual entry', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
     const wrapper = mount(<MessageList editing
                                        data={data}
                                        fields={Immutable.List(fields)}
-                                       config={config} />);
+                                       config={config}
+                                       setLoadingState={() => {}} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
     expect(td.props().children).toMatchSnapshot();
   });
+
   it('renders also when `inputs` is undefined', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
     const config = MessagesWidgetConfig.builder().fields([]).build();
     mount(<MessageList editing
                        data={data}
                        fields={Immutable.List([])}
-                       config={config} />);
+                       config={config}
+                       setLoadingState={() => {}} />);
   });
 
   it('refreshs Inputs list upon mount', () => {
@@ -108,10 +158,56 @@ describe('MessageList', () => {
       <MessageList editing
                    data={data}
                    fields={Immutable.List([])}
-                   config={config} />
+                   config={config}
+                   setLoadingState={() => {}} />
     );
     mount(<Component />);
     expect(InputsActions.list).toHaveBeenCalled();
+  });
+
+  it('reexecute query for search type, when using pagination', () => {
+    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const secondPageSize = 10;
+    const wrapper = mount(<MessageList editing
+                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                       fields={Immutable.List([])}
+                                       config={config}
+                                       setLoadingState={() => {}} />);
+    wrapper.find('[aria-label="Next"]').simulate('click');
+    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange);
+  });
+
+  it('disables refresh actions, when using pagination', () => {
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const secondPageSize = 10;
+    const wrapper = mount(<MessageList editing
+                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                       fields={Immutable.List([])}
+                                       config={config}
+                                       setLoadingState={() => {}} />);
+    wrapper.find('[aria-label="Next"]').simulate('click');
+    expect(RefreshActions.disable).toHaveBeenCalledTimes(1);
+  });
+
+  it('displays error description, when using pagination throws an error', async () => {
+    asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(Promise.resolve({
+      result: { errors: [{ description: 'Error description' }] },
+    }));
+
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const secondPageSize = 10;
+    const wrapper = mount(<MessageList editing
+                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                       fields={Immutable.List([])}
+                                       config={config}
+                                       onSortChange={() => {}}
+                                       setLoadingState={() => {}} />);
+
+    await wrapper.find('[aria-label="Next"]').simulate('click');
+    wrapper.update();
+
+    expect(wrapper.find('ErrorWidget').text()).toContain('Error description');
   });
 
   it('calls render completion callback after first render', () => {
@@ -120,7 +216,9 @@ describe('MessageList', () => {
       <MessageList editing
                    data={data}
                    fields={Immutable.List([])}
-                   config={config} />
+                   config={config}
+                   onSortChange={() => {}}
+                   setLoadingState={() => {}} />
     );
     return new Promise((resolve) => {
       const onRenderComplete = jest.fn(resolve);

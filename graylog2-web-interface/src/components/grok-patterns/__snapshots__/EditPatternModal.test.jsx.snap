@@ -1,27 +1,307 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<EditPatternModal /> should render a modal button with as create 1`] = `
-<span>
-  <button
-    className="btn btn-success"
-    onClick={[Function]}
-    type="button"
-  >
-    Create pattern
-  </button>
-</span>
+<EditPatternModal
+  create={true}
+  id=""
+  name=""
+  pattern=""
+  patterns={Array []}
+  sampleData=""
+  savePattern={[Function]}
+  testPattern={[Function]}
+  validPatternName={[Function]}
+>
+  <span>
+    <button
+      className="btn btn-success"
+      onClick={[Function]}
+      type="button"
+    >
+      Create pattern
+    </button>
+    <BootstrapModalForm
+      bsSize="large"
+      cancelButtonText="Cancel"
+      formProps={Object {}}
+      onCancel={[Function]}
+      onModalClose={[Function]}
+      onModalOpen={[Function]}
+      onSubmitForm={[Function]}
+      show={false}
+      submitButtonDisabled={false}
+      submitButtonText="Save"
+      title="Create Grok Pattern "
+    >
+      <BootstrapModalWrapper
+        backdrop="static"
+        bsSize="large"
+        onClose={[Function]}
+        onHide={[Function]}
+        onOpen={[Function]}
+        showModal={false}
+      >
+        <Modal
+          backdrop="static"
+          bsSize="large"
+          onHide={[Function]}
+          show={false}
+        >
+          <StyledComponent
+            backdrop="static"
+            bsSize="large"
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "BACKDROP_TRANSITION_DURATION": 150,
+                "Body": [Function],
+                "Dialog": [Function],
+                "Footer": [Function],
+                "Header": [Function],
+                "SIZES": Array [
+                  "large",
+                  "small",
+                ],
+                "TRANSITION_DURATION": 300,
+                "Title": [Function],
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Modal-nuree8-0",
+                  "isStatic": false,
+                  "lastClassName": "DnwXA",
+                  "rules": Array [
+                    [Function],
+                  ],
+                },
+                "displayName": "Modal",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Modal-nuree8-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+            onHide={[Function]}
+            show={false}
+          >
+            <Modal
+              animation={true}
+              autoFocus={true}
+              backdrop="static"
+              bsClass="modal"
+              bsSize="large"
+              className="Modal-nuree8-0 DnwXA"
+              dialogComponentClass={[Function]}
+              enforceFocus={true}
+              keyboard={true}
+              manager={
+                ModalManager {
+                  "add": [Function],
+                  "containers": Array [],
+                  "data": Array [],
+                  "handleContainerOverflow": true,
+                  "hideSiblingNodes": true,
+                  "isTopModal": [Function],
+                  "modals": Array [],
+                  "remove": [Function],
+                }
+              }
+              onHide={[Function]}
+              renderBackdrop={[Function]}
+              restoreFocus={true}
+              show={false}
+            >
+              <Modal
+                autoFocus={true}
+                backdrop="static"
+                backdropClassName="modal-backdrop"
+                backdropTransition={[Function]}
+                containerClassName="modal-open"
+                enforceFocus={true}
+                keyboard={true}
+                manager={
+                  ModalManager {
+                    "add": [Function],
+                    "containers": Array [],
+                    "data": Array [],
+                    "handleContainerOverflow": true,
+                    "hideSiblingNodes": true,
+                    "isTopModal": [Function],
+                    "modals": Array [],
+                    "remove": [Function],
+                  }
+                }
+                onEntering={[Function]}
+                onExited={[Function]}
+                onHide={[Function]}
+                onMouseUp={[Function]}
+                renderBackdrop={[Function]}
+                restoreFocus={true}
+                show={false}
+                transition={[Function]}
+              />
+            </Modal>
+          </StyledComponent>
+        </Modal>
+      </BootstrapModalWrapper>
+    </BootstrapModalForm>
+  </span>
+</EditPatternModal>
 `;
 
 exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
-<span>
-  <button
-    className="btn btn-info btn-xs"
-    onClick={[Function]}
-    type="button"
-  >
-    <span>
-      Edit
-    </span>
-  </button>
-</span>
+<EditPatternModal
+  create={false}
+  id=""
+  name=""
+  pattern=""
+  patterns={Array []}
+  sampleData=""
+  savePattern={[Function]}
+  testPattern={[Function]}
+  validPatternName={[Function]}
+>
+  <span>
+    <button
+      className="btn btn-info btn-xs"
+      onClick={[Function]}
+      type="button"
+    >
+      <span>
+        Edit
+      </span>
+    </button>
+    <BootstrapModalForm
+      bsSize="large"
+      cancelButtonText="Cancel"
+      formProps={Object {}}
+      onCancel={[Function]}
+      onModalClose={[Function]}
+      onModalOpen={[Function]}
+      onSubmitForm={[Function]}
+      show={false}
+      submitButtonDisabled={false}
+      submitButtonText="Save"
+      title="Edit Grok Pattern "
+    >
+      <BootstrapModalWrapper
+        backdrop="static"
+        bsSize="large"
+        onClose={[Function]}
+        onHide={[Function]}
+        onOpen={[Function]}
+        showModal={false}
+      >
+        <Modal
+          backdrop="static"
+          bsSize="large"
+          onHide={[Function]}
+          show={false}
+        >
+          <StyledComponent
+            backdrop="static"
+            bsSize="large"
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "BACKDROP_TRANSITION_DURATION": 150,
+                "Body": [Function],
+                "Dialog": [Function],
+                "Footer": [Function],
+                "Header": [Function],
+                "SIZES": Array [
+                  "large",
+                  "small",
+                ],
+                "TRANSITION_DURATION": 300,
+                "Title": [Function],
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Modal-nuree8-0",
+                  "isStatic": false,
+                  "lastClassName": "DnwXA",
+                  "rules": Array [
+                    [Function],
+                  ],
+                },
+                "displayName": "Modal",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Modal-nuree8-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+            onHide={[Function]}
+            show={false}
+          >
+            <Modal
+              animation={true}
+              autoFocus={true}
+              backdrop="static"
+              bsClass="modal"
+              bsSize="large"
+              className="Modal-nuree8-0 DnwXA"
+              dialogComponentClass={[Function]}
+              enforceFocus={true}
+              keyboard={true}
+              manager={
+                ModalManager {
+                  "add": [Function],
+                  "containers": Array [],
+                  "data": Array [],
+                  "handleContainerOverflow": true,
+                  "hideSiblingNodes": true,
+                  "isTopModal": [Function],
+                  "modals": Array [],
+                  "remove": [Function],
+                }
+              }
+              onHide={[Function]}
+              renderBackdrop={[Function]}
+              restoreFocus={true}
+              show={false}
+            >
+              <Modal
+                autoFocus={true}
+                backdrop="static"
+                backdropClassName="modal-backdrop"
+                backdropTransition={[Function]}
+                containerClassName="modal-open"
+                enforceFocus={true}
+                keyboard={true}
+                manager={
+                  ModalManager {
+                    "add": [Function],
+                    "containers": Array [],
+                    "data": Array [],
+                    "handleContainerOverflow": true,
+                    "hideSiblingNodes": true,
+                    "isTopModal": [Function],
+                    "modals": Array [],
+                    "remove": [Function],
+                  }
+                }
+                onEntering={[Function]}
+                onExited={[Function]}
+                onHide={[Function]}
+                onMouseUp={[Function]}
+                renderBackdrop={[Function]}
+                restoreFocus={true}
+                show={false}
+                transition={[Function]}
+              />
+            </Modal>
+          </StyledComponent>
+        </Modal>
+      </BootstrapModalWrapper>
+    </BootstrapModalForm>
+  </span>
+</EditPatternModal>
 `;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -62,5 +62,19 @@ describe('AggregationBuilder', () => {
 
     expect(wrapper.find(EmptyAggregationContent)).toHaveLength(1);
     expect(wrapper.find(EmptyAggregationContent)).toHaveProp('editing', false);
+  });
+  it('falls back to retrieving effective timerange from first result if no `chart` result present', () => {
+    const data = {
+      '524d182c-8e32-4372-b30d-a40d99efe55d': {
+        total: 42,
+        rows: [{ value: 3.1415926 }],
+        effective_timerange: 42,
+      },
+    };
+    const wrapper = mount(<AggregationBuilder config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
+                                              fields={{}}
+                                              data={data} />);
+    const dummyVisualization = wrapper.find(mockDummyVisualization);
+    expect(dummyVisualization).toHaveProp('effectiveTimerange', 42);
   });
 });

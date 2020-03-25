@@ -1,13 +1,13 @@
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { get, isEqualWith } from 'lodash';
+import { get } from 'lodash';
 
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
-import type { Properties, ViewType } from 'views/logic/views/View';
+import type { Properties, ViewType, ViewStateMap } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { QuerySet } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
@@ -17,6 +17,7 @@ import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
 import { ViewManagementActions } from './ViewManagementStore';
+import isEqualForSearch from './isEqualForSearch';
 
 export type ViewStoreState = {
   activeQuery: QueryId,
@@ -26,15 +27,13 @@ export type ViewStoreState = {
 };
 
 type ViewActionsType = RefluxActions<{
-  create: (ViewType) => Promise<ViewStoreState>,
-  description: (string) => Promise<ViewStoreState>,
-  load: (View) => Promise<ViewStoreState>,
+  create: (ViewType, ?string) => Promise<ViewStoreState>,
+  load: (View, ?boolean) => Promise<ViewStoreState>,
   properties: (Properties) => Promise<void>,
   search: (Search) => Promise<View>,
   selectQuery: (string) => Promise<string>,
-  state: (ViewState) => Promise<View>,
-  summary: (string) => Promise<void>,
-  title: (string) => Promise<void>,
+  state: (ViewStateMap) => Promise<View>,
+  update: (View) => Promise<ViewStoreState>,
 }>;
 
 export const ViewActions: ViewActionsType = singletonActions(
@@ -42,24 +41,17 @@ export const ViewActions: ViewActionsType = singletonActions(
   () => Reflux.createActions({
     create: { asyncResult: true },
     dashboardState: { asyncResult: true },
-    description: { asyncResult: true },
     load: { asyncResult: true },
     properties: { asyncResult: true },
     search: { asyncResult: true },
     selectQuery: { asyncResult: true },
     state: { asyncResult: true },
-    summary: { asyncResult: true },
-    title: { asyncResult: true },
     setNew: { asyncResult: true },
+    update: { asyncResult: true },
   }),
 );
 
-type ViewStoreUnsubscribe = () => void;
-
-type ViewStoreType = {
-  listen: ((ViewStoreState) => void) => ViewStoreUnsubscribe,
-  getInitialState: () => ViewStoreState,
-};
+type ViewStoreType = Store<ViewStoreState>;
 
 export const ViewStore: ViewStoreType = singletonStore(
   'views.View',
@@ -82,22 +74,25 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    create(type: ViewType) {
-      const [view] = this._updateSearch(ViewGenerator(type));
-      this.view = view;
-      const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
-      this.activeQuery = queries.first().id;
+    create(type: ViewType, streamId: ?string = null) {
+      return ViewGenerator(type, streamId)
+        .then((newView) => {
+          const [view] = this._updateSearch(newView);
+          this.view = view;
+          const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
+          this.activeQuery = queries.first().id;
+          return view;
+        }).then((view) => {
+          const promise = ViewActions.search(view.search)
+            .then(() => {
+              this.dirty = false;
+              this.isNew = true;
+            })
+            .then(() => this._trigger());
 
-      const promise = ViewActions.search(view.search)
-        .then(() => {
-          this.dirty = false;
-          this.isNew = true;
-        })
-        .then(() => this._trigger());
-
-      ViewActions.create.promise(promise.then(() => this._state()));
-
-      return promise;
+          ViewActions.create.promise(promise.then(() => this._state()));
+          return promise;
+        });
     },
     createQuery(query: Query, viewState: ViewState) {
       if (query.id === undefined) {
@@ -122,15 +117,15 @@ export const ViewStore: ViewStoreType = singletonStore(
 
       QueriesActions.create.promise(promise);
     },
-    description(newDescription: string) {
-      this.dirty = true;
-      this.view = this.view.toBuilder().description(newDescription).build();
+    update(view: View) {
+      this.dirty = false;
+      this.view = view;
       this._trigger();
       const promise = Promise.resolve(this._state());
-      ViewActions.description.promise(promise);
+      ViewActions.update.promise(promise);
       return promise;
     },
-    load(view: View): Promise<ViewStoreState> {
+    load(view: View, isNew: ?boolean = false): Promise<ViewStoreState> {
       this.view = view;
       this.dirty = false;
 
@@ -140,7 +135,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       const firstQueryId = get(queries.first(), 'id');
       const selectedQuery = this.activeQuery && queries.find(q => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
       this.selectQuery(selectedQuery);
-      this.isNew = false;
+      this.isNew = isNew;
 
       const promise = Promise.resolve(this._state());
       ViewActions.load.promise(promise);
@@ -176,23 +171,13 @@ export const ViewStore: ViewStoreType = singletonStore(
       ViewActions.state.promise(promise);
       return promise;
     },
-    summary(newSummary) {
-      this.dirty = true;
-      this.view = this.view.toBuilder().summary(newSummary).build();
-      this._trigger();
-    },
-    title(newTitle) {
-      this.dirty = true;
-      this.view = this.view.toBuilder().title(newTitle).build();
-      this._trigger();
-    },
     _updateSearch(view: View): [View, boolean] {
       if (!view.search) {
         return [view, false];
       }
       const oldWidgets = get(this.view, 'state') && this.view.state.map(s => s.widgets);
       const newWidgets = get(view, 'state') && view.state.map(s => s.widgets);
-      if (!isEqualWith(oldWidgets, newWidgets, Immutable.is)) {
+      if (!isEqualForSearch(oldWidgets, newWidgets)) {
         const newView = UpdateSearchForWidgets(view);
         return [newView, true];
       }

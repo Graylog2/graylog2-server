@@ -1,0 +1,350 @@
+{
+  "v": 1,
+  "id": "04fcf179-49e0-4e8f-9c02-0ff13062efbe",
+  "rev": 1,
+  "name": "Sources Page Dashboard",
+  "summary": "A predefined dashboard showing the statistics of all sources.",
+  "description": "This is a list of all sources that sent in messages to _Graylog_. You can narrow the time range by zooming in on the message histogram, or you can increase the time range by specifying a broader one in the controls at the top. You can also specify filters to limit the results you are seeing. You can also add additional widgets to this dashboard, or adapt the appearance of existing widgets to suit your needs.",
+  "vendor": "Graylog <hello@graylog.com> ",
+  "url": "https://github.com/Graylog2/graylog2-server ",
+  "parameters": [],
+  "entities": [
+    {
+      "v": "1",
+      "type": {
+        "name": "dashboard",
+        "version": "2"
+      },
+      "id": "0866a87b-6c8d-4001-969c-da3be19c0f09",
+      "data": {
+        "summary": {
+          "@type": "string",
+          "@value": "This is a list of all sources that sent in messages to Graylog."
+        },
+        "search": {
+          "queries": [
+            {
+              "id": "a1647eb6-a064-4fe6-b459-1e4267d3f659",
+              "timerange": {
+                "type": "relative",
+                "range": 300
+              },
+              "query": {
+                "type": "elasticsearch",
+                "query_string": ""
+              },
+              "search_types": [
+                {
+                  "query": null,
+                  "name": "chart",
+                  "timerange": {
+                    "type": "relative",
+                    "range": 300
+                  },
+                  "streams": [],
+                  "series": [
+                    {
+                      "type": "count",
+                      "id": "Message count",
+                      "field": null
+                    }
+                  ],
+                  "filter": null,
+                  "rollup": true,
+                  "row_groups": [
+                    {
+                      "type": "time",
+                      "field": "timestamp",
+                      "interval": {
+                        "type": "auto",
+                        "scaling": 1
+                      }
+                    }
+                  ],
+                  "type": "pivot",
+                  "id": "481de18f-938e-40d5-8ab2-6eaf6a28f091",
+                  "column_groups": [],
+                  "sort": []
+                },
+                {
+                  "query": null,
+                  "name": "chart",
+                  "timerange": {
+                    "type": "relative",
+                    "range": 300
+                  },
+                  "streams": [],
+                  "series": [
+                    {
+                      "type": "count",
+                      "id": "Message count",
+                      "field": null
+                    }
+                  ],
+                  "filter": null,
+                  "rollup": true,
+                  "row_groups": [
+                    {
+                      "type": "values",
+                      "field": "source",
+                      "limit": 10
+                    }
+                  ],
+                  "type": "pivot",
+                  "id": "a964f1c5-e108-4b5e-a907-ffe0b0f0683c",
+                  "column_groups": [],
+                  "sort": [
+                    {
+                      "type": "series",
+                      "field": "count()",
+                      "direction": "Descending"
+                    }
+                  ]
+                },
+                {
+                  "query": null,
+                  "name": "chart",
+                  "timerange": {
+                    "type": "relative",
+                    "range": 300
+                  },
+                  "streams": [],
+                  "series": [
+                    {
+                      "type": "count",
+                      "id": "Message count",
+                      "field": null
+                    }
+                  ],
+                  "filter": null,
+                  "rollup": true,
+                  "row_groups": [
+                    {
+                      "type": "values",
+                      "field": "source",
+                      "limit": 15
+                    }
+                  ],
+                  "type": "pivot",
+                  "id": "011b2894-49e5-44d8-aab6-8c4d4457a886",
+                  "column_groups": [],
+                  "sort": [
+                    {
+                      "type": "series",
+                      "field": "count()",
+                      "direction": "Descending"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [],
+          "requires": {},
+          "owner": "admin",
+          "created_at": "2019-11-22T10:58:47.255Z"
+        },
+        "created_at": "2019-11-22T10:54:50.950Z",
+        "requires": {},
+        "state": {
+          "a1647eb6-a064-4fe6-b459-1e4267d3f659": {
+            "selected_fields": null,
+            "static_message_list_id": null,
+            "titles": {
+              "tab": {
+                "title": "Sources Overview"
+              },
+              "widget": {
+                "6c127c5d-be75-4157-b43f-ac0194ac0586": "Selected sources",
+                "92d63811-e4dd-47db-bd3b-db03c8a9bd53": "Messages per Source",
+                "00637e63-d728-4b3e-932b-7c8696b4855d": "Messages over time"
+              }
+            },
+            "widgets": [
+              {
+                "id": "6c127c5d-be75-4157-b43f-ac0194ac0586",
+                "type": "aggregation",
+                "filter": null,
+                "timerange": {
+                  "type": "relative",
+                  "range": 300
+                },
+                "query": null,
+                "streams": [],
+                "config": {
+                  "visualization": "table",
+                  "event_annotation": false,
+                  "row_pivots": [
+                    {
+                      "field": "source",
+                      "type": "values",
+                      "config": {
+                        "limit": 15
+                      }
+                    }
+                  ],
+                  "series": [
+                    {
+                      "config": {
+                        "name": "Message count"
+                      },
+                      "function": "count()"
+                    }
+                  ],
+                  "rollup": true,
+                  "column_pivots": [],
+                  "visualization_config": null,
+                  "formatting_settings": null,
+                  "sort": [
+                    {
+                      "type": "series",
+                      "field": "count()",
+                      "direction": "Descending"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "00637e63-d728-4b3e-932b-7c8696b4855d",
+                "type": "aggregation",
+                "filter": null,
+                "timerange": {
+                  "type": "relative",
+                  "range": 300
+                },
+                "query": null,
+                "streams": [],
+                "config": {
+                  "visualization": "line",
+                  "event_annotation": false,
+                  "row_pivots": [
+                    {
+                      "field": "timestamp",
+                      "type": "time",
+                      "config": {
+                        "interval": {
+                          "type": "auto",
+                          "scaling": null
+                        }
+                      }
+                    }
+                  ],
+                  "series": [
+                    {
+                      "config": {
+                        "name": "Message count"
+                      },
+                      "function": "count()"
+                    }
+                  ],
+                  "rollup": true,
+                  "column_pivots": [],
+                  "visualization_config": null,
+                  "formatting_settings": null,
+                  "sort": []
+                }
+              },
+              {
+                "id": "92d63811-e4dd-47db-bd3b-db03c8a9bd53",
+                "type": "aggregation",
+                "filter": null,
+                "timerange": {
+                  "type": "relative",
+                  "range": 300
+                },
+                "query": null,
+                "streams": [],
+                "config": {
+                  "visualization": "pie",
+                  "event_annotation": false,
+                  "row_pivots": [
+                    {
+                      "field": "source",
+                      "type": "values",
+                      "config": {
+                        "limit": 10
+                      }
+                    }
+                  ],
+                  "series": [
+                    {
+                      "config": {
+                        "name": "Message count"
+                      },
+                      "function": "count()"
+                    }
+                  ],
+                  "rollup": true,
+                  "column_pivots": [],
+                  "visualization_config": null,
+                  "formatting_settings": null,
+                  "sort": [
+                    {
+                      "type": "series",
+                      "field": "count()",
+                      "direction": "Descending"
+                    }
+                  ]
+                }
+              }
+            ],
+            "widget_mapping": {
+              "6c127c5d-be75-4157-b43f-ac0194ac0586": [
+                "011b2894-49e5-44d8-aab6-8c4d4457a886"
+              ],
+              "92d63811-e4dd-47db-bd3b-db03c8a9bd53": [
+                "a964f1c5-e108-4b5e-a907-ffe0b0f0683c"
+              ],
+              "00637e63-d728-4b3e-932b-7c8696b4855d": [
+                "481de18f-938e-40d5-8ab2-6eaf6a28f091"
+              ]
+            },
+            "positions": {
+              "6c127c5d-be75-4157-b43f-ac0194ac0586": {
+                "col": 1,
+                "row": 5,
+                "height": 4,
+                "width": 6
+              },
+              "92d63811-e4dd-47db-bd3b-db03c8a9bd53": {
+                "col": 7,
+                "row": 5,
+                "height": 4,
+                "width": 6
+              },
+              "00637e63-d728-4b3e-932b-7c8696b4855d": {
+                "col": 1,
+                "row": 1,
+                "height": 4,
+                "width": "Infinity"
+              }
+            },
+            "formatting": {
+              "highlighting": []
+            },
+            "display_mode_settings": {
+              "positions": {}
+            }
+          }
+        },
+        "properties": [],
+        "owner": "admin",
+        "title": {
+          "@type": "string",
+          "@value": "Sources"
+        },
+        "type": "DASHBOARD",
+        "description": {
+          "@type": "string",
+          "@value": "This is a list of all sources that sent in messages to Graylog. You can narrow the timerange by zooming in on the message histogram, or you can increase the time range by specifying a broader one in the controls at the top. You can also specify filters to limit the results you are seeing. You can also add additional widgets to this dashboard, or adapt the appearance of existing widgets to suit your needs."
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.2.0"
+        }
+      ]
+    }
+  ]
+}

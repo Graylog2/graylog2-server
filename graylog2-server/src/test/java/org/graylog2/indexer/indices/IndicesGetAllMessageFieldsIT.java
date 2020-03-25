@@ -52,7 +52,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
         indices = new Indices(jestClient(),
                 new ObjectMapper(),
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder()),
+                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus());

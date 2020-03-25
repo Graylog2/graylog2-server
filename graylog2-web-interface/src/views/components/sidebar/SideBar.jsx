@@ -1,19 +1,19 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import { capitalize } from 'lodash';
 
+import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
+import type { ViewType } from 'views/logic/views/View';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import { AddWidgetButton } from 'views/components/sidebar';
 import { Icon, Spinner } from 'components/common';
-import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
-
 import { Container, ContentOverlay, SidebarHeader, Headline, ToggleIcon, HorizontalRuler } from './Sidebar.styles';
 import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
 import ViewDescription from './ViewDescription';
-
-const defaultNewViewTitle = 'New Search';
 
 type Props = {
   children: React.Element<any>,
@@ -86,10 +86,11 @@ class SideBar extends React.Component<Props, State> {
     this.setState({ disabledAutoClose: !disabledAutoClose });
   };
 
-  setSelectedKey = (key: string) => {
-    const { open } = this.state;
-    return () => this.setState(
-      { selectedKey: key },
+  onNavItemClick = (key: string) => () => {
+    const { open, selectedKey } = this.state;
+    const nextKey = key === selectedKey ? undefined : key;
+    this.setState(
+      { selectedKey: nextKey },
       () => !open && this.toggleOpen(),
     );
   };
@@ -103,51 +104,64 @@ class SideBar extends React.Component<Props, State> {
     return navItemChildren;
   }
 
+  sidebarTitle = (viewType: ?ViewType) => {
+    const { viewMetadata } = this.props;
+    const defaultTitle = `Untitled ${capitalize(viewType)}`;
+    return viewMetadata.title || defaultTitle;
+  }
+
   render() {
     const { results, viewMetadata, children, queryId } = this.props;
     const { open, selectedKey } = this.state;
-    const title = viewMetadata.title || defaultNewViewTitle;
+
     const toggleIcon = open
       ? 'times'
       : 'chevron-right';
     return (
-      <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
-        {open && <ContentOverlay onClick={this.toggleOpen} />}
-        <SidebarHeader role="presentation" onClick={this.toggleOpen} hasTitle={!!title} open={open}>
-          {open && title && <Headline title={title}>{title}</Headline>}
-          <ToggleIcon><Icon name={toggleIcon} /></ToggleIcon>
-        </SidebarHeader>
-        <HorizontalRuler />
-        <NavItem isSelected={open && selectedKey === 'viewDescription'}
-                 text="Description"
-                 icon="info"
-                 onClick={this.setSelectedKey('viewDescription')}
-                 isOpen={open}>
-          {this.navItemChildren(<ViewDescription viewMetadata={viewMetadata} results={results} />)}
-        </NavItem>
-        <NavItem isSelected={open && selectedKey === 'createWidget'}
-                 text="Create"
-                 icon="plus"
-                 onClick={this.setSelectedKey('createWidget')}
-                 isOpen={open}>
-          {this.navItemChildren(<AddWidgetButton onClick={this.toggleOpen} toggleAutoClose={this.toggleAutoClose} queryId={queryId} />)}
-        </NavItem>
-        <NavItem isSelected={open && selectedKey === 'highlighting'}
-                 text="Formatting & Highlighting"
-                 icon="paragraph"
-                 onClick={this.setSelectedKey('highlighting')}
-                 isOpen={open}>
-          {this.navItemChildren(<HighlightingRules />)}
-        </NavItem>
-        <NavItem isSelected={open && selectedKey === 'fields'}
-                 text="Fields"
-                 icon="subscript"
-                 onClick={this.setSelectedKey('fields')}
-                 expandRight
-                 isOpen={open}>
-          {this.navItemChildren(children)}
-        </NavItem>
-      </Container>
+      <ViewTypeContext.Consumer>
+        {(viewType) => {
+          const title = this.sidebarTitle(viewType);
+          return (
+            <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
+              {open && <ContentOverlay onClick={this.toggleOpen} />}
+              <SidebarHeader role="presentation" onClick={this.toggleOpen} hasTitle={!!title} open={open}>
+                {open && title && <Headline title={title}>{title}</Headline>}
+                <ToggleIcon><Icon name={toggleIcon} /></ToggleIcon>
+              </SidebarHeader>
+              <HorizontalRuler />
+              <NavItem isSelected={open && selectedKey === 'viewDescription'}
+                       text="Description"
+                       icon="info"
+                       onClick={this.onNavItemClick('viewDescription')}
+                       isOpen={open}>
+                {this.navItemChildren(<ViewDescription viewMetadata={viewMetadata} results={results} />)}
+              </NavItem>
+              <NavItem isSelected={open && selectedKey === 'createWidget'}
+                       text="Create"
+                       icon="plus"
+                       onClick={this.onNavItemClick('createWidget')}
+                       isOpen={open}>
+                {this.navItemChildren(<AddWidgetButton onClick={this.toggleOpen} toggleAutoClose={this.toggleAutoClose} queryId={queryId} />)}
+              </NavItem>
+              <NavItem isSelected={open && selectedKey === 'highlighting'}
+                       text="Formatting & Highlighting"
+                       icon="paragraph"
+                       onClick={this.onNavItemClick('highlighting')}
+                       isOpen={open}>
+                {this.navItemChildren(<HighlightingRules />)}
+              </NavItem>
+              <NavItem isSelected={open && selectedKey === 'fields'}
+                       text="Fields"
+                       icon="subscript"
+                       onClick={this.onNavItemClick('fields')}
+                       expandRight
+                       isOpen={open}>
+                {this.navItemChildren(children)}
+              </NavItem>
+            </Container>
+          );
+        }}
+      </ViewTypeContext.Consumer>
     );
   }
 }

@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import { ViewSharingActions } from 'views/stores/ViewSharingStore';
 import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
+import View from 'views/logic/views/View';
 import ShareViewModal from './ShareViewModal';
 
 const mockLoadRoles = jest.fn(() => Promise.resolve([]));
@@ -21,8 +22,9 @@ jest.mock('injection/StoreProvider', () => ({
         };
       case 'CurrentUser':
         return {};
+      default:
+        return null;
     }
-    return null;
   },
 }));
 jest.mock('views/stores/ViewSharingStore', () => ({
@@ -35,7 +37,7 @@ jest.mock('views/stores/ViewSharingStore', () => ({
 }));
 
 describe('ShareViewModal', () => {
-  const view = { id: 'deadbeef', title: 'My fabulous view' };
+  const view = View.builder().id('deadbeef').title('My fabulous view').build();
   const currentUser = { roles: [], permissions: [] };
   const onClose = jest.fn();
 

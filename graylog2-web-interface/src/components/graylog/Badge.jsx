@@ -1,31 +1,28 @@
-import React, { forwardRef, useMemo } from 'react';
-import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import React, { forwardRef } from 'react';
+import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Badge as BootstrapBadge } from 'react-bootstrap';
 
-import { bsStyles } from './variants/bsStyle';
-import badgeStyles from './styles/badge';
+import { util } from 'theme';
+import bsStyleThemeVariant from './variants/bsStyle';
 
-const Badge = forwardRef((props, ref) => {
-  const { bsStyle } = props;
-  const StyledBadge = useMemo(
-    () => styled(BootstrapBadge)`${badgeStyles(props)}`,
-    [bsStyle],
-  );
+const cssBuilder = (backgroundColor) => {
+  const textColor = util.readableColor(backgroundColor);
 
+  return css`
+    background-color: ${backgroundColor};
+    color: ${textColor};
+  `;
+};
+
+const StyledBadge = styled(BootstrapBadge)`
+  ${bsStyleThemeVariant(cssBuilder)}
+`;
+
+const Badge = forwardRef(({ ...props }, ref) => {
   return (
     <StyledBadge ref={ref} {...props} />
   );
 });
-
-Badge.propTypes = {
-  /* Bootstrap `bsStyle` variant name */
-  bsStyle: PropTypes.oneOf(bsStyles),
-};
-
-Badge.defaultProps = {
-  bsStyle: 'default',
-};
 
 export default Badge;

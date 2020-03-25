@@ -17,6 +17,7 @@
 package org.graylog.events.rest;
 
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import io.swagger.annotations.Api;
@@ -71,6 +72,7 @@ public class AvailableEntityTypesResource extends RestResource implements Plugin
     }
 
     @AutoValue
+    @JsonAutoDetect
     public static abstract class AvailableEntityTypesSummary {
         @JsonProperty("processor_types")
         public abstract Set<String> processorTypes();

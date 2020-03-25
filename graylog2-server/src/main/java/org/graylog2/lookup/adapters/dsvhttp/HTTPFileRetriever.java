@@ -44,14 +44,32 @@ public class HTTPFileRetriever {
                 .build();
     }
 
+    /**
+     * Request file. No "If-Modified-Since" header will be sent so the file will be fetched again, even if hasn't been
+     * modified since the last fetch.
+     */
+    public Optional<String> fetchFile(String url) throws IOException {
+        return fetchFile(url, false);
+    }
+
+    /**
+     * Request file by sending an "If-Modified-Since" header so that the file won't be fetched if it hasn't been
+     * modified since the last request.
+     */
     public Optional<String> fetchFileIfNotModified(String url) throws IOException {
+        return fetchFile(url, true);
+    }
+
+    private Optional<String> fetchFile(String url, boolean addIfModifiedSinceHeader) throws IOException {
         final Request.Builder requestBuilder = new Request.Builder()
                 .get()
                 .url(url)
                 .header("User-Agent", "Graylog (server)");
-        final String lastModified = this.lastLastModified.get().get(url);
-        if (lastModified != null) {
-            requestBuilder.header("If-Modified-Since", lastModified);
+        if (addIfModifiedSinceHeader) {
+            final String lastModified = this.lastLastModified.get().get(url);
+            if (lastModified != null) {
+                requestBuilder.header("If-Modified-Since", lastModified);
+            }
         }
         final Call request = client.newCall(requestBuilder.build());
 

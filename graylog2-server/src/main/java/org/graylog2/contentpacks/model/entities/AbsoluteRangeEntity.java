@@ -22,7 +22,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.format.ISODateTimeFormat;
+
+import java.util.Map;
 
 @AutoValue
 @JsonAutoDetect
@@ -49,6 +53,17 @@ public abstract class AbsoluteRangeEntity extends TimeRangeEntity {
 
     static AbsoluteRangeEntity.Builder builder() {
         return new AutoValue_AbsoluteRangeEntity.Builder();
+    }
+
+    @Override
+    public final TimeRange convert(Map<String, ValueReference> parameters) {
+        final String from = from().asString(parameters);
+        final String to = to().asString(parameters);
+        try {
+            return AbsoluteRange.create(from, to);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("Invalid timerange.", e);
+        }
     }
 
     @AutoValue.Builder

@@ -1,9 +1,23 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Well } from 'components/graylog';
 
 import MessageLoader from './MessageLoader';
+
+const NewExampleWell = styled(Well)`
+  margin-bottom: 5px;
+  font-family: monospace;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+`;
+
+const NoExample = styled.div`
+  margin-top: 15px;
+  margin-bottom: 12px;
+`;
 
 class ExtractorExampleMessage extends React.Component {
   static propTypes = {
@@ -31,16 +45,16 @@ class ExtractorExampleMessage extends React.Component {
 
     if (example) {
       messagePreview = (
-        <Well bsSize="small" className="xtrc-new-example">
+        <NewExampleWell bsSize="small">
           <span id="xtrc-example">{example}</span>
-        </Well>
+        </NewExampleWell>
       );
     } else {
       messagePreview = (
-        <div className="alert alert-warning xtrc-no-example">
+        <NoExample className="alert alert-warning">
           Could not load an example of field &lsquo;{field}&rsquo;. It is not possible to test
           the extractor before updating it.
-        </div>
+        </NoExample>
       );
     }
 

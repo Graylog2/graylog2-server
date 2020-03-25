@@ -20,6 +20,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
+import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
@@ -27,14 +30,13 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.streams.StreamService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.inject.Provider;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,8 +51,14 @@ public class ElasticsearchBackendTest {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
 
+        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         final QueryStringParser queryStringParser = new QueryStringParser();
-        backend = new ElasticsearchBackend(handlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake());
+        backend = new ElasticsearchBackend(handlers,
+                queryStringParser,
+                null,
+                mock(IndexLookup.class),
+                new ESQueryDecorators.Fake(),
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup));
     }
 
     @Test
@@ -91,5 +99,38 @@ public class ElasticsearchBackendTest {
 
         assertThat(queryMetadata.usedParameterNames())
                 .containsOnly("username", "foo", "bar", "baz");
+    }
+
+    @Test
+    public void generatesSearchForEmptySearchTypes() throws Exception {
+        final Query query = Query.builder()
+                .id("query1")
+                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .timerange(RelativeRange.create(300))
+                .build();
+        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
+        final SearchJob job = new SearchJob("deadbeef", search, "admin");
+
+        backend.generate(job, query, Collections.emptySet());
+    }
+
+    @Test
+    public void executesSearchForEmptySearchTypes() throws Exception {
+        final Query query = Query.builder()
+                .id("query1")
+                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .timerange(RelativeRange.create(300))
+                .build();
+        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
+        final SearchJob job = new SearchJob("deadbeef", search, "admin");
+
+        final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
+
+        final QueryResult queryResult = backend.doRun(job, query, queryContext, Collections.emptySet());
+
+        assertThat(queryResult).isNotNull();
+        assertThat(queryResult.searchTypes()).isEmpty();
+        assertThat(queryResult.executionStats()).isNotNull();
+        assertThat(queryResult.errors()).isEmpty();
     }
 }

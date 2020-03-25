@@ -133,7 +133,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String SYSTEMJOBS_READ = "systemjobs:read";
     public static final String SYSTEMMESSAGES_READ = "systemmessages:read";
     public static final String THREADS_DUMP = "threads:dump";
+    public static final String PROCESSBUFFER_DUMP = "processbuffer:dump";
     public static final String THROUGHPUT_READ = "throughput:read";
+    public static final String URL_WHITELIST_READ = "urlwhitelist:read";
+    public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
     public static final String USERS_EDIT = "users:edit";
     public static final String USERS_LIST = "users:list";
@@ -246,7 +249,10 @@ public class RestPermissions implements PluginPermissions {
         .add(create(SYSTEMJOBS_READ, ""))
         .add(create(SYSTEMMESSAGES_READ, ""))
         .add(create(THREADS_DUMP, ""))
+        .add(create(PROCESSBUFFER_DUMP, ""))
         .add(create(THROUGHPUT_READ, ""))
+        .add(create(URL_WHITELIST_READ, ""))
+        .add(create(URL_WHITELIST_WRITE, ""))
         .add(create(USERS_CREATE, ""))
         .add(create(USERS_EDIT, ""))
         .add(create(USERS_LIST, ""))

@@ -156,7 +156,7 @@ class ConfigurationVariablesHelper extends React.Component {
           <Modal.Body>
             <Alert bsStyle="warning">
               <p>
-              Cannot delete this configuration variable as it is still in use. Please remove the variable from
+                Cannot delete this configuration variable as it is still in use. Please remove the variable from
                 the following configurations and try again.
                 {errorModalContent}
               </p>

@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { List } from 'immutable';
+import { mount } from 'wrappedEnzyme';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -40,14 +41,14 @@ jest.mock('util/History', () => ({}));
 jest.mock('./ExtendedSearchPage', () => 'extended-search-page');
 
 describe('ShowViewPage', () => {
-  const viewJson = {
+  const viewJson: ViewJson = {
     id: 'foo',
     type: 'DASHBOARD',
     title: 'Foo',
     summary: 'summary',
     description: 'Foo',
     search_id: 'foosearch',
-    properties: {},
+    properties: List<any>(),
     state: {},
     dashboard_state: { widgets: [], positions: [] },
     created_at: new Date(),
@@ -110,5 +111,27 @@ describe('ShowViewPage', () => {
     mount(<SimpleShowViewPage viewLoader={viewLoader} />);
 
     expect(viewLoader).toHaveBeenCalled();
+  });
+  it('calls ViewLoader again if view id prop changes', () => {
+    const viewLoader = jest.fn(() => Promise.resolve());
+    const wrapper = mount(<SimpleShowViewPage viewLoader={viewLoader} />);
+
+    expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
+
+    wrapper.setProps({ params: { viewId: 'bar' } });
+
+    expect(viewLoader).toHaveBeenCalledWith('bar', [], [], {}, expect.anything(), expect.anything());
+  });
+  it('does not call ViewLoader again if view id prop does not change', () => {
+    const viewLoader = jest.fn(() => Promise.resolve());
+    const wrapper = mount(<SimpleShowViewPage viewLoader={viewLoader} />);
+
+    expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
+
+    viewLoader.mockClear();
+
+    wrapper.setProps({ params: { viewId: 'foo' } });
+
+    expect(viewLoader).not.toHaveBeenCalled();
   });
 });

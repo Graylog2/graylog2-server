@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -9,6 +9,7 @@ import AppConfig from 'util/AppConfig';
 jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
+jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('react-router', () => ({ withRouter: x => x }));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
 jest.mock('util/AppConfig', () => ({
@@ -151,7 +152,6 @@ describe('Navigation', () => {
     permissions                    | count | links
     ${[]}                          | ${4}  | ${['Streams', 'Alerts', 'Dashboards']}
     ${['searches:absolute', 'searches:relative', 'searches:keyword']} | ${5}  | ${['Search']}
-    ${['sources:read']}            | ${5}  | ${['Sources']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
 });

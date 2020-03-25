@@ -8,7 +8,7 @@ type InternalState = {
 
 type InternalStateBuilder = Immutable.Map<string, any>;
 
-type JsonRepresentation = {
+export type ParameterBindingJsonRepresentation = {
   type: string,
   value: any,
 };
@@ -47,7 +47,7 @@ export default class ParameterBinding {
     return ParameterBinding.create('value', '');
   }
 
-  toJSON(): JsonRepresentation {
+  toJSON(): ParameterBindingJsonRepresentation {
     const { type, value } = this._value;
 
     return {
@@ -56,29 +56,32 @@ export default class ParameterBinding {
     };
   }
 
-  static fromJSON(json: JsonRepresentation): ParameterBinding {
+  static fromJSON(json: ?ParameterBindingJsonRepresentation): ?ParameterBinding {
+    if (json == null) {
+      return null;
+    }
     const { type, value } = json;
     return ParameterBinding.create(type, value);
   }
 }
 
 class Builder {
-  value: InternalStateBuilder;
+  _value: InternalStateBuilder;
 
-  constructor(value: Immutable.Map<string, *> = Immutable.Map()) {
-    this.value = value;
+  constructor(value: InternalStateBuilder = Immutable.Map()) {
+    this._value = value;
   }
 
   type(value: string): Builder {
-    return new Builder(this.value.set('type', value));
+    return new Builder(this._value.set('type', value));
   }
 
   value(value: string): Builder {
-    return new Builder(this.value.set('value', value));
+    return new Builder(this._value.set('value', value));
   }
 
   build(): ParameterBinding {
-    const { type, value } = this.value.toObject();
+    const { type, value } = this._value.toObject();
     return new ParameterBinding(type, value);
   }
 }

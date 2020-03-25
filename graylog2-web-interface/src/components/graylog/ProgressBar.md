@@ -1,38 +1,45 @@
+## Default
 ```js
-<ProgressBar now={60} />
+<ProgressBar bars={[{ value: 35 }]} />
 ```
 
+## Labeled
 ```js
-const now = 60;
-<ProgressBar now={now} label={`${now}%`} />
+const value = 60;
+<ProgressBar bars={[{ value, label: `${value}%` }]} />
 ```
 
+## Variant
 ```js
 <div>
-  <ProgressBar bsStyle="success" now={40} />
-  <ProgressBar bsStyle="info" now={20} />
-  <ProgressBar bsStyle="warning" now={60} />
-  <ProgressBar bsStyle="danger" now={80} />
+  <ProgressBar bars={[{ value: 70, bsStyle: 'primary' }]} />
+  <ProgressBar bars={[{ value: 40, bsStyle: 'success' }]} />
+  <ProgressBar bars={[{ value: 20, bsStyle: 'info' }]} />
+  <ProgressBar bars={[{ value: 60, bsStyle: 'warning' }]} />
+  <ProgressBar bars={[{ value: 80, bsStyle: 'danger' }]} />
 </div>
 ```
 
+## Striped
 ```js
 <div>
-  <ProgressBar striped bsStyle="success" now={40} />
-  <ProgressBar striped bsStyle="info" now={20} />
-  <ProgressBar striped bsStyle="warning" now={60} />
-  <ProgressBar striped bsStyle="danger" now={80} />
+  <ProgressBar bars={[{ value: 40, bsStyle: 'success', striped: true }]} />
+  <ProgressBar bars={[{ value: 20, bsStyle: 'info', striped: true }]} />
+  <ProgressBar bars={[{ value: 60, bsStyle: 'warning', striped: true }]} />
+  <ProgressBar bars={[{ value: 80, bsStyle: 'danger', striped: true }]} />
 </div>
 ```
+## Animated
 
 ```js
-<ProgressBar active now={45} />
+  <ProgressBar bars={[{ value: 45, bsStyle: 'danger', animated: true }]} />
 ```
 
+## Multiples
 ```js
-<ProgressBar>
-  <ProgressBar striped bsStyle="success" now={35} key={1} />
-  <ProgressBar bsStyle="warning" now={20} key={2} />
-  <ProgressBar active bsStyle="danger" now={10} key={3} />
-</ProgressBar>
+<ProgressBar bars={[
+  { value: 35, bsStyle: 'success', striped: true },
+  { value: 20, bsStyle: 'warning' },
+  { value: 10, bsStyle: 'danger', animated: true }
+]} />
 ```

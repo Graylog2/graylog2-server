@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -43,7 +42,7 @@ public abstract class JournalSummaryResponse {
                                                        Size journalSizeLimit,
                                                        int numberOfSegments,
                                                        DateTime oldestSegment,
-                                                       KafkaJournalConfiguration kafkaJournalConfiguration) {
+                                                       KafkaJournalConfigurationSummary kafkaJournalConfiguration) {
         return JournalSummaryResponse.create(true,
                 appendEventsPerSec,
                 readEventsPerSec,
@@ -64,7 +63,7 @@ public abstract class JournalSummaryResponse {
                                                 @JsonProperty("journal_size_limit") long journalSizeLimit,
                                                 @JsonProperty("number_of_segments") int numberOfSegments,
                                                 @JsonProperty("oldest_segment") DateTime oldestSegment,
-                                                @JsonProperty("journal_config") KafkaJournalConfiguration kafkaJournalConfiguration) {
+                                                @JsonProperty("journal_config") KafkaJournalConfigurationSummary kafkaJournalConfiguration) {
         return JournalSummaryResponse.create(enabled,
                 appendEventsPerSec,
                 readEventsPerSec,
@@ -84,7 +83,7 @@ public abstract class JournalSummaryResponse {
                                                 Size journalSizeLimit,
                                                 int numberOfSegments,
                                                 DateTime oldestSegment,
-                                                KafkaJournalConfiguration kafkaJournalConfiguration) {
+                                                KafkaJournalConfigurationSummary kafkaJournalConfiguration) {
         return new AutoValue_JournalSummaryResponse(enabled,
                 appendEventsPerSec,
                 readEventsPerSec,
@@ -124,5 +123,5 @@ public abstract class JournalSummaryResponse {
 
     @JsonProperty
     @Nullable
-    public abstract KafkaJournalConfiguration journalConfig();
+    public abstract KafkaJournalConfigurationSummary journalConfig();
 }

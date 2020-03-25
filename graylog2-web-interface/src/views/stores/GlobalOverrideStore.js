@@ -1,20 +1,20 @@
 // @flow strict
 import Reflux from 'reflux';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { RefluxActions } from 'stores/StoreTypes';
-import { SearchExecutionStateStore, SearchExecutionStateActions } from './SearchExecutionStateStore';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
+import { SearchExecutionStateActions, SearchExecutionStateStore } from './SearchExecutionStateStore';
 
 export type GlobalOverrideActionsType = RefluxActions<{
   rangeType: (string) => Promise<?GlobalOverride>,
   rangeParams: (string, string | number) => Promise<?GlobalOverride>,
   query: (string) => Promise<?GlobalOverride>,
   reset: () => Promise<?GlobalOverride>,
+  timerange: (TimeRange) => Promise<?GlobalOverride>,
 }>;
 
 export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions(
@@ -24,10 +24,14 @@ export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions
     rangeParams: { asyncResult: true },
     query: { asyncResult: true },
     reset: { asyncResult: true },
+    timerange: { asyncResult: true },
   }),
 );
 
-export const GlobalOverrideStore = singletonStore(
+type GlobalOverrideStoreState = ?GlobalOverride;
+type GlobalOverrideStoreType = Store<GlobalOverrideStoreState>;
+
+export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
   'views.GlobalOverride',
   () => Reflux.createStore({
     listenables: [GlobalOverrideActions],
@@ -44,10 +48,18 @@ export const GlobalOverrideStore = singletonStore(
     getInitialState() {
       return this.globalOverride;
     },
+    timerange(newTimerange: TimeRange) {
+      const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
+      const newGlobalOverride = currentGlobalOverride.toBuilder().timerange(newTimerange).build();
+
+      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+      GlobalOverrideActions.timerange.promise(promise);
+      return promise;
+    },
     rangeType(newType: string) {
       if (newType === 'disabled') {
-        const { timerange, ...rest } = this.globalOverride || {};
-        const newGlobalOverride: ?GlobalOverride = isEmpty(rest) ? undefined : { ...rest };
+        const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
+        const newGlobalOverride: ?GlobalOverride = currentGlobalOverride.toBuilder().timerange(undefined).build();
         const promise = this._propagateNewGlobalOverride(newGlobalOverride);
         GlobalOverrideActions.rangeType.promise(promise);
         return promise;
@@ -78,8 +90,8 @@ export const GlobalOverrideStore = singletonStore(
             };
             break;
         }
-        const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
-        const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+
+        const promise = this.timerange(newTimerange);
         GlobalOverrideActions.rangeType.promise(promise);
         return promise;
       }
@@ -92,8 +104,8 @@ export const GlobalOverrideStore = singletonStore(
         ? { ...this.globalOverride.timerange, [key]: value }
         // $FlowFixMe: Flow is unable to validate that timerange is complete
         : { [key]: value };
-      const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
-      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+
+      const promise = this.timerange(newTimerange);
       GlobalOverrideActions.rangeParams.promise(promise);
       return promise;
     },
@@ -107,7 +119,7 @@ export const GlobalOverrideStore = singletonStore(
         type: 'elasticsearch',
         query_string: newQueryString,
       };
-      const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, query: newQuery } : { query: newQuery };
+      const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(this.globalOverride.timerange, newQuery) : new GlobalOverride(undefined, newQuery);
       const promise = this._propagateNewGlobalOverride(newGlobalOverride);
       GlobalOverrideActions.query.promise(promise);
       return promise;

@@ -39,8 +39,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
@@ -56,6 +58,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final ULID ulid;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
+    private volatile Message currentMessage;
 
     @AssistedInject
     public ProcessBufferProcessor(MetricRegistry metricRegistry,
@@ -75,6 +78,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
         processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
+        currentMessage = null;
     }
 
     @Override
@@ -103,7 +107,12 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         }
     }
 
+    public Optional<Message> getCurrentMessage() {
+        return Optional.ofNullable(currentMessage);
+    }
+
     private void dispatchMessage(final Message msg) {
+        currentMessage = msg;
         incomingMessages.mark();
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
@@ -114,6 +123,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         } catch (Exception e) {
             LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
         } finally {
+            currentMessage = null;
             outgoingMessages.mark();
         }
     }
@@ -126,9 +136,11 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             messages = messageProcessor.process(messages);
         }
         for (Message message : messages) {
-            // Set the message ID once all message processors have finished
-            // See documentation of Message.FIELD_GL2_MESSAGE_ID for details
-            message.addField(Message.FIELD_GL2_MESSAGE_ID, ulid.nextULID());
+            if (!message.hasField(Message.FIELD_GL2_MESSAGE_ID) || isNullOrEmpty(message.getFieldAs(String.class, Message.FIELD_GL2_MESSAGE_ID))) {
+                // Set the message ID once all message processors have finished
+                // See documentation of Message.FIELD_GL2_MESSAGE_ID for details
+                message.addField(Message.FIELD_GL2_MESSAGE_ID, ulid.nextULID());
+            }
 
             // The processing time should only be set once all message processors have finished
             message.setProcessingTime(Tools.nowUTC());

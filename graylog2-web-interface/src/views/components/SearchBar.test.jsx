@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
+import { act } from 'react-dom/test-utils';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import { QueriesActions } from 'views/stores/QueriesStore';
@@ -39,6 +40,9 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
 
 describe('SearchBar', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
   const config = {
     analysis_disabled_fields: ['full_message', 'message'],
     query_time_range_limit: 'PT0S',
@@ -55,14 +59,18 @@ describe('SearchBar', () => {
   it('should render the SearchBar', () => {
     // Empty currentQuery
     const wrapper = mount(<SearchBar config={config} onExecute={() => {}} />);
-    expect(wrapper.find('span').text()).toBe(' Loading...');
-    expect(wrapper.find('option').length).toBe(0);
+
+    act(() => jest.advanceTimersByTime(200));
+    wrapper.update();
+
+    expect(wrapper).toHaveText(' Loading...');
+    expect(wrapper.find('option')).not.toExist();
 
     // Set new currentQuery
     wrapper.setState({ currentQuery });
-    expect(wrapper.find('option').at(0).text()).toBe('Search in last day');
-    expect(wrapper.find('option').at(1).text()).toBe('Search in all messages');
-    expect(wrapper.find('option').at(2).length).toBe(0);
+    expect(wrapper.find('option')).toHaveLength(2);
+    expect(wrapper.find('option[children="Search in last day"]')).toExist();
+    expect(wrapper.find('option[children="Search in all messages"]')).toExist();
   });
 
   it('should execute a search', () => {

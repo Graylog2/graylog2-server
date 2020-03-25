@@ -1,8 +1,8 @@
 // @flow strict
-import React, { type Element, type ElementRef, type AbstractComponent, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import React, { type Element, type ElementRef, useEffect, useRef, useState } from 'react';
+import styled, { type StyledComponent } from 'styled-components';
 
-const FontSize: AbstractComponent<{ fontSize: number }> = styled.div`
+const FontSize: StyledComponent<{ fontSize: number }, {}, HTMLDivElement> = styled.div`
   height: 100%;
   width: 100%;
   font-size: ${props => `${props.fontSize}px`};

@@ -1,0 +1,107 @@
+{
+  "expr": "||",
+  "left": {
+    "expr": "group",
+    "child": {
+      "expr": "&&",
+      "left": {
+        "expr": ">=",
+        "left": {
+          "expr": "number-ref",
+          "ref": "count-"
+        },
+        "right": {
+          "expr": "number",
+          "value": 10.0
+        }
+      },
+      "right": {
+        "expr": "&&",
+        "left": {
+          "expr": "<",
+          "left": {
+            "expr": "number-ref",
+            "ref": "count-"
+          },
+          "right": {
+            "expr": "number",
+            "value": 100.0
+          }
+        },
+        "right": {
+          "expr": ">",
+          "left": {
+            "expr": "number-ref",
+            "ref": "count-"
+          },
+          "right": {
+            "expr": "number",
+            "value": 20.0
+          }
+        }
+      }
+    },
+    "operator": "&&"
+  },
+  "right": {
+    "expr": "group",
+    "child": {
+      "expr": "||",
+      "left": {
+        "expr": "==",
+        "left": {
+          "expr": "number-ref",
+          "ref": "count-"
+        },
+        "right": {
+          "expr": "number",
+          "value": 101.0
+        }
+      },
+      "right": {
+        "expr": "||",
+        "left": {
+          "expr": "==",
+          "left": {
+            "expr": "number-ref",
+            "ref": "count-"
+          },
+          "right": {
+            "expr": "number",
+            "value": 402.0
+          }
+        },
+        "right": {
+          "expr": "group",
+          "child": {
+            "expr": "&&",
+            "left": {
+              "expr": ">",
+              "left": {
+                "expr": "number-ref",
+                "ref": "count-"
+              },
+              "right": {
+                "expr": "number",
+                "value": 200.0
+              }
+            },
+            "right": {
+              "expr": "<",
+              "left": {
+                "expr": "number-ref",
+                "ref": "count-"
+              },
+              "right": {
+                "expr": "number",
+                "value": 300.0
+              }
+            }
+          },
+          "operator": "&&"
+        }
+      }
+    },
+    "operator": "||"
+  }
+}

@@ -1,516 +1,172 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ShowMessagePage renders for generic event 1`] = `
-<ShowMessagePage
-  params={
-    Object {
-      "index": "gl-events_0",
-      "messageId": "01DFZQ64CMGV30NT7DW2P7HQX2",
-    }
-  }
-  searchConfig={Object {}}
->
-  <DocumentTitle
-    title="Message 01DFZQ64CMGV30NT7DW2P7HQX2 on gl-events_0"
+<div>
+  <div
+    class="content row"
   >
-    <ConnectStoresWrapper[MessageShow] stores=nodes
-      allStreamsLoaded={true}
-      inputs={Immutable.Map {}}
-      message={
-        Object {
-          "fields": Object {
-            "_id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-            "alert": false,
-            "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-            "event_definition_type": "aggregation-v1",
-            "fields": Object {
-              "ssh_target": "10.0.0.82",
-            },
-            "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-            "key_tuple": Array [],
-            "message": "SSH Brute Force",
-            "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-            "priority": 2,
-            "source": "localhost",
-            "streams": Array [
-              "000000000000000000000002",
-            ],
-            "timestamp": "2019-07-17T09:50:12.886Z",
-            "timestamp_processing": "2019-07-17 10:20:59.668",
-          },
-          "filtered_fields": Object {
-            "alert": false,
-            "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-            "event_definition_type": "aggregation-v1",
-            "fields": Object {
-              "ssh_target": "10.0.0.82",
-            },
-            "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-            "key_tuple": Array [],
-            "message": "SSH Brute Force",
-            "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-            "priority": 2,
-            "source": "localhost",
-            "timestamp": "2019-07-17T09:50:12.886Z",
-            "timestamp_processing": "2019-07-17 10:20:59.668",
-          },
-          "formatted_fields": Object {
-            "alert": false,
-            "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-            "event_definition_type": "aggregation-v1",
-            "fields": Object {
-              "ssh_target": "10.0.0.82",
-            },
-            "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-            "key_tuple": Array [],
-            "message": "SSH Brute Force",
-            "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-            "priority": 2,
-            "source": "localhost",
-            "timestamp": "2019-07-17T09:50:12.886Z",
-            "timestamp_processing": "2019-07-17 10:20:59.668",
-          },
-          "highlight_ranges": Object {},
-          "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-          "index": "gl-events_0",
-          "stream_ids": Array [],
-          "timestamp": 1563357012,
-        }
-      }
-      searchConfig={Object {}}
-      streams={Immutable.Map {}}
+    <div
+      class="col-md-12"
     >
-      <MessageShow
-        allStreamsLoaded={true}
-        inputs={Immutable.Map {}}
-        message={
-          Object {
-            "fields": Object {
-              "_id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-              "alert": false,
-              "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-              "event_definition_type": "aggregation-v1",
-              "fields": Object {
-                "ssh_target": "10.0.0.82",
-              },
-              "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-              "key_tuple": Array [],
-              "message": "SSH Brute Force",
-              "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-              "priority": 2,
-              "source": "localhost",
-              "streams": Array [
-                "000000000000000000000002",
-              ],
-              "timestamp": "2019-07-17T09:50:12.886Z",
-              "timestamp_processing": "2019-07-17 10:20:59.668",
-            },
-            "filtered_fields": Object {
-              "alert": false,
-              "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-              "event_definition_type": "aggregation-v1",
-              "fields": Object {
-                "ssh_target": "10.0.0.82",
-              },
-              "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-              "key_tuple": Array [],
-              "message": "SSH Brute Force",
-              "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-              "priority": 2,
-              "source": "localhost",
-              "timestamp": "2019-07-17T09:50:12.886Z",
-              "timestamp_processing": "2019-07-17 10:20:59.668",
-            },
-            "formatted_fields": Object {
-              "alert": false,
-              "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-              "event_definition_type": "aggregation-v1",
-              "fields": Object {
-                "ssh_target": "10.0.0.82",
-              },
-              "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-              "key_tuple": Array [],
-              "message": "SSH Brute Force",
-              "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-              "priority": 2,
-              "source": "localhost",
-              "timestamp": "2019-07-17T09:50:12.886Z",
-              "timestamp_processing": "2019-07-17 10:20:59.668",
-            },
-            "highlight_ranges": Object {},
-            "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-            "index": "gl-events_0",
-            "stream_ids": Array [],
-            "timestamp": 1563357012,
-          }
-        }
-        nodes={Immutable.Map {}}
-        searchConfig={Object {}}
-        streams={Immutable.Map {}}
-      >
-        <Row
-          bsClass="row"
-          className="content"
-          componentClass="div"
-        >
-          <div
-            className="content row"
-          >
-            <Col
-              bsClass="col"
-              componentClass="div"
-              md={12}
-            >
-              <div
-                className="col-md-12"
-              >
-                <message-detail
-                  allStreamsLoaded={true}
-                  inputs={Immutable.Map {}}
-                  message={
-                    Object {
-                      "fields": Object {
-                        "_id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-                        "alert": false,
-                        "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-                        "event_definition_type": "aggregation-v1",
-                        "fields": Object {
-                          "ssh_target": "10.0.0.82",
-                        },
-                        "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-                        "key_tuple": Array [],
-                        "message": "SSH Brute Force",
-                        "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-                        "priority": 2,
-                        "source": "localhost",
-                        "streams": Array [
-                          "000000000000000000000002",
-                        ],
-                        "timestamp": "2019-07-17T09:50:12.886Z",
-                        "timestamp_processing": "2019-07-17 10:20:59.668",
-                      },
-                      "filtered_fields": Object {
-                        "alert": false,
-                        "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-                        "event_definition_type": "aggregation-v1",
-                        "fields": Object {
-                          "ssh_target": "10.0.0.82",
-                        },
-                        "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-                        "key_tuple": Array [],
-                        "message": "SSH Brute Force",
-                        "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-                        "priority": 2,
-                        "source": "localhost",
-                        "timestamp": "2019-07-17T09:50:12.886Z",
-                        "timestamp_processing": "2019-07-17 10:20:59.668",
-                      },
-                      "formatted_fields": Object {
-                        "alert": false,
-                        "event_definition_id": "5d2d8350e117dc4659d2dfcc",
-                        "event_definition_type": "aggregation-v1",
-                        "fields": Object {
-                          "ssh_target": "10.0.0.82",
-                        },
-                        "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-                        "key_tuple": Array [],
-                        "message": "SSH Brute Force",
-                        "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
-                        "priority": 2,
-                        "source": "localhost",
-                        "timestamp": "2019-07-17T09:50:12.886Z",
-                        "timestamp_processing": "2019-07-17 10:20:59.668",
-                      },
-                      "highlight_ranges": Object {},
-                      "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
-                      "index": "gl-events_0",
-                      "stream_ids": Array [],
-                      "timestamp": 1563357012,
-                    }
-                  }
-                  nodes={Immutable.Map {}}
-                  renderForDisplay={[Function]}
-                  searchConfig={Object {}}
-                  showTimestamp={true}
-                  streams={Immutable.Map {}}
-                />
-              </div>
-            </Col>
-          </div>
-        </Row>
-      </MessageShow>
-    </ConnectStoresWrapper[MessageShow] stores=nodes>
-  </DocumentTitle>
-</ShowMessagePage>
+      <span>
+        {
+  "fields": {},
+  "streams": {},
+  "allStreams": [],
+  "disableSurroundingSearch": true,
+  "disableFieldActions": true,
+  "inputs": {},
+  "message": {
+    "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
+    "timestamp": 1563357012,
+    "filtered_fields": {
+      "timestamp_processing": "2019-07-17 10:20:59.668",
+      "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
+      "source": "localhost",
+      "message": "SSH Brute Force",
+      "priority": 2,
+      "key_tuple": [],
+      "alert": false,
+      "event_definition_type": "aggregation-v1",
+      "event_definition_id": "5d2d8350e117dc4659d2dfcc",
+      "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
+      "fields": {
+        "ssh_target": "10.0.0.82"
+      },
+      "timestamp": "2019-07-17T09:50:12.886Z"
+    },
+    "formatted_fields": {
+      "timestamp_processing": "2019-07-17 10:20:59.668",
+      "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
+      "source": "localhost",
+      "message": "SSH Brute Force",
+      "priority": 2,
+      "key_tuple": [],
+      "alert": false,
+      "event_definition_type": "aggregation-v1",
+      "event_definition_id": "5d2d8350e117dc4659d2dfcc",
+      "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
+      "fields": {
+        "ssh_target": "10.0.0.82"
+      },
+      "timestamp": "2019-07-17T09:50:12.886Z"
+    },
+    "fields": {
+      "timestamp_processing": "2019-07-17 10:20:59.668",
+      "origin_context": "urn:graylog:message:es:netflow_13:459cb2f1-a878-11e9-8a11-0242ac130004",
+      "streams": [
+        "000000000000000000000002"
+      ],
+      "source": "localhost",
+      "message": "SSH Brute Force",
+      "priority": 2,
+      "key_tuple": [],
+      "alert": false,
+      "event_definition_type": "aggregation-v1",
+      "event_definition_id": "5d2d8350e117dc4659d2dfcc",
+      "_id": "01DFZQ64CMGV30NT7DW2P7HQX2",
+      "id": "01DFZQ64CMGV30NT7DW2P7HQX2",
+      "fields": {
+        "ssh_target": "10.0.0.82"
+      },
+      "timestamp": "2019-07-17T09:50:12.886Z"
+    },
+    "index": "gl-events_0",
+    "stream_ids": [],
+    "highlight_ranges": {}
+  }
+}
+      </span>
+    </div>
+  </div>
+</div>
 `;
 
 exports[`ShowMessagePage renders for generic message 1`] = `
-<ShowMessagePage
-  params={
-    Object {
-      "index": "graylog_5",
-      "messageId": "20f683d2-a874-11e9-8a11-0242ac130004",
-    }
-  }
-  searchConfig={Object {}}
->
-  <DocumentTitle
-    title="Message 20f683d2-a874-11e9-8a11-0242ac130004 on graylog_5"
+<div>
+  <div
+    class="content row"
   >
-    <ConnectStoresWrapper[MessageShow] stores=nodes
-      allStreamsLoaded={true}
-      inputs={
-        Immutable.Map {
-          "5c26a37b3885e50480aa12a2": Object {
-            "attributes": Object {
-              "allow_override_date": true,
-              "bind_address": "0.0.0.0",
-              "expand_structured_data": false,
-              "force_rdns": false,
-              "number_worker_threads": 8,
-              "override_source": null,
-              "port": 12514,
-              "recv_buffer_size": 262144,
-              "store_full_message": false,
-            },
-            "content_pack": null,
-            "created_at": "2019-07-15T07:25:12.397Z",
-            "creator_user_id": "admin",
-            "global": true,
-            "id": "5c26a37b3885e50480aa12a2",
-            "name": "Syslog UDP",
-            "node": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-            "static_fields": Object {},
-            "title": "syslog udp",
-            "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
-          },
-        }
-      }
-      message={
-        Object {
-          "fields": Object {
-            "_id": "20f683d2-a874-11e9-8a11-0242ac130004",
-            "facility": "user-level",
-            "gl2_message_id": "01DFZKQF4D3642JY91FM6Z1WQG",
-            "gl2_remote_ip": "192.168.1.47",
-            "gl2_remote_port": 35024,
-            "gl2_source_input": "5c26a37b3885e50480aa12a2",
-            "gl2_source_node": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-            "hostname": "babbage",
-            "level": 6,
-            "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-            "source": "babbage",
-            "streams": Array [
-              "000000000000000000000001",
-            ],
-            "timestamp": "2019-07-17T11:20:33.000Z",
-          },
-          "filtered_fields": Object {
-            "facility": "user-level",
-            "hostname": "babbage",
-            "level": 6,
-            "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-            "source": "babbage",
-            "timestamp": "2019-07-17T11:20:33.000Z",
-          },
-          "formatted_fields": Object {
-            "facility": "user-level",
-            "hostname": "babbage",
-            "level": 6,
-            "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-            "source": "babbage",
-            "timestamp": "2019-07-17T11:20:33.000Z",
-          },
-          "highlight_ranges": Object {},
-          "id": "20f683d2-a874-11e9-8a11-0242ac130004",
-          "index": "graylog_5",
-          "source_input_id": "5c26a37b3885e50480aa12a2",
-          "source_node_id": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-          "stream_ids": Array [],
-          "timestamp": 1563362433,
-        }
-      }
-      searchConfig={Object {}}
-      streams={Immutable.Map {}}
+    <div
+      class="col-md-12"
     >
-      <MessageShow
-        allStreamsLoaded={true}
-        inputs={
-          Immutable.Map {
-            "5c26a37b3885e50480aa12a2": Object {
-              "attributes": Object {
-                "allow_override_date": true,
-                "bind_address": "0.0.0.0",
-                "expand_structured_data": false,
-                "force_rdns": false,
-                "number_worker_threads": 8,
-                "override_source": null,
-                "port": 12514,
-                "recv_buffer_size": 262144,
-                "store_full_message": false,
-              },
-              "content_pack": null,
-              "created_at": "2019-07-15T07:25:12.397Z",
-              "creator_user_id": "admin",
-              "global": true,
-              "id": "5c26a37b3885e50480aa12a2",
-              "name": "Syslog UDP",
-              "node": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-              "static_fields": Object {},
-              "title": "syslog udp",
-              "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
-            },
-          }
-        }
-        message={
-          Object {
-            "fields": Object {
-              "_id": "20f683d2-a874-11e9-8a11-0242ac130004",
-              "facility": "user-level",
-              "gl2_message_id": "01DFZKQF4D3642JY91FM6Z1WQG",
-              "gl2_remote_ip": "192.168.1.47",
-              "gl2_remote_port": 35024,
-              "gl2_source_input": "5c26a37b3885e50480aa12a2",
-              "gl2_source_node": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-              "hostname": "babbage",
-              "level": 6,
-              "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-              "source": "babbage",
-              "streams": Array [
-                "000000000000000000000001",
-              ],
-              "timestamp": "2019-07-17T11:20:33.000Z",
-            },
-            "filtered_fields": Object {
-              "facility": "user-level",
-              "hostname": "babbage",
-              "level": 6,
-              "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-              "source": "babbage",
-              "timestamp": "2019-07-17T11:20:33.000Z",
-            },
-            "formatted_fields": Object {
-              "facility": "user-level",
-              "hostname": "babbage",
-              "level": 6,
-              "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-              "source": "babbage",
-              "timestamp": "2019-07-17T11:20:33.000Z",
-            },
-            "highlight_ranges": Object {},
-            "id": "20f683d2-a874-11e9-8a11-0242ac130004",
-            "index": "graylog_5",
-            "source_input_id": "5c26a37b3885e50480aa12a2",
-            "source_node_id": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-            "stream_ids": Array [],
-            "timestamp": 1563362433,
-          }
-        }
-        nodes={Immutable.Map {}}
-        searchConfig={Object {}}
-        streams={Immutable.Map {}}
-      >
-        <Row
-          bsClass="row"
-          className="content"
-          componentClass="div"
-        >
-          <div
-            className="content row"
-          >
-            <Col
-              bsClass="col"
-              componentClass="div"
-              md={12}
-            >
-              <div
-                className="col-md-12"
-              >
-                <message-detail
-                  allStreamsLoaded={true}
-                  inputs={
-                    Immutable.Map {
-                      "5c26a37b3885e50480aa12a2": Object {
-                        "attributes": Object {
-                          "allow_override_date": true,
-                          "bind_address": "0.0.0.0",
-                          "expand_structured_data": false,
-                          "force_rdns": false,
-                          "number_worker_threads": 8,
-                          "override_source": null,
-                          "port": 12514,
-                          "recv_buffer_size": 262144,
-                          "store_full_message": false,
-                        },
-                        "content_pack": null,
-                        "created_at": "2019-07-15T07:25:12.397Z",
-                        "creator_user_id": "admin",
-                        "global": true,
-                        "id": "5c26a37b3885e50480aa12a2",
-                        "name": "Syslog UDP",
-                        "node": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-                        "static_fields": Object {},
-                        "title": "syslog udp",
-                        "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
-                      },
-                    }
-                  }
-                  message={
-                    Object {
-                      "fields": Object {
-                        "_id": "20f683d2-a874-11e9-8a11-0242ac130004",
-                        "facility": "user-level",
-                        "gl2_message_id": "01DFZKQF4D3642JY91FM6Z1WQG",
-                        "gl2_remote_ip": "192.168.1.47",
-                        "gl2_remote_port": 35024,
-                        "gl2_source_input": "5c26a37b3885e50480aa12a2",
-                        "gl2_source_node": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-                        "hostname": "babbage",
-                        "level": 6,
-                        "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-                        "source": "babbage",
-                        "streams": Array [
-                          "000000000000000000000001",
-                        ],
-                        "timestamp": "2019-07-17T11:20:33.000Z",
-                      },
-                      "filtered_fields": Object {
-                        "facility": "user-level",
-                        "hostname": "babbage",
-                        "level": 6,
-                        "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-                        "source": "babbage",
-                        "timestamp": "2019-07-17T11:20:33.000Z",
-                      },
-                      "formatted_fields": Object {
-                        "facility": "user-level",
-                        "hostname": "babbage",
-                        "level": 6,
-                        "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
-                        "source": "babbage",
-                        "timestamp": "2019-07-17T11:20:33.000Z",
-                      },
-                      "highlight_ranges": Object {},
-                      "id": "20f683d2-a874-11e9-8a11-0242ac130004",
-                      "index": "graylog_5",
-                      "source_input_id": "5c26a37b3885e50480aa12a2",
-                      "source_node_id": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
-                      "stream_ids": Array [],
-                      "timestamp": 1563362433,
-                    }
-                  }
-                  nodes={Immutable.Map {}}
-                  renderForDisplay={[Function]}
-                  searchConfig={Object {}}
-                  showTimestamp={true}
-                  streams={Immutable.Map {}}
-                />
-              </div>
-            </Col>
-          </div>
-        </Row>
-      </MessageShow>
-    </ConnectStoresWrapper[MessageShow] stores=nodes>
-  </DocumentTitle>
-</ShowMessagePage>
+      <span>
+        {
+  "fields": {},
+  "streams": {},
+  "allStreams": [],
+  "disableSurroundingSearch": true,
+  "disableFieldActions": true,
+  "inputs": {
+    "5c26a37b3885e50480aa12a2": {
+      "title": "syslog udp",
+      "global": true,
+      "name": "Syslog UDP",
+      "content_pack": null,
+      "created_at": "2019-07-15T07:25:12.397Z",
+      "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
+      "creator_user_id": "admin",
+      "attributes": {
+        "expand_structured_data": false,
+        "recv_buffer_size": 262144,
+        "port": 12514,
+        "number_worker_threads": 8,
+        "override_source": null,
+        "force_rdns": false,
+        "allow_override_date": true,
+        "bind_address": "0.0.0.0",
+        "store_full_message": false
+      },
+      "static_fields": {},
+      "node": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
+      "id": "5c26a37b3885e50480aa12a2"
+    }
+  },
+  "message": {
+    "id": "20f683d2-a874-11e9-8a11-0242ac130004",
+    "timestamp": 1563362433,
+    "filtered_fields": {
+      "level": 6,
+      "source": "babbage",
+      "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
+      "hostname": "babbage",
+      "facility": "user-level",
+      "timestamp": "2019-07-17T11:20:33.000Z"
+    },
+    "formatted_fields": {
+      "level": 6,
+      "source": "babbage",
+      "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
+      "hostname": "babbage",
+      "facility": "user-level",
+      "timestamp": "2019-07-17T11:20:33.000Z"
+    },
+    "fields": {
+      "level": 6,
+      "gl2_remote_ip": "192.168.1.47",
+      "gl2_remote_port": 35024,
+      "streams": [
+        "000000000000000000000001"
+      ],
+      "gl2_message_id": "01DFZKQF4D3642JY91FM6Z1WQG",
+      "source": "babbage",
+      "message": "babbage 30ac6e35e442[27354]: [2019-07-17T09:20:33,415][WARN ][o.e.d.c.ParseField       ] [Mc1oQWu] Deprecated field [split_on_whitespace] used, replaced by [This setting is ignored, the parser always splits on operator]",
+      "gl2_source_input": "5c26a37b3885e50480aa12a2",
+      "hostname": "babbage",
+      "gl2_source_node": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
+      "_id": "20f683d2-a874-11e9-8a11-0242ac130004",
+      "facility": "user-level",
+      "timestamp": "2019-07-17T11:20:33.000Z"
+    },
+    "index": "graylog_5",
+    "source_node_id": "4c0cbe7b-c51a-4617-bb50-ea01fe6dbfd0",
+    "source_input_id": "5c26a37b3885e50480aa12a2",
+    "stream_ids": [],
+    "highlight_ranges": {}
+  }
+}
+      </span>
+    </div>
+  </div>
+</div>
 `;

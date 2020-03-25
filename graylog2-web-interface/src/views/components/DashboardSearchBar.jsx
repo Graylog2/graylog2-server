@@ -8,13 +8,13 @@ import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
-import HorizontalSpacer from 'views/components/horizontalspacer/HorizontalSpacer';
 import { Icon, Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import TimeRangeOverrideTypeSelector from 'views/components/searchbar/TimeRangeOverrideTypeSelector';
 import TimeRangeOverrideInput from 'views/components/searchbar/TimeRangeOverrideInput';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
+import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from '../stores/GlobalOverrideStore';
 
 type Props = {
@@ -45,11 +45,25 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
 
   return (
     <ScrollToHint value={query.query_string || ''}>
-      <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+      <Row className="content">
         <Col md={12}>
           <form method="GET" onSubmit={submitForm}>
+            <Row className="no-bm extended-search-query-metadata">
+              <Col lg={4} md={6} xs={8}>
+                <TimeRangeOverrideTypeSelector onSelect={newRangeType => GlobalOverrideActions.rangeType(newRangeType).then(performSearch)}
+                                               value={rangeType} />
+                <TimeRangeOverrideInput onChange={(key, value) => GlobalOverrideActions.rangeParams(key, value).then(performSearch)}
+                                        rangeType={rangeType}
+                                        rangeParams={rangeParams}
+                                        config={config} />
+              </Col>
+              <Col lg={8} md={6} xs={4}>
+                <RefreshControls />
+              </Col>
+            </Row>
+
             <Row className="no-bm">
-              <Col lg={8} md={7} xs={6}>
+              <Col md={9} xs={8}>
                 <div className="pull-right search-help">
                   <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                      title="Search query syntax documentation"
@@ -62,23 +76,10 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
                             onChange={value => GlobalOverrideActions.query(value).then(performSearch).then(() => value)}
                             onExecute={performSearch} />
               </Col>
-              <Col lg={4} md={5} xs={6}>
-                <TimeRangeOverrideTypeSelector onSelect={newRangeType => GlobalOverrideActions.rangeType(newRangeType).then(performSearch)}
-                                               value={rangeType} />
-                <TimeRangeOverrideInput onChange={(key, value) => GlobalOverrideActions.rangeParams(key, value).then(performSearch)}
-                                        rangeType={rangeType}
-                                        rangeParams={rangeParams}
-                                        config={config} />
-              </Col>
-            </Row>
-            <Row className="no-bm">
-              <Col>
-                <HorizontalSpacer />
-              </Col>
-            </Row>
-            <Row className="no-bm">
-              <Col md={12}>
-                <RefreshControls />
+              <Col md={3} xs={4}>
+                <div className="pull-right">
+                  <ViewActionsMenu />
+                </div>
               </Col>
             </Row>
           </form>

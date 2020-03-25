@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SavedSearchControls render the SavedSearchControls should render dirty 1`] = `
+<button
+  className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+  disabled={false}
+  onClick={[Function]}
+  title="Unsaved changes"
+  type="button"
+>
+  <ForwardRef
+    fixedWidth={false}
+    inverse={false}
+    name="star"
+    pulse={false}
+    spin={false}
+    style={
+      Object {
+        "color": "#ffc107",
+      }
+    }
+  >
+    <i
+      className="fa fa-star"
+      style={
+        Object {
+          "color": "#ffc107",
+        }
+      }
+    />
+  </ForwardRef>
+   Save
+</button>
+`;
+
+exports[`SavedSearchControls render the SavedSearchControls should render not dirty 1`] = `
+<button
+  className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+  disabled={false}
+  onClick={[Function]}
+  title="Saved search"
+  type="button"
+>
+  <ForwardRef
+    fixedWidth={false}
+    inverse={false}
+    name="star"
+    pulse={false}
+    spin={false}
+    style={
+      Object {
+        "color": "#007bff",
+      }
+    }
+  >
+    <i
+      className="fa fa-star"
+      style={
+        Object {
+          "color": "#007bff",
+        }
+      }
+    />
+  </ForwardRef>
+   Save
+</button>
+`;
+
+exports[`SavedSearchControls render the SavedSearchControls should render not dirty with unsaved view 1`] = `
+<button
+  className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+  disabled={false}
+  onClick={[Function]}
+  title="Save search"
+  type="button"
+>
+  <ForwardRef
+    fixedWidth={false}
+    inverse={false}
+    name="star-o"
+    pulse={false}
+    spin={false}
+    style={
+      Object {
+        "color": "",
+      }
+    }
+  >
+    <i
+      className="fa fa-star-o"
+      style={
+        Object {
+          "color": "",
+        }
+      }
+    />
+  </ForwardRef>
+   Save
+</button>
+`;

@@ -23,10 +23,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.graph.Graph;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.apache.commons.collections.map.HashedMap;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -43,7 +42,6 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.DashboardImpl;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
@@ -73,7 +71,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,18 +88,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class InputFacadeTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public final MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -143,7 +136,7 @@ public class InputFacadeTest {
                 Executors.newScheduledThreadPool(1));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        inputService = new InputServiceImpl(mongoRule.getMongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
+        inputService = new InputServiceImpl(mongodb.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
         final InputRegistry inputRegistry = new InputRegistry();
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();
@@ -196,7 +189,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void exportEntity() {
         final ModelId id = ModelId.of("5acc84f84b900a4ff290d9a7");
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.INPUT_V1);
@@ -219,7 +212,6 @@ public class InputFacadeTest {
 
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     @Ignore("Doesn't work without massive amount of mocks")
     public void createNativeEntity() {
         final Map<String, Object> configuration = new HashMap<>();
@@ -267,7 +259,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("5adf25294b900a0fdb4e5365"))
@@ -298,7 +290,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void collectEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
@@ -320,7 +312,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void findExisting() {
         final Map<String, Object> configuration = new HashMap<>();
         configuration.put("override_source", null);
@@ -344,7 +336,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5acc84f84b900a4ff290d9a7", ModelTypes.INPUT_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
@@ -352,7 +344,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveEntity() {
         final Map<String, Object> configuration = new HashMap<>();
         configuration.put("override_source", null);
@@ -377,7 +369,7 @@ public class InputFacadeTest {
 
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void delete() throws NotFoundException {
         final Input input = inputService.find("5acc84f84b900a4ff290d9a7");
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
@@ -391,7 +383,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveNativeEntityGrokPattern() throws NotFoundException {
         final Input input = inputService.find("5ae2ebbeef27464477f0fd8b");
         EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
@@ -401,7 +393,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveNativeEntityLookupTable() throws NotFoundException {
         when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
@@ -426,7 +418,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveForInstallationLookupTable() throws NotFoundException {
         when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
@@ -514,7 +506,7 @@ public class InputFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("InputFacadeTest.json")
     public void resolveForInstallationGrokPattern() throws NotFoundException {
         final Input input = inputService.find("5ae2ebbeef27464477f0fd8b");
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));

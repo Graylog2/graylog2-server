@@ -2,7 +2,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import { ChartColorRulesStore, ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
 import type { ColorRule } from 'views/stores/ChartColorRulesStore';

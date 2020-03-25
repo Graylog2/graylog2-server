@@ -36,6 +36,7 @@ public class IndexMapping5 extends IndexMapping {
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
                 .put("timestamp", typeTimeWithMillis())
+                .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)

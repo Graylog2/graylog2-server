@@ -26,6 +26,10 @@ public class BooleanField extends AbstractConfigurationField {
         super(FIELD_TYPE, name, humanName, description, Optional.OPTIONAL);
         this.defaultValue = defaultValue;
     }
+    public BooleanField(String name, String humanName, boolean defaultValue, String description, int position) {
+        super(FIELD_TYPE, name, humanName, description, Optional.OPTIONAL, position);
+        this.defaultValue = defaultValue;
+    }
 
     @Override
     public Object getDefaultValue() {

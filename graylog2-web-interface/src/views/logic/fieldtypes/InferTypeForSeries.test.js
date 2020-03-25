@@ -43,4 +43,10 @@ describe('InferTypeForSeries', () => {
     expect(inferTypeForSeries(Series.forFunction('avg(foo)'), []))
       .toEqual(FieldTypeMapping.create('avg(foo)', FieldType.Unknown));
   });
+
+  it('returns unknown if field types are `undefined`', () => {
+    // $FlowFixMe: passing invalid types parameter on purpose.
+    expect(inferTypeForSeries(Series.forFunction('avg(foo)'), undefined))
+      .toEqual(FieldTypeMapping.create('avg(foo)', FieldType.Unknown));
+  });
 });

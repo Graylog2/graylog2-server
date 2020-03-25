@@ -13,9 +13,33 @@ Object {
       "formatting": Object {
         "highlighting": Array [],
       },
-      "positions": Object {
+      "positions": Immutable.Map {
+        "98ccf13e-6dec-4362-bcf3-a4776f457061": Object {
+          "col": 1,
+          "height": 2,
+          "row": 7,
+          "width": "Infinity",
+        },
+        "ef9e676a-2d08-4433-b082-2617878a6e59": Object {
+          "col": 1,
+          "height": 6,
+          "row": 9,
+          "width": "Infinity",
+        },
+        "c78e9a51-2e36-4ec4-86de-9df4d29f0863": Object {
+          "col": 1,
+          "height": 2,
+          "row": 1,
+          "width": 4,
+        },
         "3d568826-fe3d-413a-99a6-09e51d82c851": Object {
           "col": 9,
+          "height": 2,
+          "row": 1,
+          "width": 4,
+        },
+        "fb496a41-4358-4bc8-b19f-244c71fe9143": Object {
+          "col": 5,
           "height": 2,
           "row": 1,
           "width": 4,
@@ -26,40 +50,16 @@ Object {
           "row": 3,
           "width": 4,
         },
-        "98ccf13e-6dec-4362-bcf3-a4776f457061": Object {
-          "col": 1,
-          "height": 2,
-          "row": 7,
-          "width": "Infinity",
-        },
-        "c78e9a51-2e36-4ec4-86de-9df4d29f0863": Object {
-          "col": 1,
-          "height": 2,
-          "row": 1,
-          "width": 4,
-        },
-        "dc4a61b2-26e6-468e-bac2-f7702846ca92": Object {
-          "col": 9,
-          "height": 4,
-          "row": 3,
-          "width": 4,
-        },
         "ec997825-6065-4fb7-ba86-427e74109ee4": Object {
           "col": 5,
           "height": 4,
           "row": 3,
           "width": 4,
         },
-        "ef9e676a-2d08-4433-b082-2617878a6e59": Object {
-          "col": 1,
-          "height": 6,
-          "row": 9,
-          "width": "Infinity",
-        },
-        "fb496a41-4358-4bc8-b19f-244c71fe9143": Object {
-          "col": 5,
-          "height": 2,
-          "row": 1,
+        "dc4a61b2-26e6-468e-bac2-f7702846ca92": Object {
+          "col": 9,
+          "height": 4,
+          "row": 3,
           "width": 4,
         },
       },

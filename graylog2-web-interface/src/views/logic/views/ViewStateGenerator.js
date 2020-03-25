@@ -1,16 +1,28 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import WidgetPosition from '../widgets/WidgetPosition';
 import View from './View';
 import ViewState from './ViewState';
 import { resultHistogram, allMessagesTable } from '../Widgets';
 import type { ViewType } from './View';
+import Widget from '../widgets/Widget';
 
-const _defaultWidgets = {
-  [View.Type.Search]: () => {
+const { DecoratorsActions } = CombinedProvider.get('Decorators');
+
+type Result = {
+  titles: { widget: { [string]: string } },
+  widgets: Array<Widget>,
+  positions: { [string]: WidgetPosition },
+};
+
+const _defaultWidgets: { [ViewType]: (?string) => Promise<Result> } = {
+  [View.Type.Search]: async (streamId: ?string) => {
+    const decorators = await DecoratorsActions.list();
+    const streamDecorators = decorators ? decorators.filter(decorator => decorator.stream === streamId) : [];
     const histogram = resultHistogram();
-    const messageTable = allMessagesTable();
+    const messageTable = allMessagesTable(undefined, streamDecorators);
     const widgets = [
       histogram,
       messageTable,
@@ -30,7 +42,8 @@ const _defaultWidgets = {
 
     return { titles, widgets, positions };
   },
-  [View.Type.Dashboard]: () => {
+  // eslint-disable-next-line no-unused-vars
+  [View.Type.Dashboard]: async (streamId: ?string) => {
     const widgets = [];
     const titles = {};
     const positions = {};
@@ -39,8 +52,8 @@ const _defaultWidgets = {
   },
 };
 
-export default (type: ViewType) => {
-  const { titles, widgets, positions } = _defaultWidgets[type]();
+export default async (type: ViewType, streamId: ?string) => {
+  const { titles, widgets, positions } = await _defaultWidgets[type](streamId);
   return ViewState.create()
     .toBuilder()
     .titles(titles)

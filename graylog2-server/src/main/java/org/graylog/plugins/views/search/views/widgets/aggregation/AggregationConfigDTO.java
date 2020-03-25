@@ -41,6 +41,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     static final String FIELD_VISUALIZATION_CONFIG = "visualization_config";
     static final String FIELD_ROLLUP = "rollup";
     static final String FIELD_FORMATTING_SETTINGS = "formatting_settings";
+    static final String FIELD_EVENT_ANNOTATION = "event_annotation";
 
     @JsonProperty(FIELD_ROW_PIVOTS)
     public abstract List<PivotDTO> rowPivots();
@@ -68,6 +69,9 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     @JsonProperty(FIELD_ROLLUP)
     public abstract boolean rollup();
 
+    @JsonProperty(FIELD_EVENT_ANNOTATION)
+    public abstract boolean eventAnnotation();
+
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_ROW_PIVOTS)
@@ -91,21 +95,23 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
                 include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
                 property = AggregationConfigDTO.FIELD_VISUALIZATION,
                 visible = true)
-        @Nullable
-        public abstract Builder visualizationConfig(VisualizationConfigDTO visualizationConfig);
+        public abstract Builder visualizationConfig(@Nullable VisualizationConfigDTO visualizationConfig);
 
         @JsonProperty(FIELD_FORMATTING_SETTINGS)
-        @Nullable
-        public abstract Builder formattingSettings(WidgetFormattingSettings formattingSettings);
+        public abstract Builder formattingSettings(@Nullable WidgetFormattingSettings formattingSettings);
 
         @JsonProperty(FIELD_ROLLUP)
         public abstract Builder rollup(boolean roolup);
 
+        @JsonProperty(FIELD_EVENT_ANNOTATION)
+        public abstract Builder eventAnnotation(boolean eventAnnotation);
+
         public abstract AggregationConfigDTO build();
 
         @JsonCreator
-        static Builder builder() {
+        public static Builder builder() {
             return new AutoValue_AggregationConfigDTO.Builder()
+                    .eventAnnotation(false)
                     .rollup(true);
         }
     }

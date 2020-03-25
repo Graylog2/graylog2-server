@@ -23,7 +23,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -40,6 +39,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,11 +66,10 @@ import java.util.Set;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;
 
-@Api(value = "Enterprise/Views", description = "Views management")
+@Api(value = "Views")
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@RequiresPermissions(ViewsRestPermissions.VIEW_USE)
 public class ViewsResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ViewsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
@@ -117,6 +116,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                         final Optional<ViewSharing> viewSharing = viewSharingService.forView(view.id());
 
                         return isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
+                                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id()))
                                 || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false);
                     },
                     order,
@@ -133,7 +133,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{id}")
     @ApiOperation("Get a single view")
-    public ViewDTO get(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public ViewDTO get(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
@@ -142,9 +142,11 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
 
         final Optional<ViewSharing> viewSharing = viewSharingService.forView(id);
+        final ViewDTO view = loadView(id);
         if (isPermitted(ViewsRestPermissions.VIEW_READ, id)
+                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id()))
                 || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false)) {
-            return loadView(id);
+            return view;
         }
 
         throw viewNotFoundException(id);
@@ -152,7 +154,6 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     @POST
     @ApiOperation("Create a new view")
-    @RequiresPermissions(ViewsRestPermissions.VIEW_CREATE)
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
     public ViewDTO create(@ApiParam @Valid ViewDTO dto) throws ValidationException {
         final String username = getCurrentUser() == null ? null : getCurrentUser().getName();
@@ -165,9 +166,16 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
-    public ViewDTO update(@ApiParam @PathParam("id") @NotEmpty String id,
+    public ViewDTO update(@ApiParam(name="id") @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid ViewDTO dto) {
-        checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
+        if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
+            checkAnyPermission(new String[]{
+                    ViewsRestPermissions.VIEW_EDIT,
+                    RestPermissions.DASHBOARDS_EDIT
+            }, id);
+        } else {
+            checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
+        }
         loadView(id);
         return dbService.update(dto.toBuilder().id(id).build());
     }
@@ -176,7 +184,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}/default")
     @ApiOperation("Configures the view as default view")
     @AuditEvent(type = ViewsAuditEventTypes.DEFAULT_VIEW_SET)
-    public void setDefault(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public void setDefault(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_READ, id);
         checkPermission(ViewsRestPermissions.DEFAULT_VIEW_SET);
         dbService.saveDefault(loadView(id));
@@ -186,7 +194,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Delete view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
-    public ViewDTO delete(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public ViewDTO delete(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_DELETE, id);
         final ViewDTO dto = loadView(id);
         dbService.delete(id);

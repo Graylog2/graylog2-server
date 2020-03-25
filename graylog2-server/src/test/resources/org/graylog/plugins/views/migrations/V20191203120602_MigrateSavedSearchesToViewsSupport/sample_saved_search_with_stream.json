@@ -1,0 +1,22 @@
+{
+  "saved_searches": [
+    {
+      "_id": {
+        "$oid": "5de660b7b2d44b5813c1d7f6"
+      },
+      "creator_user_id": "admin",
+      "created_at": {
+        "$date": "2019-12-03T13:18:47.602Z"
+      },
+      "title": "The Absolute Search on a stream",
+      "query": {
+        "from": "2019-12-02T13:18:28.000Z",
+        "to": "2019-12-03T13:18:29.000Z",
+        "rangeType": "absolute",
+        "fields": "message,source",
+        "query": "source:sophon",
+        "streamId": "5ddf8ed5b2d44b2e0447298c"
+      }
+    }
+  ]
+}

@@ -10,7 +10,7 @@ import viewTransformer from 'views/logic/views/ViewTransformer';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { ViewJson } from 'views/logic/views/View';
-import ExtendedSearchPage from './ExtendedSearchPage';
+import { ExtendedSearchPage } from 'views/pages';
 
 type Props = {
   route: {},
@@ -18,6 +18,7 @@ type Props = {
     state?: {
       view?: View | ViewJson,
     },
+    query: { [string]: any }
   };
   loadingViewHooks: Array<ViewHook>,
   executingViewHooks: Array<ViewHook>,
@@ -31,10 +32,10 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
     const { state = {} } = location;
     const { view: searchView } = state;
     if (searchView && searchView.search) {
-      const query = location;
+      const { query } = location;
       /* $FlowFixMe the searchView.search is guard enough and instanceof does not work here */
       const dashboardView = viewTransformer(searchView);
-      const loadPromise = ViewActions.load(dashboardView).then(() => dashboardView);
+      const loadPromise = ViewActions.load(dashboardView, true).then(() => dashboardView);
       processHooks(
         loadPromise,
         loadingViewHooks,

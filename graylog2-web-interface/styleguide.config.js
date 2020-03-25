@@ -9,9 +9,7 @@ module.exports = {
     'opensans-npm-webfont',
     'stylesheets/bootstrap-submenus.less',
     'toastr/toastr.less',
-    'rickshaw/rickshaw.css',
     'stylesheets/typeahead.less',
-    'stylesheets/graylog2.less',
     'injection/builtins.js',
   ],
   sections: [
@@ -22,6 +20,23 @@ module.exports = {
     {
       name: 'Style guide',
       content: 'docs/styleguide.md',
+    },
+    {
+      name: 'Theming Details',
+      sections: [
+        {
+          name: 'ThemeProvider',
+          content: 'src/theme/docs/ThemeProvider.md',
+        },
+        {
+          name: 'Colors',
+          content: 'src/theme/docs/Colors.md',
+        },
+        {
+          name: 'Color Utilities',
+          content: 'src/theme/docs/Utilities.md',
+        },
+      ],
     },
     {
       name: 'Documentation',
@@ -50,14 +65,6 @@ module.exports = {
           name: 'Configuration Forms',
           components: 'src/components/configurationforms/[A-Z]*.jsx',
         },
-        {
-          name: 'Inputs',
-          components: 'src/components/inputs/[A-Z]*.jsx',
-        },
-        {
-          name: 'Visualizations',
-          components: 'src/components/visualizations/[A-Z]*.jsx',
-        },
       ],
     },
     {
@@ -65,9 +72,9 @@ module.exports = {
       content: 'docs/util-objects.md',
     },
   ],
-  usageMode: 'expand',
+  usageMode: 'collapse',
   styleguideComponents: {
-    Wrapper: path.join(__dirname, 'src/theme/GraylogThemeContext'),
+    Wrapper: path.join(__dirname, 'src/theme/GraylogThemeProvider'),
   },
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',

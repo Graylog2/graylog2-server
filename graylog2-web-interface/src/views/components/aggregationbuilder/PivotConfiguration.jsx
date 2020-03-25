@@ -41,12 +41,12 @@ export default class PivotConfiguration extends React.Component {
     const { config } = this.state;
     const typeSpecificConfiguration = _configurationComponentByType(type, config, this._onChange);
     return (
-      <span>
+      <form onSubmit={this._onSubmit}>
         {typeSpecificConfiguration}
         <div className="pull-right" style={{ marginBottom: '10px' }}>
-          <Button bsStyle="success" onClick={this._onSubmit}>Done</Button>
+          <Button type="submit" bsStyle="success">Done</Button>
         </div>
-      </span>
+      </form>
     );
   }
 }

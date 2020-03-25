@@ -12,12 +12,16 @@ import HoverForHelp from './HoverForHelp';
 export default class DescriptionBox extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
-    description: PropTypes.string.isRequired,
     configurableOptions: PropTypes.node,
+    description: PropTypes.string.isRequired,
+    help: PropTypes.string,
+    style: PropTypes.object,
   };
 
   static defaultProps = {
     configurableOptions: undefined,
+    style: undefined,
+    help: undefined,
   };
 
   constructor(props) {
@@ -29,15 +33,19 @@ export default class DescriptionBox extends React.Component {
   }
 
   onToggleConfig = () => {
-    this.setState({ configOpen: !this.state.configOpen });
+    const { configOpen } = this.state;
+    this.setState({ configOpen: !configOpen });
   };
 
   configPopover = () => {
-    if (!this.state.configOpen) {
+    const { configOpen } = this.state;
+    const { configurableOptions } = this.props;
+
+    if (!configOpen) {
       return '';
     }
 
-    const configurableElement = React.cloneElement(this.props.configurableOptions, {
+    const configurableElement = React.cloneElement(configurableOptions, {
       onClose: this.onToggleConfig,
     });
 
@@ -55,7 +63,8 @@ export default class DescriptionBox extends React.Component {
   };
 
   configCaret = () => {
-    if (this.props.configurableOptions) {
+    const { configurableOptions } = this.props;
+    if (configurableOptions) {
       return (
         <Icon ref={(node) => { this.target = node; }}
               role="button"
@@ -68,9 +77,9 @@ export default class DescriptionBox extends React.Component {
   };
 
   render() {
-    const { description, children, help } = this.props;
+    const { description, children, help, style: inlineStyle } = this.props;
     return (
-      <div className={styles.descriptionBox}>
+      <div className={styles.descriptionBox} style={inlineStyle}>
         <div className={styles.description}>{description} {this.configCaret()} {help && <HoverForHelp title={description}>{help}</HoverForHelp>}</div>
         {children}
         {this.configPopover()}

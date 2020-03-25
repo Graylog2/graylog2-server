@@ -65,6 +65,7 @@ const Routes = {
     THREADDUMP: nodeId => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
+    PROCESSBUFFERDUMP: nodeId => `/system/processbufferdump/${nodeId}`,
     AUTHENTICATION: {
       OVERVIEW: '/system/authentication',
       ROLES: '/system/authentication/roles',
@@ -223,6 +224,7 @@ const qualifyUrls = (routes, appPrefix) => {
 };
 
 const defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
+defaultExport.unqualified = Routes;
 
 /*
  * Global registry of plugin routes. Route names are generated automatically from the route path, by removing

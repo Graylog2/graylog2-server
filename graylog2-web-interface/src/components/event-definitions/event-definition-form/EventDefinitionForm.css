@@ -29,21 +29,21 @@
 }
 
 :local(.steps).nav > li:hover::after {
-    background-color: #f4f5f5;
+    background-color: #e8e8e8;
 }
 
-:local(.steps).nav > li.active > a {
+:local(.steps).nav > li > a {
     border-radius: 0;
 }
 
-:local(.steps).nav > li.active:first-child > a {
+:local(.steps).nav > li:first-child > a {
     border-radius: 4px 0 0 4px;
 }
 
-:local(.steps).nav > li.active:last-child > a {
+:local(.steps).nav > li:last-child > a {
     border-radius: 0 4px 4px 0;
 }
 
 :local(.steps).nav > li.active:after {
-    background-color: #90d3ec;
+    background-color: #702785;
 }

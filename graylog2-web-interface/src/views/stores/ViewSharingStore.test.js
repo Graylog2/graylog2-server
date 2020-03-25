@@ -1,5 +1,4 @@
 // @flow strict
-// $FlowFixMe: imports from core need to be fixed in flow
 import fetch from 'logic/rest/FetchProvider';
 import { ViewSharingStore } from './ViewSharingStore';
 

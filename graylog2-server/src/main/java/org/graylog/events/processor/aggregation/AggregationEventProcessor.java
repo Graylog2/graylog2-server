@@ -39,6 +39,8 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorPreconditionException;
 import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.errors.ParameterExpansionError;
+import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -114,10 +116,19 @@ public class AggregationEventProcessor implements EventProcessor {
 
         // The absence of a series indicates that the user doesn't want to do an aggregation but create events from
         // a simple search query. (one message -> one event)
-        if (config.series().isEmpty()) {
-            filterSearch(eventFactory, parameters, eventsConsumer);
-        } else {
-            aggregatedSearch(eventFactory, parameters, eventsConsumer);
+        try {
+            if (config.series().isEmpty()) {
+                filterSearch(eventFactory, parameters, eventsConsumer);
+            } else {
+                aggregatedSearch(eventFactory, parameters, eventsConsumer);
+            }
+        } catch (SearchException e) {
+            if (e.error() instanceof ParameterExpansionError) {
+                final String msg = String.format(Locale.ROOT, "Couldn't run aggregation <%s/%s>  because parameters failed to expand: %s",
+                        eventDefinition.title(), eventDefinition.id(), e.error().description());
+                LOG.error(msg);
+                throw new EventProcessorPreconditionException(msg, eventDefinition, e);
+            }
         }
 
         // Update the state for this processor! This state will be used for dependency checks between event processors.
@@ -157,7 +168,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 messageConsumer.accept(summaries);
             };
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
-            moreSearch.scrollQuery(config.query(), config.streams(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
+            moreSearch.scrollQuery(config.query(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
         }
 
     }
@@ -196,7 +207,7 @@ public class AggregationEventProcessor implements EventProcessor {
             eventsConsumer.accept(eventsWithContext.build());
         };
 
-        moreSearch.scrollQuery(config.query(), streams, parameters.timerange(), parameters.batchSize(), callback);
+        moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
     }
 
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,

@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
+
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';
 import AggregationForm from './AggregationForm';
@@ -15,6 +16,7 @@ const conditionTypes = {
 
 const initialFilterConfig = {
   query: '',
+  query_parameters: [],
   streams: [],
   search_within_ms: 60 * 1000,
   execute_every_ms: 60 * 1000,
@@ -34,19 +36,16 @@ class FilterAggregationForm extends React.Component {
     entityTypes: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
-  };
-
-  static defaultConfig = {
-    ...initialFilterConfig,
-    ...initialAggregationConfig,
+    currentUser: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
 
     // eslint-disable-next-line camelcase
-    const { group_by, series } = props.eventDefinition.config;
-    const defaultConditionType = (lodash.isEmpty(group_by) && lodash.isEmpty(series)
+    const { group_by, series, conditions } = props.eventDefinition.config;
+    const expression = lodash.get(conditions, 'expression', {});
+    const defaultConditionType = (lodash.isEmpty(group_by) && lodash.isEmpty(series) && lodash.isEmpty(expression)
       ? conditionTypes.FILTER : conditionTypes.AGGREGATION);
 
     this.state = {
@@ -95,9 +94,14 @@ class FilterAggregationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
+  static defaultConfig = {
+    ...initialFilterConfig,
+    ...initialAggregationConfig,
+  };
+
   render() {
     const { conditionType } = this.state;
-    const { allFieldTypes, entityTypes, eventDefinition, streams, validation } = this.props;
+    const { allFieldTypes, entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
 
     return (
       <React.Fragment>
@@ -106,6 +110,7 @@ class FilterAggregationForm extends React.Component {
             <FilterForm eventDefinition={eventDefinition}
                         validation={validation}
                         streams={streams}
+                        currentUser={currentUser}
                         onChange={this.propagateChange} />
 
             <FormGroup>

@@ -48,7 +48,7 @@ public abstract class QueryResult {
     @JsonProperty("search_types")
     public abstract Map<String, SearchType.Result> searchTypes();
 
-    @JsonProperty("error")
+    @JsonProperty("errors")
     @Nullable
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public abstract Set<SearchError> errors();

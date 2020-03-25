@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.configuration.fields.ListField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.slf4j.Logger;
@@ -37,7 +38,8 @@ public class ConfigurationRequest {
 
     private final Map<String, ConfigurationField> fields = Maps.newLinkedHashMap();
 
-    public ConfigurationRequest() {}
+    public ConfigurationRequest() {
+    }
 
     public void putAll(Map<String, ConfigurationField> fields) {
         this.fields.putAll(fields);
@@ -88,6 +90,7 @@ public class ConfigurationRequest {
             config.put("is_optional", f.isOptional().equals(ConfigurationField.Optional.OPTIONAL));
             config.put("attributes", f.getAttributes());
             config.put("additional_info", f.getAdditionalInformation());
+            config.put("position", f.getPosition());
 
             configs.put(f.getName(), config);
         }
@@ -112,6 +115,11 @@ public class ConfigurationRequest {
                             throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
                         }
                         break;
+                    case ListField.FIELD_TYPE:
+                        if (!configuration.listIsSet(fieldName)) {
+                            throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
+                        }
+                        break;
                     case TextField.FIELD_TYPE:
                     case DropdownField.FIELD_TYPE:
                         if (!configuration.stringIsSet(fieldName)) {
@@ -124,6 +132,8 @@ public class ConfigurationRequest {
             }
         }
     }
+
+
 
     /**
      * Creates a new {@link org.graylog2.plugin.configuration.Configuration configuration object} containing only the
@@ -149,6 +159,11 @@ public class ConfigurationRequest {
                         values.put(name, config.getInt(name));
                     }
                     break;
+                case ListField.FIELD_TYPE:
+                    if (config.listIsSet(name)) {
+                        values.put(name, config.getList(name));
+                    }
+                    break;
                 case TextField.FIELD_TYPE:
                 case DropdownField.FIELD_TYPE:
                     if (config.stringIsSet(name)) {
@@ -161,6 +176,7 @@ public class ConfigurationRequest {
         }
         return new Configuration(values);
     }
+
 
     public static class Templates {
 
@@ -193,7 +209,5 @@ public class ConfigurationRequest {
                     NumberField.Attribute.ONLY_POSITIVE
             );
         }
-
     }
-
 }

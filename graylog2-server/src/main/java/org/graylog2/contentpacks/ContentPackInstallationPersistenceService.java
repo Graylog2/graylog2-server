@@ -26,7 +26,7 @@ import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetadata;
+import org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -34,7 +34,6 @@ import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;

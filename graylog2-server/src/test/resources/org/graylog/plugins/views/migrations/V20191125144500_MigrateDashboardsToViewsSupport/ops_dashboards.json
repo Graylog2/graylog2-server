@@ -1,0 +1,1557 @@
+{
+  "dashboards": [
+    {
+      "_id" : { "$oid": "5ddf8ed5b2d44b2e04472992" },
+      "creator_user_id" : "admin",
+      "description" : "This dashboard provides an analysis to help identify and resolve performance-related issues. Detailed breakdowns by response time, caching status, content type, host name, request method, protocol, and request URIs are also provided.",
+      "created_at" : { "$date": "2019-11-28T09:09:41.688Z" },
+      "positions" : {
+        "5a34d186-2823-4acc-8f1c-f66332865ff4" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 1,
+          "height" : 1
+        },
+        "fc9c5600-a771-4e86-974d-2f6e25a7bfa8" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 5,
+          "height" : 1
+        },
+        "7146f193-a481-4a99-bbea-4a8d74be43d2" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 6,
+          "height" : 2
+        },
+        "9dfcf2a5-c6b8-480f-b35b-ee2c12126c95" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 8,
+          "height" : 2
+        },
+        "b898e3e6-5fc4-4bbd-abb2-91237c47d300" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 2,
+          "height" : 1
+        },
+        "1482035e-4bb7-4064-b313-ba184d8b3cca" : {
+          "width" : 4,
+          "col" : 5,
+          "row" : 8,
+          "height" : 2
+        },
+        "bbd3a980-8547-48fb-b61f-2cb09486120a" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 3,
+          "height" : 2
+        },
+        "704deed7-07ad-46fd-8b5e-67b041582eb7" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 1,
+          "height" : 1
+        },
+        "4ce93e89-4771-4ce2-8b59-6dc058cbfd3b" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 10,
+          "height" : 3
+        },
+        "5f2d78cb-8b5a-43a7-ae60-2f88f1572c50" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 2,
+          "height" : 1
+        },
+        "e7f07f85-689a-4ef3-8c6f-cd297af3973f" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 5,
+          "height" : 1
+        },
+        "0f349fbb-04c9-4303-bdc3-137e39d3af8c" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 2,
+          "height" : 1
+        },
+        "cdf3de92-7c0c-4ef1-a533-67ded72eaf15" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 5,
+          "height" : 1
+        },
+        "568c005a-11ec-4be9-acd7-b2aa509c07e0" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 1,
+          "height" : 2
+        },
+        "b959fa46-524c-4009-a493-7db87d8532ba" : {
+          "width" : 4,
+          "col" : 5,
+          "row" : 6,
+          "height" : 2
+        },
+        "eb75eb75-0403-4b2c-ba3a-0772b5c4f99a" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 1,
+          "height" : 1
+        }
+      },
+      "title" : "Ops - Performance",
+      "widgets" : [
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Uncached Requests",
+          "id" : "5a34d186-2823-4acc-8f1c-f66332865ff4",
+          "type" : "SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "NOT CacheCacheStatus:hit"
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Uncached Bandwidth (bytes)",
+          "id" : "fc9c5600-a771-4e86-974d-2f6e25a7bfa8",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseBytes",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "NOT CacheCacheStatus:hit",
+            "stats_function" : "count",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests by Hostname",
+          "id" : "7146f193-a481-4a99-bbea-4a8d74be43d2",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeRequestHost",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "limit" : 5,
+            "sort_order" : "desc",
+            "stacked_fields" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests by Protocol",
+          "id" : "9dfcf2a5-c6b8-480f-b35b-ee2c12126c95",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestProtocol",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "limit" : 5,
+            "sort_order" : "desc",
+            "stacked_fields" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Response Time - Deviation (ms)",
+          "id" : "b898e3e6-5fc4-4bbd-abb2-91237c47d300",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "OriginResponseTimeMillis",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "std_deviation",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Request by Method",
+          "id" : "1482035e-4bb7-4064-b313-ba184d8b3cca",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestMethod",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "limit" : 5,
+            "sort_order" : "desc",
+            "stacked_fields" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Response Time (ms)",
+          "id" : "bbd3a980-8547-48fb-b61f-2cb09486120a",
+          "type" : "FIELD_CHART",
+          "config" : {
+            "valuetype" : "count",
+            "renderer" : "area",
+            "interpolation" : "linear",
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "rangeType" : "relative",
+            "field" : "OriginResponseTimeMillis",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "interval" : "minute",
+            "relative" : 900
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests",
+          "id" : "704deed7-07ad-46fd-8b5e-67b041582eb7",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheCacheStatus",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "CacheCacheStatus:hit",
+            "stats_function" : "cardinality",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Cached URIs",
+          "id" : "4ce93e89-4771-4ce2-8b59-6dc058cbfd3b",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestURI",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Response Time - Average (ms)",
+          "id" : "5f2d78cb-8b5a-43a7-ae60-2f88f1572c50",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "OriginResponseTimeMillis",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "mean",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Bandwidth (bytes)",
+          "id" : "e7f07f85-689a-4ef3-8c6f-cd297af3973f",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheResponseBytes",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "CacheCacheStatus:hit",
+            "stats_function" : "count",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Response Time - Max (ms)",
+          "id" : "0f349fbb-04c9-4303-bdc3-137e39d3af8c",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "OriginResponseTimeMillis",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "max",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Request Bandwidth (bytes)",
+          "id" : "cdf3de92-7c0c-4ef1-a533-67ded72eaf15",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseBytes",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "count",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Status Ratio",
+          "id" : "568c005a-11ec-4be9-acd7-b2aa509c07e0",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheCacheStatus",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests by Content Type",
+          "id" : "b959fa46-524c-4009-a493-7db87d8532ba",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseContentType",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "CacheCacheStatus:hit",
+            "limit" : 5
+            "sort_order" : "desc",
+            "stacked_fields" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Requests",
+          "id" : "eb75eb75-0403-4b2c-ba3a-0772b5c4f99a",
+          "type" : "SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : ""
+          }
+        }
+      ]
+    },
+    {
+      "_id" : { "$oid": "5ddf8ed6b2d44b2e044729a2" },
+      "creator_user_id" : "admin",
+      "description" : "This dashboard helps to detect and investigate bot traffic. Detailed breakdowns by bot type, country, request URIs and user agents are also provided.",
+      "created_at" : { "$date": "2019-11-28T09:09:42.241Z" },
+      "positions" : {
+        "1650f61c-c432-4a52-9784-0646e6bf414c" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 3,
+          "height" : 2
+        },
+        "1ae216e2-1420-4207-9fb7-d661c0659269" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 1,
+          "height" : 2
+        },
+        "08d6ff68-4233-4d16-bce1-8a75eb7935d4" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 11,
+          "height" : 2
+        },
+        "712063e4-7de4-4033-b6e5-3d8320058c1b" : {
+          "width" : 4,
+          "col" : 5,
+          "row" : 1,
+          "height" : 2
+        },
+        "dbd1c482-c30d-4ce9-a0e4-ae862e0f22ff" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 9,
+          "height" : 4
+        },
+        "6e374edc-eda6-402d-9b16-76f4a8fe6ab4" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 5,
+          "height" : 3
+        },
+        "63e8e90b-d138-4d5a-8097-f1dcd2fc60e3" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 5,
+          "height" : 3
+        },
+        "0701f00c-5cb4-4b0f-9458-713e0deaf459" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 5,
+          "height" : 3
+        }
+      },
+      "title" : "Ops - Bots",
+      "widgets" : [
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Bot Traffic Over Time",
+          "id" : "1650f61c-c432-4a52-9784-0646e6bf414c",
+          "type" : "SEARCH_RESULT_CHART",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "interval" : "minute",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "BadBot:true"
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Bot Requests",
+          "id" : "1ae216e2-1420-4207-9fb7-d661c0659269",
+          "type" : "STREAM_SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "Bot:true"
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Bot URIs",
+          "id" : "08d6ff68-4233-4d16-bce1-8a75eb7935d4",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestURI",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Bot:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Bad Bot Requests",
+          "id" : "712063e4-7de4-4033-b6e5-3d8320058c1b",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "BadBot",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "BadBot:true",
+            "stats_function" : "count",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Bot User Agents",
+          "id" : "dbd1c482-c30d-4ce9-a0e4-ae862e0f22ff",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestUserAgent",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Bot:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Bots by Country",
+          "id" : "6e374edc-eda6-402d-9b16-76f4a8fe6ab4",
+          "type" : "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeolocation",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Bot:false"
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Bot Countries",
+          "id" : "63e8e90b-d138-4d5a-8097-f1dcd2fc60e3",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeoCountry",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Bot:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Bot Cities",
+          "id" : "0701f00c-5cb4-4b0f-9458-713e0deaf459",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeoCityCode",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Bot:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        }
+      ]
+    },{
+      "_id" : { "$oid": "5ddf8ed7b2d44b2e044729b1" },
+      "creator_user_id" : "admin",
+      "description" : "This dashboard provides insights into application/site reliability with an overview of request successes and errors. More details breakdowns by HTTP status codes, and request URIs are also provided.",
+      "created_at" : { "$date": "2019-11-28T09:09:43.076Z" },
+      "positions" : {
+        "4a50da67-ec89-44a5-a714-f0fb3e458fa4" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 1,
+          "height" : 1
+        },
+        "83d0f560-32d7-46c0-ab57-4f2a0453b7bc" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 1,
+          "height" : 1
+        },
+        "cb1d08c3-dbbc-4375-a9c8-1d1c8b3bbda6" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 13,
+          "height" : 3
+        },
+        "13aab1cf-7327-4179-8b18-4e3843f81758" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 1,
+          "height" : 1
+        },
+        "2794fbd1-43d8-457c-bc92-a3ab652fcfd4" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 6,
+          "height" : 4
+        },
+        "1d01c51c-ece2-4460-a15e-f108de0fd102" : {
+          "width" : 6,
+          "col" : 1,
+          "row" : 6,
+          "height" : 4
+        },
+        "09b19818-df42-4d79-b543-e614ccf356d7" : {
+          "width" : 6,
+          "col" : 1,
+          "row" : 2,
+          "height" : 4
+        },
+        "b8873c60-40ef-4e1d-9216-261fc8b4201d" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 10,
+          "height" : 3
+        },
+        "45c8e847-be84-4755-9741-08546cef446d" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 1,
+          "height" : 1
+        },
+        "8e495b61-5fb7-4f99-8d88-5c7dfb7fb152" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 2,
+          "height" : 4
+        }
+      },
+      "title" : "Ops - Reliability",
+      "widgets" : [
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "5xx Responses",
+          "id" : "4a50da67-ec89-44a5-a714-f0fb3e458fa4",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseStatusClass",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "EdgeResponseStatusClass:5xx",
+            "stats_function" : "count",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "4xx Responses",
+          "id" : "83d0f560-32d7-46c0-ab57-4f2a0453b7bc",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseStatusClass",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "EdgeResponseStatusClass:4xx",
+            "stats_function" : "count",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top 4xx Request URIs",
+          "id" : "cb1d08c3-dbbc-4375-a9c8-1d1c8b3bbda6",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestURI",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "EdgeResponseStatusClass:4xx",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Responses",
+          "id" : "13aab1cf-7327-4179-8b18-4e3843f81758",
+          "type" : "SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Origin Response Error Ratios",
+          "id" : "2794fbd1-43d8-457c-bc92-a3ab652fcfd4",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "OriginResponseStatusClass",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : true,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Origin Response Statuses Over Time",
+          "id" : "1d01c51c-ece2-4460-a15e-f108de0fd102",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "OriginResponseStatusClass",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "limit" : 5,
+            "sort_order" : "desc",
+            "stacked_fields" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cache Response Status Over Time",
+          "id" : "09b19818-df42-4d79-b543-e614ccf356d7",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheResponseStatusClass",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "limit" : 5,
+            "sort_order" : "desc",
+            "stacked_fields" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top 5xx Request URIs",
+          "id" : "b8873c60-40ef-4e1d-9216-261fc8b4201d",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestURI",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "EdgeResponseStatusClass:4xx",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "3xx Responses",
+          "id" : "45c8e847-be84-4755-9741-08546cef446d",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseStatusClass",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "EdgeResponseStatusClass:3xx",
+            "stats_function" : "count",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Edge Response Error/Success Ratios",
+          "id" : "8e495b61-5fb7-4f99-8d88-5c7dfb7fb152",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseStatusClass",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : true,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        }
+      ]
+    },
+    {
+      "_id" : { "$oid": "5ddf8ed8b2d44b2e044729d2" },
+      "creator_user_id" : "admin",
+      "description" : "This dashboard provides an analysis of Ops threat traffic including the total number of requests and threats stopped. More detailed metrics by country, city, IP, threat type, and user agent are also provided.",
+      "created_at" : { "$date": "2019-11-28T09:09:44.150Z" },
+      "positions" : {
+        "d6b62a42-1cf4-4f30-aa91-95dd30ea6183" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 13,
+          "height" : 3
+        },
+        "6b767c54-716e-4a75-818b-cbb7e890b87c" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 2,
+          "height" : 3
+        },
+        "9cb7fb30-76b4-4fc5-83df-bed94cb2fc78" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 7,
+          "height" : 3
+        },
+        "3263e8ab-5301-45bc-bca1-459df5089e78" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 10,
+          "height" : 3
+        },
+        "3bb143c5-5043-42b8-bea7-1f4bd6809dba" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 2,
+          "height" : 3
+        },
+        "fdb29c49-03f6-44a6-a397-75ff4fc77549" : {
+          "width" : 4,
+          "col" : 5,
+          "row" : 7,
+          "height" : 3
+        },
+        "a534c2c8-9ae8-41d9-a318-5f4995ef416f" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 2,
+          "height" : 3
+        },
+        "c27cfc8a-4820-4984-bb9b-7d2c3496811d" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 5,
+          "height" : 2
+        },
+        "b1a60eb8-4d55-4763-9780-6e53ba6e58a4" : {
+          "width" : 4,
+          "col" : 5,
+          "row" : 1,
+          "height" : 1
+        },
+        "4e9e93d4-7dde-41ff-98b4-728adca090dd" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 1,
+          "height" : 1
+        }
+      },
+      "title" : "Ops - Security",
+      "widgets" : [
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Threat User Agents",
+          "id" : "d6b62a42-1cf4-4f30-aa91-95dd30ea6183",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestUserAgent",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Threat:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Threats Country Map",
+          "id" : "6b767c54-716e-4a75-818b-cbb7e890b87c",
+          "type" : "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeolocation",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "EdgePathingOp:ban OR EdgePathingOp:wl"
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Threat Types",
+          "id" : "9cb7fb30-76b4-4fc5-83df-bed94cb2fc78",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ThreatType",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Threat:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Threat Types by IP",
+          "id" : "3263e8ab-5301-45bc-bca1-459df5089e78",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ThreatType",
+            "query" : "Threat:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "ClientIP",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Threats by City",
+          "id" : "3bb143c5-5043-42b8-bea7-1f4bd6809dba",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeoCityCode",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Threat:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Threat IPs",
+          "id" : "fdb29c49-03f6-44a6-a397-75ff4fc77549",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIP",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Threat:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Threats by Country",
+          "id" : "a534c2c8-9ae8-41d9-a318-5f4995ef416f",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeoCountry",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Threat:true",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Threats Over Time",
+          "id" : "c27cfc8a-4820-4984-bb9b-7d2c3496811d",
+          "type" : "QUICKVALUES_HISTOGRAM",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ThreatType",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "Threat:true",
+            "limit" : 5,
+            "interval" : "minute",
+            "sort_order" : "desc",
+            "stacked_fields" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Threats Stopped",
+          "id" : "b1a60eb8-4d55-4763-9780-6e53ba6e58a4",
+          "type" : "SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "Threat:true"
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Requests",
+          "id" : "4e9e93d4-7dde-41ff-98b4-728adca090dd",
+          "type" : "STREAM_SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : ""
+          }
+        }
+      ]
+    },
+    {
+      "_id" : { "$oid": "5ddf8ed8b2d44b2e044729d8" },
+      "creator_user_id" : "admin",
+      "description" : "This dashboard provides a high-level overview of the most important Ops log metrics including a breakdown of request and caching details. More detailed metrics by content type, IP, location, protocol, and request method are also provided.",
+      "created_at" : { "$date": "2019-11-28T09:09:44.200Z" },
+      "positions" : {
+        "b10e30e1-057e-4542-8c67-d0af5b7b5df5" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 1,
+          "height" : 2
+        },
+        "798bf9a8-d0c3-4b7e-b8c9-6304ff7c7892" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 8,
+          "height" : 2
+        },
+        "1702e972-4909-42df-9822-da4b24a3812b" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 5,
+          "height" : 3
+        },
+        "c20c3fef-1b82-4d7f-b698-990d8b48d63e" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 8,
+          "height" : 2
+        },
+        "f11c03a4-feee-4c04-bbbd-8a06cebf5704" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 5,
+          "height" : 3
+        },
+        "e5062665-5655-4fbb-aefa-64ddc5264ade" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 8,
+          "height" : 2
+        },
+        "2ce606a2-2caf-46ec-8438-ed7d566bdbc7" : {
+          "width" : 2,
+          "col" : 5,
+          "row" : 1,
+          "height" : 2
+        },
+        "621a6e80-72c7-4a18-99f0-6bf59d9b1cec" : {
+          "width" : 4,
+          "col" : 1,
+          "row" : 10,
+          "height" : 2
+        },
+        "5f9524f8-6068-4d88-9578-e9cd57c3cece" : {
+          "width" : 4,
+          "col" : 5,
+          "row" : 10,
+          "height" : 2
+        },
+        "3010e468-dc9a-4209-893e-657981d26b4b" : {
+          "width" : 8,
+          "col" : 1,
+          "row" : 3,
+          "height" : 2
+        },
+        "e514284c-740f-41ff-9c43-1eb72fb5600e" : {
+          "width" : 2,
+          "col" : 3,
+          "row" : 1,
+          "height" : 2
+        },
+        "2ad6b929-95fb-424b-87af-47003d6d67c5" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 8,
+          "height" : 2
+        },
+        "a000f569-44aa-4a34-b17e-68e279bccee2" : {
+          "width" : 2,
+          "col" : 1,
+          "row" : 1,
+          "height" : 2
+        },
+        "1a69e3cc-8de3-4bf2-8585-cf1d3f5825f2" : {
+          "width" : 2,
+          "col" : 7,
+          "row" : 5,
+          "height" : 3
+        }
+      },
+      "title" : "Ops - Snapshot",
+      "widgets" : [
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Bandwidth (bytes)",
+          "id" : "b10e30e1-057e-4542-8c67-d0af5b7b5df5",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "CacheResponseBytes",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "CacheCacheStatus:hit",
+            "stats_function" : "sum",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Protocols",
+          "id" : "798bf9a8-d0c3-4b7e-b8c9-6304ff7c7892",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestProtocol",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Countries Traffic Map",
+          "id" : "1702e972-4909-42df-9822-da4b24a3812b",
+          "type" : "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeolocation",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Request Methods",
+          "id" : "c20c3fef-1b82-4d7f-b698-990d8b48d63e",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestMethod",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Countries Traffic",
+          "id" : "f11c03a4-feee-4c04-bbbd-8a06cebf5704",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeoCountry",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Content Types",
+          "id" : "e5062665-5655-4fbb-aefa-64ddc5264ade",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseContentType",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Cached Requests",
+          "id" : "2ce606a2-2caf-46ec-8438-ed7d566bdbc7",
+          "type" : "SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "CacheCacheStatus:hit"
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Request URIs",
+          "id" : "621a6e80-72c7-4a18-99f0-6bf59d9b1cec",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestURI",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Client Request Referrers",
+          "id" : "5f9524f8-6068-4d88-9578-e9cd57c3cece",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientRequestReferer",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Bandwidth Over Time (bytes)",
+          "id" : "3010e468-dc9a-4209-893e-657981d26b4b",
+          "type" : "FIELD_CHART",
+          "config" : {
+            "valuetype" : "count",
+            "renderer" : "area",
+            "interpolation" : "linear",
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "rangeType" : "relative",
+            "field" : "EdgeResponseBytes",
+            "query" : "",
+            "interval" : "minute",
+            "relative" : 300
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Bandwidth (bytes)",
+          "id" : "e514284c-740f-41ff-9c43-1eb72fb5600e",
+          "type" : "STATS_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "EdgeResponseBytes",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : "",
+            "stats_function" : "sum",
+            "lower_is_better" : false
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Device Types",
+          "id" : "2ad6b929-95fb-424b-87af-47003d6d67c5",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientDeviceType",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Total Number of Requests",
+          "id" : "a000f569-44aa-4a34-b17e-68e279bccee2",
+          "type" : "SEARCH_RESULT_COUNT",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "lower_is_better" : false,
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "trend" : false,
+            "query" : ""
+          }
+        },
+        {
+          "creator_user_id" : "admin",
+          "cache_time" : 10,
+          "description" : "Top Cities Traffic",
+          "id" : "1a69e3cc-8de3-4bf2-8585-cf1d3f5825f2",
+          "type" : "QUICKVALUES",
+          "config" : {
+            "timerange" : {
+              "type" : "relative",
+              "range" : 3600
+            },
+            "field" : "ClientIpGeoCityCode",
+            "stream_id" : "5ddf8ed5b2d44b2e0447298c",
+            "query" : "",
+            "show_data_table" : true,
+            "limit" : 5,
+            "show_pie_chart" : false,
+            "sort_order" : "desc",
+            "stacked_fields" : "",
+            "data_table_limit" : 50
+          }
+        }
+      ]
+    }
+  ]
+}

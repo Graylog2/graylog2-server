@@ -33,7 +33,7 @@ public class LookupCacheKeyTest {
         final LookupCacheKey cacheKey = LookupCacheKey.createFromJSON("prefix", "key");
         final JsonNode node = objectMapper.convertValue(cacheKey, JsonNode.class);
         assertThat(node.isObject()).isTrue();
-        assertThat(node.fieldNames()).containsExactly("prefix", "key");
+        assertThat(node.fieldNames()).containsExactlyInAnyOrder("prefix", "key");
         assertThat(node.path("prefix").isTextual()).isTrue();
         assertThat(node.path("prefix").asText()).isEqualTo("prefix");
         assertThat(node.path("key").isTextual()).isTrue();
@@ -45,7 +45,7 @@ public class LookupCacheKeyTest {
         final LookupCacheKey cacheKey = LookupCacheKey.createFromJSON("prefix", null);
         final JsonNode node = objectMapper.convertValue(cacheKey, JsonNode.class);
         assertThat(node.isObject()).isTrue();
-        assertThat(node.fieldNames()).containsExactly("prefix", "key");
+        assertThat(node.fieldNames()).containsExactlyInAnyOrder("prefix", "key");
         assertThat(node.path("prefix").isTextual()).isTrue();
         assertThat(node.path("prefix").asText()).isEqualTo("prefix");
         assertThat(node.path("key").isNull()).isTrue();

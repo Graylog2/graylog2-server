@@ -8,7 +8,7 @@ import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { singletonActions } from 'views/logic/singleton';
 
-type QueriesList = Immutable.OrderedMap<QueryId, Query>;
+export type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 
 type QueriesActionsType = RefluxActions<{
   create: (Query, ViewState) => Promise<QueriesList>,

@@ -1,53 +1,64 @@
-import * as React from 'react';
-import styled from 'styled-components';
-
+// @flow strict
+import styled, { css, type StyledComponent } from 'styled-components';
+import { util, type ThemeInterface } from 'theme';
 import { Title as NavItemTitle } from './NavItem.styles';
 
-export const Container: React.ComponentType<{ open: boolean }> = styled.div`
-  grid-area: sidebar;
-  z-index: 3;
-  background: #393939;
-  color: #9e9e9e;
+const sidebarWidth = {
+  open: '250px',
+  closed: '100%', // width is defined in parent container
+};
+
+export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+  grid-row: 1;
+  -ms-grid-row: 1;
+  grid-column: 1;
+  -ms-grid-column: 1;
+  background: ${theme.color.gray[10]};
+  color: ${util.contrastingColor(theme.color.gray[10], 'AA')};
   height: calc(100vh - 50px);
   padding-top: 20px;
-  position: sticky;
+  position: ${props => (props.open ? 'fixed' : 'static')};
   top: 50px;
-  grid-column-start: 1;
-  grid-column-end: ${props => (props.open ? 3 : 2)};
-  box-shadow: 3px 0 3px rgba(0, 0, 0, .25);
-`;
+  width: ${props => (props.open ? sidebarWidth.open : sidebarWidth.closed)};
+  box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);
 
-export const ContentOverlay = styled.div`
+  /* z-index is needed for ie11 */
+  z-index: ${props => (props.open ? 20 : 'auto')};
+`);
+
+export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 300px;
+  left: ${sidebarWidth.open};
   right: 0;
   background: rgba(3, 3, 3, 0.25);
 `;
 
-export const SidebarHeader: React.ComponentType<{open: boolean, hasTitle: boolean}> = styled(NavItemTitle)(({ open, hasTitle }) => {
-  let justifyContent = 'center';
-  if (open && hasTitle) justifyContent = 'space-between';
-  if (open && !hasTitle) justifyContent = 'flex-end';
-  return `justify-content: ${justifyContent}`;
-});
+export const SidebarHeader: StyledComponent<{open: boolean, hasTitle: boolean}, {}, React.ComponentType> = styled(NavItemTitle)`
+  ${(({ open, hasTitle }) => {
+    let justifyContent = 'center';
+    if (open && hasTitle) justifyContent = 'space-between';
+    if (open && !hasTitle) justifyContent = 'flex-end';
+    return `justify-content: ${justifyContent}`;
+  })}
+`;
 
-export const Headline = styled.h3`
+export const Headline: StyledComponent<{}, {}, HTMLHeadingElement> = styled.h3`
   color: inherit;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-export const ToggleIcon = styled.div`
+export const ToggleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   width: 25px;
   text-align: center;
   font-size: 20px;
   cursor: pointer;
 `;
 
-export const HorizontalRuler = styled.div`
+export const HorizontalRuler: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   width: 100%;
   padding: 0 10px;
   margin: 5px 0 10px 0;

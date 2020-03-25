@@ -51,7 +51,7 @@ import java.util.stream.Stream;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 @RequiresAuthentication
-@Api(value = "Alerts", description = "Manage stream alerts for all streams")
+@Api(value = "Alerts", description = "Manage stream legacy alerts for all streams")
 @Path("/streams/alerts")
 @Produces(MediaType.APPLICATION_JSON)
 public class AlertResource extends RestResource {

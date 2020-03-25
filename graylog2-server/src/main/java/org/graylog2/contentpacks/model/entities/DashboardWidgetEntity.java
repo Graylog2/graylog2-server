@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
@@ -28,6 +29,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.Map;
 import java.util.Optional;
 
 @AutoValue
@@ -99,6 +101,15 @@ public abstract class DashboardWidgetEntity {
                                       @JsonProperty("row") @PositiveOrZero ValueReference row,
                                       @JsonProperty("col") @PositiveOrZero ValueReference col) {
             return new AutoValue_DashboardWidgetEntity_Position(width, height, row, col);
+        }
+
+        public WidgetPositionDTO convert(Map<String, ValueReference> parameters) {
+            return WidgetPositionDTO.Builder.create()
+                    .col(org.graylog.plugins.views.search.views.Position.fromInt(col().asInteger(parameters)))
+                    .row(org.graylog.plugins.views.search.views.Position.fromInt(row().asInteger(parameters)))
+                    .height(org.graylog.plugins.views.search.views.Position.fromInt(height().asInteger(parameters)))
+                    .width(org.graylog.plugins.views.search.views.Position.fromInt(width().asInteger(parameters)))
+                    .build();
         }
     }
 }

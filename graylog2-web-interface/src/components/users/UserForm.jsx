@@ -11,7 +11,6 @@ import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 import history from 'util/History';
 
-import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
 
 import { Button, Row, Col, Alert, Panel } from 'components/graylog';
@@ -19,9 +18,9 @@ import { Input } from 'components/bootstrap';
 import TimeoutInput from 'components/users/TimeoutInput';
 import EditRolesForm from 'components/users/EditRolesForm';
 import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';
+import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
 
 const StreamsStore = StoreProvider.getStore('Streams');
-const { DashboardsStore } = CombinedProvider.get('Dashboards');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const UsersStore = StoreProvider.getStore('Users');
 
@@ -32,7 +31,7 @@ const UserForm = createReactClass({
     user: PropTypes.object.isRequired,
   },
 
-  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore), Reflux.connect(DashboardsStore)],
+  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore), Reflux.connect(DashboardsStore, 'dashboards')],
 
   getInitialState() {
     return {
@@ -47,6 +46,7 @@ const UserForm = createReactClass({
         streams: streams.sort((s1, s2) => s1.title.localeCompare(s2.title)),
       });
     });
+    DashboardsActions.search('', 1, 32768);
   },
 
   componentWillReceiveProps(nextProps) {
@@ -190,13 +190,13 @@ const UserForm = createReactClass({
   },
 
   render() {
-    if (!this.state.streams || !this.state.dashboards) {
+    if (!this.state.streams || !this.state.dashboards || !this.state.dashboards.list) {
       return <Spinner />;
     }
 
     const { user } = this.state;
     const { permissions } = this.state.currentUser;
-    const dashboards = this.state.dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title));
+    const dashboards = this.state.dashboards.list.sort((d1, d2) => d1.title.localeCompare(d2.title));
 
     let requiresOldPassword = true;
     if (this.isPermitted(permissions, 'users:passwordchange:*')) {
@@ -345,7 +345,7 @@ const UserForm = createReactClass({
               ? (
                 <Col smOffset={3} sm={9}>
                   <Alert bsStyle="warning" role="alert">
-                Please edit your Graylog server configuration file to change the admin password.
+                    Please edit your Graylog server configuration file to change the admin password.
                   </Alert>
                 </Col>
               )
@@ -353,8 +353,8 @@ const UserForm = createReactClass({
                 ? (
                   <Col smOffset={3} sm={9}>
                     <Alert bsStyle="warning" role="alert">
-                  This user was created from an external system and you can't change the password here.
-                  Please contact an administrator for more information.
+                      This user was created from an external system and you can't change the password here.
+                      Please contact an administrator for more information.
                     </Alert>
                   </Col>
                 )
@@ -401,7 +401,7 @@ const UserForm = createReactClass({
                     <div className="form-group">
                       <Col smOffset={3} sm={9}>
                         <Button bsStyle="primary" type="submit" className="save-button-margin">
-                      Update Password
+                          Update Password
                         </Button>
                         <Button onClick={this._onCancel}>Cancel</Button>
                       </Col>

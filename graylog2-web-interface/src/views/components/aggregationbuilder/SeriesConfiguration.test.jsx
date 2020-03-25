@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
@@ -13,8 +12,8 @@ describe('SeriesConfiguration', () => {
   };
 
   it('renders the configuration dialog', () => {
-    const wrapper = renderer.create(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders an input to change the series name', () => {
@@ -60,6 +59,22 @@ describe('SeriesConfiguration', () => {
     const newSeries = createNewSeries(series, 'Some other value');
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledWith(newSeries);
+  });
+
+  it('prevents entering a duplicate series name', () => {
+    const onClose = jest.fn();
+    const series = createNewSeries();
+    const wrapper = mount(<SeriesConfiguration series={series} onClose={onClose} usedNames={['Already Exists']} />);
+    const input = wrapper.find('input');
+
+    expect(input).toHaveProp('value', 'count()');
+
+    input.simulate('change', { target: { value: 'Already Exists' } });
+
+    wrapper.update();
+    const submit = wrapper.find('button');
+    expect(submit).toBeDisabled();
+    expect(wrapper).toIncludeText('Name must be unique');
   });
 
   it('returns original metric function name upon submit, when no name is defined', () => {

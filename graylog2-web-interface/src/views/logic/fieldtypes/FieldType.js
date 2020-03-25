@@ -1,13 +1,14 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-type Property = 'compound' | 'enumerable' | 'full-text-search' | 'numeric';
+type Property = 'compound' | 'enumerable' | 'full-text-search' | 'numeric' | 'decorated';
 
 export const Properties: { [string]: Property } = {
   Compound: 'compound',
   Enumerable: 'enumerable',
   FullTextSearch: 'full-text-search',
   Numeric: 'numeric',
+  Decorated: 'decorated',
 };
 
 export type FieldTypeJSON = {
@@ -20,13 +21,15 @@ export type FieldName = string;
 export type FieldValue = any;
 
 class FieldType {
-  value: Immutable.Map<string, *>;
+  value: Immutable.Map<string, any>;
 
   constructor(type: string, properties: Array<Property>, indexNames: Array<string>) {
     this.value = Immutable.Map({ type, properties: Immutable.Set(properties), indexNames: Immutable.Set(indexNames) });
   }
 
   static Unknown = new FieldType('unknown', [], []);
+
+  static Decorated = new FieldType('decorated field', [Properties.Decorated], []);
 
   get type(): string {
     return this.value.get('type');
@@ -46,6 +49,10 @@ class FieldType {
 
   isCompound(): boolean {
     return this.properties.has(Properties.Compound);
+  }
+
+  isDecorated(): boolean {
+    return this.properties.has(Properties.Decorated);
   }
 
   static fromJSON(value: FieldTypeJSON) {

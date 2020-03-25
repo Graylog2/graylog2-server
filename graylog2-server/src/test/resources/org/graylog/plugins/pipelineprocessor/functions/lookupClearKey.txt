@@ -1,0 +1,6 @@
+rule "lookupClearKey"
+when
+  true
+then
+  lookup_clear_key("table", "key");
+end

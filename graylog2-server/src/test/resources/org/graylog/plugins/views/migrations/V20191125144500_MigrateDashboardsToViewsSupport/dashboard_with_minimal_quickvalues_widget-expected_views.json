@@ -1,0 +1,125 @@
+[ {
+  "id" : "5c7fc3f9f38ed741ac154697",
+  "type" : "DASHBOARD",
+  "title" : "Sample Dashboard",
+  "summary" : "This dashboard was migrated automatically.",
+  "description" : "Hey!",
+  "search_id" : "5de0e98900002a0017000001",
+  "state" : {
+    "0000016e-b690-4273-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-426f-0000-016eb690426f" : "Quick values",
+          "0000016e-b690-4270-0000-016eb690426f" : "Quick values"
+        },
+        "tab" : {
+          "title" : "Sample Dashboard"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-426f-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "facility",
+            "type" : "values",
+            "config" : {
+              "limit" : 15
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "pie",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4270-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "facility",
+            "type" : "values",
+            "config" : {
+              "limit" : 15
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "count()",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-4270-0000-016eb690426f" : [ "0000016e-b690-4272-0000-016eb690426f" ],
+        "0000016e-b690-426f-0000-016eb690426f" : [ "0000016e-b690-4271-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-4270-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 10,
+          "height" : 2,
+          "width" : 3
+        },
+        "0000016e-b690-426f-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 7,
+          "height" : 3,
+          "width" : 3
+        }
+      },
+      "static_message_list_id" : null,
+      "display_mode_settings" : {
+        "positions" : { }
+      },
+      "selected_fields" : null
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-03-06T12:58:33.610Z",
+  "requires" : { },
+  "properties" : [ ]
+} ]

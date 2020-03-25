@@ -16,11 +16,11 @@
  */
 package org.graylog2.plugin.lookup;
 
-import com.google.common.collect.Multimap;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.collect.Multimap;
+import org.graylog2.lookup.adapters.LookupDataAdapterValidationContext;
 
 import java.util.Optional;
 
@@ -46,10 +46,23 @@ public interface LookupDataAdapterConfiguration {
      *
      * <p>Returning failing validations here <b>does not</b> prevent saving the configuration!</p>
      *
+     * <p>If your validation needs access to additional services, override
+     * {@link #validate(LookupDataAdapterValidationContext)} instead. </p>
+     *
      * @return optionally map of property name to error messages
      */
     @JsonIgnore
     default Optional<Multimap<String, String>> validate() {
         return Optional.empty();
+    }
+
+    /**
+     * Same as {@link #validate()} but providing access to additional services via the given context object.
+     * <p>If you override this message, don't also override {@link #validate()} as the calling code is not expected
+     * to call both methods.</p>
+     */
+    @JsonIgnore
+    default Optional<Multimap<String, String>> validate(LookupDataAdapterValidationContext validationContext) {
+        return validate();
     }
 }

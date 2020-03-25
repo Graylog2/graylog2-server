@@ -17,13 +17,17 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
-import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { TimeRange } from 'views/logic/queries/Query';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -41,6 +45,8 @@ import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
+import IfDashboard from '../dashboard/IfDashboard';
+import ReplaySearchButton from './ReplaySearchButton';
 
 type Props = {
   id: string,
@@ -58,10 +64,28 @@ type Props = {
   onPositionsChange: () => void,
 };
 type State = {
-  configChanged?: boolean,
   editing: boolean,
-  oldConfig?: WidgetConfig,
+  loading: boolean;
+  oldWidget?: WidgetModel,
   showCopyToDashboard: boolean,
+};
+
+export type Result = {
+  total: number,
+  rows: Rows,
+  effective_timerange: TimeRange,
+};
+
+export type OnVisualizationConfigChange = (VisualizationConfig) => void;
+
+export type WidgetProps = {
+  config: AggregationWidgetConfig,
+  data: { [string]: Result },
+  editing?: boolean,
+  toggleEdit: () => void,
+  fields: FieldTypeMappingsList,
+  onVisualizationConfigChange: OnVisualizationConfigChange,
+  type: string,
 };
 
 const _visualizationForType = (type) => {
@@ -108,10 +132,11 @@ class Widget extends React.Component<Props, State> {
     const { editing } = props;
     this.state = {
       editing,
+      loading: false,
       showCopyToDashboard: false,
     };
     if (editing) {
-      this.state = { ...this.state, oldConfig: props.widget.config };
+      this.state = { ...this.state, oldWidget: props.widget };
     }
   }
 
@@ -170,32 +195,29 @@ class Widget extends React.Component<Props, State> {
       if (state.editing) {
         return {
           editing: false,
-          oldConfig: undefined,
-          configChanged: undefined,
+          oldWidget: undefined,
         };
       }
       RefreshActions.disable();
       return {
         editing: true,
-        oldConfig: widget.config,
+        oldWidget: widget,
       };
     });
   };
 
   _onCancelEdit = () => {
-    const { configChanged } = this.state;
-    if (configChanged) {
+    const { oldWidget } = this.state;
+    if (oldWidget) {
       const { id } = this.props;
-      const { oldConfig } = this.state;
-      WidgetActions.updateConfig(id, oldConfig);
+      WidgetActions.update(id, oldWidget);
     }
     this._onToggleEdit();
   };
 
-  _onWidgetConfigChange = (widgetId, config) => {
-    this.setState({ configChanged: true });
-    WidgetActions.updateConfig(widgetId, config);
-  };
+  _onWidgetConfigChange = (widgetId, config) => WidgetActions.updateConfig(widgetId, config);
+
+  _setLoadingState = (loading: boolean) => this.setState({ loading });
 
   visualize = () => {
     const { data, errors, title } = this.props;
@@ -208,16 +230,19 @@ class Widget extends React.Component<Props, State> {
       const { config, filter } = widget;
       const VisComponent = _visualizationForType(widget.type);
       return (
-        <VisComponent id={id}
-                      editing={editing}
-                      title={title}
-                      config={config}
+        <VisComponent config={config}
                       data={data}
+                      editing={editing}
                       fields={fields}
-                      height={height}
-                      width={width}
                       filter={filter}
-                      toggleEdit={this._onToggleEdit} />
+                      height={height}
+                      onConfigChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}
+                      setLoadingState={this._setLoadingState}
+                      title={title}
+                      toggleEdit={this._onToggleEdit}
+                      type={widget.type}
+                      width={width}
+                      id={id} />
       );
     }
     return <LoadingWidget />;
@@ -226,7 +251,7 @@ class Widget extends React.Component<Props, State> {
   // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
-    const { editing, showCopyToDashboard } = this.state;
+    const { editing, loading, showCopyToDashboard } = this.state;
     const { config } = widget;
     const visualization = this.visualize();
     if (editing) {
@@ -237,15 +262,16 @@ class Widget extends React.Component<Props, State> {
             <MeasureDimensions>
               <WidgetHeader title={title}
                             hideDragHandle
+                            loading={loading}
                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                             editing={editing} />
               <EditComponent config={config}
                              fields={fields}
-                             editting={editing}
+                             editing={editing}
                              id={id}
+                             type={widget.type}
                              onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
                 <WidgetErrorBoundary>
-
                   {visualization}
                 </WidgetErrorBoundary>
               </EditComponent>
@@ -258,43 +284,46 @@ class Widget extends React.Component<Props, State> {
     return (
       <WidgetColorContext id={id}>
         <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
-          <span>
-            <InteractiveContext.Consumer>
-              {interactive => (
-                <WidgetHeader title={title}
-                              hideDragHandle={!interactive}
-                              onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                              editing={editing}>
-                  <IfInteractive>
-                    <WidgetHorizontalStretch widgetId={widget.id}
-                                             widgetType={widget.type}
-                                             onStretch={onPositionsChange}
-                                             position={position} />
+          <InteractiveContext.Consumer>
+            {interactive => (
+              <WidgetHeader title={title}
+                            hideDragHandle={!interactive}
+                            loading={loading}
+                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                            editing={editing}>
+                <IfInteractive>
+                  <IfDashboard>
+                    <ReplaySearchButton />
                     {' '}
-                    <WidgetActionDropdown>
-                      <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                      <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-                      <IfSearch>
-                        <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
-                      </IfSearch>
-                      <MenuItem divider />
-                      <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-                    </WidgetActionDropdown>
-                    {showCopyToDashboard
+                  </IfDashboard>
+                  <WidgetHorizontalStretch widgetId={widget.id}
+                                           widgetType={widget.type}
+                                           onStretch={onPositionsChange}
+                                           position={position} />
+                  {' '}
+                  <WidgetActionDropdown>
+                    <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                    <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                    <IfSearch>
+                      <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
+                    </IfSearch>
+                    <MenuItem divider />
+                    <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
+                  </WidgetActionDropdown>
+                  {showCopyToDashboard
                     && (
                       <CopyToDashboard widgetId={id}
                                        onSubmit={this._onCopyToDashboard}
                                        onCancel={this._onToggleCopyToDashboard} />
                     )}
-                  </IfInteractive>
-                </WidgetHeader>
-              )}
-            </InteractiveContext.Consumer>
-            <WidgetErrorBoundary>
+                </IfInteractive>
+              </WidgetHeader>
+            )}
+          </InteractiveContext.Consumer>
 
-              {visualization}
-            </WidgetErrorBoundary>
-          </span>
+          <WidgetErrorBoundary>
+            {visualization}
+          </WidgetErrorBoundary>
         </WidgetFrame>
       </WidgetColorContext>
     );

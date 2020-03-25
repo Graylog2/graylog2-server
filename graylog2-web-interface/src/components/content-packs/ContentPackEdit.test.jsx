@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -50,26 +49,26 @@ describe('<ContentPackEdit />', () => {
     .build();
 
   it('should render spinner with no content pack', () => {
-    const wrapper = renderer.create(<ContentPackEdit />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackEdit />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render empty content pack for create', () => {
-    const wrapper = renderer.create(<ContentPackEdit contentPack={emptyContentPack}
-                                                     selectedEntities={{}}
-                                                     appliedParameter={{}}
-                                                     entityIndex={{}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackEdit contentPack={emptyContentPack}
+                                           selectedEntities={{}}
+                                           appliedParameter={{}}
+                                           entityIndex={{}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with content pack for edit', () => {
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <ContentPackEdit contentPack={filledContentPack}
                        appliedParameter={appliedParameter}
                        entityIndex={serverEntities}
                        selectedEntities={selectedEntities} />,
     );
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should create a new content pack', () => {

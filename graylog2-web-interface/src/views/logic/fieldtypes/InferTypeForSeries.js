@@ -1,6 +1,6 @@
 // @flow strict
-
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';
@@ -11,7 +11,7 @@ const constantTypeFunctions = {
   count: FieldTypes.LONG,
 };
 
-const inferTypeForSeries = (series: Series, types: Array<FieldTypeMapping>): FieldTypeMapping => {
+const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Array<FieldTypeMapping>)): FieldTypeMapping => {
   const definition = parseSeries(series.function);
   const newMapping = type => FieldTypeMapping.create(series.function, type);
   if (definition === null) {
@@ -27,7 +27,7 @@ const inferTypeForSeries = (series: Series, types: Array<FieldTypeMapping>): Fie
   }
 
   if (typePreservingFunctions.includes(type)) {
-    const mapping = types.find(t => (t.name === field));
+    const mapping = types && types.find(t => (t.name === field));
 
     if (!mapping) {
       return newMapping(FieldType.Unknown);

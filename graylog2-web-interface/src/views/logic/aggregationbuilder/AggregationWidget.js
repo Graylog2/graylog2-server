@@ -1,5 +1,7 @@
-import { Map, is } from 'immutable';
+import { Map } from 'immutable';
 
+import isDeepEqual from 'stores/isDeepEqual';
+import isEqualForSearch from 'views/stores/isEqualForSearch';
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 import Widget from '../widgets/Widget';
 
@@ -28,7 +30,14 @@ export default class AggregationWidget extends Widget {
 
   equals(other) {
     if (other instanceof AggregationWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every(key => is(this[key], other[key]));
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every(key => isDeepEqual(this[key], other[key]));
+    }
+    return false;
+  }
+
+  equalsForSearch(other) {
+    if (other instanceof AggregationWidget) {
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams'].every(key => isEqualForSearch(this[key], other[key]));
     }
     return false;
   }

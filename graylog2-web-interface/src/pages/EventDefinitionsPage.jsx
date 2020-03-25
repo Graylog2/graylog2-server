@@ -14,11 +14,11 @@ const EventDefinitionsPage = () => {
       <span>
         <PageHeader title="Event Definitions">
           <span>
-              Create new Event Definitions that will allow you to search for different Conditions and alert on them.
+            Create new Event Definitions that will allow you to search for different Conditions and alert on them.
           </span>
 
           <span>
-              Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
+            Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
             <DocumentationLink page={DocsHelper.PAGES.ALERTS}
                                text="documentation" />
           </span>

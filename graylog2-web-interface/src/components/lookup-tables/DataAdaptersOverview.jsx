@@ -104,7 +104,7 @@ class DataAdaptersOverview extends React.Component {
         <Row className="content">
           <Col md={12}>
             <h2>
-            Configured lookup Data Adapters
+              Configured lookup Data Adapters
               <span>&nbsp;
                 <small>{pagination.total} total</small>
               </span>

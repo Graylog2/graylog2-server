@@ -1,51 +1,56 @@
 // eslint-disable-next-line no-restricted-imports
 import { Navbar as BootstrapNavbar } from 'react-bootstrap';
-import styled from 'styled-components';
-import { darken, lighten } from 'polished';
+import styled, { css } from 'styled-components';
+import chroma from 'chroma-js';
 
-import { breakpoint, teinte } from 'theme';
+import { breakpoint, util } from 'theme';
 
-const Navbar = styled(BootstrapNavbar)`
+const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   &.navbar-default {
-    background-color: ${teinte.secondary.due};
-    border-color: ${darken(0.065, teinte.secondary.due)};
+    background-color: ${theme.color.gray[90]};
+    border-color: ${theme.color.gray[80]};
 
     .navbar-brand {
-      color: ${teinte.tertiary.uno};
+      color: ${theme.color.variant.info};
+      padding: 12px 15px 0 15px;
+
       &:hover,
       &:focus {
-        color: ${darken(0.1, teinte.tertiary.uno)};
+        color: ${theme.color.variant.dark.info};
         background-color: transparent;
       }
     }
 
     .navbar-text {
-      color: ${teinte.primary.tre};
+      color: ${theme.color.global.textDefault};
     }
 
     .navbar-nav {
-      > li > a {
-        color: ${teinte.tertiary.uno};
+      > li > a,
+      > li > .btn-link {
+        color: ${theme.color.variant.info};
 
         &:hover,
         &:focus {
-          color: ${darken(0.25, teinte.tertiary.uno)};
+          color: ${theme.color.variant.dark.info};
           background-color: transparent;
         }
       }
+
       > .active > a {
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, teinte.tertiary.uno)};
-          background-color: ${darken(0.065, teinte.secondary.due)};
+          color: ${util.readableColor(theme.color.gray[80])};
+          background-color: ${theme.color.gray[80]};
         }
       }
+
       > .disabled > a {
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.25, teinte.secondary.tre)};
+          color: ${theme.color.gray[70]};
           background-color: transparent;
         }
       }
@@ -54,34 +59,38 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, teinte.tertiary.uno)};
-          background-color: ${darken(0.065, teinte.secondary.due)};
+          color: ${chroma(theme.color.variant.info).darken(0.15)};
+          background-color: ${chroma(theme.color.gray[90]).darken(0.065)};
         }
       }
 
       @media (max-width: ${breakpoint.max.sm}) {
         .open .dropdown-menu {
-          > li > a {
-            color: ${teinte.tertiary.uno};
+          > li > a,
+          > li > .btn-link {
+            color: ${theme.color.variant.info};
+
             &:hover,
             &:focus {
-              color: ${darken(0.25, teinte.tertiary.uno)};
+              color: ${chroma(theme.color.variant.info).darken(0.25)};
               background-color: transparent;
             }
           }
+
           > .active > a {
             &,
             &:hover,
             &:focus {
-              color: ${darken(0.15, teinte.tertiary.uno)};
-              background-color: ${darken(0.065, teinte.secondary.due)};
+              color: ${chroma(theme.color.variant.info).darken(0.15)};
+              background-color: ${chroma(theme.color.gray[90]).darken(0.065)};
             }
           }
+
           > .disabled > a {
             &,
             &:hover,
             &:focus {
-              color: ${teinte.secondary.tre};
+              color: ${theme.color.gray[80]};
               background-color: transparent;
             }
           }
@@ -90,84 +99,94 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-toggle {
-      border-color: ${teinte.secondary.tre};
+      border-color: ${theme.color.gray[80]};
+
       &:hover,
       &:focus {
-        background-color: ${teinte.secondary.tre};
+        background-color: ${theme.color.gray[80]};
       }
+
       .icon-bar {
-        background-color: ${darken(0.25, teinte.secondary.tre)};
+        background-color: ${chroma(theme.color.gray[80]).darken(0.25)};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${darken(0.065, teinte.secondary.due)};
+      border-color: ${chroma(theme.color.gray[90]).darken(0.065)};
     }
 
     .navbar-link {
-      color: ${teinte.tertiary.uno};
+      color: ${theme.color.variant.info};
+
       &:hover {
-        color: ${darken(0.25, teinte.tertiary.uno)};
+        color: ${chroma(theme.color.variant.info).darken(0.25)};
       }
     }
 
     .btn-link {
-      color: ${teinte.tertiary.uno};
+      color: ${theme.color.variant.info};
+
       &:hover,
       &:focus {
-        color: ${darken(0.25, teinte.tertiary.uno)};
+        color: ${theme.color.variant.dark.info};
       }
+
       &[disabled],
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${teinte.secondary.tre};
+          color: ${theme.color.gray[80]};
         }
       }
     }
   }
 
   &.navbar-inverse {
-    background-color: ${teinte.primary.tre};
-    border-color: ${darken(0.15, teinte.primary.tre)};
+    background-color: ${theme.color.gray[10]};
+    border: 0;
 
     .navbar-brand {
-      color: ${lighten(0.15, teinte.tertiary.uno)};
+      color: ${chroma(theme.color.variant.info).brighten(0.15)};
+      padding: 12px 15px 0 15px;
+
       &:hover,
       &:focus {
-        color: ${teinte.primary.due};
+        color: ${theme.color.global.textAlt};
         background-color: transparent;
       }
     }
 
     .navbar-text {
-      color: ${lighten(0.15, teinte.primary.tre)};
+      color: ${chroma(theme.color.global.textDefault).brighten(0.15)};
     }
 
     .navbar-nav {
-      > li > a {
-        color: ${teinte.secondary.due};
+      > li > a,
+      > li > .btn-link {
+        color: ${theme.color.gray[90]};
 
         &:hover,
         &:focus {
-          color: ${teinte.tertiary.due};
+          color: ${theme.color.variant.light.info};
           background-color: transparent;
         }
       }
+
       > .active > a {
         &,
         &:hover,
         &:focus {
-          color: ${teinte.primary.due};
-          background-color: ${lighten(0.20, teinte.primary.tre)};
+          color: ${theme.color.global.textAlt};
+          background-color: ${theme.color.gray[20]};
         }
       }
+
       > .disabled > a {
         &,
         &:hover,
         &:focus {
-          color: ${lighten(0.50, teinte.primary.tre)};
+          color: ${chroma(theme.color.global.textDefault).brighten(0.50)};
           background-color: transparent;
         }
       }
@@ -176,40 +195,46 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${teinte.primary.due};
-          background-color: ${lighten(0.20, teinte.primary.tre)};
+          color: ${theme.color.global.textAlt};
+          background-color: ${theme.color.gray[20]};
         }
       }
 
       @media (max-width: ${breakpoint.max.sm}) {
         .open .dropdown-menu {
           > .dropdown-header {
-            border-color: ${darken(0.10, teinte.primary.tre)};
+            border-color: ${theme.color.gray[10]};
           }
+
           .divider {
-            background-color: ${lighten(0.20, teinte.primary.tre)};
+            background-color: ${theme.color.gray[20]};
           }
-          > li > a {
-            color: ${teinte.secondary.due};
+
+          > li > a,
+          > li > .btn-link {
+            color: ${theme.color.gray[90]};
+
             &:hover,
             &:focus {
-              color: ${teinte.tertiary.due};
+              color: ${theme.color.variant.light.info};
               background-color: transparent;
             }
           }
+
           > .active > a {
             &,
             &:hover,
             &:focus {
-              color: ${teinte.primary.due};
-              background-color: ${lighten(0.20, teinte.primary.tre)};
+              color: ${theme.color.global.textAlt};
+              background-color: ${theme.color.gray[20]};
             }
           }
+
           > .disabled > a {
             &,
             &:hover,
             &:focus {
-              color: ${lighten(0.50, teinte.primary.tre)};
+              color: ${chroma(theme.color.global.textDefault).brighten(0.50)};
               background-color: transparent;
             }
           }
@@ -218,43 +243,55 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-toggle {
-      border-color: ${lighten(0.35, teinte.primary.tre)};
+      border-color: ${theme.color.gray[70]};
+
       &:hover,
       &:focus {
-        background-color: ${lighten(0.35, teinte.primary.tre)};
+        background-color: ${theme.color.gray[70]};
       }
+
       .icon-bar {
-        background-color: ${teinte.primary.due};
+        background-color: ${theme.color.global.textAlt};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${darken(0.07, teinte.primary.tre)};
+      border-color: ${theme.color.gray[100]};
     }
 
     .navbar-link {
-      color: ${lighten(0.15, teinte.tertiary.uno)};
+      color: ${chroma(theme.color.variant.info).brighten(0.15)};
+
       &:hover {
-        color: ${teinte.primary.due};
+        color: ${theme.color.global.textAlt};
       }
     }
 
     .btn-link {
-      color: ${lighten(0.15, teinte.tertiary.uno)};
+      color: ${chroma(theme.color.variant.info).brighten(0.15)};
+
       &:hover,
       &:focus {
-        color: ${teinte.primary.due};
+        color: ${theme.color.global.textAlt};
       }
+
       &[disabled],
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${lighten(0.50, teinte.primary.tre)};
+          color: ${chroma(theme.color.global.textDefault).brighten(0.50)};
         }
       }
     }
   }
-`;
 
+  .dropdown-header {
+    text-transform: uppercase;
+    padding: 0 15px !important;
+    font-weight: bold;
+  }
+`);
+
+/** @component */
 export default Navbar;

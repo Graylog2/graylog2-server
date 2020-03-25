@@ -1,0 +1,108 @@
+{
+  "views": [
+    {
+      "_id" : { "$oid": "5e2ee372b22d7970576b2eb3" },
+      "type" : "SEARCH",
+      "title" : "mig test",
+      "summary" : "",
+      "description" : "",
+      "search_id" : "5e2ee360b22d7970576b2eb2",
+      "properties" : [],
+      "requires" : {},
+      "state" : {
+        "2c67cc0f-c62e-47c1-8b70-e3198925e6bc" : {
+          "titles" : {
+            "widget" : {
+              "3cdaa286-e1c9-44bf-9467-b91f8fe146a4" : "Message Count",
+              "414d294b-cc94-47c8-8b9c-56a42b53748b" : "All Messages"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "414d294b-cc94-47c8-8b9c-56a42b53748b",
+              "type" : "messages",
+              "timerange" : null,
+              "query" : null,
+              "streams" : [],
+              "config" : {
+                "fields" : [
+                  "timestamp",
+                  "source"
+                ],
+                "show_message_row" : true,
+                "decorators" : []
+              }
+            },
+            {
+              "id" : "3cdaa286-e1c9-44bf-9467-b91f8fe146a4",
+              "type" : "aggregation",
+              "timerange" : null,
+              "query" : null,
+              "streams" : [],
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "formatting_settings" : {
+                  "chart_colors" : {
+                    "count()" : "#e91e63",
+                    "avg(fields)" : "#e81e63",
+                    "mean(man)" : "#e91f63",
+                    "total(win)" : "#e91fff"
+                  }
+                },
+                "rollup" : true,
+                "event_annotation" : false
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "3cdaa286-e1c9-44bf-9467-b91f8fe146a4" : [
+              "cca70fb5-b19a-4142-b500-51f9973ba917"
+            ],
+            "414d294b-cc94-47c8-8b9c-56a42b53748b" : [
+              "6a3754dd-113d-4dcd-b4b4-c2825b9d5c47"
+            ]
+          },
+          "positions" : {
+            "3cdaa286-e1c9-44bf-9467-b91f8fe146a4" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 8,
+            },
+            "414d294b-cc94-47c8-8b9c-56a42b53748b" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 6,
+              "width" : 8,
+            }
+          },
+          "display_mode_settings" : {
+            "positions" : {}
+          }
+        }
+      },
+      "owner" : "admin",
+      "created_at" : "2020-01-27T13:19:12.465Z"
+    }
+  ]
+}

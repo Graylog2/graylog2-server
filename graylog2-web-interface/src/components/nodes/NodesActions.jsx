@@ -95,6 +95,11 @@ class NodesActions extends React.Component {
               <MenuItem>Get thread dump</MenuItem>
             </LinkContainer>
           </IfPermitted>
+          <IfPermitted permissions="processbuffer:dump">
+            <LinkContainer to={Routes.SYSTEM.PROCESSBUFFERDUMP(this.props.node.node_id)}>
+              <MenuItem>Get process-buffer dump</MenuItem>
+            </LinkContainer>
+          </IfPermitted>
         </DropdownButton>
       </div>
     );

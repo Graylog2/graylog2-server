@@ -18,13 +18,11 @@ package org.graylog2.system.processing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
 import org.graylog.events.JobSchedulerTestClock;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
@@ -32,7 +30,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -43,7 +40,6 @@ import org.mongojack.JacksonDBCollection;
 
 import java.util.stream.Collectors;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -51,11 +47,9 @@ import static org.mockito.Mockito.when;
 public class DBProcessingStatusServiceTest {
     private static final String NODE_ID = "abc-123";
 
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
     @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -79,15 +73,15 @@ public class DBProcessingStatusServiceTest {
 
         clock = spy(new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z")));
         updateThreshold = spy(Duration.minutes(1));
-        dbService = new DBProcessingStatusService(mongoRule.getMongoConnection(), nodeId, clock, updateThreshold, 1, mapperProvider, baseConfiguration);
-        db = JacksonDBCollection.wrap(mongoRule.getMongoConnection().getDatabase().getCollection(DBProcessingStatusService.COLLECTION_NAME),
+        dbService = new DBProcessingStatusService(mongodb.mongoConnection(), nodeId, clock, updateThreshold, 1, mapperProvider, baseConfiguration);
+        db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection(DBProcessingStatusService.COLLECTION_NAME),
                 ProcessingStatusDto.class,
                 ObjectId.class,
                 mapperProvider.get());
     }
 
     @Test
-    @UsingDataSet(locations = "processing-status.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("processing-status.json")
     public void loadPersisted() {
         assertThat(dbService.all()).hasSize(3);
 
@@ -150,7 +144,6 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void persistAndUpdate() {
         final InMemoryProcessingStatusRecorder statusRecorder = new InMemoryProcessingStatusRecorder();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
@@ -216,7 +209,6 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void get() {
         assertThat(dbService.get()).isNotPresent();
 
@@ -226,7 +218,7 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "processing-status.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("processing-status.json")
     public void earliestPostIndexingTimestamp() {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T02:01:00.000Z"));
 
@@ -240,7 +232,7 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "processing-status.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("processing-status.json")
     public void earliestPostIndexingTimestampWithoutAnyRecentUpdates() {
         // The exclude threshold is not including any nodes
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-02T00:00:00.000Z"));
@@ -248,13 +240,12 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void earliestPostIndexingTimestampWithoutData() {
         assertThat(dbService.earliestPostIndexingTimestamp()).isNotPresent();
     }
 
     @Test
-    @UsingDataSet(locations = "processing-status-node-selection-test.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("processing-status-node-selection-test.json")
     public void selectionQuery() {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T00:03:00.000Z"));
 
@@ -271,14 +262,13 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "processing-status-single-active-node.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("processing-status-single-active-node.json")
     public void singleNodeStatus() {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T00:01:00.000Z"));
         assertThat(dbService.earliestPostIndexingTimestamp()).isPresent();
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void updateProcessingStatusWithJournalDisabled() {
         when(baseConfiguration.isMessageJournalEnabled()).thenReturn(false);
         dbService.save(new InMemoryProcessingStatusRecorder());
@@ -289,7 +279,7 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "processing-status-disabled-journal.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @MongoDBFixtures("processing-status-disabled-journal.json")
     public void retrieveWithDisabledJournal() {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T02:01:00.000Z"));
         when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(4).toMilliseconds());

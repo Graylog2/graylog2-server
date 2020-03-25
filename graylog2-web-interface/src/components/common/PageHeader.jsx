@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
+import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
+import ContentHeadRow from 'components/common/ContentHeadRow';
 import lodash from 'lodash';
 
 import SupportLink from 'components/support/SupportLink';
@@ -44,13 +45,14 @@ class PageHeader extends React.Component {
   };
 
   renderLifecycleIndicator = () => {
-    if (this.props.lifecycle === undefined) {
+    const { lifecycle, lifecycleMessage } = this.props;
+    if (lifecycle === undefined) {
       return null;
     }
 
-    const label = lodash.upperFirst(this.props.lifecycle);
-    const defaultMessage = this.props.lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
-    const tooltip = <Tooltip id={this.props.lifecycle}>{this.props.lifecycleMessage || defaultMessage}</Tooltip>;
+    const label = lodash.upperFirst(lifecycle);
+    const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
+    const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
 
     return (
       <span style={{ cursor: 'help', marginLeft: 5, fontSize: 14, lineHeight: '20px', verticalAlign: 'text-top' }}>
@@ -62,12 +64,13 @@ class PageHeader extends React.Component {
   };
 
   render() {
-    const children = (this.props.children !== undefined && this.props.children.length !== undefined ? this.props.children : [this.props.children]);
+    const { children: childList, subpage, title } = this.props;
+    const children = (childList !== undefined && childList.length !== undefined ? childList : [childList]);
 
-    const topLevelClassNames = this.props.subpage ? 'content-head' : 'content content-head';
+    const topLevelClassNames = subpage ? '' : 'content';
     return (
       <div>
-        <Row className={topLevelClassNames}>
+        <ContentHeadRow className={topLevelClassNames}>
           <Col sm={12}>
             {children[2]
             && (
@@ -80,7 +83,7 @@ class PageHeader extends React.Component {
             }
 
             <h1>
-              {this.props.title} <small>{this.renderLifecycleIndicator()}</small>
+              {title} <small>{this.renderLifecycleIndicator()}</small>
             </h1>
             {children[0]
             && (
@@ -106,7 +109,7 @@ class PageHeader extends React.Component {
             </Col>
             )
           }
-        </Row>
+        </ContentHeadRow>
       </div>
     );
   }

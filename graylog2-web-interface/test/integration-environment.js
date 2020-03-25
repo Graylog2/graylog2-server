@@ -56,7 +56,7 @@ class IntegrationEnvironment extends JSDomEnvironment {
     api.post(/views\/search\/(\w+)\/execute$/, (req, res) => {
       const search = searches[req.params[0]];
       const results = search.queries.map(({ id }) => [id, {
-        error: [],
+        errors: [],
         execution_stats: {
           timestamp: '2019-07-05T13:37:00Z',
           effective_timerange: {

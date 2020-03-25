@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
@@ -35,18 +34,18 @@ describe('<ContentPackInstallations />', () => {
   ];
 
   it('should render without installations', () => {
-    const wrapper = renderer.create(<ContentPackInstallations />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackInstallations />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with empty installations', () => {
-    const wrapper = renderer.create(<ContentPackInstallations installations={[]} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackInstallations installations={[]} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with a installation', () => {
-    const wrapper = renderer.create(<ContentPackInstallations installations={installations} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackInstallations installations={installations} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should uninstall a installation', () => {

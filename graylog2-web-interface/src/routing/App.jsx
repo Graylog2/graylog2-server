@@ -1,19 +1,36 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Navigation from 'components/navigation/Navigation';
-import { Icon, Spinner } from 'components/common';
+import { Scratchpad, Icon, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
+import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 
 import AppErrorBoundary from './AppErrorBoundary';
 
-import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
-import 'c3/c3.css';
-import 'dc/dc.css';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+
+const ScrollToHint = styled.div(({ theme }) => css`
+  position: fixed;
+  left: 50%;
+  margin-left: -125px;
+  top: 50px;
+  color: ${theme.color.global.textAlt};
+  font-size: 80px;
+  padding: 25px;
+  z-index: 2000;
+  width: 200px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 10px;
+  display: none;
+  background: rgba(0, 0, 0, 0.8);
+  filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+`);
 
 const App = ({ children, currentUser, location }) => {
   if (!currentUser) {
@@ -21,18 +38,19 @@ const App = ({ children, currentUser, location }) => {
   }
 
   return (
-    <div>
+    <ScratchpadProvider loginName={currentUser.username}>
       <Navigation requestPath={location.pathname}
                   fullName={currentUser.full_name}
                   loginName={currentUser.username}
                   permissions={currentUser.permissions} />
-      <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
+      <ScrollToHint id="scroll-to-hint">
         <Icon name="arrow-up" />
-      </div>
+      </ScrollToHint>
+      <Scratchpad />
       <AppErrorBoundary>
         {children}
       </AppErrorBoundary>
-    </div>
+    </ScratchpadProvider>
   );
 };
 

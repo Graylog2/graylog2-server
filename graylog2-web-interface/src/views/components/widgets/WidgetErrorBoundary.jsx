@@ -22,9 +22,10 @@ export default class WidgetErrorBoundary extends React.Component<Props, State> {
 
   render() {
     const { error } = this.state;
-    const { children } = this.props;
+    const { children, ...rest } = this.props;
+    const childrenWithProps = React.Children.map(children, child => React.cloneElement(child, rest));
     return error
       ? <ErrorWidget title="While rendering this widget, the following error occurred:" errors={[{ description: error.toString() }]} />
-      : children;
+      : childrenWithProps;
   }
 }

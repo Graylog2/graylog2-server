@@ -26,6 +26,7 @@ import org.graylog2.plugin.lookup.LookupResult;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Streams.stream;
@@ -71,11 +72,43 @@ public abstract class LookupTable {
     public LookupResult lookup(@Nonnull Object key) {
         final LookupResult result = cache().get(LookupCacheKey.create(dataAdapter(), key), () -> dataAdapter().get(key));
 
+        if (result.hasError()) {
+            return result;
+        }
         // The default value will only be used if single, multi and list values are empty
         if (result.isEmpty()) {
             return LookupResult.addDefaults(defaultSingleValue(), defaultMultiValue()).hasError(result.hasError()).build();
         }
         return result;
+    }
+
+    public LookupResult setValue(@Nonnull Object key, @Nonnull Object value) {
+        final LookupResult result = dataAdapter().setValue(key, value);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
+        return result;
+    }
+
+    public LookupResult setStringList(@Nonnull Object key, @Nonnull List<String> value) {
+        final LookupResult result = dataAdapter().setStringList(key, value);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
+        return result;
+    }
+
+    public LookupResult addStringList(@Nonnull Object key, @Nonnull List<String> value, boolean keepDuplicates) {
+        final LookupResult result = dataAdapter().addStringList(key, value, keepDuplicates);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
+        return result;
+    }
+
+    public LookupResult removeStringList(@Nonnull Object key, @Nonnull List<String> value) {
+        final LookupResult result = dataAdapter().removeStringList(key, value);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
+        return result;
+    }
+
+    public void clearKey(@Nonnull Object key) {
+        dataAdapter().clearKey(key);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
     }
 
     @AutoValue.Builder

@@ -27,6 +27,7 @@ const ErrorList = styled.ul`
 
 const Row = styled.div`
   margin-bottom: 5px;
+
   :last-child {
     margin-bottom: 0;
   }

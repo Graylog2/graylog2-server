@@ -168,8 +168,8 @@ public class V20161125161400_AlertReceiversMigrationTest {
         final ArgumentCaptor<BasicDBObject> queryCaptor = ArgumentCaptor.forClass(BasicDBObject.class);
         final ArgumentCaptor<BasicDBObject> updateCaptor = ArgumentCaptor.forClass(BasicDBObject.class);
         verify(this.dbCollection, times(1)).update(queryCaptor.capture(), updateCaptor.capture());
-        assertThat(queryCaptor.getValue().toJson()).isEqualTo("{ \"_id\" : { \"$oid\" : \"" + matchingStreamId + "\" } }");
-        assertThat(updateCaptor.getValue().toJson()).isEqualTo("{ \"$unset\" : { \"" + StreamImpl.FIELD_ALERT_RECEIVERS + "\" : \"\" } }");
+        assertThat(queryCaptor.getValue().toJson()).isEqualTo("{\"_id\": {\"$oid\": \"" + matchingStreamId + "\"}}");
+        assertThat(updateCaptor.getValue().toJson()).isEqualTo("{\"$unset\": {\"" + StreamImpl.FIELD_ALERT_RECEIVERS + "\": \"\"}}");
 
         verifyMigrationCompletedWasPosted(ImmutableMap.of(
             matchingStreamId, Optional.of(alarmCallbackId)
@@ -286,10 +286,10 @@ public class V20161125161400_AlertReceiversMigrationTest {
         final List<BasicDBObject> queries = queryCaptor.getAllValues();
         for (BasicDBObject query : queries) {
             final String streamId = (queries.indexOf(query) == 0 ? matchingStreamId1 : matchingStreamId2);
-            assertThat(query.toJson()).isEqualTo("{ \"_id\" : { \"$oid\" : \"" + streamId + "\" } }");
+            assertThat(query.toJson()).isEqualTo("{\"_id\": {\"$oid\": \"" + streamId + "\"}}");
         }
         updateCaptor.getAllValues()
-                .forEach(update -> assertThat(update.toJson()).isEqualTo("{ \"$unset\" : { \"" + StreamImpl.FIELD_ALERT_RECEIVERS + "\" : \"\" } }"));
+                .forEach(update -> assertThat(update.toJson()).isEqualTo("{\"$unset\": {\"" + StreamImpl.FIELD_ALERT_RECEIVERS + "\": \"\"}}"));
 
         verifyMigrationCompletedWasPosted(ImmutableMap.of(
             matchingStreamId1, Optional.of(alarmCallbackId1),

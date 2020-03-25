@@ -2,7 +2,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { MenuItem } from 'components/graylog';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { Overlay } from 'react-overlays';
 import StopPropagation from './StopPropagation';
 

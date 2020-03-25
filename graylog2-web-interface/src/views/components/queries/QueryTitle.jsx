@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { MenuItem } from 'components/graylog';
 
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { ViewActions } from 'views/stores/ViewStore';
 import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 
@@ -45,10 +44,7 @@ class QueryTitle extends React.Component<Props, State> {
     onClose();
   };
 
-  _onDuplicate = (id: QueryId) => {
-    QueriesActions.duplicate(id)
-      .then(newQuery => ViewActions.selectQuery(newQuery.id));
-  };
+  _onDuplicate = (id: QueryId) => QueriesActions.duplicate(id);
 
   render() {
     const { editing, title } = this.state;

@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.models.system.processing;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -25,6 +26,7 @@ import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 
 @AutoValue
+@JsonAutoDetect
 @JsonDeserialize(builder = ProcessingStatusSummary.Builder.class)
 public abstract class ProcessingStatusSummary {
     public static final String FIELD_RECEIVE_TIMES = "receive_times";

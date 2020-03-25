@@ -17,17 +17,14 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.system.processing.DBProcessingStatusService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -36,33 +33,30 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Optional;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 public class EventProcessorDependencyCheckTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
     @Mock
     private DBProcessingStatusService dbProcessingStatusService;
 
     private MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-    private DBEventProcessorStateService stateService = new DBEventProcessorStateService(mongoRule.getMongoConnection(), objectMapperProvider);
+    private DBEventProcessorStateService stateService;
     private EventProcessorDependencyCheck dependencyCheck;
 
     @Before
     public void setUp() throws Exception {
+        stateService = new DBEventProcessorStateService(mongodb.mongoConnection(), objectMapperProvider);
         dependencyCheck = new EventProcessorDependencyCheck(stateService, dbProcessingStatusService);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void canProcessTimerange() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
 

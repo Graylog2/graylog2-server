@@ -1,8 +1,7 @@
 // @flow strict
 import React from 'react';
-import { mount } from 'enzyme';
-import renderer from 'react-test-renderer';
-import Immutable from 'immutable';
+import { mount } from 'wrappedEnzyme';
+import * as Immutable from 'immutable';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import 'helpers/mocking/react-dom_mock';
 
@@ -19,27 +18,44 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };
 
-  const data = {
-    chart: [{
-      key: ['2018-10-04T09:43:50.000Z'],
-      source: 'leaf',
-      values: [{
-        key: ['hulud.net', 'count()'],
-        rollup: false,
-        source: 'col-leaf',
-        value: 408,
-      }, {
-        key: ['count()'],
-        rollup: true,
-        source: 'row-leaf',
-        value: 408,
-      }],
+  const rows = [{
+    key: ['2018-10-04T09:43:50.000Z'],
+    source: 'leaf',
+    values: [{
+      key: ['hulud.net', 'count()'],
+      rollup: false,
+      source: 'col-leaf',
+      value: 408,
+    }, {
+      key: ['count()'],
+      rollup: true,
+      source: 'row-leaf',
+      value: 408,
     }],
+  }];
+  const data = {
+    chart: rows,
   };
 
   const columnPivot = new Pivot('source', 'values', { limit: 15 });
   const rowPivot = new Pivot('timestamp', 'time', { interval: 'auto' });
   const series = new Series('count()');
+
+  const SimplifiedDataTable = props => (
+    <DataTable config={AggregationWidgetConfig.builder().build()}
+               currentView={currentView}
+               data={{}}
+               fields={Immutable.List([])}
+               effectiveTimerange={{
+                 type: 'relative',
+                 range: 300,
+               }}
+               toggleEdit={() => {}}
+               onChange={() => {}}
+               height={200}
+               width={300}
+               {...props} />
+  );
 
   it('should render with empty data', () => {
     const config = AggregationWidgetConfig.builder()
@@ -50,11 +66,8 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const wrapper = renderer.create(<DataTable config={config}
-                                               currentView={currentView}
-                                               data={{}}
-                                               fields={Immutable.List([])} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<SimplifiedDataTable config={config} />);
+    expect(wrapper.children()).toMatchSnapshot();
   });
 
   it('should render with filled data with rollup', () => {
@@ -66,11 +79,24 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const wrapper = renderer.create(<DataTable config={config}
-                                               currentView={currentView}
-                                               data={data}
-                                               fields={Immutable.List([])} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               data={data} />);
+    expect(wrapper.children()).toMatchSnapshot();
+  });
+
+  it('should render for legacy search result with id as key', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot])
+      .series([series])
+      .sort([])
+      .visualization('table')
+      .rollup(true)
+      .build();
+
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               data={{ 'd8e311db-276c-46e4-ba75-57bf1e0b4d35': rows }} />);
+    expect(wrapper).toIncludeText('hulud.net');
   });
 
   it('should render with filled data without rollup', () => {
@@ -82,11 +108,9 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(false)
       .build();
-    const wrapper = renderer.create(<DataTable config={config}
-                                               currentView={currentView}
-                                               data={data}
-                                               fields={Immutable.List([])} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               data={data} />);
+    expect(wrapper.children()).toMatchSnapshot();
   });
 
   it('renders column pivot header without offset when rollup is disabled', () => {
@@ -113,11 +137,9 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(false)
       .build();
-    const wrapper = renderer.create(<DataTable config={config}
-                                               currentView={currentView}
-                                               data={protocolData}
-                                               fields={Immutable.List([])} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               data={protocolData} />);
+    expect(wrapper.children()).toMatchSnapshot();
   });
 
   it('passes inferred types to fields', () => {
@@ -174,10 +196,9 @@ describe('DataTable', () => {
       FieldTypeMapping.create('bytes', FieldTypes.LONG()),
       FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
     ]);
-    const wrapper = mount(<DataTable config={config}
-                                     currentView={currentView}
-                                     data={dataWithMoreSeries}
-                                     fields={fields} />);
+    const wrapper = mount(<SimplifiedDataTable config={config}
+                                               fields={fields}
+                                               data={dataWithMoreSeries} />);
 
     const expectFieldType = (elem, type) => expect(wrapper.find(elem).props().type).toEqual(type);
 
@@ -200,16 +221,10 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const Component = () => (
-      <DataTable config={config}
-                 currentView={currentView}
-                 data={[]}
-                 fields={Immutable.List([])} />
-    );
     const onRenderComplete = jest.fn();
     mount((
       <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <Component />
+        <SimplifiedDataTable config={config} />
       </RenderCompletionCallback.Provider>
     ));
     expect(onRenderComplete).toHaveBeenCalled();

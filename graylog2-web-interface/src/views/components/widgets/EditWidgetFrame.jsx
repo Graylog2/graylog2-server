@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Modal } from 'components/graylog';
 
 import WidgetContext from 'views/components/contexts/WidgetContext';
+import QueryEditModeContext from 'views/components/contexts/QueryEditModeContext';
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 
@@ -11,6 +12,8 @@ import IfDashboard from '../dashboard/IfDashboard';
 import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
+import HeaderElements from '../HeaderElements';
+import WidgetOverrideElements from '../WidgetOverrideElements';
 
 
 type DialogProps = {
@@ -58,16 +61,21 @@ export default class EditWidgetFrame extends React.Component<Props> {
              enforceFocus={false}>
         <IfDashboard>
           <Modal.Header className={styles.QueryControls}>
-            <WidgetContext.Consumer>
-              {widget => (
-                <WidgetQueryControls widget={widget} />
-              )}
-            </WidgetContext.Consumer>
+            <QueryEditModeContext.Provider value="widget">
+              <HeaderElements />
+              <WidgetContext.Consumer>
+                {widget => (
+                  <WidgetQueryControls widget={widget} />
+                )}
+              </WidgetContext.Consumer>
+            </QueryEditModeContext.Provider>
           </Modal.Header>
         </IfDashboard>
         <Modal.Body className={styles.Visualization}>
           <div role="presentation" style={{ height: '100%' }}>
-            {children[0]}
+            <WidgetOverrideElements>
+              {children[0]}
+            </WidgetOverrideElements>
           </div>
         </Modal.Body>
         <Modal.Footer className={styles.Footer}>

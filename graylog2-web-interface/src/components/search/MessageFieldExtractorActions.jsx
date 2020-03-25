@@ -25,8 +25,8 @@ class MessageFieldExtractorActions extends React.Component {
 
   _formatExtractorMenuItem = (extractorType) => {
     return (
-      <LinkContainer to={this.newExtractorRoutes[extractorType]}>
-        <MenuItem key={`menu-item-${extractorType}`}>
+      <LinkContainer key={`menu-item-${extractorType}`} to={this.newExtractorRoutes[extractorType]}>
+        <MenuItem>
           {ExtractorUtils.getReadableExtractorTypeName(extractorType)}
         </MenuItem>
       </LinkContainer>
@@ -34,7 +34,8 @@ class MessageFieldExtractorActions extends React.Component {
   };
 
   render() {
-    const messageField = this.props.message.fields[this.props.fieldName];
+    const { fieldName, message } = this.props;
+    const messageField = message.fields[fieldName];
     if (typeof messageField === 'string') {
       return (
         <div className="message-field-actions pull-right">
@@ -42,7 +43,7 @@ class MessageFieldExtractorActions extends React.Component {
                           bsSize="xsmall"
                           title="Select extractor type"
                           key={1}
-                          id={`select-extractor-type-dropdown-field-${this.props.fieldName}`}>
+                          id={`select-extractor-type-dropdown-field-${fieldName}`}>
             {ExtractorUtils.EXTRACTOR_TYPES.map(extractorType => this._formatExtractorMenuItem(extractorType))}
           </DropdownButton>
         </div>
@@ -54,9 +55,9 @@ class MessageFieldExtractorActions extends React.Component {
                         bsSize="xsmall"
                         title="Select extractor type"
                         key={1}
-                        id={`select-extractor-type-dropdown-field-${this.props.fieldName}`}>
+                        id={`select-extractor-type-dropdown-field-${fieldName}`}>
           <MenuItem key="select-extractor-type-disabled" disabled>
-                    Extractors can only be used with string fields.
+            Extractors can only be used with string fields.
           </MenuItem>
         </DropdownButton>
       </div>

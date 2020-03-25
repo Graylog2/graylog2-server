@@ -1,7 +1,6 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';
@@ -31,7 +30,7 @@ jest.mock('react-sizeme', () => ({
 
 describe('<WidgetGrid />', () => {
   it('should render with minimal props', () => {
-    const wrapper = renderer.create((
+    const wrapper = mount((
       <WidgetGrid allFields={Immutable.List()}
                   data={{}}
                   errors={{}}
@@ -40,7 +39,7 @@ describe('<WidgetGrid />', () => {
                   widgets={{}}
                   fields={Immutable.List()} />
     ));
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with widgets passed', () => {

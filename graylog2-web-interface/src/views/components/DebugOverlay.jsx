@@ -1,41 +1,45 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
-import { Modal } from 'components/graylog';
 
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchStore } from 'views/stores/SearchStore';
 import connect from 'stores/connect';
 
-const DebugOverlay = createReactClass({
-  displayName: 'DebugOverlay',
+import { Modal, Button } from 'components/graylog';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
-  propTypes: {
-    show: PropTypes.bool.isRequired,
-    onClose: PropTypes.func,
-  },
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import type { SearchStoreState } from 'views/stores/SearchStore';
 
-  getDefaultProps() {
-    return {
-      onClose: () => {},
-    };
-  },
+type Props = {
+  currentView: ViewStoreState,
+  onClose: () => void,
+  searches: SearchStoreState,
+  show: boolean,
+}
 
-  render() {
-    const { show, onClose } = this.props;
-    const modalBody = show && (
+const DebugOverlay = ({ currentView, searches, show, onClose }: Props) => (
+  <BootstrapModalWrapper showModal={show} onHide={onClose}>
+    <Modal.Header closeButton>
+      <Modal.Title>Debug information</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
       <textarea disabled
                 style={{ height: '80vh', width: '100%' }}
-                value={JSON.stringify(this.props, null, 2)} />
-    );
-    return (
-      <Modal onHide={onClose} show={show}>
-        <Modal.Body>
-          {modalBody}
-        </Modal.Body>
-      </Modal>
-    );
-  },
-});
+                value={JSON.stringify({ currentView, searches }, null, 2)} />
+    </Modal.Body>
+    <Modal.Footer>
+      <Button type="button" onClick={() => onClose()} bsStyle="primary">Close</Button>
+    </Modal.Footer>
+  </BootstrapModalWrapper>
+);
 
-export default connect(DebugOverlay, { views: ViewStore, searches: SearchStore });
+DebugOverlay.propTypes = {
+  currentView: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  searches: PropTypes.object.isRequired,
+  show: PropTypes.bool.isRequired,
+};
+
+export default connect(DebugOverlay, { currentView: ViewStore, searches: SearchStore });

@@ -1,47 +1,29 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Row } from 'components/graylog';
 import { DocumentTitle, Spinner, Icon } from 'components/common';
+import LoginBox from 'components/login/LoginBox';
+import AuthThemeStyles from 'theme/styles/authStyles';
 
-import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
-import authStyle from '!style/useable!css!less!stylesheets/auth.less';
+const LoadingPage = ({ text }) => {
+  return (
+    <DocumentTitle title="Loading...">
+      <AuthThemeStyles />
+      <LoginBox>
+        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        <p>
+          <Spinner text={text} delay={0} />
+        </p>
+      </LoginBox>
+    </DocumentTitle>
+  );
+};
 
-class LoadingPage extends React.Component {
-  static propTypes = {
-    text: PropTypes.string,
-  };
-
-  static defaultProps = {
-    text: 'Loading, please wait...',
-  };
-
-  componentDidMount() {
-    disconnectedStyle.use();
-    authStyle.use();
-  }
-
-  componentWillUnmount() {
-    disconnectedStyle.unuse();
-    authStyle.unuse();
-  }
-
-  render() {
-    return (
-      <DocumentTitle title="Loading...">
-        <div className="container" id="login-box">
-          <Row>
-            <Col md={4} mdOffset={4} className="well" id="login-box-content">
-              <legend><Icon name="group" /> Welcome to Graylog</legend>
-              <p className="loading-text">
-                <Spinner text={this.props.text} />
-              </p>
-            </Col>
-          </Row>
-        </div>
-      </DocumentTitle>
-    );
-  }
-}
+LoadingPage.propTypes = {
+  text: PropTypes.string,
+};
+LoadingPage.defaultProps = {
+  text: 'Loading, please wait...',
+};
 
 export default LoadingPage;

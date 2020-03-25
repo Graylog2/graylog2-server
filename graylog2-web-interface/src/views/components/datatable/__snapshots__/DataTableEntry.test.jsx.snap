@@ -73,7 +73,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
         },
       ]
     }
-    types={Array []}
+    types={Immutable.List []}
     valuePath={
       Array [
         Object {
@@ -267,16 +267,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -490,16 +480,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -516,6 +496,9 @@ exports[`DataTableEntry does not fail without types 1`] = `
                 "valuePath": Array [
                   Object {
                     "nf_dst_address": "192.168.1.24",
+                  },
+                  Object {
+                    "_exists_": "timestamp",
                   },
                 ],
               }
@@ -686,16 +669,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -712,6 +685,9 @@ exports[`DataTableEntry does not fail without types 1`] = `
                 "valuePath": Array [
                   Object {
                     "nf_dst_address": "192.168.1.24",
+                  },
+                  Object {
+                    "_exists_": "timestamp",
                   },
                 ],
               }
@@ -909,16 +885,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1135,16 +1101,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1164,6 +1120,9 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   },
                   Object {
                     "nf_proto_name": "TCP",
+                  },
+                  Object {
+                    "_exists_": "timestamp",
                   },
                 ],
               }
@@ -1334,16 +1293,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1363,6 +1312,9 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   },
                   Object {
                     "nf_proto_name": "TCP",
+                  },
+                  Object {
+                    "_exists_": "timestamp",
                   },
                 ],
               }
@@ -1560,16 +1512,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1786,16 +1728,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -1815,6 +1747,9 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   },
                   Object {
                     "nf_proto_name": "UDP",
+                  },
+                  Object {
+                    "_exists_": "timestamp",
                   },
                 ],
               }
@@ -1985,16 +1920,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -2014,6 +1939,9 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   },
                   Object {
                     "nf_proto_name": "UDP",
+                  },
+                  Object {
+                    "_exists_": "timestamp",
                   },
                 ],
               }
@@ -2211,16 +2139,6 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           className="caret"
                         />
                       </span>
-                      <Overlay
-                        container={<body />}
-                        containerPadding={10}
-                        onHide={[Function]}
-                        placement="right"
-                        rootClose={true}
-                        shouldUpdatePosition={true}
-                        show={false}
-                        target={[Function]}
-                      />
                     </OverlayDropdown>
                   </ValueActions>
                 </Value>
@@ -2255,12 +2173,8 @@ Array [
       Object {
         "nf_dst_address": "192.168.1.24",
       },
-    ],
-  },
-  Object {
-    "valuePath": Array [
       Object {
-        "nf_dst_address": "192.168.1.24",
+        "_exists_": "timestamp",
       },
     ],
   },
@@ -2270,7 +2184,7 @@ Array [
         "nf_dst_address": "192.168.1.24",
       },
       Object {
-        "nf_proto_name": "TCP",
+        "_exists_": "timestamp",
       },
     ],
   },
@@ -2292,6 +2206,22 @@ Array [
       Object {
         "nf_proto_name": "TCP",
       },
+      Object {
+        "_exists_": "timestamp",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "TCP",
+      },
+      Object {
+        "_exists_": "timestamp",
+      },
     ],
   },
   Object {
@@ -2312,6 +2242,9 @@ Array [
       Object {
         "nf_proto_name": "UDP",
       },
+      Object {
+        "_exists_": "timestamp",
+      },
     ],
   },
   Object {
@@ -2321,6 +2254,9 @@ Array [
       },
       Object {
         "nf_proto_name": "UDP",
+      },
+      Object {
+        "_exists_": "timestamp",
       },
     ],
   },
