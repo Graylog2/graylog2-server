@@ -46,6 +46,7 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   }, [onSubmit]);
   return (
     <Formik initialValues={initialValues}
+            enableReinitialize
             onSubmit={_onSubmit}>
       {(...args) => (
         <Form>
