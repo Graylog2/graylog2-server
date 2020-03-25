@@ -5,7 +5,6 @@ const webpackConfig = require('./webpack.config.js');
 module.exports = {
   require: [
     'bootstrap/less/bootstrap.less',
-    'opensans-npm-webfont',
     'stylesheets/bootstrap-submenus.less',
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
