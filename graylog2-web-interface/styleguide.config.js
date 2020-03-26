@@ -6,7 +6,6 @@ module.exports = {
   require: [
     'bootstrap/less/bootstrap.less',
     'font-awesome/css/font-awesome.css',
-    'opensans-npm-webfont',
     'stylesheets/bootstrap-submenus.less',
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
