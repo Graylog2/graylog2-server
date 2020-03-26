@@ -19,6 +19,8 @@ The system will use the Jars it finds in the `target` directories, because it's 
 Executing tests from outside Maven (e.g., from IntelliJ) will explicitly trigger and wait for a `mvn package` to ensure that up-to-date Jars are available. 
 This packaging can be disabled by setting the env var GRAYLOG_IT_SKIP_PACKAGING (see above).
 
+*Note: For this to work the `mvn` executable file must be in your `PATH` and its path must not contain the `~` character.* 
+
 # Debugging
 
 Debugging can be enabled by setting the env var GRAYLOG_IT_DEBUG_SERVER (see above). 

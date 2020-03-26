@@ -28,6 +28,8 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog.testing.graylognode.ExecutableFileUtil.makeSureExecutableIsFound;
+
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
     private static final String MVN_COMMAND = "mvn package -DskipTests -Dskip.web.build -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true";
@@ -37,7 +39,7 @@ public class MavenPackager {
             LOG.info("Running from Maven. Assuming jars are current.");
         } else {
             LOG.info("Running from outside Maven. Packaging server jar now...");
-            makeSureMavenExecutableIsFound();
+            makeSureExecutableIsFound("mvn");
             packageJar(projectDir);
         }
     }
@@ -45,19 +47,6 @@ public class MavenPackager {
     private static boolean isRunFromMaven() {
         // surefire-related properties should only be present when the tests are started from surefire, i.e. maven
         return System.getProperty("surefire.test.class.path") != null;
-    }
-
-    private static void makeSureMavenExecutableIsFound() {
-        String mavenExecutable = "mvn";
-        String path = System.getenv("PATH");
-        for (String dirname : path.split(File.pathSeparator)) {
-            File file = new File(dirname, mavenExecutable);
-            if (file.isFile() && file.canExecute()) {
-                LOG.info("Found Maven executable at " + file.getAbsolutePath());
-                return;
-            }
-        }
-        throw new RuntimeException(String.format(Locale.US, "Could not find Maven executable in PATH [%s]", path));
     }
 
     static void packageJar(String pomDir) {
