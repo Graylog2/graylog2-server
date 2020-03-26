@@ -64,7 +64,6 @@ const Pagination = ({
 }) => {
   if (activePage || maxButtons || prev || next || first || last) {
     useEffect(() => {
-      /* eslint-disable-next-line no-console */
       deprecationNotice('You have used a deprecated `Pagination` prop, please check the documentation to use the latest `Pagination`.');
     }, []);
 

@@ -161,7 +161,6 @@ const Panel = ({
   if (header || footer || title || collapsible || hasDeprecatedChildren) {
     /** NOTE: Deprecated & should be removed in 4.0 */
     useEffect(() => {
-      /* eslint-disable-next-line no-console */
       deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
     }, []);
 
