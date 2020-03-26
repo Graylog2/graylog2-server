@@ -6,20 +6,20 @@ import deprecationNotice from 'util/deprecationNotice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-
 import compareIconNames from './icon-fallback';
 
 library.add(fas);
 
-const cleanIconName = (icon) => {
-  const replacedIcon = find(compareIconNames, { v4: icon });
 
-  if (replacedIcon) {
-    deprecationNotice(`You have used a deprecated \`Icon\` name. \`${icon}\` should be \`${replacedIcon.v5}\``);
-    return replacedIcon.v5;
+const cleanIconName = (icon) => {
+  const v4icon = find(compareIconNames, { v4: icon });
+  const iconName = (v4icon && v4icon.v5) || icon;
+
+  if (v4icon) {
+    deprecationNotice(`You have used a deprecated \`Icon\` name. \`${icon}\` should be \`${iconName}\``);
   }
 
-  return icon;
+  return { prefix: 'fas', iconName };
 };
 
 /**
