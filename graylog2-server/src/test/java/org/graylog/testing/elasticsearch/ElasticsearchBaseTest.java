@@ -17,13 +17,10 @@
 package org.graylog.testing.elasticsearch;
 
 import com.github.zafarkhaja.semver.Version;
-import com.google.common.io.Resources;
 import io.searchbox.client.JestClient;
 import org.junit.Before;
 import org.junit.Rule;
 
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 
@@ -75,6 +72,7 @@ public class ElasticsearchBaseTest {
 
     /**
      * Returns the Elasticsearch client.
+     *
      * @return the client
      */
     protected JestClient jestClient() {
@@ -98,20 +96,8 @@ public class ElasticsearchBaseTest {
      *
      * @param resourcePath the fixture resource path
      */
-    @SuppressWarnings("UnstableApiUsage")
     protected void importFixture(String resourcePath) {
-        final URL fixtureResource;
-
-        if (Paths.get(resourcePath).getNameCount() > 1) {
-            fixtureResource = Resources.getResource(resourcePath);
-        } else {
-            fixtureResource = Resources.getResource(getClass(), resourcePath);
-        }
-
-        elasticsearch.fixtureImporter().importResource(fixtureResource, jestClient());
-
-        // Make sure the data we just imported is visible
-        client().refreshNode();
+        elasticsearch.importFixtureResource(resourcePath, getClass());
     }
 
     protected Version elasticsearchVersion() {

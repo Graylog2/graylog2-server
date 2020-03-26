@@ -19,8 +19,8 @@ package integration;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
-import com.jayway.restassured.matcher.ResponseAwareMatcher;
-import com.jayway.restassured.response.Response;
+import io.restassured.matcher.ResponseAwareMatcher;
+import io.restassured.response.Response;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -37,7 +37,7 @@ import static org.hamcrest.core.IsNot.not;
 
 public class BaseRestTestHelper {
     /**
-     * Returns a {@link com.jayway.restassured.matcher.ResponseAwareMatcher} which checks that all given keys are present,
+     * Returns a {@link io.rest-assured.matcher.ResponseAwareMatcher} which checks that all given keys are present,
      * and that no additional keys are in the given path.
      * Given this JSON
      * <pre>
@@ -64,7 +64,7 @@ public class BaseRestTestHelper {
     }
 
     /**
-     * Returns a {@link com.jayway.restassured.matcher.ResponseAwareMatcher} which checks that the given keys are present.
+     * Returns a {@link io.rest-assured.matcher.ResponseAwareMatcher} which checks that the given keys are present.
      * Given this JSON
      * <pre>
      *     {

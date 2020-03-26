@@ -18,10 +18,12 @@ package integration.roles;
 
 import integration.BaseRestTest;
 import integration.RequiresAuthentication;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
+@Ignore("legacy test that should be converted or deleted")
 @RequiresAuthentication
 public class RolesResourceTest extends BaseRestTest {
 

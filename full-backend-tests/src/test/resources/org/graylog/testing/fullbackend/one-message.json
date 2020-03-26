@@ -1,0 +1,25 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "source": "affenmann.info",
+            "message": "hello from es fixture",
+            "timestamp": "2015-01-01 01:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
