@@ -26,6 +26,7 @@ import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.util.Locale;
@@ -48,32 +49,34 @@ import static java.util.Objects.requireNonNull;
  */
 public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     public enum Lifecycle {
-        METHOD, CLASS
-    }
+        METHOD, CLASS;
 
+    }
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBInstance.class);
+
     private static final String DEFAULT_IMAGE = "mongo";
     private static final String DEFAULT_VERSION = "3.6";
     private static final String DEFAULT_DATABASE_NAME = "graylog";
     private static final String DEFAULT_INSTANCE_NAME = "default";
+    private static final int MONGODB_PORT = 27017;
 
+    private static final String NETWORK_ALIAS = "mongodb";
     private static final ConcurrentMap<String, GenericContainer> CACHED_CONTAINER = new ConcurrentHashMap<>();
 
     private final String instanceName;
+
     private final Lifecycle lifecycle;
-    private final String databaseName;
     private final GenericContainer container;
-
     private MongoConnection mongoConnection;
-    private MongoDBFixtureImporter fixtureImporter;
 
+    private MongoDBFixtureImporter fixtureImporter;
     /**
      * Creates a new MongoDB instance for every test method.
      *
      * @return the MongoDB instance
      */
     public static MongoDBInstance createForEachTest() {
-        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, Lifecycle.METHOD, DEFAULT_VERSION, DEFAULT_DATABASE_NAME);
+        return createWithDefaults(Network.newNetwork(), Lifecycle.METHOD);
     }
 
     /**
@@ -82,29 +85,40 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
      * @return the MongoDB instance
      */
     public static MongoDBInstance createForClass() {
-        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, Lifecycle.CLASS, DEFAULT_VERSION, DEFAULT_DATABASE_NAME);
+        return createWithDefaults(Network.newNetwork(), Lifecycle.CLASS);
     }
 
-    private MongoDBInstance(String instanceName, Lifecycle lifecycle, String version, String databaseName) {
+    public static MongoDBInstance createWithDefaults(Network network, Lifecycle lifecycle) {
+        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, DEFAULT_VERSION, network);
+    }
+
+    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle) {
+        MongoDBInstance mongoDb = createWithDefaults(network, lifecycle);
+        mongoDb.startContainer();
+        return mongoDb;
+    }
+
+    private MongoDBInstance(String instanceName, Lifecycle lifecycle, String version, Network network) {
         this.instanceName = instanceName;
         this.lifecycle = lifecycle;
-        this.databaseName = databaseName;
 
         switch (lifecycle) {
             case CLASS:
-                this.container = CACHED_CONTAINER.computeIfAbsent(instanceName, k -> createContainer(version));
+                this.container = CACHED_CONTAINER.computeIfAbsent(instanceName, k -> createContainer(version, network));
                 break;
             case METHOD:
-                this.container = createContainer(version);
+                this.container = createContainer(version, network);
                 break;
             default:
                 throw new IllegalArgumentException("Support for lifecycle " + lifecycle.toString() + " not implemented yet");
         }
     }
 
-    private GenericContainer createContainer(String version) {
+    private GenericContainer createContainer(String version, Network network) {
         return new GenericContainer<>(String.format(Locale.US, "%s:%s", DEFAULT_IMAGE, version))
-                .withExposedPorts(27017)
+                .withExposedPorts(MONGODB_PORT)
+                .withNetwork(network)
+                .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forListeningPort());
     }
 
@@ -140,31 +154,26 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     /**
-     * Returns the database name.
-     *
-     * @return the database name
-     */
-    public String databaseName() {
-        return databaseName;
-    }
-
-    /**
      * Drops the configured database.
      */
     public void dropDatabase() {
-        LOG.debug("Dropping database {}", databaseName());
+        LOG.debug("Dropping database {}", DEFAULT_DATABASE_NAME);
         mongoConnection().getMongoDatabase().drop();
     }
 
     @Override
     protected void before() {
+        startContainer();
+    }
+
+    public void startContainer() {
         LOG.debug("Attempting to start container for image: {}", container.getDockerImageName());
+
         container.start();
         LOG.debug("Started container: {}", containerInfoString());
 
         final MongoDbConfiguration mongoConfiguration = new MongoDbConfiguration();
-        mongoConfiguration.setUri(String.format(Locale.US, "mongodb://%s:%d/%s",
-                ipAddress(), port(), databaseName()));
+        mongoConfiguration.setUri(uri());
 
         this.mongoConnection = new MongoConnectionImpl(mongoConfiguration);
         this.mongoConnection.connect();
@@ -173,6 +182,18 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         if (fixtureImporter != null) {
             fixtureImporter.importResources(mongoConnection().getMongoDatabase());
         }
+    }
+
+    private String uri() {
+        return uriWithHostAndPort(ipAddress(), port());
+    }
+
+    public static String internalUri() {
+        return uriWithHostAndPort(NETWORK_ALIAS, MONGODB_PORT);
+    }
+
+    private static String uriWithHostAndPort(String hostname, int port) {
+        return String.format(Locale.US, "mongodb://%s:%d/%s", hostname, port, DEFAULT_DATABASE_NAME);
     }
 
     @Override
