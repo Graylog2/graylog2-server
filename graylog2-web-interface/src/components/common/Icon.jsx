@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { find, isString } from 'lodash';
 
-import { DEPRECATION_NOTICE } from 'util/constants';
+import deprecationNotice from 'util/deprecationNotice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
@@ -15,8 +15,7 @@ const cleanIconName = (icon) => {
   const replacedIcon = find(compareIconNames, { v4: icon });
 
   if (replacedIcon) {
-    /* eslint-disable-next-line no-console */
-    console.warn(DEPRECATION_NOTICE, `You have used a deprecated \`Icon\` name. \`${icon}\` should be \`${replacedIcon.v5}\``);
+    deprecationNotice(`You have used a deprecated \`Icon\` name. \`${icon}\` should be \`${replacedIcon.v5}\``);
     return replacedIcon.v5;
   }
 
