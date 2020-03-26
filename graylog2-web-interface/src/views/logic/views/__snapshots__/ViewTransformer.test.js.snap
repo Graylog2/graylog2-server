@@ -27,7 +27,7 @@ Object {
           },
           "id": "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e",
           "query": Object {
-            "query_string": "author: \\"Bernd Ahlers\\"",
+            "query_string": "",
             "type": "elasticsearch",
           },
           "search_types": Array [
@@ -123,7 +123,7 @@ Object {
             "filter": undefined,
             "id": "8209351b-407a-455b-9942-cefea43b76ae",
             "query": Object {
-              "query_string": "author: \\"Bernd Ahlers\\"",
+              "query_string": "",
               "type": "elasticsearch",
             },
             "streams": Array [
@@ -166,7 +166,7 @@ Object {
             "filter": undefined,
             "id": "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a",
             "query": Object {
-              "query_string": "author: \\"Bernd Ahlers\\"",
+              "query_string": "",
               "type": "elasticsearch",
             },
             "streams": Array [
