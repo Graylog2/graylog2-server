@@ -1,7 +1,6 @@
 // @flow
 import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
-import { cloneDeep } from 'lodash';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
