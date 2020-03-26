@@ -2801,41 +2801,16 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       name="server"
                     >
                       <FontAwesomeIcon
-                        border={false}
-                        className=""
-                        fixedWidth={false}
-                        flip={null}
-                        icon="server"
-                        inverse={false}
-                        listItem={false}
-                        mask={null}
-                        pull={null}
-                        pulse={false}
-                        rotation={null}
-                        size={null}
-                        spin={false}
-                        swapOpacity={false}
-                        symbol={false}
-                        title=""
-                        transform={null}
+                        icon={
+                          Object {
+                            "iconName": "server",
+                            "prefix": "fas",
+                          }
+                        }
                       >
                         <svg
-                          aria-hidden="true"
-                          className="svg-inline--fa fa-server fa-w-16 "
-                          data-icon="server"
-                          data-prefix="fas"
-                          focusable="false"
-                          role="img"
-                          style={Object {}}
-                          viewBox="0 0 512 512"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M480 160H32c-17.673 0-32-14.327-32-32V64c0-17.673 14.327-32 32-32h448c17.673 0 32 14.327 32 32v64c0 17.673-14.327 32-32 32zm-48-88c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-64 0c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm112 248H32c-17.673 0-32-14.327-32-32v-64c0-17.673 14.327-32 32-32h448c17.673 0 32 14.327 32 32v64c0 17.673-14.327 32-32 32zm-48-88c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-64 0c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm112 248H32c-17.673 0-32-14.327-32-32v-64c0-17.673 14.327-32 32-32h448c17.673 0 32 14.327 32 32v64c0 17.673-14.327 32-32 32zm-48-88c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm-64 0c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24z"
-                            fill="currentColor"
-                            style={Object {}}
-                          />
-                        </svg>
+                          className="svg-inline--fa fa-server"
+                        />
                       </FontAwesomeIcon>
                     </Icon>
                     ) or entities from the former content pack revision (
@@ -2844,41 +2819,17 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       name="archive"
                     >
                       <FontAwesomeIcon
-                        border={false}
                         className="contentPackEntity"
-                        fixedWidth={false}
-                        flip={null}
-                        icon="archive"
-                        inverse={false}
-                        listItem={false}
-                        mask={null}
-                        pull={null}
-                        pulse={false}
-                        rotation={null}
-                        size={null}
-                        spin={false}
-                        swapOpacity={false}
-                        symbol={false}
-                        title=""
-                        transform={null}
+                        icon={
+                          Object {
+                            "iconName": "archive",
+                            "prefix": "fas",
+                          }
+                        }
                       >
                         <svg
-                          aria-hidden="true"
-                          className="svg-inline--fa fa-archive fa-w-16 contentPackEntity"
-                          data-icon="archive"
-                          data-prefix="fas"
-                          focusable="false"
-                          role="img"
-                          style={Object {}}
-                          viewBox="0 0 512 512"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"
-                            fill="currentColor"
-                            style={Object {}}
-                          />
-                        </svg>
+                          className="svg-inline--fa fa-archive"
+                        />
                       </FontAwesomeIcon>
                     </Icon>
                     ).
@@ -3207,41 +3158,17 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             name="circle"
                           >
                             <FontAwesomeIcon
-                              border={false}
                               className="fa-stack-1x iconBackground"
-                              fixedWidth={false}
-                              flip={null}
-                              icon="circle"
-                              inverse={false}
-                              listItem={false}
-                              mask={null}
-                              pull={null}
-                              pulse={false}
-                              rotation={null}
-                              size={null}
-                              spin={false}
-                              swapOpacity={false}
-                              symbol={false}
-                              title=""
-                              transform={null}
+                              icon={
+                                Object {
+                                  "iconName": "circle",
+                                  "prefix": "fas",
+                                }
+                              }
                             >
                               <svg
-                                aria-hidden="true"
-                                className="svg-inline--fa fa-circle fa-w-16 fa-stack-1x iconBackground"
-                                data-icon="circle"
-                                data-prefix="fas"
-                                focusable="false"
-                                role="img"
-                                style={Object {}}
-                                viewBox="0 0 512 512"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"
-                                  fill="currentColor"
-                                  style={Object {}}
-                                />
-                              </svg>
+                                className="svg-inline--fa fa-circle"
+                              />
                             </FontAwesomeIcon>
                           </Icon>
                           <Icon
@@ -3249,41 +3176,17 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             name="angle-up"
                           >
                             <FontAwesomeIcon
-                              border={false}
                               className="fa-stack-1x"
-                              fixedWidth={false}
-                              flip={null}
-                              icon="angle-up"
-                              inverse={false}
-                              listItem={false}
-                              mask={null}
-                              pull={null}
-                              pulse={false}
-                              rotation={null}
-                              size={null}
-                              spin={false}
-                              swapOpacity={false}
-                              symbol={false}
-                              title=""
-                              transform={null}
+                              icon={
+                                Object {
+                                  "iconName": "angle-up",
+                                  "prefix": "fas",
+                                }
+                              }
                             >
                               <svg
-                                aria-hidden="true"
-                                className="svg-inline--fa fa-angle-up fa-w-10 fa-stack-1x"
-                                data-icon="angle-up"
-                                data-prefix="fas"
-                                focusable="false"
-                                role="img"
-                                style={Object {}}
-                                viewBox="0 0 320 512"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M177 159.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 255.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 329.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1z"
-                                  fill="currentColor"
-                                  style={Object {}}
-                                />
-                              </svg>
+                                className="svg-inline--fa fa-angle-up"
+                              />
                             </FontAwesomeIcon>
                           </Icon>
                         </div>

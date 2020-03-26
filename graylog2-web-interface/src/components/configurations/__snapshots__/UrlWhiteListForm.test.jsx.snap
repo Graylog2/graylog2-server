@@ -2125,41 +2125,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         name="caret-down"
                                                       >
                                                         <FontAwesomeIcon
-                                                          border={false}
-                                                          className=""
-                                                          fixedWidth={false}
-                                                          flip={null}
-                                                          icon="caret-down"
-                                                          inverse={false}
-                                                          listItem={false}
-                                                          mask={null}
-                                                          pull={null}
-                                                          pulse={false}
-                                                          rotation={null}
-                                                          size={null}
-                                                          spin={false}
-                                                          swapOpacity={false}
-                                                          symbol={false}
-                                                          title=""
-                                                          transform={null}
+                                                          icon={
+                                                            Object {
+                                                              "iconName": "caret-down",
+                                                              "prefix": "fas",
+                                                            }
+                                                          }
                                                         >
                                                           <svg
-                                                            aria-hidden="true"
-                                                            className="svg-inline--fa fa-caret-down fa-w-10 "
-                                                            data-icon="caret-down"
-                                                            data-prefix="fas"
-                                                            focusable="false"
-                                                            role="img"
-                                                            style={Object {}}
-                                                            viewBox="0 0 320 512"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                          >
-                                                            <path
-                                                              d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
-                                                              fill="currentColor"
-                                                              style={Object {}}
-                                                            />
-                                                          </svg>
+                                                            className="svg-inline--fa fa-caret-down"
+                                                          />
                                                         </FontAwesomeIcon>
                                                       </Icon>
                                                     </div>
@@ -2251,41 +2226,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             name="trash-alt"
                           >
                             <FontAwesomeIcon
-                              border={false}
-                              className=""
-                              fixedWidth={false}
-                              flip={null}
-                              icon="trash-alt"
-                              inverse={false}
-                              listItem={false}
-                              mask={null}
-                              pull={null}
-                              pulse={false}
-                              rotation={null}
-                              size={null}
-                              spin={false}
-                              swapOpacity={false}
-                              symbol={false}
-                              title=""
-                              transform={null}
+                              icon={
+                                Object {
+                                  "iconName": "trash-alt",
+                                  "prefix": "fas",
+                                }
+                              }
                             >
                               <svg
-                                aria-hidden="true"
-                                className="svg-inline--fa fa-trash-alt fa-w-14 "
-                                data-icon="trash-alt"
-                                data-prefix="fas"
-                                focusable="false"
-                                role="img"
-                                style={Object {}}
-                                viewBox="0 0 448 512"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
-                                  fill="currentColor"
-                                  style={Object {}}
-                                />
-                              </svg>
+                                className="svg-inline--fa fa-trash-alt"
+                              />
                             </FontAwesomeIcon>
                           </Icon>
                         </button>
@@ -4112,41 +4062,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         name="caret-down"
                                                       >
                                                         <FontAwesomeIcon
-                                                          border={false}
-                                                          className=""
-                                                          fixedWidth={false}
-                                                          flip={null}
-                                                          icon="caret-down"
-                                                          inverse={false}
-                                                          listItem={false}
-                                                          mask={null}
-                                                          pull={null}
-                                                          pulse={false}
-                                                          rotation={null}
-                                                          size={null}
-                                                          spin={false}
-                                                          swapOpacity={false}
-                                                          symbol={false}
-                                                          title=""
-                                                          transform={null}
+                                                          icon={
+                                                            Object {
+                                                              "iconName": "caret-down",
+                                                              "prefix": "fas",
+                                                            }
+                                                          }
                                                         >
                                                           <svg
-                                                            aria-hidden="true"
-                                                            className="svg-inline--fa fa-caret-down fa-w-10 "
-                                                            data-icon="caret-down"
-                                                            data-prefix="fas"
-                                                            focusable="false"
-                                                            role="img"
-                                                            style={Object {}}
-                                                            viewBox="0 0 320 512"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                          >
-                                                            <path
-                                                              d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
-                                                              fill="currentColor"
-                                                              style={Object {}}
-                                                            />
-                                                          </svg>
+                                                            className="svg-inline--fa fa-caret-down"
+                                                          />
                                                         </FontAwesomeIcon>
                                                       </Icon>
                                                     </div>
@@ -4238,41 +4163,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             name="trash-alt"
                           >
                             <FontAwesomeIcon
-                              border={false}
-                              className=""
-                              fixedWidth={false}
-                              flip={null}
-                              icon="trash-alt"
-                              inverse={false}
-                              listItem={false}
-                              mask={null}
-                              pull={null}
-                              pulse={false}
-                              rotation={null}
-                              size={null}
-                              spin={false}
-                              swapOpacity={false}
-                              symbol={false}
-                              title=""
-                              transform={null}
+                              icon={
+                                Object {
+                                  "iconName": "trash-alt",
+                                  "prefix": "fas",
+                                }
+                              }
                             >
                               <svg
-                                aria-hidden="true"
-                                className="svg-inline--fa fa-trash-alt fa-w-14 "
-                                data-icon="trash-alt"
-                                data-prefix="fas"
-                                focusable="false"
-                                role="img"
-                                style={Object {}}
-                                viewBox="0 0 448 512"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
-                                  fill="currentColor"
-                                  style={Object {}}
-                                />
-                              </svg>
+                                className="svg-inline--fa fa-trash-alt"
+                              />
                             </FontAwesomeIcon>
                           </Icon>
                         </button>
@@ -6099,41 +5999,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         name="caret-down"
                                                       >
                                                         <FontAwesomeIcon
-                                                          border={false}
-                                                          className=""
-                                                          fixedWidth={false}
-                                                          flip={null}
-                                                          icon="caret-down"
-                                                          inverse={false}
-                                                          listItem={false}
-                                                          mask={null}
-                                                          pull={null}
-                                                          pulse={false}
-                                                          rotation={null}
-                                                          size={null}
-                                                          spin={false}
-                                                          swapOpacity={false}
-                                                          symbol={false}
-                                                          title=""
-                                                          transform={null}
+                                                          icon={
+                                                            Object {
+                                                              "iconName": "caret-down",
+                                                              "prefix": "fas",
+                                                            }
+                                                          }
                                                         >
                                                           <svg
-                                                            aria-hidden="true"
-                                                            className="svg-inline--fa fa-caret-down fa-w-10 "
-                                                            data-icon="caret-down"
-                                                            data-prefix="fas"
-                                                            focusable="false"
-                                                            role="img"
-                                                            style={Object {}}
-                                                            viewBox="0 0 320 512"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                          >
-                                                            <path
-                                                              d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
-                                                              fill="currentColor"
-                                                              style={Object {}}
-                                                            />
-                                                          </svg>
+                                                            className="svg-inline--fa fa-caret-down"
+                                                          />
                                                         </FontAwesomeIcon>
                                                       </Icon>
                                                     </div>
@@ -6225,41 +6100,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             name="trash-alt"
                           >
                             <FontAwesomeIcon
-                              border={false}
-                              className=""
-                              fixedWidth={false}
-                              flip={null}
-                              icon="trash-alt"
-                              inverse={false}
-                              listItem={false}
-                              mask={null}
-                              pull={null}
-                              pulse={false}
-                              rotation={null}
-                              size={null}
-                              spin={false}
-                              swapOpacity={false}
-                              symbol={false}
-                              title=""
-                              transform={null}
+                              icon={
+                                Object {
+                                  "iconName": "trash-alt",
+                                  "prefix": "fas",
+                                }
+                              }
                             >
                               <svg
-                                aria-hidden="true"
-                                className="svg-inline--fa fa-trash-alt fa-w-14 "
-                                data-icon="trash-alt"
-                                data-prefix="fas"
-                                focusable="false"
-                                role="img"
-                                style={Object {}}
-                                viewBox="0 0 448 512"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
-                                  fill="currentColor"
-                                  style={Object {}}
-                                />
-                              </svg>
+                                className="svg-inline--fa fa-trash-alt"
+                              />
                             </FontAwesomeIcon>
                           </Icon>
                         </button>

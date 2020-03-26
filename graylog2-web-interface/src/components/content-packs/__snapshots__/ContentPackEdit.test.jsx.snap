@@ -4377,41 +4377,17 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           name="circle"
                                         >
                                           <FontAwesomeIcon
-                                            border={false}
                                             className="fa-stack-1x iconBackground"
-                                            fixedWidth={false}
-                                            flip={null}
-                                            icon="circle"
-                                            inverse={false}
-                                            listItem={false}
-                                            mask={null}
-                                            pull={null}
-                                            pulse={false}
-                                            rotation={null}
-                                            size={null}
-                                            spin={false}
-                                            swapOpacity={false}
-                                            symbol={false}
-                                            title=""
-                                            transform={null}
+                                            icon={
+                                              Object {
+                                                "iconName": "circle",
+                                                "prefix": "fas",
+                                              }
+                                            }
                                           >
                                             <svg
-                                              aria-hidden="true"
-                                              className="svg-inline--fa fa-circle fa-w-16 fa-stack-1x iconBackground"
-                                              data-icon="circle"
-                                              data-prefix="fas"
-                                              focusable="false"
-                                              role="img"
-                                              style={Object {}}
-                                              viewBox="0 0 512 512"
-                                              xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                              <path
-                                                d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"
-                                                fill="currentColor"
-                                                style={Object {}}
-                                              />
-                                            </svg>
+                                              className="svg-inline--fa fa-circle"
+                                            />
                                           </FontAwesomeIcon>
                                         </Icon>
                                         <Icon
@@ -4419,41 +4395,17 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           name="angle-up"
                                         >
                                           <FontAwesomeIcon
-                                            border={false}
                                             className="fa-stack-1x"
-                                            fixedWidth={false}
-                                            flip={null}
-                                            icon="angle-up"
-                                            inverse={false}
-                                            listItem={false}
-                                            mask={null}
-                                            pull={null}
-                                            pulse={false}
-                                            rotation={null}
-                                            size={null}
-                                            spin={false}
-                                            swapOpacity={false}
-                                            symbol={false}
-                                            title=""
-                                            transform={null}
+                                            icon={
+                                              Object {
+                                                "iconName": "angle-up",
+                                                "prefix": "fas",
+                                              }
+                                            }
                                           >
                                             <svg
-                                              aria-hidden="true"
-                                              className="svg-inline--fa fa-angle-up fa-w-10 fa-stack-1x"
-                                              data-icon="angle-up"
-                                              data-prefix="fas"
-                                              focusable="false"
-                                              role="img"
-                                              style={Object {}}
-                                              viewBox="0 0 320 512"
-                                              xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                              <path
-                                                d="M177 159.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 255.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 329.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1z"
-                                                fill="currentColor"
-                                                style={Object {}}
-                                              />
-                                            </svg>
+                                              className="svg-inline--fa fa-angle-up"
+                                            />
                                           </FontAwesomeIcon>
                                         </Icon>
                                       </div>
