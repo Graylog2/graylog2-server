@@ -1,6 +1,7 @@
 // @flow
 import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
+import { cloneDeep } from 'lodash';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
@@ -41,6 +42,12 @@ const ConfigurationsStore = Reflux.createStore({
   propagateChanges() {
     this.trigger(this.getState());
   },
+  // Use cloneDeep to get a copy of configuration to avoid reference sharing
+  setConfigurationState(configType, updatedConfig) {
+    const newConfig = cloneDeep(this.configuration);
+    newConfig[configType] = updatedConfig;
+    this.configuration = newConfig;
+  },
 
   _url(path) {
     return qualifyUrl(urlPrefix + path);
@@ -49,7 +56,7 @@ const ConfigurationsStore = Reflux.createStore({
   list(configType) {
     const promise = fetch('GET', this._url(`/${configType}`));
     promise.then((response) => {
-      this.configuration[configType] = response;
+      this.setConfigurationState(configType, response);
       this.propagateChanges();
       return response;
     });
@@ -69,7 +76,7 @@ const ConfigurationsStore = Reflux.createStore({
 
   listMessageProcessorsConfig(configType) {
     const promise = fetch('GET', qualifyUrl('/system/messageprocessors/config')).then((response) => {
-      this.configuration[configType] = response;
+      this.setConfigurationState(configType, response);
       this.propagateChanges();
       return response;
     });
@@ -79,7 +86,7 @@ const ConfigurationsStore = Reflux.createStore({
 
   listWhiteListConfig(configType) {
     const promise = fetch('GET', qualifyUrl('/system/urlwhitelist')).then((response) => {
-      this.configuration[configType] = response;
+      this.setConfigurationState(configType, response);
       this.propagateChanges();
       return response;
     });
@@ -102,7 +109,7 @@ const ConfigurationsStore = Reflux.createStore({
 
     promise.then(
       (response) => {
-        this.configuration[configType] = response;
+        this.setConfigurationState(configType, response);
         this.propagateChanges();
         UserNotification.success('Configuration updated successfully');
         return response;
@@ -120,7 +127,7 @@ const ConfigurationsStore = Reflux.createStore({
 
     promise.then(
       () => {
-        this.configuration[configType] = config;
+        this.setConfigurationState(configType, config);
         this.propagateChanges();
         UserNotification.success('Url Whitelist Configuration updated successfully');
         return config;
@@ -138,7 +145,7 @@ const ConfigurationsStore = Reflux.createStore({
 
     promise.then(
       (response) => {
-        this.configuration[configType] = response;
+        this.setConfigurationState(configType, response);
         this.propagateChanges();
         UserNotification.success('Configuration updated successfully');
         return response;
