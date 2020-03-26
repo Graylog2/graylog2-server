@@ -118,7 +118,8 @@ public class AggregationEventProcessorTest {
                 .sourceStreams(ImmutableSet.of("stream-1", "stream-2"))
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of(now.toString(), "one", "two"))
+                                .key(ImmutableList.of("one", "two"))
+                                .timestamp(now)
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
@@ -230,7 +231,8 @@ public class AggregationEventProcessorTest {
                 .sourceStreams(ImmutableSet.of("stream-1", "stream-2", "stream-3"))
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of(now.toString(), "one", "two"))
+                                .key(ImmutableList.of("one", "two"))
+                                .timestamp(now)
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
@@ -256,7 +258,7 @@ public class AggregationEventProcessorTest {
                                 .key(ImmutableList.of(now.toString(), "one", "two"))
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
-                                                .key(ImmutableList.of("a")) // TODO shouldn't this always be the same key as the AggregationKeyResult.key()?
+                                                .key(ImmutableList.of("a"))
                                                 .value(23.0d) // Doesn't match condition
                                                 .series(AggregationSeries.builder()
                                                         .id("abc123")
@@ -460,7 +462,8 @@ public class AggregationEventProcessorTest {
                 .sourceStreams(ImmutableSet.of()) // No streams in result
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of(now.toString(), "one", "two"))
+                                .key(ImmutableList.of("one", "two"))
+                                .timestamp(now)
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
@@ -551,7 +554,8 @@ public class AggregationEventProcessorTest {
                 .sourceStreams(ImmutableSet.of()) // No streams in result
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of(now.toString(), "one", "two"))
+                                .key(ImmutableList.of("one", "two"))
+                                .timestamp(now)
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))

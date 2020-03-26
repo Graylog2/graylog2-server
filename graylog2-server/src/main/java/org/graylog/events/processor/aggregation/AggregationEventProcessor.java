@@ -272,10 +272,7 @@ public class AggregationEventProcessor implements EventProcessor {
             sourceStreams = Sets.intersection(searchStreams, result.sourceStreams());
         }
 
-        for (final AggregationKeyResult keyResultWithTimeBuckets : result.keyResults()) {
-            // The first group-by bucket is always a Date histogram, remove for further processing
-            final AggregationKeyResult keyResult = keyResultWithTimeBuckets.withoutFirstBucket();
-
+        for (final AggregationKeyResult keyResult : result.keyResults()) {
             if (!satisfiesConditions(keyResult)) {
                 LOG.debug("Skipping result <{}> because the conditions <{}> don't match", keyResult, config.conditions());
                 continue;
@@ -284,8 +281,8 @@ public class AggregationEventProcessor implements EventProcessor {
             final String keyString = Strings.join(keyResult.key(), '|');
             final String eventMessage = createEventMessageString(keyString, keyResult);
 
-            // Extract eventTime from the date histogram bucket. Use query time range as fallback
-            final DateTime eventTime = keyResultWithTimeBuckets.getEventHistogramTime().orElse(result.effectiveTimerange().to());
+            // Extract eventTime from the key result or use query time range as fallback
+            final DateTime eventTime = keyResult.timestamp().orElse(result.effectiveTimerange().to());
             final Event event = eventFactory.createEvent(eventDefinition, eventTime, eventMessage);
 
             // TODO: Do we have to set any other event fields here?

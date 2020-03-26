@@ -49,6 +49,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterv
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.plugin.streams.Stream;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +66,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toSet;
 
 public class PivotAggregationSearch implements AggregationSearch {
@@ -171,16 +174,17 @@ public class PivotAggregationSearch implements AggregationSearch {
     }
 
     @VisibleForTesting
-    ImmutableList<AggregationKeyResult> extractValues(PivotResult pivotResult) {
+    ImmutableList<AggregationKeyResult> extractValues(PivotResult pivotResult) throws EventProcessorException {
         final ImmutableList.Builder<AggregationKeyResult> results = ImmutableList.builder();
 
-        // Example PivotResult structures. The "key" value is composed of: "metric/<function>/<field>/<series-id>"
+        // Example PivotResult structures. The row value "key" is composed of: "metric/<function>/<field>/<series-id>"
+        // The row "key" always contains the date histogram bucket value as first element.
         //
         // With group-by:
         // {
         //  "rows": [
         //    {
-        //      "key": ["php", "box2"],
+        //      "key": ["2020-03-27T16:23:12Z", "php", "box2"],
         //      "values": [
         //        {
         //          "key": ["metric/count/source/abc123"],
@@ -198,7 +202,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         //      "source": "leaf"
         //    },
         //    {
-        //      "key": ["php"],
+        //      "key": ["2020-03-27T16:23:12Z", "php"],
         //      "values": [
         //        {
         //          "key": ["metric/count/source/abc123"],
@@ -216,7 +220,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         //      "source": "non-leaf"
         //    },
         //    {
-        //      "key": ["sshd","box2"],
+        //      "key": ["2020-03-27T16:23:12Z", "sshd","box2"],
         //      "values": [
         //        {
         //          "key": ["metric/count/source/abc123"],
@@ -240,7 +244,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // {
         //  "rows": [
         //    {
-        //      "key": [],
+        //      "key": ["2020-03-27T16:23:12Z"],
         //      "values": [
         //        {
         //          "key": ["metric/count/source/abc123"],
@@ -265,6 +269,24 @@ public class PivotAggregationSearch implements AggregationSearch {
                 continue;
             }
 
+            // Safety guard against programming errors
+            if (row.key().size() == 0 || isNullOrEmpty(row.key().get(0))) {
+                throw new EventProcessorException("Invalid row key! Expected at least the date histogram timestamp value: " + row.key().toString(), true, eventDefinition);
+            }
+
+            // We always wrap aggregations in date histogram buckets so we can run aggregations for multiple ranges at once.
+            // The timestamp value of the date histogram bucket will be part of the result.
+            final String timeKey = row.key().get(0);
+            final ImmutableList<String> groupKey;
+
+            if (row.key().size() > 1) {
+                // The date histogram bucket value must not be exposed to consumers as part of the key so they
+                // don't have to unwrap the key all the time.
+                groupKey = row.key().subList(1, row.key().size());
+            } else {
+                groupKey = ImmutableList.of();
+            }
+
             final ImmutableList.Builder<AggregationSeriesValue> values = ImmutableList.builder();
 
             for (final PivotResult.Value value : row.values()) {
@@ -282,7 +304,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                         if (maybeNumberValue instanceof Number) {
                             final double numberValue = ((Number) maybeNumberValue).doubleValue();
                             final AggregationSeriesValue seriesValue = AggregationSeriesValue.builder()
-                                    .key(row.key())
+                                    .key(groupKey)
                                     .value(numberValue)
                                     .series(series)
                                     .build();
@@ -297,7 +319,8 @@ public class PivotAggregationSearch implements AggregationSearch {
             }
 
             results.add(AggregationKeyResult.builder()
-                    .key(row.key())
+                    .key(groupKey)
+                    .timestamp(DateTime.parse(timeKey).withZone(DateTimeZone.UTC))
                     .seriesValues(values.build())
                     .build());
         }
@@ -383,12 +406,17 @@ public class PivotAggregationSearch implements AggregationSearch {
         // Wrap every aggregation with a date histogram bucket of the searchWithin time range.
         // This allows us to run aggregations over larger time ranges than the searchWithin time.
         // The results will be received in time buckets of the searchWithin time size.
-        final Time interval = Time.builder().interval(TimeUnitInterval.Builder.builder()
-                .timeunit(String.valueOf(searchWithinMs / 1000) + "s")
-                .build()).field("timestamp").build();
+        final Time dateHistogram = Time.builder()
+                .interval(TimeUnitInterval.ofTimeunit(String.valueOf(searchWithinMs / 1000) + "s"))
+                .field("timestamp")
+                .build();
         final List<BucketSpec> groupBy = new ArrayList<>();
-        groupBy.add(interval);
+
+        // The first bucket must be the date histogram!
+        groupBy.add(dateHistogram);
+
         if (!config.groupBy().isEmpty()) {
+            // Then we add the configured groups
             groupBy.addAll(config.groupBy().stream()
                     .map(field -> Values.builder()
                             // The pivot search type (as of Graylog 3.1.0) is using the "terms" aggregation under
@@ -410,8 +438,10 @@ public class PivotAggregationSearch implements AggregationSearch {
                             .field(field)
                             .build())
                     .collect(Collectors.toList()));
-            pivotBuilder.rowGroups(groupBy);
         }
+
+        // We always have row groups because of the date histogram
+        pivotBuilder.rowGroups(groupBy);
 
         final Set<SearchType> searchTypes = Collections.singleton(pivotBuilder.build());
 
