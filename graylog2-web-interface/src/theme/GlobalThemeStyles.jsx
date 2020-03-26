@@ -1,13 +1,52 @@
 import { createGlobalStyle, css } from 'styled-components';
 
+import openSansRegular from './fonts/OpenSans-Regular.woff';
+import openSansRegular2 from './fonts/OpenSans-Regular.woff2';
+import openSansItalic from './fonts/OpenSans-Italic.woff';
+import openSansItalic2 from './fonts/OpenSans-Italic.woff2';
+import openSansBold from './fonts/OpenSans-Bold.woff';
+import openSansBold2 from './fonts/OpenSans-Bold.woff2';
+
+const fontFamily = '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
+
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
+  @font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Open Sans'),
+      local('OpenSans'),
+      url(${openSansRegular2}) format('woff2'),
+      url(${openSansRegular}) format('woff');
+  }
+
+  @font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Open Sans'),
+      local('OpenSans'),
+      url(${openSansBold2}) format('woff2'),
+      url(${openSansBold}) format('woff');
+  }
+
+  @font-face {
+    font-family: 'Open Sans';
+    font-style: italic;
+    font-weight: 400;
+    src: local('Open Sans'),
+      local('OpenSans'),
+      url(${openSansItalic2}) format('woff2'),
+      url(${openSansItalic}) format('woff');
+  }
+
   #editor {
     height: 256px;
   }
 
   body {
     background-color: ${theme.color.global.background};
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: ${fontFamily};
     font-size: 12px;
     overflow-x: hidden;
     margin-top: 50px;
@@ -79,7 +118,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   select.form-control,
   textarea.form-control {
     color: ${theme.color.gray[30]};
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: ${fontFamily};
 
     &:hover {
       border-color: hsl(0, 0%, 70%);
@@ -622,7 +661,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .btn-text {
-    font-family: 'Open Sans', sans-serif;
+    font-family: ${fontFamily};
     font-size: 12px;
     padding: 0;
     vertical-align: baseline;
