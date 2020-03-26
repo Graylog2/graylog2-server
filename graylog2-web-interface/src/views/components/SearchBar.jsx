@@ -65,7 +65,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
         <Col md={12}>
           <SearchBarForm initialValues={{ timerange, streams, queryString }}
                          onSubmit={_onSubmit}>
-            {({ isSubmitting, isValid, handleSubmit }) => (
+            {({ dirty, isSubmitting, isValid, handleSubmit }) => (
               <>
                 <Row className="no-bm extended-search-query-metadata">
                   <Col md={4}>
@@ -99,13 +99,13 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                                          title="Search query syntax documentation"
                                          text={<Icon name="lightbulb-o" />} />
                     </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid} />
+                    <SearchButton disabled={disableSearch || isSubmitting || !isValid} dirty={dirty} />
 
                     <Field name="queryString">
                       {({ field: { name, value, onChange } }) => (
                         <QueryInput value={value}
                                     placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                    onChange={newQuery => onChange({ target: { value: newQuery, name } })}
+                                    onChange={(newQuery) => { onChange({ target: { value: newQuery, name } }); return Promise.resolve(); }}
                                     onExecute={handleSubmit} />
                       )}
                     </Field>
