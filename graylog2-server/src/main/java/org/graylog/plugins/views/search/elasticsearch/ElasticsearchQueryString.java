@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 
 @AutoValue
@@ -37,6 +38,25 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
 
     public static Builder builder() {
         return new AutoValue_ElasticsearchQueryString.Builder().type(NAME);
+    }
+
+    abstract Builder toBuilder();
+
+    public ElasticsearchQueryString concatenate(ElasticsearchQueryString other) {
+        final String thisQueryString = Strings.nullToEmpty(this.queryString()).trim();
+        final String otherQueryString = Strings.nullToEmpty(other.queryString()).trim();
+
+        final StringBuilder finalStringBuilder = new StringBuilder(thisQueryString);
+        if (!thisQueryString.isEmpty() && !otherQueryString.isEmpty()) {
+            finalStringBuilder.append(" AND ");
+        }
+        if (!otherQueryString.isEmpty()) {
+            finalStringBuilder.append(otherQueryString);
+        }
+
+        return toBuilder()
+                .queryString(finalStringBuilder.toString())
+                .build();
     }
 
     @Override
