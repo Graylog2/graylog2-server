@@ -18,10 +18,10 @@ notifications:
 before_script:
   - sudo sysctl -w vm.max_map_count=262144
 script:
-  - mvn -B verify -Dit.ElasticsearchVersion=${GRAYLOG_ELASTICSEARCH_VERSION}
+  - mvn -B package
 after_success:
   - mvn -B -Dmaven.test.skip=true -Dskip.web.build=true assembly:single
-  - mvn -B -Dmaven.test.skip=true -Dskip.web.build=true --settings config/settings.xml deploy
+  - mvn -B -Dmaven.test.skip=true -DskipITs -Dskip.web.build=true --settings config/settings.xml deploy
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA

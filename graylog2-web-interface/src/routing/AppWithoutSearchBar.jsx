@@ -1,36 +1,30 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 import Footer from 'components/layout/Footer';
+import AppContentGrid from 'components/layout/AppContentGrid';
+
+type Props = {
+  children: React.Node
+}
 
 const StyledRow = styled(Row)`
   margin-bottom: 0;
 `;
 
-const StyledCol = styled(Col)`
-  margin-top: 10px;
-  padding: 5px 25px;
-
-  @media print {
-    width: 100%;
-  }
-`;
-
-const AppWithoutSearchBar = (props) => {
-  const { children } = props;
-  return (
-    <div className="container-fluid">
-      <StyledRow>
-        <StyledCol md={12}>
-          {children}
-        </StyledCol>
-      </StyledRow>
-      <Footer />
-    </div>
-  );
-};
+const AppWithoutSearchBar = ({ children }: Props) => (
+  <AppContentGrid>
+    <StyledRow>
+      <Col md={12}>
+        {children}
+      </Col>
+    </StyledRow>
+    <Footer />
+  </AppContentGrid>
+);
 
 AppWithoutSearchBar.propTypes = {
   children: PropTypes.node.isRequired,

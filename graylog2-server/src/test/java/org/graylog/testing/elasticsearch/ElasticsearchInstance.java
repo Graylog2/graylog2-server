@@ -19,8 +19,8 @@ package org.graylog.testing.elasticsearch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.Resources;
 import io.searchbox.client.JestClient;
 import io.searchbox.cluster.State;
 import org.graylog.testing.PropertyLoader;
@@ -30,14 +30,16 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.net.URI;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Iterators.toArray;
 
@@ -56,25 +58,33 @@ public class ElasticsearchInstance extends ExternalResource {
     private static final String DEFAULT_IMAGE = "elasticsearch";
     private static final String DEFAULT_VERSION = "6.8.4";
 
-    private final ElasticsearchContainer container;
+    private static final int ES_PORT = 9200;
+    private static final String NETWORK_ALIAS = "elasticsearch";
+
     private JestClient jestClient;
     private Client client;
     private FixtureImporter fixtureImporter = new FixtureImporter();
     private final Version version;
 
     public static ElasticsearchInstance create() {
-        final Properties properties = PropertyLoader.loadProperties(PROPERTIES_RESOURCE_NAME);
-
-        return create(properties.getProperty("version", DEFAULT_VERSION));
+        return create(Network.newNetwork());
     }
 
-    public static ElasticsearchInstance create(String versionString) {
+    public static ElasticsearchInstance create(Network network) {
+        String version = PropertyLoader
+                .loadProperties(PROPERTIES_RESOURCE_NAME)
+                .getProperty("version", DEFAULT_VERSION);
+
+        return create(version, network);
+    }
+
+    public static ElasticsearchInstance create(String versionString, Network network) {
         final Version version = Version.valueOf(versionString);
         final String image = imageNameFrom(version);
 
         LOG.debug("Creating instance {}", image);
 
-        return new ElasticsearchInstance(image, version);
+        return new ElasticsearchInstance(image, version, network);
     }
 
     private static String imageNameFrom(Version version) {
@@ -86,35 +96,38 @@ public class ElasticsearchInstance extends ExternalResource {
         return defaultImage + ":" + version.toString();
     }
 
-    private ElasticsearchInstance(String image, Version version) {
+    private ElasticsearchInstance(String image, Version version, Network network) {
         this.version = version;
-        this.container = createContainer(image, version);
+
+        ElasticsearchContainer container = createContainer(image, version, network);
+
+        jestClient = jestClientFrom(container);
+
+        client = new Client(jestClient);
     }
 
-    private static ElasticsearchContainer createContainer(String image, Version version) {
+    private ElasticsearchContainer createContainer(String image, Version version, Network network) {
         if (!containersByVersion.containsKey(version)) {
-            containersByVersion.put(version, startNewContainerInstance(image));
+            ElasticsearchContainer container = buildContainer(image, network);
+            container.start();
+            containersByVersion.put(version, container);
         }
         return containersByVersion.get(version);
     }
 
-    private static ElasticsearchContainer startNewContainerInstance(String image) {
-        final Stopwatch sw = Stopwatch.createStarted();
-
-        final ElasticsearchContainer container = new ElasticsearchContainer(image)
+    private ElasticsearchContainer buildContainer(String image, Network network) {
+        return new ElasticsearchContainer(image)
                 .withReuse(true)
                 .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
-                .waitingFor(Wait.forHttp("/").forPort(9200));
-        container.start();
-        LOG.debug("Started container {} in {}ms", container.getContainerInfo().getName(), sw.elapsed(TimeUnit.MILLISECONDS));
-        return container;
+                .withNetwork(network)
+                .withNetworkAliases(NETWORK_ALIAS)
+                .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
     }
 
-    @Override
-    protected void before() {
-        jestClient = new JestClientProvider(
+    private JestClient jestClientFrom(ElasticsearchContainer container) {
+        return new JestClientProvider(
                 ImmutableList.of(URI.create("http://" + container.getHttpHostAddress())),
                 Duration.seconds(60),
                 Duration.seconds(60),
@@ -129,8 +142,6 @@ public class ElasticsearchInstance extends ExternalResource {
                 false,
                 new ObjectMapperProvider().get()
         ).get();
-
-        client = new Client(jestClient);
     }
 
     @Override
@@ -138,7 +149,7 @@ public class ElasticsearchInstance extends ExternalResource {
         cleanUp();
     }
 
-    private void cleanUp() {
+    public void cleanUp() {
         final State request = new State.Builder().withMetadata().build();
         final JsonNode result = JestUtils.execute(jestClient, request, () -> "failed to read state").getJsonObject();
 
@@ -148,6 +159,10 @@ public class ElasticsearchInstance extends ExternalResource {
 
     private String[] metadataFieldNamesFor(JsonNode result, String templates) {
         return toArray(result.get("metadata").get(templates).fieldNames(), String.class);
+    }
+
+    public static String internalUri() {
+        return String.format(Locale.US, "http://%s:%d", NETWORK_ALIAS, ES_PORT);
     }
 
     public Version version() {
@@ -162,7 +177,16 @@ public class ElasticsearchInstance extends ExternalResource {
         return client;
     }
 
-    FixtureImporter fixtureImporter() {
-        return fixtureImporter;
+    public void importFixtureResource(String resourcePath, Class<?> testClass) {
+        boolean isFullResourcePath = Paths.get(resourcePath).getNameCount() > 1;
+
+        @SuppressWarnings("UnstableApiUsage") final URL fixtureResource = isFullResourcePath
+                ? Resources.getResource(resourcePath)
+                : Resources.getResource(testClass, resourcePath);
+
+        fixtureImporter.importResource(fixtureResource, jestClient);
+
+        // Make sure the data we just imported is visible
+        client().refreshNode();
     }
 }

@@ -52,30 +52,42 @@ exports[`<ExpandableList /> should render with a Item 1`] = `
               role="button"
               tabIndex={0}
             >
-              <ForwardRef
+              <Icon
                 className="fa-stack-1x iconBackground"
-                fixedWidth={false}
-                inverse={false}
-                name="circle-thin"
-                pulse={false}
-                spin={false}
+                name="circle"
               >
-                <i
-                  className="fa fa-circle-thin fa-stack-1x iconBackground"
-                />
-              </ForwardRef>
-              <ForwardRef
+                <FontAwesomeIcon
+                  className="fa-stack-1x iconBackground"
+                  icon={
+                    Object {
+                      "iconName": "circle",
+                      "prefix": "fas",
+                    }
+                  }
+                >
+                  <svg
+                    className="svg-inline--fa fa-circle"
+                  />
+                </FontAwesomeIcon>
+              </Icon>
+              <Icon
                 className="fa-stack-1x"
-                fixedWidth={false}
-                inverse={false}
                 name="angle-up"
-                pulse={false}
-                spin={false}
               >
-                <i
-                  className="fa fa-angle-up fa-stack-1x"
-                />
-              </ForwardRef>
+                <FontAwesomeIcon
+                  className="fa-stack-1x"
+                  icon={
+                    Object {
+                      "iconName": "angle-up",
+                      "prefix": "fas",
+                    }
+                  }
+                >
+                  <svg
+                    className="svg-inline--fa fa-angle-up"
+                  />
+                </FontAwesomeIcon>
+              </Icon>
             </div>
           </div>
           <span
@@ -151,30 +163,42 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
               role="button"
               tabIndex={0}
             >
-              <ForwardRef
+              <Icon
                 className="fa-stack-1x iconBackground"
-                fixedWidth={false}
-                inverse={false}
-                name="circle-thin"
-                pulse={false}
-                spin={false}
+                name="circle"
               >
-                <i
-                  className="fa fa-circle-thin fa-stack-1x iconBackground"
-                />
-              </ForwardRef>
-              <ForwardRef
+                <FontAwesomeIcon
+                  className="fa-stack-1x iconBackground"
+                  icon={
+                    Object {
+                      "iconName": "circle",
+                      "prefix": "fas",
+                    }
+                  }
+                >
+                  <svg
+                    className="svg-inline--fa fa-circle"
+                  />
+                </FontAwesomeIcon>
+              </Icon>
+              <Icon
                 className="fa-stack-1x"
-                fixedWidth={false}
-                inverse={false}
                 name="angle-down"
-                pulse={false}
-                spin={false}
               >
-                <i
-                  className="fa fa-angle-down fa-stack-1x"
-                />
-              </ForwardRef>
+                <FontAwesomeIcon
+                  className="fa-stack-1x"
+                  icon={
+                    Object {
+                      "iconName": "angle-down",
+                      "prefix": "fas",
+                    }
+                  }
+                >
+                  <svg
+                    className="svg-inline--fa fa-angle-down"
+                  />
+                </FontAwesomeIcon>
+              </Icon>
             </div>
           </div>
           <span
@@ -243,30 +267,42 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
                         role="button"
                         tabIndex={0}
                       >
-                        <ForwardRef
+                        <Icon
                           className="fa-stack-1x iconBackground"
-                          fixedWidth={false}
-                          inverse={false}
-                          name="circle-thin"
-                          pulse={false}
-                          spin={false}
+                          name="circle"
                         >
-                          <i
-                            className="fa fa-circle-thin fa-stack-1x iconBackground"
-                          />
-                        </ForwardRef>
-                        <ForwardRef
+                          <FontAwesomeIcon
+                            className="fa-stack-1x iconBackground"
+                            icon={
+                              Object {
+                                "iconName": "circle",
+                                "prefix": "fas",
+                              }
+                            }
+                          >
+                            <svg
+                              className="svg-inline--fa fa-circle"
+                            />
+                          </FontAwesomeIcon>
+                        </Icon>
+                        <Icon
                           className="fa-stack-1x"
-                          fixedWidth={false}
-                          inverse={false}
                           name="angle-up"
-                          pulse={false}
-                          spin={false}
                         >
-                          <i
-                            className="fa fa-angle-up fa-stack-1x"
-                          />
-                        </ForwardRef>
+                          <FontAwesomeIcon
+                            className="fa-stack-1x"
+                            icon={
+                              Object {
+                                "iconName": "angle-up",
+                                "prefix": "fas",
+                              }
+                            }
+                          >
+                            <svg
+                              className="svg-inline--fa fa-angle-up"
+                            />
+                          </FontAwesomeIcon>
+                        </Icon>
                       </div>
                     </div>
                     <span

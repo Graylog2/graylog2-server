@@ -18,19 +18,21 @@ package integration.counts;
 
 import integration.BaseRestTest;
 import integration.RequiresAuthentication;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
+@Ignore("legacy test that should be converted or deleted")
 @RequiresAuthentication
 public class TotalTest extends BaseRestTest {
     @Test
     public void total() {
         given()
                 .when()
-                    .get("/count/total")
+                .get("/count/total")
                 .then()
-                    .statusCode(200)
-                    .body(".", containsAllKeys("events"));
+                .statusCode(200)
+                .body(".", containsAllKeys("events"));
     }
 }

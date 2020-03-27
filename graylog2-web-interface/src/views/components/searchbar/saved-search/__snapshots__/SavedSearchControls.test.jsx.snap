@@ -8,27 +8,32 @@ exports[`SavedSearchControls render the SavedSearchControls should render dirty 
   title="Unsaved changes"
   type="button"
 >
-  <ForwardRef
-    fixedWidth={false}
-    inverse={false}
+  <Icon
     name="star"
-    pulse={false}
-    spin={false}
     style={
       Object {
         "color": "#ffc107",
       }
     }
   >
-    <i
-      className="fa fa-star"
+    <FontAwesomeIcon
+      icon={
+        Object {
+          "iconName": "star",
+          "prefix": "fas",
+        }
+      }
       style={
         Object {
           "color": "#ffc107",
         }
       }
-    />
-  </ForwardRef>
+    >
+      <svg
+        className="svg-inline--fa fa-star"
+      />
+    </FontAwesomeIcon>
+  </Icon>
    Save
 </button>
 `;
@@ -41,27 +46,32 @@ exports[`SavedSearchControls render the SavedSearchControls should render not di
   title="Saved search"
   type="button"
 >
-  <ForwardRef
-    fixedWidth={false}
-    inverse={false}
+  <Icon
     name="star"
-    pulse={false}
-    spin={false}
     style={
       Object {
         "color": "#007bff",
       }
     }
   >
-    <i
-      className="fa fa-star"
+    <FontAwesomeIcon
+      icon={
+        Object {
+          "iconName": "star",
+          "prefix": "fas",
+        }
+      }
       style={
         Object {
           "color": "#007bff",
         }
       }
-    />
-  </ForwardRef>
+    >
+      <svg
+        className="svg-inline--fa fa-star"
+      />
+    </FontAwesomeIcon>
+  </Icon>
    Save
 </button>
 `;
@@ -74,27 +84,32 @@ exports[`SavedSearchControls render the SavedSearchControls should render not di
   title="Save search"
   type="button"
 >
-  <ForwardRef
-    fixedWidth={false}
-    inverse={false}
+  <Icon
     name="star-o"
-    pulse={false}
-    spin={false}
     style={
       Object {
         "color": "",
       }
     }
   >
-    <i
-      className="fa fa-star-o"
+    <FontAwesomeIcon
+      icon={
+        Object {
+          "iconName": "star",
+          "prefix": "fas",
+        }
+      }
       style={
         Object {
           "color": "",
         }
       }
-    />
-  </ForwardRef>
+    >
+      <svg
+        className="svg-inline--fa fa-star"
+      />
+    </FontAwesomeIcon>
+  </Icon>
    Save
 </button>
 `;

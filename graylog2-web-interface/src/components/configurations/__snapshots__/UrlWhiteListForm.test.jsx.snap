@@ -2121,17 +2121,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         }
                                                       }
                                                     >
-                                                      <ForwardRef
-                                                        fixedWidth={false}
-                                                        inverse={false}
+                                                      <Icon
                                                         name="caret-down"
-                                                        pulse={false}
-                                                        spin={false}
                                                       >
-                                                        <i
-                                                          className="fa fa-caret-down"
-                                                        />
-                                                      </ForwardRef>
+                                                        <FontAwesomeIcon
+                                                          icon={
+                                                            Object {
+                                                              "iconName": "caret-down",
+                                                              "prefix": "fas",
+                                                            }
+                                                          }
+                                                        >
+                                                          <svg
+                                                            className="svg-inline--fa fa-caret-down"
+                                                          />
+                                                        </FontAwesomeIcon>
+                                                      </Icon>
                                                     </div>
                                                   </DropdownIndicator>
                                                 </div>
@@ -2217,17 +2222,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
-                            name="fa-trash"
-                            pulse={false}
-                            spin={false}
+                          <Icon
+                            name="trash-alt"
                           >
-                            <i
-                              className="fa fa-trash"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              icon={
+                                Object {
+                                  "iconName": "trash-alt",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-trash-alt"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>
@@ -4048,17 +4058,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         }
                                                       }
                                                     >
-                                                      <ForwardRef
-                                                        fixedWidth={false}
-                                                        inverse={false}
+                                                      <Icon
                                                         name="caret-down"
-                                                        pulse={false}
-                                                        spin={false}
                                                       >
-                                                        <i
-                                                          className="fa fa-caret-down"
-                                                        />
-                                                      </ForwardRef>
+                                                        <FontAwesomeIcon
+                                                          icon={
+                                                            Object {
+                                                              "iconName": "caret-down",
+                                                              "prefix": "fas",
+                                                            }
+                                                          }
+                                                        >
+                                                          <svg
+                                                            className="svg-inline--fa fa-caret-down"
+                                                          />
+                                                        </FontAwesomeIcon>
+                                                      </Icon>
                                                     </div>
                                                   </DropdownIndicator>
                                                 </div>
@@ -4144,17 +4159,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
-                            name="fa-trash"
-                            pulse={false}
-                            spin={false}
+                          <Icon
+                            name="trash-alt"
                           >
-                            <i
-                              className="fa fa-trash"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              icon={
+                                Object {
+                                  "iconName": "trash-alt",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-trash-alt"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>
@@ -5975,17 +5995,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         }
                                                       }
                                                     >
-                                                      <ForwardRef
-                                                        fixedWidth={false}
-                                                        inverse={false}
+                                                      <Icon
                                                         name="caret-down"
-                                                        pulse={false}
-                                                        spin={false}
                                                       >
-                                                        <i
-                                                          className="fa fa-caret-down"
-                                                        />
-                                                      </ForwardRef>
+                                                        <FontAwesomeIcon
+                                                          icon={
+                                                            Object {
+                                                              "iconName": "caret-down",
+                                                              "prefix": "fas",
+                                                            }
+                                                          }
+                                                        >
+                                                          <svg
+                                                            className="svg-inline--fa fa-caret-down"
+                                                          />
+                                                        </FontAwesomeIcon>
+                                                      </Icon>
                                                     </div>
                                                   </DropdownIndicator>
                                                 </div>
@@ -6071,17 +6096,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
-                            name="fa-trash"
-                            pulse={false}
-                            spin={false}
+                          <Icon
+                            name="trash-alt"
                           >
-                            <i
-                              className="fa fa-trash"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              icon={
+                                Object {
+                                  "iconName": "trash-alt",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-trash-alt"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>

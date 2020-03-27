@@ -816,20 +816,26 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       />
                       <td>
                         <span>
-                          <ForwardRef
+                          <Icon
                             className="contentPackEntity"
-                            fixedWidth={false}
-                            inverse={false}
                             name="archive"
-                            pulse={false}
-                            spin={false}
                             title="Content Pack"
                           >
-                            <i
-                              className="fa fa-archive contentPackEntity"
+                            <FontAwesomeIcon
+                              className="contentPackEntity"
+                              icon={
+                                Object {
+                                  "iconName": "archive",
+                                  "prefix": "fas",
+                                }
+                              }
                               title="Content Pack"
-                            />
-                          </ForwardRef>
+                            >
+                              <svg
+                                className="svg-inline--fa fa-archive"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </span>
                       </td>
                       <td>
@@ -1279,19 +1285,24 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       />
                       <td>
                         <span>
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="server"
-                            pulse={false}
-                            spin={false}
                             title="Server"
                           >
-                            <i
-                              className="fa fa-server"
+                            <FontAwesomeIcon
+                              icon={
+                                Object {
+                                  "iconName": "server",
+                                  "prefix": "fas",
+                                }
+                              }
                               title="Server"
-                            />
-                          </ForwardRef>
+                            >
+                              <svg
+                                className="svg-inline--fa fa-server"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </span>
                       </td>
                       <td>

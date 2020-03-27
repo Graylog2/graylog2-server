@@ -5,7 +5,7 @@
       "id": "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e",
       "query": {
         "type": "elasticsearch",
-        "query_string": "author: \"Bernd Ahlers\""
+        "query_string": ""
       },
       "timerange": {
         "type": "relative",

@@ -15,10 +15,8 @@ exports[`<Widget /> should render with empty props 1`] = `
         title="Widget Title"
       >
         <span>
-          <i
-            class="fa fa-arrows-h button"
-            role="link"
-            tabindex="0"
+          <svg
+            class="svg-inline--fa fa-arrows-alt-h"
           />
         </span>
          
@@ -29,8 +27,8 @@ exports[`<Widget /> should render with empty props 1`] = `
             role="presentation"
           >
             <span>
-              <i
-                class="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
+              <svg
+                class="svg-inline--fa fa-chevron-down"
                 data-testid="widgetActionDropDown"
               />
             </span>
@@ -40,8 +38,8 @@ exports[`<Widget /> should render with empty props 1`] = `
       <div
         class="spinnerContainer"
       >
-        <i
-          class="fa fa-refresh spinner fa-3x"
+        <svg
+          class="svg-inline--fa fa-sync"
           data-testid="loading-widget"
         />
       </div>

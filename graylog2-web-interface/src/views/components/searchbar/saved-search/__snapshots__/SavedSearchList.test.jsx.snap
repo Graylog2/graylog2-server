@@ -80,8 +80,8 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
               class="SavedSearchList__NoSavedSearches-sc-1r3qvm6-1 gmJDqJ Alert-sc-1yucn9g-0 gTlUyR alert alert-info"
               role="alert"
             >
-              <i
-                class="fa fa-exclamation-triangle SavedSearchList__AlertIcon-sc-1r3qvm6-0 cqQHDu fa-lg"
+              <svg
+                class="svg-inline--fa fa-exclamation-triangle"
               />
               <span>
                 No saved searches found.

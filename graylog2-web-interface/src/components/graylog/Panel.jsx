@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Panel as BootstrapPanel } from 'react-bootstrap';
 
-import { DEPRECATION_NOTICE } from 'util/constants';
+import deprecationNotice from 'util/deprecationNotice';
 import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
@@ -161,8 +161,7 @@ const Panel = ({
   if (header || footer || title || collapsible || hasDeprecatedChildren) {
     /** NOTE: Deprecated & should be removed in 4.0 */
     useEffect(() => {
-      /* eslint-disable-next-line no-console */
-      console.warn(DEPRECATION_NOTICE, 'You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
+      deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
     }, []);
 
     return (

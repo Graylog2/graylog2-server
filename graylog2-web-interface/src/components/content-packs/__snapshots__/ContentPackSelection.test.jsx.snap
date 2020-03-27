@@ -2797,30 +2797,41 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                     className="HelpBlock-i8is92-0 kxWRDS help-block"
                   >
                     You can select between installed entities from the server (
-                    <ForwardRef
-                      fixedWidth={false}
-                      inverse={false}
+                    <Icon
                       name="server"
-                      pulse={false}
-                      spin={false}
                     >
-                      <i
-                        className="fa fa-server"
-                      />
-                    </ForwardRef>
+                      <FontAwesomeIcon
+                        icon={
+                          Object {
+                            "iconName": "server",
+                            "prefix": "fas",
+                          }
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-server"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
                     ) or entities from the former content pack revision (
-                    <ForwardRef
+                    <Icon
                       className="contentPackEntity"
-                      fixedWidth={false}
-                      inverse={false}
                       name="archive"
-                      pulse={false}
-                      spin={false}
                     >
-                      <i
-                        className="fa fa-archive contentPackEntity"
-                      />
-                    </ForwardRef>
+                      <FontAwesomeIcon
+                        className="contentPackEntity"
+                        icon={
+                          Object {
+                            "iconName": "archive",
+                            "prefix": "fas",
+                          }
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-archive"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
                     ).
                   </span>
                 </HelpBlock>
@@ -3142,30 +3153,42 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                           role="button"
                           tabIndex={0}
                         >
-                          <ForwardRef
+                          <Icon
                             className="fa-stack-1x iconBackground"
-                            fixedWidth={false}
-                            inverse={false}
-                            name="circle-thin"
-                            pulse={false}
-                            spin={false}
+                            name="circle"
                           >
-                            <i
-                              className="fa fa-circle-thin fa-stack-1x iconBackground"
-                            />
-                          </ForwardRef>
-                          <ForwardRef
+                            <FontAwesomeIcon
+                              className="fa-stack-1x iconBackground"
+                              icon={
+                                Object {
+                                  "iconName": "circle",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-circle"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
+                          <Icon
                             className="fa-stack-1x"
-                            fixedWidth={false}
-                            inverse={false}
                             name="angle-up"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-angle-up fa-stack-1x"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              className="fa-stack-1x"
+                              icon={
+                                Object {
+                                  "iconName": "angle-up",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-angle-up"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </div>
                       </div>
                       <span

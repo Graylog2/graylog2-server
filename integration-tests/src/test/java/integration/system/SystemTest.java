@@ -18,10 +18,12 @@ package integration.system;
 
 import integration.BaseRestTest;
 import integration.RequiresAuthentication;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 
+@Ignore("legacy test that should be converted or deleted")
 @RequiresAuthentication
 public class SystemTest extends BaseRestTest {
 
@@ -29,22 +31,22 @@ public class SystemTest extends BaseRestTest {
     public void system() {
         given()
                 .when()
-                    .get("/system")
+                .get("/system")
                 .then()
-                    .body(".", containsAllKeys(
-                            "cluster_id",
-                            "codename",
-                            "facility",
-                            "hostname",
-                            "is_processing",
-                            "lb_status",
-                            "lifecycle",
-                            "node_id",
-                            "operating_system",
-                            "started_at",
-                            "timezone",
-                            "version"
-                    ));
+                .body(".", containsAllKeys(
+                        "cluster_id",
+                        "codename",
+                        "facility",
+                        "hostname",
+                        "is_processing",
+                        "lb_status",
+                        "lifecycle",
+                        "node_id",
+                        "operating_system",
+                        "started_at",
+                        "timezone",
+                        "version"
+                ));
     }
 
 }

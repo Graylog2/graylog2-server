@@ -83,7 +83,7 @@ describe('AggregationControls', () => {
       </AggregationControls>
     ));
     expect(wrapper.find('h3.popover-title')).toHaveLength(0);
-    wrapper.find('div.description i.fa-wrench').simulate('click');
+    wrapper.find('div.description svg.fa-wrench').simulate('click');
     expect(wrapper.find('h3.popover-title')).toHaveLength(1);
     expect(wrapper.find('h3.popover-title').text()).toContain('Config options');
   });

@@ -16,15 +16,15 @@
  */
 package integration.search;
 
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.ValidatableResponse;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import integration.RequiresAuthentication;
 import integration.RestTestIncludingElasticsearch;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.ValidatableResponse;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RequiresAuthentication

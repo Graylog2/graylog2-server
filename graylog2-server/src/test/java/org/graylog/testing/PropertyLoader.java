@@ -45,4 +45,8 @@ public class PropertyLoader {
         }
         return properties;
     }
+
+    public static String get(String resourcePath, String propertyName) {
+        return loadProperties(resourcePath).getProperty(propertyName);
+    }
 }

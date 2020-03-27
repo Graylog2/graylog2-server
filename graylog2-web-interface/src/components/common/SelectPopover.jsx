@@ -97,17 +97,17 @@ class SelectPopover extends React.Component {
     }
   }
 
-  handleSelectionChange(nextSelection) {
+  handleSelectionChange = (nextSelection) => {
     const { onItemSelect } = this.props;
     this.setState({ selectedItems: nextSelection });
     onItemSelect(nextSelection, () => this.overlay.hide());
-  }
+  };
 
-  clearItemSelection() {
+  clearItemSelection = () => {
     this.handleSelectionChange([]);
-  }
+  };
 
-  handleItemSelection(item) {
+  handleItemSelection = (item) => {
     return () => {
       const { multiple } = this.props;
       const { selectedItems } = this.state;
@@ -122,21 +122,21 @@ class SelectPopover extends React.Component {
 
       this.handleSelectionChange(nextSelectedItems);
     };
-  }
+  };
 
-  filterData(filterText, items) {
+  filterData = (filterText, items) => {
     const newFilteredItems = items.filter(item => item.match(new RegExp(filterText, 'i')));
     this.setState({ filterText: filterText, filteredItems: newFilteredItems });
-  }
+  };
 
-  handleFilterChange(items) {
+  handleFilterChange = (items) => {
     return (event) => {
       const filterText = event.target.value.trim();
       this.filterData(filterText, items);
     };
-  }
+  };
 
-  renderDataFilter(items) {
+  renderDataFilter = (items) => {
     const { filterPlaceholder } = this.props;
     const { filterText } = this.state;
 
@@ -148,9 +148,9 @@ class SelectPopover extends React.Component {
                      onChange={this.handleFilterChange(items)} />
       </FormGroup>
     );
-  }
+  };
 
-  renderClearSelectionItem() {
+  renderClearSelectionItem = () => {
     const { clearSelectionText } = this.props;
 
     return (
@@ -158,7 +158,7 @@ class SelectPopover extends React.Component {
         <Icon name="times" fixedWidth className="text-danger" /> {clearSelectionText}
       </ListGroupItem>
     );
-  }
+  };
 
   render() {
     const {

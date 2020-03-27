@@ -35,19 +35,19 @@ class StatusIndicator extends React.Component {
     switch (this.props.status) {
       case SidecarStatusEnum.RUNNING:
         className = 'text-success';
-        icon = 'fa-play';
+        icon = 'play';
         break;
       case SidecarStatusEnum.FAILING:
         className = 'text-danger';
-        icon = 'fa-exclamation-triangle';
+        icon = 'exclamation-triangle';
         break;
       case SidecarStatusEnum.STOPPED:
         className = 'text-danger';
-        icon = 'fa-stop';
+        icon = 'stop';
         break;
       default:
         className = 'text-info';
-        icon = 'fa-question-circle';
+        icon = 'question-circle';
         message += ` (${lastSeenDateTime.toRelativeString()})`;
     }
 
