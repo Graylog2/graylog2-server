@@ -49,10 +49,10 @@ const ProcessingTimelineComponent = createReactClass({
 
   _calculateUsedStages(pipelines) {
     return pipelines
-      .map(pipeline => pipeline.stages)
+      .map((pipeline) => pipeline.stages)
       .reduce((usedStages, pipelineStages) => {
         // Concat stages in a single array removing duplicates
-        return usedStages.concat(pipelineStages.map(stage => stage.stage).filter(stage => usedStages.indexOf(stage) === -1));
+        return usedStages.concat(pipelineStages.map((stage) => stage.stage).filter((stage) => usedStages.indexOf(stage) === -1));
       }, [])
       .sort(naturalSort);
   },
@@ -67,12 +67,12 @@ const ProcessingTimelineComponent = createReactClass({
   },
 
   _formatConnectedStreams(streams) {
-    return streams.map(s => s.title).join(', ');
+    return streams.map((s) => s.title).join(', ');
   },
 
   _formatStages(pipeline, stages) {
     const formattedStages = [];
-    const stageNumbers = stages.map(stage => stage.stage);
+    const stageNumbers = stages.map((stage) => stage.stage);
 
     this.usedStages.forEach((usedStage) => {
       if (stageNumbers.indexOf(usedStage) === -1) {
@@ -137,7 +137,7 @@ const ProcessingTimelineComponent = createReactClass({
     }
 
     const addNewPipelineButton = (
-      <div>
+      <div className="pull-right">
         <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
           <Button bsStyle="success">Add new pipeline</Button>
         </LinkContainer>
