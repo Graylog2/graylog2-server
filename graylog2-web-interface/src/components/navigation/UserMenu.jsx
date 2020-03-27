@@ -30,7 +30,7 @@ class UserMenu extends React.Component {
     const { fullName, loginName } = this.props;
 
     return (
-      <NavDropdown title={<Icon name="user" aria-label={fullName} />}
+      <NavDropdown title={<Icon name="user" size="lg" aria-label={fullName} />}
                    id="user-menu-dropdown"
                    noCaret>
         <MenuItem header>{fullName}</MenuItem>

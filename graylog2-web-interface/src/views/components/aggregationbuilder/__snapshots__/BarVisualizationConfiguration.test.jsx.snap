@@ -16,21 +16,26 @@ exports[`BarVisualizationConfiguration should render with props 1`] = `
     title="Help for bar chart mode"
   >
     <span
+      className="pull-right"
       onMouseEnter={[Function]}
       onMouseLeave={[Function]}
     >
-      <ForwardRef
-        className="pull-right"
-        fixedWidth={false}
-        inverse={false}
+      <Icon
         name="question-circle"
-        pulse={false}
-        spin={false}
       >
-        <i
-          className="fa fa-question-circle pull-right"
-        />
-      </ForwardRef>
+        <FontAwesomeIcon
+          icon={
+            Object {
+              "iconName": "question-circle",
+              "prefix": "fas",
+            }
+          }
+        >
+          <svg
+            className="svg-inline--fa fa-question-circle"
+          />
+        </FontAwesomeIcon>
+      </Icon>
     </span>
   </HoverForHelp>
   <Select
@@ -1490,21 +1495,26 @@ exports[`BarVisualizationConfiguration should render without props 1`] = `
     title="Help for bar chart mode"
   >
     <span
+      className="pull-right"
       onMouseEnter={[Function]}
       onMouseLeave={[Function]}
     >
-      <ForwardRef
-        className="pull-right"
-        fixedWidth={false}
-        inverse={false}
+      <Icon
         name="question-circle"
-        pulse={false}
-        spin={false}
       >
-        <i
-          className="fa fa-question-circle pull-right"
-        />
-      </ForwardRef>
+        <FontAwesomeIcon
+          icon={
+            Object {
+              "iconName": "question-circle",
+              "prefix": "fas",
+            }
+          }
+        >
+          <svg
+            className="svg-inline--fa fa-question-circle"
+          />
+        </FontAwesomeIcon>
+      </Icon>
     </span>
   </HoverForHelp>
   <Select
