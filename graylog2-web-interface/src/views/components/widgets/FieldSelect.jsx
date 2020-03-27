@@ -22,8 +22,8 @@ type Props = {
 
 const FieldSelect = ({ fields, onChange, value }: Props) => {
   const fieldsForSelect = fields
-    .map(fieldType => fieldType.name)
-    .map(fieldName => ({ label: fieldName, value: fieldName }))
+    .map((fieldType) => fieldType.name)
+    .map((fieldName) => ({ label: fieldName, value: fieldName }))
     .valueSeq()
     .toJS()
     .sort((v1, v2) => defaultCompare(v1.label, v2.label));

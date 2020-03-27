@@ -27,7 +27,7 @@ const _exportOnSearchPage = (defaultExportPayload: ExportPayload, searchQueries:
       exportSearchTypeMessages(defaultExportPayload, searchId, searchType.id);
     } else {
       const { query, timerange } = firstQuery;
-      const streams = firstQuery.filter ? firstQuery.filter.get('filters').filter(filter => filter.get('type') === 'stream').map(filter => filter.get('id')).toArray() : [];
+      const streams = firstQuery.filter ? firstQuery.filter.get('filters').filter((filter) => filter.get('type') === 'stream').map((filter) => filter.get('id')).toArray() : [];
       const exportPayload = {
         ...defaultExportPayload,
         timerange,
@@ -42,15 +42,15 @@ const _exportOnSearchPage = (defaultExportPayload: ExportPayload, searchQueries:
 const startDownload = (view: View, selectedWidget: ?Widget, selectedFields: { field: string }[], selectedSort: SortConfig[]) => {
   let searchType;
   const defaultExportPayload = {
-    fields_in_order: selectedFields.map(field => field.field),
-    sort: selectedSort.map(sortConfig => new MessageSortConfig(sortConfig.field, sortConfig.direction)),
+    fields_in_order: selectedFields.map((field) => field.field),
+    sort: selectedSort.map((sortConfig) => new MessageSortConfig(sortConfig.field, sortConfig.direction)),
   };
 
   if (selectedWidget) {
-    const widgetMapping = view.state.map(state => state.widgetMapping).flatten(true);
+    const widgetMapping = view.state.map((state) => state.widgetMapping).flatten(true);
     const searchTypeId = widgetMapping.get(selectedWidget.id).first();
-    const searchTypes = flatten(view.search.queries.map(query => query.searchTypes).toArray());
-    searchType = searchTypes.find(entry => entry && entry.id && entry.id === searchTypeId);
+    const searchTypes = flatten(view.search.queries.map((query) => query.searchTypes).toArray());
+    searchType = searchTypes.find((entry) => entry && entry.id && entry.id === searchTypeId);
   }
 
   if (view.type === View.Type.Dashboard) {

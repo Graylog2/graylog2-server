@@ -44,7 +44,7 @@ const SelectedWidgetInfo = ({ selectedWidget, widgetTitles }: {selectedWidget: W
 
 const CSVExportSettings = ({ fields, selectedWidget, selectField, selectedFields, setSelectedSort, selectedSortDirection, selectedSort, widgetTitles }: CSVExportSettingsType) => {
   const onSortDirectionChange = (newDirection) => {
-    const newSort = selectedSort.map(sort => sort.toBuilder().direction(newDirection).build());
+    const newSort = selectedSort.map((sort) => sort.toBuilder().direction(newDirection).build());
     setSelectedSort(newSort);
   };
   return (

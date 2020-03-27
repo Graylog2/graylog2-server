@@ -12,7 +12,7 @@ type ExportStrategy = {
     initialWidget: (widgets: Map<string, Widget>, directExportWidgetId: ?string) => ?Widget,
   }
 
-const _getWidgetById = (widgets, id) => widgets.find(item => item.id === id);
+const _getWidgetById = (widgets, id) => widgets.find((item) => item.id === id);
 
 const _initialSearchWidget = (widgets, directExportWidgetId) => {
   if (directExportWidgetId) {

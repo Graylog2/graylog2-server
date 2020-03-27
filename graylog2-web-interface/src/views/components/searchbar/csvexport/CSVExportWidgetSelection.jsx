@@ -17,8 +17,8 @@ type WidgetSelectionProps = {
 }
 
 const WidgetSelection = ({ selectWidget, widgets, widgetTitles }: WidgetSelectionProps) => {
-  const widgetOption = widget => ({ label: widgetTitles.get(widget.id) || MessagesWidget.defaultTitle, value: widget });
-  const widgetOptions = widgets.map(widget => (widgetOption(widget))).toArray();
+  const widgetOption = (widget) => ({ label: widgetTitles.get(widget.id) || MessagesWidget.defaultTitle, value: widget });
+  const widgetOptions = widgets.map((widget) => (widgetOption(widget))).toArray();
   return (
     <>
       <Row>

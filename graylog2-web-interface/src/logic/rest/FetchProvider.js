@@ -1,7 +1,6 @@
 import request from 'superagent-bluebird-promise';
 import BluebirdPromise from 'bluebird';
 
-import ErrorsActions from 'actions/errors/ErrorsActions';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 // eslint-disable-next-line import/no-cycle

@@ -48,7 +48,7 @@ describe('CSVExportModal', () => {
     .id('search-id')
     .queries(queries)
     .build();
-  const viewWithoutWidget = viewType => View.create()
+  const viewWithoutWidget = (viewType) => View.create()
     .toBuilder()
     .id('deadbeef')
     .type(viewType)
@@ -63,7 +63,7 @@ describe('CSVExportModal', () => {
       .titles(Immutable.Map())
       .build(),
   });
-  const viewWithOneWidget = viewType => viewWithoutWidget(viewType)
+  const viewWithOneWidget = (viewType) => viewWithoutWidget(viewType)
     .toBuilder()
     .state(statesWithOneWidget)
     .build();
@@ -75,7 +75,7 @@ describe('CSVExportModal', () => {
       .titles(Immutable.Map())
       .build(),
   });
-  const viewWithMultipleWidgets = viewType => viewWithoutWidget(viewType)
+  const viewWithMultipleWidgets = (viewType) => viewWithoutWidget(viewType)
     .toBuilder()
     .state(statesWithMultipleWidgets)
     .build();
@@ -91,7 +91,7 @@ describe('CSVExportModal', () => {
   });
 
   describe('on search page', () => {
-    const SimpleCSVExportModal = props => (
+    const SimpleCSVExportModal = (props) => (
       <ViewTypeContext.Provider value={View.Type.Search}>
         <CSVExportModal view={viewWithoutWidget(View.Type.Search)} fields={Immutable.List()} closeModal={() => {}} {...props} />
       </ViewTypeContext.Provider>
@@ -165,7 +165,7 @@ describe('CSVExportModal', () => {
   });
 
   describe('on dashboard', () => {
-    const SimpleCSVExportModal = props => (
+    const SimpleCSVExportModal = (props) => (
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <CSVExportModal view={viewWithoutWidget(View.Type.Dashboard)} fields={Immutable.List()} closeModal={() => {}} {...props} />
       </ViewTypeContext.Provider>
