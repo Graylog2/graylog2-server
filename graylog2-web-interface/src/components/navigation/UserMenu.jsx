@@ -15,11 +15,6 @@ const SessionStore = StoreProvider.getStore('Session');
 const SessionActions = ActionsProvider.getActions('Session');
 
 class UserMenu extends React.Component {
-  static propTypes = {
-    loginName: PropTypes.string.isRequired,
-    fullName: PropTypes.string.isRequired,
-  };
-
   onLogoutClicked = () => {
     SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
       history.push(Routes.STARTPAGE);
@@ -44,5 +39,10 @@ class UserMenu extends React.Component {
     );
   }
 }
+
+UserMenu.propTypes = {
+  loginName: PropTypes.string.isRequired,
+  fullName: PropTypes.string.isRequired,
+};
 
 export default UserMenu;

@@ -16,17 +16,6 @@ class StreamRuleForm extends React.Component {
 
   ALWAYS_MATCH_RULE_TYPE = 7;
 
-  static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-    streamRule: PropTypes.object,
-    streamRuleTypes: PropTypes.array.isRequired,
-    title: PropTypes.string.isRequired,
-  };
-
-  static defaultProps = {
-    streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
-  };
-
   constructor(props) {
     super(props);
 
@@ -131,5 +120,16 @@ class StreamRuleForm extends React.Component {
     );
   }
 }
+
+StreamRuleForm.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  streamRule: PropTypes.object,
+  streamRuleTypes: PropTypes.array.isRequired,
+  title: PropTypes.string.isRequired,
+};
+
+StreamRuleForm.defaultProps = {
+  streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
+};
 
 export default StreamRuleForm;
