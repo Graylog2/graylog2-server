@@ -30,9 +30,20 @@ type Props = {
     to: string,
   },
   getChartColor?: (Array<ChartConfig>, string) => ?string,
+  height?: number;
   setChartColor?: (ChartConfig, ColorMap) => ChartColor,
   plotLayout?: any,
   onZoom: (Query, string, string, ?ViewType) => boolean,
+};
+
+const yLegendPosition = (containerHeight: number) => {
+  if (containerHeight < 150) {
+    return -0.6;
+  }
+  if (containerHeight < 400) {
+    return -0.2;
+  }
+  return -0.14;
 };
 
 const XYPlot = ({
@@ -43,13 +54,16 @@ const XYPlot = ({
   effectiveTimerange,
   getChartColor,
   setChartColor,
+  height,
   plotLayout = {},
   onZoom = OnZoom,
 }: Props) => {
   const yaxis = { fixedrange: true, rangemode: 'tozero' };
-
-  const layout = merge({}, { yaxis }, plotLayout);
-
+  const defaultLayout: {yaxis: Object, legend?: Object} = { yaxis };
+  if (height) {
+    defaultLayout.legend = { y: yLegendPosition(height) };
+  }
+  const layout = merge({}, defaultLayout, plotLayout);
   const viewType = useContext(ViewTypeContext);
   const _onZoom = useCallback(config.isTimeline
     ? (from, to) => onZoom(currentQuery, from, to, viewType)
@@ -97,6 +111,7 @@ XYPlot.propTypes = {
 XYPlot.defaultProps = {
   plotLayout: {},
   getChartColor: undefined,
+  height: undefined,
   setChartColor: undefined,
   effectiveTimerange: undefined,
   onZoom: OnZoom,

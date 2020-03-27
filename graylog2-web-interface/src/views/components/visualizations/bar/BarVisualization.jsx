@@ -30,7 +30,7 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
 
-const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange }: VisualizationComponentProps) => {
+const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const { visualizationConfig } = config;
   const layout = {};
 
@@ -56,6 +56,7 @@ const BarVisualization: VisualizationComponent = makeVisualization(({ config, da
             chartData={chartDataResult}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
+            height={height}
             setChartColor={setChartColor}
             plotLayout={layout} />
   );
@@ -64,6 +65,7 @@ const BarVisualization: VisualizationComponent = makeVisualization(({ config, da
 BarVisualization.propTypes = {
   config: AggregationType.isRequired,
   data: PropTypes.object.isRequired,
+  height: PropTypes.number,
 };
 
 export default BarVisualization;

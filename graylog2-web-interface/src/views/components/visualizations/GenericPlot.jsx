@@ -124,24 +124,28 @@ class GenericPlot extends React.Component<Props, State> {
       autosize: true,
       showlegend: true,
       margin: {
-        autoexpand: true,
         t: 10,
         l: 40,
         r: 10,
-        b: 40,
+        b: 0,
         pad: 0,
       },
       legend: {
         orientation: 'h',
-        y: -0.14,
       },
       hoverlabel: {
         namelength: -1,
       },
+      yaxis: {
+        automargin: true,
+      },
+      xaxis: {
+        automargin: true,
+      },
     };
     const plotLayout = merge({}, defaultLayout, layout);
 
-    const style = { height: 'calc(100% - 10px)', width: '100%' };
+    const style = { height: '100%', width: '100%' };
 
     const config = { displayModeBar: false, doubleClick: false, responsive: true };
 
