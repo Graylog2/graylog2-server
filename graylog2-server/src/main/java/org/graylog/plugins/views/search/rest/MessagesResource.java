@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
@@ -49,6 +50,15 @@ import static org.graylog.plugins.views.search.export.Defaults.createDefaultMess
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
     private final MessagesExporter exporter;
+
+    //allow mocking
+    Supplier<ChunkedOutput<String>> chunkedOutputSupplier = () -> new ChunkedOutput<>(String.class);
+    Consumer<Runnable> asyncRunner = this::runAsync;
+
+    private void runAsync(Runnable runnable) {
+        Executor e = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("chunked-messages-request").build());
+        e.execute(runnable);
+    }
 
     @Inject
     public MessagesResource(MessagesExporter exporter) {
@@ -65,8 +75,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         final MessagesRequest req = request != null ? request : createDefaultMessagesRequest();
 
-        Executor e = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("chunked-messages-request").build());
-        e.execute(() -> exporter.export(req, fwd));
+        asyncRunner.accept(() -> exporter.export(req, fwd));
 
         return output;
     }
@@ -89,8 +98,6 @@ public class MessagesResource extends RestResource implements PluginRestResource
                 //.header("Content-Disposition", "attachment; filename=" + result.filename())
                 .build();
     }
-
-    Supplier<ChunkedOutput<String>> chunkedOutputSupplier = () -> new ChunkedOutput<>(String.class);
 
     private void close(ChunkedOutput<String> output) {
         try {

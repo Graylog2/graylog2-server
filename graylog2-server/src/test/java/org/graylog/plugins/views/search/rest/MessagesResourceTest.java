@@ -47,6 +47,7 @@ public class MessagesResourceTest {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
         exporter = mock(MessagesExporter.class);
         sut = new MessagesResource(exporter);
+        sut.asyncRunner = Runnable::run;
     }
 
     @Test
