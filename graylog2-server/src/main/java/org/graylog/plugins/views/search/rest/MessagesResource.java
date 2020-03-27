@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -64,19 +65,19 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         final MessagesRequest req = request != null ? request : createDefaultMessagesRequest();
 
-        Executor e = Executors.newSingleThreadExecutor();
+        Executor e = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("chunked-messages-request").build());
         e.execute(() -> exporter.export(req, fwd));
 
         return output;
     }
 
     @POST
-    @Path("{search-id}/{search-type-id}")
+    @Path("{searchId}/{searchTypeId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
     public Response retrieveForSearchType(
-            @ApiParam @PathParam("search-id") String searchId,
-            @ApiParam @PathParam("search-type-id") String searchTypeId,
+            @ApiParam @PathParam("searchId") String searchId,
+            @ApiParam @PathParam("searchTypeId") String searchTypeId,
             @ApiParam SearchTypeOverrides overrides) {
         exporter.export(searchId, searchTypeId, overrides);
         return okResultFrom();
