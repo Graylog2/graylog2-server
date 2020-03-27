@@ -167,7 +167,10 @@ export const SearchStore = singletonStore(
             this._trigger();
             this.executePromise = undefined;
             return { result, widgetMapping };
-          }, displayError);
+          }, (error) => {
+            displayError(error);
+            throw error;
+          });
         startActionPromise(this.executePromise);
         return this.executePromise;
       }

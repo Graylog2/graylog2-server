@@ -1,5 +1,5 @@
 // @flow strict
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
@@ -36,6 +36,7 @@ import { FieldList } from 'views/components/sidebar';
 
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
+import SearchExecutionErrors from 'views/components/SearchExecutionErrors';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import IfSearch from 'views/components/search/IfSearch';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -103,12 +104,12 @@ const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshCo
   return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
 };
 
-const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
+const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, setErrors) => {
   const { view } = ViewStore.getInitialState();
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
       FieldTypesActions.all();
-      return SearchActions.execute(executionState);
+      return SearchActions.execute(executionState).catch((error) => setErrors([error]));
     }
     return Promise.reject(searchMetadata);
   });
@@ -133,8 +134,8 @@ const useStyle = () => {
 const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
-  const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
-
+  const [errors, setErrors] = useState([]);
+  const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), setErrors);
   useEffect(() => {
     const { view } = ViewStore.getInitialState();
 
@@ -161,6 +162,14 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   }, []);
 
   useSyncWithQueryParameters(query);
+
+  if (errors && errors.length > 0) {
+    return (
+      <CurrentViewTypeProvider>
+        <SearchExecutionErrors errors={errors} />
+      </CurrentViewTypeProvider>
+    );
+  }
 
   return (
     <CurrentViewTypeProvider>
