@@ -13,8 +13,8 @@ const Container: StyledComponent<Props, {}, HTMLDivElement> = styled.div`
   padding: 15px 10px;
 `;
 
-const AppContentGrid = ({ children }: Props) => (
-  <Container>
+const AppContentGrid = ({ children, ...rest }: Props) => (
+  <Container {...rest}>
     <Grid fluid>
       {children}
     </Grid>
