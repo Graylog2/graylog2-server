@@ -19,7 +19,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => `
     }
 
     .header-meta-nav {
-      border-top: 1px solid ${theme.color.gray[70]};
+      border-top: 1px solid ${theme.color.gray[50]};
       padding-top: 7.5px;
 
       #scratchpad-toggle {
