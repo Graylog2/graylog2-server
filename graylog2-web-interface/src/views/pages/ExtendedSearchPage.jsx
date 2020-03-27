@@ -8,6 +8,7 @@ import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
+import AppContentGrid from 'components/layout/AppContentGrid';
 
 import SideBar from 'views/components/sidebar/SideBar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
@@ -17,7 +18,6 @@ import type {
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
 
-import { Grid } from 'components/graylog';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -60,39 +60,30 @@ const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ` : '')}
 `;
 
-const SearchArea = styled.div`
+const SearchArea = styled(AppContentGrid)`
   height: 100%;
   grid-column: 2;
   -ms-grid-column: 2;
   grid-row: 1;
   -ms-grid-row: 1;
-  padding: 15px;
   z-index: 1;
   overflow-y: auto;
 `;
 
-const SearchGrid = styled(Grid)`
-  width: 100%;
-`;
-
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
-  props => Object.assign(
-    {},
-    props,
-    {
-      queryId: props.viewMetadata.activeQuery,
-      results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
-    },
-  ));
+  (props) => ({
+
+    ...props,
+    queryId: props.viewMetadata.activeQuery,
+    results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
+  }));
 const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
-  props => Object.assign(
-    {},
-    props,
-    {
-      allFields: props.fieldTypes.all,
-      fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
-    },
-  ));
+  (props) => ({
+
+    ...props,
+    allFields: props.fieldTypes.all,
+    fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
+  }));
 
 type Props = {
   route: any,
@@ -166,7 +157,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
     });
 
     // Returning cleanup function used when unmounting
-    return () => { storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc()); };
+    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
   }, []);
 
   useSyncWithQueryParameters(query);
@@ -179,7 +170,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
         </IfDashboard>
       </IfInteractive>
       <InteractiveContext.Consumer>
-        {interactive => (
+        {(interactive) => (
           <ViewAdditionalContextProvider>
             <GridContainer id="main-row" interactive={interactive}>
               <IfInteractive>
@@ -188,27 +179,25 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
                 </ConnectedSideBar>
               </IfInteractive>
               <SearchArea>
-                <SearchGrid>
-                  <IfInteractive>
-                    <HeaderElements />
-                    <IfDashboard>
-                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    </IfDashboard>
-                    <IfSearch>
-                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    </IfSearch>
+                <IfInteractive>
+                  <HeaderElements />
+                  <IfDashboard>
+                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                  </IfDashboard>
+                  <IfSearch>
+                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                  </IfSearch>
 
-                    <QueryBarElements />
+                  <QueryBarElements />
 
-                    <IfDashboard>
-                      <QueryBar />
-                    </IfDashboard>
-                  </IfInteractive>
-                  <HighlightMessageInQuery query={location.query}>
-                    <SearchResult />
-                  </HighlightMessageInQuery>
-                  <Footer />
-                </SearchGrid>
+                  <IfDashboard>
+                    <QueryBar />
+                  </IfDashboard>
+                </IfInteractive>
+                <HighlightMessageInQuery query={location.query}>
+                  <SearchResult />
+                </HighlightMessageInQuery>
+                <Footer />
               </SearchArea>
             </GridContainer>
           </ViewAdditionalContextProvider>

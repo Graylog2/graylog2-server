@@ -647,10 +647,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     display: inline-block;
   }
 
-  .fa-mini {
-    font-size: 10px;
-  }
-
   .configuration-bundles input[type="file"] {
     line-height: inherit !important;
   }

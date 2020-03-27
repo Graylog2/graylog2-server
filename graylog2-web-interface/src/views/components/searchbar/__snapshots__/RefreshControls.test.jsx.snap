@@ -149,17 +149,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="play"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-play"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "play",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-play"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -751,17 +756,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="play"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-play"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "play",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-play"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -1353,17 +1363,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -2012,17 +2027,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -2671,17 +2691,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -3330,17 +3355,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -3989,17 +4019,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -4648,17 +4683,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -5307,17 +5347,22 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>

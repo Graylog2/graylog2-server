@@ -133,17 +133,22 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="caret-left"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-caret-left"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              icon={
+                                Object {
+                                  "iconName": "caret-left",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-caret-left"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>
@@ -217,17 +222,22 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="caret-right"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-caret-right"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              icon={
+                                Object {
+                                  "iconName": "caret-right",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-caret-right"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>
@@ -533,17 +543,22 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="caret-left"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-caret-left"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              icon={
+                                Object {
+                                  "iconName": "caret-left",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-caret-left"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>
@@ -617,17 +632,22 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                           onClick={[Function]}
                           type="button"
                         >
-                          <ForwardRef
-                            fixedWidth={false}
-                            inverse={false}
+                          <Icon
                             name="caret-right"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-caret-right"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              icon={
+                                Object {
+                                  "iconName": "caret-right",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-caret-right"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </button>
                       </Button>
                     </StyledComponent>

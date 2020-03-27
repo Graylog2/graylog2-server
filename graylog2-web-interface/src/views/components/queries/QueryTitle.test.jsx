@@ -18,7 +18,7 @@ describe('QueryTitle', () => {
   });
 
   const findAction = (wrapper, name) => {
-    const openMenuTrigger = wrapper.find('i[data-testid="query-action-dropdown"]');
+    const openMenuTrigger = wrapper.find('svg[data-testid="query-action-dropdown"]');
     openMenuTrigger.simulate('click');
 
     wrapper.update();

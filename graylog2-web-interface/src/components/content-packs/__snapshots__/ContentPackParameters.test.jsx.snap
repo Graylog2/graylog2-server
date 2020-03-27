@@ -759,17 +759,22 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             <span
                                               className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                                             >
-                                              <ForwardRef
-                                                fixedWidth={false}
-                                                inverse={false}
+                                              <Icon
                                                 name="times"
-                                                pulse={false}
-                                                spin={false}
                                               >
-                                                <i
-                                                  className="fa fa-times"
-                                                />
-                                              </ForwardRef>
+                                                <FontAwesomeIcon
+                                                  icon={
+                                                    Object {
+                                                      "iconName": "times",
+                                                      "prefix": "fas",
+                                                    }
+                                                  }
+                                                >
+                                                  <svg
+                                                    className="svg-inline--fa fa-times"
+                                                  />
+                                                </FontAwesomeIcon>
+                                              </Icon>
                                             </span>
                                           </Badge>
                                         </StyledComponent>
@@ -1690,20 +1695,26 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   />
                                   <td>
                                     <span>
-                                      <ForwardRef
+                                      <Icon
                                         className="contentPackEntity"
-                                        fixedWidth={false}
-                                        inverse={false}
                                         name="archive"
-                                        pulse={false}
-                                        spin={false}
                                         title="Content Pack"
                                       >
-                                        <i
-                                          className="fa fa-archive contentPackEntity"
+                                        <FontAwesomeIcon
+                                          className="contentPackEntity"
+                                          icon={
+                                            Object {
+                                              "iconName": "archive",
+                                              "prefix": "fas",
+                                            }
+                                          }
                                           title="Content Pack"
-                                        />
-                                      </ForwardRef>
+                                        >
+                                          <svg
+                                            className="svg-inline--fa fa-archive"
+                                          />
+                                        </FontAwesomeIcon>
+                                      </Icon>
                                     </span>
                                   </td>
                                   <td>

@@ -164,8 +164,8 @@ describe('<Wizard />', () => {
     expect(wrapperV.find('button[children="Previous"]').exists()).toBe(true);
 
     const wrapperH = mount(<Wizard steps={steps} horizontal />);
-    expect(wrapperH.find('i.fa-caret-left').exists()).toBe(true);
-    expect(wrapperH.find('i.fa-caret-right').exists()).toBe(true);
+    expect(wrapperH.find('svg.fa-caret-left').exists()).toBe(true);
+    expect(wrapperH.find('svg.fa-caret-right').exists()).toBe(true);
   });
 
   it('should hide next/previous buttons if hidePreviousNextButtons is set', () => {
@@ -174,7 +174,7 @@ describe('<Wizard />', () => {
     expect(wrapperV.find('button[children="Previous"]').exists()).toBe(false);
 
     const wrapperH = mount(<Wizard steps={steps} horizontal hidePreviousNextButtons />);
-    expect(wrapperH.find('button > i.fa-caret-left').exists()).toBe(false);
-    expect(wrapperH.find('button > i.fa-caret-right').exists()).toBe(false);
+    expect(wrapperH.find('button > svg.fa-caret-left').exists()).toBe(false);
+    expect(wrapperH.find('button > svg.fa-caret-right').exists()).toBe(false);
   });
 });

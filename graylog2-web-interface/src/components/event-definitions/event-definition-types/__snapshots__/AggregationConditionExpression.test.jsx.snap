@@ -1683,17 +1683,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -3402,17 +3407,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   }
                                                                 }
                                                               >
-                                                                <ForwardRef
-                                                                  fixedWidth={false}
-                                                                  inverse={false}
+                                                                <Icon
                                                                   name="caret-down"
-                                                                  pulse={false}
-                                                                  spin={false}
                                                                 >
-                                                                  <i
-                                                                    className="fa fa-caret-down"
-                                                                  />
-                                                                </ForwardRef>
+                                                                  <FontAwesomeIcon
+                                                                    icon={
+                                                                      Object {
+                                                                        "iconName": "caret-down",
+                                                                        "prefix": "fas",
+                                                                      }
+                                                                    }
+                                                                  >
+                                                                    <svg
+                                                                      className="svg-inline--fa fa-caret-down"
+                                                                    />
+                                                                  </FontAwesomeIcon>
+                                                                </Icon>
                                                               </div>
                                                             </DropdownIndicator>
                                                           </div>
@@ -4954,17 +4964,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                     }
                                                                   }
                                                                 >
-                                                                  <ForwardRef
-                                                                    fixedWidth={false}
-                                                                    inverse={false}
+                                                                  <Icon
                                                                     name="caret-down"
-                                                                    pulse={false}
-                                                                    spin={false}
                                                                   >
-                                                                    <i
-                                                                      className="fa fa-caret-down"
-                                                                    />
-                                                                  </ForwardRef>
+                                                                    <FontAwesomeIcon
+                                                                      icon={
+                                                                        Object {
+                                                                          "iconName": "caret-down",
+                                                                          "prefix": "fas",
+                                                                        }
+                                                                      }
+                                                                    >
+                                                                      <svg
+                                                                        className="svg-inline--fa fa-caret-down"
+                                                                      />
+                                                                    </FontAwesomeIcon>
+                                                                  </Icon>
                                                                 </div>
                                                               </DropdownIndicator>
                                                             </div>
@@ -6711,17 +6726,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -7156,17 +7176,24 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="minus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-minus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "minus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-minus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -7240,17 +7267,24 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="plus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-plus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "plus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-plus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -8871,17 +8905,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   }
                                                                 }
                                                               >
-                                                                <ForwardRef
-                                                                  fixedWidth={false}
-                                                                  inverse={false}
+                                                                <Icon
                                                                   name="caret-down"
-                                                                  pulse={false}
-                                                                  spin={false}
                                                                 >
-                                                                  <i
-                                                                    className="fa fa-caret-down"
-                                                                  />
-                                                                </ForwardRef>
+                                                                  <FontAwesomeIcon
+                                                                    icon={
+                                                                      Object {
+                                                                        "iconName": "caret-down",
+                                                                        "prefix": "fas",
+                                                                      }
+                                                                    }
+                                                                  >
+                                                                    <svg
+                                                                      className="svg-inline--fa fa-caret-down"
+                                                                    />
+                                                                  </FontAwesomeIcon>
+                                                                </Icon>
                                                               </div>
                                                             </DropdownIndicator>
                                                           </div>
@@ -10423,17 +10462,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                     }
                                                                   }
                                                                 >
-                                                                  <ForwardRef
-                                                                    fixedWidth={false}
-                                                                    inverse={false}
+                                                                  <Icon
                                                                     name="caret-down"
-                                                                    pulse={false}
-                                                                    spin={false}
                                                                   >
-                                                                    <i
-                                                                      className="fa fa-caret-down"
-                                                                    />
-                                                                  </ForwardRef>
+                                                                    <FontAwesomeIcon
+                                                                      icon={
+                                                                        Object {
+                                                                          "iconName": "caret-down",
+                                                                          "prefix": "fas",
+                                                                        }
+                                                                      }
+                                                                    >
+                                                                      <svg
+                                                                        className="svg-inline--fa fa-caret-down"
+                                                                      />
+                                                                    </FontAwesomeIcon>
+                                                                  </Icon>
                                                                 </div>
                                                               </DropdownIndicator>
                                                             </div>
@@ -12140,17 +12184,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -12543,17 +12592,24 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="minus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-minus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "minus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-minus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -12627,17 +12683,24 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="plus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-plus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "plus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-plus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -14419,17 +14482,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -16150,17 +16218,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                   }
                                                                 }
                                                               >
-                                                                <ForwardRef
-                                                                  fixedWidth={false}
-                                                                  inverse={false}
+                                                                <Icon
                                                                   name="caret-down"
-                                                                  pulse={false}
-                                                                  spin={false}
                                                                 >
-                                                                  <i
-                                                                    className="fa fa-caret-down"
-                                                                  />
-                                                                </ForwardRef>
+                                                                  <FontAwesomeIcon
+                                                                    icon={
+                                                                      Object {
+                                                                        "iconName": "caret-down",
+                                                                        "prefix": "fas",
+                                                                      }
+                                                                    }
+                                                                  >
+                                                                    <svg
+                                                                      className="svg-inline--fa fa-caret-down"
+                                                                    />
+                                                                  </FontAwesomeIcon>
+                                                                </Icon>
                                                               </div>
                                                             </DropdownIndicator>
                                                           </div>
@@ -17702,17 +17775,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                     }
                                                                   }
                                                                 >
-                                                                  <ForwardRef
-                                                                    fixedWidth={false}
-                                                                    inverse={false}
+                                                                  <Icon
                                                                     name="caret-down"
-                                                                    pulse={false}
-                                                                    spin={false}
                                                                   >
-                                                                    <i
-                                                                      className="fa fa-caret-down"
-                                                                    />
-                                                                  </ForwardRef>
+                                                                    <FontAwesomeIcon
+                                                                      icon={
+                                                                        Object {
+                                                                          "iconName": "caret-down",
+                                                                          "prefix": "fas",
+                                                                        }
+                                                                      }
+                                                                    >
+                                                                      <svg
+                                                                        className="svg-inline--fa fa-caret-down"
+                                                                      />
+                                                                    </FontAwesomeIcon>
+                                                                  </Icon>
                                                                 </div>
                                                               </DropdownIndicator>
                                                             </div>
@@ -19459,17 +19537,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -19904,17 +19987,24 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="minus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-minus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "minus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-minus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -19988,17 +20078,24 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="plus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-plus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "plus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-plus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -21806,17 +21903,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             }
                                                           }
                                                         >
-                                                          <ForwardRef
-                                                            fixedWidth={false}
-                                                            inverse={false}
+                                                          <Icon
                                                             name="caret-down"
-                                                            pulse={false}
-                                                            spin={false}
                                                           >
-                                                            <i
-                                                              className="fa fa-caret-down"
-                                                            />
-                                                          </ForwardRef>
+                                                            <FontAwesomeIcon
+                                                              icon={
+                                                                Object {
+                                                                  "iconName": "caret-down",
+                                                                  "prefix": "fas",
+                                                                }
+                                                              }
+                                                            >
+                                                              <svg
+                                                                className="svg-inline--fa fa-caret-down"
+                                                              />
+                                                            </FontAwesomeIcon>
+                                                          </Icon>
                                                         </div>
                                                       </DropdownIndicator>
                                                     </div>
@@ -23441,17 +23543,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                             }
                                                                           }
                                                                         >
-                                                                          <ForwardRef
-                                                                            fixedWidth={false}
-                                                                            inverse={false}
+                                                                          <Icon
                                                                             name="caret-down"
-                                                                            pulse={false}
-                                                                            spin={false}
                                                                           >
-                                                                            <i
-                                                                              className="fa fa-caret-down"
-                                                                            />
-                                                                          </ForwardRef>
+                                                                            <FontAwesomeIcon
+                                                                              icon={
+                                                                                Object {
+                                                                                  "iconName": "caret-down",
+                                                                                  "prefix": "fas",
+                                                                                }
+                                                                              }
+                                                                            >
+                                                                              <svg
+                                                                                className="svg-inline--fa fa-caret-down"
+                                                                              />
+                                                                            </FontAwesomeIcon>
+                                                                          </Icon>
                                                                         </div>
                                                                       </DropdownIndicator>
                                                                     </div>
@@ -24993,17 +25100,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                               }
                                                                             }
                                                                           >
-                                                                            <ForwardRef
-                                                                              fixedWidth={false}
-                                                                              inverse={false}
+                                                                            <Icon
                                                                               name="caret-down"
-                                                                              pulse={false}
-                                                                              spin={false}
                                                                             >
-                                                                              <i
-                                                                                className="fa fa-caret-down"
-                                                                              />
-                                                                            </ForwardRef>
+                                                                              <FontAwesomeIcon
+                                                                                icon={
+                                                                                  Object {
+                                                                                    "iconName": "caret-down",
+                                                                                    "prefix": "fas",
+                                                                                  }
+                                                                                }
+                                                                              >
+                                                                                <svg
+                                                                                  className="svg-inline--fa fa-caret-down"
+                                                                                />
+                                                                              </FontAwesomeIcon>
+                                                                            </Icon>
                                                                           </div>
                                                                         </DropdownIndicator>
                                                                       </div>
@@ -26710,17 +26822,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 }
                                                               }
                                                             >
-                                                              <ForwardRef
-                                                                fixedWidth={false}
-                                                                inverse={false}
+                                                              <Icon
                                                                 name="caret-down"
-                                                                pulse={false}
-                                                                spin={false}
                                                               >
-                                                                <i
-                                                                  className="fa fa-caret-down"
-                                                                />
-                                                              </ForwardRef>
+                                                                <FontAwesomeIcon
+                                                                  icon={
+                                                                    Object {
+                                                                      "iconName": "caret-down",
+                                                                      "prefix": "fas",
+                                                                    }
+                                                                  }
+                                                                >
+                                                                  <svg
+                                                                    className="svg-inline--fa fa-caret-down"
+                                                                  />
+                                                                </FontAwesomeIcon>
+                                                              </Icon>
                                                             </div>
                                                           </DropdownIndicator>
                                                         </div>
@@ -27113,17 +27230,24 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               onClick={[Function]}
                                               type="button"
                                             >
-                                              <ForwardRef
+                                              <Icon
                                                 fixedWidth={true}
-                                                inverse={false}
                                                 name="minus"
-                                                pulse={false}
-                                                spin={false}
                                               >
-                                                <i
-                                                  className="fa fa-minus fa-fw"
-                                                />
-                                              </ForwardRef>
+                                                <FontAwesomeIcon
+                                                  fixedWidth={true}
+                                                  icon={
+                                                    Object {
+                                                      "iconName": "minus",
+                                                      "prefix": "fas",
+                                                    }
+                                                  }
+                                                >
+                                                  <svg
+                                                    className="svg-inline--fa fa-minus"
+                                                  />
+                                                </FontAwesomeIcon>
+                                              </Icon>
                                             </button>
                                           </Button>
                                         </StyledComponent>
@@ -27197,17 +27321,24 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               onClick={[Function]}
                                               type="button"
                                             >
-                                              <ForwardRef
+                                              <Icon
                                                 fixedWidth={true}
-                                                inverse={false}
                                                 name="plus"
-                                                pulse={false}
-                                                spin={false}
                                               >
-                                                <i
-                                                  className="fa fa-plus fa-fw"
-                                                />
-                                              </ForwardRef>
+                                                <FontAwesomeIcon
+                                                  fixedWidth={true}
+                                                  icon={
+                                                    Object {
+                                                      "iconName": "plus",
+                                                      "prefix": "fas",
+                                                    }
+                                                  }
+                                                >
+                                                  <svg
+                                                    className="svg-inline--fa fa-plus"
+                                                  />
+                                                </FontAwesomeIcon>
+                                              </Icon>
                                             </button>
                                           </Button>
                                         </StyledComponent>
@@ -28962,17 +29093,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         }
                                                       }
                                                     >
-                                                      <ForwardRef
-                                                        fixedWidth={false}
-                                                        inverse={false}
+                                                      <Icon
                                                         name="caret-down"
-                                                        pulse={false}
-                                                        spin={false}
                                                       >
-                                                        <i
-                                                          className="fa fa-caret-down"
-                                                        />
-                                                      </ForwardRef>
+                                                        <FontAwesomeIcon
+                                                          icon={
+                                                            Object {
+                                                              "iconName": "caret-down",
+                                                              "prefix": "fas",
+                                                            }
+                                                          }
+                                                        >
+                                                          <svg
+                                                            className="svg-inline--fa fa-caret-down"
+                                                          />
+                                                        </FontAwesomeIcon>
+                                                      </Icon>
                                                     </div>
                                                   </DropdownIndicator>
                                                 </div>
@@ -30637,17 +30773,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         }
                                                                       }
                                                                     >
-                                                                      <ForwardRef
-                                                                        fixedWidth={false}
-                                                                        inverse={false}
+                                                                      <Icon
                                                                         name="caret-down"
-                                                                        pulse={false}
-                                                                        spin={false}
                                                                       >
-                                                                        <i
-                                                                          className="fa fa-caret-down"
-                                                                        />
-                                                                      </ForwardRef>
+                                                                        <FontAwesomeIcon
+                                                                          icon={
+                                                                            Object {
+                                                                              "iconName": "caret-down",
+                                                                              "prefix": "fas",
+                                                                            }
+                                                                          }
+                                                                        >
+                                                                          <svg
+                                                                            className="svg-inline--fa fa-caret-down"
+                                                                          />
+                                                                        </FontAwesomeIcon>
+                                                                      </Icon>
                                                                     </div>
                                                                   </DropdownIndicator>
                                                                 </div>
@@ -32189,17 +32330,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                           }
                                                                         }
                                                                       >
-                                                                        <ForwardRef
-                                                                          fixedWidth={false}
-                                                                          inverse={false}
+                                                                        <Icon
                                                                           name="caret-down"
-                                                                          pulse={false}
-                                                                          spin={false}
                                                                         >
-                                                                          <i
-                                                                            className="fa fa-caret-down"
-                                                                          />
-                                                                        </ForwardRef>
+                                                                          <FontAwesomeIcon
+                                                                            icon={
+                                                                              Object {
+                                                                                "iconName": "caret-down",
+                                                                                "prefix": "fas",
+                                                                              }
+                                                                            }
+                                                                          >
+                                                                            <svg
+                                                                              className="svg-inline--fa fa-caret-down"
+                                                                            />
+                                                                          </FontAwesomeIcon>
+                                                                        </Icon>
                                                                       </div>
                                                                     </DropdownIndicator>
                                                                   </div>
@@ -33946,17 +34092,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             }
                                                           }
                                                         >
-                                                          <ForwardRef
-                                                            fixedWidth={false}
-                                                            inverse={false}
+                                                          <Icon
                                                             name="caret-down"
-                                                            pulse={false}
-                                                            spin={false}
                                                           >
-                                                            <i
-                                                              className="fa fa-caret-down"
-                                                            />
-                                                          </ForwardRef>
+                                                            <FontAwesomeIcon
+                                                              icon={
+                                                                Object {
+                                                                  "iconName": "caret-down",
+                                                                  "prefix": "fas",
+                                                                }
+                                                              }
+                                                            >
+                                                              <svg
+                                                                className="svg-inline--fa fa-caret-down"
+                                                              />
+                                                            </FontAwesomeIcon>
+                                                          </Icon>
                                                         </div>
                                                       </DropdownIndicator>
                                                     </div>
@@ -34391,17 +34542,24 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           onClick={[Function]}
                                           type="button"
                                         >
-                                          <ForwardRef
+                                          <Icon
                                             fixedWidth={true}
-                                            inverse={false}
                                             name="minus"
-                                            pulse={false}
-                                            spin={false}
                                           >
-                                            <i
-                                              className="fa fa-minus fa-fw"
-                                            />
-                                          </ForwardRef>
+                                            <FontAwesomeIcon
+                                              fixedWidth={true}
+                                              icon={
+                                                Object {
+                                                  "iconName": "minus",
+                                                  "prefix": "fas",
+                                                }
+                                              }
+                                            >
+                                              <svg
+                                                className="svg-inline--fa fa-minus"
+                                              />
+                                            </FontAwesomeIcon>
+                                          </Icon>
                                         </button>
                                       </Button>
                                     </StyledComponent>
@@ -34475,17 +34633,24 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           onClick={[Function]}
                                           type="button"
                                         >
-                                          <ForwardRef
+                                          <Icon
                                             fixedWidth={true}
-                                            inverse={false}
                                             name="plus"
-                                            pulse={false}
-                                            spin={false}
                                           >
-                                            <i
-                                              className="fa fa-plus fa-fw"
-                                            />
-                                          </ForwardRef>
+                                            <FontAwesomeIcon
+                                              fixedWidth={true}
+                                              icon={
+                                                Object {
+                                                  "iconName": "plus",
+                                                  "prefix": "fas",
+                                                }
+                                              }
+                                            >
+                                              <svg
+                                                className="svg-inline--fa fa-plus"
+                                              />
+                                            </FontAwesomeIcon>
+                                          </Icon>
                                         </button>
                                       </Button>
                                     </StyledComponent>
@@ -36246,17 +36411,22 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -37808,17 +37978,22 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                               }
                                                             }
                                                           >
-                                                            <ForwardRef
-                                                              fixedWidth={false}
-                                                              inverse={false}
+                                                            <Icon
                                                               name="caret-down"
-                                                              pulse={false}
-                                                              spin={false}
                                                             >
-                                                              <i
-                                                                className="fa fa-caret-down"
-                                                              />
-                                                            </ForwardRef>
+                                                              <FontAwesomeIcon
+                                                                icon={
+                                                                  Object {
+                                                                    "iconName": "caret-down",
+                                                                    "prefix": "fas",
+                                                                  }
+                                                                }
+                                                              >
+                                                                <svg
+                                                                  className="svg-inline--fa fa-caret-down"
+                                                                />
+                                                              </FontAwesomeIcon>
+                                                            </Icon>
                                                           </div>
                                                         </DropdownIndicator>
                                                       </div>
@@ -39166,17 +39341,22 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                                 }
                                                               }
                                                             >
-                                                              <ForwardRef
-                                                                fixedWidth={false}
-                                                                inverse={false}
+                                                              <Icon
                                                                 name="caret-down"
-                                                                pulse={false}
-                                                                spin={false}
                                                               >
-                                                                <i
-                                                                  className="fa fa-caret-down"
-                                                                />
-                                                              </ForwardRef>
+                                                                <FontAwesomeIcon
+                                                                  icon={
+                                                                    Object {
+                                                                      "iconName": "caret-down",
+                                                                      "prefix": "fas",
+                                                                    }
+                                                                  }
+                                                                >
+                                                                  <svg
+                                                                    className="svg-inline--fa fa-caret-down"
+                                                                  />
+                                                                </FontAwesomeIcon>
+                                                              </Icon>
                                                             </div>
                                                           </DropdownIndicator>
                                                         </div>
@@ -40923,17 +41103,22 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   }
                                                 }
                                               >
-                                                <ForwardRef
-                                                  fixedWidth={false}
-                                                  inverse={false}
+                                                <Icon
                                                   name="caret-down"
-                                                  pulse={false}
-                                                  spin={false}
                                                 >
-                                                  <i
-                                                    className="fa fa-caret-down"
-                                                  />
-                                                </ForwardRef>
+                                                  <FontAwesomeIcon
+                                                    icon={
+                                                      Object {
+                                                        "iconName": "caret-down",
+                                                        "prefix": "fas",
+                                                      }
+                                                    }
+                                                  >
+                                                    <svg
+                                                      className="svg-inline--fa fa-caret-down"
+                                                    />
+                                                  </FontAwesomeIcon>
+                                                </Icon>
                                               </div>
                                             </DropdownIndicator>
                                           </div>
@@ -41356,17 +41541,24 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 onClick={[Function]}
                                 type="button"
                               >
-                                <ForwardRef
+                                <Icon
                                   fixedWidth={true}
-                                  inverse={false}
                                   name="minus"
-                                  pulse={false}
-                                  spin={false}
                                 >
-                                  <i
-                                    className="fa fa-minus fa-fw"
-                                  />
-                                </ForwardRef>
+                                  <FontAwesomeIcon
+                                    fixedWidth={true}
+                                    icon={
+                                      Object {
+                                        "iconName": "minus",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-minus"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
                               </button>
                             </Button>
                           </StyledComponent>
@@ -41440,17 +41632,24 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 onClick={[Function]}
                                 type="button"
                               >
-                                <ForwardRef
+                                <Icon
                                   fixedWidth={true}
-                                  inverse={false}
                                   name="plus"
-                                  pulse={false}
-                                  spin={false}
                                 >
-                                  <i
-                                    className="fa fa-plus fa-fw"
-                                  />
-                                </ForwardRef>
+                                  <FontAwesomeIcon
+                                    fixedWidth={true}
+                                    icon={
+                                      Object {
+                                        "iconName": "plus",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-plus"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
                               </button>
                             </Button>
                           </StyledComponent>
@@ -43212,17 +43411,22 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -44793,17 +44997,22 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                               }
                                                             }
                                                           >
-                                                            <ForwardRef
-                                                              fixedWidth={false}
-                                                              inverse={false}
+                                                            <Icon
                                                               name="caret-down"
-                                                              pulse={false}
-                                                              spin={false}
                                                             >
-                                                              <i
-                                                                className="fa fa-caret-down"
-                                                              />
-                                                            </ForwardRef>
+                                                              <FontAwesomeIcon
+                                                                icon={
+                                                                  Object {
+                                                                    "iconName": "caret-down",
+                                                                    "prefix": "fas",
+                                                                  }
+                                                                }
+                                                              >
+                                                                <svg
+                                                                  className="svg-inline--fa fa-caret-down"
+                                                                />
+                                                              </FontAwesomeIcon>
+                                                            </Icon>
                                                           </div>
                                                         </DropdownIndicator>
                                                       </div>
@@ -46345,17 +46554,22 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                                 }
                                                               }
                                                             >
-                                                              <ForwardRef
-                                                                fixedWidth={false}
-                                                                inverse={false}
+                                                              <Icon
                                                                 name="caret-down"
-                                                                pulse={false}
-                                                                spin={false}
                                                               >
-                                                                <i
-                                                                  className="fa fa-caret-down"
-                                                                />
-                                                              </ForwardRef>
+                                                                <FontAwesomeIcon
+                                                                  icon={
+                                                                    Object {
+                                                                      "iconName": "caret-down",
+                                                                      "prefix": "fas",
+                                                                    }
+                                                                  }
+                                                                >
+                                                                  <svg
+                                                                    className="svg-inline--fa fa-caret-down"
+                                                                  />
+                                                                </FontAwesomeIcon>
+                                                              </Icon>
                                                             </div>
                                                           </DropdownIndicator>
                                                         </div>
@@ -48137,17 +48351,22 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   }
                                                 }
                                               >
-                                                <ForwardRef
-                                                  fixedWidth={false}
-                                                  inverse={false}
+                                                <Icon
                                                   name="caret-down"
-                                                  pulse={false}
-                                                  spin={false}
                                                 >
-                                                  <i
-                                                    className="fa fa-caret-down"
-                                                  />
-                                                </ForwardRef>
+                                                  <FontAwesomeIcon
+                                                    icon={
+                                                      Object {
+                                                        "iconName": "caret-down",
+                                                        "prefix": "fas",
+                                                      }
+                                                    }
+                                                  >
+                                                    <svg
+                                                      className="svg-inline--fa fa-caret-down"
+                                                    />
+                                                  </FontAwesomeIcon>
+                                                </Icon>
                                               </div>
                                             </DropdownIndicator>
                                           </div>
@@ -48582,17 +48801,24 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 onClick={[Function]}
                                 type="button"
                               >
-                                <ForwardRef
+                                <Icon
                                   fixedWidth={true}
-                                  inverse={false}
                                   name="minus"
-                                  pulse={false}
-                                  spin={false}
                                 >
-                                  <i
-                                    className="fa fa-minus fa-fw"
-                                  />
-                                </ForwardRef>
+                                  <FontAwesomeIcon
+                                    fixedWidth={true}
+                                    icon={
+                                      Object {
+                                        "iconName": "minus",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-minus"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
                               </button>
                             </Button>
                           </StyledComponent>
@@ -48666,17 +48892,24 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 onClick={[Function]}
                                 type="button"
                               >
-                                <ForwardRef
+                                <Icon
                                   fixedWidth={true}
-                                  inverse={false}
                                   name="plus"
-                                  pulse={false}
-                                  spin={false}
                                 >
-                                  <i
-                                    className="fa fa-plus fa-fw"
-                                  />
-                                </ForwardRef>
+                                  <FontAwesomeIcon
+                                    fixedWidth={true}
+                                    icon={
+                                      Object {
+                                        "iconName": "plus",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-plus"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
                               </button>
                             </Button>
                           </StyledComponent>

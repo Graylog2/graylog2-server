@@ -76,17 +76,17 @@ describe('Trend', () => {
   describe('renders icon indicating trend direction', () => {
     it('shows circle right if values are equal', () => {
       const wrapper = renderTrend();
-      const trendIcon = wrapper.find('i');
+      const trendIcon = wrapper.find('svg');
       expect(trendIcon).toHaveClassName('fa-arrow-circle-right');
     });
     it('shows circle down if current values is lower', () => {
       const wrapper = renderTrend({ current: 41 });
-      const trendIcon = wrapper.find('i');
+      const trendIcon = wrapper.find('svg');
       expect(trendIcon).toHaveClassName('fa-arrow-circle-down');
     });
     it('shows circle up if current values is higher', () => {
       const wrapper = renderTrend({ current: 43 });
-      const trendIcon = wrapper.find('i');
+      const trendIcon = wrapper.find('svg');
       expect(trendIcon).toHaveClassName('fa-arrow-circle-up');
     });
   });
