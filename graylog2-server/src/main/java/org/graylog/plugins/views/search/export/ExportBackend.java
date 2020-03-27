@@ -20,5 +20,5 @@ import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
 public interface ExportBackend {
-    ChunkedResult run(MessagesRequest request, Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector);
+    void run(MessagesRequest request, Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector, Runnable onDone);
 }

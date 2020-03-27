@@ -26,7 +26,6 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.export.ChunkedResult;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.searchtypes.Sort;
@@ -34,6 +33,8 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.plugin.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.LinkedHashSet;
@@ -50,6 +51,7 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class ElasticsearchExportBackend implements ExportBackend {
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchExportBackend.class);
 
     private static final int CHUNK_SIZE = 1000;
     private static final String TIEBREAKER_FIELD = "gl2_message_id";
@@ -64,30 +66,39 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     @Override
-    public ChunkedResult run(MessagesRequest request, Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector) {
+    public void run(MessagesRequest request, Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector, Runnable onDone) {
         request.ensureCompleteness();
 
-        getChunksRecursively(request, chunkCollector, null);
+        fetchResults(request, chunkCollector);
 
-        return new ChunkedResult();
+        onDone.run();
     }
 
-    private void getChunksRecursively(MessagesRequest request, Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector, Object[] searchAfterValues) {
+    private void fetchResults(MessagesRequest request, Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector) {
+        Object[] searchAfterValues = null;
 
+        while (true) {
+            List<SearchResult.Hit<Map, Void>> hits = search(request, searchAfterValues);
+
+            if (hits.isEmpty()) {
+                return;
+            }
+
+            boolean success = publishChunk(chunkCollector, hits, request.fieldsInOrder().get());
+            if (!success) {
+                return;
+            }
+
+            searchAfterValues = lastHitSortFrom(hits);
+        }
+    }
+
+    private List<SearchResult.Hit<Map, Void>> search(MessagesRequest request, Object[] searchAfterValues) {
         Search search = buildSearchRequest(request, searchAfterValues);
 
         SearchResult result = JestUtils.execute(jestClient, search, () -> "");
 
-        List<SearchResult.Hit<Map, Void>> hits = result.getHits(Map.class, false);
-
-        if (hits.isEmpty())
-            return;
-
-        publishChunk(chunkCollector, hits, request.fieldsInOrder().get());
-
-        Object[] lastHitSort = lastHitSortFrom(hits);
-
-        getChunksRecursively(request, chunkCollector, lastHitSort);
+        return result.getHits(Map.class, false);
     }
 
     private Search buildSearchRequest(MessagesRequest request, Object[] searchAfterValues) {
@@ -120,10 +131,16 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return lastHit.sort.toArray(new Object[0]);
     }
 
-    private void publishChunk(Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, Set<String> desiredFieldsInOrder) {
+    private boolean publishChunk(Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, Set<String> desiredFieldsInOrder) {
         LinkedHashSet<LinkedHashSet<String>> hitsWithOnlyRelevantFields = buildHitsWithRelevantFields(hits, desiredFieldsInOrder);
 
-        chunkCollector.accept(hitsWithOnlyRelevantFields);
+        try {
+            chunkCollector.accept(hitsWithOnlyRelevantFields);
+            return true;
+        } catch (Exception e) {
+            LOG.warn("Chunk publishing threw exception. Stopping search after queries", e);
+            return false;
+        }
     }
 
     private LinkedHashSet<LinkedHashSet<String>> buildHitsWithRelevantFields(List<SearchResult.Hit<Map, Void>> hits, Set<String> desiredFieldsInOrder) {

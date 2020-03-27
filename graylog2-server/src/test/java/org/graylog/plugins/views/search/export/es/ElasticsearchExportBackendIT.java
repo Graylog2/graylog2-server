@@ -29,7 +29,9 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
@@ -64,12 +66,6 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 "2015-01-01 02:00:00.000 source-2 He",
                 "2015-01-01 01:00:00.000 source-1 Ha"
         );
-    }
-
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public void mockIndexLookupFor(MessagesRequest request, String... indexNames) {
-        when(indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get()))
-                .thenReturn(ImmutableSet.copyOf(indexNames));
     }
 
     @Test
@@ -130,6 +126,25 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 "2015-01-01 02:00:00.000 source-2 He");
     }
 
+    @Test
+    public void notifiesDoneOnNoMoreResults() {
+        importFixture("messages.json");
+
+        MessagesRequest request = defaultRequestBuilder().build();
+
+        List<String> invocations = new ArrayList<>();
+
+        sut.run(request, h -> invocations.add(String.valueOf(h.size())), () -> invocations.add("done"));
+
+        assertThat(invocations).containsExactly("4", "done");
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    public void mockIndexLookupFor(MessagesRequest request, String... indexNames) {
+        when(indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get()))
+                .thenReturn(ImmutableSet.copyOf(indexNames));
+    }
+
     private MessagesRequest.Builder defaultRequestBuilder() {
         return createDefaultMessagesRequest().toBuilder()
                 .timeRange(allMessagesTimeRange());
@@ -144,7 +159,8 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     private LinkedHashSet<String> collectResultAsStringSet(MessagesRequest request) {
         LinkedHashSet<String> totalResult = new LinkedHashSet<>();
 
-        sut.run(request, h -> collect(h, totalResult));
+        sut.run(request, h -> collect(h, totalResult), () -> {
+        });
 
         return totalResult;
     }

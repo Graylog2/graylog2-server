@@ -21,9 +21,9 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
-import org.graylog.plugins.views.search.export.MessagesResult;
 import org.graylog.plugins.views.search.export.SearchTypeOverrides;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -31,13 +31,17 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.function.Supplier;
+
+import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
 
 @Api(value = "Search Messages")
 @Path("/views/search/messages")
@@ -53,9 +57,17 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public Response retrieve(@ApiParam @NotNull MessagesRequest request) {
-        MessagesResult result = exporter.export(request);
-        return okResultFrom(result);
+    public ChunkedOutput<String> retrieve(@ApiParam MessagesRequest request) {
+        ChunkedOutput<String> output = chunkedOutputSupplier.get();
+
+        ChunkForwarder<String> fwd = ChunkForwarder.create(chunk -> writeTo(output, chunk), () -> close(output));
+
+        final MessagesRequest req = request != null ? request : createDefaultMessagesRequest();
+
+        Executor e = Executors.newSingleThreadExecutor();
+        e.execute(() -> exporter.export(req, fwd));
+
+        return output;
     }
 
     @POST
@@ -66,27 +78,32 @@ public class MessagesResource extends RestResource implements PluginRestResource
             @ApiParam @PathParam("search-id") String searchId,
             @ApiParam @PathParam("search-type-id") String searchTypeId,
             @ApiParam SearchTypeOverrides overrides) {
-        MessagesResult result = exporter.export(searchId, searchTypeId, overrides);
-        return okResultFrom(result);
+        exporter.export(searchId, searchTypeId, overrides);
+        return okResultFrom();
     }
 
-    private Response okResultFrom(MessagesResult result) {
-        ChunkedOutput<String> chunkedOutput = chunkedOutputFrom(result);
+    private Response okResultFrom() {
         return Response
-                .ok(chunkedOutput)
-                .header("Content-Disposition", "attachment; filename=" + result.filename())
+                .ok()
+                //.header("Content-Disposition", "attachment; filename=" + result.filename())
                 .build();
     }
 
-    private ChunkedOutput<String> chunkedOutputFrom(MessagesResult result) {
-        ChunkedOutput<String> output = new ChunkedOutput<>(String.class);
+    Supplier<ChunkedOutput<String>> chunkedOutputSupplier = () -> new ChunkedOutput<>(String.class);
 
+    private void close(ChunkedOutput<String> output) {
         try {
-            output.write(result.messages());
             output.close();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create ChunkedOutput for " + result, e);
+            throw new RuntimeException("Failed to close ChunkedOutput", e);
         }
-        return output;
+    }
+
+    private void writeTo(ChunkedOutput<String> output, String chunk) {
+        try {
+            output.write(chunk);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write to ChunkedOutput", e);
+        }
     }
 }

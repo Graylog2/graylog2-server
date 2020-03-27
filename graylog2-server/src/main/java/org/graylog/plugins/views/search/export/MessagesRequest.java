@@ -77,7 +77,7 @@ public abstract class MessagesRequest {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        @JsonProperty
+        @JsonProperty("timerange")
         public abstract Builder timeRange(TimeRange timeRange);
 
         @JsonProperty
