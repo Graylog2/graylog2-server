@@ -71,23 +71,19 @@ const SearchArea = styled(AppContentGrid)`
 `;
 
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
-  props => Object.assign(
-    {},
-    props,
-    {
-      queryId: props.viewMetadata.activeQuery,
-      results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
-    },
-  ));
+  (props) => ({
+
+    ...props,
+    queryId: props.viewMetadata.activeQuery,
+    results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
+  }));
 const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
-  props => Object.assign(
-    {},
-    props,
-    {
-      allFields: props.fieldTypes.all,
-      fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
-    },
-  ));
+  (props) => ({
+
+    ...props,
+    allFields: props.fieldTypes.all,
+    fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
+  }));
 
 type Props = {
   route: any,
@@ -161,7 +157,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
     });
 
     // Returning cleanup function used when unmounting
-    return () => { storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc()); };
+    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
   }, []);
 
   useSyncWithQueryParameters(query);
@@ -174,7 +170,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
         </IfDashboard>
       </IfInteractive>
       <InteractiveContext.Consumer>
-        {interactive => (
+        {(interactive) => (
           <ViewAdditionalContextProvider>
             <GridContainer id="main-row" interactive={interactive}>
               <IfInteractive>
