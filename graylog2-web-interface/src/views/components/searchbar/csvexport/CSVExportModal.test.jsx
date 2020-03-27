@@ -16,7 +16,7 @@ import Search from 'views/logic/search/Search';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
-import Widget from 'views/logic/widgets/widget';
+import Widget from 'views/logic/widgets/Widget';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import CSVExportModal from './CSVExportModal';
