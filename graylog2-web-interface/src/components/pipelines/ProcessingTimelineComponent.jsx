@@ -1,4 +1,5 @@
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
@@ -90,6 +91,8 @@ const ProcessingTimelineComponent = createReactClass({
   },
 
   _pipelineFormatter(pipeline) {
+    const { connections, streams } = this.state;
+
     return (
       <tr key={pipeline.id}>
         <td className="pipeline-name">
@@ -102,8 +105,8 @@ const ProcessingTimelineComponent = createReactClass({
         </td>
         <td className="stream-list">
           <PipelineConnectionsList pipeline={pipeline}
-                                   connections={this.state.connections}
-                                   streams={this.state.streams}
+                                   connections={connections}
+                                   streams={streams}
                                    streamsFormatter={this._formatConnectedStreams}
                                    noConnectionsMessage={<em>Not connected</em>} />
         </td>
@@ -121,6 +124,8 @@ const ProcessingTimelineComponent = createReactClass({
 
   _deletePipeline(pipeline) {
     return () => {
+      // TODO: Replace with ConfirmDialog components
+      // eslint-disable-next-line no-alert, no-restricted-globals
       if (confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
         PipelinesActions.delete(pipeline.id);
       }
@@ -128,7 +133,9 @@ const ProcessingTimelineComponent = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.pipelines || !this.state.streams || !this.state.connections;
+    const { connections, pipelines, streams } = this.state;
+
+    return !pipelines || !streams || !connections;
   },
 
   render() {
@@ -136,6 +143,7 @@ const ProcessingTimelineComponent = createReactClass({
       return <Spinner />;
     }
 
+    const { pipelines } = this.state;
     const addNewPipelineButton = (
       <div className="pull-right">
         <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
@@ -144,7 +152,7 @@ const ProcessingTimelineComponent = createReactClass({
       </div>
     );
 
-    if (this.state.pipelines.length === 0) {
+    if (pipelines.length === 0) {
       return (
         <div>
           <StyledAlert>
@@ -156,7 +164,7 @@ const ProcessingTimelineComponent = createReactClass({
       );
     }
 
-    this.usedStages = this._calculateUsedStages(this.state.pipelines);
+    this.usedStages = this._calculateUsedStages(pipelines);
 
     const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
     return (
@@ -167,7 +175,7 @@ const ProcessingTimelineComponent = createReactClass({
                    headers={headers}
                    headerCellFormatter={this._headerCellFormatter}
                    sortByKey="title"
-                   rows={this.state.pipelines}
+                   rows={pipelines}
                    dataRowFormatter={this._pipelineFormatter}
                    filterLabel="Filter pipelines"
                    filterKeys={['title']} />
