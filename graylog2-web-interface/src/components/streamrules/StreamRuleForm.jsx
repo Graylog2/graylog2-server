@@ -115,7 +115,7 @@ class StreamRuleForm extends React.Component {
               The server will try to convert to strings or numbers based on the matcher type as well as it can.
 
               <br /><br />
-              <Icon name="github" />
+              <Icon name={{ prefix: 'fab', iconName: 'github' }} />
               <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
                  target="_blank"
                  rel="noopener noreferrer"> Take a look at the matcher code on GitHub
