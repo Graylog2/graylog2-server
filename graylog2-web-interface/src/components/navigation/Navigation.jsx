@@ -8,29 +8,27 @@ import naturalSort from 'javascript-natural-sort';
 
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
-import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
-import UserMenu from 'components/navigation/UserMenu';
-import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
 
+import UserMenu from './UserMenu';
+import HelpMenu from './HelpMenu';
 import NavigationBrand from './NavigationBrand';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
 import SystemMenu from './SystemMenu';
-import styles from './Navigation.css';
 import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
+import StyledNavbar from './Navigation.styles';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const { isPermitted } = PermissionsMixin;
 
 const _isActive = (requestPath, prefix) => {
   return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
@@ -38,9 +36,11 @@ const _isActive = (requestPath, prefix) => {
 
 const formatSinglePluginRoute = ({ description, path, permissions }) => {
   const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} />;
+
   if (permissions) {
     return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
   }
+
   return link;
 };
 
@@ -48,26 +48,29 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
   if (pluginRoute.children) {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(location.pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
-    const isEmpty = !pluginRoute.children.some(child => isPermitted(permissions, child.permissions));
+    const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
+
     if (isEmpty) {
       return null;
     }
+
     return (
       <NavDropdown key={title} title={title} id="enterprise-dropdown">
         {pluginRoute.children.map(formatSinglePluginRoute)}
       </NavDropdown>
     );
   }
+
   return formatSinglePluginRoute(pluginRoute);
 };
 
 const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginNavigations = PluginStore.exports('navigation')
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
-    .map(pluginRoute => formatPluginRoute(pluginRoute, permissions, location));
+    .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, location));
 
   return (
-    <Navbar inverse fluid fixedTop>
+    <StyledNavbar inverse fluid fixedTop>
       <Navbar.Header>
         <Navbar.Brand>
           <LinkContainer to={Routes.STARTPAGE}>
@@ -78,9 +81,10 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         {
         AppConfig.gl2DevMode()
-          && <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
+          && <Badge bsStyle="danger" className="small-scrn-badge dev-badge">DEV</Badge>
         }
       </Navbar.Header>
+
       <Navbar.Collapse>
         <Nav navbar>
           <IfPermitted permissions={['searches:absolute', 'searches:relative', 'searches:keyword']}>
@@ -108,11 +112,11 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         <NotificationBadge />
 
-        <Nav navbar pullRight className={styles['header-meta-nav']}>
+        <Nav navbar pullRight className="header-meta-nav">
           {
           AppConfig.gl2DevMode()
             && (
-              <InactiveNavItem className={styles['dev-badge-wrap']}>
+              <InactiveNavItem className="dev-badge-wrap">
                 <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
               </InactiveNavItem>
             )
@@ -126,7 +130,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           <UserMenu fullName={fullName} loginName={loginName} />
         </Nav>
       </Navbar.Collapse>
-    </Navbar>
+    </StyledNavbar>
   );
 };
 

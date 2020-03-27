@@ -19,8 +19,10 @@ const ScratchpadToggle = () => {
     <li role="presentation">
       <Toggle bsStyle="link"
               type="button"
+              aria-label="Scratchpad"
+              id="scratchpad-toggle"
               onClick={toggleScratchpadVisibility}>
-        <Icon name="edit" size="lg" fixedWidth aria-label="Scratchpad" title="Scratchpad" />
+        <Icon name="edit" size="lg" fixedWidth title="Scratchpad" />
       </Toggle>
     </li>
 
