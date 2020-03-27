@@ -155,7 +155,7 @@
     "enzyme": "3.10.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "eslint-config-graylog": "file:packages/eslint-config-graylog",
-    "eslint-loader": "^1.6.3",
+    "eslint-loader": "^3.0.3",
     "estraverse-fb": "^1.3.1",
     "express": "^4.16.4",
     "extract-text-webpack-plugin": "^3.0.0",
