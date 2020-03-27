@@ -28,7 +28,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -47,7 +47,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -57,7 +57,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -302,7 +302,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -635,7 +635,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -654,7 +654,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -664,7 +664,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -909,7 +909,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -1242,7 +1242,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -1261,7 +1261,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -1271,7 +1271,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -1560,7 +1560,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -1906,7 +1906,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -1925,7 +1925,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -1935,7 +1935,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -2224,7 +2224,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -2570,7 +2570,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -2589,7 +2589,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -2599,7 +2599,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -2888,7 +2888,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -3234,7 +3234,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -3253,7 +3253,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -3263,7 +3263,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -3552,7 +3552,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -3898,7 +3898,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -3917,7 +3917,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -3927,7 +3927,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -4216,7 +4216,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -4562,7 +4562,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -4581,7 +4581,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -4591,7 +4591,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -4880,7 +4880,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -5226,7 +5226,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -5245,7 +5245,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -5255,7 +5255,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -5544,7 +5544,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",

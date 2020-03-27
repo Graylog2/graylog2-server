@@ -57,7 +57,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -275,7 +275,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -286,7 +286,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                     type="reset"
                   >
                     Reset

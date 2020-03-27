@@ -78,7 +78,7 @@ exports[`NumberVisualization should render a number visualization 1`] = `
           "attrs": Array [],
           "componentStyle": ComponentStyle {
             "componentId": "NumberVisualization__SingleItemGrid-lb6dwm-1",
-            "isStatic": true,
+            "isStatic": false,
             "lastClassName": "bAvNbr",
             "rules": Array [
               "display:grid;grid-template-columns:1fr;grid-template-rows:1fr;grid-column-gap:0;grid-row-gap:0;height:100%;width:100%;",
@@ -107,7 +107,7 @@ exports[`NumberVisualization should render a number visualization 1`] = `
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "NumberVisualization__NumberBox-lb6dwm-2",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHukuE",
                   "rules": Array [
                     "display:flex;justify-content:center;align-items:center;height:100%;width:100%;text-align:center;padding-bottom:10px;",

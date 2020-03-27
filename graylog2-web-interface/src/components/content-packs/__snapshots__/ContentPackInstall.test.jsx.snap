@@ -163,11 +163,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           >
                             <ControlLabel
                               bsClass="control-label"
-                              className="col-sm-3 ControlLabel-sc-1edmum5-0 hCskeX"
+                              className="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3"
                               srOnly={false}
                             >
                               <label
-                                className="col-sm-3 ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                className="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
                                 htmlFor="comment"
                               >
                                 Comment
@@ -390,11 +390,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           >
                             <ControlLabel
                               bsClass="control-label"
-                              className="col-sm-3 ControlLabel-sc-1edmum5-0 hCskeX"
+                              className="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3"
                               srOnly={false}
                             >
                               <label
-                                className="col-sm-3 ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                className="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
                                 htmlFor="PARAM"
                               >
                                 A parameter
@@ -687,12 +687,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -771,13 +771,13 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
