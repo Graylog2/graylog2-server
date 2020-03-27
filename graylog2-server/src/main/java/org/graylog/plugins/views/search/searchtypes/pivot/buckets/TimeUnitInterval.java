@@ -34,7 +34,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 @JsonDeserialize(builder = TimeUnitInterval.Builder.class)
 public abstract class TimeUnitInterval implements Interval {
     public static final String type = "timeunit";
-    public static final Pattern TIMEUNIT_PATTERN = Pattern.compile("(?<quantity>\\d+)(?<unit>[smhdwM])");
+    public static final Pattern TIMEUNIT_PATTERN = Pattern.compile("(?<quantity>\\d+)(?<unit>(ms|s|m|h|d|w|M))");
 
     @JsonProperty
     public abstract String type();
@@ -55,6 +55,7 @@ public abstract class TimeUnitInterval implements Interval {
         final String unit = matcher.group("unit");
 
         switch (unit) {
+            case "ms":
             case "s":
             case "m":
             case "h":
