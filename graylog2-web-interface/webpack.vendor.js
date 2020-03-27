@@ -87,7 +87,7 @@ if (TARGET === 'build') {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
-      new CleanWebpackPlugin([path.resolve(BUILD_PATH)]),
+      new CleanWebpackPlugin(),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
       }),
