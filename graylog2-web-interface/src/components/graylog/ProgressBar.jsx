@@ -75,7 +75,7 @@ const Bar: StyledComponent<BarProps, ThemeInterface, *> = styled.div(({ animated
     transition: width 500ms ease-in-out;
     width: ${value}%;
     max-width: 100%;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 2px ${chroma(theme.color.gray[0]).alpha(0.4).css()}, 2px -1px 3px ${chroma(theme.color.gray[100]).alpha(0.5).css()};
     ${(animated || striped) && css`
       background-image: linear-gradient(
         45deg,

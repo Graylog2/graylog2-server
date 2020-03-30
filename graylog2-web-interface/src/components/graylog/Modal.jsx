@@ -6,7 +6,7 @@ import chroma from 'chroma-js';
 const Modal = styled(BootstrapModal)(({ theme }) => css`
   .modal-content {
     background-color: ${theme.color.global.contentBackground};
-    border-color: ${chroma(theme.color.gray[10]).alpha(0.2)};
+    border-color: ${chroma(theme.color.gray[10]).alpha(0.2).css()};
 
     .modal-header {
       border-bottom-color: ${theme.color.gray[90]};

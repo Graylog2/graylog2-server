@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import chroma from 'chroma-js';
 
 import { Table } from 'components/graylog';
 
@@ -87,7 +88,7 @@ const StyledTable = styled(Table)(({ theme }) => `
         left: 5px;
         top: 4.5em;
         height: 1.5em;
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
+        background: linear-gradient(to bottom, ${chroma(theme.color.global.contentBackground).alpha(0).css()}, ${chroma(theme.color.global.contentBackground).alpha(1).css()} 95%);
       }
     }
   }

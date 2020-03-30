@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Label } from 'components/graylog';
+import { withTheme } from 'styled-components';
 import d3 from 'd3';
 
 import style from './ColorLabel.css';
@@ -10,6 +11,9 @@ class ColorLabel extends React.Component {
     color: PropTypes.string.isRequired,
     text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     size: PropTypes.oneOf(['normal', 'small', 'xsmall']),
+    theme: PropTypes.shape({
+      color: PropTypes.object,
+    }).isRequired,
   };
 
   static defaultProps = {
@@ -19,12 +23,12 @@ class ColorLabel extends React.Component {
   };
 
   render() {
-    const { color, size } = this.props;
+    const { color, size, theme } = this.props;
 
     const backgroundColor = d3.hsl(color);
     const borderColor = backgroundColor.darker();
     // Use dark font on brighter backgrounds and light font in darker backgrounds
-    const textColor = backgroundColor.l > 0.6 ? d3.rgb('#333333') : d3.rgb('#FFFFFF');
+    const textColor = backgroundColor.l > 0.6 ? d3.rgb(theme.color.global.textDefault) : d3.rgb(theme.color.global.textAlt);
     return (
       <span className={`${style.colorLabel} ${style[size]}`}>
         <Label style={{
@@ -39,4 +43,4 @@ class ColorLabel extends React.Component {
   }
 }
 
-export default ColorLabel;
+export default withTheme(ColorLabel);
