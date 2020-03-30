@@ -42,5 +42,6 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
+    'react/static-property-placement': 'off',
   },
 };
