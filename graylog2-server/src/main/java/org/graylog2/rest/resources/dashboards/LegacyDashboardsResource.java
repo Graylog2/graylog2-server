@@ -65,15 +65,15 @@ import java.util.Map;
 @RequiresAuthentication
 @Api(value = "Legacy/Dashboards", description = "Manage dashboards")
 @Path("/legacy/dashboards")
-public class DashboardsResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(DashboardsResource.class);
+public class LegacyDashboardsResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(LegacyDashboardsResource.class);
 
     private final DashboardService dashboardService;
     private final ActivityWriter activityWriter;
 
     @Inject
-    public DashboardsResource(DashboardService dashboardService,
-                              ActivityWriter activityWriter) {
+    public LegacyDashboardsResource(DashboardService dashboardService,
+                                    ActivityWriter activityWriter) {
         this.dashboardService = dashboardService;
         this.activityWriter = activityWriter;
     }
@@ -91,7 +91,7 @@ public class DashboardsResource extends RestResource {
         final String id = dashboardService.save(dashboard);
 
         final Map<String, String> result = ImmutableMap.of("dashboard_id", id);
-        final URI dashboardUri = getUriBuilderToSelf().path(DashboardsResource.class, "get")
+        final URI dashboardUri = getUriBuilderToSelf().path(LegacyDashboardsResource.class, "get")
                 .build(id);
 
         final User user = getCurrentUser();
@@ -156,7 +156,7 @@ public class DashboardsResource extends RestResource {
 
         final String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
         LOG.info(msg);
-        activityWriter.write(new Activity(msg, DashboardsResource.class));
+        activityWriter.write(new Activity(msg, LegacyDashboardsResource.class));
     }
 
     @PUT

@@ -47,7 +47,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DashboardsResourceTest {
+public class LegacyDashboardsResourceTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -66,7 +66,7 @@ public class DashboardsResourceTest {
 
     private DashboardsTestResource dashboardsResource;
 
-    private static class DashboardsTestResource extends DashboardsResource {
+    private static class DashboardsTestResource extends LegacyDashboardsResource {
         private final Subject subject;
 
         DashboardsTestResource(DashboardService dashboardService,
@@ -101,7 +101,7 @@ public class DashboardsResourceTest {
         }
     }
 
-    public DashboardsResourceTest() {
+    public LegacyDashboardsResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
 

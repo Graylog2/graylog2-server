@@ -64,9 +64,9 @@ import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "Legacy/Dashboards/Widgets", description = "Manage widgets of an existing dashboard")
-@Path("/dashboards/{dashboardId}/widgets")
-public class DashboardWidgetsResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(DashboardWidgetsResource.class);
+@Path("/legacy/dashboards/{dashboardId}/widgets")
+public class LegacyDashboardWidgetsResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(LegacyDashboardWidgetsResource.class);
 
     private final DashboardWidgetCreator dashboardWidgetCreator;
     private final ActivityWriter activityWriter;
@@ -74,10 +74,10 @@ public class DashboardWidgetsResource extends RestResource {
     private final DashboardService dashboardService;
 
     @Inject
-    public DashboardWidgetsResource(DashboardWidgetCreator dashboardWidgetCreator,
-                                    ActivityWriter activityWriter,
-                                    WidgetResultCache widgetResultCache,
-                                    DashboardService dashboardService) {
+    public LegacyDashboardWidgetsResource(DashboardWidgetCreator dashboardWidgetCreator,
+                                          ActivityWriter activityWriter,
+                                          WidgetResultCache widgetResultCache,
+                                          DashboardService dashboardService) {
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.activityWriter = activityWriter;
         this.widgetResultCache = widgetResultCache;
@@ -129,7 +129,7 @@ public class DashboardWidgetsResource extends RestResource {
         }
 
         final Map<String, String> result = ImmutableMap.of("widget_id", widget.getId());
-        final URI widgetUri = getUriBuilderToSelf().path(DashboardWidgetsResource.class, "getWidget")
+        final URI widgetUri = getUriBuilderToSelf().path(LegacyDashboardWidgetsResource.class, "getWidget")
                 .build(dashboardId, widget.getId());
 
         return Response.created(widgetUri).entity(result).build();
@@ -182,7 +182,7 @@ public class DashboardWidgetsResource extends RestResource {
 
         final String msg = "Deleted widget <" + widgetId + "> from dashboard <" + dashboardId + ">. Reason: REST request.";
         LOG.info(msg);
-        activityWriter.write(new Activity(msg, DashboardsResource.class));
+        activityWriter.write(new Activity(msg, LegacyDashboardsResource.class));
     }
 
     @GET
