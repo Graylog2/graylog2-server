@@ -104,12 +104,12 @@ const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshCo
   return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
 };
 
-const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, setErrors) => {
+const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
   const { view } = ViewStore.getInitialState();
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
       FieldTypesActions.all();
-      return SearchActions.execute(executionState).catch((error) => setErrors([error]));
+      return SearchActions.execute(executionState);
     }
     return Promise.reject(searchMetadata);
   });
@@ -135,7 +135,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
   const [errors, setErrors] = useState([]);
-  const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), setErrors);
+  const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
   useEffect(() => {
     const { view } = ViewStore.getInitialState();
 
@@ -155,7 +155,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
         .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
       return null;
-    });
+    }).catch((error) => setErrors([error]));
 
     // Returning cleanup function used when unmounting
     return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
