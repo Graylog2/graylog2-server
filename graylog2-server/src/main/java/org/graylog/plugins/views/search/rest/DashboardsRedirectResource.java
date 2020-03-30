@@ -27,13 +27,21 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/views/dashboards")
 @RequiresAuthentication
-public class DashboardsRedirectResource {
+public class DashboardsRedirectResource extends RedirectResource {
+    private final String sourcePath;
+    private final String targetPath;
+
+    public DashboardsRedirectResource() {
+        this.sourcePath = pathForClass(this.getClass());
+        this.targetPath = pathForClass(DashboardsResource.class);
+    }
+
     @GET
     @Deprecated
     public Response redirect(@Context UriInfo uriInfo) {
         final UriBuilder uriBuilder = uriInfo.getRequestUriBuilder()
             .replacePath(
-                uriInfo.getPath().replace("/views/dashboards", "/dashboards")
+                uriInfo.getPath().replace(sourcePath, targetPath)
             );
         return Response.status(Response.Status.MOVED_PERMANENTLY)
                 .location(uriBuilder.build())
