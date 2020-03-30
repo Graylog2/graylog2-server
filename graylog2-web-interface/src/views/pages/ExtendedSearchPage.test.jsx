@@ -264,7 +264,7 @@ describe('ExtendedSearchPage', () => {
   });
 
   it('information about execution error will be displayed', async () => {
-    asMock(SearchActions.execute).mockImplementationOnce(() => Promise.reject(new Error('Unable to add highlighting for missing value.')));
+    asMock(SearchActions.execute).mockImplementationOnce(() => Promise.reject(new Error('The error message.')));
     let wrapper;
     await act(async () => {
       wrapper = mount(<SimpleExtendedSearchPage />);
@@ -272,7 +272,7 @@ describe('ExtendedSearchPage', () => {
 
     if (wrapper) {
       wrapper.update();
-      expect(wrapper.contains('Unable to add highlighting for missing value.')).not.toBeNull();
+      expect(wrapper.contains('The error message.')).not.toBeNull();
     }
   });
 });

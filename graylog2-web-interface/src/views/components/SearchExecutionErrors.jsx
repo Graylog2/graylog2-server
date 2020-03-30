@@ -24,7 +24,7 @@ const CommonError = ({ error: { additional: { body: { message, streams } } } }: 
     </p>
     {streams && (
       <p>
-        Please get in contact with the dashboard owner and provide the ids of streams you need access for:<br />
+        Please get in contact with a graylog administrator and provide the ids of streams you need permissions to:<br />
         {streams.join(', ')}<br />
       </p>
     )}
@@ -39,7 +39,7 @@ const SearchExecutionErrors = ({ errors }: { errors: Object[] }) => {
       <Row className="content">
         <Col md={12}>
           <h2>The {viewTypeName} can&apos;t be accessed</h2>
-          <p>This is mostly related to missing access rights. Please have a look at the following errors.</p>
+          <p>This is mostly related to missing permissions. Please have a look at the following errors.</p>
           {errors.map((error, index) => {
             const { additional } = error;
             if (additional && additional.body) {
