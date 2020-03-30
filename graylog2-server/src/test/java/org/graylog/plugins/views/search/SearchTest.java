@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public class SearchTest {
     public void throwsExceptionIfQueryHasNoStreamsAndThereAreNoDefaultStreams() {
         Search search = searchWithQueriesWithStreams("a,b,c", "");
 
-        assertThatExceptionOfType(PermissionException.class)
+        assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> search.addStreamsToQueriesWithoutStreams(ImmutableSet::of));
     }
 
