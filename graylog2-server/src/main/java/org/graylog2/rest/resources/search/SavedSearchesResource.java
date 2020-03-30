@@ -59,7 +59,7 @@ import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "Legacy/Search/Saved", description = "Saved searches")
-@Path("/search/saved")
+@Path("/legacy/search/saved")
 public class SavedSearchesResource extends SearchResource {
     private final SavedSearchService savedSearchService;
 

@@ -48,7 +48,7 @@ import static java.util.Locale.ENGLISH;
 @RequiresAuthentication
 @Api(value = "Search/Saved")
 @Produces(MediaType.APPLICATION_JSON)
-@Path("/views/savedSearches")
+@Path("/search/saved")
 public class SavedSearchesResource extends RestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
