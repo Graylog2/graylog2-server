@@ -64,7 +64,7 @@ import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "Legacy/Dashboards", description = "Manage dashboards")
-@Path("/dashboards")
+@Path("/legacy/dashboards")
 public class DashboardsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardsResource.class);
 
