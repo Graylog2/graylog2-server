@@ -132,7 +132,12 @@ const webpackConfig = {
         return c2.id - c1.id;
       },
     }),
-    new HtmlWebpackPlugin({ filename: 'module.json', inject: false, template: path.resolve(ROOT_PATH, 'templates/module.json.template'), excludeChunks: ['config'] }),
+    new HtmlWebpackPlugin({
+      filename: 'module.json',
+      inject: false,
+      template: path.resolve(ROOT_PATH, 'templates/module.json.template'),
+      excludeChunks: ['config'],
+    }),
     new webpack.DefinePlugin({
       FEATURES: JSON.stringify(process.env.FEATURES),
     }),
