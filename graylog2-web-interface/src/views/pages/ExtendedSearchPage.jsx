@@ -136,6 +136,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   const query = `${pathname}${search}`;
   const [errors, setErrors] = useState([]);
   const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
+
   useEffect(() => {
     const { view } = ViewStore.getInitialState();
 
