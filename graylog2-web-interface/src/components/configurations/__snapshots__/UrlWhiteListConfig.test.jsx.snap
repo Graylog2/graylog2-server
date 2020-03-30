@@ -77,14 +77,14 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
         <Table
           bordered={true}
           bsClass="table"
-          className="top-margin Table-ztr4bi-0 lbroLI"
+          className="Table-ztr4bi-0 lbroLI top-margin"
           condensed={true}
           hover={false}
           responsive={false}
           striped={true}
         >
           <table
-            className="top-margin Table-ztr4bi-0 lbroLI table table-striped table-bordered table-condensed"
+            className="Table-ztr4bi-0 lbroLI top-margin table table-striped table-bordered table-condensed"
           >
             <thead>
               <tr>

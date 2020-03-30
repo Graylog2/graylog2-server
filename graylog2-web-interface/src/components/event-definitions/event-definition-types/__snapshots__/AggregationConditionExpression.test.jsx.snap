@@ -77,7 +77,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHBaXW",
                   "rules": Array [
                     "margin-bottom:15px;font-size:14px;",
@@ -96,7 +96,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
             forwardedRef={null}
           >
             <div
-              className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+              className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
             >
               <Component
                 validationState={null}
@@ -236,11 +236,11 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                         >
                           <FormGroup
                             bsClass="form-group"
-                            className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj"
                             validationState={null}
                           >
                             <div
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj form-group"
                             >
                               <Select
                                 allowCreate={false}
@@ -12876,7 +12876,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHBaXW",
                   "rules": Array [
                     "margin-bottom:15px;font-size:14px;",
@@ -12895,7 +12895,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
             forwardedRef={null}
           >
             <div
-              className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+              className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
             >
               <Component
                 validationState={null}
@@ -13035,11 +13035,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                         >
                           <FormGroup
                             bsClass="form-group"
-                            className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj"
                             validationState={null}
                           >
                             <div
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj form-group"
                             >
                               <Select
                                 allowCreate={false}
@@ -20358,7 +20358,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                        "isStatic": true,
+                        "isStatic": false,
                         "lastClassName": "hHBaXW",
                         "rules": Array [
                           "margin-bottom:15px;font-size:14px;",
@@ -20377,7 +20377,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                   forwardedRef={null}
                 >
                   <div
-                    className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+                    className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
                   >
                     <BooleanOperatorSelector__BooleanOperatorSelect
                       isFirstElement={true}
@@ -20456,11 +20456,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                               >
                                 <FormGroup
                                   bsClass="form-group"
-                                  className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ"
                                   validationState={null}
                                 >
                                   <div
-                                    className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ form-group"
                                   >
                                     <Select
                                       allowCreate={false}
@@ -22020,7 +22020,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "GroupExpression__Group-sc-17izmkk-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "edMkpk",
                   "rules": Array [
                     "padding-left:40px;",
@@ -27548,7 +27548,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "hHBaXW",
                     "rules": Array [
                       "margin-bottom:15px;font-size:14px;",
@@ -27567,7 +27567,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
               forwardedRef={null}
             >
               <div
-                className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+                className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
               >
                 <BooleanOperatorSelector__BooleanOperatorSelect
                   isFirstElement={true}
@@ -27646,11 +27646,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ"
                               validationState={null}
                             >
                               <div
-                                className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ form-group"
                               >
                                 <Select
                                   allowCreate={false}
@@ -29210,7 +29210,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "GroupExpression__Group-sc-17izmkk-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "edMkpk",
               "rules": Array [
                 "padding-left:40px;",
@@ -34805,7 +34805,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHBaXW",
                   "rules": Array [
                     "margin-bottom:15px;font-size:14px;",
@@ -34824,7 +34824,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
             forwardedRef={null}
           >
             <div
-              className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+              className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
             >
               <Component
                 validationState={null}
@@ -34964,11 +34964,11 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                         >
                           <FormGroup
                             bsClass="form-group"
-                            className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj"
                             validationState={null}
                           >
                             <div
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj form-group"
                             >
                               <Select
                                 allowCreate={false}
@@ -41805,7 +41805,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHBaXW",
                   "rules": Array [
                     "margin-bottom:15px;font-size:14px;",
@@ -41824,7 +41824,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
             forwardedRef={null}
           >
             <div
-              className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+              className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
             >
               <Component
                 validationState={null}
@@ -41964,11 +41964,11 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                         >
                           <FormGroup
                             bsClass="form-group"
-                            className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj"
                             validationState={null}
                           >
                             <div
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj form-group"
                             >
                               <Select
                                 allowCreate={false}

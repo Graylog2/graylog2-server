@@ -60,11 +60,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 hCskeX"
+                      className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel"
                       srOnly={false}
                     >
                       <label
-                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                        className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel control-label"
                       >
                         Token Name
                       </label>
@@ -748,11 +748,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA listGroupHeader"
                             listItem={false}
                           >
                             <span
-                              className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA listGroupHeader list-group-item"
                             >
                               <div
                                 className="headerWrapper"
@@ -922,11 +922,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 hCskeX"
+                      className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel"
                       srOnly={false}
                     >
                       <label
-                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                        className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel control-label"
                       >
                         Token Name
                       </label>
@@ -1636,11 +1636,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA listGroupHeader"
                             listItem={false}
                           >
                             <span
-                              className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA listGroupHeader list-group-item"
                             >
                               <div
                                 className="headerWrapper"

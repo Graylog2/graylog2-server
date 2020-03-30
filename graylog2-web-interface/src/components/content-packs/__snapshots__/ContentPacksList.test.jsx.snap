@@ -994,11 +994,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA listGroupHeader"
                         listItem={false}
                       >
                         <span
-                          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fcPNBA listGroupHeader list-group-item"
                         >
                           <div
                             className="headerWrapper"

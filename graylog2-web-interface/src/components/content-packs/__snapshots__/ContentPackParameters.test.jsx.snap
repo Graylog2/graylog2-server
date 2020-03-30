@@ -451,12 +451,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -535,13 +535,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -753,11 +753,11 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                         >
                                           <Badge
                                             bsClass="badge"
-                                            className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                            className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                             pullRight={false}
                                           >
                                             <span
-                                              className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                              className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                             >
                                               <Icon
                                                 name="times"
@@ -1401,12 +1401,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -1485,13 +1485,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -2488,12 +2488,12 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -2572,13 +2572,13 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -2918,12 +2918,12 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -3002,13 +3002,13 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"

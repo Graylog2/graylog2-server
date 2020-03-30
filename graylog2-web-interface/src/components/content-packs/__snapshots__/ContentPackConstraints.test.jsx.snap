@@ -186,11 +186,11 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                             >
                               <Badge
                                 bsClass="badge"
-                                className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                 pullRight={false}
                               >
                                 <span
-                                  className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                 >
                                   <Icon
                                     name="times"
@@ -273,11 +273,11 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                             >
                               <Badge
                                 bsClass="badge"
-                                className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success"
                                 pullRight={false}
                               >
                                 <span
-                                  className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success badge"
                                 >
                                   <Icon
                                     name="check"
@@ -494,11 +494,11 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                             >
                               <Badge
                                 bsClass="badge"
-                                className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success"
                                 pullRight={false}
                               >
                                 <span
-                                  className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success badge"
                                 >
                                   <Icon
                                     name="check"
@@ -581,11 +581,11 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                             >
                               <Badge
                                 bsClass="badge"
-                                className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success"
                                 pullRight={false}
                               >
                                 <span
-                                  className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success badge"
                                 >
                                   <Icon
                                     name="check"
@@ -802,11 +802,11 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                             >
                               <Badge
                                 bsClass="badge"
-                                className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                 pullRight={false}
                               >
                                 <span
-                                  className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                 >
                                   <Icon
                                     name="times"
@@ -889,11 +889,11 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                             >
                               <Badge
                                 bsClass="badge"
-                                className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                 pullRight={false}
                               >
                                 <span
-                                  className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                 >
                                   <Icon
                                     name="times"
