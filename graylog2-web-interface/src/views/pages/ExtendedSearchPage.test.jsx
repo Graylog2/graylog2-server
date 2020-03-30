@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
+import { act } from 'react-dom/test-utils';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
@@ -260,5 +261,18 @@ describe('ExtendedSearchPage', () => {
       .then(() => {
         expect(SearchActions.execute).not.toHaveBeenCalled();
       });
+  });
+
+  it('information about execution error will be displayed', async () => {
+    asMock(SearchActions.execute).mockImplementationOnce(() => Promise.reject(new Error('Unable to add highlighting for missing value.')));
+    let wrapper;
+    await act(async () => {
+      wrapper = mount(<SimpleExtendedSearchPage />);
+    });
+
+    if (wrapper) {
+      wrapper.update();
+      expect(wrapper.contains('Unable to add highlighting for missing value.')).not.toBeNull();
+    }
   });
 });
