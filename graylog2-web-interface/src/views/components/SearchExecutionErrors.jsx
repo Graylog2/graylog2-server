@@ -17,15 +17,17 @@ type CommonErrorType = {
 }
 
 const CommonError = ({ error: { additional: { body: { message, streams } } } }: CommonErrorType) => (
-  <>
-    <p><b><Icon name="info-circle" /> {message}</b></p>
+  <Alert bsStyle="danger" role="alert">
+    <p>
+      <b><Icon name="info-circle" /> {message}</b>
+    </p>
     {streams && (
       <p>
         Please get in contact with the dashboard owner and provide the ids of streams you need access for:<br />
         {streams.join(', ')}<br />
       </p>
     )}
-  </>
+  </Alert>
 );
 
 const SearchExecutionErrors = ({ errors }: { errors: Object[] }) => {
@@ -39,12 +41,12 @@ const SearchExecutionErrors = ({ errors }: { errors: Object[] }) => {
           <p>This is mostly related to missing access rights. Please have a look at the following errors.</p>
           {errors.map((error, index) => {
             const { additional } = error;
-            return (
+            if (additional && additional.body) {
               // eslint-disable-next-line react/no-array-index-key
-              <Alert bsStyle="danger" role="alert" key={index}>
-                {(additional && additional.body) ? <CommonError error={error} /> : JSON.stringify(error)}
-              </Alert>
-            );
+              return <CommonError error={error} key={index} />;
+            }
+            // eslint-disable-next-line react/no-array-index-key
+            return <pre key={index}>{JSON.stringify(error)}</pre>;
           })}
         </Col>
       </Row>
