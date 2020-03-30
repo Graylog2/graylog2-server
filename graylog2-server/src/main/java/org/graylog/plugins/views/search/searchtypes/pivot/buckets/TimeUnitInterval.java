@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import javax.annotation.Nullable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,9 @@ public abstract class TimeUnitInterval implements Interval {
 
     @JsonProperty
     public abstract String timeunit();
+
+    @JsonProperty
+    public abstract Long offset();
 
     @Override
     public DateHistogramInterval toDateHistogramInterval(TimeRange timerange) {
@@ -66,8 +70,8 @@ public abstract class TimeUnitInterval implements Interval {
         }
     }
 
-    public static TimeUnitInterval ofTimeunit(String timeunit) {
-        return Builder.builder().timeunit(timeunit).build();
+    public static TimeUnitInterval ofTimeunitAndOffset(String timeunit, long offset) {
+        return Builder.builder().timeunit(timeunit).offset(offset).build();
     }
 
     @AutoValue.Builder
@@ -77,6 +81,9 @@ public abstract class TimeUnitInterval implements Interval {
 
         @JsonProperty("timeunit")
         public abstract Builder timeunit(String timeunit);
+
+        @JsonProperty("offset")
+        public abstract Builder offset(@Nullable Long offset);
 
         abstract TimeUnitInterval autoBuild();
         public TimeUnitInterval build() {
@@ -94,7 +101,7 @@ public abstract class TimeUnitInterval implements Interval {
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_TimeUnitInterval.Builder().type(type);
+            return new AutoValue_TimeUnitInterval.Builder().type(type).offset(0L);
         }
 
         @JsonCreator

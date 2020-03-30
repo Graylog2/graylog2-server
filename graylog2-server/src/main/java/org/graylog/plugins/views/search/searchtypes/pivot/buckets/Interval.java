@@ -35,4 +35,8 @@ public interface Interval {
     String type();
 
     DateHistogramInterval toDateHistogramInterval(TimeRange timerange);
+
+    default Long offset() {
+        return 0L;
+    }
 }
