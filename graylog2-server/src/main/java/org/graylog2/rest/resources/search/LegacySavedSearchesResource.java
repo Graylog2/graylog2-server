@@ -60,14 +60,14 @@ import java.util.Map;
 @RequiresAuthentication
 @Api(value = "Legacy/Search/Saved", description = "Saved searches")
 @Path("/legacy/search/saved")
-public class SavedSearchesResource extends SearchResource {
+public class LegacySavedSearchesResource extends SearchResource {
     private final SavedSearchService savedSearchService;
 
     @Inject
-    public SavedSearchesResource(Searches searches,
-                                 SavedSearchService savedSearchService,
-                                 ClusterConfigService clusterConfigService,
-                                 DecoratorProcessor decoratorProcessor) {
+    public LegacySavedSearchesResource(Searches searches,
+                                       SavedSearchService savedSearchService,
+                                       ClusterConfigService clusterConfigService,
+                                       DecoratorProcessor decoratorProcessor) {
         super(searches, clusterConfigService, decoratorProcessor);
         this.savedSearchService = savedSearchService;
     }
@@ -90,7 +90,7 @@ public class SavedSearchesResource extends SearchResource {
         final SavedSearch search = savedSearchService.create(cr.title(), cr.query(), getCurrentUser().getName(), Tools.nowUTC());
         final String id = savedSearchService.save(search);
 
-        final URI searchUri = getUriBuilderToSelf().path(SavedSearchesResource.class)
+        final URI searchUri = getUriBuilderToSelf().path(LegacySavedSearchesResource.class)
                 .path("{searchId}")
                 .build(id);
 
