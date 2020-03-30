@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { isFunction } from 'lodash';
 import isDeepEqual from './isDeepEqual';
 
@@ -23,7 +23,13 @@ function id<V, R>(x: V) {
 
 export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: PropsMapper<V, R> = id): R {
   const [storeState, setStoreState] = useState(() => propsMapper(store.getInitialState()));
-  useEffect(() => store.listen(newState => setStoreState(propsMapper(newState))), [store]);
+  const storeStateRef = useRef(storeState);
+  useEffect(() => store.listen((newState) => {
+    if (!isDeepEqual(newState, storeStateRef.current)) {
+      setStoreState(propsMapper(newState));
+      storeStateRef.current = newState;
+    }
+  }), [store]);
   return storeState;
 }
 

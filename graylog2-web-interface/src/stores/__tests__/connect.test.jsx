@@ -33,7 +33,7 @@ const SimpleStore: Store<{ value: number }> & Actions = Reflux.createStore({
     return this.state;
   },
   setValue(value) {
-    this.state = { value: value };
+    this.state = { value };
     this.trigger(this.state);
   },
   noop() {},
@@ -231,5 +231,22 @@ describe('useStore', () => {
     const wrapper = mount(<Component />);
     act(() => SimpleStore.setValue(42));
     expect(wrapper).toHaveText('Value is: 84');
+  });
+  it('does not rerender component if state does not change', () => {
+    let renderCount = 0;
+    const SimpleComponentWithRenderCounter = () => {
+      renderCount += 1;
+      const { value } = useStore(SimpleStore) || {};
+      return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
+    };
+    mount(<SimpleComponentWithRenderCounter />);
+
+    const beforeFirstSet = renderCount;
+    act(() => SimpleStore.setValue(42));
+    expect(renderCount).toEqual(beforeFirstSet + 1);
+
+    const beforeSecondSet = renderCount;
+    act(() => SimpleStore.setValue(42));
+    expect(renderCount).toEqual(beforeSecondSet);
   });
 });
