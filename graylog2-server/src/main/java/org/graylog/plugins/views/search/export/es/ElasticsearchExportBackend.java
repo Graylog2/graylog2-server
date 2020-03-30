@@ -26,6 +26,7 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.searchtypes.Sort;
@@ -33,6 +34,7 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,20 +104,9 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     private Search buildSearchRequest(MessagesRequest request, Object[] searchAfterValues) {
+        SearchSourceBuilder ssb = searchSourceBuilderFrom(request, searchAfterValues);
+
         Set<String> indices = indicesFor(request);
-        QueryBuilder query = queryFrom(request);
-
-        SearchSourceBuilder ssb = new SearchSourceBuilder()
-                .query(query)
-                .size(CHUNK_SIZE);
-
-        for (Sort sort : request.sort().get())
-            ssb.sort(SortBuilders.fieldSort(sort.field()).order(sort.order()));
-
-        ssb.sort(SortBuilders.fieldSort(TIEBREAKER_FIELD).order(SortOrder.ASC).unmappedType("string"));
-
-        if (searchAfterValues != null)
-            ssb.searchAfter(searchAfterValues);
 
         return new Search.Builder(ssb.toString())
                 .addType(IndexMapping.TYPE_MESSAGE)
@@ -125,10 +116,54 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .build();
     }
 
-    private Object[] lastHitSortFrom(List<SearchResult.Hit<Map, Void>> hits) {
-        SearchResult.Hit<Map, Void> lastHit = hits.get(hits.size() - 1);
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    private SearchSourceBuilder searchSourceBuilderFrom(MessagesRequest request, Object[] searchAfterValues) {
+        QueryBuilder query = queryFrom(request.queryString().get(), request.timeRange().get(), request.streams().get());
 
-        return lastHit.sort.toArray(new Object[0]);
+        SearchSourceBuilder ssb = new SearchSourceBuilder()
+                .query(query)
+                .size(CHUNK_SIZE);
+
+        addSort(ssb, request.sort().get());
+
+        if (searchAfterValues != null) {
+            ssb.searchAfter(searchAfterValues);
+        }
+        return ssb;
+    }
+
+    private QueryBuilder queryFrom(BackendQuery queryString, TimeRange timeRange, Set<String> streams) {
+        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) queryString;
+
+        QueryBuilder query = backendQuery.isEmpty() ?
+                matchAllQuery() :
+                queryStringQuery(backendQuery.queryString());//.allowLeadingWildcard(allowLeadingWildcardSearches);
+
+        BoolQueryBuilder filter = boolQuery()
+                .filter(query)
+                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(timeRange)));
+//TODO: find out, if we need the extra filter for dashboard widgets?
+//        if (!isNullOrEmpty(filterString)) {
+//            filter.filter(queryStringQuery(filterString));
+//        }
+
+        if (!streams.isEmpty())
+            filter.filter(termsQuery(Message.FIELD_STREAMS, streams));
+
+        return filter;
+    }
+
+    private void addSort(SearchSourceBuilder ssb, LinkedHashSet<Sort> sorts) {
+        for (Sort sort : sorts) {
+            ssb.sort(SortBuilders.fieldSort(sort.field()).order(sort.order()));
+        }
+
+        ssb.sort(SortBuilders.fieldSort(TIEBREAKER_FIELD).order(SortOrder.ASC).unmappedType("string"));
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    private Set<String> indicesFor(MessagesRequest request) {
+        return indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get());
     }
 
     private boolean publishChunk(Consumer<LinkedHashSet<LinkedHashSet<String>>> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, Set<String> desiredFieldsInOrder) {
@@ -155,29 +190,9 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .collect(toCollection(LinkedHashSet::new));
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public Set<String> indicesFor(MessagesRequest request) {
-        return indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get());
-    }
+    private Object[] lastHitSortFrom(List<SearchResult.Hit<Map, Void>> hits) {
+        SearchResult.Hit<Map, Void> lastHit = hits.get(hits.size() - 1);
 
-    private QueryBuilder queryFrom(MessagesRequest request) {
-        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) request.queryString().get();
-
-        final QueryBuilder query = backendQuery.isEmpty() ?
-                matchAllQuery() :
-                queryStringQuery(backendQuery.queryString());//.allowLeadingWildcard(allowLeadingWildcardSearches);
-
-        final BoolQueryBuilder filter = boolQuery()
-                .filter(query)
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(request.timeRange().get())));
-//TODO: find out, if we need the extra filter for dashboard widgets?
-//        if (!isNullOrEmpty(filterString)) {
-//            filter.filter(queryStringQuery(filterString));
-//        }
-
-        if (!request.streams().get().isEmpty())
-            filter.filter(termsQuery(Message.FIELD_STREAMS, request.streams().get()));
-
-        return filter;
+        return lastHit.sort.toArray(new Object[0]);
     }
 }
