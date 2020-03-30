@@ -1,5 +1,6 @@
 // @flow strict
 import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 
 import View from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
@@ -52,6 +53,10 @@ const SearchExecutionErrors = ({ errors }: { errors: Object[] }) => {
       </Row>
     </AppContentGrid>
   );
+};
+
+SearchExecutionErrors.propTypes = {
+  errors: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default SearchExecutionErrors;
