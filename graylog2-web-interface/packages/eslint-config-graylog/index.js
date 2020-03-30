@@ -42,9 +42,6 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
-    'react/static-property-placement': ['error', 'property assignment', {
-      contextType: 'static public field',
-      contextTypes: 'static public field',
-    }],
+    'react/static-property-placement': 'off',
   },
 };
