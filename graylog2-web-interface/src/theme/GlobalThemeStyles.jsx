@@ -1,5 +1,6 @@
 import { createGlobalStyle, css } from 'styled-components';
 
+import { util } from 'theme';
 import 'opensans-npm-webfont/open_sans.css';
 import 'opensans-npm-webfont/open_sans_italic.css';
 import 'opensans-npm-webfont/open_sans_bold.css';
@@ -177,7 +178,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .master-node {
-    color: #f89406;
+    color: ${theme.color.variant.dark.warning};
   }
 
   .loglevel-metrics-row {
@@ -365,8 +366,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .sources th {
-    background-color: #333;
-    color: ${theme.color.global.textAlt};
+    background-color: ${theme.color.gray[20]};
+    color: ${util.readableColor(theme.color.gray[20])};
     font-weight: normal;
   }
 
@@ -376,8 +377,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .parse-error {
-    background-color: #f2dede;
-    color: #a94442;
+    background-color: ${theme.color.variant.light.danger};
+    color: ${util.contrastingColor(theme.color.variant.light.danger)};
     padding-left: 2px;
     padding-right: 2px;
   }

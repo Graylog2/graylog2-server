@@ -26,10 +26,10 @@ type Props = {
   },
 };
 
-const DecoratedField = styled.small`
-  color: #aaa;
+const DecoratedField = styled.small(({ theme }) => `
+  color: ${theme.color.gray[70]};
   font-weight: normal;
-`;
+`);
 
 const MessageField = ({ fieldName, fieldType, message, value, currentView }: Props) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;

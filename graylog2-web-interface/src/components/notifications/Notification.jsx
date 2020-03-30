@@ -11,17 +11,17 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const NotificationsActions = ActionsProvider.getActions('Notifications');
 
-const StyledAlert = styled(Alert)`
+const StyledAlert = styled(Alert)(({ theme }) => `
   margin-top: 10px;
 
   i {
-    color: #000;
+    color: ${theme.color.gray[0]};
   }
 
   form {
     margin-bottom: 0;
   }
-`;
+`);
 
 const NotificationHead = styled.h3`
   margin-bottom: 5px;

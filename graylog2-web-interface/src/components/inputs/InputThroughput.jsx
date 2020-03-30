@@ -13,9 +13,9 @@ import ActionsProvider from 'injection/ActionsProvider';
 import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
 
-const InputIO = styled.span`
+const InputIO = styled.span(({ theme }) => `
   .total {
-    color: #b8b8b8;
+    color: ${theme.color.gray[70]};
   }
 
   .value {
@@ -40,7 +40,7 @@ const InputIO = styled.span`
     position: relative;
     top: -1px;
   }
-`;
+`);
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');

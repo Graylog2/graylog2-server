@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { type StyledComponent } from 'styled-components';
 
+import { util, type ThemeInterface } from 'theme';
+
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -20,14 +22,14 @@ import Field from 'views/components/Field';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
-const TableWrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   grid-row: 1;
   -ms-grid-row: 1;
   grid-column: 1;
   -ms-grid-column: 1;
 `;
 
-const Table = styled.table`
+const Table: StyledComponent<StyleProps, ThemeInterface, *> = styled.table(({ theme }) => `
   position: relative;
   font-size: 11px;
   margin-top: 0;
@@ -52,11 +54,11 @@ const Table = styled.table`
   }
 
   tbody.message-group-toggled {
-    border-left: 7px solid #16ace3;
+    border-left: 7px solid ${theme.color.variant.light.info};
   }
 
   tbody.message-highlight {
-    border-left: 7px solid #8dc63f;
+    border-left: 7px solid ${theme.color.variant.light.success};
   }
 
   tr.fields-row {
@@ -72,7 +74,7 @@ const Table = styled.table`
     padding-top: 0;
     padding-bottom: 5px;
     font-family: monospace;
-    color: #16ace3;
+    color: ${theme.color.variant.light.info};
   }
 
   tr.message-row {
@@ -116,27 +118,27 @@ const Table = styled.table`
 
     th,
     td {
-      border: 1px #ccc solid !important;
+      border: 1px ${theme.color.gray[80]} solid !important;
       left: 0;
       padding: 5px;
       position: static;
     }
   }
-`;
+`);
 
-const TableHead = styled.thead`
-  background-color: #eee;
-  color: #333;
+const TableHead: StyledComponent<StyleProps, ThemeInterface, *> = styled.thead(({ theme }) => `
+  background-color: ${theme.color.gray[90]};
+  color: ${util.readableColor(theme.color.gray[90])};
 
   th {
     border: 0;
     font-size: 11px;
     font-weight: normal;
     white-space: nowrap;
-    background-color: #eee;
-    color: #333;
+    background-color: ${theme.color.gray[90]};
+    color: ${util.readableColor(theme.color.gray[90])};
   }
-`;
+`);
 
 type State = {
   expandedMessages: Immutable.Set<string>,

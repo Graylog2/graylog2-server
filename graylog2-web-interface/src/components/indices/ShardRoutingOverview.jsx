@@ -1,39 +1,42 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-
-import { ShardRouting } from 'components/indices';
 import naturalSort from 'javascript-natural-sort';
 
-const ShardRoutingWrap = styled.div`
-  .shards .shard {
-    padding: 10px;
-    margin: 5px;
-    width: 50px;
-    float: left;
-    text-align: center;
-  }
+import { util } from 'theme';
+import { ShardRouting } from 'components/indices';
 
-  .shards .shard-started {
-    background-color: #dff0d8;
-  }
+const ShardRoutingWrap = styled.div(({ theme }) => `
+  .shards {
+    .shard {
+      padding: 10px;
+      margin: 5px;
+      width: 50px;
+      float: left;
+      text-align: center;
+    }
 
-  .shards .shard-relocating {
-    background-color: #de9df4;
-  }
+    .shard-started {
+      background-color: ${util.colorLevel(theme.color.variant.light.success, -2)};
+    }
 
-  .shards .shard-initializing {
-    background-color: #f4ddbc;
-  }
+    .shard-relocating {
+      background-color: ${util.colorLevel(theme.color.variant.light.primary, -2)};
+    }
 
-  .shards .shard-unassigned {
-    background-color: #c3c3c3;
-  }
+    .shard-initializing {
+      background-color: ${util.colorLevel(theme.color.variant.light.warning, -5)};
+    }
 
-  .shards .shard-primary .id {
-    font-weight: bold;
-    margin-bottom: 3px;
-    border-bottom: 1px solid #000;
+    .shard-unassigned {
+      background-color: ${util.colorLevel(theme.color.variant.light.default, -2)};
+    }
+
+    .shard-primary .id {
+      font-weight: bold;
+      margin-bottom: 3px;
+      border-bottom: 1px solid ${theme.color.gray[0]};
+    }
   }
 
   .description {
@@ -41,7 +44,7 @@ const ShardRoutingWrap = styled.div`
     margin-top: 2px;
     margin-left: 6px;
   }
-`;
+`);
 
 class ShardRoutingOverview extends React.Component {
   static propTypes = {

@@ -23,6 +23,19 @@ grayScale.forEach((tint, index) => {
   gray[key] = tint;
 });
 
+const wat = {
+  10: '#1f1f1f',
+  20: '#383838',
+  30: '#515151',
+  40: '#6a6a6a',
+  50: '#838383',
+  60: '#9b9b9b',
+  70: '#b4b4b4',
+  80: '#cdcdcd',
+  90: '#e6e6e6',
+  100: '#ffffff',
+};
+
 const variant = {
   danger: '#ad0707',
   default: '#1f1f1f',
