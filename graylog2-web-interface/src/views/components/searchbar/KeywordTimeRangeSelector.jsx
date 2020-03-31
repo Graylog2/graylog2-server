@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
+import TimerangeSelector from './TimerangeSelector';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
@@ -92,7 +93,7 @@ export default class KeywordTimeRangeSelector extends React.Component {
       </KeywordPreview>
     );
     return (
-      <div className="timerange-selector keyword">
+      <TimerangeSelector className="keyword">
         <Row className="no-bm" style={{ marginLeft: 50 }}>
           <Col xs={3} style={{ padding: 0 }}>
             <FormGroup controlId="form-inline-keyword" style={{ marginRight: 5, width: '100%' }} validationState={validationState}>
@@ -112,7 +113,7 @@ export default class KeywordTimeRangeSelector extends React.Component {
             {keywordPreviewElement}
           </Col>
         </Row>
-      </div>
+      </TimerangeSelector>
     );
   }
 }

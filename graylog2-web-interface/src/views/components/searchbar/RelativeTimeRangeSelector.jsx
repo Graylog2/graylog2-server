@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import Input from 'components/bootstrap/Input';
+import TimerangeSelector from './TimerangeSelector';
 
 export default function RelativeTimeRangeSelector({ config, disabled, value, onChange }) {
   const availableOptions = config.relative_timerange_options;
@@ -36,8 +37,8 @@ export default function RelativeTimeRangeSelector({ config, disabled, value, onC
   }
 
   return (
-    <div className="timerange-selector relative"
-         style={{ marginLeft: 50 }}>
+    <TimerangeSelector className="relative"
+                       style={{ marginLeft: 50 }}>
       <Input id="relative-timerange-selector"
              disabled={disabled}
              type="select"
@@ -47,7 +48,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, value, onC
              onChange={(event) => onChange('range', event.target.value)}>
         {options}
       </Input>
-    </div>
+    </TimerangeSelector>
   );
 }
 

@@ -7,6 +7,7 @@ import Input from 'components/bootstrap/Input';
 import { DatePicker, Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
+import TimerangeSelector from './TimerangeSelector';
 import styles from './AbsoluteTimeRangeSelector.css';
 
 const _formattedDateStringInUserTZ = (dateString) => {
@@ -76,7 +77,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
     const { disabled, onChange } = this.props;
 
     return (
-      <div className={`timerange-selector absolute ${styles.selectorContainer}`}>
+      <TimerangeSelector className={`absolute ${styles.selectorContainer}`}>
         <input type="hidden" name="from" />
         <div className={styles.inputWidth}>
           <DatePicker id="searchFromDatePicker"
@@ -129,7 +130,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    required />
           </DatePicker>
         </div>
-      </div>
+      </TimerangeSelector>
     );
   }
 }
