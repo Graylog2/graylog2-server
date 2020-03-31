@@ -66,7 +66,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
   if (!pluginExports.find((value) => value.description.toLowerCase() === 'enterprise')) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
-      path: '/system/enterprise',
+      path: Routes.SYSTEM.ENTERPRISE,
       description: 'Enterprise',
       enterprise: undefined,
     });
