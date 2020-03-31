@@ -18,16 +18,16 @@ import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 
+const WidgetContainer = styled.div(({ theme }) => `
+  background-color: ${theme.color.global.contentBackground};
+  border: 1px solid ${theme.color.gray[80]};
+  z-index: auto;
+`);
+
 const DashboardWrap = styled.div(({ theme }) => css`
   color: ${theme.color.global.textDefault};
   margin: 0;
   width: 100%;
-`);
-
-const WidgetContainer = styled.div(({ theme }) => css`
-  background-color: ${theme.color.global.contentBackground};
-  border: 1px solid ${theme.color.gray[80]};
-  z-index: auto;
 `);
 
 const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
