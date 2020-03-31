@@ -1088,7 +1088,8 @@
       "node_modules/es-abstract/GetIntrinsic.js": 259,
       "node_modules/has-symbols/index.js": 260,
       "node_modules/has-symbols/shams.js": 261,
-      "node_modules/prop-types-extra/node_modules/warning/warning.js": 262
+      "node_modules/prop-types-extra/node_modules/warning/warning.js": 262,
+      "node_modules/chroma-js/chroma.js": 47
     },
     "usedIds": {
       "0": 0,

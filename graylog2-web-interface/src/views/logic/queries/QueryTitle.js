@@ -8,8 +8,8 @@ const queryTitle = (view: View, queryId: QueryId): ?string => (view && view.sear
     .map((q, idx) => {
       if (queryId !== undefined && q.id !== undefined && queryId === q.id) {
         return view.state
-          ? view.state.getIn([q.id], ViewState.create()).titles.getIn(['tab', 'title'], `Query#${idx + 1}`)
-          : `Query#${idx + 1}`;
+          ? view.state.getIn([q.id], ViewState.create()).titles.getIn(['tab', 'title'], `Page#${idx + 1}`)
+          : `Page#${idx + 1}`;
       }
       return undefined;
     }).filter(title => title !== undefined)

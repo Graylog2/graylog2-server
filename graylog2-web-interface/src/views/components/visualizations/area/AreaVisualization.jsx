@@ -23,7 +23,7 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
 
-const AreaVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange }: VisualizationComponentProps) => {
+const AreaVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   // $FlowFixMe: We need to assume it is a LineVisualizationConfig instance
   const visualizationConfig: AreaVisualizationConfig = config.visualizationConfig || AreaVisualizationConfig.empty();
   const { interpolation = 'linear' } = visualizationConfig;
@@ -49,6 +49,7 @@ const AreaVisualization: VisualizationComponent = makeVisualization(({ config, d
             plotLayout={layout}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
+            height={height}
             setChartColor={setChartColor}
             chartData={chartDataResult} />
   );
@@ -57,6 +58,7 @@ const AreaVisualization: VisualizationComponent = makeVisualization(({ config, d
 AreaVisualization.propTypes = {
   config: AggregationType.isRequired,
   data: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object)).isRequired,
+  height: PropTypes.number,
 };
 
 export default AreaVisualization;

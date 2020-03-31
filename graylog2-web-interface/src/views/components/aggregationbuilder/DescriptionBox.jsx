@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
+import styled from 'styled-components';
 
 import { Popover } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -9,21 +10,13 @@ import { Icon } from 'components/common';
 import styles from './DescriptionBox.css';
 import HoverForHelp from './HoverForHelp';
 
-export default class DescriptionBox extends React.Component {
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    configurableOptions: PropTypes.node,
-    description: PropTypes.string.isRequired,
-    help: PropTypes.string,
-    style: PropTypes.object,
-  };
+const ConfigButton = styled.button`
+  border: 0;
+  background: transparent;
+  padding: 0;
+`;
 
-  static defaultProps = {
-    configurableOptions: undefined,
-    style: undefined,
-    help: undefined,
-  };
-
+class DescriptionBox extends React.Component {
   constructor(props) {
     super(props);
 
@@ -66,11 +59,10 @@ export default class DescriptionBox extends React.Component {
     const { configurableOptions } = this.props;
     if (configurableOptions) {
       return (
-        <Icon ref={(node) => { this.target = node; }}
-              role="button"
-              tabIndex={0}
-              onClick={this.onToggleConfig}
-              name="wrench" />
+        <ConfigButton ref={(node) => { this.target = node; }}
+                      onClick={this.onToggleConfig}>
+          <Icon name="wrench" />
+        </ConfigButton>
       );
     }
     return null;
@@ -80,10 +72,30 @@ export default class DescriptionBox extends React.Component {
     const { description, children, help, style: inlineStyle } = this.props;
     return (
       <div className={styles.descriptionBox} style={inlineStyle}>
-        <div className={styles.description}>{description} {this.configCaret()} {help && <HoverForHelp title={description}>{help}</HoverForHelp>}</div>
+        <div className={styles.description}>
+          {description}
+          {this.configCaret()}
+          {help && <HoverForHelp title={description}>{help}</HoverForHelp>}
+        </div>
         {children}
         {this.configPopover()}
       </div>
     );
   }
 }
+
+DescriptionBox.propTypes = {
+  children: PropTypes.node.isRequired,
+  configurableOptions: PropTypes.node,
+  description: PropTypes.string.isRequired,
+  help: PropTypes.string,
+  style: PropTypes.object,
+};
+
+DescriptionBox.defaultProps = {
+  configurableOptions: undefined,
+  style: undefined,
+  help: undefined,
+};
+
+export default DescriptionBox;

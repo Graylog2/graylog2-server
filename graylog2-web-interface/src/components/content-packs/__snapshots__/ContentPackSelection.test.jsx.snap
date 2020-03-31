@@ -181,7 +181,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -209,7 +209,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Name"
@@ -222,7 +222,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="name"
                                         label="Name"
                                         maxLength={250}
@@ -245,7 +245,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -264,10 +264,10 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Required. Give a descriptive name for this content pack.
                                       </span>
@@ -415,7 +415,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -443,7 +443,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Summary"
@@ -456,7 +456,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="summary"
                                         label="Summary"
                                         maxLength={250}
@@ -479,7 +479,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -498,10 +498,10 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Required. Give a short summary of the content pack.
                                       </span>
@@ -647,7 +647,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -674,7 +674,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="textarea"
                                       inputRef={[Function]}
                                       label="Description"
@@ -686,7 +686,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <textarea
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="description"
                                         label="Description"
                                         name="description"
@@ -708,7 +708,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -727,10 +727,10 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Give a long description of the content pack in markdown.
                                       </span>
@@ -878,7 +878,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -906,7 +906,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Vendor"
@@ -919,7 +919,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="vendor"
                                         label="Vendor"
                                         maxLength={250}
@@ -942,7 +942,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -961,10 +961,10 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                       </span>
@@ -1110,7 +1110,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1137,7 +1137,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="URL"
@@ -1149,7 +1149,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="url"
                                         label="URL"
                                         maxLength={250}
@@ -1171,7 +1171,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1190,10 +1190,10 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Where can I find the content pack. e.g. github url
                                       </span>
@@ -1348,7 +1348,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "kojzoH",
+                                "lastClassName": "iWqiEF",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1371,12 +1371,12 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                             disabled={false}
                             type="submit"
                           >
                             <button
-                              className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                               disabled={false}
                               type="submit"
                             >
@@ -1431,7 +1431,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "kojzoH",
+                                "lastClassName": "iWqiEF",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1455,13 +1455,13 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
                             <button
-                              className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                               disabled={false}
                               onClick={[Function]}
                               type="reset"
@@ -1711,7 +1711,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1739,7 +1739,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Name"
@@ -1752,7 +1752,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="name"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="name"
                                         label="Name"
                                         maxLength={250}
@@ -1775,7 +1775,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1794,10 +1794,10 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Required. Give a descriptive name for this content pack.
                                       </span>
@@ -1945,7 +1945,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1973,7 +1973,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Summary"
@@ -1986,7 +1986,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="summary"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="summary"
                                         label="Summary"
                                         maxLength={250}
@@ -2009,7 +2009,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2028,10 +2028,10 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Required. Give a short summary of the content pack.
                                       </span>
@@ -2177,7 +2177,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2204,7 +2204,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="textarea"
                                       inputRef={[Function]}
                                       label="Description"
@@ -2216,7 +2216,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="description"
                                     >
                                       <textarea
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="description"
                                         label="Description"
                                         name="description"
@@ -2238,7 +2238,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2257,10 +2257,10 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Give a long description of the content pack in markdown.
                                       </span>
@@ -2408,7 +2408,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2436,7 +2436,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Vendor"
@@ -2449,7 +2449,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="vendor"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="vendor"
                                         label="Vendor"
                                         maxLength={250}
@@ -2472,7 +2472,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2491,10 +2491,10 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                       </span>
@@ -2640,7 +2640,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "igyPGR",
+                                          "lastClassName": "fcGLmv",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2667,7 +2667,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 igyPGR"
+                                      className="FormControl-sc-1amoaox-0 fcGLmv"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="URL"
@@ -2679,7 +2679,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="http://example.com"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                         id="url"
                                         label="URL"
                                         maxLength={250}
@@ -2701,7 +2701,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "HelpBlock-i8is92-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCBNCb",
+                                          "lastClassName": "kxWRDS",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2720,10 +2720,10 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <HelpBlock
                                       bsClass="help-block"
-                                      className="HelpBlock-i8is92-0 hCBNCb"
+                                      className="HelpBlock-i8is92-0 kxWRDS"
                                     >
                                       <span
-                                        className="HelpBlock-i8is92-0 hCBNCb help-block"
+                                        className="HelpBlock-i8is92-0 kxWRDS help-block"
                                       >
                                         Where can I find the content pack. e.g. github url
                                       </span>
@@ -2772,7 +2772,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                     "componentStyle": ComponentStyle {
                       "componentId": "HelpBlock-i8is92-0",
                       "isStatic": false,
-                      "lastClassName": "hCBNCb",
+                      "lastClassName": "kxWRDS",
                       "rules": Array [
                         [Function],
                       ],
@@ -2791,36 +2791,47 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
               >
                 <HelpBlock
                   bsClass="help-block"
-                  className="HelpBlock-i8is92-0 hCBNCb"
+                  className="HelpBlock-i8is92-0 kxWRDS"
                 >
                   <span
-                    className="HelpBlock-i8is92-0 hCBNCb help-block"
+                    className="HelpBlock-i8is92-0 kxWRDS help-block"
                   >
                     You can select between installed entities from the server (
-                    <ForwardRef
-                      fixedWidth={false}
-                      inverse={false}
+                    <Icon
                       name="server"
-                      pulse={false}
-                      spin={false}
                     >
-                      <i
-                        className="fa fa-server"
-                      />
-                    </ForwardRef>
+                      <FontAwesomeIcon
+                        icon={
+                          Object {
+                            "iconName": "server",
+                            "prefix": "fas",
+                          }
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-server"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
                     ) or entities from the former content pack revision (
-                    <ForwardRef
+                    <Icon
                       className="contentPackEntity"
-                      fixedWidth={false}
-                      inverse={false}
                       name="archive"
-                      pulse={false}
-                      spin={false}
                     >
-                      <i
-                        className="fa fa-archive contentPackEntity"
-                      />
-                    </ForwardRef>
+                      <FontAwesomeIcon
+                        className="contentPackEntity"
+                        icon={
+                          Object {
+                            "iconName": "archive",
+                            "prefix": "fas",
+                          }
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-archive"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
                     ).
                   </span>
                 </HelpBlock>
@@ -2941,7 +2952,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "kojzoH",
+                                "lastClassName": "iWqiEF",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -2964,12 +2975,12 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                             disabled={false}
                             type="submit"
                           >
                             <button
-                              className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                               disabled={false}
                               type="submit"
                             >
@@ -3024,7 +3035,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "kojzoH",
+                                "lastClassName": "iWqiEF",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -3048,13 +3059,13 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
                             <button
-                              className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                               disabled={false}
                               onClick={[Function]}
                               type="reset"
@@ -3142,30 +3153,42 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                           role="button"
                           tabIndex={0}
                         >
-                          <ForwardRef
+                          <Icon
                             className="fa-stack-1x iconBackground"
-                            fixedWidth={false}
-                            inverse={false}
-                            name="circle-thin"
-                            pulse={false}
-                            spin={false}
+                            name="circle"
                           >
-                            <i
-                              className="fa fa-circle-thin fa-stack-1x iconBackground"
-                            />
-                          </ForwardRef>
-                          <ForwardRef
+                            <FontAwesomeIcon
+                              className="fa-stack-1x iconBackground"
+                              icon={
+                                Object {
+                                  "iconName": "circle",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-circle"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
+                          <Icon
                             className="fa-stack-1x"
-                            fixedWidth={false}
-                            inverse={false}
                             name="angle-up"
-                            pulse={false}
-                            spin={false}
                           >
-                            <i
-                              className="fa fa-angle-up fa-stack-1x"
-                            />
-                          </ForwardRef>
+                            <FontAwesomeIcon
+                              className="fa-stack-1x"
+                              icon={
+                                Object {
+                                  "iconName": "angle-up",
+                                  "prefix": "fas",
+                                }
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-angle-up"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
                         </div>
                       </div>
                       <span

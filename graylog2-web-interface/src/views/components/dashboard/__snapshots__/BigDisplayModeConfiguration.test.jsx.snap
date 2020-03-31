@@ -11,8 +11,8 @@ exports[`BigDisplayModeConfiguration generates markup that matches snapshot 1`] 
       role="menuitem"
       tabindex="-1"
     >
-      <i
-        class="fa fa-desktop"
+      <svg
+        class="svg-inline--fa fa-desktop"
       />
        Full Screen
     </a>

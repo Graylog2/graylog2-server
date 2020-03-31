@@ -107,4 +107,58 @@ describe('XYPlot', () => {
       xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
     });
   });
+
+  it('sets correct plot legend position for small containers', () => {
+    const wrapper = mount((
+      <XYPlot chartData={chartData}
+              getChartColor={getChartColor}
+              setChartColor={setChartColor}
+              height={140}
+              config={config}
+              currentQuery={currentQuery}
+              timezone="UTC" />
+    ));
+    const genericPlot = wrapper.find('GenericPlot');
+    expect(genericPlot).toHaveProp('layout', {
+      yaxis: { fixedrange: true, rangemode: 'tozero' },
+      xaxis: { fixedrange: true },
+      legend: { y: -0.6 },
+    });
+  });
+
+  it('sets correct plot legend position for containers with medium height', () => {
+    const wrapper = mount((
+      <XYPlot chartData={chartData}
+              getChartColor={getChartColor}
+              setChartColor={setChartColor}
+              height={350}
+              config={config}
+              currentQuery={currentQuery}
+              timezone="UTC" />
+    ));
+    const genericPlot = wrapper.find('GenericPlot');
+    expect(genericPlot).toHaveProp('layout', {
+      yaxis: { fixedrange: true, rangemode: 'tozero' },
+      xaxis: { fixedrange: true },
+      legend: { y: -0.2 },
+    });
+  });
+
+  it('sets correct plot legend position for containers with huge height', () => {
+    const wrapper = mount((
+      <XYPlot chartData={chartData}
+              getChartColor={getChartColor}
+              setChartColor={setChartColor}
+              height={700}
+              config={config}
+              currentQuery={currentQuery}
+              timezone="UTC" />
+    ));
+    const genericPlot = wrapper.find('GenericPlot');
+    expect(genericPlot).toHaveProp('layout', {
+      yaxis: { fixedrange: true, rangemode: 'tozero' },
+      xaxis: { fixedrange: true },
+      legend: { y: -0.14 },
+    });
+  });
 });

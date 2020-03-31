@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, keyframes, type StyledComponent } from 'styled-components';
 // $FlowFixMe removing in future iteration
-import { transparentize } from 'polished';
+import chroma from 'chroma-js';
 
 import { util, type ThemeInterface } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
@@ -34,7 +34,7 @@ const DEFAULT_BAR = {
 };
 
 const boxShadow = meta => css`
-  box-shadow: ${meta} ${({ theme }) => transparentize(0.9, theme.color.brand.secondary)};
+  box-shadow: ${meta} ${({ theme }) => chroma(theme.color.brand.secondary).alpha(0.1).css()};
 `;
 
 const animatedStripes = keyframes`
@@ -64,7 +64,7 @@ const ProgressWrap: StyledComponent<{}, ThemeInterface, *> = styled.div(({ theme
 `);
 
 const Bar: StyledComponent<BarProps, ThemeInterface, *> = styled.div(({ animated, striped, theme, value }) => {
-  const defaultStripColor = transparentize(0.75, theme.color.global.contentBackground);
+  const defaultStripColor = chroma(theme.color.global.contentBackground).alpha(0.25).css();
 
   return css`
     height: 100%;

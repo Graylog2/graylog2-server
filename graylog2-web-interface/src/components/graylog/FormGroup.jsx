@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { FormGroup as BootstrapFormGroup } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import styledTheme from 'styled-theming';
-import { darken, lighten } from 'polished';
+import chroma from 'chroma-js';
 
 import { themeModes, util } from 'theme';
 import FormControl from './FormControl';
@@ -37,8 +37,8 @@ const createCss = validationState => css(({ theme }) => {
         border-color: ${border};
 
         &:focus {
-          border-color: ${darken(0.10, border)};
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px ${lighten(0.20, border)};
+          border-color: ${chroma(border).darken(0.1)};
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px ${chroma(border).brighten(0.2)};
         }
       }
 

@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Panel as BootstrapPanel } from 'react-bootstrap';
 
-import { DEPRECATION_NOTICE } from 'util/constants';
+import deprecationNotice from 'util/deprecationNotice';
 import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
@@ -23,7 +23,7 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
     border-color: ${borderColor};
 
     & > ${PanelHeading} {
-      color: ${util.colorLevel(backgroundColor, 9)};
+      color: ${util.readableColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
@@ -69,7 +69,7 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   ${bsStyleThemeVariant(panelVariantStyles)};
 `);
 
-const deprecatedVariantStyles = hex => css(({ theme }) => {
+const deprecatedVariantStyles = (hex) => css(({ theme }) => {
   const backgroundColor = theme.color.global.background;
   const borderColor = theme.color.gray[80];
 
@@ -161,8 +161,7 @@ const Panel = ({
   if (header || footer || title || collapsible || hasDeprecatedChildren) {
     /** NOTE: Deprecated & should be removed in 4.0 */
     useEffect(() => {
-      /* eslint-disable-next-line no-console */
-      console.warn(DEPRECATION_NOTICE, 'You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
+      deprecationNotice('You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
     }, []);
 
     return (

@@ -77,7 +77,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHBaXW",
                   "rules": Array [
                     "margin-bottom:15px;font-size:14px;",
@@ -96,7 +96,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
             forwardedRef={null}
           >
             <div
-              className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+              className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
             >
               <Component
                 validationState={null}
@@ -236,11 +236,11 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                         >
                           <FormGroup
                             bsClass="form-group"
-                            className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj"
                             validationState={null}
                           >
                             <div
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj form-group"
                             >
                               <Select
                                 allowCreate={false}
@@ -1683,17 +1683,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -3402,17 +3407,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   }
                                                                 }
                                                               >
-                                                                <ForwardRef
-                                                                  fixedWidth={false}
-                                                                  inverse={false}
+                                                                <Icon
                                                                   name="caret-down"
-                                                                  pulse={false}
-                                                                  spin={false}
                                                                 >
-                                                                  <i
-                                                                    className="fa fa-caret-down"
-                                                                  />
-                                                                </ForwardRef>
+                                                                  <FontAwesomeIcon
+                                                                    icon={
+                                                                      Object {
+                                                                        "iconName": "caret-down",
+                                                                        "prefix": "fas",
+                                                                      }
+                                                                    }
+                                                                  >
+                                                                    <svg
+                                                                      className="svg-inline--fa fa-caret-down"
+                                                                    />
+                                                                  </FontAwesomeIcon>
+                                                                </Icon>
                                                               </div>
                                                             </DropdownIndicator>
                                                           </div>
@@ -4954,17 +4964,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                     }
                                                                   }
                                                                 >
-                                                                  <ForwardRef
-                                                                    fixedWidth={false}
-                                                                    inverse={false}
+                                                                  <Icon
                                                                     name="caret-down"
-                                                                    pulse={false}
-                                                                    spin={false}
                                                                   >
-                                                                    <i
-                                                                      className="fa fa-caret-down"
-                                                                    />
-                                                                  </ForwardRef>
+                                                                    <FontAwesomeIcon
+                                                                      icon={
+                                                                        Object {
+                                                                          "iconName": "caret-down",
+                                                                          "prefix": "fas",
+                                                                        }
+                                                                      }
+                                                                    >
+                                                                      <svg
+                                                                        className="svg-inline--fa fa-caret-down"
+                                                                      />
+                                                                    </FontAwesomeIcon>
+                                                                  </Icon>
                                                                 </div>
                                                               </DropdownIndicator>
                                                             </div>
@@ -6711,17 +6726,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -6959,7 +6979,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "igyPGR",
+                                                  "lastClassName": "fcGLmv",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -6985,7 +7005,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 igyPGR"
+                                              className="FormControl-sc-1amoaox-0 fcGLmv"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Threshold"
@@ -6996,7 +7016,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                                className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                                 id="aggregation-threshold"
                                                 label="Threshold"
                                                 name="threshold"
@@ -7122,7 +7142,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -7146,27 +7166,34 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="minus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-minus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "minus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-minus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -7206,7 +7233,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -7230,27 +7257,34 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="plus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-plus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "plus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-plus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -7290,7 +7324,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -7314,12 +7348,12 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -8871,17 +8905,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   }
                                                                 }
                                                               >
-                                                                <ForwardRef
-                                                                  fixedWidth={false}
-                                                                  inverse={false}
+                                                                <Icon
                                                                   name="caret-down"
-                                                                  pulse={false}
-                                                                  spin={false}
                                                                 >
-                                                                  <i
-                                                                    className="fa fa-caret-down"
-                                                                  />
-                                                                </ForwardRef>
+                                                                  <FontAwesomeIcon
+                                                                    icon={
+                                                                      Object {
+                                                                        "iconName": "caret-down",
+                                                                        "prefix": "fas",
+                                                                      }
+                                                                    }
+                                                                  >
+                                                                    <svg
+                                                                      className="svg-inline--fa fa-caret-down"
+                                                                    />
+                                                                  </FontAwesomeIcon>
+                                                                </Icon>
                                                               </div>
                                                             </DropdownIndicator>
                                                           </div>
@@ -10423,17 +10462,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                     }
                                                                   }
                                                                 >
-                                                                  <ForwardRef
-                                                                    fixedWidth={false}
-                                                                    inverse={false}
+                                                                  <Icon
                                                                     name="caret-down"
-                                                                    pulse={false}
-                                                                    spin={false}
                                                                   >
-                                                                    <i
-                                                                      className="fa fa-caret-down"
-                                                                    />
-                                                                  </ForwardRef>
+                                                                    <FontAwesomeIcon
+                                                                      icon={
+                                                                        Object {
+                                                                          "iconName": "caret-down",
+                                                                          "prefix": "fas",
+                                                                        }
+                                                                      }
+                                                                    >
+                                                                      <svg
+                                                                        className="svg-inline--fa fa-caret-down"
+                                                                      />
+                                                                    </FontAwesomeIcon>
+                                                                  </Icon>
                                                                 </div>
                                                               </DropdownIndicator>
                                                             </div>
@@ -12140,17 +12184,22 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -12348,7 +12397,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "igyPGR",
+                                                  "lastClassName": "fcGLmv",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -12374,7 +12423,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 igyPGR"
+                                              className="FormControl-sc-1amoaox-0 fcGLmv"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label=""
@@ -12385,7 +12434,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                                className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                                 id="aggregation-threshold"
                                                 label=""
                                                 name="threshold"
@@ -12509,7 +12558,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -12533,27 +12582,34 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="minus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-minus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "minus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-minus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -12593,7 +12649,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -12617,27 +12673,34 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="plus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-plus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "plus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-plus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -12677,7 +12740,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -12701,12 +12764,12 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -12813,7 +12876,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHBaXW",
                   "rules": Array [
                     "margin-bottom:15px;font-size:14px;",
@@ -12832,7 +12895,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
             forwardedRef={null}
           >
             <div
-              className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+              className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
             >
               <Component
                 validationState={null}
@@ -12972,11 +13035,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                         >
                           <FormGroup
                             bsClass="form-group"
-                            className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj"
                             validationState={null}
                           >
                             <div
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj form-group"
                             >
                               <Select
                                 allowCreate={false}
@@ -14419,17 +14482,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -16150,17 +16218,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                   }
                                                                 }
                                                               >
-                                                                <ForwardRef
-                                                                  fixedWidth={false}
-                                                                  inverse={false}
+                                                                <Icon
                                                                   name="caret-down"
-                                                                  pulse={false}
-                                                                  spin={false}
                                                                 >
-                                                                  <i
-                                                                    className="fa fa-caret-down"
-                                                                  />
-                                                                </ForwardRef>
+                                                                  <FontAwesomeIcon
+                                                                    icon={
+                                                                      Object {
+                                                                        "iconName": "caret-down",
+                                                                        "prefix": "fas",
+                                                                      }
+                                                                    }
+                                                                  >
+                                                                    <svg
+                                                                      className="svg-inline--fa fa-caret-down"
+                                                                    />
+                                                                  </FontAwesomeIcon>
+                                                                </Icon>
                                                               </div>
                                                             </DropdownIndicator>
                                                           </div>
@@ -17702,17 +17775,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                     }
                                                                   }
                                                                 >
-                                                                  <ForwardRef
-                                                                    fixedWidth={false}
-                                                                    inverse={false}
+                                                                  <Icon
                                                                     name="caret-down"
-                                                                    pulse={false}
-                                                                    spin={false}
                                                                   >
-                                                                    <i
-                                                                      className="fa fa-caret-down"
-                                                                    />
-                                                                  </ForwardRef>
+                                                                    <FontAwesomeIcon
+                                                                      icon={
+                                                                        Object {
+                                                                          "iconName": "caret-down",
+                                                                          "prefix": "fas",
+                                                                        }
+                                                                      }
+                                                                    >
+                                                                      <svg
+                                                                        className="svg-inline--fa fa-caret-down"
+                                                                      />
+                                                                    </FontAwesomeIcon>
+                                                                  </Icon>
                                                                 </div>
                                                               </DropdownIndicator>
                                                             </div>
@@ -19459,17 +19537,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -19707,7 +19790,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "igyPGR",
+                                                  "lastClassName": "fcGLmv",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -19733,7 +19816,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 igyPGR"
+                                              className="FormControl-sc-1amoaox-0 fcGLmv"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Threshold"
@@ -19744,7 +19827,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                                className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                                 id="aggregation-threshold"
                                                 label="Threshold"
                                                 name="threshold"
@@ -19870,7 +19953,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -19894,27 +19977,34 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="minus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-minus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "minus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-minus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -19954,7 +20044,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -19978,27 +20068,34 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
                                   >
-                                    <ForwardRef
+                                    <Icon
                                       fixedWidth={true}
-                                      inverse={false}
                                       name="plus"
-                                      pulse={false}
-                                      spin={false}
                                     >
-                                      <i
-                                        className="fa fa-plus fa-fw"
-                                      />
-                                    </ForwardRef>
+                                      <FontAwesomeIcon
+                                        fixedWidth={true}
+                                        icon={
+                                          Object {
+                                            "iconName": "plus",
+                                            "prefix": "fas",
+                                          }
+                                        }
+                                      >
+                                        <svg
+                                          className="svg-inline--fa fa-plus"
+                                        />
+                                      </FontAwesomeIcon>
+                                    </Icon>
                                   </button>
                                 </Button>
                               </StyledComponent>
@@ -20038,7 +20135,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "kojzoH",
+                                      "lastClassName": "iWqiEF",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -20062,12 +20159,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                  className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -20261,7 +20358,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                        "isStatic": true,
+                        "isStatic": false,
                         "lastClassName": "hHBaXW",
                         "rules": Array [
                           "margin-bottom:15px;font-size:14px;",
@@ -20280,7 +20377,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                   forwardedRef={null}
                 >
                   <div
-                    className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+                    className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
                   >
                     <BooleanOperatorSelector__BooleanOperatorSelect
                       isFirstElement={true}
@@ -20359,11 +20456,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                               >
                                 <FormGroup
                                   bsClass="form-group"
-                                  className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ"
                                   validationState={null}
                                 >
                                   <div
-                                    className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ form-group"
                                   >
                                     <Select
                                       allowCreate={false}
@@ -21806,17 +21903,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             }
                                                           }
                                                         >
-                                                          <ForwardRef
-                                                            fixedWidth={false}
-                                                            inverse={false}
+                                                          <Icon
                                                             name="caret-down"
-                                                            pulse={false}
-                                                            spin={false}
                                                           >
-                                                            <i
-                                                              className="fa fa-caret-down"
-                                                            />
-                                                          </ForwardRef>
+                                                            <FontAwesomeIcon
+                                                              icon={
+                                                                Object {
+                                                                  "iconName": "caret-down",
+                                                                  "prefix": "fas",
+                                                                }
+                                                              }
+                                                            >
+                                                              <svg
+                                                                className="svg-inline--fa fa-caret-down"
+                                                              />
+                                                            </FontAwesomeIcon>
+                                                          </Icon>
                                                         </div>
                                                       </DropdownIndicator>
                                                     </div>
@@ -21918,7 +22020,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "GroupExpression__Group-sc-17izmkk-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "edMkpk",
                   "rules": Array [
                     "padding-left:40px;",
@@ -23441,17 +23543,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                             }
                                                                           }
                                                                         >
-                                                                          <ForwardRef
-                                                                            fixedWidth={false}
-                                                                            inverse={false}
+                                                                          <Icon
                                                                             name="caret-down"
-                                                                            pulse={false}
-                                                                            spin={false}
                                                                           >
-                                                                            <i
-                                                                              className="fa fa-caret-down"
-                                                                            />
-                                                                          </ForwardRef>
+                                                                            <FontAwesomeIcon
+                                                                              icon={
+                                                                                Object {
+                                                                                  "iconName": "caret-down",
+                                                                                  "prefix": "fas",
+                                                                                }
+                                                                              }
+                                                                            >
+                                                                              <svg
+                                                                                className="svg-inline--fa fa-caret-down"
+                                                                              />
+                                                                            </FontAwesomeIcon>
+                                                                          </Icon>
                                                                         </div>
                                                                       </DropdownIndicator>
                                                                     </div>
@@ -24993,17 +25100,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                               }
                                                                             }
                                                                           >
-                                                                            <ForwardRef
-                                                                              fixedWidth={false}
-                                                                              inverse={false}
+                                                                            <Icon
                                                                               name="caret-down"
-                                                                              pulse={false}
-                                                                              spin={false}
                                                                             >
-                                                                              <i
-                                                                                className="fa fa-caret-down"
-                                                                              />
-                                                                            </ForwardRef>
+                                                                              <FontAwesomeIcon
+                                                                                icon={
+                                                                                  Object {
+                                                                                    "iconName": "caret-down",
+                                                                                    "prefix": "fas",
+                                                                                  }
+                                                                                }
+                                                                              >
+                                                                                <svg
+                                                                                  className="svg-inline--fa fa-caret-down"
+                                                                                />
+                                                                              </FontAwesomeIcon>
+                                                                            </Icon>
                                                                           </div>
                                                                         </DropdownIndicator>
                                                                       </div>
@@ -26710,17 +26822,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 }
                                                               }
                                                             >
-                                                              <ForwardRef
-                                                                fixedWidth={false}
-                                                                inverse={false}
+                                                              <Icon
                                                                 name="caret-down"
-                                                                pulse={false}
-                                                                spin={false}
                                                               >
-                                                                <i
-                                                                  className="fa fa-caret-down"
-                                                                />
-                                                              </ForwardRef>
+                                                                <FontAwesomeIcon
+                                                                  icon={
+                                                                    Object {
+                                                                      "iconName": "caret-down",
+                                                                      "prefix": "fas",
+                                                                    }
+                                                                  }
+                                                                >
+                                                                  <svg
+                                                                    className="svg-inline--fa fa-caret-down"
+                                                                  />
+                                                                </FontAwesomeIcon>
+                                                              </Icon>
                                                             </div>
                                                           </DropdownIndicator>
                                                         </div>
@@ -26918,7 +27035,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "FormControl-sc-1amoaox-0",
                                                             "isStatic": false,
-                                                            "lastClassName": "igyPGR",
+                                                            "lastClassName": "fcGLmv",
                                                             "rules": Array [
                                                               [Function],
                                                             ],
@@ -26944,7 +27061,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     >
                                                       <FormControl
                                                         bsClass="form-control"
-                                                        className="FormControl-sc-1amoaox-0 igyPGR"
+                                                        className="FormControl-sc-1amoaox-0 fcGLmv"
                                                         componentClass="input"
                                                         inputRef={[Function]}
                                                         label=""
@@ -26955,7 +27072,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         value={0}
                                                       >
                                                         <input
-                                                          className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                                          className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                                           id="aggregation-threshold"
                                                           label=""
                                                           name="threshold"
@@ -27079,7 +27196,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                 "isStatic": false,
-                                                "lastClassName": "kojzoH",
+                                                "lastClassName": "iWqiEF",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -27103,27 +27220,34 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             bsClass="btn"
                                             bsSize="sm"
                                             bsStyle="default"
-                                            className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                            className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                             disabled={false}
                                             onClick={[Function]}
                                           >
                                             <button
-                                              className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                              className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                               disabled={false}
                                               onClick={[Function]}
                                               type="button"
                                             >
-                                              <ForwardRef
+                                              <Icon
                                                 fixedWidth={true}
-                                                inverse={false}
                                                 name="minus"
-                                                pulse={false}
-                                                spin={false}
                                               >
-                                                <i
-                                                  className="fa fa-minus fa-fw"
-                                                />
-                                              </ForwardRef>
+                                                <FontAwesomeIcon
+                                                  fixedWidth={true}
+                                                  icon={
+                                                    Object {
+                                                      "iconName": "minus",
+                                                      "prefix": "fas",
+                                                    }
+                                                  }
+                                                >
+                                                  <svg
+                                                    className="svg-inline--fa fa-minus"
+                                                  />
+                                                </FontAwesomeIcon>
+                                              </Icon>
                                             </button>
                                           </Button>
                                         </StyledComponent>
@@ -27163,7 +27287,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                 "isStatic": false,
-                                                "lastClassName": "kojzoH",
+                                                "lastClassName": "iWqiEF",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -27187,27 +27311,34 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             bsClass="btn"
                                             bsSize="sm"
                                             bsStyle="default"
-                                            className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                            className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                             disabled={false}
                                             onClick={[Function]}
                                           >
                                             <button
-                                              className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                              className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                               disabled={false}
                                               onClick={[Function]}
                                               type="button"
                                             >
-                                              <ForwardRef
+                                              <Icon
                                                 fixedWidth={true}
-                                                inverse={false}
                                                 name="plus"
-                                                pulse={false}
-                                                spin={false}
                                               >
-                                                <i
-                                                  className="fa fa-plus fa-fw"
-                                                />
-                                              </ForwardRef>
+                                                <FontAwesomeIcon
+                                                  fixedWidth={true}
+                                                  icon={
+                                                    Object {
+                                                      "iconName": "plus",
+                                                      "prefix": "fas",
+                                                    }
+                                                  }
+                                                >
+                                                  <svg
+                                                    className="svg-inline--fa fa-plus"
+                                                  />
+                                                </FontAwesomeIcon>
+                                              </Icon>
                                             </button>
                                           </Button>
                                         </StyledComponent>
@@ -27247,7 +27378,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                 "isStatic": false,
-                                                "lastClassName": "kojzoH",
+                                                "lastClassName": "iWqiEF",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -27271,12 +27402,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             bsClass="btn"
                                             bsSize="sm"
                                             bsStyle="default"
-                                            className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                            className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                             disabled={false}
                                             onClick={[Function]}
                                           >
                                             <button
-                                              className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                              className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                               disabled={false}
                                               onClick={[Function]}
                                               type="button"
@@ -27417,7 +27548,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "hHBaXW",
                     "rules": Array [
                       "margin-bottom:15px;font-size:14px;",
@@ -27436,7 +27567,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
               forwardedRef={null}
             >
               <div
-                className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+                className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
               >
                 <BooleanOperatorSelector__BooleanOperatorSelect
                   isFirstElement={true}
@@ -27515,11 +27646,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ"
                               validationState={null}
                             >
                               <div
-                                className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 creHrZ form-group"
                               >
                                 <Select
                                   allowCreate={false}
@@ -28962,17 +29093,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         }
                                                       }
                                                     >
-                                                      <ForwardRef
-                                                        fixedWidth={false}
-                                                        inverse={false}
+                                                      <Icon
                                                         name="caret-down"
-                                                        pulse={false}
-                                                        spin={false}
                                                       >
-                                                        <i
-                                                          className="fa fa-caret-down"
-                                                        />
-                                                      </ForwardRef>
+                                                        <FontAwesomeIcon
+                                                          icon={
+                                                            Object {
+                                                              "iconName": "caret-down",
+                                                              "prefix": "fas",
+                                                            }
+                                                          }
+                                                        >
+                                                          <svg
+                                                            className="svg-inline--fa fa-caret-down"
+                                                          />
+                                                        </FontAwesomeIcon>
+                                                      </Icon>
                                                     </div>
                                                   </DropdownIndicator>
                                                 </div>
@@ -29074,7 +29210,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "GroupExpression__Group-sc-17izmkk-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "edMkpk",
               "rules": Array [
                 "padding-left:40px;",
@@ -30637,17 +30773,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         }
                                                                       }
                                                                     >
-                                                                      <ForwardRef
-                                                                        fixedWidth={false}
-                                                                        inverse={false}
+                                                                      <Icon
                                                                         name="caret-down"
-                                                                        pulse={false}
-                                                                        spin={false}
                                                                       >
-                                                                        <i
-                                                                          className="fa fa-caret-down"
-                                                                        />
-                                                                      </ForwardRef>
+                                                                        <FontAwesomeIcon
+                                                                          icon={
+                                                                            Object {
+                                                                              "iconName": "caret-down",
+                                                                              "prefix": "fas",
+                                                                            }
+                                                                          }
+                                                                        >
+                                                                          <svg
+                                                                            className="svg-inline--fa fa-caret-down"
+                                                                          />
+                                                                        </FontAwesomeIcon>
+                                                                      </Icon>
                                                                     </div>
                                                                   </DropdownIndicator>
                                                                 </div>
@@ -32189,17 +32330,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                           }
                                                                         }
                                                                       >
-                                                                        <ForwardRef
-                                                                          fixedWidth={false}
-                                                                          inverse={false}
+                                                                        <Icon
                                                                           name="caret-down"
-                                                                          pulse={false}
-                                                                          spin={false}
                                                                         >
-                                                                          <i
-                                                                            className="fa fa-caret-down"
-                                                                          />
-                                                                        </ForwardRef>
+                                                                          <FontAwesomeIcon
+                                                                            icon={
+                                                                              Object {
+                                                                                "iconName": "caret-down",
+                                                                                "prefix": "fas",
+                                                                              }
+                                                                            }
+                                                                          >
+                                                                            <svg
+                                                                              className="svg-inline--fa fa-caret-down"
+                                                                            />
+                                                                          </FontAwesomeIcon>
+                                                                        </Icon>
                                                                       </div>
                                                                     </DropdownIndicator>
                                                                   </div>
@@ -33946,17 +34092,22 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             }
                                                           }
                                                         >
-                                                          <ForwardRef
-                                                            fixedWidth={false}
-                                                            inverse={false}
+                                                          <Icon
                                                             name="caret-down"
-                                                            pulse={false}
-                                                            spin={false}
                                                           >
-                                                            <i
-                                                              className="fa fa-caret-down"
-                                                            />
-                                                          </ForwardRef>
+                                                            <FontAwesomeIcon
+                                                              icon={
+                                                                Object {
+                                                                  "iconName": "caret-down",
+                                                                  "prefix": "fas",
+                                                                }
+                                                              }
+                                                            >
+                                                              <svg
+                                                                className="svg-inline--fa fa-caret-down"
+                                                              />
+                                                            </FontAwesomeIcon>
+                                                          </Icon>
                                                         </div>
                                                       </DropdownIndicator>
                                                     </div>
@@ -34194,7 +34345,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "igyPGR",
+                                                        "lastClassName": "fcGLmv",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -34220,7 +34371,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 igyPGR"
+                                                    className="FormControl-sc-1amoaox-0 fcGLmv"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Threshold"
@@ -34231,7 +34382,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     value={0}
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                                      className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                                       id="aggregation-threshold"
                                                       label="Threshold"
                                                       name="threshold"
@@ -34357,7 +34508,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "kojzoH",
+                                            "lastClassName": "iWqiEF",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -34381,27 +34532,34 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         bsClass="btn"
                                         bsSize="sm"
                                         bsStyle="default"
-                                        className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
                                         >
-                                          <ForwardRef
+                                          <Icon
                                             fixedWidth={true}
-                                            inverse={false}
                                             name="minus"
-                                            pulse={false}
-                                            spin={false}
                                           >
-                                            <i
-                                              className="fa fa-minus fa-fw"
-                                            />
-                                          </ForwardRef>
+                                            <FontAwesomeIcon
+                                              fixedWidth={true}
+                                              icon={
+                                                Object {
+                                                  "iconName": "minus",
+                                                  "prefix": "fas",
+                                                }
+                                              }
+                                            >
+                                              <svg
+                                                className="svg-inline--fa fa-minus"
+                                              />
+                                            </FontAwesomeIcon>
+                                          </Icon>
                                         </button>
                                       </Button>
                                     </StyledComponent>
@@ -34441,7 +34599,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "kojzoH",
+                                            "lastClassName": "iWqiEF",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -34465,27 +34623,34 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         bsClass="btn"
                                         bsSize="sm"
                                         bsStyle="default"
-                                        className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
                                         >
-                                          <ForwardRef
+                                          <Icon
                                             fixedWidth={true}
-                                            inverse={false}
                                             name="plus"
-                                            pulse={false}
-                                            spin={false}
                                           >
-                                            <i
-                                              className="fa fa-plus fa-fw"
-                                            />
-                                          </ForwardRef>
+                                            <FontAwesomeIcon
+                                              fixedWidth={true}
+                                              icon={
+                                                Object {
+                                                  "iconName": "plus",
+                                                  "prefix": "fas",
+                                                }
+                                              }
+                                            >
+                                              <svg
+                                                className="svg-inline--fa fa-plus"
+                                              />
+                                            </FontAwesomeIcon>
+                                          </Icon>
                                         </button>
                                       </Button>
                                     </StyledComponent>
@@ -34525,7 +34690,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "kojzoH",
+                                            "lastClassName": "iWqiEF",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -34549,12 +34714,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         bsClass="btn"
                                         bsSize="sm"
                                         bsStyle="default"
-                                        className="Button__StyledButton-c9cbmb-0 kojzoH"
+                                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
@@ -34640,7 +34805,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHBaXW",
                   "rules": Array [
                     "margin-bottom:15px;font-size:14px;",
@@ -34659,7 +34824,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
             forwardedRef={null}
           >
             <div
-              className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+              className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
             >
               <Component
                 validationState={null}
@@ -34799,11 +34964,11 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                         >
                           <FormGroup
                             bsClass="form-group"
-                            className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj"
                             validationState={null}
                           >
                             <div
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj form-group"
                             >
                               <Select
                                 allowCreate={false}
@@ -36246,17 +36411,22 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -37808,17 +37978,22 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                               }
                                                             }
                                                           >
-                                                            <ForwardRef
-                                                              fixedWidth={false}
-                                                              inverse={false}
+                                                            <Icon
                                                               name="caret-down"
-                                                              pulse={false}
-                                                              spin={false}
                                                             >
-                                                              <i
-                                                                className="fa fa-caret-down"
-                                                              />
-                                                            </ForwardRef>
+                                                              <FontAwesomeIcon
+                                                                icon={
+                                                                  Object {
+                                                                    "iconName": "caret-down",
+                                                                    "prefix": "fas",
+                                                                  }
+                                                                }
+                                                              >
+                                                                <svg
+                                                                  className="svg-inline--fa fa-caret-down"
+                                                                />
+                                                              </FontAwesomeIcon>
+                                                            </Icon>
                                                           </div>
                                                         </DropdownIndicator>
                                                       </div>
@@ -39166,17 +39341,22 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                                 }
                                                               }
                                                             >
-                                                              <ForwardRef
-                                                                fixedWidth={false}
-                                                                inverse={false}
+                                                              <Icon
                                                                 name="caret-down"
-                                                                pulse={false}
-                                                                spin={false}
                                                               >
-                                                                <i
-                                                                  className="fa fa-caret-down"
-                                                                />
-                                                              </ForwardRef>
+                                                                <FontAwesomeIcon
+                                                                  icon={
+                                                                    Object {
+                                                                      "iconName": "caret-down",
+                                                                      "prefix": "fas",
+                                                                    }
+                                                                  }
+                                                                >
+                                                                  <svg
+                                                                    className="svg-inline--fa fa-caret-down"
+                                                                  />
+                                                                </FontAwesomeIcon>
+                                                              </Icon>
                                                             </div>
                                                           </DropdownIndicator>
                                                         </div>
@@ -40923,17 +41103,22 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   }
                                                 }
                                               >
-                                                <ForwardRef
-                                                  fixedWidth={false}
-                                                  inverse={false}
+                                                <Icon
                                                   name="caret-down"
-                                                  pulse={false}
-                                                  spin={false}
                                                 >
-                                                  <i
-                                                    className="fa fa-caret-down"
-                                                  />
-                                                </ForwardRef>
+                                                  <FontAwesomeIcon
+                                                    icon={
+                                                      Object {
+                                                        "iconName": "caret-down",
+                                                        "prefix": "fas",
+                                                      }
+                                                    }
+                                                  >
+                                                    <svg
+                                                      className="svg-inline--fa fa-caret-down"
+                                                    />
+                                                  </FontAwesomeIcon>
+                                                </Icon>
                                               </div>
                                             </DropdownIndicator>
                                           </div>
@@ -41159,7 +41344,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "igyPGR",
+                                              "lastClassName": "fcGLmv",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -41185,7 +41370,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 igyPGR"
+                                          className="FormControl-sc-1amoaox-0 fcGLmv"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Threshold"
@@ -41196,7 +41381,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                           value={0}
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                            className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                             id="aggregation-threshold"
                                             label="Threshold"
                                             name="threshold"
@@ -41322,7 +41507,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "kojzoH",
+                                  "lastClassName": "iWqiEF",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -41346,27 +41531,34 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 kojzoH"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
                               >
-                                <ForwardRef
+                                <Icon
                                   fixedWidth={true}
-                                  inverse={false}
                                   name="minus"
-                                  pulse={false}
-                                  spin={false}
                                 >
-                                  <i
-                                    className="fa fa-minus fa-fw"
-                                  />
-                                </ForwardRef>
+                                  <FontAwesomeIcon
+                                    fixedWidth={true}
+                                    icon={
+                                      Object {
+                                        "iconName": "minus",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-minus"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
                               </button>
                             </Button>
                           </StyledComponent>
@@ -41406,7 +41598,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "kojzoH",
+                                  "lastClassName": "iWqiEF",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -41430,27 +41622,34 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 kojzoH"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
                               >
-                                <ForwardRef
+                                <Icon
                                   fixedWidth={true}
-                                  inverse={false}
                                   name="plus"
-                                  pulse={false}
-                                  spin={false}
                                 >
-                                  <i
-                                    className="fa fa-plus fa-fw"
-                                  />
-                                </ForwardRef>
+                                  <FontAwesomeIcon
+                                    fixedWidth={true}
+                                    icon={
+                                      Object {
+                                        "iconName": "plus",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-plus"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
                               </button>
                             </Button>
                           </StyledComponent>
@@ -41490,7 +41689,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "kojzoH",
+                                  "lastClassName": "iWqiEF",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -41514,12 +41713,12 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 kojzoH"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -41606,7 +41805,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "BooleanOperatorSelector__OperatorSelector-sflinp-0",
-                  "isStatic": true,
+                  "isStatic": false,
                   "lastClassName": "hHBaXW",
                   "rules": Array [
                     "margin-bottom:15px;font-size:14px;",
@@ -41625,7 +41824,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
             forwardedRef={null}
           >
             <div
-              className="form-inline BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW"
+              className="BooleanOperatorSelector__OperatorSelector-sflinp-0 hHBaXW form-inline"
             >
               <Component
                 validationState={null}
@@ -41765,11 +41964,11 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                         >
                           <FormGroup
                             bsClass="form-group"
-                            className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj"
                             validationState={null}
                           >
                             <div
-                              className="BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr BooleanOperatorSelector__BooleanOperatorSelect-sflinp-1 jfMmbj form-group"
                             >
                               <Select
                                 allowCreate={false}
@@ -43212,17 +43411,22 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                       }
                                                     }
                                                   >
-                                                    <ForwardRef
-                                                      fixedWidth={false}
-                                                      inverse={false}
+                                                    <Icon
                                                       name="caret-down"
-                                                      pulse={false}
-                                                      spin={false}
                                                     >
-                                                      <i
-                                                        className="fa fa-caret-down"
-                                                      />
-                                                    </ForwardRef>
+                                                      <FontAwesomeIcon
+                                                        icon={
+                                                          Object {
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+                                                          }
+                                                        }
+                                                      >
+                                                        <svg
+                                                          className="svg-inline--fa fa-caret-down"
+                                                        />
+                                                      </FontAwesomeIcon>
+                                                    </Icon>
                                                   </div>
                                                 </DropdownIndicator>
                                               </div>
@@ -44793,17 +44997,22 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                               }
                                                             }
                                                           >
-                                                            <ForwardRef
-                                                              fixedWidth={false}
-                                                              inverse={false}
+                                                            <Icon
                                                               name="caret-down"
-                                                              pulse={false}
-                                                              spin={false}
                                                             >
-                                                              <i
-                                                                className="fa fa-caret-down"
-                                                              />
-                                                            </ForwardRef>
+                                                              <FontAwesomeIcon
+                                                                icon={
+                                                                  Object {
+                                                                    "iconName": "caret-down",
+                                                                    "prefix": "fas",
+                                                                  }
+                                                                }
+                                                              >
+                                                                <svg
+                                                                  className="svg-inline--fa fa-caret-down"
+                                                                />
+                                                              </FontAwesomeIcon>
+                                                            </Icon>
                                                           </div>
                                                         </DropdownIndicator>
                                                       </div>
@@ -46345,17 +46554,22 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                                 }
                                                               }
                                                             >
-                                                              <ForwardRef
-                                                                fixedWidth={false}
-                                                                inverse={false}
+                                                              <Icon
                                                                 name="caret-down"
-                                                                pulse={false}
-                                                                spin={false}
                                                               >
-                                                                <i
-                                                                  className="fa fa-caret-down"
-                                                                />
-                                                              </ForwardRef>
+                                                                <FontAwesomeIcon
+                                                                  icon={
+                                                                    Object {
+                                                                      "iconName": "caret-down",
+                                                                      "prefix": "fas",
+                                                                    }
+                                                                  }
+                                                                >
+                                                                  <svg
+                                                                    className="svg-inline--fa fa-caret-down"
+                                                                  />
+                                                                </FontAwesomeIcon>
+                                                              </Icon>
                                                             </div>
                                                           </DropdownIndicator>
                                                         </div>
@@ -48137,17 +48351,22 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   }
                                                 }
                                               >
-                                                <ForwardRef
-                                                  fixedWidth={false}
-                                                  inverse={false}
+                                                <Icon
                                                   name="caret-down"
-                                                  pulse={false}
-                                                  spin={false}
                                                 >
-                                                  <i
-                                                    className="fa fa-caret-down"
-                                                  />
-                                                </ForwardRef>
+                                                  <FontAwesomeIcon
+                                                    icon={
+                                                      Object {
+                                                        "iconName": "caret-down",
+                                                        "prefix": "fas",
+                                                      }
+                                                    }
+                                                  >
+                                                    <svg
+                                                      className="svg-inline--fa fa-caret-down"
+                                                    />
+                                                  </FontAwesomeIcon>
+                                                </Icon>
                                               </div>
                                             </DropdownIndicator>
                                           </div>
@@ -48385,7 +48604,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "igyPGR",
+                                              "lastClassName": "fcGLmv",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -48411,7 +48630,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 igyPGR"
+                                          className="FormControl-sc-1amoaox-0 fcGLmv"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Threshold"
@@ -48422,7 +48641,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                           value={12}
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                            className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                             id="aggregation-threshold"
                                             label="Threshold"
                                             name="threshold"
@@ -48548,7 +48767,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "kojzoH",
+                                  "lastClassName": "iWqiEF",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -48572,27 +48791,34 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 kojzoH"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
                               >
-                                <ForwardRef
+                                <Icon
                                   fixedWidth={true}
-                                  inverse={false}
                                   name="minus"
-                                  pulse={false}
-                                  spin={false}
                                 >
-                                  <i
-                                    className="fa fa-minus fa-fw"
-                                  />
-                                </ForwardRef>
+                                  <FontAwesomeIcon
+                                    fixedWidth={true}
+                                    icon={
+                                      Object {
+                                        "iconName": "minus",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-minus"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
                               </button>
                             </Button>
                           </StyledComponent>
@@ -48632,7 +48858,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "kojzoH",
+                                  "lastClassName": "iWqiEF",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -48656,27 +48882,34 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 kojzoH"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
                               >
-                                <ForwardRef
+                                <Icon
                                   fixedWidth={true}
-                                  inverse={false}
                                   name="plus"
-                                  pulse={false}
-                                  spin={false}
                                 >
-                                  <i
-                                    className="fa fa-plus fa-fw"
-                                  />
-                                </ForwardRef>
+                                  <FontAwesomeIcon
+                                    fixedWidth={true}
+                                    icon={
+                                      Object {
+                                        "iconName": "plus",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-plus"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
                               </button>
                             </Button>
                           </StyledComponent>
@@ -48716,7 +48949,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "kojzoH",
+                                  "lastClassName": "iWqiEF",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -48740,12 +48973,12 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 kojzoH"
+                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"

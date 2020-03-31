@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { capitalize } from 'lodash';
+import { capitalize, isString } from 'lodash';
 
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import type { ViewType } from 'views/logic/views/View';
@@ -68,7 +68,9 @@ class SideBar extends React.Component<Props, State> {
   handleClickOutside = (event: MouseEvent) => {
     const { open, disabledAutoClose } = this.state;
     // $FlowFixMe: EventTarget and className work here.
-    if (open && !disabledAutoClose && event.target.className.match(/background/)) {
+    const { className } = event.target;
+    const canMatchClass = className && isString(className);
+    if (open && !disabledAutoClose && (canMatchClass && className.match(/background/))) {
       this.toggleOpen();
     }
   };

@@ -120,7 +120,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "kojzoH",
+                        "lastClassName": "iWqiEF",
                         "rules": Array [
                           [Function],
                         ],
@@ -143,12 +143,12 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
+                    className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                     disabled={false}
                     type="submit"
                   >
                     <button
-                      className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                       disabled={false}
                       type="submit"
                     >
@@ -203,7 +203,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "kojzoH",
+                        "lastClassName": "iWqiEF",
                         "rules": Array [
                           [Function],
                         ],
@@ -227,13 +227,13 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
+                    className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
                   >
                     <button
-                      className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                       disabled={false}
                       onClick={[Function]}
                       type="reset"
@@ -359,7 +359,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
               "componentStyle": ComponentStyle {
                 "componentId": "Button__StyledButton-c9cbmb-0",
                 "isStatic": false,
-                "lastClassName": "kojzoH",
+                "lastClassName": "iWqiEF",
                 "rules": Array [
                   [Function],
                 ],
@@ -384,13 +384,13 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
             bsClass="btn"
             bsSize="small"
             bsStyle="info"
-            className="Button__StyledButton-c9cbmb-0 feAZhf"
+            className="Button__StyledButton-c9cbmb-0 pSZqX"
             disabled={false}
             onClick={[Function]}
             title="Edit Modal"
           >
             <button
-              className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               title="Edit Modal"
@@ -437,7 +437,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
               "componentStyle": ComponentStyle {
                 "componentId": "Modal-nuree8-0",
                 "isStatic": false,
-                "lastClassName": "fWOZMp",
+                "lastClassName": "DnwXA",
                 "rules": Array [
                   [Function],
                 ],
@@ -462,7 +462,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
             backdrop="static"
             bsClass="modal"
             bsSize="large"
-            className="Modal-nuree8-0 fWOZMp"
+            className="Modal-nuree8-0 DnwXA"
             dialogComponentClass={[Function]}
             enforceFocus={true}
             keyboard={true}
@@ -614,7 +614,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "kojzoH",
+                        "lastClassName": "iWqiEF",
                         "rules": Array [
                           [Function],
                         ],
@@ -637,12 +637,12 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
+                    className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                     disabled={false}
                     type="submit"
                   >
                     <button
-                      className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                       disabled={false}
                       type="submit"
                     >
@@ -697,7 +697,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "kojzoH",
+                        "lastClassName": "iWqiEF",
                         "rules": Array [
                           [Function],
                         ],
@@ -721,13 +721,13 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
+                    className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
                   >
                     <button
-                      className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                       disabled={false}
                       onClick={[Function]}
                       type="reset"
@@ -920,7 +920,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "kojzoH",
+                        "lastClassName": "iWqiEF",
                         "rules": Array [
                           [Function],
                         ],
@@ -943,12 +943,12 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
+                    className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                     disabled={false}
                     type="submit"
                   >
                     <button
-                      className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                       disabled={false}
                       type="submit"
                     >
@@ -1003,7 +1003,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "kojzoH",
+                        "lastClassName": "iWqiEF",
                         "rules": Array [
                           [Function],
                         ],
@@ -1027,13 +1027,13 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
+                    className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
                   >
                     <button
-                      className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                       disabled={false}
                       onClick={[Function]}
                       type="reset"
@@ -1234,23 +1234,28 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                             >
                               <Badge
                                 bsClass="badge"
-                                className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                 pullRight={false}
                               >
                                 <span
-                                  className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="times"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-times"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "times",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-times"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -1340,7 +1345,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
               "componentStyle": ComponentStyle {
                 "componentId": "Button__StyledButton-c9cbmb-0",
                 "isStatic": false,
-                "lastClassName": "feAZhf",
+                "lastClassName": "pSZqX",
                 "rules": Array [
                   [Function],
                 ],
@@ -1365,13 +1370,13 @@ exports[`<ContentPackParameterList /> should render with parameters without read
             bsClass="btn"
             bsSize="small"
             bsStyle="info"
-            className="Button__StyledButton-c9cbmb-0 feAZhf"
+            className="Button__StyledButton-c9cbmb-0 pSZqX"
             disabled={false}
             onClick={[Function]}
             title="Edit Modal"
           >
             <button
-              className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               title="Edit Modal"
@@ -1418,7 +1423,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
               "componentStyle": ComponentStyle {
                 "componentId": "Modal-nuree8-0",
                 "isStatic": false,
-                "lastClassName": "fWOZMp",
+                "lastClassName": "DnwXA",
                 "rules": Array [
                   [Function],
                 ],
@@ -1443,7 +1448,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
             backdrop="static"
             bsClass="modal"
             bsSize="large"
-            className="Modal-nuree8-0 fWOZMp"
+            className="Modal-nuree8-0 DnwXA"
             dialogComponentClass={[Function]}
             enforceFocus={true}
             keyboard={true}
@@ -1595,7 +1600,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "feAZhf",
+                        "lastClassName": "pSZqX",
                         "rules": Array [
                           [Function],
                         ],
@@ -1618,12 +1623,12 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
+                    className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
                     disabled={false}
                     type="submit"
                   >
                     <button
-                      className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
                       disabled={false}
                       type="submit"
                     >
@@ -1678,7 +1683,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "feAZhf",
+                        "lastClassName": "pSZqX",
                         "rules": Array [
                           [Function],
                         ],
@@ -1702,13 +1707,13 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
+                    className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
                   >
                     <button
-                      className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
                       disabled={false}
                       onClick={[Function]}
                       type="reset"
@@ -1920,23 +1925,28 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                             >
                               <Badge
                                 bsClass="badge"
-                                className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                 pullRight={false}
                               >
                                 <span
-                                  className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="times"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-times"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "times",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-times"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -1990,7 +2000,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "feAZhf",
+                                        "lastClassName": "pSZqX",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -2015,13 +2025,13 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                     bsClass="btn"
                                     bsSize="xs"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 dYxYaY"
+                                    className="Button__StyledButton-c9cbmb-0 hGhRKT"
                                     disabled={false}
                                     onClick={[Function]}
                                     title="Delete Parameter"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-xs btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       title="Delete Parameter"
@@ -2069,7 +2079,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "feAZhf",
+                                        "lastClassName": "pSZqX",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -2094,13 +2104,13 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                     bsClass="btn"
                                     bsSize="xsmall"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 feAZhf"
+                                    className="Button__StyledButton-c9cbmb-0 pSZqX"
                                     disabled={false}
                                     onClick={[Function]}
                                     title="Edit Modal"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 feAZhf btn btn-xs btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-xs btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       title="Edit Modal"
@@ -2147,7 +2157,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Modal-nuree8-0",
                                         "isStatic": false,
-                                        "lastClassName": "fWOZMp",
+                                        "lastClassName": "DnwXA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -2172,7 +2182,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                     backdrop="static"
                                     bsClass="modal"
                                     bsSize="large"
-                                    className="Modal-nuree8-0 fWOZMp"
+                                    className="Modal-nuree8-0 DnwXA"
                                     dialogComponentClass={[Function]}
                                     enforceFocus={true}
                                     keyboard={true}

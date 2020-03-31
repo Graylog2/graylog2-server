@@ -1,78 +1,49 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
+import { find, isString } from 'lodash';
 
-import 'font-awesome/css/font-awesome.css';
+import deprecationNotice from 'util/deprecationNotice';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import compareIconNames from './icon-fallback';
+
+library.add(fas);
+
+
+const cleanIconName = (icon) => {
+  const v4icon = find(compareIconNames, { v4: icon });
+  const iconName = (v4icon && v4icon.v5) || icon;
+
+  if (v4icon) {
+    deprecationNotice(`You have used a deprecated \`Icon\` name. \`${icon}\` should be \`${iconName}\``);
+  }
+
+  return { prefix: 'fas', iconName };
+};
 
 /**
  * Component that renders an icon or glyph.
- * Uses Font Awesome 4.7 : https://fontawesome.com/v4.7.0/icons/
+ * Uses Font Awesome 5 : https://fontawesome.com/icons
  *
  * No need to pass `fa` or `fa-` prefixes, just the name of the icon
+ * Visit [React FontAwesome Features](https://github.com/FortAwesome/react-fontawesome#features) for more information.
  */
 
-const Icon = React.forwardRef(({
-  className,
-  flip,
-  fixedWidth,
-  inverse,
-  name,
-  pulse,
-  rotate,
-  size,
-  spin,
-  ...props
-}, ref) => {
-  const cleanIconName = name.replace(/^fa-/, ''); // remove "fa-" prefix if it exists
-
-  const iconClasses = classnames('fa',
-    `fa-${cleanIconName}`,
-    className,
-    {
-      [`fa-flip-${flip}`]: !!flip,
-      [`fa-rotate-${rotate}`]: !!rotate,
-      [`fa-${size}`]: !!size,
-      'fa-fw': !!fixedWidth,
-      'fa-inverse': !!inverse,
-      'fa-pulse': !!pulse,
-      'fa-spin': !!spin,
-    });
+const Icon = ({ name, ...props }) => {
+  let icon = name;
+  if (isString(name)) {
+    icon = cleanIconName(name.replace(/^fa-/, '')); // remove "fa-" prefix if it exists
+  }
 
   return (
-    <i className={iconClasses} {...props} ref={ref} />
+    <FontAwesomeIcon {...props} icon={icon} />
   );
-});
-
-Icon.propTypes = {
-  /** Pass through any custom or Font Awesome specific classes */
-  className: PropTypes.string,
-  /** Flip icon output */
-  flip: PropTypes.oneOf(['horizontal', 'vertical']),
-  /** Use when different Icon widths throw off alignment. */
-  fixedWidth: PropTypes.bool,
-  /** Can be used as an alternative Icon color. */
-  inverse: PropTypes.bool,
-  /** Name of Font Awesome 4.7 Icon without `fa-` prefix */
-  name: PropTypes.string.isRequired,
-  /** Have Icon rotate with 8 steps */
-  pulse: PropTypes.bool,
-  /** Rotate icon output */
-  rotate: PropTypes.oneOf(['90', '180', '270']),
-  /** Increase Icon sizes relative to their container */
-  size: PropTypes.oneOf(['lg', '2x', '3x', '4x', '5x']),
-  /** Have any Icon to rotate */
-  spin: PropTypes.bool,
 };
 
-Icon.defaultProps = {
-  className: undefined,
-  flip: undefined,
-  fixedWidth: false,
-  inverse: false,
-  pulse: false,
-  rotate: undefined,
-  size: undefined,
-  spin: false,
+Icon.propTypes = {
+  /** Name of Font Awesome 5 Icon without `fa-` prefix */
+  name: PropTypes.string.isRequired,
 };
 
 export default Icon;

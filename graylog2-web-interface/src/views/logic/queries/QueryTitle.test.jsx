@@ -27,7 +27,7 @@ describe('QueryTitle', () => {
     expect(queryTitle(view, 'foo')).toEqual('The Fabulous Foo Tab');
   });
   it('returns generated name of nameless second tab', () => {
-    expect(queryTitle(view, 'bar')).toEqual('Query#2');
+    expect(queryTitle(view, 'bar')).toEqual('Page#2');
   });
   it('returns actual name of third tab', () => {
     expect(queryTitle(view, 'baz')).toEqual('The Incredible Other Tab');

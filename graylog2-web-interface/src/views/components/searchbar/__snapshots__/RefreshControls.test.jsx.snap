@@ -28,7 +28,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -47,7 +47,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -57,7 +57,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -116,7 +116,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -139,27 +139,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="play"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-play"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "play",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-play"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -192,7 +197,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -217,7 +222,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -256,7 +261,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -271,7 +276,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -281,7 +286,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -297,7 +302,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -630,7 +635,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -649,7 +654,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -659,7 +664,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -718,7 +723,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -741,27 +746,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="play"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-play"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "play",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-play"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -794,7 +804,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -819,7 +829,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -858,7 +868,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -873,7 +883,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -883,7 +893,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -899,7 +909,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -1232,7 +1242,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -1251,7 +1261,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -1261,7 +1271,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -1320,7 +1330,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -1343,27 +1353,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -1418,7 +1433,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -1454,7 +1469,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -1504,7 +1519,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -1519,7 +1534,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -1529,7 +1544,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -1545,7 +1560,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -1891,7 +1906,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -1910,7 +1925,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -1920,7 +1935,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -1979,7 +1994,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -2002,27 +2017,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -2077,7 +2097,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -2113,7 +2133,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -2163,7 +2183,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -2178,7 +2198,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -2188,7 +2208,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -2204,7 +2224,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -2550,7 +2570,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -2569,7 +2589,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -2579,7 +2599,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -2638,7 +2658,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -2661,27 +2681,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -2736,7 +2761,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -2772,7 +2797,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -2822,7 +2847,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -2837,7 +2862,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -2847,7 +2872,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -2863,7 +2888,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -3209,7 +3234,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -3228,7 +3253,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -3238,7 +3263,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -3297,7 +3322,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -3320,27 +3345,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -3395,7 +3425,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -3431,7 +3461,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -3481,7 +3511,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -3496,7 +3526,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -3506,7 +3536,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -3522,7 +3552,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -3868,7 +3898,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -3887,7 +3917,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -3897,7 +3927,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -3956,7 +3986,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -3979,27 +4009,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -4054,7 +4089,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -4090,7 +4125,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -4140,7 +4175,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -4155,7 +4190,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -4165,7 +4200,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -4181,7 +4216,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -4527,7 +4562,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -4546,7 +4581,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -4556,7 +4591,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -4615,7 +4650,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -4638,27 +4673,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -4713,7 +4753,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -4749,7 +4789,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -4799,7 +4839,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -4814,7 +4854,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -4824,7 +4864,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -4840,7 +4880,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",
@@ -5186,7 +5226,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
             "attrs": Array [],
             "componentStyle": ComponentStyle {
               "componentId": "RefreshControls__ControlsContainer-sc-1pygk8n-0",
-              "isStatic": true,
+              "isStatic": false,
               "lastClassName": "kShVuS",
               "rules": Array [
                 "max-width:100%;",
@@ -5205,7 +5245,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         forwardedRef={null}
       >
         <div
-          className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
+          className="RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS pull-right"
         >
           <RefreshControls__FlexibleButtonGroup>
             <StyledComponent
@@ -5215,7 +5255,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "eAWkfW",
                     "rules": Array [
                       "display:flex;> .btn-group{.btn:first-child{max-width:100%;}}",
@@ -5274,7 +5314,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "kojzoH",
+                              "lastClassName": "iWqiEF",
                               "rules": Array [
                                 [Function],
                               ],
@@ -5297,27 +5337,32 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 kojzoH"
+                          className="Button__StyledButton-c9cbmb-0 iWqiEF"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
+                            <Icon
                               name="pause"
-                              pulse={false}
-                              spin={false}
                             >
-                              <i
-                                className="fa fa-pause"
-                              />
-                            </ForwardRef>
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "pause",
+                                    "prefix": "fas",
+                                  }
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-pause"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
                           </button>
                         </Button>
                       </StyledComponent>
@@ -5372,7 +5417,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "eLAXAt",
+                              "lastClassName": "jcXGCM",
                               "rules": Array [
                                 [Function],
                               ],
@@ -5408,7 +5453,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       >
                         <DropdownButton
                           bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -5458,7 +5503,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
                                       bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -5473,7 +5518,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -5483,7 +5528,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 eLAXAt dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jcXGCM dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -5499,7 +5544,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "RefreshControls__ButtonLabel-sc-1pygk8n-2",
-                                                    "isStatic": true,
+                                                    "isStatic": false,
                                                     "lastClassName": "jztvlP",
                                                     "rules": Array [
                                                       "display:inline-block;text-overflow:ellipsis;overflow:hidden;max-width:calc(100% - 9px);vertical-align:inherit;",

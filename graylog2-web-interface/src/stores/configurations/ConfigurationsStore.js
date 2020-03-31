@@ -49,7 +49,7 @@ const ConfigurationsStore = Reflux.createStore({
   list(configType) {
     const promise = fetch('GET', this._url(`/${configType}`));
     promise.then((response) => {
-      this.configuration[configType] = response;
+      this.configuration = { ...this.configuration, [configType]: response };
       this.propagateChanges();
       return response;
     });
@@ -69,7 +69,7 @@ const ConfigurationsStore = Reflux.createStore({
 
   listMessageProcessorsConfig(configType) {
     const promise = fetch('GET', qualifyUrl('/system/messageprocessors/config')).then((response) => {
-      this.configuration[configType] = response;
+      this.configuration = { ...this.configuration, [configType]: response };
       this.propagateChanges();
       return response;
     });
@@ -79,7 +79,7 @@ const ConfigurationsStore = Reflux.createStore({
 
   listWhiteListConfig(configType) {
     const promise = fetch('GET', qualifyUrl('/system/urlwhitelist')).then((response) => {
-      this.configuration[configType] = response;
+      this.configuration = { ...this.configuration, [configType]: response };
       this.propagateChanges();
       return response;
     });
@@ -102,7 +102,7 @@ const ConfigurationsStore = Reflux.createStore({
 
     promise.then(
       (response) => {
-        this.configuration[configType] = response;
+        this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
         UserNotification.success('Configuration updated successfully');
         return response;
@@ -120,7 +120,7 @@ const ConfigurationsStore = Reflux.createStore({
 
     promise.then(
       () => {
-        this.configuration[configType] = config;
+        this.configuration = { ...this.configuration, [configType]: config };
         this.propagateChanges();
         UserNotification.success('Url Whitelist Configuration updated successfully');
         return config;
@@ -138,7 +138,7 @@ const ConfigurationsStore = Reflux.createStore({
 
     promise.then(
       (response) => {
-        this.configuration[configType] = response;
+        this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
         UserNotification.success('Configuration updated successfully');
         return response;

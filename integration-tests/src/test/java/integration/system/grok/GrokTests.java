@@ -16,14 +16,16 @@
  */
 package integration.system.grok;
 
-import com.jayway.restassured.response.ValidatableResponse;
 import integration.BaseRestTest;
 import integration.RequiresAuthentication;
+import io.restassured.response.ValidatableResponse;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
+@Ignore("legacy test that should be converted or deleted")
 @RequiresAuthentication
 public class GrokTests extends BaseRestTest {
 
@@ -39,39 +41,39 @@ public class GrokTests extends BaseRestTest {
 
         id = validatableResponse.extract().body().jsonPath().get("id").toString();
         validatableResponse
-            .body(".", containsAllKeys(
-                    "id",
-                    "name",
-                    "pattern",
-                    "content_pack"
-            ));
+                .body(".", containsAllKeys(
+                        "id",
+                        "name",
+                        "pattern",
+                        "content_pack"
+                ));
     }
-    
+
     @Test
     public void listPatterns() {
         createGrokPattern();
         // we have just created one pattern, so we should find it again.
         given().when()
                 .get("/system/grok/{patternid}", id)
-            .then()
+                .then()
                 .statusCode(200)
                 .statusLine(notNullValue())
-            .body(".", containsAllKeys(
-                    "id",
-                    "name",
-                    "pattern",
-                    "content_pack"
-            ));
+                .body(".", containsAllKeys(
+                        "id",
+                        "name",
+                        "pattern",
+                        "content_pack"
+                ));
     }
-    
+
     @Test
     public void deletePattern() {
         createGrokPattern();
         given()
-            .when()
+                .when()
                 .delete("/system/grok/{patternid}", id)
-            .then()
+                .then()
                 .statusCode(204);
-        
+
     }
 }

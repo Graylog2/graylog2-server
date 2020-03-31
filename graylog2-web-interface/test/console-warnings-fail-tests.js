@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { format } from 'util';
-import { DEPRECATION_NOTICE } from 'util/constants';
+import { DEPRECATION_NOTICE } from 'util/deprecationNotice';
 
 const oldConsoleWarn = console.warn;
 const oldConsoleError = console.error;

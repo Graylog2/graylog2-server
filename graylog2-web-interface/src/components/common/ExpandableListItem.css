@@ -32,12 +32,17 @@
     vertical-align: text-top;
 }
 
-:local(.expandBox):hover * {
+:local(.expandBox):hover [class*="fa-"] {
     color: #731748;
+    opacity: 1;
 }
 
 :local(.iconBackground)  {
-    color: #FFF;
+    opacity: 0;
+}
+
+:local(.iconBackground) ~ [class*="fa-"]:hover  {
+    color: #fff;
 }
 
 :local(.header) {

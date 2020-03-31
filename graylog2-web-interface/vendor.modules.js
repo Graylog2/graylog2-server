@@ -1,11 +1,11 @@
 module.exports = [
+  'chroma-js',
   'create-react-class',
   'deep-equal',
   'jquery',
   'leaflet',
   'moment-timezone',
   'moment',
-  'polished',
   'react-addons-pure-render-mixin',
   'react-bootstrap',
   'react-dom',

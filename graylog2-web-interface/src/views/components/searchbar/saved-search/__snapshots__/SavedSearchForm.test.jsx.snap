@@ -41,42 +41,41 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         "background": "#e8e8e8",
                         "contentBackground": "#fff",
                         "link": "#702785",
-                        "linkHover": "#4f1b5e",
+                        "linkHover": "#410057",
                         "textAlt": "#fff",
                         "textDefault": "#1f1f1f",
                       },
                       "gray": Object {
-                        "0": "#1f1f1f",
-                        "10": "#353535",
-                        "100": "#fff",
-                        "20": "#4b4b4b",
-                        "30": "#626262",
-                        "40": "#787878",
-                        "50": "#8f8f8f",
-                        "60": "#a5a5a5",
-                        "70": "#bbb",
-                        "80": "#d2d2d2",
-                        "90": "#e8e8e8",
+                        "10": "#1f1f1f",
+                        "100": "#ffffff",
+                        "20": "#383838",
+                        "30": "#515151",
+                        "40": "#6a6a6a",
+                        "50": "#838383",
+                        "60": "#9b9b9b",
+                        "70": "#b4b4b4",
+                        "80": "#cdcdcd",
+                        "90": "#e6e6e6",
                       },
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#5a0404",
-                          "default": "#000",
-                          "info": "#003667",
-                          "primary": "#381342",
-                          "success": "#005721",
-                          "warning": "#a88b00",
+                          "danger": "#5e0000",
+                          "default": "#000000",
+                          "info": "#002775",
+                          "primary": "#2b0042",
+                          "success": "#006600",
+                          "warning": "#ac8a00",
                         },
                         "default": "#1f1f1f",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#f96464",
-                          "default": "#737373",
-                          "info": "#67b6ff",
-                          "primary": "#c47cd9",
-                          "success": "#57ff97",
-                          "warning": "#fff0a8",
+                          "danger": "#e74a32",
+                          "default": "#464646",
+                          "info": "#5890f1",
+                          "primary": "#a155b5",
+                          "success": "#57e170",
+                          "warning": "#ffff52",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -99,7 +98,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "Popover__StyledPopover-wd1j0g-0",
                           "isStatic": false,
-                          "lastClassName": "dxgHck",
+                          "lastClassName": "cdMcFy",
                           "rules": Array [
                             [Function],
                           ],
@@ -120,13 +119,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                   >
                     <Popover
                       bsClass="popover"
-                      className="Popover__StyledPopover-wd1j0g-0 dxgHck"
+                      className="Popover__StyledPopover-wd1j0g-0 cdMcFy"
                       id="saved-search-popover"
                       placement="right"
                       title="Name of search"
                     >
                       <div
-                        className="Popover__StyledPopover-wd1j0g-0 dxgHck popover right"
+                        className="Popover__StyledPopover-wd1j0g-0 cdMcFy popover right"
                         id="saved-search-popover"
                         role="tooltip"
                         style={
@@ -259,7 +258,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "igyPGR",
+                                                "lastClassName": "fcGLmv",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -282,7 +281,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 igyPGR"
+                                            className="FormControl-sc-1amoaox-0 fcGLmv"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -290,7 +289,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                              className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
@@ -343,7 +342,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "kojzoH",
+                                        "lastClassName": "iWqiEF",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -367,13 +366,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="button Button__StyledButton-c9cbmb-0 feAZhf"
+                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 feAZhf btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -418,7 +417,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "kojzoH",
+                                        "lastClassName": "iWqiEF",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -441,12 +440,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="button Button__StyledButton-c9cbmb-0 kojzoH"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -514,42 +513,41 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                         "background": "#e8e8e8",
                         "contentBackground": "#fff",
                         "link": "#702785",
-                        "linkHover": "#4f1b5e",
+                        "linkHover": "#410057",
                         "textAlt": "#fff",
                         "textDefault": "#1f1f1f",
                       },
                       "gray": Object {
-                        "0": "#1f1f1f",
-                        "10": "#353535",
-                        "100": "#fff",
-                        "20": "#4b4b4b",
-                        "30": "#626262",
-                        "40": "#787878",
-                        "50": "#8f8f8f",
-                        "60": "#a5a5a5",
-                        "70": "#bbb",
-                        "80": "#d2d2d2",
-                        "90": "#e8e8e8",
+                        "10": "#1f1f1f",
+                        "100": "#ffffff",
+                        "20": "#383838",
+                        "30": "#515151",
+                        "40": "#6a6a6a",
+                        "50": "#838383",
+                        "60": "#9b9b9b",
+                        "70": "#b4b4b4",
+                        "80": "#cdcdcd",
+                        "90": "#e6e6e6",
                       },
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#5a0404",
-                          "default": "#000",
-                          "info": "#003667",
-                          "primary": "#381342",
-                          "success": "#005721",
-                          "warning": "#a88b00",
+                          "danger": "#5e0000",
+                          "default": "#000000",
+                          "info": "#002775",
+                          "primary": "#2b0042",
+                          "success": "#006600",
+                          "warning": "#ac8a00",
                         },
                         "default": "#1f1f1f",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#f96464",
-                          "default": "#737373",
-                          "info": "#67b6ff",
-                          "primary": "#c47cd9",
-                          "success": "#57ff97",
-                          "warning": "#fff0a8",
+                          "danger": "#e74a32",
+                          "default": "#464646",
+                          "info": "#5890f1",
+                          "primary": "#a155b5",
+                          "success": "#57e170",
+                          "warning": "#ffff52",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -572,7 +570,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                         "componentStyle": ComponentStyle {
                           "componentId": "Popover__StyledPopover-wd1j0g-0",
                           "isStatic": false,
-                          "lastClassName": "dxgHck",
+                          "lastClassName": "cdMcFy",
                           "rules": Array [
                             [Function],
                           ],
@@ -593,13 +591,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                   >
                     <Popover
                       bsClass="popover"
-                      className="Popover__StyledPopover-wd1j0g-0 dxgHck"
+                      className="Popover__StyledPopover-wd1j0g-0 cdMcFy"
                       id="saved-search-popover"
                       placement="right"
                       title="Name of search"
                     >
                       <div
-                        className="Popover__StyledPopover-wd1j0g-0 dxgHck popover right"
+                        className="Popover__StyledPopover-wd1j0g-0 cdMcFy popover right"
                         id="saved-search-popover"
                         role="tooltip"
                         style={
@@ -732,7 +730,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "igyPGR",
+                                                "lastClassName": "fcGLmv",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -755,7 +753,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 igyPGR"
+                                            className="FormControl-sc-1amoaox-0 fcGLmv"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -763,7 +761,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                              className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
@@ -813,7 +811,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "kojzoH",
+                                        "lastClassName": "iWqiEF",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -837,13 +835,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="primary"
-                                    className="button Button__StyledButton-c9cbmb-0 dYxYaY"
+                                    className="Button__StyledButton-c9cbmb-0 hGhRKT button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 dYxYaY btn btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 hGhRKT button btn btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -893,7 +891,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "kojzoH",
+                                        "lastClassName": "iWqiEF",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -917,13 +915,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="button Button__StyledButton-c9cbmb-0 feAZhf"
+                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
                                     disabled={true}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 feAZhf btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
                                       disabled={true}
                                       onClick={[Function]}
                                       type="submit"
@@ -968,7 +966,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "kojzoH",
+                                        "lastClassName": "iWqiEF",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -991,12 +989,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="button Button__StyledButton-c9cbmb-0 kojzoH"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -1064,42 +1062,41 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                         "background": "#e8e8e8",
                         "contentBackground": "#fff",
                         "link": "#702785",
-                        "linkHover": "#4f1b5e",
+                        "linkHover": "#410057",
                         "textAlt": "#fff",
                         "textDefault": "#1f1f1f",
                       },
                       "gray": Object {
-                        "0": "#1f1f1f",
-                        "10": "#353535",
-                        "100": "#fff",
-                        "20": "#4b4b4b",
-                        "30": "#626262",
-                        "40": "#787878",
-                        "50": "#8f8f8f",
-                        "60": "#a5a5a5",
-                        "70": "#bbb",
-                        "80": "#d2d2d2",
-                        "90": "#e8e8e8",
+                        "10": "#1f1f1f",
+                        "100": "#ffffff",
+                        "20": "#383838",
+                        "30": "#515151",
+                        "40": "#6a6a6a",
+                        "50": "#838383",
+                        "60": "#9b9b9b",
+                        "70": "#b4b4b4",
+                        "80": "#cdcdcd",
+                        "90": "#e6e6e6",
                       },
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#5a0404",
-                          "default": "#000",
-                          "info": "#003667",
-                          "primary": "#381342",
-                          "success": "#005721",
-                          "warning": "#a88b00",
+                          "danger": "#5e0000",
+                          "default": "#000000",
+                          "info": "#002775",
+                          "primary": "#2b0042",
+                          "success": "#006600",
+                          "warning": "#ac8a00",
                         },
                         "default": "#1f1f1f",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#f96464",
-                          "default": "#737373",
-                          "info": "#67b6ff",
-                          "primary": "#c47cd9",
-                          "success": "#57ff97",
-                          "warning": "#fff0a8",
+                          "danger": "#e74a32",
+                          "default": "#464646",
+                          "info": "#5890f1",
+                          "primary": "#a155b5",
+                          "success": "#57e170",
+                          "warning": "#ffff52",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -1122,7 +1119,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Popover__StyledPopover-wd1j0g-0",
                           "isStatic": false,
-                          "lastClassName": "dxgHck",
+                          "lastClassName": "cdMcFy",
                           "rules": Array [
                             [Function],
                           ],
@@ -1143,13 +1140,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                   >
                     <Popover
                       bsClass="popover"
-                      className="Popover__StyledPopover-wd1j0g-0 dxgHck"
+                      className="Popover__StyledPopover-wd1j0g-0 cdMcFy"
                       id="saved-search-popover"
                       placement="right"
                       title="Name of search"
                     >
                       <div
-                        className="Popover__StyledPopover-wd1j0g-0 dxgHck popover right"
+                        className="Popover__StyledPopover-wd1j0g-0 cdMcFy popover right"
                         id="saved-search-popover"
                         role="tooltip"
                         style={
@@ -1282,7 +1279,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "igyPGR",
+                                                "lastClassName": "fcGLmv",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -1305,7 +1302,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 igyPGR"
+                                            className="FormControl-sc-1amoaox-0 fcGLmv"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -1313,7 +1310,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 igyPGR form-control"
+                                              className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
@@ -1363,7 +1360,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "kojzoH",
+                                        "lastClassName": "iWqiEF",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1387,13 +1384,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="primary"
-                                    className="button Button__StyledButton-c9cbmb-0 dYxYaY"
+                                    className="Button__StyledButton-c9cbmb-0 hGhRKT button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 dYxYaY btn btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 hGhRKT button btn btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1443,7 +1440,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "kojzoH",
+                                        "lastClassName": "iWqiEF",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1467,13 +1464,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="button Button__StyledButton-c9cbmb-0 feAZhf"
+                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 feAZhf btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1518,7 +1515,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "kojzoH",
+                                        "lastClassName": "iWqiEF",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1541,12 +1538,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="button Button__StyledButton-c9cbmb-0 kojzoH"
+                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"

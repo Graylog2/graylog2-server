@@ -78,6 +78,7 @@ public abstract class MessageList implements SearchType {
     public abstract int offset();
 
     @Nullable
+    @JsonProperty
     public abstract List<Sort> sort();
 
     @JsonProperty
