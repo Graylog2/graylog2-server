@@ -27,7 +27,9 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.graylog.testing.graylognode.ResourceUtil.resourceToTmpFile;
 
 public class NodeContainerFactory {
@@ -86,7 +88,8 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
                 .withEnv("GRAYLOG_VERSIONCHECKS", "false")
                 .waitingFor(Wait.forHttp("/api"))
-                .withExposedPorts(API_PORT);
+                .withExposedPorts(API_PORT)
+                .withStartupTimeout(Duration.of(120, SECONDS));
 
         if (config.enableDebugging) {
             container.addExposedPort(DEBUG_PORT);
