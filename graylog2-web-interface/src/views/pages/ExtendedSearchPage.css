@@ -1,16 +1,17 @@
 .extended-search-timerange-chooser .btn {
-    padding: 6px 7px;
-    margin-right: 5px;
+  padding: 6px 7px;
+  margin-right: 5px;
 }
 
 .extended-search-query-metadata {
-    margin-bottom: 10px !important;
+  margin-bottom: 10px !important;
 }
 
 .search-button-execute {
-    margin-right: 7px;
+  margin-right: 7px;
 }
 
-.xtick text, .ytick text {
-    fill: #757575 !important;
+.xtick text,
+.ytick text {
+  fill: #757575 !important;
 }
