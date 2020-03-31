@@ -22,37 +22,49 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
-@JsonDeserialize(builder = SearchTypeOverrides.Builder.class)
-public abstract class SearchTypeOverrides {
-    public abstract Optional<Set<String>> fieldsInOrder();
+@JsonDeserialize(builder = ResultFormat.Builder.class)
+public abstract class ResultFormat {
+    public abstract Optional<LinkedHashSet<String>> fieldsInOrder();
 
-    public abstract Optional<Set<Sort>> sort();
+    public abstract Optional<LinkedHashSet<Sort>> sort();
 
-    public static SearchTypeOverrides.Builder builder() {
-        return SearchTypeOverrides.Builder.create();
+    public static ResultFormat.Builder builder() {
+        return ResultFormat.Builder.create();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty("fields_in_order")
-        public abstract Builder fieldsInOrder(Set<String> fieldsInOrder);
+        public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
+
+        public Builder fieldsInOrder(String... fields) {
+            LinkedHashSet<String> fieldsSet = Arrays.stream(fields).collect(Collectors.toCollection(LinkedHashSet::new));
+            return fieldsInOrder(fieldsSet);
+        }
 
         @JsonProperty
-        public abstract Builder sort(Set<Sort> sort);
+        public abstract Builder sort(LinkedHashSet<Sort> sort);
 
-        abstract SearchTypeOverrides autoBuild();
+        public Builder sort(Sort... sorts) {
+            LinkedHashSet<Sort> sortsSet = Arrays.stream(sorts).collect(Collectors.toCollection(LinkedHashSet::new));
+            return sort(sortsSet);
+        }
 
-        public SearchTypeOverrides build() {
+        abstract ResultFormat autoBuild();
+
+        public ResultFormat build() {
             return autoBuild();
         }
 
         @JsonCreator
-        public static SearchTypeOverrides.Builder create() {
-            return new AutoValue_SearchTypeOverrides.Builder();
+        public static ResultFormat.Builder create() {
+            return new AutoValue_ResultFormat.Builder();
         }
     }
 }

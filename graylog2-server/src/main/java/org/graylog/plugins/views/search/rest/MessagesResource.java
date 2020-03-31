@@ -25,7 +25,7 @@ import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
-import org.graylog.plugins.views.search.export.SearchTypeOverrides;
+import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
@@ -36,7 +36,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -69,34 +68,30 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
     public ChunkedOutput<String> retrieve(@ApiParam MessagesRequest request) {
-        ChunkedOutput<String> output = chunkedOutputSupplier.get();
-
-        ChunkForwarder<String> fwd = ChunkForwarder.create(chunk -> writeTo(output, chunk), () -> close(output));
-
         final MessagesRequest req = request != null ? request : createDefaultMessagesRequest();
 
-        asyncRunner.accept(() -> exporter.export(req, fwd));
-
-        return output;
+        return chunkedOutputFrom(fwd -> exporter.export(req, fwd));
     }
 
     @POST
     @Path("{searchId}/{searchTypeId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public Response retrieveForSearchType(
+    public ChunkedOutput<String> retrieveForSearchType(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @PathParam("searchTypeId") String searchTypeId,
-            @ApiParam SearchTypeOverrides overrides) {
-        exporter.export(searchId, searchTypeId, overrides);
-        return okResultFrom();
+            @ApiParam ResultFormat format) {
+        return chunkedOutputFrom(fwd -> exporter.export(searchId, searchTypeId, format, fwd));
     }
 
-    private Response okResultFrom() {
-        return Response
-                .ok()
-                //.header("Content-Disposition", "attachment; filename=" + result.filename())
-                .build();
+    private ChunkedOutput<String> chunkedOutputFrom(Consumer<ChunkForwarder<String>> call) {
+        ChunkedOutput<String> output = chunkedOutputSupplier.get();
+
+        ChunkForwarder<String> fwd = ChunkForwarder.create(chunk -> writeTo(output, chunk), () -> close(output));
+
+        asyncRunner.accept(() -> call.accept(fwd));
+
+        return output;
     }
 
     private void close(ChunkedOutput<String> output) {

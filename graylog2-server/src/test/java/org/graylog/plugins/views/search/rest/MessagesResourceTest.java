@@ -20,7 +20,7 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
-import org.graylog.plugins.views.search.export.SearchTypeOverrides;
+import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -114,7 +114,7 @@ public class MessagesResourceTest {
         return MessagesRequest.builder().build();
     }
 
-    private SearchTypeOverrides validOverrides() {
-        return SearchTypeOverrides.builder().build();
+    private ResultFormat validOverrides() {
+        return ResultFormat.builder().build();
     }
 }

@@ -16,18 +16,30 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
+
 import javax.inject.Inject;
+import javax.ws.rs.NotFoundException;
 import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MessagesExporter {
     private final Defaults defaults;
     private final ExportBackend backend;
+    private final SearchDbService searchDbService;
 
     @Inject
-    public MessagesExporter(Defaults defaults, ExportBackend backend) {
+    public MessagesExporter(Defaults defaults, ExportBackend backend, SearchDbService searchDbService) {
         this.defaults = defaults;
         this.backend = backend;
+        this.searchDbService = searchDbService;
     }
 
     public void export(MessagesRequest request, ChunkForwarder<String> chunkForwarder) {
@@ -36,13 +48,120 @@ public class MessagesExporter {
         backend.run(fullRequest, h -> chunkForwarder.write(reduce(h)), chunkForwarder::close);
     }
 
+    public void export(String searchId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+        exportWithRequestFrom(searchId, null, resultFormat, chunkForwarder);
+    }
+
+    public void export(String searchId, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+        exportWithRequestFrom(searchId, searchTypeId, resultFormat, chunkForwarder);
+    }
+
+    private void exportWithRequestFrom(String searchId, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+        MessagesRequest request = buildRequest(searchId, searchTypeId, resultFormat);
+
+        export(request, chunkForwarder);
+    }
+
+    private MessagesRequest buildRequest(String searchId, String searchTypeId, ResultFormat resultFormat) {
+        Query query = singleQueryForSearchId(searchId);
+
+        MessagesRequest.Builder requestBuilder = MessagesRequest.builder();
+
+        setTimeRange(query, searchTypeId, requestBuilder);
+        trySetQueryString(query, searchTypeId, requestBuilder);
+        setStreams(query, searchTypeId, requestBuilder);
+        trySetFields(resultFormat, requestBuilder);
+        trySetSort(query, searchTypeId, resultFormat, requestBuilder);
+
+        return requestBuilder.build();
+    }
+
+    private Query singleQueryForSearchId(String searchId) {
+        return searchDbService.get(searchId)
+                .map(this::singleQueryFrom)
+                .orElseThrow(() -> new NotFoundException("Couldn't find search with ID " + searchId));
+    }
+
+    private void setTimeRange(Query query, String searchTypeId, MessagesRequest.Builder requestBuilder) {
+        Optional<MessageList> ml = messageListFrom(query, searchTypeId);
+        if (ml.isPresent() && ml.get().timerange().isPresent()) {
+            requestBuilder.timeRange(query.effectiveTimeRange(ml.get()));
+        } else {
+            requestBuilder.timeRange(query.timerange());
+        }
+    }
+
+    private void trySetQueryString(Query query, String searchTypeId, MessagesRequest.Builder requestBuilder) {
+        Optional<MessageList> ml = messageListFrom(query, searchTypeId);
+        boolean messageListHasQueryString = ml.isPresent() && ml.get().query().isPresent();
+        boolean queryHasQueryString = query.query() instanceof ElasticsearchQueryString;
+
+        if (messageListHasQueryString && queryHasQueryString) {
+            requestBuilder.queryString(query.query());
+            requestBuilder.additionalQueryString(ml.get().query().get());
+        } else if (queryHasQueryString) {
+            requestBuilder.queryString(query.query());
+        } else if (messageListHasQueryString) {
+            requestBuilder.queryString(ml.get().query().get());
+        }
+    }
+
+    private void setStreams(Query query, String searchTypeId, MessagesRequest.Builder requestBuilder) {
+        Optional<MessageList> messageList = messageListFrom(query, searchTypeId);
+        if (messageList.isPresent()) {
+            Set<String> streams = messageList.get().effectiveStreams().isEmpty() ?
+                    query.usedStreamIds() :
+                    messageList.get().effectiveStreams();
+            requestBuilder.streams(streams);
+        } else {
+            requestBuilder.streams(query.usedStreamIds());
+        }
+    }
+
+    private void trySetFields(ResultFormat resultFormat, MessagesRequest.Builder requestBuilder) {
+        resultFormat.fieldsInOrder().ifPresent(requestBuilder::fieldsInOrder);
+    }
+
+    private void trySetSort(Query query, String searchTypeId, ResultFormat resultFormat, MessagesRequest.Builder requestBuilder) {
+        Optional<MessageList> ml = messageListFrom(query, searchTypeId);
+        if (resultFormat.sort().isPresent()) {
+            requestBuilder.sort(resultFormat.sort().get());
+        } else if (ml.isPresent() && ml.get().sort() != null) {
+            requestBuilder.sort(new LinkedHashSet<>(ml.get().sort()));
+        }
+    }
+
+    private Optional<MessageList> messageListFrom(Query query, String searchTypeId) {
+        Optional<SearchType> searchType = searchTypeFrom(query, searchTypeId);
+
+        if (!searchType.isPresent()) {
+            return Optional.empty();
+        }
+        return searchType.map(st -> {
+            if (!(st instanceof MessageList)) {
+                throw new ExportException("Only message lists are currently supported");
+            }
+            return (MessageList) st;
+        });
+    }
+
+    private Optional<SearchType> searchTypeFrom(Query query, String searchTypeId) {
+        return query.searchTypes().stream()
+                .filter(st -> st.id().equals(searchTypeId))
+                .findFirst();
+    }
+
+    private Query singleQueryFrom(Search s) {
+        if (s.queries().size() > 1)
+            throw new ExportException("Can't get messages for search with id" + s.id() + ", because it contains multiple queries");
+
+        return s.queries().stream().findFirst()
+                .orElseThrow(() -> new ExportException("Invalid Search object with empty Query"));
+    }
+
     private String reduce(LinkedHashSet<LinkedHashSet<String>> hits) {
         return hits.stream()
                 .map(row -> String.join(" ", row))
                 .collect(Collectors.joining("\r\n"));
-    }
-
-    public void export(String searchId, String searchTypeId, SearchTypeOverrides overrides) {
-
     }
 }

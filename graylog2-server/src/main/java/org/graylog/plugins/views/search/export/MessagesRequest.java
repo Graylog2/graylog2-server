@@ -40,6 +40,8 @@ public abstract class MessagesRequest {
 
     public abstract Optional<BackendQuery> queryString();
 
+    public abstract Optional<BackendQuery> additionalQueryString();
+
     public abstract Optional<Set<String>> streams();
 
     public abstract Optional<LinkedHashSet<String>> fieldsInOrder();
@@ -85,6 +87,8 @@ public abstract class MessagesRequest {
 
         @JsonProperty("query_string")
         public abstract Builder queryString(BackendQuery queryString);
+
+        public abstract Builder additionalQueryString(BackendQuery queryString);
 
         @JsonProperty("fields_in_order")
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
