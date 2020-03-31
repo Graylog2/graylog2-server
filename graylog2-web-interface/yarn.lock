@@ -2682,7 +2682,7 @@ accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.7:
     mime-types "~2.1.24"
     negotiator "0.6.2"
 
-ace-builds@^1.4.8:
+ace-builds@^1.4.6, ace-builds@^1.4.8:
   version "1.4.8"
   resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.4.8.tgz#d14be41d30294a2a12581f0bcfee4b696481ffdd"
   integrity sha512-8ZVAxwyCGAxQX8mOp9imSXH0hoSPkGfy8igJy+WO/7axL30saRhKgg1XPACSmxxPA7nfHVwM+ShWXT+vKsNuFg==
@@ -12862,15 +12862,16 @@ re-resizable@6.2.0:
   dependencies:
     fast-memoize "^2.5.1"
 
-react-ace-builds@^7.3.1:
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/react-ace-builds/-/react-ace-builds-7.3.1.tgz#5c1ffdb70f552985676182bd205a6019d6da8cdc"
-  integrity sha512-bfHKMLAFq7hlmXB2sQ7gJaJ0PjMnLNs6kfV6VCvPcQVeehe0XTgGGi6v5nitqkyDScjZpXBX67PlZstowNTXlQ==
+react-ace@8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/react-ace/-/react-ace-8.1.0.tgz#6680accb7306a1850e6ef4370a00f0007eadc8b4"
+  integrity sha512-n3rm9gRNZjLGlXJQ587RASOQCPn6WlcV2gjRYwvG3gyVpBf4pY6lh/uI9tDkx2zYdEKJUfnGbTmzEGL5yyDWuw==
   dependencies:
-    ace-builds "^1.4.8"
+    ace-builds "^1.4.6"
     diff-match-patch "^1.0.4"
     lodash.get "^4.4.2"
     lodash.isequal "^4.5.0"
+    prop-types "^15.7.2"
 
 react-addons-pure-render-mixin@15.6.2:
   version "15.6.2"
