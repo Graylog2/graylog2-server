@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { MessageDetailsDefinitionList } from 'components/graylog';
 
@@ -8,8 +9,19 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
-import styles from './MessageFields.css';
 import CustomHighlighting from './CustomHighlighting';
+
+const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }) => `
+  color: ${theme.color.gray[40]};
+
+  dd {
+    font-family: monospace;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid  ${theme.color.gray[90]};
+    }
+  }
+`);
 
 type Props = {
   message: {
@@ -38,9 +50,9 @@ const MessageFields = ({ message, fields }: Props) => {
     });
 
   return (
-    <MessageDetailsDefinitionList className={`message-details-fields ${styles.messageFields}`}>
+    <MessageDetailsDL className="message-details-fields">
       {renderedFields}
-    </MessageDetailsDefinitionList>
+    </MessageDetailsDL>
   );
 };
 
