@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
+import IfPermitted from 'components/common/IfPermitted';
 
 import { PaginatedList, SearchForm, Spinner, EntityList } from 'components/common';
 import View from './View';
@@ -72,11 +73,13 @@ const ViewList = createReactClass({
 
   itemActionsFactory(view) {
     return (
-      <ButtonToolbar>
-        <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} bsSize="small" pullRight>
-          <MenuItem onSelect={this.handleViewDelete(view)}>Delete</MenuItem>
-        </DropdownButton>
-      </ButtonToolbar>
+      <IfPermitted permissions={['*']}>
+        <ButtonToolbar>
+          <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} bsSize="small" pullRight>
+            <MenuItem onSelect={this.handleViewDelete(view)}>Delete</MenuItem>
+          </DropdownButton>
+        </ButtonToolbar>
+      </IfPermitted>
     );
   },
 
