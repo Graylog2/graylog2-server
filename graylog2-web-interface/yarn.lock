@@ -6013,7 +6013,7 @@ eslint-config-airbnb@18.1.0:
     eslint "6.8.0"
     eslint-config-airbnb "18.1.0"
     eslint-import-resolver-webpack "0.12.1"
-    eslint-plugin-flowtype "^4.5.2"
+    eslint-plugin-flowtype "4.7.0"
     eslint-plugin-import "2.20.1"
     eslint-plugin-jsx-a11y "6.2.3"
     eslint-plugin-react "7.18.3"
@@ -6062,10 +6062,10 @@ eslint-module-utils@^2.4.1:
     debug "^2.6.9"
     pkg-dir "^2.0.0"
 
-eslint-plugin-flowtype@^4.5.2:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-4.6.0.tgz#82b2bd6f21770e0e5deede0228e456cb35308451"
-  integrity sha512-W5hLjpFfZyZsXfo5anlu7HM970JBDqbEshAJUkeczP6BFCIfJXuiIBQXyberLRtOStT0OGPF8efeTbxlHk4LpQ==
+eslint-plugin-flowtype@4.7.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-4.7.0.tgz#903a6ea3eb5cbf4c7ba7fa73cc43fc39ab7e4a70"
+  integrity sha512-M+hxhSCk5QBEValO5/UqrS4UunT+MgplIJK5wA1sCtXjzBcZkpTGRwxmLHhGpbHcrmQecgt6ZL/KDdXWqGB7VA==
   dependencies:
     lodash "^4.17.15"
 
@@ -7829,7 +7829,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   dependencies:
     "@babel/preset-env" "7.9.0"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-3.3.0-SNAPSHOT-71f195d5-f01a-4648-9360-856566c6c76d-1585586494900/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v4/npm-graylog-web-plugin-3.3.0-SNAPSHOT-5c8d5a23-07fe-4c2e-b053-575299ad6bcb-1585729338889/node_modules/eslint-config-graylog"
     html-webpack-plugin "4.0.2"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"
