@@ -85,9 +85,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
     return (
       <Row className="content">
         <Col md={12}>
-          <h2 style={{ marginBottom: 10 }}>Free License</h2>
-          {clusterId}
-          <hr />
+          <h2 style={{ marginBottom: 10 }}>Graylog Enterprise is free for under 5 GB/day</h2>
           <form onSubmit={this.submitForm}>
             <Row>
               <Col md={5}>
@@ -120,7 +118,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
               </Col>
             </Row>
             <Row>
-              <Col smOffset={1} sm={11}>
+              <Col sm={11}>
                 <ButtonToolbar>
                   <Button id="submit-entry"
                           disabled={this.formIsInvalid()}
