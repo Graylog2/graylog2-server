@@ -26,7 +26,6 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.searchtypes.Sort;
@@ -34,7 +33,6 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +116,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private SearchSourceBuilder searchSourceBuilderFrom(MessagesRequest request, Object[] searchAfterValues) {
-        QueryBuilder query = queryFrom(request.queryString().get(), request.timeRange().get(), request.streams().get());
+        QueryBuilder query = queryFrom(request);
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
@@ -132,8 +130,9 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return ssb;
     }
 
-    private QueryBuilder queryFrom(BackendQuery queryString, TimeRange timeRange, Set<String> streams) {
-        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) queryString;
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    private QueryBuilder queryFrom(MessagesRequest request) {
+        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) request.queryString().get();
 
         QueryBuilder query = backendQuery.isEmpty() ?
                 matchAllQuery() :
@@ -141,14 +140,12 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
         BoolQueryBuilder filter = boolQuery()
                 .filter(query)
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(timeRange)));
-//TODO: find out, if we need the extra filter for dashboard widgets?
-//        if (!isNullOrEmpty(filterString)) {
-//            filter.filter(queryStringQuery(filterString));
-//        }
+                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(request.timeRange().get())));
 
-        if (!streams.isEmpty())
-            filter.filter(termsQuery(Message.FIELD_STREAMS, streams));
+        request.additionalQueryString().map(qs -> (ElasticsearchQueryString) qs)
+                .ifPresent(qs -> filter.filter(queryStringQuery(qs.queryString())));
+
+        filter.filter(termsQuery(Message.FIELD_STREAMS, request.streams().get()));
 
         return filter;
     }

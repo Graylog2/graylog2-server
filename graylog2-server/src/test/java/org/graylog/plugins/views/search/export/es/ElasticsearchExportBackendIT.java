@@ -55,7 +55,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesCorrectIndicesAndStreams() {
         importFixture("messages.json");
 
-        MessagesRequest request = defaultRequestBuilder()
+        MessagesRequest request = requestBuilderWithAllStreams()
                 .streams(ImmutableSet.of("stream-01", "stream-02"))
                 .build();
 
@@ -68,11 +68,15 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         );
     }
 
+    private MessagesRequest.Builder requestBuilderWithAllStreams() {
+        return defaultRequestBuilder().streams(ImmutableSet.of("stream-01", "stream-02", "stream-03"));
+    }
+
     @Test
     public void usesQueryString() {
         importFixture("messages.json");
 
-        MessagesRequest request = defaultRequestBuilder()
+        MessagesRequest request = requestBuilderWithAllStreams()
                 .queryString(ElasticsearchQueryString.builder().queryString("Ha Ho").build())
                 .build();
 
@@ -83,10 +87,24 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    public void usesAdditionalQueryStringIfPresent() {
+        importFixture("messages.json");
+
+        MessagesRequest request = requestBuilderWithAllStreams()
+                .queryString(ElasticsearchQueryString.builder().queryString("H*").build())
+                .additionalQueryString(ElasticsearchQueryString.builder().queryString("*a").build())
+                .build();
+
+        runWithExpectedResult(request,
+                "2015-01-01 01:00:00.000 source-1 Ha"
+        );
+    }
+
+    @Test
     public void usesTimeRange() {
         importFixture("messages.json");
 
-        MessagesRequest request = createDefaultMessagesRequest().toBuilder()
+        MessagesRequest request = requestBuilderWithAllStreams()
                 .timeRange(timerange("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.000Z"))
                 .build();
 
@@ -100,7 +118,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesFieldsInOrder() {
         importFixture("messages.json");
 
-        MessagesRequest request = defaultRequestBuilder()
+        MessagesRequest request = requestBuilderWithAllStreams()
                 .fieldsInOrder("timestamp", "message")
                 .build();
 
@@ -115,7 +133,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesSorting() {
         importFixture("messages.json");
 
-        MessagesRequest request = defaultRequestBuilder()
+        MessagesRequest request = requestBuilderWithAllStreams()
                 .sort(linkedHashSetOf(Sort.create("source", SortOrder.ASC), Sort.create("timestamp", SortOrder.DESC)))
                 .build();
 
@@ -130,7 +148,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     public void notifiesDoneOnNoMoreResults() {
         importFixture("messages.json");
 
-        MessagesRequest request = defaultRequestBuilder().build();
+        MessagesRequest request = requestBuilderWithAllStreams().build();
 
         List<String> invocations = new ArrayList<>();
 
