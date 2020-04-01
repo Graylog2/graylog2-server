@@ -12,7 +12,7 @@ jest.mock('react-sizeme', () => ({
   SizeMe: ({ children: fn }) => fn({ size: { width: 320, height: 240 } }),
 }));
 jest.mock('./AutoFontSizer', () => ({ children }) => children);
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 jest.mock('views/components/messagelist/CustomHighlighting', () => {
   /* eslint-disable-next-line react/prop-types */
   return ({ children }) => {

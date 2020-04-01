@@ -34,7 +34,7 @@ class AlertNotificationsList extends React.Component {
   };
 
   _formatNotification = (notification) => {
-    const stream = this.props.streams.find(s => s.id === notification.stream_id);
+    const stream = this.props.streams.find((s) => s.id === notification.stream_id);
     return (
       <AlertNotification key={notification.id}
                          alertNotification={notification}
@@ -55,7 +55,7 @@ class AlertNotificationsList extends React.Component {
                      pageSize={this.PAGE_SIZE}>
         <EntityList bsNoItemsStyle="info"
                     noItemsText="There are no configured notifications."
-                    items={this._paginatedNotifications().map(notification => this._formatNotification(notification))} />
+                    items={this._paginatedNotifications().map((notification) => this._formatNotification(notification))} />
       </PaginatedList>
     );
   }

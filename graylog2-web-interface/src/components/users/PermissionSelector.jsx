@@ -33,9 +33,9 @@ class PermissionSelector extends React.Component {
     };
 
     const multiStreamButtons = (streamIds) => {
-      const selectedStreams = this.props.streams.filter(stream => streamIds.contains(stream.id));
-      const allRead = selectedStreams.every(stream => this.props.permissions.contains(`streams:read:${stream.id}`));
-      const allEdit = selectedStreams.every(stream => this.props.permissions.contains(`streams:edit:${stream.id}`));
+      const selectedStreams = this.props.streams.filter((stream) => streamIds.contains(stream.id));
+      const allRead = selectedStreams.every((stream) => this.props.permissions.contains(`streams:read:${stream.id}`));
+      const allEdit = selectedStreams.every((stream) => this.props.permissions.contains(`streams:edit:${stream.id}`));
       const readActionLabel = allRead ? 'Clear' : 'Set';
       const editActionLabel = allEdit ? 'Clear' : 'Set';
 
@@ -64,9 +64,9 @@ class PermissionSelector extends React.Component {
       );
     };
     const multiDashboardButtons = (dashboardIds) => {
-      const selectedDashboards = this.props.dashboards.filter(dashboard => dashboardIds.contains(dashboard.id));
-      const allRead = selectedDashboards.every(dashboard => this.props.permissions.contains(`dashboards:read:${dashboard.id}`));
-      const allEdit = selectedDashboards.every(dashboard => this.props.permissions.contains(`dashboards:edit:${dashboard.id}`));
+      const selectedDashboards = this.props.dashboards.filter((dashboard) => dashboardIds.contains(dashboard.id));
+      const allRead = selectedDashboards.every((dashboard) => this.props.permissions.contains(`dashboards:read:${dashboard.id}`));
+      const allEdit = selectedDashboards.every((dashboard) => this.props.permissions.contains(`dashboards:edit:${dashboard.id}`));
       const readActionLabel = allRead ? 'Clear' : 'Set';
       const editActionLabel = allEdit ? 'Clear' : 'Set';
 

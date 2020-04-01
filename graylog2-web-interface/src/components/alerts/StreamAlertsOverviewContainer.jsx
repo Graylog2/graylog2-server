@@ -52,7 +52,7 @@ const StreamAlertsOverviewContainer = createReactClass({
     const { alertConditions, availableConditions } = this.state;
 
     return (
-      <React.Fragment>
+      <>
         <Row className="content">
           <Col md={12}>
             <StreamAlerts stream={stream} alertConditions={alertConditions} availableConditions={availableConditions} />
@@ -74,7 +74,7 @@ const StreamAlertsOverviewContainer = createReactClass({
             <StreamAlertNotifications stream={stream} />
           </Col>
         </Row>
-      </React.Fragment>
+      </>
     );
   },
 });

@@ -14,7 +14,7 @@ import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 import styles from './FieldList.css';
 
-const isReservedField = fieldName => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
+const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
 const FieldList = createReactClass({
   propTypes: {
@@ -52,7 +52,7 @@ const FieldList = createReactClass({
 
   _renderField({ fields, fieldType, selectedQuery, selectedView, style }) {
     const { name, type } = fieldType;
-    const disabled = !fields.find(f => f.name === name);
+    const disabled = !fields.find((f) => f.name === name);
 
     return (
       <li key={`field-${name}`} className={styles.fieldListItem} style={style}>
@@ -71,7 +71,7 @@ const FieldList = createReactClass({
   },
 
   _fieldsToShow(fields, allFields, showFieldsBy = 'all') {
-    const isNotReservedField = f => !isReservedField(f.name);
+    const isNotReservedField = (f) => !isReservedField(f.name);
     switch (showFieldsBy) {
       case 'all':
         return allFields.filter(isNotReservedField);
@@ -96,11 +96,11 @@ const FieldList = createReactClass({
     if (!fields) {
       return <span>No field information available.</span>;
     }
-    const fieldFilter = filter ? (field => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
+    const fieldFilter = filter ? ((field) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
     const fieldsToShow = this._fieldsToShow(fields, allFields, showFieldsBy);
     const fieldList = fieldsToShow
       .filter(fieldFilter)
-      .sortBy(field => field.name.toLocaleUpperCase());
+      .sortBy((field) => field.name.toLocaleUpperCase());
 
     if (fieldList.isEmpty()) {
       return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
@@ -150,7 +150,7 @@ const FieldList = createReactClass({
 
     return (
       <div style={{ whiteSpace: 'break-spaces' }}>
-        <form className={`form-inline ${styles.filterContainer}`} onSubmit={e => e.preventDefault()}>
+        <form className={`form-inline ${styles.filterContainer}`} onSubmit={(e) => e.preventDefault()}>
           <div className={`form-group has-feedback ${styles.filterInputContainer}`}>
             <input id="common-search-form-query-input"
                    className="query form-control"

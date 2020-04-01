@@ -68,18 +68,18 @@ class EmailNotificationForm extends React.Component {
   };
 
   handleRecipientsChange = (key) => {
-    return nextValue => this.propagateChange(key, nextValue === '' ? [] : nextValue.split(','));
+    return (nextValue) => this.propagateChange(key, nextValue === '' ? [] : nextValue.split(','));
   };
 
   formatUsers = (users) => {
-    return users.map(user => ({ label: `${user.username} (${user.full_name})`, value: user.username }));
+    return users.map((user) => ({ label: `${user.username} (${user.full_name})`, value: user.username }));
   };
 
   render() {
     const { config, users, validation } = this.props;
 
     return (
-      <React.Fragment>
+      <>
         <Input id="notification-sender"
                name="sender"
                label="Sender"
@@ -137,7 +137,7 @@ class EmailNotificationForm extends React.Component {
             {lodash.get(validation, 'errors.body_template[0]', 'The template that will be used to generate the email body.')}
           </HelpBlock>
         </FormGroup>
-      </React.Fragment>
+      </>
     );
   }
 }

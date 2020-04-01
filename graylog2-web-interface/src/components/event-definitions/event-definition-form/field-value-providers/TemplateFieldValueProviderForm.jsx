@@ -31,14 +31,14 @@ class TemplateFieldValueProviderForm extends React.Component {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
     const nextProviders = lodash.cloneDeep(config.providers);
-    const templateProvider = nextProviders.find(provider => provider.type === TemplateFieldValueProviderForm.type);
+    const templateProvider = nextProviders.find((provider) => provider.type === TemplateFieldValueProviderForm.type);
     templateProvider[name] = value;
-    onChange(Object.assign({}, config, { providers: nextProviders }));
+    onChange({ ...config, providers: nextProviders });
   };
 
   render() {
     const { config, validation } = this.props;
-    const provider = config.providers.find(p => p.type === TemplateFieldValueProviderForm.type);
+    const provider = config.providers.find((p) => p.type === TemplateFieldValueProviderForm.type);
 
     const helpText = (
       <span>

@@ -24,7 +24,7 @@ describe('ActionHandler', () => {
   });
   it('generates a handler from a component-based definition', () => {
     const setState = jest.fn();
-    const setActionComponents = jest.fn(fn => setState(fn({})));
+    const setActionComponents = jest.fn((fn) => setState(fn({})));
     const actionDefinition: ActionDefinition = {
       type: 'dummy-action',
       title: 'A Dummy Action',
@@ -50,7 +50,7 @@ describe('ActionHandler', () => {
   });
   it('supplied onClose removes component from state', () => {
     const setState = jest.fn();
-    const setActionComponents = jest.fn(fn => setState(fn({})));
+    const setActionComponents = jest.fn((fn) => setState(fn({})));
     const actionDefinition: ActionDefinition = {
       type: 'dummy-action',
       title: 'A Dummy Action',

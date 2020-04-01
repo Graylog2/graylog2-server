@@ -190,10 +190,8 @@ export default connect(MessageList,
     selectedFields: SelectedFieldsStore,
     currentView: ViewStore,
     searches: SearchStore,
-  }, props => Object.assign(
-    {},
-    props,
-    {
-      searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']),
-    },
-  ));
+  }, (props) => ({
+
+    ...props,
+    searchTypes: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'searchTypes']),
+  }));

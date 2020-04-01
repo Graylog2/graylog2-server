@@ -84,7 +84,7 @@ const MetricsStore = Reflux.createStore({
     let result = Promise.resolve(null);
 
     promises.forEach((promise) => {
-      result = result.then(() => promise).then(value => accumulator.push(value), error => accumulator.push(error));
+      result = result.then(() => promise).then((value) => accumulator.push(value), (error) => accumulator.push(error));
     });
 
     return result.then(() => accumulator);
@@ -94,10 +94,10 @@ const MetricsStore = Reflux.createStore({
 
     // First collect all node metric registrations
     Object.keys(localRegistrations)
-      .filter(nodeId => Object.keys(localRegistrations[nodeId]).length > 0)
+      .filter((nodeId) => Object.keys(localRegistrations[nodeId]).length > 0)
       .forEach((nodeId) => {
         Object.keys(localRegistrations[nodeId])
-          .filter(metricName => localRegistrations[nodeId][metricName] > 0)
+          .filter((metricName) => localRegistrations[nodeId][metricName] > 0)
           .forEach((metricName) => {
             metricsToFetch[metricName] = 1;
           });
@@ -105,7 +105,7 @@ const MetricsStore = Reflux.createStore({
 
     // Then collect all global metric registrations
     Object.keys(globalRegistrations)
-      .filter(metricName => globalRegistrations[metricName] > 0)
+      .filter((metricName) => globalRegistrations[metricName] > 0)
       .forEach((metricName) => {
         metricsToFetch[metricName] = 1;
       });

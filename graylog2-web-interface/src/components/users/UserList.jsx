@@ -36,7 +36,7 @@ const UserList = createReactClass({
   componentDidMount() {
     this.loadUsers();
     RolesStore.loadRoles().done((roles) => {
-      this.setState({ roles: roles.map(role => role.name) });
+      this.setState({ roles: roles.map((role) => role.name) });
     });
   },
 
@@ -122,7 +122,7 @@ const UserList = createReactClass({
       );
     }
 
-    const roleBadges = user.roles.map(role => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
+    const roleBadges = user.roles.map((role) => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
 
     let actions = null;
     if (user.read_only) {

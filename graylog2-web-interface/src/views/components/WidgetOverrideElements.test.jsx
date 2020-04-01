@@ -5,7 +5,7 @@ import { cleanup, render, waitForElement } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
 import WidgetOverrideElements from './WidgetOverrideElements';
 
-jest.mock('views/logic/withPluginEntities', () => x => x);
+jest.mock('views/logic/withPluginEntities', () => (x) => x);
 
 describe('WidgetOverrideElements', () => {
   afterEach(cleanup);

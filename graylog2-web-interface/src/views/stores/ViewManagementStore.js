@@ -58,7 +58,7 @@ const ViewManagementActions: ViewManagementActionsType = singletonActions(
 );
 
 const viewsUrl = URLUtils.qualifyUrl('/views');
-const viewsIdUrl = id => URLUtils.qualifyUrl(`/views/${id}`);
+const viewsIdUrl = (id) => URLUtils.qualifyUrl(`/views/${id}`);
 const forValueUrl = () => URLUtils.qualifyUrl('/views/forValue');
 
 const ViewManagementStore = singletonStore(
@@ -140,7 +140,7 @@ const ViewManagementStore = singletonStore(
 
     forValue() {
       const promise = fetch('POST', forValueUrl())
-        .catch(error => UserNotification.error(`Finding matching views for value failed with status: ${error}`, 'Could not find matching views'));
+        .catch((error) => UserNotification.error(`Finding matching views for value failed with status: ${error}`, 'Could not find matching views'));
       ViewManagementActions.forValue.promise(promise);
     },
   }),

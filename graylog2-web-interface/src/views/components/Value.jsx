@@ -26,12 +26,12 @@ const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
 const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
   const RenderComponent: ValueRenderer = render || ((props: ValueRendererProps) => props.value);
-  const Component = v => <RenderComponent field={field} value={v.value} type={type} />;
+  const Component = (v) => <RenderComponent field={field} value={v.value} type={type} />;
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
     <InteractiveContext.Consumer>
-      {interactive => ((interactive && queryId)
+      {(interactive) => ((interactive && queryId)
         ? (
           <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
             <ValueActionTitle>

@@ -41,7 +41,7 @@ describe('DrilldownContextProvider', () => {
     expect(timerange).toEqual(expectedTimerange);
     expect(query).toEqual(expectedQuery);
   };
-  const renderSUT = viewType => mount(
+  const renderSUT = (viewType) => mount(
     <ViewTypeContext.Provider value={viewType}>
       <DrilldownContextProvider widget={widget}>
         <TestComponent />

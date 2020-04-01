@@ -31,7 +31,7 @@ type FormattedPivot = {
 
 const formatPivot = (pivot: Pivot): FormattedPivot => {
   const { type, field, config } = pivot;
-  const newConfig = Object.assign({}, config);
+  const newConfig = { ...config };
 
   switch (type) {
     // eslint-disable-next-line no-case-declarations
@@ -65,7 +65,7 @@ const generateConfig = (id: string, name: string, { rollup, rowPivots, columnPiv
     rollup,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
-    series: series.map<FormattedSeries>(s => Object.assign({}, { id: s.effectiveName }, parseSeries(s.function))),
+    series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
     sort: sort,
   },
 });

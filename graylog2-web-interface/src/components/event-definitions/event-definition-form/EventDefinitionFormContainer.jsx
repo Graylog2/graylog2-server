@@ -77,7 +77,7 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   fetchClusterConfig = () => {
-    ConfigurationActions.listEventsClusterConfig().then(config => this.setState({ eventsClusterConfig: config }));
+    ConfigurationActions.listEventsClusterConfig().then((config) => this.setState({ eventsClusterConfig: config }));
   };
 
   handleChange = (key, value) => {
@@ -152,7 +152,7 @@ class EventDefinitionFormContainer extends React.Component {
     const defaults = { default_backlog_size: eventsClusterConfig.events_notification_default_backlog };
 
     return (
-      <React.Fragment>
+      <>
         {isDirty && (
           <ConfirmLeaveDialog route={route}
                               question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
@@ -167,7 +167,7 @@ class EventDefinitionFormContainer extends React.Component {
                              onChange={this.handleChange}
                              onCancel={this.handleCancel}
                              onSubmit={this.handleSubmit} />
-      </React.Fragment>
+      </>
     );
   }
 }

@@ -23,12 +23,12 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
   };
 
   _getDefaultStrategyConfig = (selectedStrategy) => {
-    const result = this.props.strategies.filter(strategy => strategy.type === selectedStrategy)[0];
+    const result = this.props.strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
     return result ? result.default_config : undefined;
   };
 
   _getStrategyJsonSchema = (selectedStrategy) => {
-    const result = this.props.strategies.filter(strategy => strategy.type === selectedStrategy)[0];
+    const result = this.props.strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
     return result ? result.json_schema : undefined;
   };
 
@@ -55,7 +55,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
 
   _addConfigType = (strategy, data) => {
     // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
-    const result = this.props.strategies.filter(s => s.type === strategy)[0];
+    const result = this.props.strategies.filter((s) => s.type === strategy)[0];
     const copy = data;
 
     if (result) {
@@ -83,7 +83,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
       return null;
     }
 
-    const strategy = this.props.pluginExports.filter(exportedStrategy => exportedStrategy.type === selectedStrategy)[0];
+    const strategy = this.props.pluginExports.filter((exportedStrategy) => exportedStrategy.type === selectedStrategy)[0];
 
     if (!strategy) {
       return null;

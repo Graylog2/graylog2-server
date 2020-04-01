@@ -75,13 +75,13 @@ const JvmHeapUsage = createReactClass({
       maxMemory: 'jvm.memory.heap.max',
     };
 
-    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
   },
 
   componentWillUnmount() {
     const { nodeId } = this.props;
 
-    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
   },
 
   _extractMetricValues() {

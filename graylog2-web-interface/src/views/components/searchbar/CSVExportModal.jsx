@@ -66,7 +66,7 @@ const getURLForExportAsCSV = (selectedStream: ?string, selectedFields: Array<str
   return new URI(URLUtils.qualifyUrl('/notfound'));
 };
 
-const wrapOption = o => ({ label: o, value: o });
+const wrapOption = (o) => ({ label: o, value: o });
 const defaultFields = ['timestamp', 'source', 'message'];
 const defaultFieldOptions = defaultFields.map(wrapOption);
 
@@ -76,7 +76,7 @@ const CSVExportModal = ({ closeModal, availableStreams, availableFields }: Props
 
   const link = selectedFields.length > 0
     ? (
-      <a href={getURLForExportAsCSV((selectedStream || {}).value, selectedFields.map(f => f.value))} target="_parent">
+      <a href={getURLForExportAsCSV((selectedStream || {}).value, selectedFields.map((f) => f.value))} target="_parent">
         <Icon name="cloud-download" />&nbsp;
         Download
       </a>
@@ -105,14 +105,14 @@ const CSVExportModal = ({ closeModal, availableStreams, availableFields }: Props
           <Row>
             <span>Add stream to filter messages:</span>
             <Select placeholder="None: click to add stream"
-                    onChange={selection => setSelectedStream(selection)}
+                    onChange={(selection) => setSelectedStream(selection)}
                     options={availableStreams}
                     value={selectedStream} />
           </Row>
           <Row>
             <span>Select fields to export:</span>
             <Select placeholder="None: click to add fields"
-                    onChange={selection => setSelectedFields(selection)}
+                    onChange={(selection) => setSelectedFields(selection)}
                     options={availableFields}
                     value={selectedFields}
                     isMulti />
@@ -149,7 +149,7 @@ export default connect(
   },
   ({ availableStreams: { streams }, availableFields: { all }, ...rest }) => ({
     ...rest,
-    availableStreams: sortBy(streams.map(stream => ({ label: stream.title, value: stream.id })), ['label']),
-    availableFields: all.map(field => ({ label: field.name, value: field.name })).sortBy(f => f.label).toArray(),
+    availableStreams: sortBy(streams.map((stream) => ({ label: stream.title, value: stream.id })), ['label']),
+    availableFields: all.map((field) => ({ label: field.name, value: field.name })).sortBy((f) => f.label).toArray(),
   }),
 );

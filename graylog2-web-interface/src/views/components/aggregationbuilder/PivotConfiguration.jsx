@@ -34,7 +34,7 @@ export default class PivotConfiguration extends React.Component {
   // eslint-disable-next-line react/destructuring-assignment
   _onSubmit = () => this.props.onClose(this.state);
 
-  _onChange = config => this.setState({ config });
+  _onChange = (config) => this.setState({ config });
 
   render() {
     const { type } = this.props;

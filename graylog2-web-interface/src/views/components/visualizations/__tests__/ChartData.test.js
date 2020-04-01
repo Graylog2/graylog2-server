@@ -9,7 +9,7 @@ import { chartData, extractSeries, formatSeries, generateChart } from '../ChartD
 import transformKeys from '../TransformKeys';
 
 const cwd = dirname(__filename);
-const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`, 'utf-8'));
+const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`, 'utf-8'));
 
 describe('Chart helper functions', () => {
   const config = AggregationWidgetConfig.builder().build();

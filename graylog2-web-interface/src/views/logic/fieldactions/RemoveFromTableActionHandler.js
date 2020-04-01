@@ -4,7 +4,7 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type { FieldActionHandlerCondition, FieldActionHandler } from './FieldActionHandler';
 
 const RemoveFromTableActionHandler: FieldActionHandler = ({ field, contexts: { widget } }) => {
-  const newFields = widget.config.fields.filter(f => (f !== field));
+  const newFields = widget.config.fields.filter((f) => (f !== field));
   const newConfig = widget.config.toBuilder()
     .fields(newFields)
     .build();

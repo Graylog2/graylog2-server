@@ -16,7 +16,7 @@ import CustomPropTypes from './CustomPropTypes';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
 
-const onSelectQuery = queryId => (queryId === 'new' ? NewQueryActionHandler() : ViewActions.selectQuery(queryId));
+const onSelectQuery = (queryId) => (queryId === 'new' ? NewQueryActionHandler() : ViewActions.selectQuery(queryId));
 
 const onCloseTab = (queryId, currentQuery, queries) => {
   if (queries.size === 1) {
@@ -36,15 +36,15 @@ const onCloseTab = (queryId, currentQuery, queries) => {
 
 const QueryBar = ({ children, queries, queryTitles, viewMetadata }) => {
   const { activeQuery } = viewMetadata;
-  const childrenWithQueryId = React.Children.map(children, child => React.cloneElement(child, { queryId: activeQuery }));
-  const selectQueryAndExecute = queryId => onSelectQuery(queryId);
+  const childrenWithQueryId = React.Children.map(children, (child) => React.cloneElement(child, { queryId: activeQuery }));
+  const selectQueryAndExecute = (queryId) => onSelectQuery(queryId);
   return (
     <QueryTabs queries={queries}
                selectedQueryId={activeQuery}
                titles={queryTitles}
                onSelect={selectQueryAndExecute}
                onTitleChange={onTitleChange}
-               onRemove={queryId => onCloseTab(queryId, activeQuery, queries)}>
+               onRemove={(queryId) => onCloseTab(queryId, activeQuery, queries)}>
       {childrenWithQueryId}
     </QueryTabs>
   );

@@ -116,12 +116,12 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
   return (
-    <React.Fragment>
+    <>
       {isGloballyOverridden && <ResetOverrideHint />}
       <Wrapper>
         <Row className="no-bm extended-search-query-metadata">
           <Col md={4}>
-            <TimeRangeTypeSelector onSelect={newRangeType => _updateRangeType(timerange, id, newRangeType)}
+            <TimeRangeTypeSelector onSelect={(newRangeType) => _updateRangeType(timerange, id, newRangeType)}
                                    disabled={isGloballyOverridden}
                                    value={rangeType} />
             <TimeRangeInput onChange={(key, value) => _updateRangeParams(rangeType, timerange, id, { [key]: value })}
@@ -135,7 +135,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
             <StreamsFilter value={streams}
                            disabled={isGloballyOverridden}
                            streams={availableStreams}
-                           onChange={value => _updateStreams(id, value)} />
+                           onChange={(value) => _updateStreams(id, value)} />
           </Col>
         </Row>
 
@@ -151,12 +151,12 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
             <QueryInput value={query ? query.query_string : undefined}
                         disabled={isGloballyOverridden}
                         placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                        onChange={value => _updateQuery(id, value).then(() => value)}
+                        onChange={(value) => _updateQuery(id, value).then(() => value)}
                         onExecute={performSearch} />
           </Col>
         </Row>
       </Wrapper>
-    </React.Fragment>
+    </>
   );
 };
 
@@ -171,7 +171,7 @@ export default connect(
   },
   ({ availableStreams: { streams = [] }, configurations, ...rest }) => ({
     ...rest,
-    availableStreams: streams.map(stream => ({ key: stream.title, value: stream.id })),
+    availableStreams: streams.map((stream) => ({ key: stream.title, value: stream.id })),
     config: configurations.searchesClusterConfig,
   }),
 );

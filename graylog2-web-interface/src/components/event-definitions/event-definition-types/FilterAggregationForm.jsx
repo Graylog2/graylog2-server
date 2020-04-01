@@ -73,14 +73,14 @@ class FilterAggregationForm extends React.Component {
       });
       stateChange.existingAggregationConfig = existingAggregationConfig;
 
-      const nextConfig = Object.assign({}, eventDefinition.config, initialAggregationConfig);
+      const nextConfig = { ...eventDefinition.config, ...initialAggregationConfig };
       this.propagateChange('config', nextConfig);
     } else {
       // Reset aggregation data from state if it exists
       const { existingAggregationConfig } = this.state;
       if (existingAggregationConfig) {
         const { eventDefinition } = this.props;
-        const nextConfig = Object.assign({}, eventDefinition.config, existingAggregationConfig);
+        const nextConfig = { ...eventDefinition.config, ...existingAggregationConfig };
         this.propagateChange('config', nextConfig);
         stateChange.existingAggregationConfig = undefined;
       }
@@ -104,7 +104,7 @@ class FilterAggregationForm extends React.Component {
     const { allFieldTypes, entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
 
     return (
-      <React.Fragment>
+      <>
         <Row>
           <Col md={7} lg={6}>
             <FilterForm eventDefinition={eventDefinition}
@@ -146,7 +146,7 @@ class FilterAggregationForm extends React.Component {
             </Col>
           </Row>
         )}
-      </React.Fragment>
+      </>
     );
   }
 }

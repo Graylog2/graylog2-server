@@ -58,7 +58,7 @@ describe('AddWidgetButton', () => {
   it('contains menu items for all widget types', () => {
     const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
     ['Aggregation', 'Message Count', 'Message Table', 'Parameter']
-      .forEach(title => expect(wrapper.find(`button[children="${title}"]`)).toExist());
+      .forEach((title) => expect(wrapper.find(`button[children="${title}"]`)).toExist());
   });
   it('clicking on option to add aggregation calls AggregateActionHandler', () => {
     const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);

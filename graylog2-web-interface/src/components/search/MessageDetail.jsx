@@ -151,8 +151,7 @@ class MessageDetail extends React.Component {
                 {streams}
               </ul>
             </dd>
-            )
-            }
+            )}
             </dl>
           </Col>
           <Col md={9}>

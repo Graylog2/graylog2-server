@@ -94,7 +94,7 @@ class ImportsViewModal extends React.Component {
 
     const pageSize = this.PAGE_SIZE;
     const { uploads, totalUploads } = this.state;
-    const formattedUploads = uploads.map(upload => (this._formatUpload(upload)));
+    const formattedUploads = uploads.map((upload) => (this._formatUpload(upload)));
 
     if (totalUploads === 0) {
       return (

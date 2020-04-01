@@ -13,11 +13,11 @@ const AlarmCallbacksStore = Reflux.createStore({
   listenables: [AlarmCallbacksActions],
 
   list(streamId) {
-    const failCallback = error => UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
+    const failCallback = (error) => UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
       'Could not retrieve alert notification');
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.list(streamId).url);
-    const promise = fetch('GET', url).then(response => response.alarmcallbacks, failCallback);
+    const promise = fetch('GET', url).then((response) => response.alarmcallbacks, failCallback);
 
     AlarmCallbacksActions.list.promise(promise);
   },
@@ -39,7 +39,7 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.save.promise(promise);
   },
   delete(streamId, alarmCallbackId) {
-    const failCallback = error => UserNotification.error(`Removing alert notification failed with status: ${error.message}`,
+    const failCallback = (error) => UserNotification.error(`Removing alert notification failed with status: ${error.message}`,
       'Could not remove alert notification');
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.delete(streamId, alarmCallbackId).url);

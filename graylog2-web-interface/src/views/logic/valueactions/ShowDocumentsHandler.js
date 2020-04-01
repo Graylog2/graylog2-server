@@ -24,7 +24,7 @@ type Arguments = {
 };
 
 const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
-  return valuePath.map(item => Object.entries(item)
+  return valuePath.map((item) => Object.entries(item)
     // $FlowFixMe: We know that values are strings
     .map(([key, value]: [string, string]) => (
       key === '_exists_' ? value : key)))
@@ -33,7 +33,7 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
 };
 
 const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
-  const mergedObject = valuePath.reduce((elem, acc) => Object.assign({}, acc, elem), {});
+  const mergedObject = valuePath.reduce((elem, acc) => ({ ...acc, ...elem }), {});
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
   const valuePathQuery = Object.entries(mergedObject)
     .map(([k, v]) => `${k}:${escape(String(v))}`)

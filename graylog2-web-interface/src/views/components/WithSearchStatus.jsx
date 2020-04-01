@@ -11,7 +11,7 @@ import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStor
 
 const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters) => {
   const bindingsMap = getParameterBindingsAsMap(parameterBindings);
-  const missingValues = usedParameters.map(p => bindingsMap.get(p.name)).filter(value => !trim(value));
+  const missingValues = usedParameters.map((p) => bindingsMap.get(p.name)).filter((value) => !trim(value));
 
   return undeclaredParameters.size > 0 || missingValues.size > 0;
 };

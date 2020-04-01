@@ -59,7 +59,7 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
       return view;
     }).then(() => {
       SearchActions.executeWithCurrentState();
-    }).catch(e => e);
+    }).catch((e) => e);
   };
 
   const loadNewView = (currentURLQuery: URLQuery): Promise<?View> => {
@@ -70,7 +70,7 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
       currentURLQuery,
       () => setLoaded(true),
     ).catch(
-      error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
+      (error) => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
     );
   };
 

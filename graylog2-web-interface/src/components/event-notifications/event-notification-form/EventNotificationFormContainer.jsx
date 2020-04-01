@@ -157,7 +157,7 @@ class EventNotificationFormContainer extends React.Component {
     const { notification, validation, testResult, isDirty } = this.state;
 
     return (
-      <React.Fragment>
+      <>
         {!embedded && isDirty && (
           <ConfirmLeaveDialog route={route}
                               question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
@@ -172,7 +172,7 @@ class EventNotificationFormContainer extends React.Component {
                                onCancel={this.handleCancel}
                                onSubmit={this.handleSubmit}
                                onTest={this.handleTest} />
-      </React.Fragment>
+      </>
     );
   }
 }

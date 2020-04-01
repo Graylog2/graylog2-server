@@ -113,7 +113,7 @@ describe('SavedSearchList', () => {
     });
     it('should change url after load', async () => {
       const onLoad = jest.fn(() => Promise.resolve());
-      Routes.pluginRoute = jest.fn(route => id => `${route}:${id}`);
+      Routes.pluginRoute = jest.fn((route) => (id) => `${route}:${id}`);
       browserHistory.push = jest.fn();
       const views = createViewsResponse(1);
 

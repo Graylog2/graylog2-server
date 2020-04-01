@@ -5,7 +5,7 @@ import MessagesWidget from '../widgets/MessagesWidget';
 
 const mockList = jest.fn(() => Promise.resolve([]));
 jest.mock('injection/CombinedProvider', () => ({
-  get: type => ({
+  get: (type) => ({
     Decorators: {
       DecoratorsActions: {
         list: (...args) => mockList(...args),
@@ -20,7 +20,7 @@ describe('ViewStateGenerator', () => {
   });
   it('adds message table to widgets', async () => {
     const result = await ViewStateGenerator(View.Type.Search);
-    const messageTableWidget = result.widgets.find(widget => widget.type === MessagesWidget.type);
+    const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
     expect(messageTableWidget).toBeDefined();
   });
   it('adds decorators for current stream to message table', async () => {
@@ -31,7 +31,7 @@ describe('ViewStateGenerator', () => {
     const result = await ViewStateGenerator(View.Type.Search, 'foobar');
 
     expect(mockList).toHaveBeenCalledWith();
-    const messageTableWidget = result.widgets.find(widget => widget.type === MessagesWidget.type);
+    const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
     if (!messageTableWidget) {
       throw new Error('Unable to find message table widget in generated view state.');
     }
@@ -45,7 +45,7 @@ describe('ViewStateGenerator', () => {
     const result = await ViewStateGenerator(View.Type.Search, null);
 
     expect(mockList).toHaveBeenCalledWith();
-    const messageTableWidget = result.widgets.find(widget => widget.type === MessagesWidget.type);
+    const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
     if (!messageTableWidget) {
       throw new Error('Unable to find message table widget in generated view state.');
     }
@@ -59,7 +59,7 @@ describe('ViewStateGenerator', () => {
     const result = await ViewStateGenerator(View.Type.Search, 'otherstream');
 
     expect(mockList).toHaveBeenCalledWith();
-    const messageTableWidget = result.widgets.find(widget => widget.type === MessagesWidget.type);
+    const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
     if (!messageTableWidget) {
       throw new Error('Unable to find message table widget in generated view state.');
     }
@@ -69,7 +69,7 @@ describe('ViewStateGenerator', () => {
     const result = await ViewStateGenerator(View.Type.Search, 'otherstream');
 
     expect(mockList).toHaveBeenCalledWith();
-    const messageTableWidget = result.widgets.find(widget => widget.type === MessagesWidget.type);
+    const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
     if (!messageTableWidget) {
       throw new Error('Unable to find message table widget in generated view state.');
     }
@@ -79,7 +79,7 @@ describe('ViewStateGenerator', () => {
     const result = await ViewStateGenerator(View.Type.Search, null);
 
     expect(mockList).toHaveBeenCalledWith();
-    const messageTableWidget = result.widgets.find(widget => widget.type === MessagesWidget.type);
+    const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
     if (!messageTableWidget) {
       throw new Error('Unable to find message table widget in generated view state.');
     }

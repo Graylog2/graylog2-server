@@ -47,7 +47,7 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
   const timeRangeOptions = buildTimeRangeOptions(searchConfig);
   const menuItems = Object.keys(timeRangeOptions)
     .sort((a, b) => naturalSort(a, b))
-    .map(range => (
+    .map((range) => (
       <MenuItem key={range} href={searchLink(range, timestamp, id, messageFields, searchConfig, streams)} target="_blank" rel="noopener noreferrer">
         {timeRangeOptions[range]}
       </MenuItem>

@@ -8,7 +8,7 @@ type Props = {
 };
 const IfDashboard = ({ children }: Props) => (
   <ViewTypeContext.Consumer>
-    {viewType => ((viewType === View.Type.Dashboard) ? children : null)}
+    {(viewType) => ((viewType === View.Type.Dashboard) ? children : null)}
   </ViewTypeContext.Consumer>
 );
 

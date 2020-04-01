@@ -20,7 +20,7 @@ type ChartDefinition = {
 };
 
 const getChartColor = (fullData, name) => {
-  const data = fullData.find(d => (d.name === name)).marker;
+  const data = fullData.find((d) => (d.name === name)).marker;
   if (data && data.marker && data.marker.color) {
     const { marker: color } = data;
     return color;

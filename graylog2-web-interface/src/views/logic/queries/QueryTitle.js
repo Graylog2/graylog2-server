@@ -12,7 +12,7 @@ const queryTitle = (view: View, queryId: QueryId): ?string => (view && view.sear
           : `Page#${idx + 1}`;
       }
       return undefined;
-    }).filter(title => title !== undefined)
+    }).filter((title) => title !== undefined)
     .first()
   : undefined);
 

@@ -45,7 +45,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       this.search = search;
 
       const { queries } = search;
-      const newQueries = Immutable.OrderedMap(queries.map(q => [q.id, q]));
+      const newQueries = Immutable.OrderedMap(queries.map((q) => [q.id, q]));
 
       if (!isEqual(newQueries, this.queries)) {
         this.queries = newQueries;
@@ -56,7 +56,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
     duplicate(queryId: QueryId) {
       const newQuery = this.queries.get(queryId).toBuilder().newId().build();
       const promise: Promise<QueriesList> = ViewStatesActions.duplicate(queryId)
-        .then(newViewState => QueriesActions.create(newQuery, newViewState));
+        .then((newViewState) => QueriesActions.create(newQuery, newViewState));
       QueriesActions.duplicate.promise(promise);
       return promise;
     },
@@ -78,7 +78,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
 
     query(queryId: QueryId, query: string) {
       const activeQuery: Query = this.queries.get(queryId);
-      const newQuery = activeQuery.toBuilder().query(Object.assign({}, activeQuery.query, { query_string: query })).build();
+      const newQuery = activeQuery.toBuilder().query({ ...activeQuery.query, query_string: query }).build();
       const newQueries = this.queries.set(queryId, newQuery);
       const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
       QueriesActions.query.promise(promise);
@@ -86,7 +86,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
     },
     timerange(queryId: QueryId, timerange: TimeRange) {
       const query = this.queries.get(queryId);
-      const newQueries = this.queries.update(queryId, q => q.toBuilder().timerange(timerange).build());
+      const newQueries = this.queries.update(queryId, (q) => q.toBuilder().timerange(timerange).build());
       const promise: Promise<QueriesList> = query.timerange === timerange
         ? Promise.resolve(this.queries)
         : this._propagateQueryChange(newQueries).then(() => newQueries);
@@ -96,7 +96,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
     rangeParams(queryId: QueryId, key: string, value: string | number) {
       const oldQuery = this.queries.get(queryId);
       const oldTimerange = oldQuery.timerange;
-      const newTimerange = Object.assign({}, oldTimerange, { [key]: value });
+      const newTimerange = { ...oldTimerange, [key]: value };
 
       const promise: Promise<QueriesList> = QueriesActions.timerange(queryId, newTimerange);
       QueriesActions.rangeParams.promise(promise);

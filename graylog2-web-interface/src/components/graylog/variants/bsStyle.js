@@ -25,7 +25,7 @@ const bsStyleThemeVariant = (cssBuilder, additionalVariants = {}, includedVarian
     return modes;
   };
 
-  const variants = includedVariants.map(variant => ({
+  const variants = includedVariants.map((variant) => ({
     [variant]: { ...styleModes(variant) },
   }));
 

@@ -12,7 +12,7 @@ type Props = {
   config: NumberVisualizationConfig,
 };
 
-const _makeOption = value => ({ label: capitalize(value), value });
+const _makeOption = (value) => ({ label: capitalize(value), value });
 const trendPreferenceOptions = ['LOWER', 'NEUTRAL', 'HIGHER'].map(_makeOption);
 
 const NumberVisualizationConfiguration = ({ config = NumberVisualizationConfig.empty(), onChange }: Props) => {
@@ -33,7 +33,7 @@ const NumberVisualizationConfiguration = ({ config = NumberVisualizationConfig.e
     </HoverForHelp>
   );
   return (
-    <React.Fragment>
+    <>
       <Input key="trend"
              id="trend"
              type="checkbox"
@@ -51,7 +51,7 @@ const NumberVisualizationConfiguration = ({ config = NumberVisualizationConfig.e
                 onChange={changeTrendPreference}
                 value={_makeOption(config.trendPreference)} />
       </Input>
-    </React.Fragment>
+    </>
   );
 };
 

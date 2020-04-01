@@ -124,7 +124,7 @@ const Stage = createReactClass({
     let content;
     // We check if we have the rules details before trying to render them
     if (this.state.rules) {
-      content = this._formatRules(stage, this.props.stage.rules.map(name => this.state.rules.filter(r => r.title === name)[0]));
+      content = this._formatRules(stage, this.props.stage.rules.map((name) => this.state.rules.filter((r) => r.title === name)[0]));
     } else {
       content = <Spinner />;
     }

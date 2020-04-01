@@ -5,9 +5,9 @@ import Series from 'views/logic/aggregationbuilder/Series';
 
 import { parameterNeededForType } from './SeriesParameterOptions';
 
-const _makeIncompleteFunction = fun => ({ label: `${fun}(...)`, value: fun, incomplete: true, parameterNeeded: parameterNeededForType(fun) });
+const _makeIncompleteFunction = (fun) => ({ label: `${fun}(...)`, value: fun, incomplete: true, parameterNeeded: parameterNeededForType(fun) });
 
-const _wrapOption = series => ({ label: series.effectiveName, value: series });
+const _wrapOption = (series) => ({ label: series.effectiveName, value: series });
 
 const _defaultFunctions = (functions) => {
   const funcOptions = Object.keys(functions).map(_makeIncompleteFunction);
@@ -17,7 +17,7 @@ const _defaultFunctions = (functions) => {
   );
 };
 
-const combineFunctionsWithFields = (functions, fields, parameter) => flatten(fields.map(name => functions.map((f) => {
+const combineFunctionsWithFields = (functions, fields, parameter) => flatten(fields.map((name) => functions.map((f) => {
   if (parameter) {
     return `${f}(${name},${parameter})`;
   }

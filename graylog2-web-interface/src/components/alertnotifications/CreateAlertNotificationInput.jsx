@@ -57,7 +57,7 @@ const CreateAlertNotificationInput = createReactClass({
   },
 
   _findStream(streams, streamId) {
-    return streams.find(s => s.id === streamId);
+    return streams.find((s) => s.id === streamId);
   },
 
   _onStreamChange(nextStream) {
@@ -126,7 +126,7 @@ const CreateAlertNotificationInput = createReactClass({
       );
     });
     const formattedStreams = streams
-      .map(stream => this._formatOption(stream.title, stream.id))
+      .map((stream) => this._formatOption(stream.title, stream.id))
       .sort((s1, s2) => naturalSort(s1.label.toLowerCase(), s2.label.toLowerCase()));
 
     const notificationTypeHelp = (

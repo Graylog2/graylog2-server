@@ -31,7 +31,7 @@ const ClusterOverviewStore = Reflux.createStore({
         this.clusterOverview = response;
         this.trigger({ clusterOverview: this.clusterOverview });
       },
-      error => UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview'),
+      (error) => UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview'),
     );
 
     return promise;
@@ -43,7 +43,7 @@ const ClusterOverviewStore = Reflux.createStore({
         (response) => {
           return response.threaddump;
         },
-        error => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump'),
+        (error) => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump'),
       );
 
     return promise;
@@ -55,7 +55,7 @@ const ClusterOverviewStore = Reflux.createStore({
         (response) => {
           return response.processbuffer_dump;
         },
-        error => UserNotification.error(`Getting process buffer dump for node '${nodeId}' failed: ${error}`, 'Could not get process buffer dump'),
+        (error) => UserNotification.error(`Getting process buffer dump for node '${nodeId}' failed: ${error}`, 'Could not get process buffer dump'),
       );
 
     return promise;
@@ -63,7 +63,7 @@ const ClusterOverviewStore = Reflux.createStore({
 
   jvm(nodeId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/jvm`));
-    promise.catch(error => UserNotification.error(`Getting JVM information for node '${nodeId}' failed: ${error}`, 'Could not get JVM information'));
+    promise.catch((error) => UserNotification.error(`Getting JVM information for node '${nodeId}' failed: ${error}`, 'Could not get JVM information'));
 
     return promise;
   },

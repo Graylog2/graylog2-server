@@ -29,7 +29,7 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <IfDashboard>
         <Section>
           {viewMetadata.summary || defaultNewDashboardSummary}
@@ -41,7 +41,7 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
       <IfDashboard>
         {formatDashboardDescription(viewMetadata)}
       </IfDashboard>
-    </React.Fragment>
+    </>
   );
 };
 

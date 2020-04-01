@@ -169,7 +169,7 @@ const StreamsStore = Reflux.createStore({
     this.callbacks.push(callback);
   },
   _emitChange() {
-    this.callbacks.forEach(callback => callback());
+    this.callbacks.forEach((callback) => callback());
   },
   unregister(callback: Callback) {
     lodash.pull(this.callbacks, callback);

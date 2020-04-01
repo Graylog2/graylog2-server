@@ -263,8 +263,7 @@ class LookupTableForm extends React.Component {
                           allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
                           labelClassName="col-sm-3"
                           wrapperClassName="col-sm-9" />
-          )
-          }
+          )}
 
           <Input type="checkbox"
                  label="Enable multi default value"
@@ -284,8 +283,7 @@ class LookupTableForm extends React.Component {
                           allowedTypes={['OBJECT', 'NULL']}
                           labelClassName="col-sm-3"
                           wrapperClassName="col-sm-9" />
-          )
-          }
+          )}
         </fieldset>
 
         <DataAdaptersContainer>

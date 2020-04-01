@@ -12,7 +12,7 @@ const mockLoadRoles = jest.fn(() => Promise.resolve([]));
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 jest.mock('injection/StoreProvider', () => ({
   getStore: (store) => {
     switch (store) {

@@ -15,7 +15,7 @@ class IndexMaintenanceStrategiesSummary extends React.Component {
     }
 
     const activeStrategy = this.props.config.strategy;
-    const strategy = this.props.pluginExports.filter(exportedStrategy => exportedStrategy.type === activeStrategy)[0];
+    const strategy = this.props.pluginExports.filter((exportedStrategy) => exportedStrategy.type === activeStrategy)[0];
 
     if (!strategy || !strategy.summaryComponent) {
       return (<Alert bsStyle="danger">Summary for strategy {activeStrategy} not found!</Alert>);

@@ -20,7 +20,7 @@ describe('HighlightingRule', () => {
   });
 
   it('should update rule if color was changed', () => {
-    HighlightingRulesActions.update = mockAction(jest.fn(updatedRule => Promise.resolve([updatedRule])));
+    HighlightingRulesActions.update = mockAction(jest.fn((updatedRule) => Promise.resolve([updatedRule])));
     const wrapper = mount(<HighlightingRule rule={rule} />);
 
     const { onChange } = wrapper.find('color-picker-popover').props();
@@ -37,7 +37,7 @@ describe('HighlightingRule', () => {
   });
 
   it('should close popover when color was changed', () => {
-    HighlightingRulesActions.update = mockAction(jest.fn(updatedRule => Promise.resolve([updatedRule])));
+    HighlightingRulesActions.update = mockAction(jest.fn((updatedRule) => Promise.resolve([updatedRule])));
     const wrapper = mount(<HighlightingRule rule={rule} />);
 
     const { onChange } = wrapper.find('color-picker-popover').props();

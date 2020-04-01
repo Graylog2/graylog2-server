@@ -22,10 +22,10 @@ class JSONValueInput extends React.Component {
     required: PropTypes.bool,
     validationState: PropTypes.string,
     value: PropTypes.string,
-    valueType: PropTypes.oneOf(OPTIONS.map(option => option.value)),
+    valueType: PropTypes.oneOf(OPTIONS.map((option) => option.value)),
     allowedTypes: (props, propName, componentName) => {
       // Check that allowedTypes is an array of type values
-      const values = OPTIONS.map(option => option.value);
+      const values = OPTIONS.map((option) => option.value);
       const errors = [];
       if (!(props[propName] instanceof Array)) {
         return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected an array but got ${props[propName]}`);
@@ -47,7 +47,7 @@ class JSONValueInput extends React.Component {
   static defaultProps = {
     value: '',
     valueType: 'STRING',
-    allowedTypes: OPTIONS.map(option => option.value),
+    allowedTypes: OPTIONS.map((option) => option.value),
     label: '',
     help: '',
     required: false,
@@ -83,7 +83,7 @@ class JSONValueInput extends React.Component {
   state = this._computeInitialState(this.props);
 
   render() {
-    const options = OPTIONS.filter(o => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => {
+    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => {
       return <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>{o.label}</MenuItem>;
     });
 
@@ -96,7 +96,7 @@ class JSONValueInput extends React.Component {
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
                             bsStyle={this.props.validationState === 'error' ? 'danger' : null}
-                            title={OPTIONS.filter(o => o.value === this.props.valueType)[0].label}>
+                            title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>

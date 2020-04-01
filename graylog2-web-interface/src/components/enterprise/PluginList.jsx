@@ -14,7 +14,7 @@ const PluginList = createReactClass({
   },
 
   _formatPlugin(pluginName) {
-    const plugin = PluginStore.get().filter(p => p.metadata.name === pluginName)[0];
+    const plugin = PluginStore.get().filter((p) => p.metadata.name === pluginName)[0];
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
         <Icon name={plugin ? 'check-circle' : 'minus-circle'} />&nbsp;
@@ -24,7 +24,7 @@ const PluginList = createReactClass({
   },
 
   render() {
-    const enterprisePluginList = Object.keys(this.ENTERPRISE_PLUGINS).map(pluginName => this._formatPlugin(pluginName));
+    const enterprisePluginList = Object.keys(this.ENTERPRISE_PLUGINS).map((pluginName) => this._formatPlugin(pluginName));
 
     return (
       <Row className="content">

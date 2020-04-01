@@ -3,7 +3,7 @@ import { mount, shallow } from 'wrappedEnzyme';
 import NavigationLink from './NavigationLink';
 import URLUtils from '../../util/URLUtils';
 
-jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn(path => path) }));
+jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path) }));
 
 describe('NavigationLink', () => {
   it('renders with simple props', () => {
@@ -16,7 +16,7 @@ describe('NavigationLink', () => {
     expect(wrapper.find('LinkContainer')).toHaveProp('someProp', 42);
   });
   it('does not prefix URL with app prefix', () => {
-    URLUtils.appPrefixed.mockImplementation(path => `/someprefix${path}`);
+    URLUtils.appPrefixed.mockImplementation((path) => `/someprefix${path}`);
     const wrapper = shallow(<NavigationLink description="Hello there!" path="/hello" someProp={42} />);
     const linkContainer = wrapper.find('LinkContainer');
     expect(linkContainer.props().to).not.toContain('/someprefix');

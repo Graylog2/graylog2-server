@@ -109,7 +109,7 @@ class ContentPacksList extends React.Component {
       );
 
       const metadata = contentPackMetadata[item.id] || {};
-      const installed = Object.keys(metadata).find(rev => metadata[rev].installation_count > 0);
+      const installed = Object.keys(metadata).find((rev) => metadata[rev].installation_count > 0);
       const states = installed ? ['installed'] : [];
       const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 

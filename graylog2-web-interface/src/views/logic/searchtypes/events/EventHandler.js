@@ -38,7 +38,7 @@ export default {
 
   toVisualizationData(events: Events = [],
     formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({})): { eventChartData: ChartDefinition, shapes: Shapes } {
-    const groupedEvents: GroupedEvents = groupBy(events, e => e.timestamp);
+    const groupedEvents: GroupedEvents = groupBy(events, (e) => e.timestamp);
     return {
       eventChartData: this.toChartData(groupedEvents, formattingSettings),
       shapes: this.toShapeData(Object.keys(groupedEvents), formattingSettings),
@@ -64,7 +64,7 @@ export default {
     const { chartColors } = formattingSettings;
     const chartColor = chartColors[eventsDisplayName] || defaultColor;
     const values = this.transformGroupedEvents(events);
-    const xValues: Array<string> = values.map(v => v[0]);
+    const xValues: Array<string> = values.map((v) => v[0]);
     const textValues: Array<string> = values.map((e) => {
       if (Object.prototype.hasOwnProperty.call(e[1], 'message')) {
         return e[1].message;
@@ -91,7 +91,7 @@ export default {
   toShapeData(timestamps: Array<string>, formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({})): Shapes {
     const { chartColors } = formattingSettings;
     const shapeColor = chartColors[eventsDisplayName] || defaultColor;
-    return timestamps.map(timestamp => ({
+    return timestamps.map((timestamp) => ({
       layer: 'below',
       type: 'line',
       yref: 'paper',

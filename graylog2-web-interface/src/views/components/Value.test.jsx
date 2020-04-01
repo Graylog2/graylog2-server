@@ -15,7 +15,7 @@ jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('
 
 describe('Value', () => {
   describe('shows value actions menu', () => {
-    const Component = props => <Value {...props} />;
+    const Component = (props) => <Value {...props} />;
     it('render without type information but no children', () => {
       const wrapper = mount(<Component field="foo" queryId="someQueryId" value={42} />);
       const valueActions = wrapper.find('ValueActions');
@@ -76,7 +76,7 @@ describe('Value', () => {
     });
   });
   each([true, false]).describe('setting interactive context to `%p`', (interactive) => {
-    const Component = props => (
+    const Component = (props) => (
       <InteractiveContext.Provider value={interactive}>
         <Value {...props} />
       </InteractiveContext.Provider>
@@ -121,7 +121,7 @@ describe('Value', () => {
   });
 
   describe('handles value action menu depending on interactive context', () => {
-    const component = interactive => props => (
+    const component = (interactive) => (props) => (
       <InteractiveContext.Provider value={interactive}>
         <Value {...props} />
       </InteractiveContext.Provider>

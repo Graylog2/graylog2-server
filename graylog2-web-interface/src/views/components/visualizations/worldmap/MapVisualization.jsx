@@ -81,7 +81,7 @@ class MapVisualization extends React.Component {
   // Coordinates are given as "lat,long"
   _formatMarker = (coordinates, value, min, max, radiusSize, increment, color, name, keys) => {
     // eslint-disable-next-line no-restricted-globals
-    const formattedCoordinates = coordinates.split(',').map(component => Number(component)).filter(n => !isNaN(n));
+    const formattedCoordinates = coordinates.split(',').map((component) => Number(component)).filter((n) => !isNaN(n));
     if (formattedCoordinates.length !== 2) {
       return null;
     }
@@ -104,12 +104,11 @@ class MapVisualization extends React.Component {
             <dd>{coordinates}</dd>
             {value
               && (
-              <React.Fragment>
+              <>
                 <dt>Value:</dt>
                 <dd>{value}</dd>
-              </React.Fragment>
-              )
-            }
+              </>
+              )}
           </dl>
         </Popup>
       </CircleMarker>

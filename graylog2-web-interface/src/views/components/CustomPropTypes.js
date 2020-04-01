@@ -57,17 +57,17 @@ const createInstanceOf = (expectedClass, required = false) => {
     }
     const valueConstructorName = get(prototypesOf(value)[0], ['constructor', 'name']);
     const constructorNames = prototypesOf(value)
-      .map(proto => get(proto, ['constructor', 'name']))
-      .filter(name => name !== undefined);
+      .map((proto) => get(proto, ['constructor', 'name']))
+      .filter((name) => name !== undefined);
     if (!constructorNames.includes(expectedConstructorName)) {
       return new Error(`Invalid prop ${propName} supplied to ${componentName}: ${valueConstructorName} expected to be instance of ${expectedConstructorName}`);
     }
   };
 };
 
-const instanceOf = expected => Object.assign(
+const instanceOf = (expected) => Object.assign(
   createInstanceOf(expected, false),
   { isRequired: createInstanceOf(expected, true) },
 );
 
-export default Object.assign({}, PropTypes, { CurrentView, FieldListType, FieldType, OneOrMoreChildren, TimeRangeType, instanceOf });
+export default ({ ...PropTypes, CurrentView, FieldListType, FieldType, OneOrMoreChildren, TimeRangeType, instanceOf });

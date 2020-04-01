@@ -28,7 +28,7 @@ const ExtractorUtils = {
     LOOKUP_TABLE: 'lookup_table',
   }),
   ExtractorTypes: ExtractorTypes,
-  EXTRACTOR_TYPES: Object.keys(ExtractorTypes).map(type => type.toLocaleLowerCase()),
+  EXTRACTOR_TYPES: Object.keys(ExtractorTypes).map((type) => type.toLocaleLowerCase()),
 
   getNewExtractorRoutes(sourceNodeId, sourceInputId, fieldName, messageIndex, messageId) {
     const routes = {};

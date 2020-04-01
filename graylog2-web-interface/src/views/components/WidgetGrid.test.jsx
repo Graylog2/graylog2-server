@@ -12,7 +12,7 @@ jest.mock('./widgets/Widget', () => () => 'widget');
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <react-grid-container-mock>{children}</react-grid-container-mock>);
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
-    exports: key => (key !== 'enterpriseWidgets' ? [] : [
+    exports: (key) => (key !== 'enterpriseWidgets' ? [] : [
       {
         type: 'dummy',
         displayName: 'Some Dummy Visualization',

@@ -73,11 +73,9 @@ export default connect(SearchResult, {
   searches: SearchStore,
   viewMetadata: ViewMetadataStore,
   viewState: CurrentViewStateStore,
-}, props => Object.assign(
-  {},
-  props,
-  {
-    searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping },
-    queryId: props.viewMetadata.activeQuery,
-  },
-));
+}, (props) => ({
+
+  ...props,
+  searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping },
+  queryId: props.viewMetadata.activeQuery,
+}));

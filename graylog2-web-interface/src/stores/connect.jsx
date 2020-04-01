@@ -42,7 +42,7 @@ type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
 function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props>, MappedProps>(
   Component: ComponentType,
   stores: Stores,
-  mapProps: (ResultType<Stores>) => MappedProps = props => props,
+  mapProps: (ResultType<Stores>) => MappedProps = (props) => props,
 ): React.ComponentType<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
   class ConnectStoresWrapper extends React.Component<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
@@ -76,7 +76,7 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
           console.error(`Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
           return () => {};
         }
-        return store.listen(partialState => this.setState(state => ({ ...state, [key]: partialState })));
+        return store.listen((partialState) => this.setState((state) => ({ ...state, [key]: partialState })));
       });
     }
 
@@ -88,7 +88,7 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
     }
 
     componentWillUnmount() {
-      this.unsubscribes.forEach(unsub => unsub());
+      this.unsubscribes.forEach((unsub) => unsub());
     }
 
     _genProps = (state: ResultType<Stores>): MappedProps => {

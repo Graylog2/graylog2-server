@@ -24,7 +24,7 @@ export default class ConfigurableElement extends React.Component {
   }
 
   _onClick = () => {
-    this.setState(state => ({ isOpen: !state.isOpen }));
+    this.setState((state) => ({ isOpen: !state.isOpen }));
   };
 
   _onClose = (config) => {

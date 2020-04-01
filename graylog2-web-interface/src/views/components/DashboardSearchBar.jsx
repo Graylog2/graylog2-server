@@ -50,7 +50,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
           <form method="GET" onSubmit={submitForm}>
             <Row className="no-bm extended-search-query-metadata">
               <Col lg={4} md={6} xs={8}>
-                <TimeRangeOverrideTypeSelector onSelect={newRangeType => GlobalOverrideActions.rangeType(newRangeType).then(performSearch)}
+                <TimeRangeOverrideTypeSelector onSelect={(newRangeType) => GlobalOverrideActions.rangeType(newRangeType).then(performSearch)}
                                                value={rangeType} />
                 <TimeRangeOverrideInput onChange={(key, value) => GlobalOverrideActions.rangeParams(key, value).then(performSearch)}
                                         rangeType={rangeType}
@@ -73,7 +73,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
 
                 <QueryInput value={query.query_string}
                             placeholder="Apply filter to all widgets"
-                            onChange={value => GlobalOverrideActions.query(value).then(performSearch).then(() => value)}
+                            onChange={(value) => GlobalOverrideActions.query(value).then(performSearch).then(() => value)}
                             onExecute={performSearch} />
               </Col>
               <Col md={3} xs={4}>

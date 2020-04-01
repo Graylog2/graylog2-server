@@ -23,7 +23,7 @@ describe('ReplaySearchButton', () => {
     const renderWithContext = ({ query, timerange, streams }: OptionalOverrides = {}) => {
       const { getByTitle } = render((
         <DrilldownContext.Consumer>
-          {context => (
+          {(context) => (
             <DrilldownContext.Provider value={{
               query: query || context.query,
               timerange: timerange || context.timerange,

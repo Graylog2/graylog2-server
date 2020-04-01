@@ -108,7 +108,7 @@ const AlertNotification = createReactClass({
 
     const actions = stream && (
       <IfPermitted permissions={`streams:edit:${stream.id}`}>
-        <React.Fragment>
+        <>
           <Button key="test-button"
                   bsStyle="info"
                   disabled={isTestingAlert}
@@ -128,7 +128,7 @@ const AlertNotification = createReactClass({
             <MenuItem divider />
             <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
           </DropdownButton>
-        </React.Fragment>
+        </>
       </IfPermitted>
     );
 
@@ -144,8 +144,7 @@ const AlertNotification = createReactClass({
                              submitAction={this._onSubmit}
                              values={notification.configuration} />
           {isConfigurationShown
-            && <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
-          }
+            && <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />}
         </div>
       </Col>
     );

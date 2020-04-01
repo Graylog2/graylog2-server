@@ -59,7 +59,7 @@ class EventDefinitionForm extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
+    return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
   renderButtons = (activeStep) => {

@@ -57,7 +57,7 @@ class FilterPreview extends React.Component {
     const { isFetchingData, searchResult, errors, displayPreview } = this.props;
 
     return (
-      <React.Fragment>
+      <>
         <HelpPanel collapsible
                    defaultExpanded={!displayPreview}
                    title="How many Events will Filter & Aggregation create?">
@@ -84,11 +84,10 @@ class FilterPreview extends React.Component {
               <p className="text-danger">{errors[0].description}</p>
             ) : (
               isFetchingData ? <Spinner text="Loading filter preview..." /> : this.renderSearchResult(searchResult)
-            )
-            }
+            )}
           </Panel>
         )}
-      </React.Fragment>
+      </>
     );
   }
 }

@@ -36,7 +36,7 @@ class SimulationResults extends React.Component {
   }
 
   _changeViewOptions = (eventKey) => {
-    const selectedOption = Object.keys(VIEW_OPTIONS).find(key => VIEW_OPTIONS[key] === eventKey);
+    const selectedOption = Object.keys(VIEW_OPTIONS).find((key) => VIEW_OPTIONS[key] === eventKey);
     this.setState({ viewOption: VIEW_OPTIONS[selectedOption] });
   };
 

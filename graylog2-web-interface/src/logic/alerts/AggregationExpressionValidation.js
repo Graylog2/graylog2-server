@@ -23,7 +23,7 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
       if (!expression.ref) {
         return error;
       }
-      const selectedSeries = series.find(s => s.id === expression.ref);
+      const selectedSeries = series.find((s) => s.id === expression.ref);
       return (selectedSeries && selectedSeries.function ? {} : error);
       /* eslint-enable no-case-declarations */
     case '&&':
@@ -33,9 +33,10 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
     case '>':
     case '>=':
     case '==':
-      return Object.assign({},
-        { left: validateExpressionTree(expression.left, series, validationTree) },
-        { right: validateExpressionTree(expression.right, series, validationTree) });
+      return {
+        left: validateExpressionTree(expression.left, series, validationTree),
+        right: validateExpressionTree(expression.right, series, validationTree),
+      };
     case 'group':
       return { child: validateExpressionTree(expression.child, series, validationTree) };
     default:

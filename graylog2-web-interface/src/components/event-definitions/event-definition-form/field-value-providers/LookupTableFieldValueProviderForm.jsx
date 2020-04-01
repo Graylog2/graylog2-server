@@ -39,15 +39,15 @@ class LookupTableFieldValueProviderForm extends React.Component {
           };
         });
     },
-    fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
+    (fieldTypes) => fieldTypes.map((ft) => ft.name).join('-'),
   );
 
   propagateChanges = (key, value) => {
     const { config, onChange } = this.props;
     const nextProviders = lodash.cloneDeep(config.providers);
-    const lookupProvider = nextProviders.find(provider => provider.type === LookupTableFieldValueProviderForm.type);
+    const lookupProvider = nextProviders.find((provider) => provider.type === LookupTableFieldValueProviderForm.type);
     lookupProvider[key] = value;
-    onChange(Object.assign({}, config, { providers: nextProviders }));
+    onChange({ ...config, providers: nextProviders });
   };
 
   handleChange = (event) => {
@@ -65,12 +65,12 @@ class LookupTableFieldValueProviderForm extends React.Component {
   formatLookupTables = (lookupTables) => {
     return lookupTables
       .sort((lt1, lt2) => naturalSortIgnoreCase(lt1.title, lt2.title))
-      .map(table => ({ label: table.title, value: table.name }));
+      .map((table) => ({ label: table.title, value: table.name }));
   };
 
   render() {
     const { allFieldTypes, config, lookupTables, validation } = this.props;
-    const provider = config.providers.find(p => p.type === LookupTableFieldValueProviderForm.type);
+    const provider = config.providers.find((p) => p.type === LookupTableFieldValueProviderForm.type);
 
     return (
       <Row className="row-sm">
