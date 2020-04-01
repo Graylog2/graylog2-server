@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -28,6 +29,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -43,6 +45,7 @@ import org.mockito.junit.MockitoRule;
 import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +57,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -88,13 +92,16 @@ public class SearchResourceTest {
     @Mock
     private User currentUser;
 
+    @Mock
+    private EventBus eventBus;
+
     private SearchResource searchResource;
 
     class SearchTestResource extends SearchResource {
         private final Subject subject;
 
         SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreams streamLoader) {
-            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, executionGuard, searchDomain);
+            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, executionGuard, searchDomain, eventBus);
             this.subject = subject;
         }
 
@@ -162,6 +169,66 @@ public class SearchResourceTest {
         verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
 
         assertThat(usernameCaptor.getValue()).isEqualTo("basti");
+    }
+
+    @Test
+    public void executeQueryTriggersEvent() {
+        mockCurrentUserName("basti");
+
+        final Search search = mockExistingSearch();
+
+        final Response response = this.searchResource.executeQuery(search.id(), Collections.emptyMap());
+
+        final ArgumentCaptor<SearchJobExecutionEvent> eventCaptor = ArgumentCaptor.forClass(SearchJobExecutionEvent.class);
+        verify(this.eventBus, times(1)).post(eventCaptor.capture());
+
+        final SearchJobExecutionEvent searchJobExecutionEvent = eventCaptor.getValue();
+        assertThat(searchJobExecutionEvent.user()).isEqualTo(currentUser);
+        assertThat(searchJobExecutionEvent.searchJob()).isEqualTo(response.getEntity());
+    }
+
+    @Test
+    public void guardExceptionPreventsTriggeringEvent() {
+        mockCurrentUserName("basti");
+
+        final Search search = mockExistingSearch();
+        throwGuardExceptionFor(search);
+
+        try {
+            this.searchResource.executeQuery(search.id(), Collections.emptyMap());
+        } catch (ForbiddenException ignored) {}
+
+        verify(this.eventBus, never()).post(any(SearchJobExecutionEvent.class));
+    }
+
+    @Test
+    public void executeSyncJobTriggersEvent() {
+        mockCurrentUserName("peterchen");
+
+        final Search search = mockExistingSearch();
+
+        final Response response = this.searchResource.executeSyncJob(search, 100);
+
+        final ArgumentCaptor<SearchJobExecutionEvent> eventCaptor = ArgumentCaptor.forClass(SearchJobExecutionEvent.class);
+        verify(this.eventBus, times(1)).post(eventCaptor.capture());
+
+        final SearchJobExecutionEvent searchJobExecutionEvent = eventCaptor.getValue();
+        assertThat(searchJobExecutionEvent.user()).isEqualTo(currentUser);
+        assertThat(searchJobExecutionEvent.searchJob()).isEqualTo(response.getEntity());
+    }
+
+    @Test
+    public void guardExceptionDuringSyncExecutionPreventsTriggeringEvent() {
+        mockCurrentUserName("basti");
+
+        final Search search = mockExistingSearch();
+        throwGuardExceptionFor(search);
+
+        try {
+            this.searchResource.executeSyncJob(search, 100);
+        } catch (ForbiddenException ignored) {}
+
+        verify(this.eventBus, never()).post(any(SearchJobExecutionEvent.class));
     }
 
     @Test
