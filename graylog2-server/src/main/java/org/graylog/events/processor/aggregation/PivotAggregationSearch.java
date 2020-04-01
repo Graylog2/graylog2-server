@@ -44,8 +44,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.plugin.streams.Stream;
@@ -403,17 +403,24 @@ public class PivotAggregationSearch implements AggregationSearch {
             pivotBuilder.series(series);
         }
 
-        // Wrap every aggregation with a date histogram bucket of the searchWithin time range.
+        // Wrap every aggregation with date range buckets of the searchWithin time range.
         // This allows us to run aggregations over larger time ranges than the searchWithin time.
         // The results will be received in time buckets of the searchWithin time size.
-        final Time dateHistogram = Time.builder()
-                .interval(TimeUnitInterval.ofTimeunitAndOffset(String.valueOf(searchWithinMs) + "ms", 123))
-                .field("timestamp")
-                .build();
+        final ImmutableList.Builder<DateRange> ranges = ImmutableList.builder();
+        DateTime from = parameters.timerange().getFrom();
+        do {
+            // The smallest configurable unit is 1 sec.
+            // By dividing it before casting we avoid a potential int overflow
+            final DateTime to = from.plusSeconds((int) (searchWithinMs / 1000));
+            ranges.add(DateRange.builder().from(from).to(to).build());
+            from = to;
+        } while (from.isBefore(parameters.timerange().getTo()));
+
+        final DateRangeBucket dateRangeBucket = DateRangeBucket.builder().field("timestamp").ranges(ranges.build()).build();
         final List<BucketSpec> groupBy = new ArrayList<>();
 
         // The first bucket must be the date histogram!
-        groupBy.add(dateHistogram);
+        groupBy.add(dateRangeBucket);
 
         if (!config.groupBy().isEmpty()) {
             // Then we add the configured groups
