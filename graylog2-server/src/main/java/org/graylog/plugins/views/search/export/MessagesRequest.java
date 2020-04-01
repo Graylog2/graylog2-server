@@ -64,9 +64,9 @@ public abstract class MessagesRequest {
             missingFields.add("timeRange");
         if (!queryString().isPresent())
             missingFields.add("queryString");
-        if (!streams().isPresent())
+        if (!streams().isPresent() || streams().get().isEmpty())
             missingFields.add("streams");
-        if (!fieldsInOrder().isPresent())
+        if (!fieldsInOrder().isPresent() || fieldsInOrder().get().isEmpty())
             missingFields.add("fieldsInOrder");
         if (!sort().isPresent())
             missingFields.add("sort");

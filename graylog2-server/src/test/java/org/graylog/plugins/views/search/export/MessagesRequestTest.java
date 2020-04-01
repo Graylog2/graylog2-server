@@ -52,20 +52,40 @@ class MessagesRequestTest {
     @CsvSource(value = {"timeRange", "queryString", "streams", "fieldsInOrder", "sort"})
     @ParameterizedTest
     void canComplainAboutSingleMissingField(String missingField) {
-        MessagesRequest noStreams = requestWithMissingFields(missingField);
+        MessagesRequest sut = requestWithMissingFields(missingField);
 
         assertThatExceptionOfType(ValidationException.class)
-                .isThrownBy(noStreams::ensureCompleteness)
+                .isThrownBy(sut::ensureCompleteness)
                 .withMessageContaining("[" + missingField + "]");
     }
 
     @Test
     void canComplainAboutMultipleMissingFields() {
-        MessagesRequest noStreams = requestWithMissingFields("streams", "sort");
+        MessagesRequest sut = requestWithMissingFields("streams", "sort");
 
         assertThatExceptionOfType(ValidationException.class)
-                .isThrownBy(noStreams::ensureCompleteness)
+                .isThrownBy(sut::ensureCompleteness)
                 .withMessageContaining("[streams, sort]");
+    }
+
+    @Test
+    void requiresNonEmptyStreams() {
+        MessagesRequest sut = requestWithMissingFields();
+        sut = sut.toBuilder().streams(ImmutableSet.of()).build();
+
+        assertThatExceptionOfType(ValidationException.class)
+                .isThrownBy(sut::ensureCompleteness)
+                .withMessageContaining("[streams]");
+    }
+
+    @Test
+    void requiresNonEmptyFieldsInOrder() {
+        MessagesRequest sut = requestWithMissingFields();
+        sut = sut.toBuilder().fieldsInOrder().build();
+
+        assertThatExceptionOfType(ValidationException.class)
+                .isThrownBy(sut::ensureCompleteness)
+                .withMessageContaining("[fieldsInOrder]");
     }
 
     private MessagesRequest requestWithMissingFields(String... missingFieldsArray) {
