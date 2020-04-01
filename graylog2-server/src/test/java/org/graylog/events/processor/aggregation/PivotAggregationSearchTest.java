@@ -25,7 +25,8 @@ import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -53,7 +54,7 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
-        final RelativeRange timerange = RelativeRange.create(3600);
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now().withZone(DateTimeZone.UTC).minusSeconds(3600), DateTime.now().withZone(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
@@ -82,24 +83,25 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams);
 
+        final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
                 .effectiveTimerange(AbsoluteRange.create(timerange.getFrom(), timerange.getTo()))
                 .total(1)
                 .addRow(PivotResult.Row.builder()
-                        .key(ImmutableList.of("a", "b"))
+                        .key(ImmutableList.of(toString, "a", "b"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-leaf"))
                         .source("leaf")
                         .build())
                 .addRow(PivotResult.Row.builder()
-                        .key(ImmutableList.of("a"))
+                        .key(ImmutableList.of(toString, "a"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 84, true, "row-inner"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-inner"))
                         .source("non-leaf")
                         .build())
                 .addRow(PivotResult.Row.builder()
-                        .key(ImmutableList.of("a", "c"))
+                        .key(ImmutableList.of(toString, "a", "c"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-leaf"))
                         .source("leaf")
@@ -111,6 +113,7 @@ public class PivotAggregationSearchTest {
         assertThat(results.size()).isEqualTo(2);
 
         assertThat(results.get(0)).isEqualTo(AggregationKeyResult.builder()
+                .timestamp(timerange.getTo())
                 .key(ImmutableList.of("a", "b"))
                 .seriesValues(ImmutableList.of(
                         AggregationSeriesValue.builder()
@@ -127,6 +130,7 @@ public class PivotAggregationSearchTest {
                 .build());
 
         assertThat(results.get(1)).isEqualTo(AggregationKeyResult.builder()
+                .timestamp(timerange.getTo())
                 .key(ImmutableList.of("a", "c"))
                 .seriesValues(ImmutableList.of(
                         AggregationSeriesValue.builder()
@@ -145,7 +149,7 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithoutGroupBy() throws Exception {
-        final RelativeRange timerange = RelativeRange.create(3600);
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now().withZone(DateTimeZone.UTC).minusSeconds(3600), DateTime.now().withZone(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesCountNoField = AggregationSeries.create("abc123", AggregationFunction.COUNT, "");
         final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
@@ -180,7 +184,7 @@ public class PivotAggregationSearchTest {
                 .effectiveTimerange(AbsoluteRange.create(timerange.getFrom(), timerange.getTo()))
                 .total(1)
                 .addRow(PivotResult.Row.builder()
-                        .key(ImmutableList.of())
+                        .key(ImmutableList.of(timerange.getTo().toString()))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/<no-field>/abc123"), 23, true, "row-leaf"))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/card/source/abc123"), 1, true, "row-leaf"))
@@ -194,6 +198,7 @@ public class PivotAggregationSearchTest {
 
         assertThat(results.get(0)).isEqualTo(AggregationKeyResult.builder()
                 .key(ImmutableList.of())
+                .timestamp(timerange.getTo())
                 .seriesValues(ImmutableList.of(
                         AggregationSeriesValue.builder()
                                 .key(ImmutableList.of())
@@ -216,7 +221,7 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithNullValues() throws Exception {
-        final RelativeRange timerange = RelativeRange.create(3600);
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now().withZone(DateTimeZone.UTC).minusSeconds(3600), DateTime.now().withZone(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesAvg = AggregationSeries.create("abc123", AggregationFunction.AVG, "some_field");
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
@@ -250,7 +255,7 @@ public class PivotAggregationSearchTest {
                 .effectiveTimerange(AbsoluteRange.create(timerange.getFrom(), timerange.getTo()))
                 .total(1)
                 .addRow(PivotResult.Row.builder()
-                        .key(ImmutableList.of())
+                        .key(ImmutableList.of(timerange.getTo().toString()))
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/count/source/abc123"), 42, true, "row-leaf"))
                         // A "null" value can happen with some Elasticsearch aggregations (e.g. avg on a non-existent field)
                         .addValue(PivotResult.Value.create(ImmutableList.of("metric/avg/some_field/abc123"), null, true, "row-leaf"))
@@ -264,6 +269,7 @@ public class PivotAggregationSearchTest {
 
         assertThat(results.get(0)).isEqualTo(AggregationKeyResult.builder()
                 .key(ImmutableList.of())
+                .timestamp(timerange.getTo())
                 .seriesValues(ImmutableList.of(
                         AggregationSeriesValue.builder()
                                 .key(ImmutableList.of())
