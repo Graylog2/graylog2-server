@@ -1,40 +1,43 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Icon } from 'components/common';
-import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
 
-const OperatingSystemIcon = createReactClass({
-  propTypes: {
-    operatingSystem: PropTypes.string,
-  },
+const SidecarIcon = styled(Icon)`
+  margin-right: 5px;
+  margin-left: 2px;
+`;
 
-  getDefaultProps() {
-    return {
-      operatingSystem: undefined,
-    };
-  },
+const OperatingSystemIcon = ({ operatingSystem }) => {
+  let iconName = 'question-circle';
+  let prefix = 'fas';
 
-  operatingSystemIcon(operatingSystem) {
-    let glyphName = 'question-circle';
-    if (operatingSystem) {
-      const os = operatingSystem.trim().toLowerCase();
-      if (os.indexOf('darwin') !== -1 || os.indexOf('mac os') !== -1) {
-        glyphName = 'apple';
-      } else if (os.indexOf('linux') !== -1) {
-        glyphName = 'linux';
-      } else if (os.indexOf('win') !== -1) {
-        glyphName = 'windows';
-      }
+  if (operatingSystem) {
+    const os = operatingSystem.trim().toLowerCase();
+    if (os.indexOf('darwin') !== -1 || os.indexOf('mac os') !== -1) {
+      iconName = 'apple';
+      prefix = 'fab';
+    } else if (os.indexOf('linux') !== -1) {
+      iconName = 'linux';
+      prefix = 'fab';
+    } else if (os.indexOf('win') !== -1) {
+      iconName = 'windows';
+      prefix = 'fab';
     }
+  }
 
-    return (<Icon name={glyphName} className={commonStyles.sidecarOs} fixedWidth />);
-  },
+  return (
+    <SidecarIcon name={{ prefix, iconName }} fixedWidth />
+  );
+};
 
-  render() {
-    return this.operatingSystemIcon(this.props.operatingSystem);
-  },
-});
+OperatingSystemIcon.propTypes = {
+  operatingSystem: PropTypes.string,
+};
+
+OperatingSystemIcon.defaultProps = {
+  operatingSystem: undefined,
+};
 
 export default OperatingSystemIcon;

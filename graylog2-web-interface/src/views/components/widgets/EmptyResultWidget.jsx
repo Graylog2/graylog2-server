@@ -19,7 +19,7 @@ const popover = (
         <a href="https://www.graylog.org/community-support/" target="_blank" rel="noopener noreferrer">Community support</a>
       </li>
       <li>
-        <Icon name="github-alt" />&nbsp;
+        <Icon name={{ prefix: 'fab', iconName: 'github-alt' }} />&nbsp;
         <a href="https://github.com/Graylog2/graylog2-server/issues" target="_blank" rel="noopener noreferrer">Issue tracker</a>
       </li>
       <li>

@@ -6,10 +6,10 @@ import deprecationNotice from 'util/deprecationNotice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import { faApple, faGithub, faGithubAlt, faLinux, faWindows } from '@fortawesome/free-brands-svg-icons';
 import compareIconNames from './icon-fallback';
 
-library.add(fas);
-
+library.add(fas, faApple, faGithub, faGithubAlt, faLinux, faWindows);
 
 const cleanIconName = (icon) => {
   const v4icon = find(compareIconNames, { v4: icon });
@@ -43,7 +43,13 @@ const Icon = ({ name, ...props }) => {
 
 Icon.propTypes = {
   /** Name of Font Awesome 5 Icon without `fa-` prefix */
-  name: PropTypes.string.isRequired,
+  name: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      prefix: PropTypes.string,
+      iconName: PropTypes.string,
+    }),
+    PropTypes.arrayOf(PropTypes.string)]).isRequired,
 };
 
 export default Icon;
