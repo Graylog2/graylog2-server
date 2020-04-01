@@ -54,7 +54,7 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
-        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now().withZone(DateTimeZone.UTC).minusSeconds(3600), DateTime.now().withZone(DateTimeZone.UTC));
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
@@ -86,7 +86,7 @@ public class PivotAggregationSearchTest {
         final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
-                .effectiveTimerange(AbsoluteRange.create(timerange.getFrom(), timerange.getTo()))
+                .effectiveTimerange(timerange)
                 .total(1)
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of(toString, "a", "b"))
@@ -149,7 +149,7 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithoutGroupBy() throws Exception {
-        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now().withZone(DateTimeZone.UTC).minusSeconds(3600), DateTime.now().withZone(DateTimeZone.UTC));
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesCountNoField = AggregationSeries.create("abc123", AggregationFunction.COUNT, "");
         final AggregationSeries seriesCard = AggregationSeries.create("abc123", AggregationFunction.CARD, "source");
@@ -181,7 +181,7 @@ public class PivotAggregationSearchTest {
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
-                .effectiveTimerange(AbsoluteRange.create(timerange.getFrom(), timerange.getTo()))
+                .effectiveTimerange(timerange)
                 .total(1)
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of(timerange.getTo().toString()))
@@ -221,7 +221,7 @@ public class PivotAggregationSearchTest {
 
     @Test
     public void testExtractValuesWithNullValues() throws Exception {
-        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now().withZone(DateTimeZone.UTC).minusSeconds(3600), DateTime.now().withZone(DateTimeZone.UTC));
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         final AggregationSeries seriesCount = AggregationSeries.create("abc123", AggregationFunction.COUNT, "source");
         final AggregationSeries seriesAvg = AggregationSeries.create("abc123", AggregationFunction.AVG, "some_field");
         final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
@@ -252,7 +252,7 @@ public class PivotAggregationSearchTest {
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
-                .effectiveTimerange(AbsoluteRange.create(timerange.getFrom(), timerange.getTo()))
+                .effectiveTimerange(timerange)
                 .total(1)
                 .addRow(PivotResult.Row.builder()
                         .key(ImmutableList.of(timerange.getTo().toString()))
