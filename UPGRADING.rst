@@ -11,6 +11,15 @@ For improved security, all API access tokens will now be stored encrypted in the
 
 .. warning:: The token encryption is using the ``password_secret`` value from ``graylog.conf`` (or ``/etc/graylog/server/server.conf``) as encryption key. All Graylog nodes in the cluster need to have the same value configured for that option to make sure encryption/decryption works correctly. (if the values differ across your nodes, use the one from the master node for all other nodes)
 
+Saved Searches API
+==================
+
+Since 3.2.0, the legacy saved searches API was still accessible and functional under `/search/saved`, you could create, manipulate and delete legacy saved searches, but this had no effect in the frontend.
+Starting with 3.3.0, the legacy saved searches API will be moved to `/legacy/search/saved`. The current saved searches will be accessible through `/search/saved` again. The pre-3.2.0 route for the current saved searches (`/views/savedSearches`) will redirect there as well.
+Please note that the format has changed. You can see the new format for saved searches in the API browser.
+
+We are planning to remove the legacy saved searches API and the `/views/savedSearches` redirect in the next major upgrade of Graylog.
+
 Notes for plugin authors
 ========================
 
