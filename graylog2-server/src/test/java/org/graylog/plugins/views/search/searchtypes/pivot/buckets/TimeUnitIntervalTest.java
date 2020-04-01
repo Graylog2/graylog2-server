@@ -73,7 +73,6 @@ public class TimeUnitIntervalTest {
         @Parameterized.Parameters
         public static Collection<Object[]> data() {
             return Arrays.asList(new Object[][]{
-                    {"500ms", "500ms"},
                     {"1s", "1s"},
                     {"2s", "2s"},
                     {"1m", "1m"},

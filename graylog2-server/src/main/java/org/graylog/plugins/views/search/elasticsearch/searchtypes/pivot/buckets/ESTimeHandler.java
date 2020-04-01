@@ -48,7 +48,6 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, DateHistogramA
         final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                 .dateHistogramInterval(dateHistogramInterval)
                 .field(timeSpec.field())
-                .offset(timeSpec.interval().offset())
                 .order(ordering.orElse(Histogram.Order.KEY_ASC))
                 .format("date_time");
         record(esGeneratedQueryContext, pivot, timeSpec, name, DateHistogramAggregation.class);

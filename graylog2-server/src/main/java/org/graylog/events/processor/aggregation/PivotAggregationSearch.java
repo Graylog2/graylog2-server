@@ -178,7 +178,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final ImmutableList.Builder<AggregationKeyResult> results = ImmutableList.builder();
 
         // Example PivotResult structures. The row value "key" is composed of: "metric/<function>/<field>/<series-id>"
-        // The row "key" always contains the date histogram bucket value as first element.
+        // The row "key" always contains the date range bucket value as first element.
         //
         // With group-by:
         // {
@@ -271,16 +271,16 @@ public class PivotAggregationSearch implements AggregationSearch {
 
             // Safety guard against programming errors
             if (row.key().size() == 0 || isNullOrEmpty(row.key().get(0))) {
-                throw new EventProcessorException("Invalid row key! Expected at least the date histogram timestamp value: " + row.key().toString(), true, eventDefinition);
+                throw new EventProcessorException("Invalid row key! Expected at least the date range timestamp value: " + row.key().toString(), true, eventDefinition);
             }
 
-            // We always wrap aggregations in date histogram buckets so we can run aggregations for multiple ranges at once.
-            // The timestamp value of the date histogram bucket will be part of the result.
+            // We always wrap aggregations in date range buckets so we can run aggregations for multiple ranges at once.
+            // The timestamp value of the date range bucket will be part of the result.
             final String timeKey = row.key().get(0);
             final ImmutableList<String> groupKey;
 
             if (row.key().size() > 1) {
-                // The date histogram bucket value must not be exposed to consumers as part of the key so they
+                // The date range bucket value must not be exposed to consumers as part of the key so they
                 // don't have to unwrap the key all the time.
                 groupKey = row.key().subList(1, row.key().size());
             } else {
