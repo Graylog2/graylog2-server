@@ -2,7 +2,7 @@ import React from 'react';
 import lodash from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
-import AceEditor from 'react-ace-builds';
+import AceEditor from 'react-ace';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -91,7 +91,7 @@ class SourceCodeEditor extends React.Component {
       const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
 
       fetch('GET', url).then((response) => {
-        const functions = response.map(res => res.name).join('|');
+        const functions = response.map((res) => res.name).join('|');
         const pipelineRulesMode = new PipelineRulesMode(functions);
 
         this.reactAce.editor.getSession().setMode(pipelineRulesMode);
@@ -214,8 +214,7 @@ class SourceCodeEditor extends React.Component {
               </ButtonGroup>
             </ButtonToolbar>
           </div>
-          )
-        }
+          )}
         <Resizable height={height}
                    width={width}
                    minConstraints={[200, 200]}

@@ -23,7 +23,7 @@ describe('HeatmapVisualization', () => {
       .visualization('heatmap')
       .build();
     const effectiveTimerange = { type: 'absolute', from: '2019-10-22T11:54:35.850Z', to: '2019-10-29T11:53:50.000Z' };
-    const plotLayout = { yaxis: { type: 'category', fixedrange: true, automargin: true }, xaxis: { type: 'category', fixedrange: true, automargin: true }, plot_bgcolor: '#440154' };
+    const plotLayout = { yaxis: { type: 'category', fixedrange: true }, xaxis: { type: 'category', fixedrange: true }, plot_bgcolor: '#440154', margin: { b: 40 } };
     const plotChartData = [
       {
         type: 'heatmap',

@@ -40,6 +40,7 @@ describe('AreaVisualization', () => {
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
       xaxis: { range: ['2019-11-28T15:21:00Z', '2019-11-28T15:25:57Z'], type: 'date' },
+      legend: { y: -0.14 },
     });
     expect(genericPlot).toHaveProp('chartData', [
       {

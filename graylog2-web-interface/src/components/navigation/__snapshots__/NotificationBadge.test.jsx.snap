@@ -70,7 +70,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
                       "componentId": "NotificationBadge__StyledInactiveNavItem-c049cm-0",
-                      "isStatic": true,
+                      "isStatic": false,
                       "lastClassName": "dMglXF",
                       "rules": Array [
                         "a:hover{border:0;text-decoration:none;}",

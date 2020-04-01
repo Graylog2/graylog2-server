@@ -23,7 +23,7 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
     border-color: ${borderColor};
 
     & > ${PanelHeading} {
-      color: ${util.colorLevel(backgroundColor, 9)};
+      color: ${util.readableColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
@@ -69,7 +69,7 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   ${bsStyleThemeVariant(panelVariantStyles)};
 `);
 
-const deprecatedVariantStyles = hex => css(({ theme }) => {
+const deprecatedVariantStyles = (hex) => css(({ theme }) => {
   const backgroundColor = theme.color.global.background;
   const borderColor = theme.color.gray[80];
 

@@ -168,7 +168,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "MessagesTable__MessagesContainer-ptthov-0",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "fIuwjJ",
                     "rules": Array [
                       "padding-right:13px;width:100%;",
@@ -1116,7 +1116,7 @@ exports[`DataTable should render with empty data 1`] = `
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "MessagesTable__MessagesContainer-ptthov-0",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "fIuwjJ",
                     "rules": Array [
                       "padding-right:13px;width:100%;",
@@ -1394,7 +1394,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "MessagesTable__MessagesContainer-ptthov-0",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "fIuwjJ",
                     "rules": Array [
                       "padding-right:13px;width:100%;",
@@ -2666,7 +2666,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "MessagesTable__MessagesContainer-ptthov-0",
-                    "isStatic": true,
+                    "isStatic": false,
                     "lastClassName": "fIuwjJ",
                     "rules": Array [
                       "padding-right:13px;width:100%;",

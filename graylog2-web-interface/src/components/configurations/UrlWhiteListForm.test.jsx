@@ -80,7 +80,7 @@ describe('UrlWhitelistForm', () => {
       wrapper = mount(<UrlWhiteListForm urls={config.entries}
                                         disabled={config.disabled}
                                         onUpdate={onUpdate} />);
-      const deleteButton = wrapper.find('i.fa-trash').at(0);
+      const deleteButton = wrapper.find('svg.fa-trash-alt').at(0);
       deleteButton.simulate('click');
       const listItems = wrapper.find('tbody>tr');
       expect(listItems.length).toBe(config.entries.length - 1);

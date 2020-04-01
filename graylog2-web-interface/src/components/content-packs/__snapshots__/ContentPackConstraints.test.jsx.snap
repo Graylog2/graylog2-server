@@ -186,23 +186,28 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                             >
                               <Badge
                                 bsClass="badge"
-                                className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                 pullRight={false}
                               >
                                 <span
-                                  className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="times"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-times"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "times",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-times"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -268,23 +273,28 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                             >
                               <Badge
                                 bsClass="badge"
-                                className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success"
                                 pullRight={false}
                               >
                                 <span
-                                  className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="check"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-check"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "check",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-check"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -484,23 +494,28 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                             >
                               <Badge
                                 bsClass="badge"
-                                className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success"
                                 pullRight={false}
                               >
                                 <span
-                                  className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="check"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-check"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "check",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-check"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -566,23 +581,28 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                             >
                               <Badge
                                 bsClass="badge"
-                                className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success"
                                 pullRight={false}
                               >
                                 <span
-                                  className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS success badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="check"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-check"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "check",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-check"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -782,23 +802,28 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                             >
                               <Badge
                                 bsClass="badge"
-                                className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                 pullRight={false}
                               >
                                 <span
-                                  className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="times"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-times"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "times",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-times"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>
@@ -864,23 +889,28 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                             >
                               <Badge
                                 bsClass="badge"
-                                className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure"
                                 pullRight={false}
                               >
                                 <span
-                                  className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
+                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS failure badge"
                                 >
-                                  <ForwardRef
-                                    fixedWidth={false}
-                                    inverse={false}
+                                  <Icon
                                     name="times"
-                                    pulse={false}
-                                    spin={false}
                                   >
-                                    <i
-                                      className="fa fa-times"
-                                    />
-                                  </ForwardRef>
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "times",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-times"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
                                 </span>
                               </Badge>
                             </StyledComponent>

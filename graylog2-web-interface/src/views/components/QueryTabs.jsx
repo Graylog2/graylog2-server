@@ -57,7 +57,7 @@ class QueryTabs extends React.Component<Props> {
     } = this.props;
     const queryTitles = titles;
     const queryTabs = queries.map((id, index) => {
-      const title = queryTitles.get(id, `Query#${index + 1}`);
+      const title = queryTitles.get(id, `Page#${index + 1}`);
       const tabTitle = (
         <QueryTitle active={id === selectedQueryId}
                     id={id}
