@@ -1,6 +1,6 @@
 // @flow strict
 
-type ConfigType = {};
+type ConfigType = { [string]: mixed };
 
 export type PivotJson = {
   field: string,
