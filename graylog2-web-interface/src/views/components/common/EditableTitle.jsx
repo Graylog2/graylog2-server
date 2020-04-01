@@ -42,7 +42,8 @@ export default class EditableTitle extends React.Component {
     this.setState({ value: evt.target.value });
   };
 
-  _onSubmit = () => {
+  _onSubmit = (e) => {
+    e.preventDefault();
     const { value } = this.state;
     const { onChange, value: propsValue } = this.props;
     if (value !== '') {
