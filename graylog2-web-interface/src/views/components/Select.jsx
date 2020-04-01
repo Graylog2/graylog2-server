@@ -97,19 +97,19 @@ const Select = ({ components, styles, ...rest }: Props) => {
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
   const menuStyle = useMemo(() => menu(selectRef), [selectRef]);
   const _components = {
+    ...components,
     Menu,
     MultiValueRemove,
     MultiValue: components.MultiValue || ValueWithTitle,
-    ...components,
   };
   const _styles = {
+    ...styles,
     menu: menuStyle,
     multiValue,
     multiValueLabel,
     multiValueRemove,
     option,
     valueContainer,
-    ...styles,
   };
   return <ReactSelect {...rest} components={_components} styles={_styles} tabSelectsValue={false} ref={selectRef} />;
 };
