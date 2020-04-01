@@ -20,15 +20,12 @@ package org.graylog2.dashboards.widgets;
 import com.mongodb.BasicDBObject;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.graylog2.timeranges.TimeRangeFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
-import java.util.UUID;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class DashboardWidgetCreator {
     private final WidgetCacheTime.Factory cacheTimeFactory;
@@ -40,22 +37,7 @@ public class DashboardWidgetCreator {
         this.timeRangeFactory = timeRangeFactory;
     }
 
-    public DashboardWidget fromRequest(AddWidgetRequest awr, String userId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
-        return fromRequest(null, awr, userId);
-    }
-
-    public DashboardWidget fromRequest(String widgetId, AddWidgetRequest awr, String userId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
-        final String id = isNullOrEmpty(widgetId) ? UUID.randomUUID().toString() : widgetId;
-
-        // Build timerange.
-        final Map<String, Object> timerangeConfig = (Map<String, Object>)awr.config().get("timerange");
-        final TimeRange timeRange = timeRangeFactory.create(timerangeConfig);
-
-        return buildDashboardWidget(awr.type(), id, awr.description(), 0, awr.config(),
-                timeRange, userId);
-    }
-
-    public DashboardWidget fromPersisted(BasicDBObject fields) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+    public DashboardWidget fromPersisted(BasicDBObject fields) throws InvalidRangeParametersException {
         final String type = (String)fields.get(DashboardWidget.FIELD_TYPE);
         final BasicDBObject config = (BasicDBObject) fields.get(DashboardWidget.FIELD_CONFIG);
 
@@ -79,7 +61,7 @@ public class DashboardWidgetCreator {
             final int requestedCacheTime,
             final Map<String, Object> config,
             final TimeRange timeRange,
-            final String creatorUserId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException {
+            final String creatorUserId) {
 
         final WidgetCacheTime cacheTime = cacheTimeFactory.create(requestedCacheTime);
         return new DashboardWidget(type, widgetId, timeRange, description, cacheTime, config, creatorUserId);
