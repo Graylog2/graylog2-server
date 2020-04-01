@@ -33,7 +33,11 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
 };
 
 const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
-  const mergedObject = valuePath.reduce((elem, acc) => ({ ...acc, ...elem }), {});
+  const mergedObject = valuePath.reduce((elem, acc) => ({
+    ...acc,
+    // $FlowFixMe: Needs to be typed properly, right now contains an arbitrary set of keys/values.
+    ...elem,
+  }), {});
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
   const valuePathQuery = Object.entries(mergedObject)
     .map(([k, v]) => `${k}:${escape(String(v))}`)
