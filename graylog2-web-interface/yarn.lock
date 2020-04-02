@@ -13112,10 +13112,10 @@ react-router@3.2.1:
     prop-types "^15.5.6"
     warning "^3.0.0"
 
-react-select-event@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/react-select-event/-/react-select-event-3.0.0.tgz#ff2f3a92c7931fad39d7a954b0875bc77c66aab5"
-  integrity sha512-0CnqCCF8nS4WAIbmWchuN8NvYfRTU+JMPY+EyzLWpBw2MgRa8XRt88Ve6JCK2PZtCRIJQyqh+9pRBy/c//Bu1w==
+react-select-event@^4.1.4:
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/react-select-event/-/react-select-event-4.1.4.tgz#e0aedcf54d1152ce7742b06d81c4cc27d65e1e32"
+  integrity sha512-GDoyzB/oTEOy/DC2OhSAlcxcys4ULn3W4Rp/H0EypsPFhVe82gO7RUBRZHN3CarqeUdhhLVU0ko2k0eZyhD51A==
   dependencies:
     "@testing-library/dom" ">=5"
 
