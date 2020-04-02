@@ -22,7 +22,7 @@ const CommonError = ({ error: { additional: { body: { message, streams } } } }: 
     <p>
       <b><Icon name="info-circle" /> {message}</b>
     </p>
-    {streams && (
+    {streams && streams.length > 0 && (
       <p>
         Please get in contact with a graylog administrator and provide the ids of streams you need permissions to:<br />
         {streams.join(', ')}<br />
