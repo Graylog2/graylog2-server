@@ -25,17 +25,16 @@ import org.slf4j.Logger;
 public class ExceptionLoggingChannelHandler extends ChannelInboundHandlerAdapter {
     private final MessageInput input;
     private final Logger logger;
-    private final boolean doesTransportHaveKeepAliveEnabled;
+    private final boolean keepAliveEnabled;
 
     public ExceptionLoggingChannelHandler(MessageInput input, Logger logger) {
         this(input, logger, false);
     }
 
-    public ExceptionLoggingChannelHandler(MessageInput input, Logger logger,
-                                          boolean doesTransportHaveKeepAliveEnabled) {
+    public ExceptionLoggingChannelHandler(MessageInput input, Logger logger, boolean keepAliveEnabled) {
         this.input = input;
         this.logger = logger;
-        this.doesTransportHaveKeepAliveEnabled = doesTransportHaveKeepAliveEnabled;
+        this.keepAliveEnabled = keepAliveEnabled;
     }
 
     @Override
@@ -46,8 +45,8 @@ public class ExceptionLoggingChannelHandler extends ChannelInboundHandlerAdapter
                     input.getName(),
                     input.getId(),
                     ctx.channel());
-        } else if(this.doesTransportHaveKeepAliveEnabled && cause instanceof ReadTimeoutException) {
-            if(logger.isTraceEnabled()) {
+        } else if (this.keepAliveEnabled && cause instanceof ReadTimeoutException) {
+            if (logger.isTraceEnabled()) {
                 logger.trace("KeepAlive Timeout in input [{}/{}] (channel {})",
                         input.getName(),
                         input.getId(),
