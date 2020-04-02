@@ -12,7 +12,7 @@ describe('SearchExecutionError', () => {
     expect(getByText('Common error message')).not.toBeNull();
   });
   it('displays provided stream ids', () => {
-    const commonError = { additional: { body: { message: 'Common error message', streams: ['stream-id-1'] } } };
+    const commonError = { additional: { body: { message: 'Common error message', streams: ['stream-id-1'], type: 'MissingStreamPermission' } } };
     const { getByText } = render(<SearchExecutionErrors errors={[commonError]} />);
     expect(getByText(/stream-id-1/)).not.toBeNull();
   });
