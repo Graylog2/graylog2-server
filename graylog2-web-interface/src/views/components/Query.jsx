@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import DocsHelper from 'util/DocsHelper';
+import styled from 'styled-components';
 
+import { util } from 'theme';
+import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Spinner } from 'components/common';
@@ -14,6 +16,16 @@ import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
+
+const StyledJumbotron = styled(Jumbotron)(({ theme }) => `
+  .container-fluid & {
+    border: 1px solid ${util.colorLevel(theme.color.variant.info, -5)};
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-bottom: 0;
+  }
+`);
 
 const MAXIMUM_GRID_SIZE = 12;
 
@@ -66,7 +78,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
 };
 
 const EmptyDashboardInfo = () => (
-  <Jumbotron style={{ marginBottom: 0 }}>
+  <StyledJumbotron>
     <h2>
       <IfDashboard>
         This dashboard has no widgets yet
@@ -93,7 +105,7 @@ const EmptyDashboardInfo = () => (
     <p>
       You can also have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />, to learn more about the widget creation.
     </p>
-  </Jumbotron>
+  </StyledJumbotron>
 );
 
 
