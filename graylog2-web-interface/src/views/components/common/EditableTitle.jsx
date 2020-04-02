@@ -15,20 +15,19 @@ export default class EditableTitle extends React.Component {
     onChange: () => {},
   };
 
-  state = {
-    editing: false,
-    // eslint-disable-next-line react/destructuring-assignment
-    value: this.props.value,
-  };
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({ value: nextProps.value });
+  constructor(props) {
+    super(props);
+    const { value } = props;
+    this.state = {
+      editing: false,
+      value,
+    };
   }
 
   _toggleEditing = () => {
     const { disabled } = this.props;
     if (!disabled) {
-      this.setState(state => ({ editing: !state.editing }));
+      this.setState((state) => ({ editing: !state.editing }));
     }
   };
 
