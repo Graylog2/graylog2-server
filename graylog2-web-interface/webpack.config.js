@@ -30,7 +30,9 @@ const getCssLoaderOptions = () => {
   // Development
   if (TARGET === 'start') {
     return {
-      localIdentName: '[name]__[local]--[hash:base64:5]',
+      modules: {
+        localIdentName: '[name]__[local]--[hash:base64:5]',
+      },
     };
   }
   return {};
