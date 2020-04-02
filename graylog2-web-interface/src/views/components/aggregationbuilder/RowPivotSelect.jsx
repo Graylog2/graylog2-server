@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { createFilter } from 'react-select/lib/filters';
 
 import { FieldList, PivotList } from './AggregationBuilderPropTypes';
 import PivotSelect from './PivotSelect';
@@ -9,7 +8,6 @@ const RowPivotSelect = ({ fields, onChange, rowPivots }) => (
   <PivotSelect placeholder="None: click to add fields"
                onChange={onChange}
                options={fields}
-               filterOption={createFilter({ ignoreCase: true, ignoreAccents: false })}
                value={rowPivots} />
 );
 
