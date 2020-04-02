@@ -17,10 +17,16 @@ export const logoutIfUnauthorized = (error, SessionStore) => {
   }
 };
 
-export const redirectIfForbidden = (error, SessionStore) => {
-  // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
+export const redirectIfForbidden = (error, SessionStore, route = Routes.NOTFOUND) => {
   if (SessionStore.isLoggedIn() && error.status === 403) {
-    history.replace(Routes.NOTFOUND);
+    history.replace(route);
+  }
+};
+
+const reportError = (error) => {
+  if (error.originalError && !error.originalError.status) {
+    const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
+    ServerAvailabilityActions.reportError(error);
   }
 };
 
@@ -89,18 +95,15 @@ export class Builder {
         handleForbidden(error, SessionStore);
         handleUnauthorized(error, SessionStore);]
 
-        if (error.originalError && !error.originalError.status) {
-          const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-          ServerAvailabilityActions.reportError(error);
-        }
-
+        reportError(error);
+        
         throw new FetchError(error.statusText, error);
       });
 
     return this;
   }
 
-  plaintext(body) {
+  plaintext(body, handleForbidden = redirectIfForbidden, handleUnauthorized = logoutIfUnauthorized) {
     this.request = this.request
       .send(body)
       .type('text/plain')
@@ -115,21 +118,10 @@ export class Builder {
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
-        if (SessionStore.isLoggedIn() && error.status === 401) {
-          const SessionActions = ActionsProvider.getActions('Session');
-          SessionActions.logout(SessionStore.getSessionId());
-        }
-
+        handleUnauthorized(error, SessionStore);
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-        if (SessionStore.isLoggedIn() && error.status === 403) {
-          history.replace(Routes.STARTPAGE);
-        }
-
-        if (error.originalError && !error.originalError.status) {
-          const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-          ServerAvailabilityActions.reportError(error);
-        }
-
+        handleForbidden(error, SessionStore, Routes.STARTPAGE);
+        reportError(error);
         throw new FetchError(error.statusText, error);
       });
 
@@ -171,20 +163,20 @@ export default function fetch(method, url, body, handleForbidden, handleUnauthor
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchPlainText(method, url, body) {
+export function fetchPlainText(method, url, body, handleForbidden, handleUnauthorized) {
   const promise = () => new Builder(method, url)
     .authenticated()
-    .plaintext(body)
+    .plaintext(body, handleForbidden, handleUnauthorized)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchPeriodically(method, url, body) {
+export function fetchPeriodically(method, url, body, handleForbidden, handleUnauthorized) {
   const promise = () => new Builder(method, url)
     .authenticated()
     .noSessionExtension()
-    .json(body)
+    .json(body, handleForbidden, handleUnauthorized)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();
