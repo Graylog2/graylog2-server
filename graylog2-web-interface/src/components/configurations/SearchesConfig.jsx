@@ -96,7 +96,7 @@ const SearchesConfig = createReactClass({
   },
 
   _splitStringList(stringList) {
-    return stringList.split(',').map(f => f.trim()).filter(f => f.length > 0);
+    return stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
   },
 
   _saveConfig() {
@@ -239,8 +239,7 @@ const SearchesConfig = createReactClass({
                               help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
                               validator={this.queryTimeRangeLimitValidator}
                               required />
-            )
-            }
+            )}
 
             <TimeRangeOptionsForm options={this.state.relativeTimeRangeOptionsUpdate || this._buildTimeRangeOptions(this.state.config.relative_timerange_options)}
                                   update={this._onRelativeTimeRangeOptionsUpdate}

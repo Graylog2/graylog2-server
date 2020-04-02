@@ -66,7 +66,7 @@ class ShareViewModal extends React.Component<Props, State> {
     Promise.all([
       ViewSharingActions.get(view.id),
       ViewSharingActions.users(view.id),
-      this._isAdmin(currentUser) ? RolesStore.loadRoles().then(roles => roles.map(({ name }) => name)) : Promise.resolve(currentUser.roles),
+      this._isAdmin(currentUser) ? RolesStore.loadRoles().then((roles) => roles.map(({ name }) => name)) : Promise.resolve(currentUser.roles),
     ]).then(([viewSharing, users, roles]) => {
       this.setState({ viewSharing, users, roles, loaded: true });
     });
@@ -126,9 +126,9 @@ class ShareViewModal extends React.Component<Props, State> {
     const userOptions = users ? users
       // eslint-disable-next-line camelcase
       .map(({ username, fullname }) => ({ value: username, label: fullname })) : null;
-    const userValue = get(viewSharing, 'users', []).map(user => (userOptions || []).find(option => option.value === user));
-    const rolesOptions = roles ? roles.map(rolename => ({ value: rolename, label: rolename })) : null;
-    const rolesValue = get(viewSharing, 'roles', []).map(role => ({ label: role, value: role }));
+    const userValue = get(viewSharing, 'users', []).map((user) => (userOptions || []).find((option) => option.value === user));
+    const rolesOptions = roles ? roles.map((rolename) => ({ value: rolename, label: rolename })) : null;
+    const rolesValue = get(viewSharing, 'roles', []).map((role) => ({ label: role, value: role }));
     const content = !loaded ? <Spinner /> : (
       <FormGroup style={formStyle}>
         <Radio name={AllUsersOfInstance.Type} checked={type === AllUsersOfInstance.Type} onChange={this._onChange}>
@@ -184,4 +184,4 @@ class ShareViewModal extends React.Component<Props, State> {
   }
 }
 
-export default connect(ShareViewModal, { currentUser: CurrentUserStore }, ({ currentUser, ...rest }) => Object.assign({}, rest, { currentUser: currentUser.currentUser }));
+export default connect(ShareViewModal, { currentUser: CurrentUserStore }, ({ currentUser, ...rest }) => ({ ...rest, currentUser: currentUser.currentUser }));

@@ -104,7 +104,7 @@ class PaginatedList extends React.Component<Props, State> {
     return (
       <div className="form-inline page-size" style={{ float: 'right' }}>
         <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={this._onChangePageSize}>
-          {pageSizes.map(size => <option key={`option-${size}`} value={size}>{size}</option>)}
+          {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
         </Input>
       </div>
     );

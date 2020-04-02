@@ -124,7 +124,7 @@ class DataTable extends React.Component {
   _getEffectiveRows = () => {
     const { filteredRows } = this.state;
     const { filterKeys, rows } = this.props;
-    return (filterKeys.length === 0 ? rows : filteredRows.filter(row => rows.some(r => isEqual(r, row))));
+    return (filterKeys.length === 0 ? rows : filteredRows.filter((row) => rows.some((r) => isEqual(r, row))));
   };
 
   render() {

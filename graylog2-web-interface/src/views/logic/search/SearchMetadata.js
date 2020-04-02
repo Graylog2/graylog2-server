@@ -27,9 +27,9 @@ export default class SearchMetadata {
     const allUsedParameterNames: Array<string> = queryMetadata.valueSeq()
       .reduce((acc: Array<string>, meta: QueryMetadata) => [...acc, ...meta.usedParameterNames.toJS()], []);
     const declaredParameterNames: Array<string> = declaredParameters.keySeq().toJS();
-    const used = Immutable.Set(allUsedParameterNames.filter(parameterName => declaredParameterNames.includes(parameterName))
+    const used = Immutable.Set(allUsedParameterNames.filter((parameterName) => declaredParameterNames.includes(parameterName))
       .map((parameterName: string) => declaredParameters.get(parameterName)));
-    const undeclared = Immutable.Set(allUsedParameterNames.filter(parameterName => !declaredParameterNames.includes(parameterName)));
+    const undeclared = Immutable.Set(allUsedParameterNames.filter((parameterName) => !declaredParameterNames.includes(parameterName)));
 
     this._value = { queryMetadata, declaredParameters, used, undeclared };
   }

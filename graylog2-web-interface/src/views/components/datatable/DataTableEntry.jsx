@@ -43,7 +43,7 @@ const fullValuePathForField = (fieldName, valuePath) => {
 };
 
 const columnNameToField = (column, series = []) => {
-  const currentSeries = series.find(s => s.effectiveName === column);
+  const currentSeries = series.find((s) => s.effectiveName === column);
   return currentSeries ? currentSeries.function : column;
 };
 

@@ -30,10 +30,10 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
 
   widgetDefs.forEach((widget) => {
     const widgetType = widgetDefinition(widget.type);
-    const dataTransformer = widgetType.searchResultTransformer || (x => x);
+    const dataTransformer = widgetType.searchResultTransformer || ((x) => x);
     const searchTypeIds = (widgetMapping[widget.id] || []);
-    const widgetData = searchTypeIds.map(searchTypeId => searchTypes[searchTypeId]).filter(result => result);
-    const widgetErrors = results.errors.filter(e => searchTypeIds.includes(e.searchTypeId));
+    const widgetData = searchTypeIds.map((searchTypeId) => searchTypes[searchTypeId]).filter((result) => result);
+    const widgetErrors = results.errors.filter((e) => searchTypeIds.includes(e.searchTypeId));
 
     widgets[widget.id] = widget;
     data[widget.id] = dataTransformer(widgetData, widget);
@@ -43,7 +43,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
     }
 
     if (!widgetData || widgetData.length === 0) {
-      const queryErrors = results.errors.filter(e => e.type === 'query');
+      const queryErrors = results.errors.filter((e) => e.type === 'query');
       if (queryErrors.length > 0) {
         errors[widget.id] = errors[widget.id] ? [].concat(errors[widget.id], queryErrors) : queryErrors;
       }
@@ -51,13 +51,13 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
   });
   return (
     <InteractiveContext.Consumer>
-      {interactive => (
+      {(interactive) => (
         <WidgetGrid allFields={allFields}
                     data={data}
                     errors={errors}
                     fields={fields}
                     locked={!interactive}
-                    onPositionsChange={p => _onPositionsChange(p)}
+                    onPositionsChange={(p) => _onPositionsChange(p)}
                     positions={positions}
                     widgets={widgets} />
       )}

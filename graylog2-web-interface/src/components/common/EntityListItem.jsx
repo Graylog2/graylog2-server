@@ -54,12 +54,10 @@ class EntityListItem extends React.Component {
               && (
               <div className="item-description">
                 {this.props.createdFromContentPack
-                && <span><Icon name="cube" title="Created from content pack" />&nbsp;</span>
-              }
+                && <span><Icon name="cube" title="Created from content pack" />&nbsp;</span>}
                 <span>{this.props.description}</span>
               </div>
-              )
-            }
+              )}
           </Col>
 
           <Col sm={12} lgHidden mdHidden smHidden>

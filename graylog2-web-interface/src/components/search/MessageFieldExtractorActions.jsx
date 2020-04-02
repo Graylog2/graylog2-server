@@ -44,7 +44,7 @@ class MessageFieldExtractorActions extends React.Component {
                           title="Select extractor type"
                           key={1}
                           id={`select-extractor-type-dropdown-field-${fieldName}`}>
-            {ExtractorUtils.EXTRACTOR_TYPES.map(extractorType => this._formatExtractorMenuItem(extractorType))}
+            {ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => this._formatExtractorMenuItem(extractorType))}
           </DropdownButton>
         </div>
       );

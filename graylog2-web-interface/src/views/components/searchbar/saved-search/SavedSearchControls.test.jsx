@@ -53,7 +53,7 @@ describe('SavedSearchControls', () => {
     });
 
     it('should loadView after create', (done) => {
-      ViewManagementActions.create = mockAction(jest.fn(view => Promise.resolve(view)));
+      ViewManagementActions.create = mockAction(jest.fn((view) => Promise.resolve(view)));
       const onLoadView = jest.fn((view) => {
         return new Promise(() => view);
       });

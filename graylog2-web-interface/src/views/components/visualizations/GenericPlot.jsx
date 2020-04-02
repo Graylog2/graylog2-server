@@ -167,9 +167,9 @@ class GenericPlot extends React.Component<Props, State> {
           });
           return (
             <InteractiveContext.Consumer>
-              {interactive => (
+              {(interactive) => (
                 <RenderCompletionCallback.Consumer>
-                  {onRenderComplete => (
+                  {(onRenderComplete) => (
                     <>
                       <Plot data={newChartData}
                             useResizeHandler
@@ -190,7 +190,7 @@ class GenericPlot extends React.Component<Props, State> {
                                      title={`Configuration for ${legendConfig.name}`}
                                      className={styles.locals.customPopover}>
                               <ColorPicker color={legendConfig.color}
-                                           onChange={newColor => this._onColorSelect(setColor, legendConfig.name, newColor)} />
+                                           onChange={(newColor) => this._onColorSelect(setColor, legendConfig.name, newColor)} />
                             </Popover>
                           </Overlay>
                         </RootCloseWrapper>

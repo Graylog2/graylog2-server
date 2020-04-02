@@ -36,10 +36,10 @@ const OwnerTag = connect(_OwnerTag, { currentUser: CurrentUserStore }, ({ curren
 
 // eslint-disable-next-line react/prop-types
 const Description = ({ description, owner, createdAt }) => (
-  <React.Fragment>
+  <>
     <div>{description || <i>No description given.</i>}</div>
     <div style={{ color: 'darkgray' }}><OwnerTag owner={owner} /> at <UserTimezoneTimestamp dateTime={createdAt} /></div>
-  </React.Fragment>
+  </>
 );
 
 type Plugin = {
@@ -85,10 +85,10 @@ const View = ({ children, id, title, summary, description, owner, requires, crea
   <EntityListItem title={formatTitle(title, id, isMissingRequirements(requires, requirementsProvided))}
                   titleSuffix={summary}
                   description={(
-                    <React.Fragment>
+                    <>
                       <Description description={description} owner={owner} createdAt={createdAt} />
                       <Requirements requires={requires} requirementsProvided={requirementsProvided} />
-                    </React.Fragment>
+                    </>
                   )}
                   actions={children} />
 );

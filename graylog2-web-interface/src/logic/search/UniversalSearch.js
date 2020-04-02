@@ -39,7 +39,7 @@ const UniversalSearch = {
     // this may look too complicated, but avoids false positives when one segment would be the prefix of another
     const oldQuery = this.getQuery();
     const segments = oldQuery.split(' ');
-    return segments.some(segment => segment === segmentInQuestion);
+    return segments.some((segment) => segment === segmentInQuestion);
   },
   addSegment(segment, operator) {
     let oldQuery = this.getQuery();

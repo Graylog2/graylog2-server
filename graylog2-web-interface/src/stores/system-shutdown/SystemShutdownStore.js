@@ -4,7 +4,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
 const SystemShutdownStore = Reflux.createStore({
-  sourceUrl: nodeId => `/cluster/${nodeId}/shutdown`,
+  sourceUrl: (nodeId) => `/cluster/${nodeId}/shutdown`,
 
   shutdown(nodeId) {
     return fetch('POST', URLUtils.qualifyUrl(this.sourceUrl(nodeId)))

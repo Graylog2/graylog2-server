@@ -149,9 +149,9 @@ const EditContentPackPage = createReactClass({
       const contentPackEntities = Object.keys(selectedEntities)
         .reduce((acc, entityType) => {
           return acc.concat(selectedEntities[entityType]);
-        }, []).filter(e => e instanceof Entity);
+        }, []).filter((e) => e instanceof Entity);
       /* Mark entities from server */
-      const entities = contentPackEntities.concat(result.entities.map(e => Entity.fromJSON(e, true)));
+      const entities = contentPackEntities.concat(result.entities.map((e) => Entity.fromJSON(e, true)));
       const builtContentPack = contentPack.toBuilder()
         .entities(entities)
         .build();

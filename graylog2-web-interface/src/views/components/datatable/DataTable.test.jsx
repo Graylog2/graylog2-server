@@ -41,7 +41,7 @@ describe('DataTable', () => {
   const rowPivot = new Pivot('timestamp', 'time', { interval: 'auto' });
   const series = new Series('count()');
 
-  const SimplifiedDataTable = props => (
+  const SimplifiedDataTable = (props) => (
     <DataTable config={AggregationWidgetConfig.builder().build()}
                currentView={currentView}
                data={{}}

@@ -24,7 +24,7 @@ class ProcessorSimulator extends React.Component {
   constructor(props) {
     super(props);
     // The default stream could not be present in a system. In that case we fallback to the first available stream.
-    this.defaultStream = props.streams.find(s => s.id === DEFAULT_STREAM_ID) || props.streams[0];
+    this.defaultStream = props.streams.find((s) => s.id === DEFAULT_STREAM_ID) || props.streams[0];
 
     this.state = {
       message: undefined,
@@ -63,7 +63,7 @@ class ProcessorSimulator extends React.Component {
   };
 
   _onStreamSelect = (selectedStream) => {
-    const stream = this.props.streams.find(s => s.id.toLowerCase() === selectedStream.toLowerCase());
+    const stream = this.props.streams.find((s) => s.id.toLowerCase() === selectedStream.toLowerCase());
     this.setState({ stream: stream });
   };
 

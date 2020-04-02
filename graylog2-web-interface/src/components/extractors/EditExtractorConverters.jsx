@@ -34,7 +34,7 @@ class EditExtractorConverters extends React.Component {
     super(props);
 
     this.state = {
-      displayedConverters: props.converters.map(converter => converter.type),
+      displayedConverters: props.converters.map((converter) => converter.type),
       disabledConverters: {}, // Keep disabled converters configuration, so the user doesn't need to type it again
       selectedConverter: undefined,
     };
@@ -88,7 +88,7 @@ class EditExtractorConverters extends React.Component {
 
   _getConverterByType = (converterType) => {
     const { converters } = this.props;
-    const currentConverter = converters.filter(converter => converter.type === converterType)[0];
+    const currentConverter = converters.filter((converter) => converter.type === converterType)[0];
     return (currentConverter ? currentConverter.config : {});
   };
 

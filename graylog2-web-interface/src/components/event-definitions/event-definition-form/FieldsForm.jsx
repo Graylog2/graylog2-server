@@ -34,7 +34,7 @@ class FieldsForm extends React.Component {
 
     // Filter out all non-existing field names from key_spec
     const fieldNames = Object.keys(nextFieldSpec);
-    const nextKeySpec = eventDefinition.key_spec.filter(key => fieldNames.includes(key));
+    const nextKeySpec = eventDefinition.key_spec.filter((key) => fieldNames.includes(key));
     onChange('key_spec', nextKeySpec);
   };
 
@@ -48,7 +48,7 @@ class FieldsForm extends React.Component {
 
     // Filter out all non-existing field names from key_spec and the current field name
     const fieldNames = Object.keys(nextFieldSpec);
-    let nextKeySpec = eventDefinition.key_spec.filter(key => fieldNames.includes(key) && key !== fieldName);
+    let nextKeySpec = eventDefinition.key_spec.filter((key) => fieldNames.includes(key) && key !== fieldName);
     if (isKey) {
       // Add key to its new position
       nextKeySpec = [...nextKeySpec.slice(0, keyPosition), fieldName, ...nextKeySpec.slice(keyPosition)];

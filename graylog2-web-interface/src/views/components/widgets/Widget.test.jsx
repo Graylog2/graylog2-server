@@ -45,7 +45,7 @@ jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
-    exports: key => (key !== 'enterpriseWidgets' ? [] : [
+    exports: (key) => (key !== 'enterpriseWidgets' ? [] : [
       {
         type: 'dummy',
         displayName: 'Some Dummy Visualization',
@@ -115,7 +115,7 @@ describe('<Widget />', () => {
     },
   };
 
-  const DummyWidget = props => (
+  const DummyWidget = (props) => (
     <Widget widget={widget}
             id="widgetId"
             fields={[]}
@@ -160,7 +160,7 @@ describe('<Widget />', () => {
   });
   it('renders placeholder if widget type is unknown', async () => {
     const unknownWidget = { config: {}, id: 'widgetId', type: 'i-dont-know-this-widget-type' };
-    const UnknownWidget = props => (
+    const UnknownWidget = (props) => (
       <Widget widget={unknownWidget}
               id="widgetId"
               fields={[]}
@@ -176,7 +176,7 @@ describe('<Widget />', () => {
   });
   it('renders placeholder in edit mode if widget type is unknown', async () => {
     const unknownWidget = { config: {}, id: 'widgetId', type: 'i-dont-know-this-widget-type' };
-    const UnknownWidget = props => (
+    const UnknownWidget = (props) => (
       <Widget widget={unknownWidget}
               editing
               id="widgetId"
@@ -263,7 +263,7 @@ describe('<Widget />', () => {
       SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
       ViewManagementActions.update = mockAction(jest.fn(() => Promise.resolve()));
       SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
-      Routes.pluginRoute = jest.fn(route => id => `${route}-${id}`);
+      Routes.pluginRoute = jest.fn((route) => (id) => `${route}-${id}`);
       browserHistory.push = jest.fn();
       asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
         .search(Search.builder().id('search-id').build())

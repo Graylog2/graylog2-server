@@ -22,7 +22,7 @@ const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
 `;
 
-const matchColor = matches => (matches ? '#00AE42' : '#AD0707');
+const matchColor = (matches) => (matches ? '#00AE42' : '#AD0707');
 
 const MatchIcon = styled(({ empty, matches, ...props }) => <Icon {...props} />)(
   ({ empty, matches }) => ({

@@ -24,7 +24,7 @@ const SimulationChanges = createReactClass({
   style: require('!style/useable!css!./SimulationChanges.css'),
 
   _isOriginalMessageRemoved(originalMessage, processedMessages) {
-    return !processedMessages.find(message => message.id === originalMessage.id);
+    return !processedMessages.find((message) => message.id === originalMessage.id);
   },
 
   _formatFieldTitle(field) {
@@ -40,7 +40,7 @@ const SimulationChanges = createReactClass({
     const originalFields = Object.keys(originalMessage.fields);
     const processedFields = Object.keys(processedMessage.fields);
 
-    const addedFields = processedFields.filter(field => originalFields.indexOf(field) === -1);
+    const addedFields = processedFields.filter((field) => originalFields.indexOf(field) === -1);
 
     if (addedFields.length === 0) {
       return null;
@@ -67,7 +67,7 @@ const SimulationChanges = createReactClass({
     const originalFields = Object.keys(originalMessage.fields);
     const processedFields = Object.keys(processedMessage.fields);
 
-    const removedFields = originalFields.filter(field => processedFields.indexOf(field) === -1);
+    const removedFields = originalFields.filter((field) => processedFields.indexOf(field) === -1);
 
     if (removedFields.length === 0) {
       return null;
@@ -144,7 +144,7 @@ const SimulationChanges = createReactClass({
       return <p>Original message would be dropped during processing.</p>;
     }
 
-    const processedMessage = processedMessages.find(message => message.id === originalMessage.id);
+    const processedMessage = processedMessages.find((message) => message.id === originalMessage.id);
 
     const formattedAddedFields = this._formatAddedFields(originalMessage, processedMessage);
     const formattedRemovedFields = this._formatRemovedFields(originalMessage, processedMessage);
@@ -181,7 +181,7 @@ const SimulationChanges = createReactClass({
     const originalMessageId = this.props.originalMessage.id;
     const simulatedMessages = this.props.simulationResults.messages;
 
-    const createdMessages = simulatedMessages.filter(message => message.id !== originalMessageId);
+    const createdMessages = simulatedMessages.filter((message) => message.id !== originalMessageId);
 
     if (createdMessages.length === 0) {
       return null;

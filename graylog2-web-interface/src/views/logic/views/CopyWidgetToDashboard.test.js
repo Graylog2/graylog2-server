@@ -20,7 +20,7 @@ jest.mock('../SearchType', () => jest.fn(() => ({
 })));
 
 const cwd = dirname(__filename);
-const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
+const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
 describe('copyWidgetToDashboard', () => {
   beforeEach(() => {

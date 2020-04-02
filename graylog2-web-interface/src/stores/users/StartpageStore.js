@@ -21,7 +21,7 @@ const StartpageStore = Reflux.createStore({
           UserNotification.success('Your start page was changed successfully');
           return response;
         },
-        error => UserNotification.error(`Changing your start page failed with error: ${error}`, 'Could not change your start page'),
+        (error) => UserNotification.error(`Changing your start page failed with error: ${error}`, 'Could not change your start page'),
       );
   },
 });

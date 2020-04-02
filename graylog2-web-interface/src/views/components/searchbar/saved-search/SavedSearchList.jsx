@@ -97,7 +97,7 @@ class SavedSearchList extends React.Component<Props, State> {
     const { views, deleteSavedSearch } = this.props;
     const { list } = views;
     if (list) {
-      const viewIndex = list.findIndex(v => v.id === selectedSavedSearch);
+      const viewIndex = list.findIndex((v) => v.id === selectedSavedSearch);
       if (viewIndex < 0) {
         return;
       }
@@ -151,7 +151,7 @@ class SavedSearchList extends React.Component<Props, State> {
         </Modal.Body>
         <Modal.Footer>
           <ViewLoaderContext.Consumer>
-            {loaderFunc => (
+            {(loaderFunc) => (
               <Button disabled={!selectedSavedSearch}
                       bsStyle="primary"
                       onClick={() => { this.onLoad(selectedSavedSearch, loaderFunc); }}>

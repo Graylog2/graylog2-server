@@ -57,7 +57,7 @@ const StreamAlerts = createReactClass({
   },
 
   _formatAlert(alert) {
-    const condition = this.props.alertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
+    const condition = this.props.alertConditions.find((alertCondition) => alertCondition.id === alert.condition_id);
     const conditionType = condition ? this.props.availableConditions[condition.type] : {};
 
     return (
@@ -88,7 +88,7 @@ const StreamAlerts = createReactClass({
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle="success"
                       noItemsText="Good news! Currently there are no unresolved alerts on this stream."
-                      items={this.state.alerts.alerts.map(alert => this._formatAlert(alert))} />
+                      items={this.state.alerts.alerts.map((alert) => this._formatAlert(alert))} />
         </PaginatedList>
       </div>
     );

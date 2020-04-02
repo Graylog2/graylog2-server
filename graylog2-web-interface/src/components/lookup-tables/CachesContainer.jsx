@@ -39,7 +39,7 @@ const CachesContainer = createReactClass({
       return <Spinner />;
     }
     const childrenWithProps = React.Children.map(this.props.children,
-      child => React.cloneElement(child,
+      (child) => React.cloneElement(child,
         { caches: this.state.caches, pagination: this.state.pagination }));
     return <div>{childrenWithProps}</div>;
   },

@@ -28,8 +28,8 @@ const _searchTimerange = (timerange: TimeRange) => {
 };
 
 const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [string]: mixed } = {}) => Object.keys(filterFields)
-  .filter(key => (filterFields[key] !== null && filterFields[key] !== undefined))
-  .map(key => `${key}:"${escape(String(filterFields[key]))}"`)
+  .filter((key) => (filterFields[key] !== null && filterFields[key] !== undefined))
+  .map((key) => `${key}:"${escape(String(filterFields[key]))}"`)
   .reduce((prev, cur) => addToQuery(prev, cur), query ? query.query_string : '');
 
 export default class SearchLink {

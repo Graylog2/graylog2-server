@@ -71,7 +71,7 @@ class NotificationSettingsForm extends React.Component {
     }
 
     return (
-      <React.Fragment>
+      <>
         <h3 className={commonStyles.title}>Notification Settings</h3>
         <fieldset>
           <FormGroup controlId="grace-period">
@@ -108,7 +108,7 @@ class NotificationSettingsForm extends React.Component {
             <HelpBlock>Number of messages to be included in Notifications.</HelpBlock>
           </FormGroup>
         </fieldset>
-      </React.Fragment>
+      </>
     );
   }
 }

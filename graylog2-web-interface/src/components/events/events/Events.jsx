@@ -71,11 +71,11 @@ class Events extends React.Component {
     const tooltip = <Tooltip id={`priority-${eventId}`}>{priorityName} Priority</Tooltip>;
 
     return (
-      <React.Fragment>
+      <>
         <OverlayTrigger placement="top" overlay={tooltip}>
           <Icon name={icon} fixedWidth className={`${style} ${styles.priority}`} />
         </OverlayTrigger>
-      </React.Fragment>
+      </>
     );
   };
 
@@ -161,7 +161,7 @@ class Events extends React.Component {
       onSearchReload,
     } = this.props;
 
-    const eventList = events.map(e => e.event);
+    const eventList = events.map((e) => e.event);
 
     if (totalEventDefinitions === 0) {
       return this.renderEmptyContent();
@@ -172,7 +172,7 @@ class Events extends React.Component {
     const entity = (filter === 'only' ? 'Alerts' : excludedFile);
 
     return (
-      <React.Fragment>
+      <>
         <Row>
           <Col md={12}>
             <EventsSearchBar parameters={parameters}
@@ -194,7 +194,7 @@ class Events extends React.Component {
                 <Table id="events-table" className={styles.eventsTable}>
                   <thead>
                     <tr>
-                      {HEADERS.map(header => <th key={header}>{header}</th>)}
+                      {HEADERS.map((header) => <th key={header}>{header}</th>)}
                     </tr>
                   </thead>
                   {eventList.map(this.renderEvent)}
@@ -203,7 +203,7 @@ class Events extends React.Component {
             </PaginatedList>
           </Col>
         </Row>
-      </React.Fragment>
+      </>
     );
   }
 }

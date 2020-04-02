@@ -62,7 +62,7 @@ const JournalDetails = createReactClass({
     const { nodeId } = this.props;
 
     if (this.metricNames) {
-      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
+      Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
     }
   },
 
@@ -80,7 +80,7 @@ const JournalDetails = createReactClass({
         utilizationRatio: 'org.graylog2.journal.utilization-ratio',
         oldestSegment: 'org.graylog2.journal.oldest-segment',
       };
-      Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
+      Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
     }
   },
 

@@ -72,7 +72,7 @@ class SelectableList extends React.Component {
     if (this.props.selectedOptionsType === 'string') {
       newSelectedOptions.push(option);
     } else {
-      newSelectedOptions.push(this.props.options.filter(o => this._getOptionId(o) === option)[0]);
+      newSelectedOptions.push(this.props.options.filter((o) => this._getOptionId(o) === option)[0]);
     }
 
     if (typeof this.props.onChange === 'function') {
@@ -104,8 +104,7 @@ class SelectableList extends React.Component {
       <div>
         <Select ref={(select) => { this.select = select; }} autoFocus={this.props.autoFocus} options={this.props.options} onChange={this._onAddOption} clearable={false} />
         {formattedOptions.length > 0
-        && <ListGroup style={{ marginTop: 10 }}>{formattedOptions}</ListGroup>
-        }
+        && <ListGroup style={{ marginTop: 10 }}>{formattedOptions}</ListGroup>}
       </div>
     );
   }

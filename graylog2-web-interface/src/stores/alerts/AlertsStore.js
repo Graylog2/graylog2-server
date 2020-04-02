@@ -17,7 +17,7 @@ const AlertsStore = Reflux.createStore({
     const promise = fetch('GET', url);
     promise
       .then(
-        response => this.trigger({ alerts: response }),
+        (response) => this.trigger({ alerts: response }),
         (error) => {
           UserNotification.error(`Fetching alerts for stream "${stream.title}" failed with status: ${error.message}`,
             `Could not retrieve alerts for stream "${stream.title}".`);
@@ -32,7 +32,7 @@ const AlertsStore = Reflux.createStore({
     const promise = fetch('GET', url);
     promise
       .then(
-        response => this.trigger({ alerts: response }),
+        (response) => this.trigger({ alerts: response }),
         (error) => {
           UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
         },
@@ -45,7 +45,7 @@ const AlertsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllPaginated(skip, limit, state).url);
     const promise = fetch('GET', url);
     promise.then(
-      response => this.trigger({ alerts: response }),
+      (response) => this.trigger({ alerts: response }),
       (error) => {
         UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
       },
@@ -59,7 +59,7 @@ const AlertsStore = Reflux.createStore({
     const promise = fetch('GET', url);
     promise
       .then(
-        response => this.trigger({ alerts: response }),
+        (response) => this.trigger({ alerts: response }),
         (error) => {
           UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
         },

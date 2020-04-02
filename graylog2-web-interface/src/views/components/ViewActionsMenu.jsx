@@ -41,12 +41,12 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
-    <React.Fragment>
+    <>
       <MenuItem divider />
       <MenuItem onSelect={() => setDebugOpen(true)}>
         <Icon name="code" /> Debug
       </MenuItem>
-    </React.Fragment>
+    </>
   );
   return (
     <ButtonGroup>
@@ -79,14 +79,14 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
                              view={view.toBuilder().newId().build()}
                              title="Save new dashboard"
                              onClose={() => setSaveAsViewOpen(false)}
-                             onSave={newView => onSaveAsView(newView, router)} />
+                             onSave={(newView) => onSaveAsView(newView, router)} />
       )}
       {editViewOpen && (
         <ViewPropertiesModal show
                              view={view}
                              title="Editing dashboard"
                              onClose={() => setEditViewOpen(false)}
-                             onSave={updatedView => onSaveView(updatedView, router)} />
+                             onSave={(updatedView) => onSaveView(updatedView, router)} />
       )}
       {shareViewOpen && <ShareViewModal show view={view} onClose={() => setShareViewOpen(false)} />}
     </ButtonGroup>

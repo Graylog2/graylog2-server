@@ -2,7 +2,7 @@ import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
 
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 
 describe('NotificationBadge', () => {
   let notifications;

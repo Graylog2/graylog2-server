@@ -181,7 +181,7 @@ class ReactGridContainer extends React.Component {
   _onLayoutChange = (newLayout) => {
     // `onLayoutChange` may be triggered when clicking somewhere in a widget, check before propagating the change.
     // Filter out additional Object properties in nextLayout, as it comes directly from react-grid-layout
-    const filteredNewLayout = newLayout.map(item => ({ i: item.i, x: item.x, y: item.y, h: item.h, w: item.w }));
+    const filteredNewLayout = newLayout.map((item) => ({ i: item.i, x: item.x, y: item.y, h: item.h, w: item.w }));
     const { layout } = this.state;
     if (isEqual(layout, filteredNewLayout)) {
       return;

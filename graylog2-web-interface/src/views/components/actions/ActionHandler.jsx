@@ -63,7 +63,7 @@ export function createHandlerFor(action: ActionDefinition, setActionComponents: 
                          value={value}
                          type={type} />
       );
-      setActionComponents(actionComponents => ({ [id]: renderedComponent, ...actionComponents }));
+      setActionComponents((actionComponents) => ({ [id]: renderedComponent, ...actionComponents }));
       return Promise.resolve();
     };
   }

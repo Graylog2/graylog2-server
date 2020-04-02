@@ -64,7 +64,7 @@ const AuthProvidersConfig = createReactClass({
     const { config } = this.state;
     const update = ObjectUtils.clone(config);
 
-    update.realm_order = newSorting.map(entry => entry.id);
+    update.realm_order = newSorting.map((entry) => entry.id);
 
     this.setState({ config: update });
   },
@@ -77,7 +77,7 @@ const AuthProvidersConfig = createReactClass({
       const { checked } = this.inputs[realmName];
 
       if (checked) {
-        update.disabled_realms = disabledProcessors.filter(p => p !== realmName);
+        update.disabled_realms = disabledProcessors.filter((p) => p !== realmName);
       } else if (disabledProcessors.indexOf(realmName) === -1) {
         update.disabled_realms.push(realmName);
       }
@@ -108,7 +108,7 @@ const AuthProvidersConfig = createReactClass({
     const { descriptors } = this.props;
 
     return config.realm_order.map((name, idx) => {
-      const status = config.disabled_realms.filter(disabledName => disabledName === name).length > 0 ? 'disabled' : 'active';
+      const status = config.disabled_realms.filter((disabledName) => disabledName === name).length > 0 ? 'disabled' : 'active';
       const realm = (descriptors[name] || { id: name, title: 'Unavailable' });
 
       return (
@@ -137,7 +137,7 @@ const AuthProvidersConfig = createReactClass({
     const { descriptors } = this.props;
 
     return ObjectUtils.clone(config.realm_order).sort((a, b) => naturalSort(a.displayName, b.displayName)).map((realmName) => {
-      const enabled = config.disabled_realms.filter(disabledName => disabledName === realmName).length < 1;
+      const enabled = config.disabled_realms.filter((disabledName) => disabledName === realmName).length < 1;
       const realm = (descriptors[realmName] || { id: realmName, displayName: 'Unavailable' });
 
       return (

@@ -4,7 +4,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
 const SystemLoadBalancerStore = Reflux.createStore({
-  sourceUrl: nodeId => `/cluster/${nodeId}/lbstatus`,
+  sourceUrl: (nodeId) => `/cluster/${nodeId}/lbstatus`,
 
   override(nodeId, status) {
     return fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/override/${status}`))

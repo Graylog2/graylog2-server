@@ -74,18 +74,18 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   const { columnPivots, rowPivots, series, rollup } = config;
   const rows = data.chart || Object.values(data)[0] || [];
 
-  const rowFieldNames = rowPivots.map<string>(pivot => pivot.field);
-  const columnFieldNames = columnPivots.map(pivot => pivot.field);
+  const rowFieldNames = rowPivots.map<string>((pivot) => pivot.field);
+  const columnFieldNames = columnPivots.map((pivot) => pivot.field);
 
   const seriesToMerge = rollup ? series : [];
   const effectiveFields = Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({ effectiveName }) => effectiveName));
 
-  const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter(r => r.source === 'leaf'));
+  const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r) => r.source === 'leaf'));
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
 
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
-    const valuePath = rowFieldNames.map(pivotField => ({ [pivotField]: expandedRows[idx][pivotField] }));
+    const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
     // eslint-disable-next-line react/no-array-index-key
     return (
       // eslint-disable-next-line react/no-array-index-key

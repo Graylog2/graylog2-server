@@ -23,7 +23,7 @@ class FieldsList extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('fieldValueProviders').find(p => p.type === type) || {};
+    return PluginStore.exports('fieldValueProviders').find((p) => p.type === type) || {};
   };
 
   handleAddFieldClick = () => {
@@ -46,7 +46,7 @@ class FieldsList extends React.Component {
   };
 
   providerFormatter = (config) => {
-    const configKeys = Object.keys(config).filter(key => key !== 'type');
+    const configKeys = Object.keys(config).filter((key) => key !== 'type');
     return (
       <p>
         {configKeys.map((key) => {
@@ -98,16 +98,16 @@ class FieldsList extends React.Component {
 
     if (fieldNames.length === 0) {
       return (
-        <React.Fragment>
+        <>
           <p>
             This Event does not have any custom Fields yet.
           </p>
           {addCustomFieldButton}
-        </React.Fragment>
+        </>
       );
     }
     return (
-      <React.Fragment>
+      <>
         <DataTable id="event-definition-fields"
                    className="table-striped table-hover"
                    headers={HEADERS}
@@ -115,7 +115,7 @@ class FieldsList extends React.Component {
                    dataRowFormatter={this.fieldFormatter}
                    filterKeys={[]} />
         {addCustomFieldButton}
-      </React.Fragment>
+      </>
     );
   }
 }

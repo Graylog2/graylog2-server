@@ -35,7 +35,7 @@ class FilterPreviewContainer extends React.Component {
 
     const { queryId, searchTypeId } = this.state;
 
-    const formattedStreams = config.streams.map(stream => ({ type: 'stream', id: stream }));
+    const formattedStreams = config.streams.map((stream) => ({ type: 'stream', id: stream }));
 
     const queryBuilder = Query.builder()
       .id(queryId)
@@ -52,7 +52,7 @@ class FilterPreviewContainer extends React.Component {
     const query = queryBuilder.build();
 
     const search = Search.create().toBuilder()
-      .parameters(config.query_parameters.filter(param => (!param.embryonic)))
+      .parameters(config.query_parameters.filter((param) => (!param.embryonic)))
       .queries([query])
       .build();
 

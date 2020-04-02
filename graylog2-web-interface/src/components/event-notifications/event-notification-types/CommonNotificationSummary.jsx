@@ -27,7 +27,7 @@ class CommonNotificationSummary extends React.Component {
     const { type, notification, definitionNotification, children } = this.props;
     const { displayDetails } = this.state;
     return (
-      <React.Fragment>
+      <>
         <h4>{notification.title || definitionNotification.notification_id}</h4>
         <dl>
           <dd>{type}</dd>
@@ -49,7 +49,7 @@ class CommonNotificationSummary extends React.Component {
             )}
           </dd>
         </dl>
-      </React.Fragment>
+      </>
     );
   }
 }

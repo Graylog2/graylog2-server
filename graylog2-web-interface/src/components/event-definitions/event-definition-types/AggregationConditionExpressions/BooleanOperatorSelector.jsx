@@ -12,7 +12,7 @@ const OperatorSelector = styled.div`
 
 const BooleanOperatorSelect = styled(({ isFirstElement, ...props }) => <FormGroup {...props} />)`
   width: 100px;
-  margin-left: ${props => (props.isFirstElement ? '' : '1em')};
+  margin-left: ${(props) => (props.isFirstElement ? '' : '1em')};
   margin-right: 1em;
 `;
 

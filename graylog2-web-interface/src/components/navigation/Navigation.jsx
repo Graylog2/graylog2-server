@@ -49,7 +49,6 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(location.pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
-
     if (isEmpty) {
       return null;
     }

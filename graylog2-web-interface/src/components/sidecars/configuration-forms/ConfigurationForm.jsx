@@ -135,7 +135,7 @@ const ConfigurationForm = createReactClass({
   _getCollectorDefaultTemplate(collectorId) {
     const storedTemplate = this.defaultTemplates[collectorId];
     if (storedTemplate !== undefined) {
-      return new Promise(resolve => resolve(storedTemplate));
+      return new Promise((resolve) => resolve(storedTemplate));
     }
 
     return CollectorsActions.getCollector(collectorId).then((collector) => {
@@ -237,7 +237,7 @@ const ConfigurationForm = createReactClass({
     const isConfigurationInUse = configurationSidecars.sidecar_ids && configurationSidecars.sidecar_ids.length > 0;
 
     if (isConfigurationInUse) {
-      const collector = collectors ? collectors.find(c => c.id === collectorId) : undefined;
+      const collector = collectors ? collectors.find((c) => c.id === collectorId) : undefined;
       return (
         <span>
           <FormControl.Static>{this._formatCollector(collector)}</FormControl.Static>

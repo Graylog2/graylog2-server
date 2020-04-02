@@ -24,7 +24,7 @@ class EventConditionForm extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
+    return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
   sortedEventDefinitionTypes = () => {
@@ -46,7 +46,7 @@ class EventConditionForm extends React.Component {
 
   formattedEventDefinitionTypes = () => {
     return this.sortedEventDefinitionTypes()
-      .map(type => ({ label: type.displayName, value: type.type }));
+      .map((type) => ({ label: type.displayName, value: type.type }));
   };
 
   handleEventDefinitionTypeChange = (nextType) => {
@@ -114,12 +114,12 @@ class EventConditionForm extends React.Component {
         <Clearfix />
 
         {eventDefinitionTypeComponent && (
-          <React.Fragment>
+          <>
             <hr className={styles.hr} />
             <Col md={12}>
               {eventDefinitionTypeComponent}
             </Col>
-          </React.Fragment>
+          </>
         )}
       </Row>
     );

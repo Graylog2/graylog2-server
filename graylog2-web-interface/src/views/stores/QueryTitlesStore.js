@@ -17,7 +17,7 @@ export const QueryTitlesStore = singletonStore(
     },
     onViewStoreUpdate({ view }) {
       const viewState = get(view, 'state', Immutable.Map());
-      const newState = viewState.map(state => state.titles.getIn(['tab', 'title'])).filter(v => v !== undefined);
+      const newState = viewState.map((state) => state.titles.getIn(['tab', 'title'])).filter((v) => v !== undefined);
       if (!isEqual(this.state, newState)) {
         this.state = newState;
         this._trigger();

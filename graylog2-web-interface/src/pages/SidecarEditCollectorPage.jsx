@@ -32,7 +32,7 @@ const SidecarEditCollectorPage = createReactClass({
 
   _reloadCollector() {
     CollectorsActions.getCollector(this.props.params.collectorId).then(
-      collector => this.setState({ collector }),
+      (collector) => this.setState({ collector }),
       (error) => {
         if (error.status === 404) {
           history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION);

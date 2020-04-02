@@ -47,7 +47,7 @@ const PipelineConnectionsForm = createReactClass({
   },
 
   _save() {
-    const streamIds = this.state.connectedStreams.map(cs => cs.value);
+    const streamIds = this.state.connectedStreams.map((cs) => cs.value);
     const newConnection = {
       pipeline: this.props.pipeline.id,
       streams: streamIds,
@@ -58,9 +58,9 @@ const PipelineConnectionsForm = createReactClass({
 
   _getConnectedStreams(pipeline, connections, streams) {
     return connections
-      .filter(c => c.pipeline_ids && c.pipeline_ids.includes(pipeline.id)) // Get connections for this pipeline
-      .filter(c => streams.some(s => s.id === c.stream_id)) // Filter out deleted streams
-      .map(c => this.props.streams.find(s => s.id === c.stream_id));
+      .filter((c) => c.pipeline_ids && c.pipeline_ids.includes(pipeline.id)) // Get connections for this pipeline
+      .filter((c) => streams.some((s) => s.id === c.stream_id)) // Filter out deleted streams
+      .map((c) => this.props.streams.find((s) => s.id === c.stream_id));
   },
 
   _getFormattedStreams(streams) {
@@ -72,7 +72,7 @@ const PipelineConnectionsForm = createReactClass({
   },
 
   _getFilteredStreams(streams) {
-    return streams.filter(s => !this.state.connectedStreams.some(cs => cs.value.toLowerCase() === s.id.toLowerCase()));
+    return streams.filter((s) => !this.state.connectedStreams.some((cs) => cs.value.toLowerCase() === s.id.toLowerCase()));
   },
 
   render() {

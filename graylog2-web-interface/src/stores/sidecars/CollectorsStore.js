@@ -196,8 +196,8 @@ const CollectorsStore = Reflux.createStore({
 
     promise
       .then(
-        response => response,
-        error => (
+        (response) => response,
+        (error) => (
           UserNotification.error(`Validating collector "${payload.name}" failed with status: ${error.message}`,
             'Could not validate collector')
         ),

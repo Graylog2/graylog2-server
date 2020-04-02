@@ -41,7 +41,7 @@ const NodesPage = createReactClass({
     const { nodes } = this.state;
     const nodeVals = Object.values(nodes);
     const publishURI = URLUtils.qualifyUrl('/');
-    return (nodeVals.findIndex(node => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0);
+    return (nodeVals.findIndex((node) => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0);
   },
 
   render() {

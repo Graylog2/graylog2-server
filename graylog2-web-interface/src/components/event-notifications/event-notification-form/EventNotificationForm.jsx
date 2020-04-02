@@ -54,7 +54,7 @@ class EventNotificationForm extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventNotificationTypes').find(n => n.type === type) || {};
+    return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
   handleTypeChange = (nextType) => {
@@ -70,7 +70,7 @@ class EventNotificationForm extends React.Component {
 
   formattedEventNotificationTypes = () => {
     return PluginStore.exports('eventNotificationTypes')
-      .map(type => ({ label: type.displayName, value: type.type }));
+      .map((type) => ({ label: type.displayName, value: type.type }));
   };
 
   render() {

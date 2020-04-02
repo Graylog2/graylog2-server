@@ -9,7 +9,7 @@ import Parameter from '../parameters/Parameter';
 import ValueParameter from '../parameters/ValueParameter';
 
 const cwd = dirname(__filename);
-const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
+const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
 

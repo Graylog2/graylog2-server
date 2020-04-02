@@ -52,7 +52,7 @@ class ContentPackInstall extends React.Component {
   _convertedParameters = () => {
     return Object.keys(this.state.parameterInput).reduce((result, paramName) => {
       const newResult = result;
-      const paramType = this.props.contentPack.parameters.find(parameter => parameter.name === paramName).type;
+      const paramType = this.props.contentPack.parameters.find((parameter) => parameter.name === paramName).type;
       const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
       newResult[paramName] = ValueRefHelper.createValueRef(paramType, value);
       return newResult;

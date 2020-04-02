@@ -11,7 +11,7 @@ type Props = {
   onChange: (Direction) => any,
 };
 
-const valueContainer = base => ({
+const valueContainer = (base) => ({
   ...base,
   minHeight: '35px',
 });

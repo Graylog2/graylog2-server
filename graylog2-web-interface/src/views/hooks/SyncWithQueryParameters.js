@@ -13,8 +13,8 @@ import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 
 const useActionListeners = (actions, callback, dependencies) => {
   useEffect(() => {
-    const unsubscribes = actions.map(action => action.listen(callback));
-    return () => unsubscribes.forEach(unsubscribe => unsubscribe());
+    const unsubscribes = actions.map((action) => action.listen(callback));
+    return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
   }, dependencies);
 };
 

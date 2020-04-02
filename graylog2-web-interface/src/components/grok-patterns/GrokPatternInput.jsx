@@ -94,7 +94,7 @@ class GrokPatternInput extends React.Component {
     const { className, patterns, pattern } = this.props;
     const regExp = RegExp(patternFilter, 'i');
     this.shownListItems = [];
-    const patternsToDisplay = patterns.filter(displayedPattern => regExp.test(displayedPattern.name))
+    const patternsToDisplay = patterns.filter((displayedPattern) => regExp.test(displayedPattern.name))
       .map((displayedPattern, index) => {
         const active = index === activeListItem;
         this.shownListItems.push(displayedPattern.name);

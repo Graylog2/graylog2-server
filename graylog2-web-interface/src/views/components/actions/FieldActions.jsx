@@ -37,7 +37,7 @@ class FieldActions extends React.Component<Props, State> {
     };
   }
 
-  _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
+  _onMenuToggle = () => this.setState((state) => ({ open: !state.open }));
 
   render() {
     const { children, disabled, element, menuContainer, name, type, queryId } = this.props;
@@ -52,7 +52,7 @@ class FieldActions extends React.Component<Props, State> {
         return !isHidden(handlerArgs);
       })
       .map((action: ActionDefinition) => {
-        const setActionComponents = fn => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
+        const setActionComponents = (fn) => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
         const handler = createHandlerFor(action, setActionComponents);
         const onSelect = () => {
           this._onMenuToggle();

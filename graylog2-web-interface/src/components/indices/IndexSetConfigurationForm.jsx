@@ -48,12 +48,12 @@ class IndexSetConfigurationForm extends React.Component {
 
     if (value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
       if (this.state.validationErrors[event.target.name]) {
-        const nextValidationErrors = Object.assign({}, this.state.validationErrors);
+        const nextValidationErrors = { ...this.state.validationErrors };
         delete nextValidationErrors[event.target.name];
         this.setState({ validationErrors: nextValidationErrors });
       }
     } else {
-      const nextValidationErrors = Object.assign({}, this.state.validationErrors);
+      const nextValidationErrors = { ...this.state.validationErrors };
       if (value.length === 0) {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: cannot be empty';
       } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {

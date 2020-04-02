@@ -11,7 +11,7 @@ import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
-    create: jest.fn(widget => Promise.resolve(widget)),
+    create: jest.fn((widget) => Promise.resolve(widget)),
   },
 }));
 
@@ -39,7 +39,7 @@ describe('FieldStatisticsHandler', () => {
       expect(WidgetActions.create).toHaveBeenCalled();
       const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
-      expect(widget.config.series.map(s => s.function)).toEqual([
+      expect(widget.config.series.map((s) => s.function)).toEqual([
         `count(${fieldName})`,
         `sum(${fieldName})`,
         `avg(${fieldName})`,
@@ -57,7 +57,7 @@ describe('FieldStatisticsHandler', () => {
       expect(WidgetActions.create).toHaveBeenCalled();
       const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
-      expect(widget.config.series.map(s => s.function)).toEqual([
+      expect(widget.config.series.map((s) => s.function)).toEqual([
         `count(${fieldName})`,
         `card(${fieldName})`,
       ]);

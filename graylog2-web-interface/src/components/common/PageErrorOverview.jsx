@@ -9,7 +9,7 @@ import ErrorJumbotron, { H1 } from 'pages/ErrorJumbotron';
  * can't reach the node).
  */
 const PageErrorOverview = ({ errors }) => {
-  const formattedErrors = errors ? errors.map(error => <li key={`key-${error.toString()}`}>{error.toString()}</li>) : [];
+  const formattedErrors = errors ? errors.map((error) => <li key={`key-${error.toString()}`}>{error.toString()}</li>) : [];
 
   return (
     <ErrorJumbotron>

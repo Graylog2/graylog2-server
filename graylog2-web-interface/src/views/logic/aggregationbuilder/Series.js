@@ -15,11 +15,11 @@ type InternalState = {
   function: string,
 };
 
-export type Definition = {
+export type Definition = {|
   type: string,
   field?: string,
   percentile?: string,
-};
+|};
 
 const parametersRegex = /\((.+)\)/;
 const funcNameRegex = /(\w+)\(/;

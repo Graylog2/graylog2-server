@@ -49,7 +49,7 @@ export default class FormattingSettings {
 
   static fromJSON(value: FormattingSettingsJSON) {
     const { highlighting = [] } = value;
-    return FormattingSettings.create(highlighting.map(rule => HighlightingRule.fromJSON(rule)));
+    return FormattingSettings.create(highlighting.map((rule) => HighlightingRule.fromJSON(rule)));
   }
 }
 
