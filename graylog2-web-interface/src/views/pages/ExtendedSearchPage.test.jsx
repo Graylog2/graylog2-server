@@ -262,17 +262,4 @@ describe('ExtendedSearchPage', () => {
         expect(SearchActions.execute).not.toHaveBeenCalled();
       });
   });
-
-  it('information about execution error will be displayed', async () => {
-    asMock(SearchActions.execute).mockImplementationOnce(() => Promise.reject(new Error('The error message.')));
-    let wrapper;
-    await act(async () => {
-      wrapper = mount(<SimpleExtendedSearchPage />);
-    });
-
-    if (wrapper) {
-      wrapper.update();
-      expect(wrapper.contains('The error message.')).not.toBeNull();
-    }
-  });
 });

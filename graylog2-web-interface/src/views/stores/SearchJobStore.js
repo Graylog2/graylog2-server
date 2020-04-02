@@ -1,7 +1,7 @@
 // @flow strict
 import Reflux from 'reflux';
 
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { redirectIfForbidden } from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 
 import Search from 'views/logic/search/Search';
@@ -64,7 +64,12 @@ export const SearchJobStore = singletonStore(
     },
 
     run(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
-      const promise = fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
+      const handleForbidden = (error, SessionStore) => {
+        if (!error.type === 'missing stream permission error') {
+          redirectIfForbidden(error, SessionStore);
+        }
+      };
+      const promise = fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState), handleForbidden);
       SearchJobActions.run.promise(promise);
       return promise;
     },
