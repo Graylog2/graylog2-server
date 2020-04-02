@@ -29,12 +29,16 @@ public abstract class MissingStreamPermissionError {
 
     private static final String FIELD_ERROR_MESSAGE = "message";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_TYPE = "type";
 
     @JsonProperty(FIELD_ERROR_MESSAGE)
     public abstract String errorMessage();
 
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
+
+    @JsonProperty(FIELD_TYPE)
+    public abstract String type();
 
     public static Builder builder() {
         return Builder.create();
@@ -47,7 +51,8 @@ public abstract class MissingStreamPermissionError {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_MissingStreamPermissionError.Builder();
+            return new AutoValue_MissingStreamPermissionError.Builder()
+                    .type("missing stream permission error");
         }
 
         @JsonProperty(FIELD_ERROR_MESSAGE)
@@ -55,6 +60,9 @@ public abstract class MissingStreamPermissionError {
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty(FIELD_TYPE)
+        public abstract Builder type(String type);
 
         public abstract MissingStreamPermissionError build();
     }

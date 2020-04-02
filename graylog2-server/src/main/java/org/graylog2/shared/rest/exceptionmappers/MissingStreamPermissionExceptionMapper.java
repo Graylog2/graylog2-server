@@ -30,7 +30,7 @@ public class MissingStreamPermissionExceptionMapper implements ExceptionMapper<M
                 .errorMessage(e.getMessage())
                 .streams(e.streamsWithMissingPermissions())
                 .build();
-        return Response.status(Response.Status.NOT_ACCEPTABLE)
+        return Response.status(Response.Status.FORBIDDEN)
                 .type(MediaType.APPLICATION_JSON_TYPE)
                 .entity(missingStreamPermissionError)
                 .build();
