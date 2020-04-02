@@ -10,7 +10,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import { SearchActions } from 'views/stores/SearchStore';
+import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
@@ -42,13 +42,13 @@ jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     ['listen', () => jest.fn()],
     'get',
-    ['getInitialState', () => ({
+    ['getInitialState', jest.fn(() => ({
       result: {
         forId: jest.fn(() => {
           return {};
         }),
       },
-    })],
+    }))],
   ),
 }));
 jest.mock('views/stores/FieldTypesStore', () => ({
@@ -261,5 +261,12 @@ describe('ExtendedSearchPage', () => {
       .then(() => {
         expect(SearchActions.execute).not.toHaveBeenCalled();
       });
+  });
+
+  it('displays SearhStore errors', () => {
+    asMock(SearchStore.getInitialState).mockReturnValueOnce({ errors: [new Error('The error message')] });
+    const wrapper = mount(<SimpleExtendedSearchPage />);
+
+    expect(wrapper.contains('The error message.')).not.toBeNull();
   });
 });
