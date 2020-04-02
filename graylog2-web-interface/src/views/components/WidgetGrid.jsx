@@ -57,9 +57,13 @@ class WidgetGrid extends React.Component {
     positions: {},
   };
 
-  state = {
-    widgetDimensions: {},
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      widgetDimensions: {},
+    };
+  }
 
   _onWidgetSizeChange = (widgetId, dimensions) => {
     this.setState(({ widgetDimensions }) => ({ widgetDimensions: { ...widgetDimensions, [widgetId]: dimensions } }));

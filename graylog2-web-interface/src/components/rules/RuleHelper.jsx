@@ -25,13 +25,17 @@ then
 end`;
 
 class RuleHelper extends React.Component {
-  state = {
-    expanded: {},
-    currentPage: 1,
-    pageSize: 10,
-    filteredDescriptors: undefined,
-    pageBeforeFilter: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      expanded: {},
+      currentPage: 1,
+      pageSize: 10,
+      filteredDescriptors: undefined,
+      pageBeforeFilter: undefined,
+    };
+  }
 
   componentDidMount() {
     RulesActions.loadFunctions();
@@ -50,7 +54,7 @@ class RuleHelper extends React.Component {
   }
 
   _functionSignature = (descriptor) => {
-    const args = descriptor.params.map(p => (p.optional ? `[${p.name}]` : p.name));
+    const args = descriptor.params.map((p) => (p.optional ? `[${p.name}]` : p.name));
     return `${descriptor.name}(${args.join(', ')}) : ${this._niceType(descriptor.return_type)}`;
   }
 

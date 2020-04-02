@@ -121,10 +121,14 @@ export default class extends React.Component {
     onSizeChange: PropTypes.func.isRequired,
   };
 
-  state = {
-    height: 0,
-    width: 0,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      height: 0,
+      width: 0,
+    };
+  }
 
   componentDidMount() {
     this._updateWidgetDimensionsIfChanged();
