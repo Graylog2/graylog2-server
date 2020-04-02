@@ -52,7 +52,7 @@ public abstract class MissingStreamPermissionError {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_MissingStreamPermissionError.Builder()
-                    .type("missing stream permission error");
+                    .type("MissingStreamPermission");
         }
 
         @JsonProperty(FIELD_ERROR_MESSAGE)
