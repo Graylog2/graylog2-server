@@ -10,6 +10,20 @@ import { createUnauthorizedError } from 'logic/errors/ReportedErrors';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
+export const logoutIfUnauthorized = (error, SessionStore) => {
+  if (SessionStore.isLoggedIn() && error.status === 401) {
+    const SessionActions = ActionsProvider.getActions('Session');
+    SessionActions.logout(SessionStore.getSessionId());
+  }
+};
+
+export const redirectIfForbidden = (error, SessionStore) => {
+  // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
+  if (SessionStore.isLoggedIn() && error.status === 403) {
+    history.replace(Routes.NOTFOUND);
+  }
+};
+
 export class FetchError extends Error {
   constructor(message, additional) {
     super(message);
@@ -56,7 +70,7 @@ export class Builder {
     return this;
   }
 
-  json(body) {
+  json(body, handleForbidden = redirectIfForbidden, handleUnauthorized = logoutIfUnauthorized) {
     this.request = this.request
       .send(body)
       .type('json')
@@ -67,19 +81,13 @@ export class Builder {
           ServerAvailabilityActions.reportSuccess();
           return resp.body;
         }
-
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
-        if (SessionStore.isLoggedIn() && error.status === 401) {
-          const SessionActions = ActionsProvider.getActions('Session');
-          SessionActions.logout(SessionStore.getSessionId());
-        }
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-        if (SessionStore.isLoggedIn() && error.status === 403) {
-          ErrorsActions.report(createUnauthorizedError(error));
-        }
+        handleForbidden(error, SessionStore);
+        handleUnauthorized(error, SessionStore);]
 
         if (error.originalError && !error.originalError.status) {
           const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
@@ -154,10 +162,11 @@ function queuePromiseIfNotLoggedin(promise) {
   return promise;
 }
 
-export default function fetch(method, url, body) {
+export default function fetch(method, url, body, handleForbidden, handleUnauthorized) {
+  console.log(handleForbidden, handleUnauthorized);
   const promise = () => new Builder(method, url)
     .authenticated()
-    .json(body)
+    .json(body, handleForbidden, handleUnauthorized)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();
