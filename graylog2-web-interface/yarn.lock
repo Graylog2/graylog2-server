@@ -1539,86 +1539,177 @@
   resolved "https://registry.yarnpkg.com/@icons/material/-/material-0.2.4.tgz#e90c9f71768b3736e76d7dd6783fc6c2afa88bc8"
   integrity sha512-QPcGmICAPbGLGb6F/yNf/KzKqvFx8z5qx3D1yFqVAjoFmXK35EgyW+cJ57Te3CNsmzblwtzakLGFqHPqrfb4Tw==
 
-"@interactjs/actions@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/actions/-/actions-1.8.4.tgz#dabb5db7302be4c6c62d39965a22823fb44354b5"
-  integrity sha512-G+9RRCqiYwGMc8mXcLBJbTevoRq36MpgiVCTQt/xMkMM5hGExFn976VU6frpFcal9U59QEB7TfO9O3LUGfmm9A==
+"@interactjs/actions@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/actions/-/actions-1.9.7.tgz#b015931f406e090e48d3244343cf7b2cc53c90f1"
+  integrity sha512-j5+2Cj1Ra3/0BgfCqL7hKGw7kOZyOBg3HXi+EJ9AT0sJzetjwsRt5YlvCm9URH8XcY7sNlFi8gD5mPFjD8DZaw==
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
 
-"@interactjs/auto-scroll@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/auto-scroll/-/auto-scroll-1.8.4.tgz#b4d3a13302c9cf1d153eba232e942e83fe054848"
-  integrity sha512-uluQy2ohr/CkmegNGWsztib0u1jVFqqSDQeC8rylI1nTKu1De5U5h8BGTTSRWad/TSlaW+GUaPgbjbhoiuEjew==
+"@interactjs/arrange@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/arrange/-/arrange-1.9.7.tgz#42323ce4b1af905d6e4ab76fc066cd1573bd41ee"
+  integrity sha512-gXcj4Gti3WsRmJ4Ohr5toUl7AjsBOY6Ik5SX69X3AZKrQpDJfkNBcOZJ/AlAPLXIwjBV8rRQiddYgB+SXCJcBg==
 
-"@interactjs/auto-start@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/auto-start/-/auto-start-1.8.4.tgz#fd638e3af42a6d4d17220a634ef78154e9b27ce0"
-  integrity sha512-Ln24+uiliaIb682dpzrfqKpti0xGCZXHeNFx+JvyquhZ3p3C2BmUd8jVA3wxZqce8YyK51nPc2VNdmc/Zf8aDg==
+"@interactjs/auto-scroll@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/auto-scroll/-/auto-scroll-1.9.7.tgz#e6c2e67b6ed43dd0dd6a84e96b5d1389a20a647a"
+  integrity sha512-/753R5h8z1VQ/aS5VsqI6C0V6fwb3934tP7s+htHL27aPVxyz20kfZVd74t5BmPSUAxAyDqwNVZ1vgjGLCSyAQ==
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
 
-"@interactjs/core@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/core/-/core-1.8.4.tgz#fe456ef8457e6440b089be34ff9518ba27dbfe8e"
-  integrity sha512-9/C7BYstNHMvGNIiY7laNBf2dBhlwWnOAYcbKiQBUlzncn61m4q9vq/jthCvd4WG2xEIxL8xoCYIEEdWq5JK2A==
+"@interactjs/auto-start@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/auto-start/-/auto-start-1.9.7.tgz#4afa53c7c869170cb3a01a0019aa30791b3c5d18"
+  integrity sha512-fKn7Yrl6idw7gxbAC0zvcQLSTsUE9WGs71+Y9WVj+ICQMkTO19ci9Y1lCBdo1AP/njLaQp8yPbHoUe5pI7eW6w==
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
 
-"@interactjs/dev-tools@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/dev-tools/-/dev-tools-1.8.4.tgz#8b35adfa494db3c02179abb2e3b8369a8f9f7f96"
-  integrity sha512-s9rb6FGZKPwoVcRzCAh+UBxXMvnuxXMgAjrzCIjN5Qioi7uevcY92AHLyYFaTSi8XnxlknE9uggDetOF+JYtPw==
+"@interactjs/clone@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/clone/-/clone-1.9.7.tgz#fdde8307835cecadd9e29f597ecff890d03167fc"
+  integrity sha512-GNlGh5sKVFYcpOn7Z3HNOLItBdzG3f6t38soUowCmNv4Rd19nmnXkvKKVhfodjfBk26fsdXFI6EZ3iduzYsmAg==
+
+"@interactjs/components@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/components/-/components-1.9.7.tgz#40ec9889fd1e94d07c67001b36dd39d113b3e762"
+  integrity sha512-TdNlJVbKKLy2ZmNtpjhxQkQls1SqXXFSyY4JfAGRG23UOOMrjoG4+56RAe4tlOpHSIIfEER5skvgBSv6UFajHw==
+
+"@interactjs/core@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/core/-/core-1.9.7.tgz#1fdf924c369df23ffe1300af9c945f2651538043"
+  integrity sha512-fN7OfPNU9jgS+hEqe0+OJvJjp/XgNE9lkuCnH57/xtT4nfDca/43BkE57bNoEXhM9Ym5js2Ium+MbUTUVyZ+3A==
+
+"@interactjs/dev-tools@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/dev-tools/-/dev-tools-1.9.7.tgz#91eab3f10806b84b95c313ef5f06408c2d3251cf"
+  integrity sha512-LhLeLZw2joG13j3hUAuhmC9HTsVCnUEggcScgCcpY/SQRA51JCCM9lEcXnwTxTxd02v6A/tueoyUdONm2lniCA==
   dependencies:
-    "@interactjs/utils" "1.8.4"
+    "@interactjs/utils" "1.9.7"
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
 
-"@interactjs/inertia@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/inertia/-/inertia-1.8.4.tgz#887dfcf8f3818cbe313afd5a71648bbb5924d09b"
-  integrity sha512-oF0Zl9i7DsffCowKh0pdmRCYfDc5gWiX2eVAcU20ys+0aRi1em45ReWnrvwrUwPAHoHL85wj5Z6I531h5UNm5w==
+"@interactjs/feedback@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/feedback/-/feedback-1.9.7.tgz#0e3ea3c8e863fdf89d8afee0a1ae5838e9f13d09"
+  integrity sha512-CcgTv2mhCWpH0w6Fq12K6kiV1BSozt8Rdy02yXg927ruKChr7pIQvvZP7TpxfZoBFCN9JJxN3KvQpcfsUQsafQ==
 
-"@interactjs/interact@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/interact/-/interact-1.8.4.tgz#1fe5626cd06bf98f6873a6f492463fdfa8a9aed1"
-  integrity sha512-6oEEi0B9PPl5YEfSFw3KWIYM1ih3uurJzRJfF0Quj49ja1hUhT8qf1ttJopM/RKrG/KQolmzCglbs2HVB3qZog==
-
-"@interactjs/interactjs@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/interactjs/-/interactjs-1.8.4.tgz#4430426996ec92016edb20c8bd7ed534a564ae07"
-  integrity sha512-ZPRJ5vdBHTesLbmrkl1jAjvPlwA5uvcN4n1HnpGkMsXGAe8dzuUcLJfCmWz2dAS0bWWvpRsjQIS9xuPNIVdrXw==
+"@interactjs/inertia@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/inertia/-/inertia-1.9.7.tgz#e8c8ed702bd23d0182a1a0ddbca4be7419826511"
+  integrity sha512-WeVKgztqODjE+fbYuIayJv4cdqwBz4wJ45RC2qYhYWhzsHL0LUbJhEs6sCnV3q+2wZEVMdB8oURh8tnqECBIGg==
   dependencies:
-    "@interactjs/types" "1.8.4"
+    "@interactjs/offset" "1.9.7"
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
 
-"@interactjs/modifiers@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/modifiers/-/modifiers-1.8.4.tgz#3ed65c1e86fdcc9ff3634ca34beff82dfa41bc1d"
-  integrity sha512-YZP+McLdm16u6dPTD5Tu47AX2dn5z52Ac2oefTI572PP/GJwVxQyEDumV+HlnpbRY9LqS6IQHVZhvdZVhosZDg==
-
-"@interactjs/pointer-events@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/pointer-events/-/pointer-events-1.8.4.tgz#3d5734505e4b13363e7cc74888a66f7eec6245ca"
-  integrity sha512-ZSprWv6GRfZqrN4I7Wbc65YxsggL/3ZY4yz2wnRq3BkFiXISI7XosI6CJKbOHel1HHodzK12y/1c/VBwa8XLNg==
-
-"@interactjs/reflow@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/reflow/-/reflow-1.8.4.tgz#1040f66b0363379622a49b5aaf493a7f9e2f85d5"
-  integrity sha512-x4Gdq3w4ITWATQa1fOeKIvBxIKpird+1+HKIYindoz+FFU5uSkd0QGMcGJtvs+pBrZqA2IG8KgGQ0oHBG9GJtg==
-
-"@interactjs/types@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.8.4.tgz#edcd7daddc16ffa4caf4863819510faa14cb6c69"
-  integrity sha512-g9oQQ0DXOF4qiYNDR20TH5sxIJNxQh7T2E0++j5HDS6AzOA2zsMAhHog2cYv7jbDOyKvDryFke1B7hZgzZ555g==
+"@interactjs/interact@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/interact/-/interact-1.9.7.tgz#be988cfb15b13f2cfc0aa68ce826761d49f46e8a"
+  integrity sha512-BocTUB8TfZ3USuN1s7xP+3Uhvb7dnZFNTfr3Ux6Nv2BxKLMz/bIU2fZhYAHw7xApIMKfYyRuUNxSyGM5iyCaEA==
   dependencies:
-    "@interactjs/actions" "1.8.4"
-    "@interactjs/auto-scroll" "1.8.4"
-    "@interactjs/auto-start" "1.8.4"
-    "@interactjs/core" "1.8.4"
-    "@interactjs/dev-tools" "1.8.4"
-    "@interactjs/inertia" "1.8.4"
-    "@interactjs/interact" "1.8.4"
-    "@interactjs/modifiers" "1.8.4"
-    "@interactjs/pointer-events" "1.8.4"
-    "@interactjs/reflow" "1.8.4"
-    "@interactjs/utils" "1.8.4"
+    "@interactjs/core" "1.9.7"
+    "@interactjs/types" "1.9.7"
+    "@interactjs/utils" "1.9.7"
 
-"@interactjs/utils@1.8.4":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@interactjs/utils/-/utils-1.8.4.tgz#ced37e241c5ec71a12c03b9ed0197e7999ab7620"
-  integrity sha512-Kg/da0pQSIvEChGL96fYOSzguDc+2zbz061BWnnskq2viZvPnacFIDC2Z+dEZHH+DBMnnLAt2pqLEulxauSQhA==
+"@interactjs/interactjs@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/interactjs/-/interactjs-1.9.7.tgz#995b6d9b4abd03a84b02c887315768ab2421b35c"
+  integrity sha512-D3wdlwUQRS8t8r7TopYlkjKsONxazrZu8R4DBL+czUrm26Il/0427+uoV92iMgDUZpw5fYLt1dzqzozUL/y6Dw==
+  dependencies:
+    "@interactjs/actions" "1.9.7"
+    "@interactjs/arrange" "1.9.7"
+    "@interactjs/auto-scroll" "1.9.7"
+    "@interactjs/auto-start" "1.9.7"
+    "@interactjs/clone" "1.9.7"
+    "@interactjs/components" "1.9.7"
+    "@interactjs/core" "1.9.7"
+    "@interactjs/dev-tools" "1.9.7"
+    "@interactjs/feedback" "1.9.7"
+    "@interactjs/inertia" "1.9.7"
+    "@interactjs/interact" "1.9.7"
+    "@interactjs/modifiers" "1.9.7"
+    "@interactjs/multi-target" "1.9.7"
+    "@interactjs/offset" "1.9.7"
+    "@interactjs/pointer-events" "1.9.7"
+    "@interactjs/reflow" "1.9.7"
+    "@interactjs/types" "1.9.7"
+    "@interactjs/utils" "1.9.7"
+    "@interactjs/vue" "1.9.7"
+
+"@interactjs/modifiers@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/modifiers/-/modifiers-1.9.7.tgz#dcb37e3782c91d7f8b28008d68ec5ebc26101e7a"
+  integrity sha512-1trdJ6E85DiUn2u0zvqLYt77aoug0VYDg8c1GyzcLm64t8CYw+PggTQKqhy+kJiKb30QsgUuhsR5aQdlotguew==
+  dependencies:
+    "@interactjs/snappers" "1.9.7"
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
+
+"@interactjs/multi-target@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/multi-target/-/multi-target-1.9.7.tgz#bb4de8612f6a649e18d40b93ed5461cde72f79ee"
+  integrity sha512-hqw4sCKYxUZV00u0ikEM66t6zrCP8t3TDgDPrph274LmEUIdfGrCsv7xWLIEdke63h0pt3lO1V5H8N/rMoGs0A==
+
+"@interactjs/offset@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/offset/-/offset-1.9.7.tgz#5a2aec0f25781bd1728c71fe8c16a55edc3f5b8e"
+  integrity sha512-IMCizwVDk2hj8yNNTfLnqdK9GuSlFSS8GxK2ZGUGNSQSPh3b6vrkkIrxwA/qHjDGUUuDP+ZWvlAF4D0/OAc74g==
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
+
+"@interactjs/pointer-events@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/pointer-events/-/pointer-events-1.9.7.tgz#5a0e0daff1c322c6cbff8cbb8052c531d66d1aad"
+  integrity sha512-Vl/+GTVnZlw8DQ7YN7D1oIIZLiqPL/KgdfRrGHSidsLmo/WJNM2TsJJsJcRMY/IiEQrtTvp/fSKG6rNWyzIr5w==
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
+
+"@interactjs/reflow@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/reflow/-/reflow-1.9.7.tgz#77494d83e1a13236ca841adba997faaaf6eb633c"
+  integrity sha512-npuIadX3YBoFFqJbM+LQZgPyw/IYq3HwYM2WNi8Bc/feCy1Ia12uF4Lwi5Rj+8jcA5FyInHzZXBUJCcHO1zaFQ==
+  optionalDependencies:
+    "@interactjs/interact" "1.9.7"
+
+"@interactjs/snappers@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/snappers/-/snappers-1.9.7.tgz#b2f3752ab25c886cd5ae1f4c0478964b9b8b652e"
+  integrity sha512-EfKsgTi8yCtNWRHSU2INfMob5eMUBY8Wrh53tszgh94JstyKwlmzG2mH6eGwdN7pU3//h0AM4ThuqOmbIYUPCw==
+
+"@interactjs/symbol-tree@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/symbol-tree/-/symbol-tree-1.9.7.tgz#2aec371ded47be71cfa359305da959b382de66ff"
+  integrity sha512-zLRpXVtzq/TxG6MwT1FhkBNoFGZlYxNd52RZ6Wy5XyPAsxaZoXqNzDUT6See/xe2X80gzvT78dkT5uKSUE3I2w==
+
+"@interactjs/types@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/types/-/types-1.9.7.tgz#6e7a8bc26d99bd5f324312950b948b936f6d42e0"
+  integrity sha512-Z6fPHp2JjCYg4SJ/DhaIqelY1WA6Oppw87PscOM+28jPc2q5pTUMlFzAY0QQlF43t4PFiCAZVhmBGZzgMfyF0A==
+  dependencies:
+    "@interactjs/actions" "1.9.7"
+    "@interactjs/arrange" "1.9.7"
+    "@interactjs/auto-scroll" "1.9.7"
+    "@interactjs/auto-start" "1.9.7"
+    "@interactjs/core" "1.9.7"
+    "@interactjs/dev-tools" "1.9.7"
+    "@interactjs/inertia" "1.9.7"
+    "@interactjs/modifiers" "1.9.7"
+    "@interactjs/pointer-events" "1.9.7"
+    "@interactjs/reflow" "1.9.7"
+    "@interactjs/snappers" "1.9.7"
+    "@interactjs/symbol-tree" "1.9.7"
+    "@interactjs/utils" "1.9.7"
+
+"@interactjs/utils@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/utils/-/utils-1.9.7.tgz#390f574c5b8adbf9cc527affb686d9233d241eec"
+  integrity sha512-7/j0UmeuBHi20FHlqKN9KbndulLEuTiPIPID5nEw+1F/jMKucn3uPIXfruSkbcGswltqTCR0QHhICMLXhFRVhw==
+
+"@interactjs/vue@1.9.7":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@interactjs/vue/-/vue-1.9.7.tgz#9942407a144b4cd9d1f264ccaaf43d75f5a00a60"
+  integrity sha512-Y1mjCB5tGxsaUkfYP/i1dIoBRnxkDpvZtmfKp38u1SRt3QCfNznKf4252QC7RBTSgIL/Cohi8c/oAq++ZpkTSQ==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.0.0"
@@ -7815,7 +7906,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   dependencies:
     "@babel/preset-env" "7.9.0"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../../.cache/yarn/v6/npm-graylog-web-plugin-3.3.0-SNAPSHOT-6d78d854-c589-4b3e-bbc4-c78255dcc92d-1585843125932/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     html-webpack-plugin "^3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"
@@ -8429,12 +8520,12 @@ inquirer@^7.0.0:
     through "^2.3.6"
 
 interactjs@^1.4.0-rc.13:
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/interactjs/-/interactjs-1.8.4.tgz#d52d63944c4299ebba99aa9720dd67fd7c31a9e3"
-  integrity sha512-otuS3ujYXBEhwRPamNgky/j8FE8CkHQZ9m6/yETIxZKRHcOtlEeCA/tq5AH5ibB3lRLszFOMzQ9ieoA6PBMORA==
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/interactjs/-/interactjs-1.9.7.tgz#ebcbc3cab9c63f4cd66aa650a5918bcc2aaeeead"
+  integrity sha512-X8Y4iSeFdy8bnFkbrDJ5C/HwGKCgLUHhOdfvxLsx/f1YlYZ23qBA4aYoB74Qw0CG/mMenYiOFLxbDIaly8hhzQ==
   dependencies:
-    "@interactjs/interactjs" "1.8.4"
-    "@interactjs/types" "1.8.4"
+    "@interactjs/interactjs" "1.9.7"
+    "@interactjs/types" "1.9.7"
 
 internal-ip@^4.3.0:
   version "4.3.0"
