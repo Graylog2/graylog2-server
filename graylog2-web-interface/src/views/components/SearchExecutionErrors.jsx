@@ -12,22 +12,28 @@ import AppContentGrid from 'components/layout/AppContentGrid';
 type CommonErrorType = {
   error: {
     additional: {
-      body: { message: string, streams: string[]}
+      body: { message: string, streams: string[], type: string}
     }
   }
 }
 
-const CommonError = ({ error: { additional: { body: { message, streams } } } }: CommonErrorType) => (
+const CommonError = ({ error: { additional: { body: { message, streams, type } } } }: CommonErrorType) => (
   <Alert bsStyle="danger" role="alert">
     <p>
       <b><Icon name="info-circle" /> {message}</b>
     </p>
-    {streams && streams.length > 0 && (
+    {type === 'MissingStreamPermission' && (
       <p>
-        Please get in contact with a graylog administrator and provide the ids of streams you need permissions to:<br />
-        {streams.join(', ')}<br />
+        Please get in contact with a graylog administrator.
+        {streams && streams.length > 0 && (
+          <>
+            {' '}You need permission to streams with the id:<br />
+            {streams.join(', ')}
+          </>
+        )}
       </p>
     )}
+
   </Alert>
 );
 
