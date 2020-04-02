@@ -87,6 +87,7 @@ const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, vie
   }));
 
 type Props = {
+  errors: Object[],
   route: any,
   searchRefreshHooks: Array<SearchRefreshCondition>,
   router: {
@@ -131,10 +132,9 @@ const useStyle = () => {
   }, []);
 };
 
-const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks }: Props) => {
+const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks, errors }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
-  const [errors, setErrors] = useState([]);
   const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
 
   useEffect(() => {
@@ -156,7 +156,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
         .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
       return null;
-    }).catch((error) => setErrors([error]));
+    });
 
     // Returning cleanup function used when unmounting
     return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
@@ -223,10 +223,12 @@ ExtendedSearchPage.propTypes = {
     query: PropTypes.object.isRequired,
   }),
   router: PropTypes.object,
+  errors: PropTypes.arrayOf(PropTypes.object),
   searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
 };
 
 ExtendedSearchPage.defaultProps = {
+  errors: undefined,
   location: { query: {} },
   router: {
     getCurrentLocation: () => ({ pathname: '', search: '' }),
@@ -240,8 +242,14 @@ ExtendedSearchPage.defaultProps = {
   },
 };
 
+const ExtendedSearchPageWithStores = connect(ExtendedSearchPage, {
+  searches: SearchStore,
+}, ({ searches: { errors } }) => ({
+  errors,
+}));
+
 const mapping = {
   searchRefreshHooks: 'views.hooks.searchRefresh',
 };
 
-export default withPluginEntities<$Rest<Props, {| router: any |}>, typeof mapping>(withRouter(ExtendedSearchPage), mapping);
+export default withPluginEntities<$Rest<Props, {| router: any |}>, typeof mapping>(withRouter(ExtendedSearchPageWithStores), mapping);

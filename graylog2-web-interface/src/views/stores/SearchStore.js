@@ -39,6 +39,7 @@ export { SearchActions };
 export type SearchStoreState = {
   search: Search,
   result: SearchResult,
+  errors: any[],
   widgetMapping: WidgetMapping,
 };
 
@@ -168,8 +169,9 @@ export const SearchStore = singletonStore(
             this.executePromise = undefined;
             return { result, widgetMapping };
           }, (error) => {
+            this.errors = [error];
+            this._trigger();
             displayError(error);
-            throw error;
           });
         startActionPromise(this.executePromise);
         return this.executePromise;
@@ -178,7 +180,7 @@ export const SearchStore = singletonStore(
     },
 
     _state(): SearchStoreState {
-      return { search: this.search, result: this.result, widgetMapping: this.widgetMapping };
+      return { search: this.search, result: this.result, widgetMapping: this.widgetMapping, errors: this.errors };
     },
 
     _trigger() {
