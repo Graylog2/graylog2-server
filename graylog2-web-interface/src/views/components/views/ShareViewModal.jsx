@@ -146,6 +146,7 @@ class ShareViewModal extends React.Component<Props, State> {
                   isDisabled={type !== SpecificRoles.Type}
                   value={rolesValue}
                   placeholder="Select roles"
+                  stripDiacritics
                   onChange={this._onRolesChange}
                   options={rolesOptions} />
           <HelpBlock>Only users with these roles can access the dashboard.</HelpBlock>
@@ -159,6 +160,7 @@ class ShareViewModal extends React.Component<Props, State> {
                   isDisabled={type !== SpecificUsers.Type}
                   value={userValue}
                   placeholder="Select users"
+                  stripDiacritics
                   onChange={this._onUsersChange}
                   options={userOptions || []} />
           <HelpBlock>Only these users can access the dashboard.</HelpBlock>
