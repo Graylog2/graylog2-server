@@ -37,7 +37,7 @@ export default class PivotConfiguration extends React.Component {
     onClose(this.state);
   };
 
-  _onChange = (config) => this.setState({ config });
+  _onChange = config => this.setState({ config });
 
   render() {
     const { type } = this.props;
