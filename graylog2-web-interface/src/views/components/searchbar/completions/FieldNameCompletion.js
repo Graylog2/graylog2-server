@@ -53,14 +53,14 @@ class FieldNameCompletion implements Completer {
 
   constructor(staticSuggestions: Array<Suggestion> = [existsOperator]) {
     this.staticSuggestions = staticSuggestions;
-    this._newFields(FieldTypesStore.getInitialState());
-    FieldTypesStore.listen((newState) => this._newFields(newState));
-
     this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
     ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
+
+    this._newFields(FieldTypesStore.getInitialState());
+    FieldTypesStore.listen((newState) => this._newFields(newState));
   }
 
-  _newFields = (fields) => {
+  _newFields = (fields: FieldTypesStoreState) => {
     this.fields = fields;
     const { queryFields } = this.fields;
     if (this.activeQuery) {
