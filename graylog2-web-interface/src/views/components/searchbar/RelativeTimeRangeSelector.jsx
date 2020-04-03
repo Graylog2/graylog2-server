@@ -1,9 +1,8 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { Field, useFormikContext } from 'formik';
+import { Field } from 'formik';
 
 import Input from 'components/bootstrap/Input';
 import type { SearchesConfig } from 'components/search/SearchConfig';
@@ -55,7 +54,7 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
                  value={value}
                  className="relative"
                  name={name}
-                 onChange={e => { onChange(e); handleSubmit(); }}>
+                 onChange={(e) => { onChange(e); handleSubmit(); }}>
             {options}
           </Input>
         </div>

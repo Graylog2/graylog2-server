@@ -38,7 +38,7 @@ type Props = {
 export default function TimeRangeTypeSelector({ disabled }: Props) {
   const [{ value, onChange, name }] = useField('timerange');
   const { type } = value;
-  const onSelect = useCallback(newType => onChange({
+  const onSelect = useCallback((newType) => onChange({
     target: {
       value: migrateTimeRangeToNewType(value, newType),
       name,

@@ -89,7 +89,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
-  const _onSubmit = useCallback(values => onSubmit(values, widget), [widget]);
+  const _onSubmit = useCallback((values) => onSubmit(values, widget), [widget]);
   return (
     <>
       {isGloballyOverridden && <ResetOverrideHint />}
@@ -110,7 +110,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                       <StreamsFilter value={value}
                                      disabled={isGloballyOverridden}
                                      streams={availableStreams}
-                                     onChange={newStreams => onChange({ target: { value: newStreams, name } })} />
+                                     onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
                     )}
                   </Field>
                 </Col>
@@ -130,7 +130,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                       <QueryInput value={value}
                                   disabled={isGloballyOverridden}
                                   placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                  onChange={newQuery => onChange({ target: { value: newQuery, name } })}
+                                  onChange={(newQuery) => onChange({ target: { value: newQuery, name } })}
                                   onExecute={handleSubmit} />
                     )}
                   </Field>

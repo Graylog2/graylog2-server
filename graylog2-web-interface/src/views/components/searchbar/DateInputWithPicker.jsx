@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback } from 'react';
-import PropTypes from 'prop-types';
 
 import { DatePicker, Icon } from 'components/common';
 import { Button } from 'components/graylog';
@@ -25,8 +24,8 @@ type Props = {
   title: string,
 };
 const DateInputWithPicker = ({ disabled, error, value, onBlur, onChange, name, title }: Props) => {
-  const _onChange = useCallback(newValue => onChange({ target: { name, value: newValue } }), [onChange]);
-  const onDatePicked = useCallback(date => _onChange(_onDateSelected(date)), [_onChange]);
+  const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [onChange]);
+  const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date)), [_onChange]);
   const onSetTimeToNow = useCallback(() => _onChange(_setDateTimeToNow()), [_onChange]);
   return (
     <DatePicker disabled={disabled}

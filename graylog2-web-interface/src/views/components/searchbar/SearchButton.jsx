@@ -8,7 +8,8 @@ import { Spinner, Icon } from 'components/common';
 
 const DirtyButton = styled(Button)`
   position: relative;
-  &:after {
+
+  ::after {
     position: absolute;
     content: '';
     height: 16px;

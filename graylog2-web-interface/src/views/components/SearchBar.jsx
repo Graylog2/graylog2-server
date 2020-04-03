@@ -33,7 +33,6 @@ type Props = {
   config: any,
   currentQuery: Query,
   disableSearch: boolean,
-  onExecute: () => void,
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
@@ -126,7 +125,6 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 SearchBar.propTypes = {
   config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
-  onExecute: PropTypes.func.isRequired,
 };
 
 SearchBar.defaultProps = {
