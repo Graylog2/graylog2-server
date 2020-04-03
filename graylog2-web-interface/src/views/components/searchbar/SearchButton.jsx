@@ -2,11 +2,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Spinner, Icon } from 'components/common';
+import type { ThemeInterface } from 'theme/index';
 
-const DirtyButton = styled(Button)`
+const DirtyButton: StyledComponent<{}, ThemeInterface, any> = styled(Button)`
   position: relative;
 
   ::after {
