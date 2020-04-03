@@ -31,7 +31,7 @@ const DashboardsActions: DashboardsActionsType = singletonActions(
   }),
 );
 
-const dashboardsUrl = URLUtils.qualifyUrl('/views/dashboards');
+const dashboardsUrl = URLUtils.qualifyUrl('/dashboards');
 
 const DashboardsStore = singletonStore(
   'views.Dashboards',
