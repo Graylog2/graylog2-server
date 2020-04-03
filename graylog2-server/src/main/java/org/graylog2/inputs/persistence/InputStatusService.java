@@ -26,7 +26,7 @@ import java.util.Optional;
 public class InputStatusService {
     private static final Logger LOG = LoggerFactory.getLogger(InputStatusService.class);
 
-    private static final String COLLECTION_NAME = "input_status";
+    public static final String COLLECTION_NAME = "input_status";
 
     private final JacksonDBCollection<InputStatusRecord, ObjectId> statusCollection;
 
