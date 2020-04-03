@@ -40,6 +40,8 @@ exports[`BarVisualizationConfiguration should render with props 1`] = `
   </HoverForHelp>
   <Select
     components={Object {}}
+    ignoreAccents={false}
+    ignoreCase={true}
     onChange={[Function]}
     options={
       Array [
@@ -81,6 +83,7 @@ exports[`BarVisualizationConfiguration should render with props 1`] = `
       defaultInputValue=""
       defaultMenuIsOpen={false}
       defaultValue={null}
+      filterOption={[Function]}
       onChange={[Function]}
       options={
         Array [
@@ -1519,6 +1522,8 @@ exports[`BarVisualizationConfiguration should render without props 1`] = `
   </HoverForHelp>
   <Select
     components={Object {}}
+    ignoreAccents={false}
+    ignoreCase={true}
     onChange={[Function]}
     options={
       Array [
@@ -1560,6 +1565,7 @@ exports[`BarVisualizationConfiguration should render without props 1`] = `
       defaultInputValue=""
       defaultMenuIsOpen={false}
       defaultValue={null}
+      filterOption={[Function]}
       onChange={[Function]}
       options={
         Array [
