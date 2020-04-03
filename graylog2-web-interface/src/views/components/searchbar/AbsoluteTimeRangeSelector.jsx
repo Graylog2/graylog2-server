@@ -14,7 +14,9 @@ type Props = {
 };
 
 const _isValidDateString = (dateString: string) => {
-  console.log('Validating field: ', dateString);
+  if (!dateString) {
+    return undefined;
+  }
   return (DateTime.isValidDateString(dateString)
     ? undefined
     : `Invalid date: ${dateString}`);

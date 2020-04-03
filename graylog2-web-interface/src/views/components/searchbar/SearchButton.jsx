@@ -29,10 +29,12 @@ type Props = {
 
 const SearchButton = ({ running, disabled, glyph, dirty }: Props) => {
   const ButtonComponent = dirty ? DirtyButton : Button;
+  const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform search';
   return (
     <ButtonComponent type="submit"
                      bsStyle={running ? 'warning' : 'success'}
                      disabled={disabled}
+                     title={title}
                      className="pull-left search-button-execute">
       {running ? <Spinner fixedWidth pulse text="" /> : <Icon name={glyph} />}
     </ButtonComponent>

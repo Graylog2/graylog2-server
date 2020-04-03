@@ -57,7 +57,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  const _onSubmit = useCallback(values => onSubmit(values, currentQuery), [query]);
+  const _onSubmit = useCallback((values) => onSubmit(values, currentQuery), [query]);
 
   return (
     <ScrollToHint value={query.query_string}>
@@ -82,7 +82,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                       {({ field: { name, value, onChange } }) => (
                         <StreamsFilter value={value}
                                        streams={availableStreams}
-                                       onChange={newStreams => onChange({ target: { value: newStreams, name } })} />
+                                       onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
                       )}
                     </Field>
                   </Col>

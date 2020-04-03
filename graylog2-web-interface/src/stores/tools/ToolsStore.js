@@ -7,7 +7,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
 const ToolsStore = Reflux.createStore({
-  testNaturalDate(text: string): Promise<string[]> {
+  testNaturalDate(text: string, handleError = true): Promise<string[]> {
     const { url } = ApiRoutes.ToolsApiController.naturalDateTest(text);
     const promise = fetch('GET', qualifyUrl(url));
 

@@ -38,7 +38,9 @@ type Props = {
 };
 
 const _validateKeyword = (keyword: string, _setSuccessfullPreview, _setFailedPreview) => {
-  console.log('Validating keyword');
+  if (!keyword) {
+    return undefined;
+  }
   return trim(keyword) === ''
     ? Promise.resolve('Keyword must not be empty!')
     : ToolsStore.testNaturalDate(keyword)
@@ -47,7 +49,10 @@ const _validateKeyword = (keyword: string, _setSuccessfullPreview, _setFailedPre
 
 const KeywordTimeRangeSelector = ({ disabled }: Props) => {
   const [keywordPreview, setKeywordPreview] = useState(Immutable.Map());
-  const _setSuccessfullPreview = useCallback((response: { from: string, to: string }) => setKeywordPreview(_parseKeywordPreview(response)), [setKeywordPreview]);
+  const _setSuccessfullPreview = useCallback(
+    (response: { from: string, to: string }) => setKeywordPreview(_parseKeywordPreview(response)),
+    [setKeywordPreview],
+  );
   const _setFailedPreview = useCallback(() => {
     setKeywordPreview(Immutable.Map());
     return 'Unable to parse keyword.';
@@ -61,13 +66,13 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
       .then(_setSuccessfullPreview)
       .catch(_setFailedPreview);
 
-    return () => {
-      console.log('Unmounting keyword');
-      formik.unregisterField('timerange.keyword');
-    };
+    return () => formik.unregisterField('timerange.keyword');
   }, []);
 
-  const _validate = useCallback(newKeyword => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview), [_setSuccessfullPreview, _setFailedPreview]);
+  const _validate = useCallback(
+    (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
+    [_setSuccessfullPreview, _setFailedPreview],
+  );
 
   const { from, to } = keywordPreview.toObject();
   const keywordPreviewElement = !keywordPreview.isEmpty() && (
