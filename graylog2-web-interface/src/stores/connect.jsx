@@ -66,6 +66,7 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
 ): React.ComponentType<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
   class ConnectStoresWrapper extends React.Component<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
+    // eslint-disable-next-line react/state-in-constructor
     state: ResultType<Stores>;
 
     unsubscribes: Array<() => void>;
