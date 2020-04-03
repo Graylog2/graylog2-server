@@ -54,12 +54,15 @@ const Additional = ({ children }: { children: React.Node }) => <div style={{ pad
 const extractValue = ({ value }) => value;
 
 class ShareViewModal extends React.Component<Props, State> {
-  state = {
-    viewSharing: null,
-    loaded: false,
-    users: undefined,
-    roles: undefined,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      viewSharing: null,
+      loaded: false,
+      users: undefined,
+      roles: undefined,
+    };
+  }
 
   componentDidMount() {
     const { view, currentUser } = this.props;
