@@ -26,22 +26,22 @@ const _changeUnit = (unit: string, interval: TimeUnitInterval, onChange: OnChang
 };
 
 const TimeUnitTimeHistogramPivot = ({ interval, onChange }: Props) => (
-  <React.Fragment>
+  <>
     <InputGroup className={styles.useFullWidth}>
       <FormControl type="number"
                    value={interval.value}
                    step="1"
                    min="1"
-                   onChange={e => _changeValue(e, interval, onChange)} />
+                   onChange={(e) => _changeValue(e, interval, onChange)} />
       <DropdownButton componentClass={InputGroup.Button}
                       id="input-dropdown-addon"
                       title={TimeUnits[interval.unit] || ''}
-                      onChange={newUnit => _changeUnit(newUnit, interval, onChange)}>
-        {Object.keys(TimeUnits).map(unit => <MenuItem key={unit} onSelect={() => _changeUnit(unit, interval, onChange)}>{TimeUnits[unit]}</MenuItem>)}
+                      onChange={(newUnit) => _changeUnit(newUnit, interval, onChange)}>
+        {Object.keys(TimeUnits).map((unit) => <MenuItem key={unit} onSelect={() => _changeUnit(unit, interval, onChange)}>{TimeUnits[unit]}</MenuItem>)}
       </DropdownButton>
     </InputGroup>
     <HelpBlock>The size of the buckets for this timestamp type.</HelpBlock>
-  </React.Fragment>
+  </>
 );
 
 export default TimeUnitTimeHistogramPivot;

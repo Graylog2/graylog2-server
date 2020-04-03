@@ -15,8 +15,8 @@ import type { Decorator } from './widgets/MessagesWidgetConfig';
 
 const widgetsKey = 'enterpriseWidgets';
 
-const _findWidgetDefinition = type => PluginStore.exports(widgetsKey)
-  .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
+const _findWidgetDefinition = (type) => PluginStore.exports(widgetsKey)
+  .find((widget) => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
 
 export function widgetDefinition(type: string) {
   const typeDefinition = _findWidgetDefinition(type);

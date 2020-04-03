@@ -95,7 +95,7 @@ const RawMessageLoader = createReactClass({
     }
 
     return codecTypesIds
-      .filter(id => id !== 'random-http-msg') // Skip Random HTTP codec, as nobody wants to enter a raw random message.
+      .filter((id) => id !== 'random-http-msg') // Skip Random HTTP codec, as nobody wants to enter a raw random message.
       .map((id) => {
         const { name } = this.state.codecTypes[id];
         // Add id as label on codecs not having a descriptor name
@@ -195,7 +195,7 @@ const RawMessageLoader = createReactClass({
       const codecConfiguration = this.state.codecTypes[this.state.codec].requested_configuration;
       codecConfigurationOptions = Object.keys(codecConfiguration)
         .sort((keyA, keyB) => codecConfiguration[keyA].is_optional - codecConfiguration[keyB].is_optional)
-        .map(key => this._formatConfigField(key, codecConfiguration[key]));
+        .map((key) => this._formatConfigField(key, codecConfiguration[key]));
     }
 
     let inputIdSelector;

@@ -99,7 +99,7 @@ class TableList extends React.Component {
   }
 
   _recalculateSelection = (selected, nextFilteredItems) => {
-    const nextFilteredIds = Immutable.Set(nextFilteredItems.map(item => item[this.props.idKey]));
+    const nextFilteredIds = Immutable.Set(nextFilteredItems.map((item) => item[this.props.idKey]));
     return selected.intersect(nextFilteredIds);
   };
 
@@ -140,8 +140,7 @@ class TableList extends React.Component {
         <div className={style.headerComponentsWrapper}>
           {this.props.bulkActionsFactory(selected)}
         </div>
-        )
-        }
+        )}
         <Input ref={(c) => { this.selectAllInput = c; }}
                id="select-all-checkbox"
                type="checkbox"
@@ -155,7 +154,7 @@ class TableList extends React.Component {
   };
 
   _toggleSelectAll = (event) => {
-    const newSelected = event.target.checked ? Immutable.Set(this.state.filteredItems.map(item => item[this.props.idKey])) : Immutable.Set();
+    const newSelected = event.target.checked ? Immutable.Set(this.state.filteredItems.map((item) => item[this.props.idKey])) : Immutable.Set();
     this.setState({ selected: newSelected });
   };
 
@@ -226,7 +225,7 @@ class TableList extends React.Component {
         <ControlledTableList.Item>No items match your filter criteria</ControlledTableList.Item>
       );
     } else {
-      formattedItems = this.state.filteredItems.map(item => this._formatItem(item)).toJS();
+      formattedItems = this.state.filteredItems.map((item) => this._formatItem(item)).toJS();
     }
 
     return (

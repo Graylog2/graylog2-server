@@ -29,7 +29,7 @@ class StreamAlertNotifications extends React.Component {
   _loadData = () => {
     AlertNotificationsActions.available();
     AlarmCallbacksActions.list(this.props.stream.id)
-      .then(callbacks => this.setState({ conditionNotifications: callbacks }));
+      .then((callbacks) => this.setState({ conditionNotifications: callbacks }));
   };
 
   _isLoading = () => {

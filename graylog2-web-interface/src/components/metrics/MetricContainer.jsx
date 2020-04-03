@@ -74,7 +74,7 @@ class MetricContainer extends React.Component<Props> {
       return (<span>Loading...</span>);
     }
     let throughput = Object.keys(metrics)
-      .map(nodeId => MetricsExtractor.getValuesForNode(metrics[nodeId], { throughput: fullName }))
+      .map((nodeId) => MetricsExtractor.getValuesForNode(metrics[nodeId], { throughput: fullName }))
       .reduce((accumulator: { throughput?: number }, currentMetric: { throughput: ?number }): { throughput?: number } => {
         return { throughput: (accumulator.throughput || 0) + (currentMetric.throughput || 0) };
       }, {});

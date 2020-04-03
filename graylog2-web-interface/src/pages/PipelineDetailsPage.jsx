@@ -26,14 +26,14 @@ const HIDDEN_STREAMS = [
 ];
 
 function filterPipeline(state) {
-  return state.pipelines ? state.pipelines.filter(p => p.id === this.props.params.pipelineId)[0] : undefined;
+  return state.pipelines ? state.pipelines.filter((p) => p.id === this.props.params.pipelineId)[0] : undefined;
 }
 
 function filterConnections(state) {
   if (!state.connections) {
     return undefined;
   }
-  return state.connections.filter(c => c.pipeline_ids && c.pipeline_ids.includes(this.props.params.pipelineId));
+  return state.connections.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(this.props.params.pipelineId));
 }
 
 const PipelineDetailsPage = createReactClass({
@@ -54,7 +54,7 @@ const PipelineDetailsPage = createReactClass({
     PipelineConnectionsActions.list();
 
     StreamsStore.listStreams().then((streams) => {
-      const filteredStreams = streams.filter(s => !HIDDEN_STREAMS.includes(s.id));
+      const filteredStreams = streams.filter((s) => !HIDDEN_STREAMS.includes(s.id));
       this.setState({ streams: filteredStreams });
     });
   },
@@ -92,7 +92,7 @@ const PipelineDetailsPage = createReactClass({
       promise = PipelinesActions.save(requestPipeline);
     }
 
-    promise.then(p => callback(p));
+    promise.then((p) => callback(p));
   },
 
   _isNewPipeline(pipelineId) {

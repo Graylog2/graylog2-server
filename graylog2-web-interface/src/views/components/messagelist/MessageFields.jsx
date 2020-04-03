@@ -21,7 +21,7 @@ const MessageFields = ({ message, fields }: Props) => {
   const renderedFields = Object.keys(formattedFields)
     .sort()
     .map((key) => {
-      const { type } = fields.find(t => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
+      const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
       return (
         <CustomHighlighting key={key}
                             field={key}

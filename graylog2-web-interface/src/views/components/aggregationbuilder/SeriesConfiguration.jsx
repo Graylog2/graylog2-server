@@ -39,13 +39,13 @@ export default class SeriesConfiguration extends React.Component {
     }
   };
 
-  _changeName = e => this.setState({ name: e.target.value });
+  _changeName = (e) => this.setState({ name: e.target.value });
 
   render() {
     const { name } = this.state;
     const { usedNames = [] } = this.props;
     const isValid = !usedNames.includes(trim(name));
-    const validationHint = isValid ? null : <React.Fragment> <strong>Name must be unique.</strong></React.Fragment>;
+    const validationHint = isValid ? null : <> <strong>Name must be unique.</strong></>;
     return (
       <span>
         <FormGroup validationState={isValid ? null : 'error'}>

@@ -245,7 +245,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             handlers.put("codec-aggregator", () -> new ByteBufMessageAggregationHandler(aggregator, localRegistry));
         }
         handlers.put("rawmessage-handler", () -> new RawMessageHandler(input));
-        handlers.put("exception-logger", () -> new ExceptionLoggingChannelHandler(input, LOG));
+        handlers.put("exception-logger", () -> new ExceptionLoggingChannelHandler(input, LOG, this.tcpKeepalive));
 
         return handlers;
     }

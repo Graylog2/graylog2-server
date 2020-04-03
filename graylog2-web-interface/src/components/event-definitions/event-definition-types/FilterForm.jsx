@@ -40,7 +40,7 @@ class FilterForm extends React.Component {
       const { streams } = this.props;
 
       return streamIds
-        .map(streamId => streams.find(s => s.id === streamId) || streamId)
+        .map((streamId) => streams.find((s) => s.id === streamId) || streamId)
         .map((streamOrId) => {
           const stream = (typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId });
           return {
@@ -50,7 +50,7 @@ class FilterForm extends React.Component {
         })
         .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
     },
-    streamIds => streamIds.join('-'),
+    (streamIds) => streamIds.join('-'),
   );
 
   _parseQuery = lodash.debounce((queryString) => {
@@ -143,7 +143,7 @@ class FilterForm extends React.Component {
     const { queryParameterStash } = this.state;
     const newParameters = [];
     paramsInQuery.forEach((np) => {
-      if (!keptParameters.find(p => p.name === np)) {
+      if (!keptParameters.find((p) => p.name === np)) {
         if (queryParameterStash[np]) {
           newParameters.push(queryParameterStash[np]);
         } else {
@@ -213,7 +213,7 @@ class FilterForm extends React.Component {
     if (lodash.isEmpty(parameterButtons)) {
       return null;
     }
-    const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter(param => (param.embryonic)));
+    const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter((param) => (param.embryonic)));
     return (
       <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
         <ControlLabel>Query Parameters</ControlLabel>
@@ -226,8 +226,7 @@ class FilterForm extends React.Component {
           <HelpBlock>
             {validation.errors.query_parameters
               ? lodash.get(validation, 'errors.query_parameters[0]')
-              : 'Please declare missing query parameters by clicking on the buttons above.'
-            }
+              : 'Please declare missing query parameters by clicking on the buttons above.'}
           </HelpBlock>
         )}
       </FormGroup>
@@ -239,7 +238,7 @@ class FilterForm extends React.Component {
     const { searchWithinMsDuration, searchWithinMsUnit, executeEveryMsDuration, executeEveryMsUnit } = this.state;
 
     // Ensure deleted streams are still displayed in select
-    const allStreamIds = lodash.union(streams.map(s => s.id), lodash.defaultTo(eventDefinition.config.streams, []));
+    const allStreamIds = lodash.union(streams.map((s) => s.id), lodash.defaultTo(eventDefinition.config.streams, []));
     const formattedStreams = this.formatStreamIds(allStreamIds);
 
     return (
@@ -265,7 +264,7 @@ class FilterForm extends React.Component {
           <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>
           <MultiSelect id="filter-streams"
                        matchProp="label"
-                       onChange={selected => this.handleStreamsChange(selected === '' ? [] : selected.split(','))}
+                       onChange={(selected) => this.handleStreamsChange(selected === '' ? [] : selected.split(','))}
                        options={formattedStreams}
                        value={lodash.defaultTo(eventDefinition.config.streams, []).join(',')} />
           <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>

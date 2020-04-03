@@ -17,11 +17,11 @@ import PivotConfiguration from './PivotConfiguration';
 import CustomPropTypes from '../CustomPropTypes';
 
 const _onChange = (fields, newValue, onChange, fieldTypes) => {
-  const newFields = newValue.map(v => v.value);
+  const newFields = newValue.map((v) => v.value);
 
   return onChange(newFields.map((field) => {
-    const existingField = fields.find(f => f.field === field);
-    const mapping = fieldTypes.find(fieldType => fieldType.name === field) || new FieldTypeMapping(field, FieldType.Unknown);
+    const existingField = fields.find((f) => f.field === field);
+    const mapping = fieldTypes.find((fieldType) => fieldType.name === field) || new FieldTypeMapping(field, FieldType.Unknown);
     return existingField || pivotForField(field, mapping.type);
   }));
 };
@@ -43,7 +43,7 @@ const PivotSelect = ({ onChange, fields, value, ...props }) => {
   const ValueComponent = ({ children, innerProps, ...rest }) => {
     const element = rest.data;
     const fieldTypes = fields && fields.all
-      ? fields.all.filter(v => v.name === element.label)
+      ? fields.all.filter((v) => v.name === element.label)
       : Immutable.List();
     const fieldType = fieldTypes.isEmpty() ? FieldType.Unknown : fieldTypes.first().type;
     // eslint-disable-next-line react/prop-types
@@ -52,7 +52,7 @@ const PivotSelect = ({ onChange, fields, value, ...props }) => {
       <span className={className}>
         <ConfigurableElement {...rest}
                              configuration={({ onClose }) => <PivotConfiguration type={fieldType} config={configFor(element, value)} onClose={onClose} />}
-                             onChange={newPivotConfig => newPivotConfigChange(value, element, newPivotConfig, onChange)}
+                             onChange={(newPivotConfig) => newPivotConfigChange(value, element, newPivotConfig, onChange)}
                              title="Pivot Configuration">
           {children}
         </ConfigurableElement>
@@ -60,7 +60,7 @@ const PivotSelect = ({ onChange, fields, value, ...props }) => {
     );
   };
 
-  return <SortableSelect {...props} onChange={newValue => _onChange(value, newValue, onChange, fields.all)} value={value} valueComponent={ValueComponent} />;
+  return <SortableSelect {...props} onChange={(newValue) => _onChange(value, newValue, onChange, fields.all)} value={value} valueComponent={ValueComponent} />;
 };
 
 PivotSelect.propTypes = {

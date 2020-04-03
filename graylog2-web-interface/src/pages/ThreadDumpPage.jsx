@@ -28,7 +28,7 @@ const ThreadDumpPage = createReactClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
 
   componentDidMount() {
-    ClusterOverviewStore.threadDump(this.props.params.nodeId).then(threadDump => this.setState({ threadDump: threadDump }));
+    ClusterOverviewStore.threadDump(this.props.params.nodeId).then((threadDump) => this.setState({ threadDump: threadDump }));
   },
 
   _isLoading() {

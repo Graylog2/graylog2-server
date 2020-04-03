@@ -4,7 +4,7 @@ import AppConfig from '../../util/AppConfig';
 
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 const containsLink = (wrapper, title, length = 1) => expect(findLink(wrapper, title)).toHaveLength(length);
-const containsAllLinks = (wrapper, titles) => titles.forEach(title => containsLink(wrapper, title));
+const containsAllLinks = (wrapper, titles) => titles.forEach((title) => containsLink(wrapper, title));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -23,7 +23,7 @@ describe('SystemMenu', () => {
     };
     jest.doMock('injection/StoreProvider', () => ({ getStore: () => CurrentUserStore }));
     exports = {};
-    const PluginStore = { exports: jest.fn(key => exports[key] || []) };
+    const PluginStore = { exports: jest.fn((key) => exports[key] || []) };
     jest.doMock('graylog-web-plugin/plugin', () => ({ PluginStore }));
     AppConfig.gl2AppPathPrefix = jest.fn(() => '');
   });

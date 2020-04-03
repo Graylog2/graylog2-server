@@ -6,7 +6,7 @@ const loadSUT = () => require('./OnSaveAsViewAction');
 const mockActions = () => {
   const ViewActions = { load: jest.fn(() => Promise.resolve({ view: { id: 'deadbeef' } })).mockName('load') };
   const ViewManagementActions = {
-    create: jest.fn(v => Promise.resolve(v)).mockName('create'),
+    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
   };
   jest.doMock('views/stores/ViewManagementStore', () => ({ ViewManagementActions }));
   jest.doMock('views/stores/ViewStore', () => ({ ViewActions }));

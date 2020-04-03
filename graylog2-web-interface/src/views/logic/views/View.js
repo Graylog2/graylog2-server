@@ -125,7 +125,7 @@ export default class View {
   }
 
   get widgetMapping(): WidgetMapping {
-    return (this.state || Immutable.Map()).valueSeq().map(s => s.widgetMapping).reduce((prev, cur) => Immutable.fromJS(prev).merge(Immutable.fromJS(cur)));
+    return (this.state || Immutable.Map()).valueSeq().map((s) => s.widgetMapping).reduce((prev, cur) => Immutable.fromJS(prev).merge(Immutable.fromJS(cur)));
   }
 
   get owner(): string {

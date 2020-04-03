@@ -27,7 +27,7 @@ const CollectorsAdministrationFilters = createReactClass({
 
   getCollectorsFilter() {
     const { collectors, filters } = this.props;
-    const collectorMapper = collector => `${collector.id};${collector.name}`;
+    const collectorMapper = (collector) => `${collector.id};${collector.name}`;
 
     const collectorItems = collectors
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
@@ -47,7 +47,7 @@ const CollectorsAdministrationFilters = createReactClass({
 
     let collectorFilter;
     if (filters.collector) {
-      const collector = collectors.find(c => c.id === filters.collector);
+      const collector = collectors.find((c) => c.id === filters.collector);
       collectorFilter = collector ? collectorMapper(collector) : undefined;
     }
 
@@ -66,7 +66,7 @@ const CollectorsAdministrationFilters = createReactClass({
   getConfigurationFilter() {
     const { configurations, filters } = this.props;
 
-    const configurationMapper = configuration => `${configuration.id};${configuration.name}`;
+    const configurationMapper = (configuration) => `${configuration.id};${configuration.name}`;
     const configurationItems = configurations
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
       // TODO: Hack to be able to filter in SelectPopover. We should change that to avoid this hack.
@@ -85,7 +85,7 @@ const CollectorsAdministrationFilters = createReactClass({
 
     let configurationFilter;
     if (filters.configuration) {
-      const configuration = configurations.find(c => c.id === filters.configuration);
+      const configuration = configurations.find((c) => c.id === filters.configuration);
       configurationFilter = configuration ? configurationMapper(configuration) : undefined;
     }
 
@@ -105,7 +105,7 @@ const CollectorsAdministrationFilters = createReactClass({
     const { collectors, filters } = this.props;
 
     const operatingSystems = lodash
-      .uniq(collectors.map(collector => lodash.upperFirst(collector.node_operating_system)))
+      .uniq(collectors.map((collector) => lodash.upperFirst(collector.node_operating_system)))
       .sort(naturalSortIgnoreCase);
 
     const filter = ([os], callback) => this.onFilterChange('os', os, callback);
@@ -125,11 +125,11 @@ const CollectorsAdministrationFilters = createReactClass({
 
   getStatusFilter() {
     const { filters } = this.props;
-    const status = Object.keys(SidecarStatusEnum.properties).map(key => String(key));
+    const status = Object.keys(SidecarStatusEnum.properties).map((key) => String(key));
     const filter = ([statusCode], callback) => this.onFilterChange('status', statusCode, callback);
 
     const statusFilter = filters.status;
-    const statusFormatter = statusCode => lodash.upperFirst(SidecarStatusEnum.toString(statusCode));
+    const statusFormatter = (statusCode) => lodash.upperFirst(SidecarStatusEnum.toString(statusCode));
 
     return (
       <SelectPopover id="status-filter"

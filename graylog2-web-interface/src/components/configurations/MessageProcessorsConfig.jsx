@@ -74,7 +74,7 @@ const MessageProcessorsConfig = createReactClass({
       const { checked } = this.inputs[className];
 
       if (checked) {
-        update.disabled_processors = disabledProcessors.filter(p => p !== className);
+        update.disabled_processors = disabledProcessors.filter((p) => p !== className);
       } else if (disabledProcessors.indexOf(className) === -1) {
         update.disabled_processors.push(className);
       }
@@ -99,7 +99,7 @@ const MessageProcessorsConfig = createReactClass({
 
   _summary() {
     return this.state.config.processor_order.map((processor, idx) => {
-      const status = this.state.config.disabled_processors.filter(p => p === processor.class_name).length > 0 ? 'disabled' : 'active';
+      const status = this.state.config.disabled_processors.filter((p) => p === processor.class_name).length > 0 ? 'disabled' : 'active';
       return (
         <tr key={idx}>
           <td>{idx + 1}</td>
@@ -118,7 +118,7 @@ const MessageProcessorsConfig = createReactClass({
 
   _statusForm() {
     return ObjectUtils.clone(this.state.config.processor_order).sort((a, b) => naturalSort(a.name, b.name)).map((processor, idx) => {
-      const enabled = this.state.config.disabled_processors.filter(p => p === processor.class_name).length < 1;
+      const enabled = this.state.config.disabled_processors.filter((p) => p === processor.class_name).length < 1;
 
       return (
         <tr key={idx}>

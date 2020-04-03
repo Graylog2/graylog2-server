@@ -77,7 +77,7 @@ class IndexSetDeletionForm extends React.Component {
     if (!this._isDeletable()) {
       const assignedStreams = this.state.assignedStreams
         .sort((s1, s2) => naturalSort(s1.title, s2.title))
-        .map(stream => <li key={`stream-id-${stream.id}`}>{stream.title}</li>);
+        .map((stream) => <li key={`stream-id-${stream.id}`}>{stream.title}</li>);
 
       return (
         <div>

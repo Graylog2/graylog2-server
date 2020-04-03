@@ -133,7 +133,7 @@ export const ViewStore: ViewStoreType = singletonStore(
          Selected query might become a property on the view later. */
       const queries = get(view, 'search.queries', Immutable.List());
       const firstQueryId = get(queries.first(), 'id');
-      const selectedQuery = this.activeQuery && queries.find(q => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
+      const selectedQuery = this.activeQuery && queries.find((q) => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
       this.selectQuery(selectedQuery);
       this.isNew = isNew;
 
@@ -175,8 +175,8 @@ export const ViewStore: ViewStoreType = singletonStore(
       if (!view.search) {
         return [view, false];
       }
-      const oldWidgets = get(this.view, 'state') && this.view.state.map(s => s.widgets);
-      const newWidgets = get(view, 'state') && view.state.map(s => s.widgets);
+      const oldWidgets = get(this.view, 'state') && this.view.state.map((s) => s.widgets);
+      const newWidgets = get(view, 'state') && view.state.map((s) => s.widgets);
       if (!isEqualForSearch(oldWidgets, newWidgets)) {
         const newView = UpdateSearchForWidgets(view);
         return [newView, true];

@@ -90,7 +90,7 @@ const AlertCondition = createReactClass({
     }
 
     return (
-      <React.Fragment>
+      <>
         <AlertConditionForm ref={(updateForm) => { this.updateForm = updateForm; }}
                             conditionType={conditionType}
                             alertCondition={alertCondition}
@@ -103,7 +103,7 @@ const AlertCondition = createReactClass({
                                stream={stream}
                                actions={actions}
                                isDetailsView={isDetailsView} />
-      </React.Fragment>
+      </>
     );
   },
 });

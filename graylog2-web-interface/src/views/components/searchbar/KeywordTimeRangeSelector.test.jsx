@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
 
-jest.mock('logic/datetimes/DateTime', () => ({ fromUTCDateTime: date => date }));
+jest.mock('logic/datetimes/DateTime', () => ({ fromUTCDateTime: (date) => date }));
 
 describe('KeywordTimeRangeSelector', () => {
   let KeywordTimeRangeSelector;

@@ -33,8 +33,8 @@ const findIndices = <T>(ary: Array<T>, predicate: (T) => boolean): Array<number>
 
 export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((Rows) => Rows) => {
   return (result = []) => {
-    const rowIndices = findIndices(rowPivots, pivot => (pivot.type === 'time'));
-    const columnIndices = findIndices(columnPivots, pivot => (pivot.type === 'time'));
+    const rowIndices = findIndices(rowPivots, (pivot) => (pivot.type === 'time'));
+    const columnIndices = findIndices(columnPivots, (pivot) => (pivot.type === 'time'));
 
     if (rowIndices.length === 0 && columnIndices.length === 0) {
       return result;

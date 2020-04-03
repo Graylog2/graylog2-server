@@ -45,7 +45,7 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
           setHookComponent(undefined);
           setLoaded(true);
         },
-      ).catch(e => setHookComponent(e));
+      ).catch((e) => setHookComponent(e));
     } else {
       ViewActions.create(View.Type.Dashboard).then(() => mounted && setLoaded(true));
     }

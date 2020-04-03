@@ -8,7 +8,7 @@ import InteractiveContext from './contexts/InteractiveContext';
 
 describe('Field', () => {
   describe('handles value action menu depending on interactive context', () => {
-    const component = interactive => props => (
+    const component = (interactive) => (props) => (
       <InteractiveContext.Provider value={interactive}>
         <Field {...props} />
       </InteractiveContext.Provider>

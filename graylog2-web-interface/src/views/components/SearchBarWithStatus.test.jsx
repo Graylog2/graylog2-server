@@ -11,7 +11,7 @@ import SearchBar from './SearchBar';
 
 const SearchBarWithStatus = WithSearchStatus(SearchBar);
 
-jest.mock('stores/connect', () => (Component, _, propsMapper) => props => <Component {...(Object.assign({}, props, propsMapper(props)))} />);
+jest.mock('stores/connect', () => (Component, _, propsMapper) => (props) => <Component {...({ ...props, ...propsMapper(props) })} />);
 jest.mock('views/stores/SearchConfigStore', () => ({}));
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 

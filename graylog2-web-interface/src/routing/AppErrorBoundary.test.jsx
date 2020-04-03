@@ -5,7 +5,7 @@ import { mount } from 'wrappedEnzyme';
 import suppressConsole from 'helpers/suppressConsole';
 import AppErrorBoundary from './AppErrorBoundary';
 
-jest.mock('react-router', () => ({ withRouter: x => x }));
+jest.mock('react-router', () => ({ withRouter: (x) => x }));
 
 const ErroneusComponent = () => {
   // eslint-disable-next-line no-throw-literal

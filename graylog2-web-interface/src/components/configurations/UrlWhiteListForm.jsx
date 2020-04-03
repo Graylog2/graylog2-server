@@ -64,7 +64,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const _isFormValid = (): boolean => {
     let isValid = true;
     if (validationState.errors.length > 0
-      && validationState.errors.find((el => (el && el.title && el.title.valid) === false
+      && validationState.errors.find(((el) => (el && el.title && el.title.valid) === false
       || (el && el.value && el.value.valid === false)))) {
       isValid = false;
     }
@@ -143,7 +143,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
                    help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'Required field' : null}
                    name="title"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
-                   onChange={event => _onInputChange(event, idx, url.type)}
+                   onChange={(event) => _onInputChange(event, idx, url.type)}
                    defaultValue={url.title}
                    required />
           </td>
@@ -154,7 +154,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
                    help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? _getErrorMessage(url.type) : null}
                    name="value"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
-                   onChange={event => _onInputChange(event, idx, url.type)}
+                   onChange={(event) => _onInputChange(event, idx, url.type)}
                    defaultValue={url.value}
                    required />
           </td>
@@ -166,12 +166,12 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
                       options={options}
                       matchProp="label"
                       placeholder="Select url type"
-                      onChange={option => _onUpdateType(idx, option)}
+                      onChange={(option) => _onUpdateType(idx, option)}
                       value={url.type} />
             </Input>
           </td>
           <td>
-            <Button onClick={event => _onRemove(event, idx)}>
+            <Button onClick={(event) => _onRemove(event, idx)}>
               <Icon name="trash-alt" />
             </Button>
           </td>
@@ -194,7 +194,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
              checked={config.disabled}
              onChange={() => setConfig({ ...config, disabled: !config.disabled })}
              help="Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk." />
-      <Button bsSize="sm" onClick={event => _onAdd(event)}>Add Url</Button>
+      <Button bsSize="sm" onClick={(event) => _onAdd(event)}>Add Url</Button>
       <StyledTable striped bordered>
         <thead>
           <tr>
@@ -209,7 +209,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
           {_getSummary()}
         </tbody>
       </StyledTable>
-      <Button bsSize="sm" onClick={event => _onAdd(event)}>Add Url</Button>
+      <Button bsSize="sm" onClick={(event) => _onAdd(event)}>Add Url</Button>
     </>
   );
 };

@@ -36,9 +36,9 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   // Ensure the field is a string for later processing
   const origValue = StringUtils.stringify(value);
 
-  const ranges = sortBy(highlightRanges[field], r => r.start);
+  const ranges = sortBy(highlightRanges[field], (r) => r.start);
   const subst = (s, l) => origValue.substring(s, s + l);
-  const rest = pos => origValue.substring(pos, origValue.length);
+  const rest = (pos) => origValue.substring(pos, origValue.length);
 
   const highlights = ranges
     .filter(({ start }) => (start >= 0))
@@ -51,10 +51,10 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
       cur.start + cur.length,
     ], [[], 0])[0];
 
-  const lastRange = last(sortBy(ranges, r => r.start + r.length));
+  const lastRange = last(sortBy(ranges, (r) => r.start + r.length));
   highlights.push(rest(lastRange.start + lastRange.length));
 
-  return <React.Fragment>{highlights}</React.Fragment>;
+  return <>{highlights}</>;
 };
 
 PossiblyHighlight.propTypes = {

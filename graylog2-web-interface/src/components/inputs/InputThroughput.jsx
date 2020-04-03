@@ -61,11 +61,11 @@ const InputThroughput = createReactClass({
   },
 
   componentWillMount() {
-    this._metricNames().forEach(metricName => MetricsActions.addGlobal(metricName));
+    this._metricNames().forEach((metricName) => MetricsActions.addGlobal(metricName));
   },
 
   componentWillUnmount() {
-    this._metricNames().forEach(metricName => MetricsActions.removeGlobal(metricName));
+    this._metricNames().forEach((metricName) => MetricsActions.removeGlobal(metricName));
   },
 
   _metricNames() {
@@ -167,7 +167,7 @@ const InputThroughput = createReactClass({
     return (
       <span>
         <hr key="separator" />
-        {Object.keys(metrics).map(nodeId => this._formatNodeDetails(nodeId, metrics[nodeId]))}
+        {Object.keys(metrics).map((nodeId) => this._formatNodeDetails(nodeId, metrics[nodeId]))}
       </span>
     );
   },

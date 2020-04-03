@@ -47,7 +47,7 @@ const InputStateBadge = createReactClass({
 
   _textForState(sortedStates) {
     if (this.props.input.global) {
-      return sortedStates.map(state => `${state.count} ${state.state}`).join(', ');
+      return sortedStates.map((state) => `${state.count} ${state.state}`).join(', ');
     }
     return sortedStates[0].state;
   },

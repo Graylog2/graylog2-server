@@ -10,7 +10,7 @@ jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
-jest.mock('react-router', () => ({ withRouter: x => x }));
+jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -146,7 +146,7 @@ describe('Navigation', () => {
       const wrapper = mount(<Navigation location={{ pathname: '/' }} fullName="Sam Lowry" loginName="slowry" />);
       const navigationLinks = wrapper.find('NavItem');
       expect(navigationLinks).toHaveLength(count);
-      links.forEach(title => expect(wrapper.find(`NavItem[children="${title}"]`)).toExist());
+      links.forEach((title) => expect(wrapper.find(`NavItem[children="${title}"]`)).toExist());
     };
     it.each`
     permissions                    | count | links

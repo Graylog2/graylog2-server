@@ -1,6 +1,6 @@
 import View from './View';
 
-jest.mock('routing/Routes', () => ({ VIEWS: { VIEWID: viewId => `/views/${viewId}` } }));
+jest.mock('routing/Routes', () => ({ VIEWS: { VIEWID: (viewId) => `/views/${viewId}` } }));
 
 // eslint-disable-next-line global-require
 const loadSUT = () => require('./OnSaveViewAction');

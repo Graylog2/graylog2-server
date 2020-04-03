@@ -44,8 +44,7 @@ class SidecarRow extends React.Component {
                 {sidecar.node_name}
               </Link>
             )
-            : sidecar.node_name
-          }
+            : sidecar.node_name}
         </td>
         <td>
           <StatusIndicator status={sidecarStatus.status}

@@ -114,8 +114,7 @@ class ExpandableListItem extends React.Component {
               <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
             </div>
           </div>
-          )
-          }
+          )}
           <span className={style.header}>{headerToRender}{subheader && <span className={style.subheader}>{subheader}</span>}</span>
         </div>
         <div className={style.expandableContent}>

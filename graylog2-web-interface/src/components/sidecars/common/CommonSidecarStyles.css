@@ -1,8 +1,3 @@
-:local(.sidecarOs) {
-    margin-right: 5px;
-    margin-left: 2px;
-}
-
 :local(.deflist) {
     margin-top: 10px;
 }

@@ -113,7 +113,7 @@ const EventDefinitionsStore = Reflux.createStore({
 
   setAlertFlag(eventDefinition) {
     const isAlert = eventDefinition.notifications.length > 0;
-    return Object.assign({}, eventDefinition, { alert: isAlert });
+    return { ...eventDefinition, alert: isAlert };
   },
 
   create(eventDefinition) {

@@ -145,7 +145,7 @@ const IndexSetsComponent = createReactClass({
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle="info"
                       noItemsText="There are no index sets to display"
-                      items={this.state.indexSets.map(indexSet => this._formatIndexSet(indexSet))} />
+                      items={this.state.indexSets.map((indexSet) => this._formatIndexSet(indexSet))} />
         </PaginatedList>
       </div>
     );

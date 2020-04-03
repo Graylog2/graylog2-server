@@ -7,7 +7,7 @@ import fetch from 'logic/rest/FetchProvider';
 
 const InputStaticFieldsStore = Reflux.createStore({
   listenables: [],
-  sourceUrl: inputId => `/system/inputs/${inputId}/staticfields`,
+  sourceUrl: (inputId) => `/system/inputs/${inputId}/staticfields`,
 
   create(input, name, value) {
     const url = URLUtils.qualifyUrl(this.sourceUrl(input.id));

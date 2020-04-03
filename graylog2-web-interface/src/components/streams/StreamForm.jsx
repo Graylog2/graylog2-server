@@ -33,7 +33,7 @@ class StreamForm extends React.Component {
   _getValuesFromProps = (props) => {
     let defaultIndexSetId = props.stream.index_set_id;
     if (!defaultIndexSetId && props.indexSets && props.indexSets.length > 0) {
-      const defaultIndexSet = props.indexSets.find(indexSet => indexSet.default);
+      const defaultIndexSet = props.indexSets.find((indexSet) => indexSet.default);
       if (defaultIndexSet) {
         defaultIndexSetId = defaultIndexSet.id;
       }
@@ -69,7 +69,7 @@ class StreamForm extends React.Component {
   };
 
   _formatSelectOptions = () => {
-    return this.props.indexSets.filter(indexSet => indexSet.writable).map((indexSet) => {
+    return this.props.indexSets.filter((indexSet) => indexSet.writable).map((indexSet) => {
       return { value: indexSet.id, label: indexSet.title };
     });
   };

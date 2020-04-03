@@ -33,7 +33,7 @@ type Props = {
 };
 
 const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayModeQuery): BigDisplayModeQuery => ({
-  tabs: tabs !== undefined ? tabs.split(',').map(tab => Number.parseInt(tab, 10)) : undefined,
+  tabs: tabs !== undefined ? tabs.split(',').map((tab) => Number.parseInt(tab, 10)) : undefined,
   interval: interval !== undefined ? Math.max(Number.parseInt(interval, 10), 1) : 30,
   refresh: refresh !== undefined ? Math.max(Number.parseInt(refresh, 10), 1) : 10,
 });

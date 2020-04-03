@@ -25,7 +25,7 @@ type Props = {
 const _updateOrder = (orderedDecorators, decorators, onChange) => {
   const newDecorators = cloneDeep(decorators);
   orderedDecorators.forEach((item, idx) => {
-    const decorator = newDecorators.find(i => i.id === item.id);
+    const decorator = newDecorators.find((i) => i.id === item.id);
     if (decorator) {
       decorator.order = idx;
     }
@@ -43,15 +43,15 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     [modifiedDecorators, setModifiedDecorators],
   );
   const onReorder = useCallback(
-    orderedDecorators => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
+    (orderedDecorators) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
     [modifiedDecorators, setModifiedDecorators],
   );
   const onSubmit = useCallback(() => onSave(modifiedDecorators), [onSave, modifiedDecorators]);
 
-  const currentDecorators = modifiedDecorators.filter(decorator => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
+  const currentDecorators = modifiedDecorators.filter((decorator) => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
   const decoratorItems = currentDecorators
     .sort((d1, d2) => d1.order - d2.order)
-    .map(decorator => formatDecorator(decorator, modifiedDecorators, types, setModifiedDecorators));
+    .map((decorator) => formatDecorator(decorator, modifiedDecorators, types, setModifiedDecorators));
 
   const nextOrder = currentDecorators.reduce((currentMax, decorator) => Math.max(currentMax, decorator.order), 0) + 1;
 

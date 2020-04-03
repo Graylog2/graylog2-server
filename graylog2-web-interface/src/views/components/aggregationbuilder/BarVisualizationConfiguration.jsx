@@ -65,11 +65,11 @@ class BarVisualizationConfiguration extends React.Component<Props> {
     const { config } = this.props;
 
     return (
-      <React.Fragment>
+      <>
         <span>Mode:</span>
         <HoverForHelp title="Help for bar chart mode">
           <ul>
-            {modes.map(mode => (
+            {modes.map((mode) => (
               <li key={mode}><h4>{BarVisualizationConfiguration.options[mode].label}</h4>
                 {BarVisualizationConfiguration.options[mode].help}
               </li>
@@ -80,7 +80,7 @@ class BarVisualizationConfiguration extends React.Component<Props> {
                 onChange={this._onChange}
                 options={options}
                 value={this._wrapOption(config.barmode)} />
-      </React.Fragment>
+      </>
     );
   };
 }

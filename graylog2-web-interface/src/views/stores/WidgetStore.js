@@ -68,7 +68,7 @@ export const WidgetStore = singletonStore(
       this.activeQuery = activeQuery;
 
       const activeWidgets = get(state, 'widgets', []);
-      const widgets = Immutable.OrderedMap(activeWidgets.map(w => [w.id, w]));
+      const widgets = Immutable.OrderedMap(activeWidgets.map((w) => [w.id, w]));
 
       if (!isEqual(widgets, this.widgets)) {
         this.widgets = widgets;
@@ -138,7 +138,7 @@ export const WidgetStore = singletonStore(
       return newWidgets;
     },
     updateConfig(widgetId, config): Promise<Widgets> {
-      const newWidgets = this.widgets.update(widgetId, widget => widget.toBuilder().config(config).build());
+      const newWidgets = this.widgets.update(widgetId, (widget) => widget.toBuilder().config(config).build());
       const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
       WidgetActions.updateConfig.promise(promise);
       return newWidgets;

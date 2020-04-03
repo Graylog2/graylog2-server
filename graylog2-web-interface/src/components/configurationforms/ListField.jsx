@@ -48,7 +48,7 @@ class ListField extends React.Component {
     const isRequired = !field.is_optional;
     const allowCreate = field.attributes.includes('allow_create');
     const options = (field.additional_info && field.additional_info.values ? field.additional_info.values : {});
-    const formattedOptions = Object.keys(options).map(key => this._formatOption(key, options[key]));
+    const formattedOptions = Object.keys(options).map((key) => this._formatOption(key, options[key]));
 
     return (
       <div className="form-group">

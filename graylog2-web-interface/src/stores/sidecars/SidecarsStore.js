@@ -130,7 +130,7 @@ const SidecarsStore = Reflux.createStore({
   assignConfigurations(sidecars, configurations) {
     const nodes = sidecars.map(({ sidecar, collector }) => {
       // Add all previous assignments, but the one that was changed
-      const assignments = sidecar.assignments.filter(assignment => assignment.collector_id !== collector.id);
+      const assignments = sidecar.assignments.filter((assignment) => assignment.collector_id !== collector.id);
 
       // Add new assignments
       configurations.forEach((configuration) => {

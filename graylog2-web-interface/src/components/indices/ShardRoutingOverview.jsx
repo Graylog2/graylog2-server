@@ -58,7 +58,7 @@ class ShardRoutingOverview extends React.Component {
         <ul className="shards">
           {routing
             .sort((shard1, shard2) => naturalSort(shard1.id, shard2.id))
-            .map(route => <ShardRouting key={`${indexName}-shard-route-${route.node_id}-${route.id}`} route={route} />)}
+            .map((route) => <ShardRouting key={`${indexName}-shard-route-${route.node_id}-${route.id}`} route={route} />)}
         </ul>
 
         <br style={{ clear: 'both' }} />

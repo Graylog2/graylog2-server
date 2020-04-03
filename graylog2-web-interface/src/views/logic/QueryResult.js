@@ -5,8 +5,8 @@ import SearchError from './SearchError';
 
 const _findMessages = (results) => {
   return Object.keys(results.searchTypes)
-    .map(id => results.searchTypes[id])
-    .find(searchType => searchType.type.toLocaleLowerCase() === 'messages');
+    .map((id) => results.searchTypes[id])
+    .find((searchType) => searchType.type.toLocaleLowerCase() === 'messages');
 };
 
 const _searchTypePlugin = (type) => {
@@ -27,7 +27,7 @@ export default class QueryResult {
     const { duration, timestamp, effective_timerange } = queryResult.execution_stats;
     this._state = {
       query: queryResult.query,
-      errors: queryResult.errors.map(error => new SearchError(error)),
+      errors: queryResult.errors.map((error) => new SearchError(error)),
       duration,
       timestamp,
       effectiveTimerange: effective_timerange,

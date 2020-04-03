@@ -87,7 +87,7 @@ const ViewList = createReactClass({
       return <Spinner text="Loading views..." />;
     }
 
-    const items = list.map(view => (
+    const items = list.map((view) => (
       <View key={`view-${view.id}`}
             id={view.id}
             owner={view.owner}

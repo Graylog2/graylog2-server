@@ -55,7 +55,7 @@ const CreateInputControl = createReactClass({
     }
 
     this.setState({ selectedInput: selectedInput });
-    InputTypesActions.get.triggerPromise(selectedInput).then(inputDefinition => this.setState({ selectedInputDefinition: inputDefinition }));
+    InputTypesActions.get.triggerPromise(selectedInput).then((inputDefinition) => this.setState({ selectedInputDefinition: inputDefinition }));
   },
 
   _openModal(event) {
@@ -63,7 +63,7 @@ const CreateInputControl = createReactClass({
     const { selectedInput } = this.state;
 
     const customConfiguration = PluginStore.exports('inputConfiguration')
-      .find(inputConfig => inputConfig.type === selectedInput);
+      .find((inputConfig) => inputConfig.type === selectedInput);
 
     if (customConfiguration) {
       const onClose = () => this.setState({ customInputsComponent: undefined });

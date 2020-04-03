@@ -53,7 +53,7 @@ export default class Search {
 
   get requiredParameters(): Immutable.Set<Parameter> {
     return this.parameters
-      .filter(p => (!p.optional && !p.defaultValue));
+      .filter((p) => (!p.optional && !p.defaultValue));
   }
 
   // eslint-disable-next-line no-use-before-define
@@ -75,8 +75,8 @@ export default class Search {
   static fromJSON(value: SearchJson): Search {
     const { id, parameters } = value;
 
-    const queries = value.queries.map(q => Query.fromJSON(q));
-    return new Search(id, queries, parameters.map(p => Parameter.fromJSON(p)));
+    const queries = value.queries.map((q) => Query.fromJSON(q));
+    return new Search(id, queries, parameters.map((p) => Parameter.fromJSON(p)));
   }
 
   // eslint-disable-next-line no-use-before-define

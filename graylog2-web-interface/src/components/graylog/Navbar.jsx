@@ -257,7 +257,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${theme.color.gray[100]};
+      border-color: ${theme.color.gray[70]};
     }
 
     .navbar-link {

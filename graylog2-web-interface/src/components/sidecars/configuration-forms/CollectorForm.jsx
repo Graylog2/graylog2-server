@@ -95,7 +95,7 @@ const CollectorForm = createReactClass({
 
   _validateFormData(nextFormData) {
     if (nextFormData.name && nextFormData.node_operating_system) {
-      CollectorsActions.validate(nextFormData).then(validation => (
+      CollectorsActions.validate(nextFormData).then((validation) => (
         this.setState({ validation_errors: validation.errors, error: validation.failed })
       ));
     }

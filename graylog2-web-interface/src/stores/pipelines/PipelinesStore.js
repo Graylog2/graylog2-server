@@ -19,9 +19,9 @@ const PipelinesStore = Reflux.createStore({
     if (!this.pipelines) {
       this.pipelines = [pipeline];
     } else {
-      const doesPipelineExist = this.pipelines.some(p => p.id === pipeline.id);
+      const doesPipelineExist = this.pipelines.some((p) => p.id === pipeline.id);
       if (doesPipelineExist) {
-        this.pipelines = this.pipelines.map(p => (p.id === pipeline.id ? pipeline : p));
+        this.pipelines = this.pipelines.map((p) => (p.id === pipeline.id ? pipeline : p));
       } else {
         this.pipelines.push(pipeline);
       }
@@ -107,7 +107,7 @@ const PipelinesStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
     return fetch('DELETE', url).then(() => {
       const updatedPipelines = this.pipelines || [];
-      this.pipelines = updatedPipelines.filter(el => el.id !== pipelineId);
+      this.pipelines = updatedPipelines.filter((el) => el.id !== pipelineId);
       this.trigger({ pipelines: this.pipelines });
       UserNotification.success(`Pipeline "${pipelineId}" deleted successfully`);
     }, failCallback);

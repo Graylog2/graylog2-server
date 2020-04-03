@@ -243,8 +243,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
     const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate`), payload);
     promise
       .then(
-        response => response,
-        error => (
+        (response) => response,
+        (error) => (
           UserNotification.error(`Validating configuration "${payload.name}" failed with status: ${error.message}`,
             'Could not validate configuration')
         ),

@@ -31,7 +31,7 @@ class RolesComponent extends React.Component {
 
   componentDidMount() {
     this.loadRoles();
-    StreamsStore.load(streams => this.setState({ streams: Immutable.List(streams) }));
+    StreamsStore.load((streams) => this.setState({ streams: Immutable.List(streams) }));
     DashboardsActions.search('', 1, 32768);
   }
 

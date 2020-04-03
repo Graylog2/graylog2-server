@@ -64,7 +64,7 @@ export default class EditWidgetFrame extends React.Component<Props> {
             <QueryEditModeContext.Provider value="widget">
               <HeaderElements />
               <WidgetContext.Consumer>
-                {widget => (
+                {(widget) => (
                   <WidgetQueryControls widget={widget} />
                 )}
               </WidgetContext.Consumer>

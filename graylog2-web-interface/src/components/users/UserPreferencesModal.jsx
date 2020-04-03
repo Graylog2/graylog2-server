@@ -17,7 +17,7 @@ class UserPreferencesModal extends React.Component {
 
   _onPreferenceChanged = (event) => {
     const { name } = event.target;
-    const preferenceToChange = this.state.preferences.filter(preference => preference.name === name)[0];
+    const preferenceToChange = this.state.preferences.filter((preference) => preference.name === name)[0];
     // TODO: we need the type of the preference to set it properly
     if (preferenceToChange) {
       preferenceToChange.value = event.target.value;

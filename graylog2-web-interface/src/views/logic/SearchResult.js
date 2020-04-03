@@ -8,7 +8,7 @@ class SearchResult {
   constructor(result) {
     this._result = fromJS(result);
 
-    this._results = fromJS(mapValues(result.results, queryResult => new QueryResult(queryResult)));
+    this._results = fromJS(mapValues(result.results, (queryResult) => new QueryResult(queryResult)));
     this._errors = fromJS(get(result, 'errors', []).map((error) => {
       if (error.type === 'result_window_limit') {
         return new ResultWindowLimitError(error, this);
@@ -51,7 +51,7 @@ class SearchResult {
   }
 
   _getQueryBySearchTypeId(searchTypeId) {
-    return Object.values(this.result.results).find(query => SearchResult._getSearchTypeFromQuery(query, searchTypeId));
+    return Object.values(this.result.results).find((query) => SearchResult._getSearchTypeFromQuery(query, searchTypeId));
   }
 
   static _getSearchTypeFromQuery(query, searchTypeId) {

@@ -4,7 +4,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
 const SystemProcessingStore = Reflux.createStore({
-  sourceUrl: nodeId => `/cluster/${nodeId}/processing`,
+  sourceUrl: (nodeId) => `/cluster/${nodeId}/processing`,
 
   pause(nodeId) {
     return fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/pause`))

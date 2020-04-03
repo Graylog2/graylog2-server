@@ -7,7 +7,7 @@ type Props = {
 };
 const IfInteractive = ({ children }: Props) => (
   <InteractiveContext.Consumer>
-    {interactive => (interactive ? children : null)}
+    {(interactive) => (interactive ? children : null)}
   </InteractiveContext.Consumer>
 );
 

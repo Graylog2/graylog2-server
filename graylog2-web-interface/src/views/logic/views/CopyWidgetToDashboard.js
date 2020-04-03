@@ -15,7 +15,7 @@ const _findWidgetAndQueryIdInView = (widgetId: string, view: View): ?[Widget, Qu
     if (foundWidget) {
       return foundWidget;
     }
-    const widget = state.widgets.find(w => w.id === widgetId);
+    const widget = state.widgets.find((w) => w.id === widgetId);
     if (widget) {
       return [widget, queryId];
     }
@@ -39,7 +39,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
     return undefined;
   }
 
-  const queryMap: Map<QueryId, Query> = Map(search.search.queries.map(q => [q.id, q]));
+  const queryMap: Map<QueryId, Query> = Map(search.search.queries.map((q) => [q.id, q]));
   const match: ?[Widget, QueryId] = _findWidgetAndQueryIdInView(widgetId, search);
 
   if (match) {
@@ -47,8 +47,8 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
     const { timerange, query, filter = Map() } = queryMap.get(queryId);
 
     const streams = (filter ? filter.get('filters', List.of()) : List.of())
-      .filter(value => Map.isMap(value) && value.get('type') === 'stream')
-      .map(value => value.get('id'))
+      .filter((value) => Map.isMap(value) && value.get('type') === 'stream')
+      .map((value) => value.get('id'))
       .toList()
       .toArray();
 

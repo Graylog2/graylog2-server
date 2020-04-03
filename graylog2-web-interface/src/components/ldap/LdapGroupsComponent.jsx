@@ -34,17 +34,17 @@ class LdapGroupsComponent extends React.Component {
   };
 
   componentDidMount() {
-    LdapGroupsActions.loadMapping().then(mapping => this.setState({ mapping: Immutable.Map(mapping) }));
+    LdapGroupsActions.loadMapping().then((mapping) => this.setState({ mapping: Immutable.Map(mapping) }));
     LdapGroupsActions.loadGroups()
       .then(
-        groups => this.setState({ groups: Immutable.Set(groups) }),
+        (groups) => this.setState({ groups: Immutable.Set(groups) }),
         (error) => {
           if (error.additional.status !== 400) {
             this.setState({ groupsErrorMessage: error });
           }
         },
       );
-    RolesStore.loadRoles().then(roles => this.setState({ roles: Immutable.Set(roles) }));
+    RolesStore.loadRoles().then((roles) => this.setState({ roles: Immutable.Set(roles) }));
   }
 
   _updateMapping = (event) => {
@@ -57,7 +57,7 @@ class LdapGroupsComponent extends React.Component {
   _saveMapping = (event) => {
     event.preventDefault();
     const { mapping } = this.state;
-    LdapGroupsActions.saveMapping(mapping.filter(role => role !== '').toJS());
+    LdapGroupsActions.saveMapping(mapping.filter((role) => role !== '').toJS());
   };
 
   _onShowConfig = () => {
@@ -132,7 +132,7 @@ class LdapGroupsComponent extends React.Component {
     });
 
     const currentLdapSearchGroups = groups;
-    const previousMappings = Immutable.Set(mapping.keySeq()).filter(group => !groups.contains(group));
+    const previousMappings = Immutable.Set(mapping.keySeq()).filter((group) => !groups.contains(group));
 
     return (
       <form className="form-horizontal" onSubmit={this._saveMapping}>

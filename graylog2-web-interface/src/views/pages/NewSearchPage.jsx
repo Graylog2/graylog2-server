@@ -82,7 +82,7 @@ class NewSearchPage extends React.Component<Props, State> {
       currentURLQuery,
       () => this.setState({ loaded: true }),
     ).catch(
-      error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
+      (error) => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
     );
   };
 
@@ -109,7 +109,7 @@ class NewSearchPage extends React.Component<Props, State> {
       return view;
     }).then(() => {
       SearchActions.executeWithCurrentState();
-    }).catch(e => e);
+    }).catch((e) => e);
   };
 
   render() {

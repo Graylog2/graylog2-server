@@ -17,7 +17,7 @@ class NotificationList extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventNotificationTypes').find(n => n.type === type) || {};
+    return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
   handleRemoveClick = (notificationId) => {
@@ -61,7 +61,7 @@ class NotificationList extends React.Component {
 
     const definitionNotifications = eventDefinition.notifications
       .map((edn) => {
-        return notifications.find(n => n.id === edn.notification_id) || {
+        return notifications.find((n) => n.id === edn.notification_id) || {
           title: edn.notification_id,
           missing: true,
         };
@@ -74,16 +74,16 @@ class NotificationList extends React.Component {
 
     if (definitionNotifications.length === 0) {
       return (
-        <React.Fragment>
+        <>
           <p>
             This Event is not configured to trigger any Notifications yet.
           </p>
           {addNotificationButton}
-        </React.Fragment>
+        </>
       );
     }
     return (
-      <React.Fragment>
+      <>
         <DataTable id="event-definition-notifications"
                    className="table-striped table-hover"
                    headers={['Notification', 'Type', 'Actions']}
@@ -92,7 +92,7 @@ class NotificationList extends React.Component {
                    dataRowFormatter={this.notificationFormatter}
                    filterKeys={[]} />
         {addNotificationButton}
-      </React.Fragment>
+      </>
     );
   }
 }

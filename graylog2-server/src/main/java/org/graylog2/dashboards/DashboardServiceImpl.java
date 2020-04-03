@@ -25,30 +25,23 @@ import org.bson.types.ObjectId;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
-import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
-import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DashboardServiceImpl extends PersistedServiceImpl implements DashboardService {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
@@ -88,12 +81,8 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
                     try {
                         final DashboardWidget widget = dashboardWidgetCreator.fromPersisted(widgetFields);
                         dashboard.addPersistedWidget(widget);
-                    } catch (DashboardWidget.NoSuchWidgetTypeException e) {
-                        LOG.error("No such widget type: [" + widgetFields.get("type") + "] - Dashboard: [" + dashboard.getId() + "]", e);
                     } catch (InvalidRangeParametersException e) {
                         LOG.error("Invalid range parameters of widget in dashboard: [" + dashboard.getId() + "]", e);
-                    } catch (InvalidWidgetConfigurationException e) {
-                        LOG.error("Invalid configuration of widget in dashboard: [" + dashboard.getId() + "]", e);
                     }
                 }
             }
@@ -142,56 +131,10 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     }
 
     @Override
-    public void updateWidgetPositions(Dashboard dashboard, WidgetPositionsRequest positions) throws ValidationException {
-        checkNotNull(dashboard, "dashboard must be given");
-        checkNotNull(positions, "positions must be given");
-
-        final List<WidgetPosition> widgetPositions = new ArrayList<>(positions.positions().size());
-
-        for (WidgetPositionsRequest.WidgetPosition position : positions.positions()) {
-            widgetPositions.add(WidgetPosition.builder()
-                    .id(position.id())
-                    .width(position.width())
-                    .height(position.height())
-                    .col(position.col())
-                    .row(position.row())
-                    .build());
-        }
-
-        dashboard.setPositions(widgetPositions);
-        save(dashboard);
-    }
-
-    @Override
-    public void addWidget(Dashboard dashboard, DashboardWidget widget) throws ValidationException {
-        embed(dashboard, DashboardImpl.EMBEDDED_WIDGETS, widget);
-        dashboard.addWidget(widget);
-        clusterEventBus.post(WidgetUpdatedEvent.create(widget));
-    }
-
-    @Override
     public void removeWidget(Dashboard dashboard, DashboardWidget widget) {
         removeEmbedded(dashboard, DashboardImpl.EMBEDDED_WIDGETS, widget.getId());
         dashboard.removeWidget(widget);
         clusterEventBus.post(WidgetUpdatedEvent.create(widget));
-    }
-
-    @Deprecated
-    @Override
-    public void updateWidgetDescription(Dashboard dashboard, DashboardWidget widget, String newDescription) throws ValidationException {
-        // Updating objects in arrays is a bit flaky in MongoDB. Let'S go the simple and stupid way until weh ave a proper DBA layer.
-        widget.setDescription(newDescription);
-        removeWidget(dashboard, widget);
-        addWidget(dashboard, widget);
-    }
-
-    @Deprecated
-    @Override
-    public void updateWidgetCacheTime(Dashboard dashboard, DashboardWidget widget, int cacheTime) throws ValidationException {
-        // Updating objects in arrays is a bit flaky in MongoDB. Let'S go the simple and stupid way until weh ave a proper DBA layer.
-        widget.setCacheTime(cacheTime);
-        removeWidget(dashboard, widget);
-        addWidget(dashboard, widget);
     }
 
     @Override

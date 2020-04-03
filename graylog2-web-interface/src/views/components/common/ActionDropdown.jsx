@@ -55,7 +55,7 @@ type FilterPropsProps = {
 
 const FilterProps = ({ children, style }: FilterPropsProps) => React.Children.map(
   children,
-  child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }),
+  (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }),
 );
 
 type ActionDropdownProps = {
@@ -99,12 +99,15 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
 
     const mappedChildren = React.Children.map(
       children,
-      child => React.cloneElement(child, Object.assign({}, child.props, child.props.onSelect ? {
-        onSelect: (eventKey, event) => {
-          child.props.onSelect();
-          this._onToggle(event);
-        },
-      } : {})),
+      (child) => React.cloneElement(child, {
+        ...child.props,
+        ...(child.props.onSelect ? {
+          onSelect: (eventKey, event) => {
+            child.props.onSelect();
+            this._onToggle(event);
+          },
+        } : {}),
+      }),
     );
     return (
       <StopPropagation>
@@ -119,7 +122,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
                  onHide={this._onToggle}
                  target={() => this.target}>
           <FilterProps>
-            <ul className="dropdown-menu" style={Object.assign({}, listStyle, displayMenu)}>
+            <ul className="dropdown-menu" style={({ ...listStyle, ...displayMenu })}>
               <MenuItem header>Actions</MenuItem>
               {mappedChildren}
             </ul>

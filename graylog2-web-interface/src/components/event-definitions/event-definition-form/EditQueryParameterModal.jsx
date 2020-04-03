@@ -60,7 +60,7 @@ class EditQueryParameterModal extends React.Component {
     const { queryParameter } = this.state;
     const config = lodash.cloneDeep(eventDefinition.config);
     const { query_parameters: queryParameters } = config;
-    const index = queryParameters.findIndex(p => p.name === prevQueryParameter.name);
+    const index = queryParameters.findIndex((p) => p.name === prevQueryParameter.name);
     if (index < 0) {
       throw new Error(`Query parameter "${queryParameter.name}" not found`);
     }
@@ -70,7 +70,7 @@ class EditQueryParameterModal extends React.Component {
 
   handleParameterChange = (key, value) => {
     const { queryParameter } = this.state;
-    const nextQueryParameter = Object.assign({}, queryParameter, { [key]: value });
+    const nextQueryParameter = { ...queryParameter, [key]: value };
     this.setState({ queryParameter: nextQueryParameter });
   };
 
@@ -104,7 +104,7 @@ class EditQueryParameterModal extends React.Component {
     }
     return lookupTables
       .sort((lt1, lt2) => naturalSortIgnoreCase(lt1.title, lt2.title))
-      .map(table => ({ label: table.title, value: table.name }));
+      .map((table) => ({ label: table.title, value: table.name }));
   };
 
   render() {
@@ -112,7 +112,7 @@ class EditQueryParameterModal extends React.Component {
     const { queryParameter, validation } = this.state;
     const parameterSyntax = `$${queryParameter.name}$`;
     return (
-      <React.Fragment>
+      <>
         <Button bsSize="small"
                 bsStyle={queryParameter.embryonic ? 'primary' : 'info'}
                 onClick={() => this.openModal()}>
@@ -182,7 +182,7 @@ class EditQueryParameterModal extends React.Component {
             </p>
           </StyledPanel>
         </BootstrapModalForm>
-      </React.Fragment>
+      </>
     );
   }
 }

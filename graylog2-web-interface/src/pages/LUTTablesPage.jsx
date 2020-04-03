@@ -40,10 +40,10 @@ class LUTTablesPage extends React.Component {
     this.errorStatesTimer = setInterval(() => {
       let tableNames = null;
       if (tables) {
-        tableNames = tables.map(t => t.name);
+        tableNames = tables.map((t) => t.name);
       }
       if (tableNames) {
-        const adapterNames = Object.values(dataAdapters).map(a => a.name);
+        const adapterNames = Object.values(dataAdapters).map((a) => a.name);
         LookupTablesActions.getErrors(tableNames, null, adapterNames || null);
       }
     }, this.errorStatesInterval);

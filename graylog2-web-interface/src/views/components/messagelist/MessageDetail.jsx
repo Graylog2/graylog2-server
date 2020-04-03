@@ -135,7 +135,7 @@ class MessageDetail extends React.Component {
     const messageTitle = this._formatMessageTitle(index, id);
 
     return (
-      <React.Fragment>
+      <>
         <Row className="row-sm">
           <Col md={12}>
             <MessageActions index={index}
@@ -170,7 +170,7 @@ class MessageDetail extends React.Component {
                            showDecoration={showOriginal} />
           </Col>
         </Row>
-      </React.Fragment>
+      </>
     );
   }
 }

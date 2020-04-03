@@ -25,7 +25,7 @@ const ServerAvailabilityStore = Reflux.createStore({
       .build()
       .then(
         () => ServerAvailabilityActions.reportSuccess(),
-        error => ServerAvailabilityActions.reportError(error),
+        (error) => ServerAvailabilityActions.reportError(error),
       );
   },
   reportError(error) {

@@ -34,7 +34,7 @@ class EventDefinitions extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
+    return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
   renderEmptyContent = () => {
@@ -78,10 +78,10 @@ class EventDefinitions extends React.Component {
     }
 
     return (
-      <React.Fragment>
+      <>
         <p>{definition.description}</p>
         <p>{schedulingInformation} {notificationsInformation}</p>
-      </React.Fragment>
+      </>
     );
   };
 

@@ -18,7 +18,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     editor.completer.autoSelect = false;
     const tokens = editor.session.getTokens(pos.row);
     const currentToken = editor.session.getTokenAt(pos.row, pos.column);
-    const currentTokenIdx = tokens.findIndex(t => (t === currentToken));
+    const currentTokenIdx = tokens.findIndex((t) => (t === currentToken));
 
     const lastToken: ?Token = currentTokenIdx > 0 ? tokens[currentTokenIdx - 1] : null;
 

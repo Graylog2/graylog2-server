@@ -22,14 +22,14 @@ type IncompleteOption = {| incomplete: true, parameterNeeded: false, value: stri
 type ParameterNeededOption = {| incomplete: true, parameterNeeded: true, value: string, value: string |};
 type BackToFunctions = {| label: string, backToFunctions: true |};
 
-const parseSeries = (series: Array<Option>) => (series ? series.map(s => s.value) : []);
+const parseSeries = (series: Array<Option>) => (series ? series.map((s) => s.value) : []);
 
 const newSeriesConfigChange = (values, series, newSeries, onChange) => {
-  const newValues = values.map(s => (s === series ? newSeries : s));
+  const newValues = values.map((s) => (s === series ? newSeries : s));
   return onChange(newValues);
 };
 
-const _wrapOption = series => ({ label: series.effectiveName, value: series });
+const _wrapOption = (series) => ({ label: series.effectiveName, value: series });
 
 type Props = {
   onChange: (Array<Series>) => boolean,
@@ -60,7 +60,7 @@ class SeriesSelect extends React.Component<Props, State> {
 
     if (last && last.parameterNeeded) {
       const options = parameterOptionsForType(last.value)
-        .map(value => ({ label: value.toString(), value: last.value, parameterNeeded: false, incomplete: true, parameter: value }));
+        .map((value) => ({ label: value.toString(), value: last.value, parameterNeeded: false, incomplete: true, parameter: value }));
 
       this.setState({ options });
       return false;
@@ -101,15 +101,15 @@ class SeriesSelect extends React.Component<Props, State> {
     const valueComponent = ({ children, innerProps, ...rest }) => {
       const element = rest.data.value;
       const { className } = innerProps;
-      const usedNames = series.filter(s => s !== element)
-        .map(s => (s && s.config && s.config.name ? s.config.name : null))
-        .map(name => trim(name))
-        .filter(name => name !== null && name !== undefined && name !== '');
+      const usedNames = series.filter((s) => s !== element)
+        .map((s) => (s && s.config && s.config.name ? s.config.name : null))
+        .map((name) => trim(name))
+        .filter((name) => name !== null && name !== undefined && name !== '');
       return (
         <span className={className}>
           <ConfigurableElement {...rest}
                                configuration={({ onClose }) => <SeriesConfiguration series={element} usedNames={usedNames} onClose={onClose} />}
-                               onChange={newElement => newSeriesConfigChange(series, element, newElement, onChange)}
+                               onChange={(newElement) => newSeriesConfigChange(series, element, newElement, onChange)}
                                title="Series Configuration">
             {children}
           </ConfigurableElement>

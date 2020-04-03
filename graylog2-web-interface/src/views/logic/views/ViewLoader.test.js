@@ -41,7 +41,7 @@ describe('ViewLoader', () => {
     ViewActions.load = jest.fn(() => Promise.resolve());
   });
   it('deserializes a view', () => {
-    SearchActions.get = mockAction(jest.fn(id => Promise.resolve({ id, queries: [], parameters: [] })));
+    SearchActions.get = mockAction(jest.fn((id) => Promise.resolve({ id, queries: [], parameters: [] })));
     return ViewLoader('foo').then((result) => {
       expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
       expect(result).toEqual(
