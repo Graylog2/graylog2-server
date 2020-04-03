@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Optional;
 
 /**
@@ -21,10 +22,11 @@ import java.util.Optional;
  *
  * Inputs using this service are responsible for defining their own model for InputStatusRecord.inputStateData
  */
+@Singleton
 public class InputStatusService {
     private static final Logger LOG = LoggerFactory.getLogger(InputStatusService.class);
 
-    private static final String INPUT_STATUS_COLLECTION = "input_status";
+    private static final String COLLECTION_NAME = "input_status";
 
     private final JacksonDBCollection<InputStatusRecord, ObjectId> statusCollection;
 
@@ -33,7 +35,7 @@ public class InputStatusService {
                               MongoJackObjectMapperProvider objectMapperProvider,
                               EventBus eventBus) {
         DB mongoDatabase = mongoConnection.getDatabase();
-        DBCollection collection = mongoDatabase.getCollection(INPUT_STATUS_COLLECTION);
+        DBCollection collection = mongoDatabase.getCollection(COLLECTION_NAME);
 
         eventBus.register(this);
 
