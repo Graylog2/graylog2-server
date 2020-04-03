@@ -57,7 +57,7 @@ const _systemTitle = (pathname) => {
     return `${prefix} / Sidecars`;
   }
 
-  const pluginRoute = PluginStore.exports('systemnavigation').filter(route => _isActive(pathname, route.path))[0];
+  const pluginRoute = PluginStore.exports('systemnavigation').filter((route) => _isActive(pathname, route.path))[0];
   if (pluginRoute) {
     return `${prefix} / ${pluginRoute.description}`;
   }

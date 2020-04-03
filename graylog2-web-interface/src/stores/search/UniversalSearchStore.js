@@ -30,7 +30,7 @@ const UniversalSearchStore = Reflux.createStore({
         };
       });
 
-      result.messages = result.messages.map(message => MessageFormatter.formatMessageSummary(message));
+      result.messages = result.messages.map((message) => MessageFormatter.formatMessageSummary(message));
 
       return result;
     });

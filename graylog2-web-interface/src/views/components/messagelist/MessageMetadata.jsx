@@ -18,14 +18,14 @@ const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
     <dd>{index || 'Message is not stored'}</dd>
 
     {streams.size > 0 && (
-      <React.Fragment>
+      <>
         <dt>Routed into streams</dt>
         <dd className="stream-list">
           <ul>
             {streams}
           </ul>
         </dd>
-      </React.Fragment>
+      </>
     )}
   </dl>
 );

@@ -16,7 +16,7 @@ export default class ContentPackRevisions {
   }
 
   get revisions() {
-    return Object.keys(this._value).map(rev => parseInt(rev, 10));
+    return Object.keys(this._value).map((rev) => parseInt(rev, 10));
   }
 
   get latest() {

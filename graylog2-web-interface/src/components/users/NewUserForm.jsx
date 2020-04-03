@@ -35,7 +35,7 @@ class NewUserForm extends React.Component {
 
   _onUsernameChange = (event) => {
     const usernameField = this.inputs.username.getInputDOMNode();
-    const usernameExists = this.state.users.some(user => user.username === event.target.value);
+    const usernameExists = this.state.users.some((user) => user.username === event.target.value);
 
     ValidationsUtils.setFieldValidity(usernameField, usernameExists, 'Username is already taken');
   };

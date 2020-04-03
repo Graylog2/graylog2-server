@@ -161,8 +161,7 @@ class EditPatternModal extends React.Component {
               <Panel bsStyle="danger" header="Grok Error">
                 <code style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{testError}</code>
               </Panel>
-              )
-            }
+              )}
             <Input type="textarea"
                    id={this._getId('sampleData')}
                    label="Sample Data"

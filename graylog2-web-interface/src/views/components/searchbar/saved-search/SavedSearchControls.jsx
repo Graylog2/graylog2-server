@@ -113,7 +113,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     ViewManagementActions.update(newView)
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-      .catch(error => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
+      .catch((error) => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
   _extractErrorMessage = (error) => {
@@ -147,7 +147,7 @@ class SavedSearchControls extends React.Component<Props, State> {
       })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-      .catch(error => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
+      .catch((error) => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
   loadSavedSearch = () => {
@@ -165,7 +165,7 @@ class SavedSearchControls extends React.Component<Props, State> {
           browserHistory.push(Routes.SEARCH);
         }
       })
-      .catch(error => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
+      .catch((error) => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
   loadAsDashboard = () => {
@@ -229,15 +229,15 @@ class SavedSearchControls extends React.Component<Props, State> {
 
     return (
       <NewViewLoaderContext.Consumer>
-        {loadNewView => (
+        {(loadNewView) => (
           <div className="pull-right">
             <ButtonGroup>
-              <React.Fragment>
+              <>
                 <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
                   <Icon style={{ color: savedSearchColor }} name={savedSearchStyle} /> Save
                 </Button>
                 {savedSearchForm}
-              </React.Fragment>
+              </>
               <Button title="Load a previously saved search"
                       onClick={this.toggleListModal}>
                 <Icon name="folder-o" /> Load

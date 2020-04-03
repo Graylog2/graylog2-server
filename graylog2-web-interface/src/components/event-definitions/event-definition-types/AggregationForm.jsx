@@ -24,7 +24,7 @@ class AggregationForm extends React.Component {
           };
         });
     },
-    fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
+    (fieldTypes) => fieldTypes.map((ft) => ft.name).join('-'),
   );
 
   static propTypes = {
@@ -37,7 +37,7 @@ class AggregationForm extends React.Component {
 
   propagateConfigChange = (update) => {
     const { eventDefinition, onChange } = this.props;
-    const nextConfig = Object.assign({}, eventDefinition.config, update);
+    const nextConfig = { ...eventDefinition.config, ...update };
     onChange('config', nextConfig);
   };
 
@@ -62,7 +62,7 @@ class AggregationForm extends React.Component {
               <ControlLabel>Group by Field(s) <small className="text-muted">(Optional)</small></ControlLabel>
               <MultiSelect id="group-by"
                            matchProp="label"
-                           onChange={selected => this.handleGroupByChange(selected === '' ? [] : selected.split(','))}
+                           onChange={(selected) => this.handleGroupByChange(selected === '' ? [] : selected.split(','))}
                            options={formattedFields}
                            value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')}
                            allowCreate />

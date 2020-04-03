@@ -11,7 +11,7 @@ import { numberRefNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 const formatFunctions = (functions) => {
   return functions
     .sort(naturalSort)
-    .map(fn => ({ label: `${fn.toLowerCase()}()`, value: fn }));
+    .map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
 };
 
 const NumberRefExpression = ({
@@ -24,7 +24,7 @@ const NumberRefExpression = ({
   validation,
 }) => {
   const getSeries = (seriesId) => {
-    return eventDefinition.config.series.find(series => series.id === seriesId);
+    return eventDefinition.config.series.find((series) => series.id === seriesId);
   };
 
   const createSeries = () => {
@@ -51,7 +51,7 @@ const NumberRefExpression = ({
     }
     nextSeries.id = nextSeriesId;
 
-    const seriesIndex = series.findIndex(s => s.id === nextSeries.id);
+    const seriesIndex = series.findIndex((s) => s.id === nextSeries.id);
     if (seriesIndex >= 0) {
       series[seriesIndex] = nextSeries;
     } else {

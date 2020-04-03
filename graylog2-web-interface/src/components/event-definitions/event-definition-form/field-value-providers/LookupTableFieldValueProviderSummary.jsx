@@ -19,7 +19,7 @@ class LookupTableFieldValueProviderSummary extends React.Component {
     return (
       <CommonFieldValueProviderSummary {...this.props}>
         <IfPermitted permissions="lookuptables:read">
-          <React.Fragment>
+          <>
             <tr>
               <td>Value source</td>
               <td>Lookup Table</td>
@@ -32,7 +32,7 @@ class LookupTableFieldValueProviderSummary extends React.Component {
               <td>Lookup Table Key Field</td>
               <td>{provider.key_field}</td>
             </tr>
-          </React.Fragment>
+          </>
         </IfPermitted>
       </CommonFieldValueProviderSummary>
     );

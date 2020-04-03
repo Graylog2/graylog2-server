@@ -46,11 +46,11 @@ class LookupTableExtractorConfiguration extends React.Component {
   };
 
   _onChange = (key) => {
-    return event => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
+    return (event) => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
   };
 
   _onSelect = (key) => {
-    return value => this._updateConfigValue(key, value);
+    return (value) => this._updateConfigValue(key, value);
   };
 
   _onTryClick = () => {

@@ -23,7 +23,7 @@ const MessagesStore = Reflux.createStore({
     const { url } = ApiRoutes.MessagesController.single(index.trim(), messageId.trim());
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then(
-        response => MessageFormatter.formatResultMessage(response),
+        (response) => MessageFormatter.formatResultMessage(response),
         (errorThrown) => {
           UserNotification.error(`Loading message information failed with status: ${errorThrown}`,
             'Could not load message information');
@@ -37,7 +37,7 @@ const MessagesStore = Reflux.createStore({
     const { url } = ApiRoutes.MessagesController.analyze(index, encodeURIComponent(StringUtils.stringify(string)));
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then(
-        response => response.tokens,
+        (response) => response.tokens,
         (error) => {
           UserNotification.error(`Loading field terms failed with status: ${error}`,
             'Could not load field terms.');
@@ -58,7 +58,7 @@ const MessagesStore = Reflux.createStore({
 
     const promise = fetch('POST', URLUtils.qualifyUrl(url), payload)
       .then(
-        response => MessageFormatter.formatResultMessage(response),
+        (response) => MessageFormatter.formatResultMessage(response),
         (error) => {
           if (error.additional && error.additional.status === 400) {
             UserNotification.error('Please ensure the selected codec and its configuration are right. '

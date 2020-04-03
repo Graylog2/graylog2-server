@@ -90,7 +90,7 @@ const GeoIpResolverConfig = createReactClass({
   },
 
   _activeDatabaseType(type) {
-    return this._availableDatabaseTypes().filter(t => t.value === type)[0].label;
+    return this._availableDatabaseTypes().filter((t) => t.value === type)[0].label;
   },
 
   render() {

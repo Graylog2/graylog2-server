@@ -33,7 +33,7 @@ const DEFAULT_BAR = {
   value: 0,
 };
 
-const boxShadow = meta => css`
+const boxShadow = (meta) => css`
   box-shadow: ${meta} ${({ theme }) => chroma(theme.color.brand.secondary).alpha(0.1).css()};
 `;
 
@@ -47,7 +47,7 @@ const animatedStripes = keyframes`
   }
 `;
 
-const progressBarVariants = color => css`
+const progressBarVariants = (color) => css`
   background-color: ${color};
   color: ${util.readableColor(color)};
 `;

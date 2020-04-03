@@ -94,7 +94,7 @@ export default class ViewState {
     const newWidgetTitles = Map(this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]));
     const newTitles = this.titles
       .set(TitleTypes.Widget, newWidgetTitles)
-      .updateIn([TitleTypes.Tab, 'title'], value => (value ? `${value} (Copy)` : value));
+      .updateIn([TitleTypes.Tab, 'title'], (value) => (value ? `${value} (Copy)` : value));
     const newWidgetPositions = Map(this.widgetPositions).mapEntries(([key, value]) => [widgetIdTranslation[key], value]).toJS();
     return this.toBuilder()
       .widgetMapping(Map())
@@ -143,7 +143,7 @@ export default class ViewState {
     const { selected_fields: selectedFields, titles, widgets, widget_mapping: widgetMapping, positions, formatting } = value;
     return ViewState.builder()
       .titles(fromJS(titles))
-      .widgets(List(widgets.map(w => Widget.fromJSON(w))))
+      .widgets(List(widgets.map((w) => Widget.fromJSON(w))))
       .widgetMapping(fromJS(widgetMapping))
       .fields(selectedFields)
       .widgetPositions(Map(positions).map(WidgetPosition.fromJSON))

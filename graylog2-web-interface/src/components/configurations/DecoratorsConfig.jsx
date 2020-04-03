@@ -36,21 +36,21 @@ const DecoratorsConfig = () => {
     return <Spinner />;
   }
 
-  const onSave = newDecorators => DecoratorsUpdater(newDecorators, decorators)
+  const onSave = (newDecorators) => DecoratorsUpdater(newDecorators, decorators)
     .then(
       () => UserNotification.success('Updated decorators configuration.', 'Success!'),
-      error => UserNotification.error(`Unable to save new decorators: ${error}`, 'Saving decorators failed'),
+      (error) => UserNotification.error(`Unable to save new decorators: ${error}`, 'Saving decorators failed'),
     )
     .then(DecoratorsActions.list)
     .then(setDecorators)
     .then(closeModal);
 
-  const decoratorsGroupedByStream = groupBy(decorators, decorator => (decorator.stream || DEFAULT_SEARCH_ID));
+  const decoratorsGroupedByStream = groupBy(decorators, (decorator) => (decorator.stream || DEFAULT_SEARCH_ID));
 
   const currentDecorators = decoratorsGroupedByStream[currentStream] || [];
   const sortedDecorators = currentDecorators
     .sort((d1, d2) => d1.order - d2.order);
-  const readOnlyDecoratorItems = sortedDecorators.map(decorator => formatDecorator(decorator, currentDecorators, types));
+  const readOnlyDecoratorItems = sortedDecorators.map((decorator) => formatDecorator(decorator, currentDecorators, types));
 
   const streamOptions = streams
     .filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id));

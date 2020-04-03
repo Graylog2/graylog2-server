@@ -117,7 +117,7 @@ class AggregationConditionExpression extends React.Component {
         nextUpdate = nextExpression;
       }
 
-      onChange(Object.assign({}, changes, { conditions: nextUpdate }));
+      onChange({ ...changes, conditions: nextUpdate });
     };
   };
 

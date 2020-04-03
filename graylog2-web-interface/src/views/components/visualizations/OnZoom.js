@@ -21,8 +21,8 @@ const onZoom = (currentQuery: Query, from: string, to: string, viewType: ?ViewTy
   };
 
   const action = viewType === View.Type.Dashboard
-    ? timerange => GlobalOverrideActions.timerange(timerange).then(SearchActions.refresh)
-    : timerange => QueriesActions.timerange(currentQuery.id, timerange);
+    ? (timerange) => GlobalOverrideActions.timerange(timerange).then(SearchActions.refresh)
+    : (timerange) => QueriesActions.timerange(currentQuery.id, timerange);
 
   action(newTimerange);
   return false;

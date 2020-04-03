@@ -25,7 +25,7 @@ export default class PortaledPopover extends React.Component {
     isOpen: false,
   };
 
-  _onClick = () => this.setState(state => ({ isOpen: !state.isOpen }));
+  _onClick = () => this.setState((state) => ({ isOpen: !state.isOpen }));
 
   render() {
     const { container, popover, title, ...rest } = this.props;

@@ -4,7 +4,7 @@ import { mount } from 'wrappedEnzyme';
 
 import ConfirmLeaveDialog from './ConfirmLeaveDialog';
 
-jest.mock('react-router', () => ({ withRouter: x => x }));
+jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('util/AppConfig');
 
 const mockRouter = () => ({

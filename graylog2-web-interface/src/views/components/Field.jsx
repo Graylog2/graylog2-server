@@ -19,7 +19,7 @@ type Props = {|
 
 const Field = ({ children, disabled = false, menuContainer, name, queryId, type }: Props) => (
   <InteractiveContext.Consumer>
-    {interactive => (interactive
+    {(interactive) => (interactive
       ? (
         <FieldActions element={children || name}
                       disabled={!interactive || disabled}

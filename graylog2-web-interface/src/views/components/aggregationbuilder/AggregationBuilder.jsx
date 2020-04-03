@@ -52,7 +52,7 @@ export const makeVisualization = (component: React.ComponentType<VisualizationCo
 
 const _visualizationForType = (type: string): VisualizationComponent => {
   const visualizationTypes = PluginStore.exports('visualizationTypes');
-  const visualization = visualizationTypes.filter(viz => viz.type === type)[0];
+  const visualization = visualizationTypes.filter((viz) => viz.type === type)[0];
   if (!visualization) {
     throw new Error(`Unable to find visualization component for type: ${type}`);
   }

@@ -7,7 +7,7 @@ import HighlightingRule from 'views/logic/views/formatting/highlighting/Highligh
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import CustomHighlighting from './CustomHighlighting';
 
-const renderDecorators = (decorators, field, value) => decorators.map(Decorator => (
+const renderDecorators = (decorators, field, value) => decorators.map((Decorator) => (
   <Decorator key={Decorator.name}
              type={FieldType.Unknown}
              field={field}
@@ -21,7 +21,7 @@ describe('CustomHighlighting', () => {
     const wrapper = mount((
       <CustomHighlighting field={field} value={value} highlightingRules={{}}>
         <DecoratorContext.Consumer>
-          {decorators => renderDecorators(decorators, field, value)}
+          {(decorators) => renderDecorators(decorators, field, value)}
         </DecoratorContext.Consumer>
       </CustomHighlighting>
     ));
@@ -36,7 +36,7 @@ describe('CustomHighlighting', () => {
     const wrapper = mount((
       <CustomHighlighting field={field} value={value} highlightingRules={{ bar: [rule] }}>
         <DecoratorContext.Consumer>
-          {decorators => renderDecorators(decorators, field, value)}
+          {(decorators) => renderDecorators(decorators, field, value)}
         </DecoratorContext.Consumer>
       </CustomHighlighting>
     ));
@@ -51,7 +51,7 @@ describe('CustomHighlighting', () => {
     const wrapper = mount((
       <CustomHighlighting field={field} value={value} highlightingRules={{ [field]: [rule] }}>
         <DecoratorContext.Consumer>
-          {decorators => renderDecorators(decorators, field, value)}
+          {(decorators) => renderDecorators(decorators, field, value)}
         </DecoratorContext.Consumer>
       </CustomHighlighting>
     ));
@@ -66,7 +66,7 @@ describe('CustomHighlighting', () => {
     const wrapper = mount((
       <CustomHighlighting field={field} value={value} highlightingRules={{ [field]: [rule] }}>
         <DecoratorContext.Consumer>
-          {decorators => renderDecorators(decorators, field, value)}
+          {(decorators) => renderDecorators(decorators, field, value)}
         </DecoratorContext.Consumer>
       </CustomHighlighting>
     ));
@@ -81,7 +81,7 @@ describe('CustomHighlighting', () => {
     const wrapper = mount((
       <CustomHighlighting field={field} value={value} highlightingRules={{ [field]: [rule] }}>
         <DecoratorContext.Consumer>
-          {decorators => renderDecorators(decorators, field, value)}
+          {(decorators) => renderDecorators(decorators, field, value)}
         </DecoratorContext.Consumer>
       </CustomHighlighting>
     ));

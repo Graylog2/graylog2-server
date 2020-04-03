@@ -57,7 +57,7 @@ export default class TimeHistogramPivot extends React.Component<Props, State> {
 
   _propagateState = () => this.props.onChange(this.state);
 
-  _onChangeInterval = (interval: Interval) => this.setState(state => ({ ...state, interval }), this._propagateState);
+  _onChangeInterval = (interval: Interval) => this.setState((state) => ({ ...state, interval }), this._propagateState);
 
   render() {
     const { interval } = this.state;

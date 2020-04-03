@@ -14,7 +14,7 @@ const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboar
   .createdAt(new Date('2019-10-16T14:38:44.681Z'))
   .build();
 
-jest.mock('react-router', () => ({ withRouter: x => x }));
+jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: {
     getInitialState: () => ({ isNew: false, view: mockView }),

@@ -134,7 +134,7 @@ const TestLdapLogin = createReactClass({
     const formattedEntry = (attributes.length > 0 ? <dl>{attributes}</dl>
       : <p>LDAP server did not return any attributes for the user.</p>);
 
-    const groups = (loginStatus.result.groups ? loginStatus.result.groups.map(group => <li key={group}>{group}</li>) : []);
+    const groups = (loginStatus.result.groups ? loginStatus.result.groups.map((group) => <li key={group}>{group}</li>) : []);
     const formattedGroups = (groups.length > 0 ? <ul style={{ padding: 0 }}>{groups}</ul>
       : <p>LDAP server did not return any groups for the user.</p>);
 

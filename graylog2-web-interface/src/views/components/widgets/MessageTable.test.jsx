@@ -80,7 +80,7 @@ describe('MessageTable', () => {
                                         setLoadingState={() => {}}
                                         messages={messages} />);
 
-    const tableHeadFields = wrapper.find('Field').map(field => field.text());
+    const tableHeadFields = wrapper.find('Field').map((field) => field.text());
     expect(tableHeadFields).toEqual(configFields);
   });
 

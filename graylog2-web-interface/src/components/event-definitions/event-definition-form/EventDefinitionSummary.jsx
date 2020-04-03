@@ -39,7 +39,7 @@ class EventDefinitionSummary extends React.Component {
 
   renderDetails = (eventDefinition) => {
     return (
-      <React.Fragment>
+      <>
         <h3 className={commonStyles.title}>Details</h3>
         <dl>
           <dt>Title</dt>
@@ -49,7 +49,7 @@ class EventDefinitionSummary extends React.Component {
           <dt>Priority</dt>
           <dd>{lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
         </dl>
-      </React.Fragment>
+      </>
     );
   };
 
@@ -57,7 +57,7 @@ class EventDefinitionSummary extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports(name).find(edt => edt.type === type) || {};
+    return PluginStore.exports(name).find((edt) => edt.type === type) || {};
   };
 
   renderCondition = (config) => {
@@ -72,10 +72,10 @@ class EventDefinitionSummary extends React.Component {
     );
 
     return (
-      <React.Fragment>
+      <>
         <h3 className={commonStyles.title}>{conditionPlugin.displayName || config.type}</h3>
         {component}
-      </React.Fragment>
+      </>
     );
   };
 
@@ -100,32 +100,31 @@ class EventDefinitionSummary extends React.Component {
 
   renderFieldList = (fieldNames, fields, keys) => {
     return (
-      <React.Fragment>
+      <>
         <dl>
           <dt>Keys</dt>
           <dd>{keys.length > 0 ? keys.join(', ') : 'No Keys configured for Events based on this Definition.'}</dd>
         </dl>
-        {fieldNames.sort(naturalSort).map(fieldName => this.renderField(fieldName, fields[fieldName], keys))}
-      </React.Fragment>
+        {fieldNames.sort(naturalSort).map((fieldName) => this.renderField(fieldName, fields[fieldName], keys))}
+      </>
     );
   };
 
   renderFields = (fields, keys) => {
     const fieldNames = Object.keys(fields);
     return (
-      <React.Fragment>
+      <>
         <h3 className={commonStyles.title}>Fields</h3>
         {fieldNames.length === 0
           ? <p>No Fields configured for Events based on this Definition.</p>
-          : this.renderFieldList(fieldNames, fields, keys)
-        }
-      </React.Fragment>
+          : this.renderFieldList(fieldNames, fields, keys)}
+      </>
     );
   };
 
   renderNotification = (definitionNotification) => {
     const { notifications } = this.props;
-    const notification = notifications.find(n => n.id === definitionNotification.notification_id);
+    const notification = notifications.find((n) => n.id === definitionNotification.notification_id);
 
     let content;
 
@@ -167,13 +166,13 @@ class EventDefinitionSummary extends React.Component {
       : 'Notifications will not include any messages.');
 
     return (
-      <React.Fragment>
+      <>
         <h4>Settings</h4>
         <dl>
           <dd>{formattedGracePeriod}</dd>
           <dd>{formattedBacklogSize}</dd>
         </dl>
-      </React.Fragment>
+      </>
     );
   };
 
@@ -185,17 +184,17 @@ class EventDefinitionSummary extends React.Component {
       ? definitionNotifications : [];
 
     return (
-      <React.Fragment>
+      <>
         <h3 className={commonStyles.title}>Notifications</h3>
         {effectiveDefinitionNotifications.length === 0
           ? <p>This Event is not configured to trigger any Notifications.</p>
           : (
-            <React.Fragment>
+            <>
               {this.renderNotificationSettings(notificationSettings)}
               {definitionNotifications.map(this.renderNotification)}
-            </React.Fragment>
+            </>
           )}
-      </React.Fragment>
+      </>
     );
   };
 

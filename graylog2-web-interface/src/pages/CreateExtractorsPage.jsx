@@ -51,7 +51,7 @@ const CreateExtractorsPage = createReactClass({
     InputsActions.get.triggerPromise(params.inputId);
     const { exampleIndex, exampleId } = this.state;
     MessagesActions.loadMessage.triggerPromise(exampleIndex, exampleId)
-      .then(message => this.setState({ exampleMessage: message }));
+      .then((message) => this.setState({ exampleMessage: message }));
   },
 
   _isLoading() {

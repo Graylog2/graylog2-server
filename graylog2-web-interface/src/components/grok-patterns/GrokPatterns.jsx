@@ -54,7 +54,7 @@ const GrokPatterns = createReactClass({
 
   validPatternName(name) {
     // Check if patterns already contain a pattern with the given name.
-    return !this.state.patterns.some(pattern => pattern.name === name);
+    return !this.state.patterns.some((pattern) => pattern.name === name);
   },
 
   savePattern(pattern, callback) {
@@ -92,7 +92,7 @@ const GrokPatterns = createReactClass({
   },
 
   _patternFormatter(pattern) {
-    const patterns = this.state.patterns.filter(p => p.name !== pattern.name);
+    const patterns = this.state.patterns.filter((p) => p.name !== pattern.name);
     return (
       <tr key={pattern.id}>
         <td>{pattern.name}</td>

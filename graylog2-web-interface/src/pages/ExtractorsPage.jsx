@@ -38,13 +38,13 @@ const ExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
-    InputsActions.get(params.inputId).then(input => this.setState({ input }));
+    InputsActions.get(params.inputId).then((input) => this.setState({ input }));
     NodesActions.list();
   },
 
   onNodesChange(nodes) {
     const { params } = this.props;
-    const newNode = params.nodeId ? nodes.nodes[params.nodeId] : Object.values(nodes.nodes).filter(node => node.is_master);
+    const newNode = params.nodeId ? nodes.nodes[params.nodeId] : Object.values(nodes.nodes).filter((node) => node.is_master);
 
     const { node } = this.state;
     if (!node || node.node_id !== newNode.node_id) {

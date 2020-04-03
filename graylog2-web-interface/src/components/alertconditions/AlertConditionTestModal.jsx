@@ -36,7 +36,7 @@ class AlertConditionTestModal extends React.Component {
     this.setState({ isTesting: true, testResults: undefined });
     AlertConditionsActions.test(stream.id, condition.id)
       .then(
-        testResults => this.setState({ testResults: testResults }),
+        (testResults) => this.setState({ testResults: testResults }),
         (error) => {
           if (error.status === 400) {
             // Condition testing failed but we should still get results in the body

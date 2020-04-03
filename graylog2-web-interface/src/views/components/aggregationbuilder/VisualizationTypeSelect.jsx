@@ -8,7 +8,7 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 const VisualizationTypeSelect = ({ onChange, value }) => {
   const visualizationTypes = PluginStore.exports('visualizationTypes')
     .sort((v1, v2) => defaultCompare(v1.displayName, v2.displayName))
-    .map(viz => ({ label: viz.displayName, value: viz.type }));
+    .map((viz) => ({ label: viz.displayName, value: viz.type }));
 
   return (
     <Select placeholder="Visualization type"

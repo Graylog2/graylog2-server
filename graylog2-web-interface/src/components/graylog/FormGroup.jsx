@@ -12,7 +12,7 @@ import { StyledAddon } from './InputGroup';
 
 const VALID_STATES = ['error', 'warning', 'success'];
 
-const createCss = validationState => css(({ theme }) => {
+const createCss = (validationState) => css(({ theme }) => {
   const variant = validationState === 'error' ? 'danger' : validationState;
   const text = util.colorLevel(theme.color.variant[variant], 6);
   const border = theme.color.variant[variant];

@@ -15,7 +15,7 @@ jest.mock('views/stores/ChartColorRulesStore', () => ({
   },
 }));
 
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 
 type ContainerProps = {
   colors: ChartColorMap,

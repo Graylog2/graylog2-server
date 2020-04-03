@@ -20,8 +20,7 @@ class InputTypesDataTable extends React.Component {
         <td className="limited">{inputType.type}</td>
         <td className="limited" style={{ width: 150 }}>
           {inputType.link_to_docs
-          && <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>
-          }
+          && <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>}
         </td>
       </tr>
     );
@@ -42,7 +41,7 @@ class InputTypesDataTable extends React.Component {
 
     const headers = ['Name', 'Type', 'Documentation'];
 
-    const rows = Object.keys(this.props.inputDescriptions).map(key => this.props.inputDescriptions[key]);
+    const rows = Object.keys(this.props.inputDescriptions).map((key) => this.props.inputDescriptions[key]);
 
     return (
       <DataTable id="input-types-list"

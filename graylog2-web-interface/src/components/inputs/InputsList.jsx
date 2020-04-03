@@ -81,14 +81,14 @@ const InputsList = createReactClass({
   _splitInputs(state) {
     const { inputs } = state;
     const globalInputs = inputs
-      .filter(input => input.global === true)
+      .filter((input) => input.global === true)
       .sort((inputA, inputB) => naturalSortIgnoreCase(inputA.title, inputB.title));
     let localInputs = inputs
-      .filter(input => input.global === false)
+      .filter((input) => input.global === false)
       .sort((inputA, inputB) => naturalSortIgnoreCase(inputA.title, inputB.title));
 
     if (this.props.node) {
-      localInputs = localInputs.filter(input => input.node === this.props.node.node_id);
+      localInputs = localInputs.filter((input) => input.node === this.props.node.node_id);
     }
 
     this.setState({
@@ -170,8 +170,7 @@ const InputsList = createReactClass({
         <IfPermitted permissions="inputs:create">
           <CreateInputControl />
         </IfPermitted>
-        )
-        }
+        )}
 
         <InputListRow id="filter-input" className="content">
           <Col md={12}>
@@ -189,7 +188,7 @@ const InputsList = createReactClass({
             <EntityList bsNoItemsStyle="info"
                         noItemsText={this.state.globalInputs.length <= 0 ? 'There are no global inputs.'
                           : 'No global inputs match the filter'}
-                        items={this.state.filteredGlobalInputs.map(input => this._formatInput(input))} />
+                        items={this.state.filteredGlobalInputs.map((input) => this._formatInput(input))} />
             <br />
             <br />
             <h2>
@@ -200,7 +199,7 @@ const InputsList = createReactClass({
             <EntityList bsNoItemsStyle="info"
                         noItemsText={this.state.localInputs.length <= 0 ? 'There are no local inputs.'
                           : 'No local inputs match the filter'}
-                        items={this.state.filteredLocalInputs.map(input => this._formatInput(input))} />
+                        items={this.state.filteredLocalInputs.map((input) => this._formatInput(input))} />
           </Col>
         </InputListRow>
       </div>

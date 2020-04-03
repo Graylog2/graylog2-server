@@ -83,7 +83,7 @@ class DecoratorSummary extends React.Component {
       }
     });
 
-    return Object.assign({}, config, resolvedConfig);
+    return { ...config, ...resolvedConfig };
   };
 
   _formatActionsMenu = () => {

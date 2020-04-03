@@ -56,7 +56,7 @@ describe('PivotConfigGenerator', () => {
     });
   });
   describe('maps time units for time pivots with timeunit intervals', () => {
-    const createWidgetConfigWithPivot = pivot => AggregationWidgetConfig.builder()
+    const createWidgetConfigWithPivot = (pivot) => AggregationWidgetConfig.builder()
       .rollup(true)
       .rowPivots([pivot])
       .columnPivots([])

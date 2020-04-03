@@ -19,15 +19,11 @@ package org.graylog2.savedsearches;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.Tools;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -93,18 +89,5 @@ public class SavedSearchServiceImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void testLoadInvalidId() throws Exception {
         savedSearchService.load("foobar");
-    }
-
-    @Test
-    public void testCreate() throws Exception {
-        final String title = "Example Title";
-        final Map<String, Object> query =Collections.emptyMap();
-        final String creatorUserId = "someuser";
-        final DateTime createdAt = Tools.nowUTC();
-
-        final SavedSearch savedSearch = savedSearchService.create(title, query, creatorUserId, createdAt);
-
-        assertNotNull("Should have returned a SavedSearch", savedSearch);
-        assertEquals("Collection should still be empty", 0, savedSearchService.all().size());
     }
 }

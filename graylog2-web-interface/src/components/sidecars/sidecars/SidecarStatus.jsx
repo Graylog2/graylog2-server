@@ -39,8 +39,7 @@ const SidecarStatus = createReactClass({
         <dt>Volumes &gt; 75% full</dt>
         {metrics.disks_75 === undefined
           ? <dd>Not available</dd>
-          : <dd>{metrics.disks_75.length > 0 ? metrics.disks_75.join(', ') : 'None'}</dd>
-        }
+          : <dd>{metrics.disks_75.length > 0 ? metrics.disks_75.join(', ') : 'None'}</dd>}
       </dl>
     );
   },
@@ -61,7 +60,7 @@ const SidecarStatus = createReactClass({
 
     const statuses = [];
     collectorStatuses.forEach((status) => {
-      const collector = collectors.find(c => c.id === status.collector_id);
+      const collector = collectors.find((c) => c.id === status.collector_id);
 
       let statusMessage;
       let statusBadge;

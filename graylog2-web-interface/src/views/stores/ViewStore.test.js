@@ -30,21 +30,21 @@ describe('ViewStore', () => {
     .build();
   const dummyView = View.builder().search(dummySearch).build();
   it('.load should select first query if activeQuery is not set', () => ViewActions.load(dummyView)
-    .then(state => expect(state.activeQuery).toBe('firstQueryId')));
+    .then((state) => expect(state.activeQuery).toBe('firstQueryId')));
   it('.load should set isNew to false', () => ViewActions.load(dummyView)
-    .then(state => expect(state.isNew).toBeFalsy()));
+    .then((state) => expect(state.isNew).toBeFalsy()));
   it('.load should select activeQuery if it is set and present in view', () => ViewActions.selectQuery('secondQueryId')
     .then(() => ViewActions.load(dummyView))
-    .then(state => expect(state.activeQuery).toBe('secondQueryId')));
+    .then((state) => expect(state.activeQuery).toBe('secondQueryId')));
   it('.load should select first query if activeQuery is set but not present in view', () => ViewActions.selectQuery('nonExistingQueryId')
     .then(() => ViewActions.load(dummyView))
-    .then(state => expect(state.activeQuery).toBe('firstQueryId')));
+    .then((state) => expect(state.activeQuery).toBe('firstQueryId')));
   it('.load should not mark isNew as true by default', () => ViewActions.selectQuery('nonExistingQueryId')
     .then(() => ViewActions.load(dummyView))
-    .then(state => expect(state.isNew).toBe(false)));
+    .then((state) => expect(state.isNew).toBe(false)));
   it('.load should allow to mark isNew as true', () => ViewActions.selectQuery('nonExistingQueryId')
     .then(() => ViewActions.load(dummyView, true))
-    .then(state => expect(state.isNew).toBe(true)));
+    .then((state) => expect(state.isNew).toBe(true)));
 
   it('.update should update existing view state', () => {
     // const search = Search.create();
@@ -71,7 +71,7 @@ describe('ViewStore', () => {
   });
   describe('maintains dirty flag:', () => {
     beforeEach(() => {
-      SearchActions.create = mockAction(jest.fn(s => Promise.resolve({ search: s })));
+      SearchActions.create = mockAction(jest.fn((s) => Promise.resolve({ search: s })));
     });
     it('resets dirty flag when an existing view is updated', () => {
       const search = Search.create();
@@ -102,7 +102,7 @@ describe('ViewStore', () => {
     let search: Search;
     let view: View;
     beforeEach(() => {
-      SearchActions.create = mockAction(jest.fn(s => Promise.resolve({ search: s })));
+      SearchActions.create = mockAction(jest.fn((s) => Promise.resolve({ search: s })));
 
       search = Search.create()
         .toBuilder()

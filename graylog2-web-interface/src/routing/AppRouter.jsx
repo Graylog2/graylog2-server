@@ -89,21 +89,21 @@ import AppErrorBoundary from './AppErrorBoundary';
 
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes');
-  const pluginRoutesWithNullParent = pluginRoutes.filter(route => (route.parentComponent === null)).map((pluginRoute) => {
+  const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
              path={URLUtils.appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     );
   });
-  const pluginRoutesWithParent = pluginRoutes.filter(route => route.parentComponent).map(pluginRoute => (
+  const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map((pluginRoute) => (
     <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
            component={pluginRoute.parentComponent}>
       <Route path={URLUtils.appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     </Route>
   ));
-  const standardPluginRoutes = pluginRoutes.filter(route => (route.parentComponent === undefined)).map((pluginRoute) => {
+  const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
              path={URLUtils.appPrefixed(pluginRoute.path)}

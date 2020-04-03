@@ -108,7 +108,7 @@ class Wizard extends React.Component {
     const selectedStep = this._getSelectedStep();
     const len = steps.length;
     const disabledPosition = direction === 'next' ? (len - 1) : 0;
-    const currentPosition = steps.findIndex(step => step.key === this._getSelectedStep());
+    const currentPosition = steps.findIndex((step) => step.key === this._getSelectedStep());
     const otherPosition = direction === 'next' ? (currentPosition + 1) : (currentPosition - 1);
     const otherStep = (steps[otherPosition] || {});
     return steps[disabledPosition].key === selectedStep || otherStep.disabled;
@@ -127,7 +127,7 @@ class Wizard extends React.Component {
   _getSelectedIndex = () => {
     const { steps } = this.props;
     const selectedStep = this._getSelectedStep();
-    return steps.map(step => step.key).indexOf(selectedStep);
+    return steps.map((step) => step.key).indexOf(selectedStep);
   };
 
   _renderVerticalStepNav = () => {
@@ -148,7 +148,7 @@ class Wizard extends React.Component {
           })}
         </Nav>
         {!hidePreviousNextButtons && (
-          <React.Fragment>
+          <>
             <br />
             <Row>
               <Col xs={6}>
@@ -166,7 +166,7 @@ class Wizard extends React.Component {
                 </Button>
               </Col>
             </Row>
-          </React.Fragment>
+          </>
         )}
       </Col>
     );

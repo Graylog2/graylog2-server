@@ -15,15 +15,15 @@ const DecoratorsUpdater = (newDecorators: Array<Decorator>, oldDecorators: Array
   const newDecoratorsById = newDecorators
     .reduce((prev, cur) => (cur.id ? { ...prev, [cur.id]: cur } : prev), {});
 
-  const createdDecorators = difference(newDecoratorIds, oldDecoratorIds).map(newDecoratorId => newDecoratorsById[newDecoratorId]);
+  const createdDecorators = difference(newDecoratorIds, oldDecoratorIds).map((newDecoratorId) => newDecoratorsById[newDecoratorId]);
   const updatedDecorators = newDecorators.filter(({ id }) => id)
-    .filter(decorator => decorator.id && oldDecoratorsById[decorator.id] && !isEqual(decorator, oldDecoratorsById[decorator.id]));
+    .filter((decorator) => decorator.id && oldDecoratorsById[decorator.id] && !isEqual(decorator, oldDecoratorsById[decorator.id]));
   const deletedDecoratorIds = difference(oldDecoratorIds, newDecoratorIds);
 
   return [
     ...createdDecorators.map(({ id, ...newDecorator }) => () => DecoratorsActions.create(newDecorator)),
-    ...updatedDecorators.map(updatedDecorator => () => DecoratorsActions.update(updatedDecorator.id, updatedDecorator)),
-    ...deletedDecoratorIds.map(deletedID => () => DecoratorsActions.remove(deletedID)),
+    ...updatedDecorators.map((updatedDecorator) => () => DecoratorsActions.update(updatedDecorator.id, updatedDecorator)),
+    ...deletedDecoratorIds.map((deletedID) => () => DecoratorsActions.remove(deletedID)),
   ].reduce((prev, cur) => prev.then(() => cur()), Promise.resolve());
 };
 

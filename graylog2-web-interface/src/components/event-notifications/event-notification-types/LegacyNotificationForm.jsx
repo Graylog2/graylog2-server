@@ -23,19 +23,19 @@ class LegacyNotificationForm extends React.Component {
 
   propagateMultiChange = (newValues) => {
     const { config, onChange } = this.props;
-    const nextConfig = Object.assign({}, config, newValues);
+    const nextConfig = { ...config, ...newValues };
     onChange(nextConfig);
   };
 
   propagateChange = (key, value) => {
     const { config } = this.props;
-    const nextConfiguration = Object.assign({}, config.configuration, { [key]: value });
+    const nextConfiguration = { ...config.configuration, [key]: value };
     this.propagateMultiChange({ configuration: nextConfiguration });
   };
 
   formatLegacyTypes = (legacyTypes) => {
     return Object.keys(legacyTypes)
-      .map(typeName => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
+      .map((typeName) => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
   };
 
   getDefaultConfiguration = (legacyNotificationType) => {
@@ -101,7 +101,7 @@ class LegacyNotificationForm extends React.Component {
     }
 
     return (
-      <React.Fragment>
+      <>
         <fieldset>
           <FormGroup controlId="notification-legacy-select"
                      validationState={validation.errors.callback_type ? 'error' : null}>
@@ -123,7 +123,7 @@ class LegacyNotificationForm extends React.Component {
         </Alert>
 
         {content}
-      </React.Fragment>
+      </>
     );
   }
 }

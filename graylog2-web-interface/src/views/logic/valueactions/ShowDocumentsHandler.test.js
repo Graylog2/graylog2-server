@@ -14,7 +14,7 @@ import Widget from '../widgets/Widget';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
-    create: jest.fn(widget => Promise.resolve(widget)),
+    create: jest.fn((widget) => Promise.resolve(widget)),
   },
 }));
 

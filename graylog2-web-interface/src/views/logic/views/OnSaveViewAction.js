@@ -7,5 +7,5 @@ export default (newView) => {
     return ViewManagementActions.update(view);
   }).then(({ title }) => {
     return UserNotification.success(`Saving view "${title}" was successful!`, 'Success!');
-  }).catch(error => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
+  }).catch((error) => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
 };

@@ -60,7 +60,7 @@ describe('StreamSearchPage', () => {
       relative: '300',
     },
   };
-  const SimpleStreamSearchPage = props => (
+  const SimpleStreamSearchPage = (props) => (
     <StreamSearchPage location={{ query: {} }}
                       params={{ streamId: 'stream-id-1' }}
                       route={{}}
@@ -101,7 +101,7 @@ describe('StreamSearchPage', () => {
     it('should be possible with specific view id', async () => {
       mockExtendedSearchPage.mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
-          {loadView => <button type="button" onClick={() => loadView && loadView('special-view-id')}>Load view</button>}
+          {(loadView) => <button type="button" onClick={() => loadView && loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
       ));
       const viewGetAction = asMock(ViewManagementActions.get);
@@ -119,7 +119,7 @@ describe('StreamSearchPage', () => {
     beforeEach(() => {
       mockExtendedSearchPage.mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
-          {loadNewView => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
+          {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>
       ));
     });

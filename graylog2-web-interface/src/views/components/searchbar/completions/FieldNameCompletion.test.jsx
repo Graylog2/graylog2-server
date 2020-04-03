@@ -12,11 +12,11 @@ jest.mock('views/stores/FieldTypesStore', () => ({
   ),
 }));
 
-const _createField = name => ({ name, type: { type: 'string' } });
+const _createField = (name) => ({ name, type: { type: 'string' } });
 const dummyFields = ['source', 'message', 'timestamp'].map(_createField);
 
-const _createQueryFields = fields => ({ get: () => fields });
-const _createFieldTypesStoreState = fields => ({ all: fields, queryFields: _createQueryFields(fields) });
+const _createQueryFields = (fields) => ({ get: () => fields });
+const _createFieldTypesStoreState = (fields) => ({ all: fields, queryFields: _createQueryFields(fields) });
 
 describe('FieldNameCompletion', () => {
   beforeEach(() => {
@@ -31,38 +31,38 @@ describe('FieldNameCompletion', () => {
 
   it('returns matching fields if prefix is present in one field name', () => {
     const completer = new FieldNameCompletion();
-    expect(completer.getCompletions(null, null, 'mess').map(result => result.name))
+    expect(completer.getCompletions(null, null, 'mess').map((result) => result.name))
       .toEqual(['message']);
   });
 
   it('returns matching fields if prefix is present in at least one field name', () => {
     const completer = new FieldNameCompletion([]);
-    expect(completer.getCompletions(null, null, 'e').map(result => result.name))
+    expect(completer.getCompletions(null, null, 'e').map((result) => result.name))
       .toEqual(['source', 'message', 'timestamp']);
   });
 
   it('suffixes matching fields with colon', () => {
     const completer = new FieldNameCompletion([]);
-    expect(completer.getCompletions(null, null, 'e').map(result => result.value))
+    expect(completer.getCompletions(null, null, 'e').map((result) => result.value))
       .toEqual(['source:', 'message:', 'timestamp:']);
   });
 
   it('returns _exist_-operator if matching prefix', () => {
     const completer = new FieldNameCompletion();
-    expect(completer.getCompletions(null, null, '_e').map(result => result.value))
+    expect(completer.getCompletions(null, null, '_e').map((result) => result.value))
       .toEqual(['_exists_:']);
   });
 
   it('returns matching fields after _exists_-operator', () => {
     const completer = new FieldNameCompletion();
     expect(completer.getCompletions(null, { type: 'keyword', value: '_exists_:' }, 'e')
-      .map(result => result.name))
+      .map((result) => result.name))
       .toEqual(['source', 'message', 'timestamp']);
   });
 
   it('returns exists operator together with matching fields', () => {
     const completer = new FieldNameCompletion();
-    expect(completer.getCompletions(null, null, 'e').map(result => result.name))
+    expect(completer.getCompletions(null, null, 'e').map((result) => result.name))
       .toEqual(['_exists_', 'source', 'message', 'timestamp']);
   });
 });

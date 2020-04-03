@@ -195,7 +195,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Delete view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
     public ViewDTO delete(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
-        checkPermission(ViewsRestPermissions.VIEW_DELETE, id);
+        checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
         final ViewDTO dto = loadView(id);
         dbService.delete(id);
         removeUserPermissions(dto);

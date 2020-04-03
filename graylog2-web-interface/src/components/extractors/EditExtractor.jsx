@@ -87,7 +87,7 @@ class EditExtractor extends React.Component {
 
   _onConverterChange = (converterType, newConverter) => {
     const { updatedExtractor } = this.state;
-    const previousConverter = updatedExtractor.converters.filter(converter => converter.type === converterType)[0];
+    const previousConverter = updatedExtractor.converters.filter((converter) => converter.type === converterType)[0];
 
     if (previousConverter) {
       // Remove converter from the list
@@ -106,7 +106,7 @@ class EditExtractor extends React.Component {
     const { exampleMessage, updatedExtractor } = this.state;
     const tester = (updatedExtractor.condition_type === 'string' ? ToolsStore.testContainsString : ToolsStore.testRegex);
     const promise = tester(updatedExtractor.condition_value, exampleMessage);
-    promise.then(result => this.setState({ conditionTestResult: result.matched }));
+    promise.then((result) => this.setState({ conditionTestResult: result.matched }));
   };
 
   _tryButtonDisabled = () => {

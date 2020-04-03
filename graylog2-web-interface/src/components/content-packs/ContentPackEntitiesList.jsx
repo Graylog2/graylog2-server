@@ -153,8 +153,7 @@ class ContentPackEntitiesList extends React.Component {
                     }}>
               Edit
             </Button>
-            )
-            }
+            )}
             <Button bsStyle="info"
                     bsSize="xs"
                     onClick={() => { openShowModal(); }}>
@@ -186,7 +185,7 @@ class ContentPackEntitiesList extends React.Component {
         <DataTable id="entity-list"
                    headers={headers}
                    className={ContentPackEntitiesListStyle.scrollable}
-                   sortBy={entity => entity.type.name}
+                   sortBy={(entity) => entity.type.name}
                    filterKeys={[]}
                    rows={filteredEntities}
                    dataRowFormatter={this._entityRowFormatter} />

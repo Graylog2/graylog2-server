@@ -93,12 +93,12 @@ describe('GenericPlot', () => {
 
     const newChartData = wrapper.find('PlotlyComponent').props().data;
 
-    expect(newChartData.find(chart => chart.name === 'count()').marker.color).toEqual('#783a8e');
-    expect(newChartData.find(chart => chart.name === 'sum(bytes)').marker.color).toBeUndefined();
+    expect(newChartData.find((chart) => chart.name === 'count()').marker.color).toEqual('#783a8e');
+    expect(newChartData.find((chart) => chart.name === 'sum(bytes)').marker.color).toBeUndefined();
   });
   describe('has color picker', () => {
     const getChartColor = (fullData, name) => {
-      const data = fullData.find(d => (d.name === name));
+      const data = fullData.find((d) => (d.name === name));
       if (data && data.marker && data.marker.color) {
         // $FlowFixMe the check above ensures the presents of marker
         const { marker: { color } } = data;
@@ -107,7 +107,7 @@ describe('GenericPlot', () => {
       return undefined;
     };
 
-    const event = genericPlot => ({
+    const event = (genericPlot) => ({
       node: {
         textContent: 'x',
         querySelector: jest.fn(() => genericPlot),

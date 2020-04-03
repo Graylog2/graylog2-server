@@ -8,7 +8,7 @@ import HighlightMessageContext from '../contexts/HighlightMessageContext';
 describe('HighlightMessageInQuery', () => {
   const TestComponent = () => (
     <HighlightMessageContext.Consumer>
-      {messageId => <span>{messageId}</span>}
+      {(messageId) => <span>{messageId}</span>}
     </HighlightMessageContext.Consumer>
   );
   it('should render component for empty query', () => {

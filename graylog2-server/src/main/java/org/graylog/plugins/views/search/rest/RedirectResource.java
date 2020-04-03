@@ -14,24 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.graylog.plugins.views.search.rest;
 
-package org.graylog2.rest.models.dashboards.responses;
+import javax.ws.rs.Path;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-
-@JsonAutoDetect
-@AutoValue
-@WithBeanGetter
-public abstract class CreateDashboardResponse {
-    @JsonProperty("dashboard_id")
-    public abstract String dashboardId();
-
-    @JsonCreator
-    public static CreateDashboardResponse create(@JsonProperty("dashboard_id") String dashboardId) {
-        return new AutoValue_CreateDashboardResponse(dashboardId);
+public class RedirectResource {
+    protected static String pathForClass(Class<?> resourceClass) {
+        return resourceClass.getAnnotation(Path.class).value();
     }
 }

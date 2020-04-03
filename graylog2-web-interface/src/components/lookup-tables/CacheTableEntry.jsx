@@ -30,8 +30,8 @@ class LUTTableEntry extends React.Component {
     let totalHits = 0;
     let totalMisses = 0;
 
-    Object.keys(metrics).map(nodeId => metrics[nodeId].hits.metric.rate.total).forEach((v) => { totalHits += v; });
-    Object.keys(metrics).map(nodeId => metrics[nodeId].misses.metric.rate.total).forEach((v) => { totalMisses += v; });
+    Object.keys(metrics).map((nodeId) => metrics[nodeId].hits.metric.rate.total).forEach((v) => { totalHits += v; });
+    Object.keys(metrics).map((nodeId) => metrics[nodeId].misses.metric.rate.total).forEach((v) => { totalMisses += v; });
 
     const total = totalHits + totalMisses;
 
@@ -45,7 +45,7 @@ class LUTTableEntry extends React.Component {
   _onEntriesMetrics = (metrics) => {
     let total = 0;
 
-    Object.keys(metrics).map(nodeId => metrics[nodeId].count.metric.value).forEach((v) => { total += v; });
+    Object.keys(metrics).map((nodeId) => metrics[nodeId].count.metric.value).forEach((v) => { total += v; });
 
     if (total < 0) {
       return 'n/a';

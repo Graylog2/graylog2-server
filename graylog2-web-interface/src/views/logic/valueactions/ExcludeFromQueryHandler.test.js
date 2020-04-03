@@ -27,7 +27,7 @@ jest.mock('views/stores/ViewStore', () => ({ ViewStore: {} }));
 jest.mock('views/stores/GlobalOverrideStore', () => ({ GlobalOverrideStore: {}, GlobalOverrideActions: {} }));
 jest.mock('views/actions/SearchActions', () => ({}));
 
-const queryWithQueryString = queryString => Query.builder().query({ type: 'elasticsearch', query_string: queryString }).build();
+const queryWithQueryString = (queryString) => Query.builder().query({ type: 'elasticsearch', query_string: queryString }).build();
 
 const mockQueries = (queryId: string, queryString: string) => Immutable.Map({ [queryId]: queryWithQueryString(queryString) });
 

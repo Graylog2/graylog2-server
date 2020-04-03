@@ -18,7 +18,7 @@ const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
         return;
       }
       const queryTabs = tabs || view.search.queries.toIndexedSeq().map((_, v) => v).toJS();
-      const currentQueryIndex = view.search.queries.toIndexedSeq().findIndex(q => q.id === activeQuery);
+      const currentQueryIndex = view.search.queries.toIndexedSeq().findIndex((q) => q.id === activeQuery);
       const currentTabIndex = queryTabs.indexOf(currentQueryIndex);
       const nextQueryIndex = queryTabs[(currentTabIndex + 1) % queryTabs.length];
       const nextQueryId = view.search.queries.toIndexedSeq().get(nextQueryIndex).id;

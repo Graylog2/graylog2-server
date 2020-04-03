@@ -32,7 +32,7 @@ export const emptyGroupExpressionConfig = ({ operator = '&&', child = emptyCompa
  * Replaces all boolean expressions inside the current tree, without affecting any internal groups.
  */
 export const replaceBooleanExpressionOperatorInGroup = (nextOperator, expression) => {
-  const nextExpression = Object.assign({}, expression);
+  const nextExpression = { ...expression };
 
   if (expression.expr === '&&' || expression.expr === '||') {
     nextExpression.expr = nextOperator;

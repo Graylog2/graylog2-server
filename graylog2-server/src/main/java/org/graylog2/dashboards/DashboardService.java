@@ -19,8 +19,6 @@ package org.graylog2.dashboards;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.PersistedService;
-import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.joda.time.DateTime;
 
 import java.util.Collection;
@@ -36,18 +34,7 @@ public interface DashboardService extends PersistedService {
 
     Set<Dashboard> loadByIds(Collection<String> ids);
 
-    void updateWidgetPositions(Dashboard dashboard, WidgetPositionsRequest positions) throws ValidationException;
-
-    void addWidget(Dashboard dashboard, DashboardWidget widget) throws ValidationException;
-
     void removeWidget(Dashboard dashboard, DashboardWidget widget);
-
-    @Deprecated
-    void updateWidgetDescription(Dashboard dashboard, DashboardWidget widget, String newDescription) throws ValidationException;
-
-    @Deprecated
-    void updateWidgetCacheTime(Dashboard dashboard, DashboardWidget widget, int cacheTime) throws ValidationException;
-
     /**
      * @return the total number of dashboards
      */

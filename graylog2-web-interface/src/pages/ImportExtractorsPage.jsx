@@ -24,7 +24,7 @@ const ImportExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
-    InputsActions.get.triggerPromise(params.inputId).then(input => this.setState({ input: input }));
+    InputsActions.get.triggerPromise(params.inputId).then((input) => this.setState({ input: input }));
   },
 
   _isLoading() {

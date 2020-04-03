@@ -17,7 +17,7 @@ class AppGlobalNotifications extends React.Component {
         }
         return <Component key={notification.key} />;
       })
-      .filter(component => !!component);
+      .filter((component) => !!component);
 
     return (
       <div id="global-notifications">

@@ -9,4 +9,4 @@ ErrorComponent.propTypes = {
   }).isRequired,
 };
 
-export default f => loadable(() => f().then(c => c.default), { ErrorComponent });
+export default (f) => loadable(() => f().then((c) => c.default), { ErrorComponent });

@@ -189,8 +189,7 @@ class SearchForm extends React.Component {
                 {this.props.resetButtonLabel}
               </Button>
             </div>
-            )
-          }
+            )}
           {this.props.children}
         </form>
       </div>

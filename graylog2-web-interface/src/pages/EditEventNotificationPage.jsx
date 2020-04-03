@@ -37,7 +37,7 @@ class EditEventDefinitionPage extends React.Component {
     if (isPermitted(currentUser.permissions, `eventnotifications:edit:${params.definitionId}`)) {
       EventNotificationsActions.get(params.notificationId)
         .then(
-          notification => this.setState({ notification: notification }),
+          (notification) => this.setState({ notification: notification }),
           (error) => {
             if (error.status === 404) {
               history.push(Routes.ALERTS.NOTIFICATIONS.LIST);

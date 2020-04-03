@@ -20,7 +20,7 @@ type Result = {
 const _defaultWidgets: { [ViewType]: (?string) => Promise<Result> } = {
   [View.Type.Search]: async (streamId: ?string) => {
     const decorators = await DecoratorsActions.list();
-    const streamDecorators = decorators ? decorators.filter(decorator => decorator.stream === streamId) : [];
+    const streamDecorators = decorators ? decorators.filter((decorator) => decorator.stream === streamId) : [];
     const histogram = resultHistogram();
     const messageTable = allMessagesTable(undefined, streamDecorators);
     const widgets = [

@@ -17,13 +17,13 @@ export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLD
   color: ${util.contrastingColor(theme.color.gray[10], 'AA')};
   height: calc(100vh - 50px);
   padding-top: 20px;
-  position: ${props => (props.open ? 'fixed' : 'static')};
+  position: ${(props) => (props.open ? 'fixed' : 'static')};
   top: 50px;
-  width: ${props => (props.open ? sidebarWidth.open : sidebarWidth.closed)};
+  width: ${(props) => (props.open ? sidebarWidth.open : sidebarWidth.closed)};
   box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);
 
   /* z-index is needed for ie11 */
-  z-index: ${props => (props.open ? 20 : 'auto')};
+  z-index: ${(props) => (props.open ? 20 : 'auto')};
 `);
 
 export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.div`

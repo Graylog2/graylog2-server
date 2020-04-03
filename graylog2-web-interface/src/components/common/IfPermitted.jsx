@@ -27,7 +27,7 @@ const IfPermitted = ({ children, currentUser, permissions, anyPermissions, ...re
         const presentProps = (child && child.props) ? Object.keys(child.props) : [];
         // do not overwrite existing props
         const filteredRest = Object.entries(rest)
-          .filter(entry => !presentProps.includes(entry[0]))
+          .filter((entry) => !presentProps.includes(entry[0]))
           .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
         return React.cloneElement(child, filteredRest);
       }

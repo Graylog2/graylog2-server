@@ -18,15 +18,15 @@ type Props = {
 
 const HighlightingRules = ({ rules = [] }: Props) => {
   return (
-    <React.Fragment>
+    <>
       <h4 className={styles.headline}>Highlighting</h4>
       <div id="search-term-color" className={styles.highlightingRuleBlock}>
         <ColorBox color={DEFAULT_HIGHLIGHT_COLOR} />
         Search terms
       </div>
 
-      {rules.map(rule => <HighlightingRule key={`${rule.field}-${rule.value}-${rule.color}`} rule={rule} />)}
-    </React.Fragment>
+      {rules.map((rule) => <HighlightingRule key={`${rule.field}-${rule.value}-${rule.color}`} rule={rule} />)}
+    </>
   );
 };
 

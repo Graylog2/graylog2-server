@@ -54,14 +54,14 @@ const CollectorProcessControl = createReactClass({
 
   renderSummaryContent(selectedAction, selectedSidecars) {
     return (
-      <React.Fragment>
+      <>
         <p>
           You are going to <strong>{selectedAction}</strong> log collectors in&nbsp;
           <Pluralize singular="this sidecar" plural="these sidecars" value={selectedSidecars.length} />:
         </p>
         <p>{selectedSidecars.join(', ')}</p>
         <p>Are you sure you want to proceed with this action?</p>
-      </React.Fragment>
+      </>
     );
   },
 
@@ -113,7 +113,7 @@ const CollectorProcessControl = createReactClass({
     const { selectedSidecarCollectorPairs } = this.props;
     const { selectedAction } = this.state;
 
-    const actionFormatter = action => lodash.capitalize(action);
+    const actionFormatter = (action) => lodash.capitalize(action);
 
     return (
       <span>

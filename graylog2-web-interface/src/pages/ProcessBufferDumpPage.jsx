@@ -31,7 +31,7 @@ const ProcessBufferDumpPage = createReactClass({
     const { params } = this.props;
 
     ClusterOverviewStore.processbufferDump(params.nodeId)
-      .then(processbufferDump => this.setState({ processbufferDump: processbufferDump }));
+      .then((processbufferDump) => this.setState({ processbufferDump: processbufferDump }));
   },
 
   _isLoading() {

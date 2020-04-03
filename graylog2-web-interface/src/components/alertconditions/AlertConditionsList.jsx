@@ -35,7 +35,7 @@ class AlertConditionsList extends React.Component {
   };
 
   _formatCondition = (condition) => {
-    const stream = this.props.streams.find(s => s.alert_conditions.find(c => c.id === condition.id));
+    const stream = this.props.streams.find((s) => s.alert_conditions.find((c) => c.id === condition.id));
     // Condition was deleted while rendering, don't render anything at this stage
     if (!stream) {
       return null;
@@ -63,7 +63,7 @@ class AlertConditionsList extends React.Component {
                      pageSize={this.PAGE_SIZE}>
         <EntityList bsNoItemsStyle="info"
                     noItemsText="There are no configured conditions."
-                    items={this._paginatedConditions().map(condition => this._formatCondition(condition))} />
+                    items={this._paginatedConditions().map((condition) => this._formatCondition(condition))} />
       </PaginatedList>
     );
   }

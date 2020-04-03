@@ -31,7 +31,7 @@ const handler: FieldActionHandler = ({ field, type, contexts: { widget: origWidg
 
   const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
 
-  return WidgetActions.create(widget).then(newWidget => TitlesActions.set(TitleTypes.Widget, newWidget.id, `Field Statistics for ${field}`));
+  return WidgetActions.create(widget).then((newWidget) => TitlesActions.set(TitleTypes.Widget, newWidget.id, `Field Statistics for ${field}`));
 };
 
 export default handler;

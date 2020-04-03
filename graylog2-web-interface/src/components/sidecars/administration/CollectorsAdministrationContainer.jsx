@@ -115,7 +115,7 @@ const CollectorsAdministrationContainer = createReactClass({
         }
 
         compatibleCollectorIds
-          .map(id => lodash.find(collectors.collectors, { id: id }))
+          .map((id) => lodash.find(collectors.collectors, { id: id }))
           .forEach((compatibleCollector) => {
             sidecarCollectors.push({ collector: compatibleCollector, sidecar: sidecar });
           });

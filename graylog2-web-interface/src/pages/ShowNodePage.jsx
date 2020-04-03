@@ -45,8 +45,8 @@ const ShowNodePage = createReactClass({
   componentWillMount() {
     Promise.all([
       ClusterOverviewStore.jvm(this.props.params.nodeId)
-        .then(jvmInformation => this.setState({ jvmInformation: jvmInformation })),
-      PluginsStore.list(this.props.params.nodeId).then(plugins => this.setState({ plugins: plugins })),
+        .then((jvmInformation) => this.setState({ jvmInformation: jvmInformation })),
+      PluginsStore.list(this.props.params.nodeId).then((plugins) => this.setState({ plugins: plugins })),
       InputStatesStore.list().then((inputStates) => {
         // We only want the input states for the current node
         const inputIds = Object.keys(inputStates);
@@ -60,7 +60,7 @@ const ShowNodePage = createReactClass({
 
         this.setState({ inputStates: filteredInputStates });
       }),
-    ]).then(() => {}, errors => this.setState({ errors: errors }));
+    ]).then(() => {}, (errors) => this.setState({ errors: errors }));
   },
 
   _isLoading() {
