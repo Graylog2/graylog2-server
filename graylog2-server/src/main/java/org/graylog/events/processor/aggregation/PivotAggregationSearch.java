@@ -387,7 +387,7 @@ public class PivotAggregationSearch implements AggregationSearch {
      * Returns the query to compute the aggregation.
      *
      * @param parameters processor parameters
-     * @param searchWithinMs processor search within period. Used to build the date histogram
+     * @param searchWithinMs processor search within period. Used to build the date range buckets
      * @return aggregation query
      */
     private Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs) {
@@ -419,7 +419,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final DateRangeBucket dateRangeBucket = DateRangeBucket.builder().field("timestamp").ranges(ranges.build()).build();
         final List<BucketSpec> groupBy = new ArrayList<>();
 
-        // The first bucket must be the date histogram!
+        // The first bucket must be the date range!
         groupBy.add(dateRangeBucket);
 
         if (!config.groupBy().isEmpty()) {
@@ -447,7 +447,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                     .collect(Collectors.toList()));
         }
 
-        // We always have row groups because of the date histogram
+        // We always have row groups because of the date range buckets
         pivotBuilder.rowGroups(groupBy);
 
         final Set<SearchType> searchTypes = Collections.singleton(pivotBuilder.build());
