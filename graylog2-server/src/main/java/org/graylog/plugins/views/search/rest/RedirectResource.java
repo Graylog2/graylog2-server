@@ -14,17 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.savedsearches;
+package org.graylog.plugins.views.search.rest;
 
-import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.PersistedService;
+import javax.ws.rs.Path;
 
-import java.util.List;
-
-public interface SavedSearchService extends PersistedService {
-    @SuppressWarnings("unchecked")
-    List<SavedSearch> all();
-
-    @SuppressWarnings("unchecked")
-    SavedSearch load(String id) throws NotFoundException;
+public class RedirectResource {
+    protected static String pathForClass(Class<?> resourceClass) {
+        return resourceClass.getAnnotation(Path.class).value();
+    }
 }

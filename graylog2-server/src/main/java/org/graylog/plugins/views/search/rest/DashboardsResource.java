@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,7 +50,7 @@ import static java.util.Locale.ENGLISH;
 @RequiresAuthentication
 @Api(value = "Dashboards")
 @Produces(MediaType.APPLICATION_JSON)
-@Path("/views/dashboards")
+@Path("/dashboards")
 public class DashboardsResource extends RestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
@@ -71,6 +72,7 @@ public class DashboardsResource extends RestResource {
 
     @GET
     @ApiOperation("Get a list of all dashboards")
+    @Timed
     public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                             @ApiParam(name = "sort",
