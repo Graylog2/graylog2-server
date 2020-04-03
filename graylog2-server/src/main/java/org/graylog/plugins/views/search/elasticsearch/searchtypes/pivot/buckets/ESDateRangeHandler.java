@@ -63,9 +63,12 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
                                          DateRangeAggregation rangeAggregation,
                                          ESPivot searchTypeHandler,
                                          ESGeneratedQueryContext esGeneratedQueryContext) {
-        // There is only one key per Bucket.
-        // We have to decide between from() or to()
-        return rangeAggregation.getBuckets().stream()
-                .map(range -> Bucket.create(range.getToAsString(), range));
+        if (dateRangeBucket.bucketKey().equals(DateRangeBucket.BucketKey.TO)) {
+            return rangeAggregation.getBuckets().stream()
+                    .map(range -> Bucket.create(range.getToAsString(), range));
+        } else {
+            return rangeAggregation.getBuckets().stream()
+                    .map(range -> Bucket.create(range.getFromAsString(), range));
+        }
     }
 }
