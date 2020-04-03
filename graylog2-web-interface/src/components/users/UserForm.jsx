@@ -80,8 +80,8 @@ const UserForm = createReactClass({
 
   formatSelectedOptions(permissions, permission, collection) {
     return collection
-      .filter(item => this.isPermitted(permissions, [`${permission}:${item.id}`]))
-      .map(item => item.id)
+      .filter((item) => this.isPermitted(permissions, [`${permission}:${item.id}`]))
+      .map((item) => item.id)
       .join(',');
   },
 
@@ -148,22 +148,22 @@ const UserForm = createReactClass({
   _onPermissionsChange(entity, permission) {
     return (entityIds) => {
       const userPermissions = this.state.user.permissions.slice();
-      let newUserPermissions = userPermissions.filter(p => p.indexOf(`${entity}:${permission}`) !== 0);
+      let newUserPermissions = userPermissions.filter((p) => p.indexOf(`${entity}:${permission}`) !== 0);
 
-      const updatedPermissions = entityIds === '' ? [] : entityIds.split(',').map(id => `${entity}:${permission}:${id}`);
-      const previousPermissions = userPermissions.filter(p => p.indexOf(`${entity}:${permission}`) === 0);
+      const updatedPermissions = entityIds === '' ? [] : entityIds.split(',').map((id) => `${entity}:${permission}:${id}`);
+      const previousPermissions = userPermissions.filter((p) => p.indexOf(`${entity}:${permission}`) === 0);
 
       // Remove edit permissions to entities without read permissions
       if (permission === 'read') {
         previousPermissions.forEach((previousPermission) => {
           // Do nothing if permission is still there
-          if (updatedPermissions.some(p => p === previousPermission)) {
+          if (updatedPermissions.some((p) => p === previousPermission)) {
             return;
           }
 
           // Remove edit permission
           const entityId = previousPermission.split(':').pop();
-          newUserPermissions = newUserPermissions.filter(p => p !== `${entity}:edit:${entityId}`);
+          newUserPermissions = newUserPermissions.filter((p) => p !== `${entity}:edit:${entityId}`);
         });
       }
 
@@ -171,7 +171,7 @@ const UserForm = createReactClass({
       if (permission === 'edit') {
         updatedPermissions.forEach((updatePermission) => {
           // Do nothing if permission was there before
-          if (previousPermissions.some(p => p === updatePermission)) {
+          if (previousPermissions.some((p) => p === updatePermission)) {
             return;
           }
 
@@ -227,8 +227,7 @@ const UserForm = createReactClass({
                   <div className="clearfix" />
                   <br />
                 </span>
-                )
-              }
+                )}
               <fieldset disabled={user.read_only}>
                 <Input name="full_name"
                        id="full_name"
@@ -371,8 +370,7 @@ const UserForm = createReactClass({
                          wrapperClassName="col-sm-9"
                          label="Old Password"
                          required />
-                  )
-                }
+                  )}
                     <Input ref={(password) => { this.inputs.password = password; }}
                            name="password"
                            id="password"
@@ -407,8 +405,7 @@ const UserForm = createReactClass({
                       </Col>
                     </div>
                   </form>
-                )
-            }
+                )}
           </Col>
         </Row>
         <IfPermitted permissions="users:rolesedit">

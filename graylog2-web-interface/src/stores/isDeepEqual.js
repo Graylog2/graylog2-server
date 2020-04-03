@@ -2,8 +2,8 @@
 import { isEqualWith, isFunction } from 'lodash';
 
 const hasFn = (obj, fn) => (obj && obj[fn] && isFunction(obj[fn]));
-const hasEquals = obj => hasFn(obj, 'equals');
-const isImmutable = obj => hasFn(obj, 'toJS');
+const hasEquals = (obj) => hasFn(obj, 'equals');
+const isImmutable = (obj) => hasFn(obj, 'toJS');
 
 const _isEqual = (first, second) => {
   if (isImmutable(first) && isImmutable(second)) {

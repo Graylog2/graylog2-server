@@ -23,7 +23,7 @@ const RolesStore = Reflux.createStore({
   loadRoles(): Promise<string[]> {
     const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
       .then(
-        response => response.roles,
+        (response) => response.roles,
         (error) => {
           if (error.additional.status !== 404) {
             UserNotification.error(`Loading role list failed with status: ${error}`,

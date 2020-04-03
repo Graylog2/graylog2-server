@@ -22,9 +22,9 @@ const RulesStore = Reflux.createStore({
     if (!this.rules) {
       this.rules = [rule];
     } else {
-      const doesRuleExist = this.rules.some(r => r.id === rule.id);
+      const doesRuleExist = this.rules.some((r) => r.id === rule.id);
       if (doesRuleExist) {
-        this.rules = this.rules.map(r => (r.id === rule.id ? rule : r));
+        this.rules = this.rules.map((r) => (r.id === rule.id ? rule : r));
       } else {
         this.rules.push(rule);
       }
@@ -114,7 +114,7 @@ const RulesStore = Reflux.createStore({
     };
     const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
     return fetch('DELETE', url).then(() => {
-      this.rules = this.rules.filter(el => el.id !== rule.id);
+      this.rules = this.rules.filter((el) => el.id !== rule.id);
       this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
       UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
     }, failCallback);

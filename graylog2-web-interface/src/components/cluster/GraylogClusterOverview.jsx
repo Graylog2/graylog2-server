@@ -86,8 +86,7 @@ const GraylogClusterOverview = createReactClass({
                               from={this.state.traffic.from}
                               to={this.state.traffic.to}
                               width={this.state.graphWidth} />
-              )
-              }
+              )}
             </Col>
           </Row>
         </Col>

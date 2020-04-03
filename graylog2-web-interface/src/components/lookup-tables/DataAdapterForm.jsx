@@ -227,7 +227,7 @@ class DataAdapterForm extends React.Component {
     const { create, type, title } = this.props;
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
-    const plugin = adapterPlugins.filter(p => p.type === type);
+    const plugin = adapterPlugins.filter((p) => p.type === type);
     let configFieldSet = null;
     let documentationComponent = null;
     let pluginDisplayName = dataAdapter.config.type;

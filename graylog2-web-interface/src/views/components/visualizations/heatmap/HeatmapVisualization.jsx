@@ -38,10 +38,10 @@ const COLORSCALE = [
 ];
 
 const _generateSeriesTitles = (config, x, y) => {
-  const seriesTitles = config.series.map(s => s.function);
+  const seriesTitles = config.series.map((s) => s.function);
   const columnSeriesTitles = x.map((xLabel) => {
     if (seriesTitles.length > 1) {
-      return seriesTitles.find(title => xLabel.endsWith(title));
+      return seriesTitles.find((title) => xLabel.endsWith(title));
     }
     return seriesTitles.toString();
   });
@@ -106,7 +106,7 @@ const _axisConfg = (chartHasContent) => {
 };
 
 const _chartLayout = (heatmapData) => {
-  const hasContent = find(heatmapData, series => !isEmpty(series.z));
+  const hasContent = find(heatmapData, (series) => !isEmpty(series.z));
   const axisConfig = _axisConfg(hasContent);
   return {
     yaxis: axisConfig,

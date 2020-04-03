@@ -236,7 +236,7 @@ class Widget extends React.Component<Props, State> {
                       fields={fields}
                       filter={filter}
                       height={height}
-                      onConfigChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}
+                      onConfigChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}
                       setLoadingState={this._setLoadingState}
                       title={title}
                       toggleEdit={this._onToggleEdit}
@@ -263,14 +263,14 @@ class Widget extends React.Component<Props, State> {
               <WidgetHeader title={title}
                             hideDragHandle
                             loading={loading}
-                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                            onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing} />
               <EditComponent config={config}
                              fields={fields}
                              editing={editing}
                              id={id}
                              type={widget.type}
-                             onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
+                             onChange={(newWidgetConfig) => this._onWidgetConfigChange(id, newWidgetConfig)}>
                 <WidgetErrorBoundary>
                   {visualization}
                 </WidgetErrorBoundary>
@@ -285,11 +285,11 @@ class Widget extends React.Component<Props, State> {
       <WidgetColorContext id={id}>
         <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
           <InteractiveContext.Consumer>
-            {interactive => (
+            {(interactive) => (
               <WidgetHeader title={title}
                             hideDragHandle={!interactive}
                             loading={loading}
-                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                            onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
                 <IfInteractive>
                   <IfDashboard>

@@ -22,7 +22,7 @@ class EventDetails extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
+    return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
   renderEventFields = (eventFields) => {
@@ -82,14 +82,14 @@ class EventDetails extends React.Component {
         <Col md={6}>
           <dl>
             {event.timerange_start && event.timerange_end && (
-              <React.Fragment>
+              <>
                 <dt>Aggregation time range</dt>
                 <dd>
                   <Timestamp dateTime={event.timerange_start} />
                   &ensp;&mdash;&ensp;
                   <Timestamp dateTime={event.timerange_end} />
                 </dd>
-              </React.Fragment>
+              </>
             )}
             <dt>Event Key</dt>
             <dd>{event.key || 'No Key set for this Event.'}</dd>

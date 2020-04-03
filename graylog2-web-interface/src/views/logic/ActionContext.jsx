@@ -13,7 +13,7 @@ type Props = {
 const AdditionalContext = {
   Provider: ({ children, value }: Props) => (
     <ActionContext.Consumer>
-      {contexts => (
+      {(contexts) => (
         <ActionContext.Provider value={{ ...contexts, ...value }}>
           {children}
         </ActionContext.Provider>

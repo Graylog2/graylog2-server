@@ -21,14 +21,14 @@ const _onSortEnd = ({ oldIndex, newIndex }, onChange, values) => {
   onChange(newItems.map(({ field }) => ({ label: field, value: field })));
 };
 
-const _defaultValueTransformer = values => values.map(({ field }) => ({ value: field, label: field }));
+const _defaultValueTransformer = (values) => values.map(({ field }) => ({ value: field, label: field }));
 
 const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...remainingProps }) => {
   const values = valueTransformer(value);
   const SortableMultiValue = SortableElement(Components.MultiValue);
   const Item = (props: {data: {value: string}}) => {
     const { data: { value: itemValue } } = props;
-    const index = findIndex(value, v => v.field === itemValue);
+    const index = findIndex(value, (v) => v.field === itemValue);
     return <SortableMultiValue index={index} {...props} innerProps={{ title: itemValue }} />;
   };
 
@@ -43,7 +43,7 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...
                              onChange={onChange}
                              value={values}
                              components={_components}
-                             onSortEnd={v => _onSortEnd(v, onChange, value)}
+                             onSortEnd={(v) => _onSortEnd(v, onChange, value)}
                              axis="x"
                              helperClass={`Select--multi has-value is-clearable is-searchable ${styles.draggedElement}`}
                              pressDelay={200} />

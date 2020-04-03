@@ -51,8 +51,8 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
   const rangeParams = Immutable.Map(rest);
   const rangeType = type;
   const streams = queryFilters.getIn([id, 'filters'], Immutable.List())
-    .filter(f => f.get('type') === 'stream')
-    .map(f => f.get('id'))
+    .filter((f) => f.get('type') === 'stream')
+    .map((f) => f.get('id'))
     .toJS();
 
   return (
@@ -62,7 +62,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
           <form method="GET" onSubmit={submitForm}>
             <Row className="no-bm extended-search-query-metadata">
               <Col md={4}>
-                <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
+                <TimeRangeTypeSelector onSelect={(newRangeType) => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
                                        value={rangeType} />
                 <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
                                 rangeType={rangeType}
@@ -77,7 +77,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
               <Col md={5} xs={8}>
                 <StreamsFilter value={streams}
                                streams={availableStreams}
-                               onChange={value => QueryFiltersActions.streams(id, value)} />
+                               onChange={(value) => QueryFiltersActions.streams(id, value)} />
               </Col>
 
               <Col md={3} xs={4}>
@@ -96,7 +96,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 
                 <QueryInput value={query.query_string}
                             placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                            onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
+                            onChange={(value) => QueriesActions.query(id, value).then(performSearch).then(() => value)}
                             onExecute={performSearch} />
               </Col>
               <Col md={3} xs={4} className="pull-right">
@@ -130,6 +130,6 @@ export default connect(
   },
   ({ availableStreams: { streams }, ...rest }) => ({
     ...rest,
-    availableStreams: streams.map(stream => ({ key: stream.title, value: stream.id })),
+    availableStreams: streams.map((stream) => ({ key: stream.title, value: stream.id })),
   }),
 );

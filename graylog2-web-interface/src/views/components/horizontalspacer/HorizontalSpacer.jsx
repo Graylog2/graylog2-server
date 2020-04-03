@@ -18,7 +18,7 @@ type Props = {
 
 const Spacer: StyledComponent<Props, {}, HTMLDivElement> = styled.div`
   width: 100%;
-  height: ${props => props.height}px;
+  height: ${(props) => props.height}px;
 `;
 
 const HorizontalSpacer = ({ height, className }: Props) => <Spacer height={height} className={className} />;

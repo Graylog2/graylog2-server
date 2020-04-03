@@ -28,7 +28,7 @@ export default class EditableTitle extends React.Component {
   _toggleEditing = () => {
     const { disabled } = this.props;
     if (!disabled) {
-      this.setState(state => ({ editing: !state.editing }));
+      this.setState((state) => ({ editing: !state.editing }));
     }
   };
 

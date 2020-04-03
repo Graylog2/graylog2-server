@@ -69,7 +69,7 @@ const HelperText = {
     GROUP_ID: (
       <span>Which Active Directory attribute to use for the full name of the group, usually <code>cn</code>.</span>
     ),
-    defaultGroup: onClickHandler => (
+    defaultGroup: (onClickHandler) => (
       <span>
         The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br />
         You can assign additional permissions by{' '}
@@ -123,7 +123,7 @@ const HelperText = {
     GROUP_ID: (
       <span>Which LDAP attribute to use for the full name of the group, usually <code>cn</code>.</span>
     ),
-    defaultGroup: onClickHandler => (
+    defaultGroup: (onClickHandler) => (
       <span>
         The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br />
         You can assign additional permissions by{' '}
@@ -245,7 +245,7 @@ class LdapComponent extends React.Component {
 
   _setAdditionalDefaultGroups = (rolesString) => {
     // only keep non-empty entries
-    const roles = rolesString.split(',').filter(v => v !== '');
+    const roles = rolesString.split(',').filter((v) => v !== '');
     this._setSetting('additional_default_groups', roles);
   };
 
@@ -336,8 +336,8 @@ class LdapComponent extends React.Component {
                            id="ldap-checkbox"
                            checked={!isAD}
                            disabled={disabled}
-                           onChange={ev => this._bindChecked(ev, false)} />
-                  LDAP
+                           onChange={(ev) => this._bindChecked(ev, false)} />
+                    LDAP
                   </label>
                   <label className="radio-inline" htmlFor="ad-checkbox">
                     <input type="radio"
@@ -345,8 +345,8 @@ class LdapComponent extends React.Component {
                            id="ad-checkbox"
                            checked={isAD}
                            disabled={disabled}
-                           onChange={ev => this._bindChecked(ev, true)} />
-                  Active Directory
+                           onChange={(ev) => this._bindChecked(ev, true)} />
+                    Active Directory
                   </label>
                 </>
               </Input>
@@ -364,7 +364,7 @@ class LdapComponent extends React.Component {
                            value={this._uriHost()}
                            placeholder="Hostname"
                            required
-                           onChange={ev => this._setUriHost(ev.target.value)}
+                           onChange={(ev) => this._setUriHost(ev.target.value)}
                            disabled={disabled} />
                     <span className="input-group-addon input-group-separator">:</span>
                     <input type="number"
@@ -376,7 +376,7 @@ class LdapComponent extends React.Component {
                            placeholder="Port"
                            required
                            style={{ width: 120 }}
-                           onChange={ev => this._setUriPort(ev.target.value)}
+                           onChange={(ev) => this._setUriPort(ev.target.value)}
                            disabled={disabled} />
                   </div>
                   <label className="checkbox-inline" htmlFor="ldap-ssl-checkbox">
@@ -535,7 +535,7 @@ class LdapComponent extends React.Component {
                 <Select options={rolesOptions}
                         disabled={disabled}
                         value={ldapSettings.default_group}
-                        onChange={role => this._setSetting('default_group', role)}
+                        onChange={(role) => this._setSetting('default_group', role)}
                         placeholder="Choose a default role" />
               </Input>
 
@@ -556,7 +556,7 @@ class LdapComponent extends React.Component {
                 <MultiSelect options={rolesOptions}
                              disabled={disabled}
                              value={additionalDefaultGroupsString}
-                             onChange={roles => this._setAdditionalDefaultGroups(roles)}
+                             onChange={(roles) => this._setAdditionalDefaultGroups(roles)}
                              placeholder="Choose additional roles..." />
               </Input>
 

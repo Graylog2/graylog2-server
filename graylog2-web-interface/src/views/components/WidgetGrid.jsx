@@ -18,7 +18,7 @@ import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 
-const defaultTitleGenerator = w => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
+const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
 class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {

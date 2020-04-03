@@ -59,7 +59,7 @@ class BulkLoadPatternModal extends React.Component {
                  type="checkbox"
                  name="replace"
                  label="Replace all existing patterns?"
-                 onChange={e => this.setState({ replacePatterns: e.target.checked })} />
+                 onChange={(e) => this.setState({ replacePatterns: e.target.checked })} />
         </BootstrapModalForm>
       </span>
     );

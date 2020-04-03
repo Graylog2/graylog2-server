@@ -35,7 +35,7 @@ const GettingStartedStore = Reflux.createStore({
           this.trigger({ status: this.status });
           return response;
         },
-        error => console.error(error),
+        (error) => console.error(error),
       );
 
     GettingStartedActions.getStatus.promise(promise);

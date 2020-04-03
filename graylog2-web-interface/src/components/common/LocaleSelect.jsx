@@ -28,7 +28,7 @@ const LocaleSelect = createReactClass({
 
   _formatLocales(locales) {
     const sortedLocales = Object.values(locales)
-      .filter(locale => locale.language_tag !== 'und')
+      .filter((locale) => locale.language_tag !== 'und')
       .map((locale) => {
         return { value: locale.language_tag, label: locale.display_name };
       })

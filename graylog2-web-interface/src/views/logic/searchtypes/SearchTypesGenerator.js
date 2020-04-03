@@ -7,7 +7,7 @@ import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
 import type { WidgetMapping } from '../views/types';
 
-const filterForWidget = widget => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
+const filterForWidget = (widget) => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 
 export type ResultType = {
   searchTypes: Immutable.Set<Immutable.Map<string, any>>,
@@ -17,18 +17,21 @@ export type ResultType = {
 export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType => {
   let widgetMapping = Immutable.Map();
   const searchTypes = widgets
-    .map(widget => widgetDefinition(widget.type)
+    .map((widget) => widgetDefinition(widget.type)
       .searchTypes(widget)
-      .map(searchType => Object.assign(
-        {},
-        { id: uuid(), timerange: widget.timerange, query: widget.query, streams: widget.streams },
-        searchType,
-        { widgetId: widget.id },
-        filterForWidget(widget),
-      )))
+      .map((searchType) => ({
+
+        id: uuid(),
+        timerange: widget.timerange,
+        query: widget.query,
+        streams: widget.streams,
+        ...searchType,
+        widgetId: widget.id,
+        ...filterForWidget(widget),
+      })))
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set())
     .map((searchType) => {
-      widgetMapping = widgetMapping.update(searchType.widgetId, new Immutable.Set(), widgetSearchTypes => widgetSearchTypes.add(searchType.id));
+      widgetMapping = widgetMapping.update(searchType.widgetId, new Immutable.Set(), (widgetSearchTypes) => widgetSearchTypes.add(searchType.id));
       const typeDefinition = searchTypeDefinition(searchType.type);
       if (!typeDefinition || !typeDefinition.defaults) {
         // eslint-disable-next-line no-console

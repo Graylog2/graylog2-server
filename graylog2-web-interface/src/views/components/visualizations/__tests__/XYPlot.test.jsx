@@ -23,7 +23,7 @@ jest.mock('views/stores/SearchStore', () => ({
     executeWithCurrentState: jest.fn(),
   },
 }));
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
 jest.mock('views/stores/QueriesStore');
 

@@ -43,7 +43,7 @@ const BufferUsage = createReactClass({
       `${prefix}.usage`,
       `${prefix}.size`,
     ];
-    metricNames.forEach(metricName => MetricsActions.add(nodeId, metricName));
+    metricNames.forEach((metricName) => MetricsActions.add(nodeId, metricName));
   },
 
   _metricPrefix() {

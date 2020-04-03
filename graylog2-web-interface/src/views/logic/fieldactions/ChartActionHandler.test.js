@@ -17,7 +17,7 @@ import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesStore: { getInitialState: jest.fn() } }));
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
-    create: jest.fn(widget => Promise.resolve(widget)),
+    create: jest.fn((widget) => Promise.resolve(widget)),
   },
 }));
 jest.mock('views/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());

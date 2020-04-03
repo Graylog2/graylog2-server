@@ -31,11 +31,11 @@ const JournalState = createReactClass({
       segments: 'org.graylog2.journal.segments',
       entriesUncommitted: 'org.graylog2.journal.entries-uncommitted',
     };
-    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
   },
 
   componentWillUnmount() {
-    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
   },
 
   _isLoading() {

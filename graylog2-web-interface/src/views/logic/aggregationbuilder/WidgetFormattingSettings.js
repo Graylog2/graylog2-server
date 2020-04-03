@@ -54,7 +54,7 @@ export default class WidgetFormattingSettings {
     const { chartColors } = this._value;
     // $FlowFixMe flow cannot handle Object.keys
     const chartColorJson = Object.keys(chartColors)
-      .map(fieldName => ({ field_name: fieldName, chart_color: chartColors[fieldName] }));
+      .map((fieldName) => ({ field_name: fieldName, chart_color: chartColors[fieldName] }));
     return { chart_colors: chartColorJson };
   }
 

@@ -25,7 +25,7 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 jest.mock('views/actions/SearchActions', () => ({
   refresh: jest.fn(() => Promise.resolve()),
 }));
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 
 jest.mock('moment', () => {
   const mockMoment = jest.requireActual('moment');

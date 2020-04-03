@@ -49,7 +49,7 @@ class FieldForm extends React.Component {
 
     this.state = {
       fieldName: props.fieldName,
-      config: Object.assign({}, { data_type: 'string', providers: [] }, props.config),
+      config: { data_type: 'string', providers: [], ...props.config },
       isKey: keyIndex >= 0,
       keyPosition: keyIndex >= 0 ? keyIndex + 1 : props.keys.length + 1,
       validation: { errors: {} },
@@ -60,7 +60,7 @@ class FieldForm extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('fieldValueProviders').find(edt => edt.type === type) || {};
+    return PluginStore.exports('fieldValueProviders').find((edt) => edt.type === type) || {};
   };
 
   getConfigProviderType = (config, defaultValue) => {
@@ -123,12 +123,13 @@ class FieldForm extends React.Component {
     const { config } = this.state;
     const providerPlugin = this.getProviderPlugin(nextProvider);
     const defaultProviderConfig = providerPlugin.defaultConfig || {};
-    const nextConfig = Object.assign({}, config, {
+    const nextConfig = {
+      ...config,
       providers: [{
         ...defaultProviderConfig,
         type: nextProvider,
       }],
-    });
+    };
     this.handleConfigChange(nextConfig);
   };
 
@@ -166,7 +167,7 @@ class FieldForm extends React.Component {
 
   formatFieldValueProviders = () => {
     return PluginStore.exports('fieldValueProviders')
-      .map(type => ({ label: type.displayName, value: type.type }));
+      .map((type) => ({ label: type.displayName, value: type.type }));
   };
 
   render() {

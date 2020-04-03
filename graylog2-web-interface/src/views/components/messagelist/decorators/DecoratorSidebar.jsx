@@ -27,8 +27,8 @@ class DecoratorSidebar extends React.Component {
   _formatDecorator = (decorator) => {
     const { decorators, decoratorTypes, onChange } = this.props;
     const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
-    const deleteDecorator = decoratorId => onChange(decorators.filter(_decorator => _decorator.id !== decoratorId));
-    const updateDecorator = (id, updatedDecorator) => onChange(decorators.map(_decorator => (_decorator.id === id ? updatedDecorator : _decorator)));
+    const deleteDecorator = (decoratorId) => onChange(decorators.filter((_decorator) => _decorator.id !== decoratorId));
+    const updateDecorator = (id, updatedDecorator) => onChange(decorators.map((_decorator) => (_decorator.id === id ? updatedDecorator : _decorator)));
     return ({
       id: decorator.id,
       title: <DecoratorSummary key={`decorator-${decorator.id}`}
@@ -43,7 +43,7 @@ class DecoratorSidebar extends React.Component {
   _updateOrder = (orderedDecorators) => {
     const { decorators, onChange } = this.props;
     orderedDecorators.forEach((item, idx) => {
-      const decorator = decorators.find(i => i.id === item.id);
+      const decorator = decorators.find((i) => i.id === item.id);
       decorator.order = idx;
     });
 
@@ -60,7 +60,7 @@ class DecoratorSidebar extends React.Component {
     const nextDecoratorOrder = sortedDecorators.length > 0 ? sortedDecorators[sortedDecorators.length - 1].order + 1 : 0;
     const decoratorItems = sortedDecorators.map(this._formatDecorator);
 
-    const addDecorator = decorator => onChange([...decorators, decorator]);
+    const addDecorator = (decorator) => onChange([...decorators, decorator]);
 
     return (
       <div>

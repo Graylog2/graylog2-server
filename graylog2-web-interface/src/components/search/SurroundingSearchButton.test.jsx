@@ -29,7 +29,7 @@ describe('SurroundingSearchButton', () => {
       PT1M: 'Only a minute',
     },
   };
-  const TestComponent = props => (
+  const TestComponent = (props) => (
     <SurroundingSearchButton searchConfig={searchConfig}
                              timestamp="2020-02-28T09:45:31.123Z"
                              id="foo-bar"
@@ -106,7 +106,7 @@ describe('SurroundingSearchButton', () => {
     const streams = ['000000000000000000000001', '5c2e07eeba33a9681ad6070a', '5d2d9649e117dc4df84cf83c'];
     const { getByText } = render((
       <DrilldownContext.Consumer>
-        {drilldown => (
+        {(drilldown) => (
           <DrilldownContext.Provider value={{ ...drilldown, streams }}>
             <TestComponent />
           </DrilldownContext.Provider>

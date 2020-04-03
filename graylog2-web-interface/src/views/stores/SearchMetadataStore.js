@@ -8,7 +8,7 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
-const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);
+const parseSearchIdUrl = (id) => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);
 
 export type SearchMetadataActionsType = RefluxActions<{
   parseSearch: (any) => Promise<SearchMetadata>,

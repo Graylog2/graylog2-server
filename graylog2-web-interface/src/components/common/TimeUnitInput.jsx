@@ -141,8 +141,8 @@ const TimeUnitInput = createReactClass({
 
   _getUnitOptions(units) {
     return unitValues
-      .filter(value => units.includes(value))
-      .map(value => ({ value: value, label: value.toLowerCase() }));
+      .filter((value) => units.includes(value))
+      .map((value) => ({ value: value, label: value.toLowerCase() }));
   },
 
   _isChecked() {
@@ -161,7 +161,7 @@ const TimeUnitInput = createReactClass({
       unit: unit,
       checked: this._isChecked(),
     };
-    const nextInput = Object.assign({}, previousInput, update);
+    const nextInput = { ...previousInput, ...update };
     onUpdate(nextInput.value, nextInput.unit, nextInput.checked);
   },
 
@@ -216,7 +216,7 @@ const TimeUnitInput = createReactClass({
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
                             pullRight={pullRight}
-                            title={unitOptions.filter(o => o.value === unit)[0].label}
+                            title={unitOptions.filter((o) => o.value === unit)[0].label}
                             disabled={!this._isChecked()}>
               {options}
             </DropdownButton>

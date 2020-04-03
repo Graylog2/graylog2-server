@@ -13,7 +13,7 @@ jest.mock('../SearchType', () => () => ({ defaults: {} }));
 
 const dummyWidget = new Widget('dummyWidget', 'dummy', {});
 
-const mockSearchType = fn => asMock(widgetDefinition).mockImplementation(type => ({
+const mockSearchType = (fn) => asMock(widgetDefinition).mockImplementation((type) => ({
   dummy: {
     searchTypes: fn,
   },
@@ -37,8 +37,8 @@ describe('SearchTypesGenerator', () => {
     const widgetWithFilterId = widgetMapping.get('widgetWithFilter').first();
     const widgetWithoutFilterId = widgetMapping.get('widgetWithoutFilter').first();
 
-    const searchTypeWithFilter = searchTypes.find(w => (w.get('id') === widgetWithFilterId), null, Immutable.Map()).toJS();
-    const searchTypeWithoutFilter = searchTypes.find(w => (w.get('id') === widgetWithoutFilterId), null, Immutable.Map()).toJS();
+    const searchTypeWithFilter = searchTypes.find((w) => (w.get('id') === widgetWithFilterId), null, Immutable.Map()).toJS();
+    const searchTypeWithoutFilter = searchTypes.find((w) => (w.get('id') === widgetWithoutFilterId), null, Immutable.Map()).toJS();
 
     expect(searchTypeWithFilter.filter).toEqual({ query: 'source: foo', type: 'query_string' });
     expect(searchTypeWithoutFilter.filter).toBeUndefined();
@@ -68,7 +68,7 @@ describe('SearchTypesGenerator', () => {
     const widgetWithTimerange = dummyWidget.toBuilder()
       .query({ type: 'elasticsearch', query_string: '_exists_:src_ip' })
       .build();
-    mockSearchType(widget => ([{ query: { type: 'elasticsearch', query_string: `${widget.query.query_string} AND source:foo` } }]));
+    mockSearchType((widget) => ([{ query: { type: 'elasticsearch', query_string: `${widget.query.query_string} AND source:foo` } }]));
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([widgetWithTimerange]);
 

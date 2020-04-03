@@ -21,7 +21,7 @@ jest.mock('views/logic/views/ViewLoader', () => ({
 }));
 
 describe('NewDashboardPage', () => {
-  const SimpleNewDashboardPage = props => <NewDashboardPage route={{}} location={{}} {...props} />;
+  const SimpleNewDashboardPage = (props) => <NewDashboardPage route={{}} location={{}} {...props} />;
 
   beforeAll(() => {
     jest.useFakeTimers();

@@ -4,7 +4,7 @@ import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetForma
 import type { Event } from './EventHandler';
 import EventHandler from './EventHandler';
 
-const groupByTimestamp = (es => groupBy(es, e => e.timestamp));
+const groupByTimestamp = ((es) => groupBy(es, (e) => e.timestamp));
 
 describe('EventHandler convert', () => {
   const event: Event = {

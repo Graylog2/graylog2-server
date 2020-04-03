@@ -58,7 +58,7 @@ class EventNotifications extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventNotificationTypes').find(n => n.type === type) || {};
+    return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
   formatNotification = (notifications) => {
@@ -95,7 +95,7 @@ class EventNotifications extends React.Component {
   formatActions(notification, isTestLoading) {
     const { onDelete, onTest } = this.props;
     return (
-      <React.Fragment>
+      <>
         <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
             <Button bsStyle="info">Edit</Button>
@@ -114,7 +114,7 @@ class EventNotifications extends React.Component {
             </IfPermitted>
           </DropdownButton>
         </IfPermitted>
-      </React.Fragment>
+      </>
     );
   }
 

@@ -54,14 +54,11 @@ const ContentPackDetails = (props) => {
             <ContentPackConstraints constraints={constraints} />
             <br />
           </div>
-          )
-          }
+          )}
           { contentPack.entities && contentPack.entities.length > 0 && props.verbose
-          && <ContentPackEntitiesList contentPack={props.contentPack} readOnly />
-          }
+          && <ContentPackEntitiesList contentPack={props.contentPack} readOnly />}
           { contentPack.parameters && contentPack.parameters.length > 0 && props.verbose
-          && <ContentPackParameterList contentPack={props.contentPack} readOnly />
-          }
+          && <ContentPackParameterList contentPack={props.contentPack} readOnly />}
         </div>
       </Col>
     </Row>

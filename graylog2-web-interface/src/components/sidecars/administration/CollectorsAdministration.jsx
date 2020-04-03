@@ -78,7 +78,7 @@ const CollectorsAdministration = createReactClass({
 
   filterSelectedCollectors(collectors) {
     const filteredSidecarCollectorIds = collectors.map(({ collector, sidecar }) => this.sidecarCollectorId(sidecar, collector));
-    return this.state.selected.filter(sidecarCollectorId => filteredSidecarCollectorIds.includes(sidecarCollectorId));
+    return this.state.selected.filter((sidecarCollectorId) => filteredSidecarCollectorIds.includes(sidecarCollectorId));
   },
 
   handleConfigurationChange(selectedConfigurations, doneCallback) {
@@ -188,11 +188,11 @@ const CollectorsAdministration = createReactClass({
 
   formatCollector(sidecar, collector, configurations) {
     const sidecarCollectorId = this.sidecarCollectorId(sidecar, collector);
-    const configAssignment = sidecar.assignments.find(assignment => assignment.collector_id === collector.id) || {};
-    const configuration = configurations.find(config => config.id === configAssignment.configuration_id);
+    const configAssignment = sidecar.assignments.find((assignment) => assignment.collector_id === collector.id) || {};
+    const configuration = configurations.find((config) => config.id === configAssignment.configuration_id);
     let collectorStatus = { status: null, message: null, id: null };
     try {
-      const result = sidecar.node_details.status.collectors.find(c => c.collector_id === collector.id);
+      const result = sidecar.node_details.status.collectors.find((c) => c.collector_id === collector.id);
       if (result) {
         collectorStatus = {
           status: result.status,
@@ -248,7 +248,7 @@ const CollectorsAdministration = createReactClass({
               </h4>
             </Col>
           </Row>
-          {collectors.map(collector => this.formatCollector(sidecar, collector, configurations))}
+          {collectors.map((collector) => this.formatCollector(sidecar, collector, configurations))}
         </div>
       </ControlledTableList.Item>
     );
@@ -282,7 +282,7 @@ const CollectorsAdministration = createReactClass({
         const sidecarCollectors = sidecarCollectorPairs
           .filter(({ sidecar }) => sidecar.node_id === sidecarToMap.node_id)
           .map(({ collector }) => collector)
-          .filter(collector => !lodash.isEmpty(collector));
+          .filter((collector) => !lodash.isEmpty(collector));
         return this.formatSidecar(sidecarToMap, sidecarCollectors, configurations);
       });
     }

@@ -39,8 +39,8 @@ const PipelineConnectionsStore = Reflux.createStore({
     const promise = fetch('POST', url, updatedConnection);
     promise.then(
       (response) => {
-        if (this.connections.filter(c => c.stream_id === response.stream_id)[0]) {
-          this.connections = this.connections.map(c => (c.stream_id === response.stream_id ? response : c));
+        if (this.connections.filter((c) => c.stream_id === response.stream_id)[0]) {
+          this.connections = this.connections.map((c) => (c.stream_id === response.stream_id ? response : c));
         } else {
           this.connections.push(response);
         }
@@ -62,8 +62,8 @@ const PipelineConnectionsStore = Reflux.createStore({
     promise.then(
       (response) => {
         response.forEach((connection) => {
-          if (this.connections.filter(c => c.stream_id === connection.stream_id)[0]) {
-            this.connections = this.connections.map(c => (c.stream_id === connection.stream_id ? connection : c));
+          if (this.connections.filter((c) => c.stream_id === connection.stream_id)[0]) {
+            this.connections = this.connections.map((c) => (c.stream_id === connection.stream_id ? connection : c));
           } else {
             this.connections.push(connection);
           }

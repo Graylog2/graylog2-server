@@ -8,10 +8,10 @@ type Props = {
 };
 
 const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => (
-  <React.Fragment>
+  <>
     <Button onClick={onFinish} bsStyle="primary">Save</Button>
     <Button onClick={onCancel}>Cancel</Button>
-  </React.Fragment>
+  </>
 );
 
 export default SaveOrCancelButtons;

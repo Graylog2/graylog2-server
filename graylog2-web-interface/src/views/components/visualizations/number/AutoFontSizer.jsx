@@ -5,7 +5,7 @@ import styled, { type StyledComponent } from 'styled-components';
 const FontSize: StyledComponent<{ fontSize: number }, {}, HTMLDivElement> = styled.div`
   height: 100%;
   width: 100%;
-  font-size: ${props => `${props.fontSize}px`};
+  font-size: ${(props) => `${props.fontSize}px`};
 `;
 
 type Props = {

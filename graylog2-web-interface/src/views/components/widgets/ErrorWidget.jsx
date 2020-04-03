@@ -41,7 +41,7 @@ const ErrorWidget = ({ errors, title }: Props) => (
         <strong>{title}</strong>
       </Row>
       <ErrorList>
-        {errors.map(e => <Row as="li" key={e.description}>{e.description}</Row>)}
+        {errors.map((e) => <Row as="li" key={e.description}>{e.description}</Row>)}
       </ErrorList>
     </Description>
   </div>

@@ -69,7 +69,7 @@ const SidecarsAdministrationStore = Reflux.createStore({
 
   setAction(action, collectors) {
     const sidecarIds = Object.keys(collectors);
-    const formattedCollectors = sidecarIds.map(sidecarId => ({
+    const formattedCollectors = sidecarIds.map((sidecarId) => ({
       sidecar_id: sidecarId,
       collector_ids: collectors[sidecarId],
     }));

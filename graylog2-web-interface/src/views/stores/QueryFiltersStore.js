@@ -27,8 +27,8 @@ export const QueryFiltersStore = singletonStore(
       return this._state();
     },
     onQueriesStoreChange(newQueries) {
-      const newFilters = newQueries.map(q => q.filter);
-      const oldFilters = this.queries.map(q => q.filter);
+      const newFilters = newQueries.map((q) => q.filter);
+      const oldFilters = this.queries.map((q) => q.filter);
       this.queries = newQueries;
       if (!isEqual(newFilters, oldFilters)) {
         this._trigger();
@@ -44,7 +44,7 @@ export const QueryFiltersStore = singletonStore(
     },
 
     _state() {
-      return this.queries.map(q => q.filter).filter(f => f !== undefined);
+      return this.queries.map((q) => q.filter).filter((f) => f !== undefined);
     },
     _trigger() {
       this.trigger(this._state());

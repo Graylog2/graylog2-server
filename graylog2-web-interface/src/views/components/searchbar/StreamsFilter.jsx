@@ -14,7 +14,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }) => {
               disabled={disabled}
               displayKey="key"
               inputId="streams-filter"
-              onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
+              onChange={(selected) => onChange(selected === '' ? [] : selected.split(','))}
               options={options}
               multi
               value={selectedStreams} />

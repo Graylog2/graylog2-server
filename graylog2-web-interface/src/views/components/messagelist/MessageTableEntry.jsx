@@ -36,8 +36,8 @@ const ConnectedMessageDetail = connect(
     return ({
       ...rest,
       allStreams: Immutable.List(streams),
-      streams: Immutable.Map(streams.map(stream => [stream.id, stream])),
-      inputs: Immutable.Map(inputs.map(input => [input.id, input])),
+      streams: Immutable.Map(streams.map((stream) => [stream.id, stream])),
+      inputs: Immutable.Map(inputs.map((input) => [input.id, input])),
       searchConfig: searchesClusterConfig,
     });
   },
@@ -60,7 +60,7 @@ const isDecoratedField = (field, decorationStats) => decorationStats
 
 const fieldType = (fieldName, { decoration_stats: decorationStats }, fields) => (isDecoratedField(fieldName, decorationStats)
   ? FieldType.Decorated
-  : ((fields && fields.find(f => f.name === fieldName)) || { type: FieldType.Unknown }).type);
+  : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
 
 const MessageTableEntry = ({
   disableSurroundingSearch,

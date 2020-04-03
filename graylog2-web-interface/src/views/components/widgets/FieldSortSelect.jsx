@@ -22,9 +22,9 @@ type Option = {
   value: number
 }
 
-const findOptionByLabel = (options: Immutable.List<Option>, label: string) => options.find(option => option.label === label);
+const findOptionByLabel = (options: Immutable.List<Option>, label: string) => options.find((option) => option.label === label);
 
-const findOptionByValue = (options: Immutable.List<Option>, value: number) => options.find(option => option.value === value);
+const findOptionByValue = (options: Immutable.List<Option>, value: number) => options.find((option) => option.value === value);
 
 const currentValue = (sort: Array<SortConfig>, options: Immutable.List<Option>) => sort && sort.length > 0 && findOptionByLabel(options, sort[0].field);
 

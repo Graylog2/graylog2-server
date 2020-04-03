@@ -32,7 +32,7 @@ class MessageFieldDescription extends React.Component {
 
   _getFormattedTerms = () => {
     const { messageTerms } = this.state;
-    return messageTerms.map(term => <MessageTerms key={term}>{term}</MessageTerms>);
+    return messageTerms.map((term) => <MessageTerms key={term}>{term}</MessageTerms>);
   };
 
   _getFormattedFieldActions = () => {
@@ -53,8 +53,7 @@ class MessageFieldDescription extends React.Component {
         <Alert bsStyle="info" onDismiss={() => this.setState({ messageTerms: Immutable.Map() })}>
           Field terms: &nbsp;{this._getFormattedTerms()}
         </Alert>
-        )
-        }
+        )}
       </dd>
     );
   }

@@ -35,7 +35,7 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
   }
 
   /* eslint-disable-next-line react/no-unused-prop-types */
-  _renderOption = ({ label }: { label: string }) => <React.Fragment><strong>{label}</strong></React.Fragment>;
+  _renderOption = ({ label }: { label: string }) => <><strong>{label}</strong></>;
 
   _onSubmit = () => {
     const { onClose } = this.props;

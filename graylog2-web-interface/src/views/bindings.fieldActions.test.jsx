@@ -13,7 +13,7 @@ describe('Views bindings field actions', () => {
     contexts: {},
     type: FieldType.Unknown,
   };
-  const findAction = type => fieldActions.find(binding => binding.type === type);
+  const findAction = (type) => fieldActions.find((binding) => binding.type === type);
   describe('Aggregate', () => {
     // $FlowFixMe: We are assuming here it is generally present
     const action: Action = findAction('aggregate');

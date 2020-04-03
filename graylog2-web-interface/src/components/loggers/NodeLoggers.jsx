@@ -50,7 +50,7 @@ const NodeLoggers = createReactClass({
   render() {
     const { nodeId } = this.props;
     const subsystems = Object.keys(this.props.subsystems)
-      .map(subsystem => (
+      .map((subsystem) => (
         <LoggingSubsystem name={subsystem}
                           nodeId={nodeId}
                           key={`logging-subsystem-${nodeId}-${subsystem}`}

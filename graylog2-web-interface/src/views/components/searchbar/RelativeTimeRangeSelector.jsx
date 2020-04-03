@@ -44,7 +44,7 @@ export default function RelativeTimeRangeSelector({ config, disabled, value, onC
              value={value.get('range')}
              className="relative"
              name="relative"
-             onChange={event => onChange('range', event.target.value)}>
+             onChange={(event) => onChange('range', event.target.value)}>
         {options}
       </Input>
     </div>

@@ -14,7 +14,7 @@ import viewTransformer from './ViewTransformer';
 
 const mockList = jest.fn(() => Promise.resolve([]));
 jest.mock('injection/CombinedProvider', () => ({
-  get: type => ({
+  get: (type) => ({
     Decorators: {
       DecoratorsActions: {
         list: (...args) => mockList(...args),
@@ -25,7 +25,7 @@ jest.mock('injection/CombinedProvider', () => ({
 
 const cwd = dirname(__filename);
 
-const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
+const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
 describe('ViewTransformer', () => {
   describe('transform with missing attributes', () => {

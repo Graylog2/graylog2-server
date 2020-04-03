@@ -29,7 +29,7 @@ class IndexerFailuresList extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.props.failures.map(failure => <IndexerFailure key={`indexer-failure-${failure.letter_id}`} failure={failure} />)}
+            {this.props.failures.map((failure) => <IndexerFailure key={`indexer-failure-${failure.letter_id}`} failure={failure} />)}
           </tbody>
         </Table>
       </div>

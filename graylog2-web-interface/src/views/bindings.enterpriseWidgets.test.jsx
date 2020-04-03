@@ -10,7 +10,7 @@ describe('Views bindings enterprise widgets', () => {
   type WidgetCondig = {
     needsControlledHeight: (widget?: Widget) => boolean
   }
-  const findWidgetConfig = type => enterpriseWidgets.find(widgetConfig => widgetConfig.type === type);
+  const findWidgetConfig = (type) => enterpriseWidgets.find((widgetConfig) => widgetConfig.type === type);
 
   describe('Aggregations', () => {
     // $FlowFixMe: We are assuming here it is generally present

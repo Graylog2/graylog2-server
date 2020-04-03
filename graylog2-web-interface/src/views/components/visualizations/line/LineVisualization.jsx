@@ -14,7 +14,7 @@ import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
 
 const getChartColor = (fullData, name) => {
-  const data = fullData.find(d => (d.name === name));
+  const data = fullData.find((d) => (d.name === name));
   if (data && data.line && data.line.color) {
     const { line: { color } } = data;
     return color;

@@ -20,7 +20,7 @@ type Props = {
 const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClick }: Props) => {
   // eslint-disable-next-line no-nested-ternary
   return (
-    <React.Fragment>
+    <>
       <Title role="presentation" onClick={onClick} isSelected={isSelected} expandRight={expandRight}>
         <TitleIcon><Icon name={icon} /></TitleIcon>
         {(isOpen && <TitleText>{text}</TitleText>)}
@@ -38,7 +38,7 @@ const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClic
           );
         }}
       </SizeMe>
-    </React.Fragment>
+    </>
   );
 };
 

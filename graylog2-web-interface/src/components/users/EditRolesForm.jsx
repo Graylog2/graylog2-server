@@ -40,7 +40,7 @@ class EditRolesForm extends React.Component {
     evt.preventDefault();
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really update roles for "${user.username}"?`)) {
-      const roles = this.roles.getValue().filter(value => value !== '');
+      const roles = this.roles.getValue().filter((value) => value !== '');
       const userClone = ObjectUtils.clone(user);
       userClone.roles = roles;
       UsersStore.update(user.username, userClone).then(() => {

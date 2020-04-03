@@ -17,7 +17,7 @@ const CatalogStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.showEntityIndex().url);
     const promise = fetch('GET', url)
       .then((result) => {
-        const entityIndex = lodash.groupBy(result.entities.map(e => EntityIndex.fromJSON(e)), 'type.name');
+        const entityIndex = lodash.groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
         this.trigger({ entityIndex: entityIndex });
 
         return result;
@@ -29,8 +29,8 @@ const CatalogStore = Reflux.createStore({
   getSelectedEntities(requestedEntities) {
     const payload = Object.keys(requestedEntities).reduce((result, key) => {
       return result.concat(requestedEntities[key]
-        .filter(entitiy => entitiy instanceof EntityIndex)
-        .map(entity => entity.toJSON()));
+        .filter((entitiy) => entitiy instanceof EntityIndex)
+        .map((entity) => entity.toJSON()));
     }, []);
     const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
     const promise = fetch('POST', url, { entities: payload });

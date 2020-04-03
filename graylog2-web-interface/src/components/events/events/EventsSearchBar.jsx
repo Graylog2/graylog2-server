@@ -101,7 +101,7 @@ class EventsSearchBar extends React.Component {
           <FormGroup className="form-inline">
             <ControlLabel>Show</ControlLabel>
             <FormControl componentClass="select" bsSize="small" value={pageSize} onChange={this.handlePageSizeChange}>
-              {pageSizes.map(size => <option key={`option-${size}`} value={size}>{size}</option>)}
+              {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
             </FormControl>
           </FormGroup>
         </div>

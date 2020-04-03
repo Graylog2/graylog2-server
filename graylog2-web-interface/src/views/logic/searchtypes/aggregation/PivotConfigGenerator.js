@@ -29,16 +29,24 @@ type FormattedPivot = {
   }
 };
 
+type TimeConfig = {|
+  interval: 'timeunit',
+  unit: TimeUnit,
+  value: number,
+|};
+
 const formatPivot = (pivot: Pivot): FormattedPivot => {
   const { type, field, config } = pivot;
-  const newConfig = Object.assign({}, config);
+  const newConfig = { ...config };
 
   switch (type) {
     // eslint-disable-next-line no-case-declarations
     case 'time':
+      // $FlowFixMe: ConfigType is not properly typed yet
       if (newConfig.interval.type === 'timeunit') {
-        /* $FlowFixMe: newConfig.interval has unit and value since it is from type timeunit */
-        const { unit, value } = newConfig.interval;
+        // $FlowFixMe: We know this is the right type
+        const { interval }: { interval: TimeConfig } = newConfig;
+        const { unit, value } = interval;
         newConfig.interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
       }
       break;
@@ -48,13 +56,14 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
   return {
     type,
     field,
+    // $FlowFixMe: Not properly typed yet.
     ...newConfig,
   };
 };
 
-type FormattedSeries = {
+type FormattedSeries = $Shape<{
   id: string,
-} & Definition;
+} & Definition>;
 
 const generateConfig = (id: string, name: string, { rollup, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig) => ({
   id,
@@ -65,7 +74,7 @@ const generateConfig = (id: string, name: string, { rollup, rowPivots, columnPiv
     rollup,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
-    series: series.map<FormattedSeries>(s => Object.assign({}, { id: s.effectiveName }, parseSeries(s.function))),
+    series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
     sort: sort,
   },
 });

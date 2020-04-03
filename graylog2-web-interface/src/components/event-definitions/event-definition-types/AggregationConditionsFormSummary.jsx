@@ -30,8 +30,7 @@ const AggregationConditionsFormSummary = (props) => {
                 {showInlineValidation ? 'Hide errors' : 'Show errors'}
               </StyledButton>
             </p>
-          )
-          }
+          )}
         <b>Preview:</b> <AggregationConditionSummary series={series} conditions={conditions} />
       </StyledPanel>
     </div>
