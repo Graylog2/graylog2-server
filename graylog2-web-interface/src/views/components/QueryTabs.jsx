@@ -21,11 +21,16 @@ const StyledQueryTabs = styled(Tabs)(({ theme }) => `
   > .nav-tabs {
     border-bottom: 0;
 
+    > li {
+      > a {
+        border-color: ${theme.color.gray[80]};
+      }
+    }
+
     > li.active {
       z-index: 1;
 
       > a {
-        border-color: ${theme.color.gray[80]};
         border-bottom-color: transparent;
       }
     }

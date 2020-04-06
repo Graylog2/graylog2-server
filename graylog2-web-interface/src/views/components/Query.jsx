@@ -19,13 +19,10 @@ import InteractiveContext from './contexts/InteractiveContext';
 
 const StyledJumbotron = styled(Jumbotron)(({ theme }) => `
   .container-fluid & {
-    border: 1px solid ${util.colorLevel(theme.color.variant.info, -5)};
-    border-top: 0;
+    border: 1px solid ${theme.color.gray[80]};
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     margin-bottom: 0;
-    z-index: 2;
-    position: relative;
   }
 `);
 
