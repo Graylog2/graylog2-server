@@ -81,9 +81,20 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
     public ChunkedOutput<String> retrieve(@ApiParam MessagesRequest request) {
-        final MessagesRequest req = request != null ? request : createDefaultMessagesRequest();
+        final MessagesRequest req = defaultIfNecessary(request);
+
+        executionGuard.checkUserIsPermittedToSeeStreams(req.streams().get(), this::hasStreamReadPermission);
 
         return chunkedOutputFrom(fwd -> exporter.export(req, fwd));
+    }
+
+    private MessagesRequest defaultIfNecessary(MessagesRequest requestFromClient) {
+        MessagesRequest request = requestFromClient != null ? requestFromClient : createDefaultMessagesRequest();
+
+        if (!request.streams().isPresent()) {
+            request = request.toBuilder().streams(loadAllAllowedStreamsForUser()).build();
+        }
+        return request;
     }
 
     @POST
@@ -93,15 +104,16 @@ public class MessagesResource extends RestResource implements PluginRestResource
     public ChunkedOutput<String> retrieveForSearchType(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @PathParam("searchTypeId") String searchTypeId,
-            @ApiParam ResultFormat format) {
+            @ApiParam ResultFormat formatFromClient) {
         Search search = loadSearch(searchId);
 
-        if (format == null) {
-            format = ResultFormat.empty();
-        }
+        ResultFormat format = emptyIfNull(formatFromClient);
 
-        ResultFormat finalFormat = format;
-        return chunkedOutputFrom(fwd -> exporter.export(search, searchTypeId, finalFormat, fwd));
+        return chunkedOutputFrom(fwd -> exporter.export(search, searchTypeId, format, fwd));
+    }
+
+    private ResultFormat emptyIfNull(ResultFormat format) {
+        return format == null ? ResultFormat.empty() : format;
     }
 
     private Search loadSearch(String searchId) {

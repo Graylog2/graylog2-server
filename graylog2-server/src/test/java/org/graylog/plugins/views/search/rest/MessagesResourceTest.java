@@ -16,9 +16,11 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableSet;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
+import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
@@ -32,23 +34,33 @@ import org.mockito.InOrder;
 import java.io.IOException;
 import java.util.Collections;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class MessagesResourceTest {
 
     private MessagesResource sut;
     private MessagesExporter exporter;
+    private PermittedStreams permittedStreams;
+    private SearchExecutionGuard executionGuard;
 
     @BeforeEach
     void setUp() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
         exporter = mock(MessagesExporter.class);
-        sut = new MessagesResource(exporter, mock(SearchDomain.class), mock(SearchExecutionGuard.class), mock(PermittedStreams.class));
+        permittedStreams = mock(PermittedStreams.class);
+        when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
+        executionGuard = mock(SearchExecutionGuard.class);
+        sut = new MessagesResource(exporter, mock(SearchDomain.class), executionGuard, permittedStreams);
         sut.asyncRunner = Runnable::run;
     }
 
@@ -78,6 +90,34 @@ public class MessagesResourceTest {
         verifier.verify(output).write("chunk-1");
         verifier.verify(output).write("chunk-2");
         verifier.verify(output).close();
+    }
+
+    @Test
+    void appliesDefaultStreamsToRequestIfOmitted() {
+        MessagesRequest request = validRequest();
+
+        when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("stream-1", "stream-2"));
+
+        ArgumentCaptor<MessagesRequest> captor = ArgumentCaptor.forClass(MessagesRequest.class);
+
+        doNothing().when(exporter).export(captor.capture(), any());
+
+        sut.retrieve(request);
+
+        assertThat(captor.getValue().streams())
+                .contains(ImmutableSet.of("stream-1", "stream-2"));
+    }
+
+    @Test
+    void checksStreamPermissionsForPlainRequest() {
+        MessagesRequest request = validRequest().toBuilder().streams(ImmutableSet.of("stream-1")).build();
+
+        PermissionException exception = new PermissionException("The wurst is yet to come");
+        doThrow(exception).when(executionGuard)
+                .checkUserIsPermittedToSeeStreams(eq(ImmutableSet.of("stream-1")), any());
+
+        assertThatExceptionOfType(PermissionException.class).isThrownBy(() -> sut.retrieve(request))
+                .withMessageContaining(exception.getMessage());
     }
 
     //TODO: reimplement this stuff
