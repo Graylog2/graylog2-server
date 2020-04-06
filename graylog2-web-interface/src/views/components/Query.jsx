@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { util } from 'theme';
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';

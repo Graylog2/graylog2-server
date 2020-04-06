@@ -34,7 +34,7 @@ class QueryTitle extends React.Component<Props, State> {
     openEditModal: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
