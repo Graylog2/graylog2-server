@@ -98,6 +98,20 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     @POST
+    @Path("{searchId}")
+    @Produces(MoreMediaTypes.TEXT_CSV)
+    @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
+    public ChunkedOutput<String> retrieveForSearch(
+            @ApiParam @PathParam("searchId") String searchId,
+            @ApiParam ResultFormat formatFromClient) {
+        Search search = loadSearch(searchId);
+
+        ResultFormat format = emptyIfNull(formatFromClient);
+
+        return chunkedOutputFrom(fwd -> exporter.export(search, format, fwd));
+    }
+
+    @POST
     @Path("{searchId}/{searchTypeId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
