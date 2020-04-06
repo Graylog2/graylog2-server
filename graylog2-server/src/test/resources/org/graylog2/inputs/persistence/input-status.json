@@ -1,0 +1,34 @@
+{
+  "input_status": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "input_state_data": {
+        "type": "test_type_1",
+        "some_timestamp": "3/31/20 11:01:19 PM UTC"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "input_state_data": {
+        "type": "test_type_2",
+        "some_state_data": "foo",
+        "more_state_data": "bar",
+        "last_state_data": 2
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "input_state_data": {
+        "type": "test_type_5",
+        "some_state_data": "Three, sir.",
+        "more_state_data": "Three!"
+      }
+    }
+  ]
+}
