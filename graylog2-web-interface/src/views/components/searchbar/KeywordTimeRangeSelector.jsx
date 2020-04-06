@@ -38,11 +38,11 @@ type Props = {
 };
 
 const _validateKeyword = (keyword: string, _setSuccessfullPreview, _setFailedPreview) => {
-  if (!keyword) {
+  if (keyword === undefined) {
     return undefined;
   }
   return trim(keyword) === ''
-    ? Promise.resolve('Keyword must not be empty!')
+    ? 'Keyword must not be empty!'
     : ToolsStore.testNaturalDate(keyword)
       .then(_setSuccessfullPreview, _setFailedPreview);
 };
