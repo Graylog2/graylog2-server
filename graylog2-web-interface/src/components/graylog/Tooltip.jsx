@@ -35,6 +35,15 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   .tooltip-inner {
     color: ${util.readableColor(theme.color.gray[10])};
     background-color: ${theme.color.gray[10]};
+    max-width: 300px;
+
+    .datapoint-info {
+      text-align: left;
+
+      .date {
+        color: ${theme.color.gray[90]};
+      }
+    }
   }
 `);
 
