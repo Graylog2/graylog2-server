@@ -537,7 +537,7 @@ public class EventProcessorExecutionJobTest {
             // The new nextFrom should ignore the processingHopSize and start 1ms after the last `To` Range
             // The nextTo will be one window of the processingCatchUpWindowSize
             assertThat(triggerUpdate.data()).isPresent().get().isEqualTo(EventProcessorExecutionJob.Data.builder()
-                    .timerangeFrom(to.plusMillis(1))
+                    .timerangeFrom(to.plus(processingHopSize).minus(processingWindowSize).plusMillis(1))
                     .timerangeTo(to.plus(processingCatchUpWindowSize))
                     .build());
         } else {

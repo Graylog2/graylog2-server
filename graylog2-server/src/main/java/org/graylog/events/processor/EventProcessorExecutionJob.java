@@ -138,7 +138,6 @@ public class EventProcessorExecutionJob implements Job {
 
                 // Align to multiples of the processingWindowSize
                 nextTo = to.plus(config.processingWindowSize() * chunkCount);
-                nextFrom = to.plusMillis(1);
                 LOG.debug("eventproc <{}> is catching up on old data. Combining {} search windows with catchUpWindowSize={}ms: from={} to={}",
                         config.eventDefinitionId(), chunkCount, catchUpSize, nextFrom, nextTo);
             }
