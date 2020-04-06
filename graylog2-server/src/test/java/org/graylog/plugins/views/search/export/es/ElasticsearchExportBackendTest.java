@@ -21,6 +21,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.export.Defaults;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,6 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.graylog.plugins.views.search.export.TestData.defaultMessagesRequest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,7 +53,7 @@ class ElasticsearchExportBackendTest {
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any()))
                 .thenReturn(ImmutableSet.of("hasi", "mausi"));
 
-        MessagesRequest request = defaultMessagesRequest();
+        MessagesRequest request = defaultMessagesRequestWithDummyStream();
 
         ArgumentCaptor<Search> captor = ArgumentCaptor.forClass(Search.class);
         try {
@@ -77,5 +77,10 @@ class ElasticsearchExportBackendTest {
 
         assertThatExceptionOfType(ValidationException.class)
                 .isThrownBy(() -> sut.run(request, null, null));
+    }
+
+    private MessagesRequest defaultMessagesRequestWithDummyStream() {
+        MessagesRequest requestWithDummyStream = MessagesRequest.builder().streams(ImmutableSet.of("dummy")).build();
+        return new Defaults().fillInIfNecessary(requestWithDummyStream);
     }
 }
