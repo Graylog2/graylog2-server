@@ -24,9 +24,13 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -283,5 +287,71 @@ public class PivotAggregationSearchTest {
                                 .build()
                 ))
                 .build());
+    }
+
+    @Test
+    public void testDateRangeBucketWithOneTumblingWindow() {
+        final long processingWindowSize = Duration.standardSeconds(60).getMillis();
+        final long processingHopSize = Duration.standardSeconds(60).getMillis();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final DateTime from = now;
+        final DateTime to = now.plusMillis((int) processingWindowSize);
+        TimeRange timeRange = AbsoluteRange.create(from, to);
+        final DateRangeBucket rangeBucket = PivotAggregationSearch.buildDateRangeBuckets(timeRange, processingWindowSize, processingHopSize);
+
+        assertThat(rangeBucket.ranges()).containsExactly(DateRange.create(from, to));
+    }
+
+    @Test
+    public void testDateRangeBucketWithCatchUpTumblingWindows() {
+        final long processingWindowSize = Duration.standardSeconds(60).getMillis();
+        final long processingHopSize = Duration.standardSeconds(60).getMillis();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final DateTime from = now;
+        // We are 3 full processingWindows behind
+        final DateTime to = now.plusMillis((int) processingWindowSize * 3);
+        TimeRange timeRange = AbsoluteRange.create(from, to);
+        final DateRangeBucket rangeBucket = PivotAggregationSearch.buildDateRangeBuckets(timeRange, processingWindowSize, processingHopSize);
+
+        assertThat(rangeBucket.ranges()).containsExactly(
+                DateRange.create(from.plusMillis((int) (processingWindowSize * 0)), from.plusMillis((int) (processingWindowSize * 1))),
+                DateRange.create(from.plusMillis((int) (processingWindowSize * 1)), from.plusMillis((int) (processingWindowSize * 2))),
+                DateRange.create(from.plusMillis((int) (processingWindowSize * 2)), from.plusMillis((int) (processingWindowSize * 3)))
+        );
+    }
+
+    @Test
+    public void testDateRangeBucketWithSlidingWindow() {
+        final long processingWindowSize = Duration.standardSeconds(3600).getMillis();
+        final long processingHopSize = Duration.standardSeconds(60).getMillis();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final DateTime from = now;
+        final DateTime to = now.plusMillis((int) processingWindowSize);
+        TimeRange timeRange = AbsoluteRange.create(from, to);
+        final DateRangeBucket rangeBucket = PivotAggregationSearch.buildDateRangeBuckets(timeRange, processingWindowSize, processingHopSize);
+
+        assertThat(rangeBucket.ranges()).containsExactly(
+                DateRange.create(from, to)
+        );
+    }
+
+    @Test
+    public void testDateRangeBucketWithCatchUpSlidingWindows() {
+        final int processingWindowSizeSec = 120;
+        final int processingHopSizeSec = 60;
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final DateTime from = now;
+        // We are 3 full processingWindows behind
+        final DateTime to = now.plusSeconds(processingWindowSizeSec * 3);
+        TimeRange timeRange = AbsoluteRange.create(from, to);
+        final DateRangeBucket rangeBucket = PivotAggregationSearch.buildDateRangeBuckets(timeRange, processingWindowSizeSec * 1000, processingHopSizeSec * 1000);
+
+        assertThat(rangeBucket.ranges()).containsExactly(
+                DateRange.create(from.plusSeconds(processingHopSizeSec * 0), from.plusSeconds(processingWindowSizeSec)),
+                DateRange.create(from.plusSeconds(processingHopSizeSec * 1), from.plusSeconds(processingHopSizeSec * 1).plusSeconds(processingWindowSizeSec)),
+                DateRange.create(from.plusSeconds(processingHopSizeSec * 2), from.plusSeconds(processingHopSizeSec * 2).plusSeconds(processingWindowSizeSec)),
+                DateRange.create(from.plusSeconds(processingHopSizeSec * 3), from.plusSeconds(processingHopSizeSec * 3).plusSeconds(processingWindowSizeSec)),
+                DateRange.create(from.plusSeconds(processingHopSizeSec * 4), to)
+        );
     }
 }

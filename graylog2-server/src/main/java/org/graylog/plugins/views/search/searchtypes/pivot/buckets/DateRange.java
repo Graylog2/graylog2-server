@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
@@ -36,6 +37,16 @@ public abstract class DateRange {
     @JsonProperty
     public abstract Optional<DateTime> to();
 
+    public static DateRange create(@Nullable DateTime from, @Nullable DateTime to) {
+        final Builder builder = builder();
+        if (from != null) {
+            builder.from(from);
+        }
+        if (to != null) {
+            builder.to(to);
+        }
+        return builder.build();
+    }
 
     public static DateRange.Builder builder() {
         return new AutoValue_DateRange.Builder();
