@@ -19,12 +19,10 @@ package org.graylog.plugins.views.search.export;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 
 import javax.inject.Inject;
-import javax.ws.rs.NotFoundException;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -33,13 +31,11 @@ import java.util.stream.Collectors;
 public class MessagesExporter {
     private final Defaults defaults;
     private final ExportBackend backend;
-    private final SearchDbService searchDbService;
 
     @Inject
-    public MessagesExporter(Defaults defaults, ExportBackend backend, SearchDbService searchDbService) {
+    public MessagesExporter(Defaults defaults, ExportBackend backend) {
         this.defaults = defaults;
         this.backend = backend;
-        this.searchDbService = searchDbService;
     }
 
     public void export(MessagesRequest request, ChunkForwarder<String> chunkForwarder) {
@@ -48,22 +44,22 @@ public class MessagesExporter {
         backend.run(fullRequest, h -> chunkForwarder.write(reduce(h)), chunkForwarder::close);
     }
 
-    public void export(String searchId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
-        exportWithRequestFrom(searchId, null, resultFormat, chunkForwarder);
+    public void export(Search search, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+        exportWithRequestFrom(search, null, resultFormat, chunkForwarder);
     }
 
-    public void export(String searchId, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
-        exportWithRequestFrom(searchId, searchTypeId, resultFormat, chunkForwarder);
+    public void export(Search search, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+        exportWithRequestFrom(search, searchTypeId, resultFormat, chunkForwarder);
     }
 
-    private void exportWithRequestFrom(String searchId, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
-        MessagesRequest request = buildRequest(searchId, searchTypeId, resultFormat);
+    private void exportWithRequestFrom(Search search, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+        MessagesRequest request = buildRequest(search, searchTypeId, resultFormat);
 
         export(request, chunkForwarder);
     }
 
-    private MessagesRequest buildRequest(String searchId, String searchTypeId, ResultFormat resultFormat) {
-        Query query = singleQueryForSearchId(searchId);
+    private MessagesRequest buildRequest(Search search, String searchTypeId, ResultFormat resultFormat) {
+        Query query = singleQueryFrom(search);
 
         MessagesRequest.Builder requestBuilder = MessagesRequest.builder();
 
@@ -76,10 +72,12 @@ public class MessagesExporter {
         return requestBuilder.build();
     }
 
-    private Query singleQueryForSearchId(String searchId) {
-        return searchDbService.get(searchId)
-                .map(this::singleQueryFrom)
-                .orElseThrow(() -> new NotFoundException("Couldn't find search with ID " + searchId));
+    private Query singleQueryFrom(Search s) {
+        if (s.queries().size() > 1)
+            throw new ExportException("Can't get messages for search with id" + s.id() + ", because it contains multiple queries");
+
+        return s.queries().stream().findFirst()
+                .orElseThrow(() -> new ExportException("Invalid Search object with empty Query"));
     }
 
     private void setTimeRange(Query query, String searchTypeId, MessagesRequest.Builder requestBuilder) {
@@ -149,14 +147,6 @@ public class MessagesExporter {
         return query.searchTypes().stream()
                 .filter(st -> st.id().equals(searchTypeId))
                 .findFirst();
-    }
-
-    private Query singleQueryFrom(Search s) {
-        if (s.queries().size() > 1)
-            throw new ExportException("Can't get messages for search with id" + s.id() + ", because it contains multiple queries");
-
-        return s.queries().stream().findFirst()
-                .orElseThrow(() -> new ExportException("Invalid Search object with empty Query"));
     }
 
     private String reduce(LinkedHashSet<LinkedHashSet<String>> hits) {

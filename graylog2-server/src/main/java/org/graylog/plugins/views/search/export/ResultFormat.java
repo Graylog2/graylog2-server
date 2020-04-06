@@ -38,6 +38,10 @@ public abstract class ResultFormat {
         return ResultFormat.Builder.create();
     }
 
+    public static ResultFormat empty() {
+        return ResultFormat.builder().build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty("fields_in_order")

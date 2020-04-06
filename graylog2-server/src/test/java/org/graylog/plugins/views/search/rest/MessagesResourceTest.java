@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.search.rest;
 
 import org.glassfish.jersey.server.ChunkedOutput;
+import org.graylog.plugins.views.search.SearchDomain;
+import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
@@ -46,7 +48,7 @@ public class MessagesResourceTest {
     void setUp() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
         exporter = mock(MessagesExporter.class);
-        sut = new MessagesResource(exporter);
+        sut = new MessagesResource(exporter, mock(SearchDomain.class), mock(SearchExecutionGuard.class), mock(PermittedStreams.class));
         sut.asyncRunner = Runnable::run;
     }
 

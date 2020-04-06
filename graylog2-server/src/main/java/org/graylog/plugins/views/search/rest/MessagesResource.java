@@ -16,22 +16,29 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchDomain;
+import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -49,6 +56,9 @@ import static org.graylog.plugins.views.search.export.Defaults.createDefaultMess
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
     private final MessagesExporter exporter;
+    private final SearchDomain searchDomain;
+    private final SearchExecutionGuard executionGuard;
+    private final PermittedStreams permittedStreams;
 
     //allow mocking
     Supplier<ChunkedOutput<String>> chunkedOutputSupplier = () -> new ChunkedOutput<>(String.class);
@@ -60,8 +70,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     @Inject
-    public MessagesResource(MessagesExporter exporter) {
+    public MessagesResource(MessagesExporter exporter, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams) {
         this.exporter = exporter;
+        this.searchDomain = searchDomain;
+        this.executionGuard = executionGuard;
+        this.permittedStreams = permittedStreams;
     }
 
     @POST
@@ -81,7 +94,37 @@ public class MessagesResource extends RestResource implements PluginRestResource
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @PathParam("searchTypeId") String searchTypeId,
             @ApiParam ResultFormat format) {
-        return chunkedOutputFrom(fwd -> exporter.export(searchId, searchTypeId, format, fwd));
+        Search search = loadSearch(searchId);
+
+        if (format == null) {
+            format = ResultFormat.empty();
+        }
+
+        ResultFormat finalFormat = format;
+        return chunkedOutputFrom(fwd -> exporter.export(search, searchTypeId, finalFormat, fwd));
+    }
+
+    private Search loadSearch(String searchId) {
+        Search search = searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
+                .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
+
+        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
+
+        executionGuard.check(search, this::hasStreamReadPermission);
+
+        return search;
+    }
+
+    private boolean hasViewReadPermission(ViewDTO view) {
+        return isPermitted(ViewsRestPermissions.VIEW_READ, view.id());
+    }
+
+    private ImmutableSet<String> loadAllAllowedStreamsForUser() {
+        return permittedStreams.load(this::hasStreamReadPermission);
+    }
+
+    private boolean hasStreamReadPermission(String streamId) {
+        return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
     private ChunkedOutput<String> chunkedOutputFrom(Consumer<ChunkForwarder<String>> call) {
