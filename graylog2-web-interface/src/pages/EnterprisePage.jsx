@@ -2,24 +2,25 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import { GraylogClusterOverview } from 'components/cluster';
 import EnterpriseFreeLicenseForm from 'components/enterprise/EnterpriseFreeLicenseForm';
 import PluginList from 'components/enterprise/PluginList';
 
 import StoreProvider from 'injection/StoreProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 
 const NodesStore = StoreProvider.getStore('Nodes');
+const { EnterpriseActions, EnterpriseStore } = CombinedProvider.get('Enterprise');
 
 const EnterprisePage = createReactClass({
   displayName: 'EnterprisePage',
-  mixins: [Reflux.connect(NodesStore)],
+  mixins: [Reflux.connect(NodesStore), Reflux.connect(EnterpriseStore)],
 
   onFreeLicenseFormSubmit(clusterId, formFields, callback) {
-    // TODO: Implement store action
-    if (callback) {
-      callback();
-    }
+    EnterpriseActions.requestFreeEnterpriseLicense(clusterId, formFields)
+      .then(() => callback(true))
+      .catch(() => callback(false));
   },
 
   _isLoading() {
@@ -55,7 +56,9 @@ const EnterprisePage = createReactClass({
 
           <GraylogClusterOverview />
           <PluginList />
-          <EnterpriseFreeLicenseForm clusterId={clusterId} onSubmit={this.onFreeLicenseFormSubmit} />
+          <IfPermitted permissions="freelicenses:create">
+            <EnterpriseFreeLicenseForm clusterId={clusterId} onSubmit={this.onFreeLicenseFormSubmit} />
+          </IfPermitted>
         </div>
       </DocumentTitle>
     );

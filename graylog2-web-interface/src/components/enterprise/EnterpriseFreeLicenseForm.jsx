@@ -61,11 +61,15 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
 
     // First set "submitting" status to make sure we disable the submit button (avoid double-click)
     this.setState({ isSubmitting: true }, () => {
-      onSubmit(clusterId, formFields, () => {
-        // Clear form before unsetting "submitting" status, again, to avoid double-click
-        this.clearValues(() => {
+      onSubmit(clusterId, formFields, (success) => {
+        if (success) {
+          // Clear form before unsetting "submitting" status, again, to avoid double-click
+          this.clearValues(() => {
+            this.setState({ isSubmitting: false });
+          });
+        } else {
           this.setState({ isSubmitting: false });
-        });
+        }
       });
     });
   };
