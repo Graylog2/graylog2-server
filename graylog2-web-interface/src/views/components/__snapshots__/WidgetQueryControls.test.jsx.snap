@@ -21,21 +21,19 @@ exports[`WidgetQueryControls should do something 1`] = `
             <button
               aria-expanded="false"
               aria-haspopup="true"
-              class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 ZNXPm dropdown-toggle btn btn-info"
-              id="timerange-type"
+              class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hNEGNs dropdown-toggle btn btn-info"
               role="button"
               type="button"
             >
               <svg
                 class="svg-inline--fa fa-clock"
               />
-               
+
               <span
                 class="caret"
               />
             </button>
             <ul
-              aria-labelledby="timerange-type"
               class="dropdown-menu"
               role="menu"
             >
@@ -85,7 +83,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           <div
             class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
-            
+
             <span>
               <select
                 class="FormControl-sc-1amoaox-0 fcGLmv relative form-control"
@@ -93,11 +91,10 @@ exports[`WidgetQueryControls should do something 1`] = `
                 label=""
                 name="timerange.range"
                 placeholder=""
-                title="Select a relative time range"
                 type="select"
               >
                 <option
-                  value="86400"
+                  value="0"
                 >
                   Search in last day
                 </option>
@@ -107,7 +104,7 @@ exports[`WidgetQueryControls should do something 1`] = `
                   Search in all messages
                 </option>
               </select>
-              
+
             </span>
           </div>
         </div>
@@ -196,7 +193,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           </a>
         </div>
         <button
-          class="Button__StyledButton-c9cbmb-0 jVYrA pull-left search-button-execute btn btn-success"
+          class="Button__StyledButton-c9cbmb-0 gxhWww pull-left search-button-execute btn btn-success"
           title="Perform search"
           type="submit"
         >
