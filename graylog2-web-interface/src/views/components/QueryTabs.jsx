@@ -13,12 +13,24 @@ import Query from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
 
-const StyledQueryTabs = styled(Tabs)`
+const StyledQueryTabs = styled(Tabs)(({ theme }) => `
   .tab-pane {
-    border-bottom: 0;
-    border-radius: 0;
+    display: none;
   }
-`;
+
+  > .nav-tabs {
+    border-bottom: 0;
+
+    > li.active {
+      z-index: 1;
+
+      > a {
+        border-color: ${theme.color.gray[80]};
+        border-bottom-color: transparent;
+      }
+    }
+  }
+`);
 
 type Props = {
   children: React.Node,
@@ -91,7 +103,6 @@ class QueryTabs extends React.Component<Props> {
         <Col>
           <StyledQueryTabs activeKey={selectedQueryId}
                            animation={false}
-                           id="QueryTabs"
                            onSelect={onSelect}>
             {tabs}
           </StyledQueryTabs>

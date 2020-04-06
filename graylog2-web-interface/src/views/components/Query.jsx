@@ -24,6 +24,8 @@ const StyledJumbotron = styled(Jumbotron)(({ theme }) => `
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     margin-bottom: 0;
+    z-index: 2;
+    position: relative;
   }
 `);
 
