@@ -22,6 +22,7 @@ exports[`WidgetQueryControls should do something 1`] = `
               aria-expanded="false"
               aria-haspopup="true"
               class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hNEGNs dropdown-toggle btn btn-info"
+              id="timerange-type"
               role="button"
               type="button"
             >
@@ -34,6 +35,7 @@ exports[`WidgetQueryControls should do something 1`] = `
               />
             </button>
             <ul
+              aria-labelledby="timerange-type"
               class="dropdown-menu"
               role="menu"
             >
@@ -91,10 +93,11 @@ exports[`WidgetQueryControls should do something 1`] = `
                 label=""
                 name="timerange.range"
                 placeholder=""
+                title="Select a relative time range"
                 type="select"
               >
                 <option
-                  value="0"
+                  value="86400"
                 >
                   Search in last day
                 </option>
