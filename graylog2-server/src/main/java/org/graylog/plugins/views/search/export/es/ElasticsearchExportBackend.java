@@ -29,6 +29,7 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.SimpleMessage;
+import org.graylog.plugins.views.search.export.SimpleMessages;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
@@ -68,7 +69,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     @Override
-    public void run(MessagesRequest request, Consumer<LinkedHashSet<SimpleMessage>> chunkCollector, Runnable onDone) {
+    public void run(MessagesRequest request, Consumer<SimpleMessages> chunkCollector, Runnable onDone) {
         request.ensureCompleteness();
 
         fetchResults(request, chunkCollector);
@@ -76,7 +77,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
         onDone.run();
     }
 
-    private void fetchResults(MessagesRequest request, Consumer<LinkedHashSet<SimpleMessage>> chunkCollector) {
+    private void fetchResults(MessagesRequest request, Consumer<SimpleMessages> chunkCollector) {
         Object[] searchAfterValues = null;
 
         while (true) {
@@ -165,8 +166,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get());
     }
 
-    private boolean publishChunk(Consumer<LinkedHashSet<SimpleMessage>> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, Set<String> desiredFieldsInOrder) {
-        LinkedHashSet<SimpleMessage> hitsWithOnlyRelevantFields = buildHitsWithRelevantFields(hits, desiredFieldsInOrder);
+    private boolean publishChunk(Consumer<SimpleMessages> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, Set<String> desiredFieldsInOrder) {
+        SimpleMessages hitsWithOnlyRelevantFields = buildHitsWithRelevantFields(hits, desiredFieldsInOrder);
 
         try {
             chunkCollector.accept(hitsWithOnlyRelevantFields);
@@ -177,17 +178,18 @@ public class ElasticsearchExportBackend implements ExportBackend {
         }
     }
 
-    private LinkedHashSet<SimpleMessage> buildHitsWithRelevantFields(List<SearchResult.Hit<Map, Void>> hits, Set<String> desiredFieldsInOrder) {
-        return hits.stream()
-                .map(h -> buildHitWithRelevantFields(h, desiredFieldsInOrder))
+    private SimpleMessages buildHitsWithRelevantFields(List<SearchResult.Hit<Map, Void>> hits, Set<String> desiredFieldsInOrder) {
+        LinkedHashSet<SimpleMessage> set = hits.stream()
+                .map(h -> buildHitWithRelevantFields(desiredFieldsInOrder, h.source))
                 .collect(toCollection(LinkedHashSet::new));
+        return SimpleMessages.from(set);
     }
 
-    private SimpleMessage buildHitWithRelevantFields(SearchResult.Hit<Map, Void> hit, Set<String> desiredFieldsInOrder) {
+    private SimpleMessage buildHitWithRelevantFields(Set<String> desiredFieldsInOrder, Map source) {
         LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
 
         for (String name : desiredFieldsInOrder) {
-            fields.put(name, hit.source.get(name));
+            fields.put(name, source.get(name));
         }
 
         return SimpleMessage.from(fields);

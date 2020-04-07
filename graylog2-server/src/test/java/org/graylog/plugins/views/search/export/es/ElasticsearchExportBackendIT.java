@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.SimpleMessage;
+import org.graylog.plugins.views.search.export.SimpleMessages;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -156,7 +157,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
 
         List<String> invocations = new ArrayList<>();
 
-        sut.run(request, h -> invocations.add(String.valueOf(h.size())), () -> invocations.add("done"));
+        sut.run(request, chunk -> invocations.add(String.valueOf(chunk.size())), () -> invocations.add("done"));
 
         assertThat(invocations).containsExactly("4", "done");
     }
@@ -173,15 +174,18 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     }
 
     private void runWithExpectedResult(MessagesRequest request, String resultFields, String... resultMessages) {
-        LinkedHashSet<SimpleMessage> totalResult = collectResultAsStringSet(request);
+        SimpleMessages totalResult = collectTotalResult(request);
 
-        LinkedHashSet<SimpleMessage> expected = parseToSimpleMessages(resultFields, resultMessages);
+        SimpleMessages expected = parseToSimpleMessages(resultFields, resultMessages);
 
         assertThat(totalResult).isEqualTo(expected);
     }
 
-    private LinkedHashSet<SimpleMessage> parseToSimpleMessages(String resultFields, String... messageStrings) {
-        return Arrays.stream(messageStrings).map(s -> parse(resultFields, s)).collect(toCollection(LinkedHashSet::new));
+    private SimpleMessages parseToSimpleMessages(String resultFields, String... messageStrings) {
+        LinkedHashSet<SimpleMessage> messages = Arrays.stream(messageStrings)
+                .map(s -> parse(resultFields, s))
+                .collect(toCollection(LinkedHashSet::new));
+        return SimpleMessages.from(messages);
     }
 
     private SimpleMessage parse(String fieldNames, String messageString) {
@@ -195,13 +199,19 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         return SimpleMessage.from(fields);
     }
 
-    private LinkedHashSet<SimpleMessage> collectResultAsStringSet(MessagesRequest request) {
-        LinkedHashSet<SimpleMessage> totalResult = new LinkedHashSet<>();
+    private SimpleMessages collectTotalResult(MessagesRequest request) {
+        LinkedHashSet<SimpleMessages> allChunks = new LinkedHashSet<>();
 
-        sut.run(request, totalResult::addAll, () -> {
+        sut.run(request, allChunks::add, () -> {
         });
 
-        return totalResult;
+        LinkedHashSet<SimpleMessage> allMessages = new LinkedHashSet<>();
+
+        for (SimpleMessages chunk : allChunks) {
+            allMessages.addAll(chunk.messages());
+        }
+
+        return SimpleMessages.from(allMessages);
     }
 
     private TimeRange allMessagesTimeRange() {

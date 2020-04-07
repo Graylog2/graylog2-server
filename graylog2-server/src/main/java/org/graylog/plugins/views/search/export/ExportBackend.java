@@ -16,9 +16,8 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
 public interface ExportBackend {
-    void run(MessagesRequest request, Consumer<LinkedHashSet<SimpleMessage>> chunkCollector, Runnable onDone);
+    void run(MessagesRequest request, Consumer<SimpleMessages> chunkCollector, Runnable onDone);
 }
