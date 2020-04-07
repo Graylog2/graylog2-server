@@ -12,7 +12,7 @@ import OriginalKeywordTimeRangeSelector from './KeywordTimeRangeSelector';
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
 const KeywordTimeRangeSelector = ({ value, ...props }: { value: string }) => (
-  <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }}>
+  <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }} validateOnMount>
     <Form>
       <OriginalKeywordTimeRangeSelector {...props} />
     </Form>
