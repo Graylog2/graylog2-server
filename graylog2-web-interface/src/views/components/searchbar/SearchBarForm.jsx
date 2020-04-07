@@ -19,7 +19,7 @@ const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
     case 'relative':
       return {
         type: timerange.type,
-        range: Number.parseInt(timerange.range, 10),
+        range: timerange.range,
       };
     case 'keyword':
       return timerange;
