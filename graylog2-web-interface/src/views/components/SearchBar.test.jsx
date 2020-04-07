@@ -9,8 +9,9 @@ import { QueriesActions } from 'views/stores/QueriesStore';
 import mockAction from 'helpers/mocking/MockAction';
 import SearchBar from './SearchBar';
 
+const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
 jest.mock('stores/sessions/SessionStore', () => MockStore(['isLoggedIn', () => { return true; }], 'getSessionId'));
-jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
+jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', ['getInitialState', () => mockCurrentUser], ['get', () => mockCurrentUser]));
 jest.mock('actions/sessions/SessionActions', () => ({
   logout: {
     completed: {
