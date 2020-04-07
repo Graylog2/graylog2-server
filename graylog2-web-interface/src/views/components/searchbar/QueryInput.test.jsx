@@ -19,6 +19,12 @@ class Completer {
 }
 
 describe('QueryInput', () => {
+  beforeAll(() => {
+    /* eslint-disable no-undef */
+    // $FlowFixMe: `ace` is defined by external import
+    ace.config.set('basePath', 'path');
+    /* eslint-enable no-undef */
+  });
   const SimpleQueryInput = (props) => (
     <QueryInput value="*"
                 onChange={(s) => Promise.resolve(s)}

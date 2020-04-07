@@ -10,7 +10,6 @@ import WrappingContainer from 'WrappingContainer';
 import WidgetQueryControls from './WidgetQueryControls';
 import { WidgetActions } from '../stores/WidgetStore';
 
-
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     timerange: jest.fn(),
@@ -31,6 +30,8 @@ jest.mock('moment', () => {
   const mockMoment = jest.requireActual('moment');
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
+
+jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Editor</span>);
 
 describe('WidgetQueryControls', () => {
   afterEach(cleanup);

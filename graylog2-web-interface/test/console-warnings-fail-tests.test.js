@@ -9,17 +9,15 @@ describe('console-warnings-fail-tests', () => {
   let oldConsoleWarn;
   let oldConsoleError;
   beforeAll(() => {
-    oldConsoleWarn = console.warn;
-    oldConsoleError = console.error;
-    console.warn = () => {};
-    console.error = () => {};
-    // eslint-disable-next-line no-unused-vars, global-require
-    const unused = require('./console-warnings-fail-tests');
+    oldConsoleWarn = console.origWarn;
+    oldConsoleError = console.origError;
+    console.origWarn = () => {};
+    console.origError = () => {};
   });
 
   afterAll(() => {
-    console.warn = oldConsoleWarn;
-    console.error = oldConsoleError;
+    console.origWarn = oldConsoleWarn;
+    console.origError = oldConsoleError;
   });
   describe('console.error', () => {
     it('throws error if used', () => {
