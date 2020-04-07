@@ -11,7 +11,8 @@ const { EnterpriseActions } = CombinedProvider.get('Enterprise');
 const EnterpriseStore = Reflux.createStore({
   listenables: [EnterpriseActions],
   sourceUrl: '/free-enterprise',
-  licenseInstalled: undefined,
+  licenseStatus: undefined,
+  clusterId: undefined,
 
   getInitialState() {
     return this.getState();
@@ -23,7 +24,8 @@ const EnterpriseStore = Reflux.createStore({
 
   getState() {
     return {
-      licenseInstalled: this.licenseInstalled,
+      licenseStatus: this.licenseStatus,
+      clusterId: this.clusterId,
     };
   },
 
@@ -37,10 +39,18 @@ const EnterpriseStore = Reflux.createStore({
 
   getLicenseInfo() {
     const promise = fetch('GET', this.enterpriseUrl('license/info'));
-    promise.catch((error) => {
-      const errorMessage = lodash.get(error, 'additional.body.message', error.message);
-      UserNotification.error(`Couldn't load license information: ${errorMessage}`, 'Error');
-    });
+    promise.then(
+      (response) => {
+        this.licenseStatus = response.free_license_info.license_status;
+        this.clusterId = response.free_license_info.cluster_id;
+        this.propagateChanges();
+        return response;
+      },
+      (error) => {
+        const errorMessage = lodash.get(error, 'additional.body.message', error.message);
+        UserNotification.error(`Couldn't load license information: ${errorMessage}`, 'Error');
+      },
+    );
     EnterpriseActions.getLicenseInfo.promise(promise);
   },
 

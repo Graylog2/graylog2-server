@@ -87,61 +87,56 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
     }
 
     return (
-      <Row className="content">
-        <Col md={12}>
-          <h2 style={{ marginBottom: 10 }}>Graylog Enterprise is free for under 5 GB/day</h2>
-          <form onSubmit={this.submitForm}>
-            <Row>
-              <Col md={5}>
-                <h3 style={{ marginBottom: 10 }}>Get your free Graylog Enterprise license:</h3>
-                <Input type="text"
-                       id="firstName"
-                       label="First Name"
-                       value={firstName}
-                       required
-                       onChange={this.handleInput('firstName')} />
-                <Input type="text"
-                       id="lastName"
-                       label="Last Name"
-                       value={lastName}
-                       required
-                       onChange={this.handleInput('lastName')} />
-                <Input type="text"
-                       id="company"
-                       label="Company"
-                       value={company}
-                       required
-                       onChange={this.handleInput('company')} />
-                <Input type="email"
-                       id="email"
-                       label="Email Address"
-                       value={email}
-                       placeholder="Please provide a valid email address to send the license key to"
-                       required
-                       onChange={this.handleInput('email')} />
-              </Col>
-            </Row>
-            <Row>
-              <Col sm={11}>
-                <ButtonToolbar>
-                  <Button id="submit-entry"
-                          disabled={this.formIsInvalid()}
-                          type="submit"
-                          bsSize="small"
-                          bsStyle="primary">
-                    Get your free license
-                  </Button>
-                  <Button id="clear-entry"
-                          onClick={this.resetForm}
-                          bsSize="small">
-                    Clear form
-                  </Button>
-                </ButtonToolbar>
-              </Col>
-            </Row>
-          </form>
-        </Col>
-      </Row>
+      <form onSubmit={this.submitForm}>
+        <Row>
+          <Col md={5}>
+            <h3 style={{ marginBottom: 10 }}>Get your free Graylog Enterprise license:</h3>
+            <Input type="text"
+                   id="firstName"
+                   label="First Name"
+                   value={firstName}
+                   required
+                   onChange={this.handleInput('firstName')} />
+            <Input type="text"
+                   id="lastName"
+                   label="Last Name"
+                   value={lastName}
+                   required
+                   onChange={this.handleInput('lastName')} />
+            <Input type="text"
+                   id="company"
+                   label="Company"
+                   value={company}
+                   required
+                   onChange={this.handleInput('company')} />
+            <Input type="email"
+                   id="email"
+                   label="Email Address"
+                   value={email}
+                   placeholder="Please provide a valid email address to send the license key to"
+                   required
+                   onChange={this.handleInput('email')} />
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={11}>
+            <ButtonToolbar>
+              <Button id="submit-entry"
+                      disabled={this.formIsInvalid()}
+                      type="submit"
+                      bsSize="small"
+                      bsStyle="primary">
+                Get your free license
+              </Button>
+              <Button id="clear-entry"
+                      onClick={this.resetForm}
+                      bsSize="small">
+                Clear form
+              </Button>
+            </ButtonToolbar>
+          </Col>
+        </Row>
+      </form>
     );
   }
 }

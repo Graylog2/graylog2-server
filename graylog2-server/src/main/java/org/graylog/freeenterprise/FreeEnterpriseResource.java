@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
@@ -35,6 +37,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 
 @Api(value = "Enterprise")
 @Path("/free-enterprise")
@@ -56,8 +59,7 @@ public class FreeEnterpriseResource extends RestResource {
     @Path("/license/info")
     @RequiresPermissions(RestPermissions.LICENSEINFOS_READ)
     public Response licenseInfo() {
-        // TODO: Add real implementation
-        return Response.ok().build();
+        return Response.ok(Collections.singletonMap("free_license_info", freeEnterpriseService.licenseInfo())).build();
     }
 
     @POST
@@ -65,12 +67,15 @@ public class FreeEnterpriseResource extends RestResource {
     @ApiOperation(value = "Request free Graylog Enterprise license")
     @Path("/license")
     @RequiresPermissions(RestPermissions.FREELICENSES_CREATE)
-    public Response requestFreeLicense(@Valid FreeLicenseRequest request) {
-        try {
-            freeEnterpriseService.requestFreeLicense(request);
-        } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage(), e);
+    public Response requestFreeLicense(@NotNull @Valid FreeLicenseRequest request) {
+        if (freeEnterpriseService.canRequestFreeLicense()) {
+            try {
+                freeEnterpriseService.requestFreeLicense(request);
+            } catch (Exception e) {
+                throw new InternalServerErrorException(e.getMessage(), e);
+            }
+            return Response.accepted().build();
         }
-        return Response.accepted().build();
+        throw new BadRequestException("Free Graylog Enterprise license already requested or license already installed");
     }
 }
