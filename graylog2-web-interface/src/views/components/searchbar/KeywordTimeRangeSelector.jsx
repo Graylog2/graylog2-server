@@ -37,12 +37,16 @@ type Props = {
   disabled: boolean,
 };
 
-const _validateKeyword = (keyword: string, _setSuccessfullPreview, _setFailedPreview) => {
+const _validateKeyword = (
+  keyword: string,
+  _setSuccessfullPreview: ({ from: string, to: string }) => void,
+  _setFailedPreview: () => void,
+): ?Promise<mixed> => {
   if (keyword === undefined) {
     return undefined;
   }
   return trim(keyword) === ''
-    ? 'Keyword must not be empty!'
+    ? Promise.resolve('Keyword must not be empty!')
     : ToolsStore.testNaturalDate(keyword)
       .then(_setSuccessfullPreview, _setFailedPreview);
 };
@@ -60,19 +64,18 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
 
   const formik = useFormikContext();
 
-  useEffect(() => {
-    const { values: { timerange: { keyword } } } = formik;
-    ToolsStore.testNaturalDate(keyword)
-      .then(_setSuccessfullPreview)
-      .catch(_setFailedPreview);
-
-    return () => formik.unregisterField('timerange.keyword');
-  }, []);
-
   const _validate = useCallback(
     (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
     [_setSuccessfullPreview, _setFailedPreview],
   );
+
+  useEffect(() => {
+    const { values: { timerange: { keyword } } } = formik;
+    ToolsStore.testNaturalDate(keyword)
+      .then(_setSuccessfullPreview, _setFailedPreview);
+
+    return () => formik.unregisterField('timerange.keyword');
+  }, []);
 
   const { from, to } = keywordPreview.toObject();
   const keywordPreviewElement = !keywordPreview.isEmpty() && (
