@@ -263,7 +263,7 @@ describe('ExtendedSearchPage', () => {
       });
   });
 
-  it('displays SearhStore errors', () => {
+  it('displays SearchStore errors', () => {
     asMock(SearchStore.getInitialState).mockReturnValueOnce({ errors: [new Error('The error message')] });
     const wrapper = mount(<SimpleExtendedSearchPage />);
 
