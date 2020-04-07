@@ -2,15 +2,15 @@
 import Reflux from 'reflux';
 
 import fetch, { redirectIfForbidden } from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 
 import Search from 'views/logic/search/Search';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
-const executeQueryUrl = (id) => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
-const jobStatusUrl = (jobId) => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);
+const executeQueryUrl = (id) => qualifyUrl(`/views/search/${id}/execute`);
+const jobStatusUrl = (jobId) => qualifyUrl(`/views/search/status/${jobId}`);
 
 type InternalState = {};
 

@@ -1,5 +1,5 @@
 // @flow strict
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
