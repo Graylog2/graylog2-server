@@ -65,7 +65,7 @@ export const SearchJobStore = singletonStore(
 
     run(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
       const handleForbidden = (error, SessionStore) => {
-        if (!error.type === 'MissingStreamPermission') {
+        if (error.body && error.body.type !== 'MissingStreamPermission') {
           redirectIfForbidden(error, SessionStore);
         }
       };
