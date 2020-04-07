@@ -21,6 +21,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.MessagesRequest;
+import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -30,9 +31,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
@@ -61,10 +65,10 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
 
         mockIndexLookupFor(request, "graylog_0", "graylog_1");
 
-        runWithExpectedResult(request,
-                "2015-01-01 04:00:00.000 source-2 Ho",
-                "2015-01-01 02:00:00.000 source-2 He",
-                "2015-01-01 01:00:00.000 source-1 Ha"
+        runWithExpectedResult(request, "timestamp,source,message",
+                "2015-01-01 04:00:00.000, source-2, Ho",
+                "2015-01-01 02:00:00.000, source-2, He",
+                "2015-01-01 01:00:00.000, source-1, Ha"
         );
     }
 
@@ -80,9 +84,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .queryString(ElasticsearchQueryString.builder().queryString("Ha Ho").build())
                 .build();
 
-        runWithExpectedResult(request,
-                "2015-01-01 04:00:00.000 source-2 Ho",
-                "2015-01-01 01:00:00.000 source-1 Ha"
+        runWithExpectedResult(request, "timestamp,source,message",
+                "2015-01-01 04:00:00.000, source-2, Ho",
+                "2015-01-01 01:00:00.000, source-1, Ha"
         );
     }
 
@@ -95,8 +99,8 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .additionalQueryString(ElasticsearchQueryString.builder().queryString("*a").build())
                 .build();
 
-        runWithExpectedResult(request,
-                "2015-01-01 01:00:00.000 source-1 Ha"
+        runWithExpectedResult(request, "timestamp,source,message",
+                "2015-01-01 01:00:00.000, source-1, Ha"
         );
     }
 
@@ -108,9 +112,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .timeRange(timerange("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.000Z"))
                 .build();
 
-        runWithExpectedResult(request,
-                "2015-01-01 02:00:00.000 source-2 He",
-                "2015-01-01 01:00:00.000 source-1 Ha"
+        runWithExpectedResult(request, "timestamp,source,message",
+                "2015-01-01 02:00:00.000, source-2, He",
+                "2015-01-01 01:00:00.000, source-1, Ha"
         );
     }
 
@@ -122,11 +126,11 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .fieldsInOrder("timestamp", "message")
                 .build();
 
-        runWithExpectedResult(request,
-                "2015-01-01 04:00:00.000 Ho",
-                "2015-01-01 03:00:00.000 Hi",
-                "2015-01-01 02:00:00.000 He",
-                "2015-01-01 01:00:00.000 Ha");
+        runWithExpectedResult(request, "timestamp,message",
+                "2015-01-01 04:00:00.000, Ho",
+                "2015-01-01 03:00:00.000, Hi",
+                "2015-01-01 02:00:00.000, He",
+                "2015-01-01 01:00:00.000, Ha");
     }
 
     @Test
@@ -137,11 +141,11 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .sort(linkedHashSetOf(Sort.create("source", SortOrder.ASC), Sort.create("timestamp", SortOrder.DESC)))
                 .build();
 
-        runWithExpectedResult(request,
-                "2015-01-01 03:00:00.000 source-1 Hi",
-                "2015-01-01 01:00:00.000 source-1 Ha",
-                "2015-01-01 04:00:00.000 source-2 Ho",
-                "2015-01-01 02:00:00.000 source-2 He");
+        runWithExpectedResult(request, "timestamp,source,message",
+                "2015-01-01 03:00:00.000, source-1, Hi",
+                "2015-01-01 01:00:00.000, source-1, Ha",
+                "2015-01-01 04:00:00.000, source-2, Ho",
+                "2015-01-01 02:00:00.000, source-2, He");
     }
 
     @Test
@@ -168,25 +172,36 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .timeRange(allMessagesTimeRange());
     }
 
-    private void runWithExpectedResult(MessagesRequest request, String... resultLines) {
-        LinkedHashSet<String> totalResult = collectResultAsStringSet(request);
+    private void runWithExpectedResult(MessagesRequest request, String resultFields, String... resultMessages) {
+        LinkedHashSet<SimpleMessage> totalResult = collectResultAsStringSet(request);
 
-        assertThat(totalResult).containsExactly(resultLines);
+        LinkedHashSet<SimpleMessage> expected = parseToSimpleMessages(resultFields, resultMessages);
+
+        assertThat(totalResult).isEqualTo(expected);
     }
 
-    private LinkedHashSet<String> collectResultAsStringSet(MessagesRequest request) {
-        LinkedHashSet<String> totalResult = new LinkedHashSet<>();
+    private LinkedHashSet<SimpleMessage> parseToSimpleMessages(String resultFields, String... messageStrings) {
+        return Arrays.stream(messageStrings).map(s -> parse(resultFields, s)).collect(toCollection(LinkedHashSet::new));
+    }
 
-        sut.run(request, h -> collect(h, totalResult), () -> {
+    private SimpleMessage parse(String fieldNames, String messageString) {
+        String[] names = fieldNames.split(",");
+        String[] values = messageString.split(",");
+        LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
+        int i = 0;
+        for (String name : names) {
+            fields.put(name, values[i++].trim());
+        }
+        return SimpleMessage.from(fields);
+    }
+
+    private LinkedHashSet<SimpleMessage> collectResultAsStringSet(MessagesRequest request) {
+        LinkedHashSet<SimpleMessage> totalResult = new LinkedHashSet<>();
+
+        sut.run(request, totalResult::addAll, () -> {
         });
 
         return totalResult;
-    }
-
-    private void collect(LinkedHashSet<LinkedHashSet<String>> hits, LinkedHashSet<String> totalResult) {
-        hits.stream()
-                .map(row -> String.join(" ", row))
-                .forEach(totalResult::add);
     }
 
     private TimeRange allMessagesTimeRange() {

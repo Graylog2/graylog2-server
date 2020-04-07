@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
+import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -44,6 +45,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -61,7 +63,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final PermittedStreams permittedStreams;
 
     //allow mocking
-    Supplier<ChunkedOutput<String>> chunkedOutputSupplier = () -> new ChunkedOutput<>(String.class);
+    Supplier<ChunkedOutput<LinkedHashSet<SimpleMessage>>> chunkedOutputSupplier = () -> new ChunkedOutput<>(LinkedHashSet.class);
     Consumer<Runnable> asyncRunner = this::runAsync;
 
     private void runAsync(Runnable runnable) {
@@ -80,7 +82,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public ChunkedOutput<String> retrieve(@ApiParam MessagesRequest request) {
+    public ChunkedOutput<LinkedHashSet<SimpleMessage>> retrieve(@ApiParam MessagesRequest request) {
         final MessagesRequest req = defaultIfNecessary(request);
 
         executionGuard.checkUserIsPermittedToSeeStreams(req.streams().get(), this::hasStreamReadPermission);
@@ -101,7 +103,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @Path("{searchId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public ChunkedOutput<String> retrieveForSearch(
+    public ChunkedOutput<LinkedHashSet<SimpleMessage>> retrieveForSearch(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam ResultFormat formatFromClient) {
         Search search = loadSearch(searchId);
@@ -115,7 +117,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @Path("{searchId}/{searchTypeId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public ChunkedOutput<String> retrieveForSearchType(
+    public ChunkedOutput<LinkedHashSet<SimpleMessage>> retrieveForSearchType(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @PathParam("searchTypeId") String searchTypeId,
             @ApiParam ResultFormat formatFromClient) {
@@ -153,17 +155,17 @@ public class MessagesResource extends RestResource implements PluginRestResource
         return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
-    private ChunkedOutput<String> chunkedOutputFrom(Consumer<ChunkForwarder<String>> call) {
-        ChunkedOutput<String> output = chunkedOutputSupplier.get();
+    private ChunkedOutput<LinkedHashSet<SimpleMessage>> chunkedOutputFrom(Consumer<ChunkForwarder<LinkedHashSet<SimpleMessage>>> call) {
+        ChunkedOutput<LinkedHashSet<SimpleMessage>> output = chunkedOutputSupplier.get();
 
-        ChunkForwarder<String> fwd = ChunkForwarder.create(chunk -> writeTo(output, chunk), () -> close(output));
+        ChunkForwarder<LinkedHashSet<SimpleMessage>> fwd = ChunkForwarder.create(chunk -> writeTo(output, chunk), () -> close(output));
 
         asyncRunner.accept(() -> call.accept(fwd));
 
         return output;
     }
 
-    private void close(ChunkedOutput<String> output) {
+    private void close(ChunkedOutput<LinkedHashSet<SimpleMessage>> output) {
         try {
             output.close();
         } catch (IOException e) {
@@ -171,7 +173,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         }
     }
 
-    private void writeTo(ChunkedOutput<String> output, String chunk) {
+    private void writeTo(ChunkedOutput<LinkedHashSet<SimpleMessage>> output, LinkedHashSet<SimpleMessage> chunk) {
         try {
             output.write(chunk);
         } catch (IOException e) {

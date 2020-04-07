@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
+import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,8 @@ import org.mockito.InOrder;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -68,28 +71,39 @@ public class MessagesResourceTest {
     void writesToChunkedOutputAsResultsComeIn() throws IOException {
         MessagesRequest request = validRequest();
 
-        @SuppressWarnings("unchecked") ChunkedOutput<String> output = mock(ChunkedOutput.class);
+        @SuppressWarnings("unchecked") ChunkedOutput<LinkedHashSet<SimpleMessage>> output = mock(ChunkedOutput.class);
 
         sut.chunkedOutputSupplier = () -> output;
 
-        ArgumentCaptor<ChunkForwarder<String>> chunkForwarderArgumentCaptor = ArgumentCaptor.forClass(ChunkForwarder.class);
+        ArgumentCaptor<ChunkForwarder<LinkedHashSet<SimpleMessage>>> chunkForwarderArgumentCaptor = ArgumentCaptor.forClass(ChunkForwarder.class);
         doNothing().when(exporter).export(any(), chunkForwarderArgumentCaptor.capture());
 
         sut.retrieve(request);
 
         verify(output, never()).write(any());
 
-        ChunkForwarder<String> forwarder = chunkForwarderArgumentCaptor.getValue();
+        ChunkForwarder<LinkedHashSet<SimpleMessage>> forwarder = chunkForwarderArgumentCaptor.getValue();
 
-        forwarder.write("chunk-1");
-        forwarder.write("chunk-2");
+        forwarder.write(singleMessage("field-1:a", "field-2:b"));
+        forwarder.write(singleMessage("field-1:c", "field-2:d"));
         forwarder.close();
 
         InOrder verifier = inOrder(output);
 
-        verifier.verify(output).write("chunk-1");
-        verifier.verify(output).write("chunk-2");
+        verifier.verify(output).write(singleMessage("field-1:a", "field-2:b"));
+        verifier.verify(output).write(singleMessage("field-1:c", "field-2:d"));
         verifier.verify(output).close();
+    }
+
+    private LinkedHashSet<SimpleMessage> singleMessage(String... fields) {
+        LinkedHashMap<String, Object> fieldsMap = new LinkedHashMap<>();
+        for (String field : fields) {
+            String[] split = field.split(":");
+            String name = split[0];
+            String value = split[1];
+            fieldsMap.put(name, value);
+        }
+        return new LinkedHashSet<>(ImmutableSet.of(SimpleMessage.from(fieldsMap)));
     }
 
     @Test

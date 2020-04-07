@@ -321,7 +321,7 @@ class MessagesExporterTest {
         return captor.getValue();
     }
 
-    private ChunkForwarder<String> dummyForwarder() {
+    private ChunkForwarder<LinkedHashSet<SimpleMessage>> dummyForwarder() {
         return new ChunkForwarder<>(c -> {
         }, () -> {
         });

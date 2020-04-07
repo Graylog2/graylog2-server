@@ -38,21 +38,21 @@ public class MessagesExporter {
         this.backend = backend;
     }
 
-    public void export(MessagesRequest request, ChunkForwarder<String> chunkForwarder) {
+    public void export(MessagesRequest request, ChunkForwarder<LinkedHashSet<SimpleMessage>> chunkForwarder) {
         MessagesRequest fullRequest = defaults.fillInIfNecessary(request);
 
-        backend.run(fullRequest, h -> chunkForwarder.write(reduce(h)), chunkForwarder::close);
+        backend.run(fullRequest, chunkForwarder::write, chunkForwarder::close);
     }
 
-    public void export(Search search, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+    public void export(Search search, ResultFormat resultFormat, ChunkForwarder<LinkedHashSet<SimpleMessage>> chunkForwarder) {
         exportWithRequestFrom(search, null, resultFormat, chunkForwarder);
     }
 
-    public void export(Search search, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+    public void export(Search search, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<LinkedHashSet<SimpleMessage>> chunkForwarder) {
         exportWithRequestFrom(search, searchTypeId, resultFormat, chunkForwarder);
     }
 
-    private void exportWithRequestFrom(Search search, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<String> chunkForwarder) {
+    private void exportWithRequestFrom(Search search, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<LinkedHashSet<SimpleMessage>> chunkForwarder) {
         MessagesRequest request = buildRequest(search, searchTypeId, resultFormat);
 
         export(request, chunkForwarder);
