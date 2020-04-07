@@ -48,6 +48,9 @@ describe('KeywordTimeRangeSelector', () => {
   const asyncRender = async (element) => {
     let wrapper;
     await act(async () => { wrapper = render(element); });
+    if (!wrapper) {
+      throw new Error('Render returned `null`.');
+    }
     return wrapper;
   };
 
