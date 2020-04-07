@@ -7,11 +7,11 @@ import { Button } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
 import DateTime from 'logic/datetimes/DateTime';
 
-const _setDateTimeToNow = () => new DateTime().toISOString();
+const _setDateTimeToNow = () => new DateTime();
 
 const _onDateSelected = (date) => {
   const midnightDate = date.setHours(0);
-  return DateTime.ignoreTZ(midnightDate).toISOString();
+  return DateTime.ignoreTZ(midnightDate);
 };
 
 type Props = {
@@ -30,13 +30,13 @@ const DateInputWithPicker = ({ disabled, error, value, onBlur, onChange, name, t
   return (
     <DatePicker disabled={disabled}
                 title={title}
-                date={value}
+                date={value.toString()}
                 onChange={onDatePicked}>
       <Input type="text"
              name={name}
              disabled={disabled}
              className="absolute"
-             value={value}
+             value={value.toString()}
              onBlur={onBlur}
              onChange={onChange}
              placeholder={DateTime.Formats.DATETIME}
