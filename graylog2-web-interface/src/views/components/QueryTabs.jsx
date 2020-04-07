@@ -108,6 +108,7 @@ class QueryTabs extends React.Component<Props> {
         <Col>
           <StyledQueryTabs activeKey={selectedQueryId}
                            animation={false}
+                           id="dashboard-pages"
                            onSelect={onSelect}>
             {tabs}
           </StyledQueryTabs>
