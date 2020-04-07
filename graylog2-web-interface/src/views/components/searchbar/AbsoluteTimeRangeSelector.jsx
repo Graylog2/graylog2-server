@@ -14,12 +14,12 @@ type Props = {
 };
 
 const _isValidDateString = (dateString: string) => {
-  if (!dateString) {
+  if (dateString === undefined) {
     return undefined;
   }
-  return (DateTime.isValidDateString(dateString)
+  return DateTime.isValidDateString(dateString)
     ? undefined
-    : `Invalid date: ${dateString}`);
+    : `Invalid date: ${dateString}`;
 };
 
 const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
@@ -51,7 +51,7 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
                                  onBlur={onBlur}
                                  value={value}
                                  name={name}
-                                 title="Search start date"
+                                 title="Search end date"
                                  error={error} />
           </div>
         )}
