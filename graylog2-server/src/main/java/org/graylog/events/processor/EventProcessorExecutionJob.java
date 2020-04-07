@@ -131,14 +131,18 @@ public class EventProcessorExecutionJob implements Job {
 
             // If the event processor is catching up on old data (e.g. the server was shut down for a significant time),
             // we can switch to a bigger scheduling window: `processingCatchUpWindowSize`.
-            // If enabled, it will ignore the processingHopSize and will schedule a tumbling window timerange of `processingCatchUpWindowSize` chunks.
+            // If engaged, we will schedule jobs with a timerange of multiple processingWindowSize chunks.
+            // It's the specific event processors' duty to handle being executed with this larger timerange.
+            // If an event processor was configured with a processingHopSize greater than the processingWindowSize
+            // we can't use the catchup mode.
             final long catchUpSize = configurationProvider.get().eventCatchupWindow();
-            if (catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now)) {
+            if (catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
+                config.processingHopSize() <= config.processingWindowSize()) {
                 final long chunkCount = catchUpSize / config.processingWindowSize();
 
                 // Align to multiples of the processingWindowSize
                 nextTo = to.plus(config.processingWindowSize() * chunkCount);
-                LOG.debug("eventproc <{}> is catching up on old data. Combining {} search windows with catchUpWindowSize={}ms: from={} to={}",
+                LOG.info("Event processor <{}> is catching up on old data. Combining {} search windows with catchUpWindowSize={}ms: from={} to={}",
                         config.eventDefinitionId(), chunkCount, catchUpSize, nextFrom, nextTo);
             }
 

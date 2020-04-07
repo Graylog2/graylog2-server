@@ -452,18 +452,22 @@ public class EventProcessorExecutionJobTest {
 
     @Test
     public void executeWithCatchUp() throws Exception {
-       catchupWindowTestHelper(EventsConfiguration.DEFAULT_CATCH_UP_WINDOW_MS);
+        catchupWindowTestHelper(EventsConfiguration.DEFAULT_CATCH_UP_WINDOW_MS, Duration.standardSeconds(60).getMillis(), Duration.standardSeconds(60).getMillis());
     }
     @Test
     public void executeWithDisabledCatchUp() throws Exception {
-        catchupWindowTestHelper(0);
+        catchupWindowTestHelper(0, Duration.standardSeconds(60).getMillis(), Duration.standardSeconds(60).getMillis());
     }
     @Test
     public void executeWithSmallerThanWindowSizeCatchUp() throws Exception {
-        catchupWindowTestHelper(Duration.standardSeconds(59).getMillis());
+        catchupWindowTestHelper(Duration.standardSeconds(59).getMillis(), Duration.standardSeconds(60).getMillis(), Duration.standardSeconds(60).getMillis());
+    }
+    @Test
+    public void executeWithHopSizeGreaterThanWindowSize() throws Exception {
+        catchupWindowTestHelper(EventsConfiguration.DEFAULT_CATCH_UP_WINDOW_MS, Duration.standardSeconds(120).getMillis(), Duration.standardSeconds(60).getMillis());
     }
 
-    private void catchupWindowTestHelper(long catchUpWindowSize) throws Exception {
+    private void catchupWindowTestHelper(long catchUpWindowSize, long processingHopSize, long processingWindowSize) throws Exception {
 
         when(eventsConfigurationProvider.get()).thenReturn(EventsConfiguration.builder().eventCatchupWindow(catchUpWindowSize).build());
 
@@ -471,11 +475,8 @@ public class EventProcessorExecutionJobTest {
         clock.plus(1, TimeUnit.MINUTES);
 
         final DateTime now = clock.nowUTC();
-        // When using a hopping window, the window size is not the same as the hop size
-        final long processingWindowSize = Duration.standardSeconds(60).getMillis();
-        final long processingHopSize = Duration.standardSeconds(5).getMillis();
         final long processingCatchUpWindowSize = eventsConfigurationProvider.get().eventCatchupWindow();
-        final int scheduleIntervalSeconds = 5;
+        final int scheduleIntervalSeconds = (int) processingHopSize * 1000;
         final DateTime from = now.minus(processingWindowSize);
         final DateTime to = now;
         final DateTime triggerNextTime = now;
@@ -532,7 +533,7 @@ public class EventProcessorExecutionJobTest {
 
         assertThat(triggerUpdate.nextTime()).isPresent().get().isEqualTo(clock.nowUTC().minus(timeSpentInEventProcessor));
 
-        if (catchUpWindowSize > processingWindowSize) {
+        if (catchUpWindowSize > processingWindowSize && processingHopSize <= processingWindowSize) {
             // We are behind at least one chunk of catchUpWindowSize
             // The new nextFrom should ignore the processingHopSize and start 1ms after the last `To` Range
             // The nextTo will be one window of the processingCatchUpWindowSize
