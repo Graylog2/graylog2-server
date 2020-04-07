@@ -37,7 +37,11 @@ jest.mock('views/stores/ViewSharingStore', () => ({
 }));
 
 describe('ShareViewModal', () => {
-  const view = View.builder().id('deadbeef').title('My fabulous view').build();
+  const view = View.builder()
+    .id('deadbeef')
+    .title('My fabulous view')
+    .type(View.Type.Search)
+    .build();
   const currentUser = { roles: [], permissions: [] };
   const onClose = jest.fn();
 

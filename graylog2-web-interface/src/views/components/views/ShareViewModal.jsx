@@ -54,12 +54,15 @@ const Additional = ({ children }: { children: React.Node }) => <div style={{ pad
 const extractValue = ({ value }) => value;
 
 class ShareViewModal extends React.Component<Props, State> {
-  state = {
-    viewSharing: null,
-    loaded: false,
-    users: undefined,
-    roles: undefined,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      viewSharing: null,
+      loaded: false,
+      users: undefined,
+      roles: undefined,
+    };
+  }
 
   componentDidMount() {
     const { view, currentUser } = this.props;
@@ -135,7 +138,7 @@ class ShareViewModal extends React.Component<Props, State> {
           Any user of this Graylog
         </Radio>{' '}
         <Additional>
-          <HelpBlock>Anyone with an account can access the dashboard.</HelpBlock>
+          <HelpBlock>Anyone with an account can access the {view.typeLabel}.</HelpBlock>
         </Additional>
 
         <Radio name={SpecificRoles.Type} checked={type === SpecificRoles.Type} onChange={this._onChange}>
@@ -148,7 +151,7 @@ class ShareViewModal extends React.Component<Props, State> {
                   placeholder="Select roles"
                   onChange={this._onRolesChange}
                   options={rolesOptions} />
-          <HelpBlock>Only users with these roles can access the dashboard.</HelpBlock>
+          <HelpBlock>Only users with these roles can access the {view.typeLabel}.</HelpBlock>
         </Additional>
 
         <Radio name={SpecificUsers.Type} checked={type === SpecificUsers.Type} onChange={this._onChange}>
@@ -161,21 +164,21 @@ class ShareViewModal extends React.Component<Props, State> {
                   placeholder="Select users"
                   onChange={this._onUsersChange}
                   options={userOptions || []} />
-          <HelpBlock>Only these users can access the dashboard.</HelpBlock>
+          <HelpBlock>Only these users can access the {view.typeLabel}.</HelpBlock>
         </Additional>
 
         <Radio name="none" checked={type === 'none'} onChange={this._onChange}>
           Only me
         </Radio>
         <Additional>
-          <HelpBlock>Noone but you can access the dashboard.</HelpBlock>
+          <HelpBlock>Noone but you can access the {view.typeLabel}.</HelpBlock>
         </Additional>
       </FormGroup>
     );
     return (
       <BootstrapModalConfirm onCancel={() => this._onClose()}
                              onConfirm={() => this._onSave()}
-                             title={`Who is supposed to access the dashboard ${view.title}?`}
+                             title={`Who is supposed to access the ${view.typeLabel} ${view.title}?`}
                              confirmButtonText="Save"
                              showModal={show}>
         {content}
