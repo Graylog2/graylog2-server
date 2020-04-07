@@ -33,7 +33,7 @@ jest.mock('moment', () => {
 jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Input</span>);
 
 describe('WidgetQueryControls', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => { jest.clearAllMocks(); });
   afterEach(cleanup);
 
   const config = {

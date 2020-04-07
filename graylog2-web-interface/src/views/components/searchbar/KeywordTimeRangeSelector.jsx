@@ -40,8 +40,8 @@ type Props = {
 const _validateKeyword = (
   keyword: string,
   _setSuccessfullPreview: ({ from: string, to: string }) => void,
-  _setFailedPreview: () => void,
-): ?Promise<mixed> => {
+  _setFailedPreview: () => string,
+): ?Promise<string> => {
   if (keyword === undefined) {
     return undefined;
   }
