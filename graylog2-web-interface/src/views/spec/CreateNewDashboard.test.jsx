@@ -51,6 +51,7 @@ jest.mock('stores/sessions/SessionStore', () => ({
   isLoggedIn: jest.fn(() => true),
   getSessionId: jest.fn(() => 'foobar'),
 }));
+jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Editor</span>);
 
 jest.unmock('logic/rest/FetchProvider');
 
