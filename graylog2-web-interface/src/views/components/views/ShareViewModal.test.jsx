@@ -125,4 +125,13 @@ describe('ShareViewModal', () => {
       done();
     });
   });
+  it('displays correct description if view is a search', () => {
+    const wrapper = mount(<ShareViewModal show view={view} currentUser={currentUser} onClose={onClose} />);
+    expect(wrapper.contains('Who is supposed to access the search My fabulous view?')).toBe(true);
+  });
+  it('displays correct description if view is a dashboard', () => {
+    const dashboardView = view.toBuilder().type(View.Type.Dashboard).build();
+    const wrapper = mount(<ShareViewModal show view={dashboardView} currentUser={currentUser} onClose={onClose} />);
+    expect(wrapper.contains('Who is supposed to access the dashboard My fabulous view?')).toBe(true);
+  });
 });
