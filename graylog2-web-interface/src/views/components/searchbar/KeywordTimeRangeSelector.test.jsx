@@ -1,8 +1,10 @@
 // @flow strict
 import React from 'react';
-import { fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
+import { act } from 'react-dom/test-utils';
 
+import asMock from 'helpers/mocking/AsMock';
 import ToolsStore from 'stores/tools/ToolsStore';
 
 import OriginalKeywordTimeRangeSelector from './KeywordTimeRangeSelector';
@@ -10,7 +12,7 @@ import OriginalKeywordTimeRangeSelector from './KeywordTimeRangeSelector';
 jest.mock('stores/tools/ToolsStore', () => ({}));
 
 const KeywordTimeRangeSelector = ({ value, ...props }: { value: string }) => (
-  <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }} validateOnMount>
+  <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }}>
     <Form>
       <OriginalKeywordTimeRangeSelector {...props} />
     </Form>
@@ -27,28 +29,42 @@ describe('KeywordTimeRangeSelector', () => {
     }));
   });
 
+  afterEach(cleanup);
+
   const findValidationState = (container) => {
-    return container.querySelector('.form-group').className.includes('has-error')
+    const formGroup = container.querySelector('.form-group');
+    return formGroup && formGroup.className.includes('has-error')
       ? 'error'
       : null;
   };
 
-  it('renders value passed to it', () => {
-    const { getByDisplayValue } = render(<KeywordTimeRangeSelector value="Last hour" />);
+  const changeInput = async (input, value) => act(async () => {
+    const { name } = input;
+    fireEvent.change(input, { target: { value, name } });
+  });
+
+  const asyncRender = async (element) => {
+    let wrapper;
+    await act(async () => { wrapper = render(element); });
+    return wrapper;
+  };
+
+  it('renders value passed to it', async () => {
+    const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
     expect(getByDisplayValue('Last hour')).not.toBeNull();
   });
 
-  it('calls onChange if value changes', () => {
-    const { getByDisplayValue } = render(<KeywordTimeRangeSelector value="Last hour" />);
+  it('calls onChange if value changes', async () => {
+    const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
     const input = getByDisplayValue('Last hour');
 
-    fireEvent.change(input, { target: { value: 'last year', name: 'timerange.keyword' } });
+    await changeInput(input, 'last year');
   });
 
-  it('calls testNaturalDate', () => {
+  it('calls testNaturalDate', async () => {
     expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
 
-    render(<KeywordTimeRangeSelector value="Last hour" />);
+    await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
 
     expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour');
   });
@@ -73,16 +89,16 @@ describe('KeywordTimeRangeSelector', () => {
     const { container, getByDisplayValue } = render(<KeywordTimeRangeSelector value="last week" />);
     const input = getByDisplayValue('last week');
 
-    fireEvent.change(input, { target: { value: 'invalid', name: 'timerange.keyword' } });
+    await changeInput(input, 'invalid');
 
     await wait(() => expect(findValidationState(container)).toEqual('error'));
   });
 
   it('resets validation state if parsing succeeds after changing input', async () => {
     const { container, getByDisplayValue } = render(<KeywordTimeRangeSelector value="last week" />);
-
     const input = getByDisplayValue('last week');
-    fireEvent.change(input, { target: { value: 'last hour', name: 'timerange.keyword' } });
+
+    await changeInput(input, 'last hour');
 
     await wait(() => expect(findValidationState(container)).toEqual(null));
   });
@@ -101,21 +117,21 @@ describe('KeywordTimeRangeSelector', () => {
   });
 
   it('shows keyword preview if parsing succeeded after changing input', async () => {
-    const { getByDisplayValue, queryByText } = render(<KeywordTimeRangeSelector value="" />);
-
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="" />);
     const input = getByDisplayValue('');
-    fireEvent.change(input, { target: { value: 'last hour', name: 'timerange.keyword' } });
+
+    await changeInput(input, 'last hour');
 
     await wait(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
   });
 
-  it('does not show keyword preview if parsing fails after changing input', () => {
-    const { getByDisplayValue, queryByText } = render(<KeywordTimeRangeSelector value="last week" />);
+  it('does not show keyword preview if parsing fails after changing input', async () => {
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="last week" />);
 
-    ToolsStore.testNaturalDate = () => Promise.reject();
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
     const input = getByDisplayValue('last week');
 
-    fireEvent.change(input, { target: { value: 'invalid', name: 'timerange.keyword' } });
+    await changeInput(input, 'invalid');
 
     expect(queryByText('Preview:')).toBeNull();
   });
