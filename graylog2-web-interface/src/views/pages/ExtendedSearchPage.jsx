@@ -119,7 +119,7 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 const ViewAdditionalContextProvider = connect(
   AdditionalContext.Provider,
   { view: ViewStore, configs: SearchConfigStore, highlightingRules: HighlightingRulesStore, currentUser: CurrentUserStore },
-  ({ view, configs: { searchesClusterConfig }, highlightingRules, currentUser }) => ({
+  ({ view, configs: { searchesClusterConfig }, highlightingRules, currentUser: { currentUser } }) => ({
     value: {
       analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields,
       currentUser,
