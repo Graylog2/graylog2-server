@@ -117,7 +117,7 @@ public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implem
 
     @JsonCreator
     static QuickValuesHistogramConfig create(
-            @JsonProperty("query") String query,
+            @JsonProperty("query") @Nullable String query,
             @JsonProperty("timerange") TimeRange timerange,
             @JsonProperty("field") String field,
             @JsonProperty("limit") Integer limit,
@@ -128,7 +128,7 @@ public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implem
     ) {
         return new AutoValue_QuickValuesHistogramConfig(
                 timerange,
-                query,
+                Strings.nullToEmpty(query),
                 Optional.ofNullable(streamId),
                 field,
                 limit,

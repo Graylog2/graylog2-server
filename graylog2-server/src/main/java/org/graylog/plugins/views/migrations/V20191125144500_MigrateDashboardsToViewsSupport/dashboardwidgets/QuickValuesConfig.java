@@ -172,7 +172,7 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
 
     @JsonCreator
     static QuickValuesConfig create(
-            @JsonProperty("query") String query,
+            @JsonProperty("query") @Nullable String query,
             @JsonProperty("timerange") TimeRange timerange,
             @JsonProperty("field") String field,
             @JsonProperty("show_data_table") @Nullable Boolean showDataTable,
@@ -185,7 +185,7 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
     ) {
         return new AutoValue_QuickValuesConfig(
                 timerange,
-                query,
+                Strings.nullToEmpty(query),
                 Optional.ofNullable(streamId),
                 field,
                 (showDataTable == null || !showDataTable) && (showPieChart == null || !showPieChart)

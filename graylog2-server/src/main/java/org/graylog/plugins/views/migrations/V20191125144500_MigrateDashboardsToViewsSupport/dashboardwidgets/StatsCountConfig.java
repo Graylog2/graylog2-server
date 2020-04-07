@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
@@ -75,12 +76,12 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
             @JsonProperty("lower_is_better") Boolean lowerIsBetter,
             @JsonProperty("trend") Boolean trend,
             @JsonProperty("stream_id") @Nullable String streamId,
-            @JsonProperty("query") String query,
+            @JsonProperty("query") @Nullable String query,
             @JsonProperty("timerange") TimeRange timerange
     ) {
         return new AutoValue_StatsCountConfig(
                 timerange,
-                query,
+                Strings.nullToEmpty(query),
                 field,
                 statsFunction,
                 Optional.ofNullable(lowerIsBetter),
