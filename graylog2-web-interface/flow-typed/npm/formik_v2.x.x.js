@@ -64,6 +64,7 @@ declare module 'formik/@flow-typed' {
   declare export type FormikSharedConfig = {|
     validateOnChange?: boolean,
     validateOnBlur?: boolean,
+    validateOnMount?: boolean,
     isInitialValid?: boolean | ((props: {...}) => boolean),
     enableReinitialize?: boolean,
   |};
