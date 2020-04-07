@@ -27,15 +27,10 @@ import javax.validation.constraints.NotBlank;
 @AutoValue
 @JsonDeserialize(builder = FreeLicenseRequest.Builder.class)
 public abstract class FreeLicenseRequest {
-    public static final String FIELD_CLUSTER_ID = "cluster_id";
     public static final String FIELD_FIRST_NAME = "first_name";
     public static final String FIELD_LAST_NAME = "last_name";
     public static final String FIELD_EMAIL = "email";
     public static final String FIELD_COMPANY = "company";
-
-    @JsonProperty(FIELD_CLUSTER_ID)
-    @NotBlank
-    public abstract String clusterId();
 
     @JsonProperty(FIELD_FIRST_NAME)
     @NotBlank
@@ -64,9 +59,6 @@ public abstract class FreeLicenseRequest {
         public static Builder create() {
             return new AutoValue_FreeLicenseRequest.Builder();
         }
-
-        @JsonProperty(FIELD_CLUSTER_ID)
-        public abstract Builder clusterId(@NotBlank String clusterId);
 
         @JsonProperty(FIELD_FIRST_NAME)
         public abstract Builder firstName(@NotBlank String firstName);

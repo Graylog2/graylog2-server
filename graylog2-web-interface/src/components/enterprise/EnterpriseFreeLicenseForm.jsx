@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Spinner } from 'components/common';
 import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import lodash from 'lodash';
@@ -10,12 +9,7 @@ const FORM_FIELDS = ['firstName', 'lastName', 'email', 'company'];
 
 export default class EnterpriseFreeLicenseForm extends React.Component {
   static propTypes = {
-    clusterId: PropTypes.string,
     onSubmit: PropTypes.func.isRequired,
-  };
-
-  static defaultProps = {
-    clusterId: undefined,
   };
 
   constructor(props) {
@@ -45,23 +39,20 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
   };
 
   formIsInvalid = () => {
-    const { clusterId } = this.props;
     const { isSubmitting, formFields } = this.state;
 
-    return !clusterId
-      || isSubmitting
-      || !lodash.isEmpty(FORM_FIELDS.filter((key) => lodash.isEmpty(lodash.trim(formFields[key]))));
+    return isSubmitting || !lodash.isEmpty(FORM_FIELDS.filter((key) => lodash.isEmpty(lodash.trim(formFields[key]))));
   };
 
   submitForm = (event) => {
     event.preventDefault();
 
-    const { clusterId, onSubmit } = this.props;
+    const { onSubmit } = this.props;
     const { formFields } = this.state;
 
     // First set "submitting" status to make sure we disable the submit button (avoid double-click)
     this.setState({ isSubmitting: true }, () => {
-      onSubmit(clusterId, formFields, (success) => {
+      onSubmit(formFields, (success) => {
         if (success) {
           // Clear form before unsetting "submitting" status, again, to avoid double-click
           this.clearValues(() => {
@@ -79,12 +70,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
   };
 
   render() {
-    const { clusterId } = this.props;
     const { formFields: { firstName, lastName, company, email } } = this.state;
-
-    if (!clusterId) {
-      return <Spinner text="Loading node information..." />;
-    }
 
     return (
       <form onSubmit={this.submitForm}>

@@ -32,29 +32,24 @@ public abstract class FreeLicenseInfo {
     }
 
     private static final String FIELD_LICENSE_STATUS = "license_status";
-    private static final String FIELD_CLUSTER_ID = "cluster_id";
 
     @JsonProperty(FIELD_LICENSE_STATUS)
     public abstract Status licenseStatus();
 
-    @JsonProperty(FIELD_CLUSTER_ID)
-    public abstract String clusterId();
-
-    public static FreeLicenseInfo absent(String clusterId) {
-        return create(clusterId, Status.ABSENT);
+    public static FreeLicenseInfo absent() {
+        return create(Status.ABSENT);
     }
 
-    public static FreeLicenseInfo staged(String clusterId) {
-        return create(clusterId, Status.STAGED);
+    public static FreeLicenseInfo staged() {
+        return create(Status.STAGED);
     }
 
-    public static FreeLicenseInfo installed(String clusterId) {
-        return create(clusterId, Status.INSTALLED);
+    public static FreeLicenseInfo installed() {
+        return create(Status.INSTALLED);
     }
 
     @JsonCreator
-    public static FreeLicenseInfo create(@JsonProperty(FIELD_CLUSTER_ID) String clusterId,
-                                         @JsonProperty(FIELD_LICENSE_STATUS) Status licenseStatus) {
-        return new AutoValue_FreeLicenseInfo(licenseStatus, clusterId);
+    public static FreeLicenseInfo create(@JsonProperty(FIELD_LICENSE_STATUS) Status licenseStatus) {
+        return new AutoValue_FreeLicenseInfo(licenseStatus);
     }
 }

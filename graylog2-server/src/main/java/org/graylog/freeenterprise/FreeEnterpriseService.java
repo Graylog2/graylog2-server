@@ -70,18 +70,21 @@ public class FreeEnterpriseService {
         return mongoConnection.getMongoDatabase().getCollection("licenses").countDocuments() > 0;
     }
 
-    public FreeLicenseInfo licenseInfo() {
+    private String getClusterId() {
         final ClusterId clusterId = clusterConfigService.get(ClusterId.class);
         if (clusterId == null) {
             throw new IllegalStateException("Couldn't find cluster ID in cluster config");
         }
+        return clusterId.clusterId();
+    }
 
+    public FreeLicenseInfo licenseInfo() {
         if (hasLicenseInstalled()) {
-            return FreeLicenseInfo.installed(clusterId.clusterId());
+            return FreeLicenseInfo.installed();
         } else if (hasFreeLicenseStaged()) {
-            return FreeLicenseInfo.staged(clusterId.clusterId());
+            return FreeLicenseInfo.staged();
         }
-        return FreeLicenseInfo.absent(clusterId.clusterId());
+        return FreeLicenseInfo.absent();
     }
 
     public boolean canRequestFreeLicense() {
@@ -89,8 +92,9 @@ public class FreeEnterpriseService {
     }
 
     public void requestFreeLicense(FreeLicenseRequest request) {
+        final String clusterId = getClusterId();
         final FreeLicenseAPIRequest apiRequest = FreeLicenseAPIRequest.builder()
-                .clusterId(request.clusterId())
+                .clusterId(clusterId)
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .email(request.email())
@@ -103,7 +107,7 @@ public class FreeEnterpriseService {
                 // TODO: Change to debug
                 LOG.info("Received free Graylog Enterprise license: {}", response.body());
                 final StagedFreeEnterpriseLicense dto = StagedFreeEnterpriseLicense.builder()
-                        .clusterId(request.clusterId())
+                        .clusterId(clusterId)
                         .license(response.body().licenseString())
                         .createdAt(DateTime.now(DateTimeZone.UTC))
                         .build();

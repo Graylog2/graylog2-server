@@ -12,7 +12,6 @@ const EnterpriseStore = Reflux.createStore({
   listenables: [EnterpriseActions],
   sourceUrl: '/free-enterprise',
   licenseStatus: undefined,
-  clusterId: undefined,
 
   getInitialState() {
     return this.getState();
@@ -25,7 +24,6 @@ const EnterpriseStore = Reflux.createStore({
   getState() {
     return {
       licenseStatus: this.licenseStatus,
-      clusterId: this.clusterId,
     };
   },
 
@@ -42,7 +40,6 @@ const EnterpriseStore = Reflux.createStore({
     promise.then(
       (response) => {
         this.licenseStatus = response.free_license_info.license_status;
-        this.clusterId = response.free_license_info.cluster_id;
         this.propagateChanges();
         return response;
       },
@@ -54,9 +51,8 @@ const EnterpriseStore = Reflux.createStore({
     EnterpriseActions.getLicenseInfo.promise(promise);
   },
 
-  requestFreeEnterpriseLicense(clusterId, formValues) {
+  requestFreeEnterpriseLicense(formValues) {
     const requestBody = {
-      cluster_id: clusterId,
       first_name: formValues.firstName,
       last_name: formValues.lastName,
       company: formValues.company,

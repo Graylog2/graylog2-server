@@ -20,18 +20,18 @@ const EnterprisePage = createReactClass({
     EnterpriseActions.getLicenseInfo();
   },
 
-  onFreeLicenseFormSubmit(clusterId, formFields, callback) {
-    EnterpriseActions.requestFreeEnterpriseLicense(clusterId, formFields)
+  onFreeLicenseFormSubmit(formFields, callback) {
+    EnterpriseActions.requestFreeEnterpriseLicense(formFields)
       .then(() => callback(true))
       .catch(() => callback(false));
   },
 
   _isLoading() {
-    const { clusterId } = this.state;
-    return !clusterId;
+    const { licenseStatus } = this.state;
+    return !licenseStatus;
   },
 
-  renderLicenseFormContent(licenseStatus, clusterId) {
+  renderLicenseFormContent(licenseStatus) {
     let licenseFormContent;
     if (this._isLoading()) {
       licenseFormContent = <Spinner text="Loading license status" />;
@@ -48,20 +48,15 @@ const EnterprisePage = createReactClass({
         </Alert>
       );
     } else {
-      licenseFormContent = <EnterpriseFreeLicenseForm clusterId={clusterId} onSubmit={this.onFreeLicenseFormSubmit} />;
+      licenseFormContent = <EnterpriseFreeLicenseForm onSubmit={this.onFreeLicenseFormSubmit} />;
     }
 
     return licenseFormContent;
   },
 
   render() {
-    console.log('STATE', this.state);
-    let orderLink = 'https://www.graylog.org/enterprise';
-    const { clusterId, nodeCount, licenseStatus } = this.state;
-
-    if (clusterId) {
-      orderLink = `https://www.graylog.org/enterprise?cid=${clusterId}&nodes=${nodeCount}`;
-    }
+    const orderLink = 'https://www.graylog.org/enterprise';
+    const { licenseStatus } = this.state;
 
     return (
       <DocumentTitle title="Graylog Enterprise">
@@ -85,7 +80,7 @@ const EnterprisePage = createReactClass({
             <Row className="content">
               <Col md={12}>
                 <h2 style={{ marginBottom: 10 }}>Graylog Enterprise is free for under 5 GB/day</h2>
-                {this.renderLicenseFormContent(licenseStatus, clusterId)}
+                {this.renderLicenseFormContent(licenseStatus)}
               </Col>
             </Row>
           </IfPermitted>
