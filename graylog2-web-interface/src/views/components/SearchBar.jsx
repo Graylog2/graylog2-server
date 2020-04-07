@@ -25,7 +25,7 @@ import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
-import type { FilterType, QueryId } from 'views/logic/queries/Query';
+import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
@@ -33,10 +33,11 @@ type Props = {
   config: any,
   currentQuery: Query,
   disableSearch: boolean,
+  onSubmit: ({ timerange: TimeRange, streams: Array<string>, queryString: string }, Query) => Promise<any>,
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
-const onSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
+const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   const newQuery = currentQuery.toBuilder()
     .timerange(timerange)
     .filter(filtersForQuery(streams))
@@ -46,7 +47,7 @@ const onSubmit = ({ timerange, streams, queryString }, currentQuery: Query) => {
   return QueriesActions.update(newQuery.id, newQuery);
 };
 
-const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, queryFilters }: Props) => {
+const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, queryFilters, onSubmit = defaultOnSubmit }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -56,7 +57,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  const _onSubmit = useCallback((values) => onSubmit(values, currentQuery), [query]);
+  const _onSubmit = useCallback((values) => onSubmit(values, currentQuery), [query, onSubmit]);
 
   return (
     <ScrollToHint value={query.query_string}>
@@ -125,10 +126,12 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 SearchBar.propTypes = {
   config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
+  onSubmit: PropTypes.func,
 };
 
 SearchBar.defaultProps = {
   disableSearch: false,
+  onSubmit: defaultOnSubmit,
 };
 
 export default connect(
