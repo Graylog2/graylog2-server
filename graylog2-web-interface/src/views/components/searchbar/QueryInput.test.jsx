@@ -19,6 +19,10 @@ class Completer {
 }
 
 describe('QueryInput', () => {
+  beforeAll(() => {
+    // eslint-disable-next-line no-undef
+    ace.config.set('basePath', 'path');
+  });
   const SimpleQueryInput = (props) => (
     <QueryInput value="*"
                 onChange={(s) => Promise.resolve(s)}
