@@ -28,11 +28,13 @@ const DateInputWithPicker = ({ disabled, error, value, onBlur, onChange, name, t
   const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date)), [_onChange]);
   const onSetTimeToNow = useCallback(() => _onChange(_setDateTimeToNow()), [_onChange]);
   return (
-    <DatePicker disabled={disabled}
+    <DatePicker id={`date-input-datepicker-${name}`}
+                disabled={disabled}
                 title={title}
                 date={value.toString()}
                 onChange={onDatePicked}>
       <Input type="text"
+             id={`date-input-${name}`}
              name={name}
              disabled={disabled}
              className="absolute"
