@@ -17,6 +17,10 @@ const onSubmittingTimerange = (timerange: TimeRange): TimeRange => {
         to: DateTime.parseFromString(timerange.to).toISOString(),
       };
     case 'relative':
+      return {
+        type: timerange.type,
+        range: Number.parseInt(timerange.range, 10),
+      };
     case 'keyword':
       return timerange;
     default: throw new Error(`Invalid time range type: ${timerange.type}`);
