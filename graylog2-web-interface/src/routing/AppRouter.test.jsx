@@ -20,7 +20,7 @@ jest.mock('injection/CombinedProvider', () => {
   })]);
   return new MockCombinedProvider({
     CurrentUser: { CurrentUserStore: mockCurrentUserStoretore },
-    Notifications: { NotificationsActions: { list: jest.fn() } },
+    Notifications: { NotificationsActions: { list: jest.fn() }, NotificationsStore: MockStore() },
   });
 });
 
