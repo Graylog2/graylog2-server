@@ -140,7 +140,7 @@ describe('WidgetQueryControls', () => {
         timerange: {
           type: 'absolute',
           from: '2019-10-10T12:21:31.146Z',
-          to: '2019-10-10T12:26:31.146Z'
+          to: '2019-10-10T12:26:31.146Z',
         },
       })));
   });
