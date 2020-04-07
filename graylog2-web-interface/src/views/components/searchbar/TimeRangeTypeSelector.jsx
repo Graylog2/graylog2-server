@@ -47,6 +47,7 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
   return (
     <ButtonToolbar className="extended-search-timerange-chooser pull-left">
       <DropdownButton bsStyle="info"
+                      id="timerange-type"
                       disabled={disabled}
                       title={<Icon name="clock-o" />}
                       onSelect={onSelect}>
