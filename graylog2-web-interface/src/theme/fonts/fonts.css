@@ -1,0 +1,31 @@
+/* Importing each font path with "import" and defining the @font-faces
+ * with styled-components createGlobalStyle results in fonts being fetched multiple times */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'),
+    local('OpenSans'),
+    url('./OpenSans-Regular.woff2') format('woff2'),
+    url('./OpenSans-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans'),
+    local('OpenSans'),
+    url('./OpenSans-Bold.woff2') format('woff2'),
+    url('./OpenSans-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Open Sans'),
+    local('OpenSans'),
+    url('./OpenSans-Italic.woff2') format('woff2'),
+    url('./OpenSans-Italic.woff') format('woff');
+}
