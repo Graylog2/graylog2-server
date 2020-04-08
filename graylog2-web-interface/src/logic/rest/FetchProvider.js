@@ -11,16 +11,31 @@ import Routes from 'routing/Routes';
 import history from 'util/History';
 
 export const logoutIfUnauthorized = (error, SessionStore) => {
-  if (SessionStore.isLoggedIn() && error.status === 401) {
+  if (SessionStore.isLoggedIn()) {
     const SessionActions = ActionsProvider.getActions('Session');
     SessionActions.logout(SessionStore.getSessionId());
   }
 };
 
 export const redirectIfForbidden = (error, SessionStore, route = Routes.NOTFOUND) => {
-  if (SessionStore.isLoggedIn() && error.status === 403) {
+  if (SessionStore.isLoggedIn()) {
     history.replace(route);
   }
+};
+
+export const queuePromiseIfNotLoggedin = (promise) => {
+  const SessionStore = StoreProvider.getStore('Session');
+
+  if (!SessionStore.isLoggedIn()) {
+    return () => new BluebirdPromise((resolve, reject) => {
+      const SessionActions = ActionsProvider.getActions('Session');
+      SessionActions.login.completed.listen(() => {
+        promise().then(resolve, reject);
+      });
+    });
+  }
+
+  return promise;
 };
 
 const reportError = (error) => {
@@ -76,7 +91,13 @@ export class Builder {
     return this;
   }
 
-  json(body, handleForbidden = redirectIfForbidden, handleUnauthorized = logoutIfUnauthorized) {
+  noSessionExtension() {
+    this.request = this.request.set('X-Graylog-No-Session-Extension', 'true');
+
+    return this;
+  }
+
+  json(body) {
     this.request = this.request
       .send(body)
       .type('json')
@@ -90,11 +111,20 @@ export class Builder {
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
+<<<<<<< HEAD
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
         handleForbidden(error, SessionStore);
         handleUnauthorized(error, SessionStore);]
 
+=======
+        if (error.status === 401) {
+          this._handleUnauthorized(error, SessionStore);
+        }
+        if (error.status === 403) {
+          this._handleForbidden(error, SessionStore);
+        }
+>>>>>>> Implement unauthorized and forbidden handling as customizable builder methods for fetch provider
         reportError(error);
         
         throw new FetchError(error.statusText, error);
@@ -103,7 +133,7 @@ export class Builder {
     return this;
   }
 
-  plaintext(body, handleForbidden = redirectIfForbidden, handleUnauthorized = logoutIfUnauthorized) {
+  plaintext(body) {
     this.request = this.request
       .send(body)
       .type('text/plain')
@@ -118,9 +148,13 @@ export class Builder {
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
-        handleUnauthorized(error, SessionStore);
+        if (error.status === 401) {
+          this._handleUnauthorized(error, SessionStore);
+        }
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-        handleForbidden(error, SessionStore, Routes.STARTPAGE);
+        if (error.status === 403) {
+          this._handleForbidden(error, SessionStore, Routes.STARTPAGE);
+        }
         reportError(error);
         throw new FetchError(error.statusText, error);
       });
@@ -128,55 +162,55 @@ export class Builder {
     return this;
   }
 
-  noSessionExtension() {
-    this.request = this.request.set('X-Graylog-No-Session-Extension', 'true');
-
+  _handleUnauthorized(error, SessionStore) {
+    logoutIfUnauthorized(error, SessionStore);
     return this;
   }
+
+  _handleForbidden(error, SessionStore, route) {
+    redirectIfForbidden(error, SessionStore, route);
+    return this;
+  }
+
+  handleUnauthorized(fn) {
+    this._handleUnauthorized = fn;
+    return this;
+  }
+
+  handleForbidden(fn) {
+    this._handleForbidden = fn;
+    return this;
+  }
+
 
   build() {
     return this.request;
   }
 }
 
-function queuePromiseIfNotLoggedin(promise) {
-  const SessionStore = StoreProvider.getStore('Session');
-
-  if (!SessionStore.isLoggedIn()) {
-    return () => new BluebirdPromise((resolve, reject) => {
-      const SessionActions = ActionsProvider.getActions('Session');
-      SessionActions.login.completed.listen(() => {
-        promise().then(resolve, reject);
-      });
-    });
-  }
-
-  return promise;
-}
-
-export default function fetch(method, url, body, handleForbidden, handleUnauthorized) {
+export default function fetch(method, url, body) {
   const promise = () => new Builder(method, url)
     .authenticated()
-    .json(body, handleForbidden, handleUnauthorized)
+    .json(body)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchPlainText(method, url, body, handleForbidden, handleUnauthorized) {
+export function fetchPlainText(method, url, body) {
   const promise = () => new Builder(method, url)
     .authenticated()
-    .plaintext(body, handleForbidden, handleUnauthorized)
+    .plaintext(body)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchPeriodically(method, url, body, handleForbidden, handleUnauthorized) {
+export function fetchPeriodically(method, url, body) {
   const promise = () => new Builder(method, url)
     .authenticated()
     .noSessionExtension()
-    .json(body, handleForbidden, handleUnauthorized)
+    .json(body)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();
