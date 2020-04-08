@@ -23,6 +23,8 @@ import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
+import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,6 +68,12 @@ public class ClusterIT extends ElasticsearchBaseTest {
     public void getFileDescriptorStats() {
         final Set<NodeFileDescriptorStats> fileDescriptorStats = cluster.getFileDescriptorStats();
         assertThat(fileDescriptorStats).isNotEmpty();
+    }
+
+    @Test
+    public void getDiskUsageStats() {
+        final Set<NodeDiskUsageStats> diskUsageStats = cluster.getDiskUsageStats();
+        assertThat(diskUsageStats).isNotEmpty();
     }
 
     @Test
