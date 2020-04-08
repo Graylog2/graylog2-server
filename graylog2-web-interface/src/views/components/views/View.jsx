@@ -1,38 +1,30 @@
 // @flow strict
-import * as React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
-import connect from 'stores/connect';
 import { EntityListItem } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
+import CurrentUserContext from 'components/contexts/CurrentUserContext';
 import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
 import withPluginEntities from 'views/logic/withPluginEntities';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const formatTitle = (title, id, disabled = false) => (disabled
   ? <h2>{title}</h2>
   : <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(id)}>{title}</Link>);
 
-const _OwnerTag = ({ owner, currentUser }) => {
+const OwnerTag = ({ owner }) => {
+  const currentUser = useContext(CurrentUserContext);
   if (!owner || owner === currentUser.username) {
     return <span>Last saved</span>;
   }
-
   return <span>Shared by {owner}, last saved</span>;
 };
 
-_OwnerTag.propTypes = {
+OwnerTag.propTypes = {
   owner: PropTypes.string.isRequired,
-  currentUser: PropTypes.shape({
-    username: PropTypes.string.isRequired,
-  }).isRequired,
 };
-
-const OwnerTag = connect(_OwnerTag, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));
 
 // eslint-disable-next-line react/prop-types
 const Description = ({ description, owner, createdAt }) => (
