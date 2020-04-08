@@ -31,16 +31,17 @@ import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.persistence.InputStatusService;
+import org.graylog2.inputs.persistence.MongoInputStatusService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.savedsearches.SavedSearchService;
 import org.graylog2.savedsearches.SavedSearchServiceImpl;
 import org.graylog2.security.AccessTokenService;
+import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDBSessionServiceImpl;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.ldap.LdapSettingsServiceImpl;
-import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
@@ -69,6 +70,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(SavedSearchService.class).to(SavedSearchServiceImpl.class);
         bind(LdapSettingsService.class).to(LdapSettingsServiceImpl.class);
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
-        bind(InputStatusService.class).asEagerSingleton();
+        bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
     }
 }
