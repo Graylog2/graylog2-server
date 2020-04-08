@@ -33,7 +33,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
   handleInput = (key) => {
     return (event) => {
       const { formFields } = this.state;
-      const newFormFields = Object.assign(formFields, { [key]: lodash.trim(event.target.value) });
+      const newFormFields = Object.assign(formFields, { [key]: event.target.value });
       this.setState({ formFields: newFormFields });
     };
   };
