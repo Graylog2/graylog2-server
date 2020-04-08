@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback } from 'react';
+import PropTypes from 'prop-types';
 
 import { DatePicker, Icon } from 'components/common';
 import { Button } from 'components/graylog';
@@ -25,20 +26,20 @@ type Props = {
 };
 const DateInputWithPicker = ({ disabled, error, value, onBlur, onChange, name, title }: Props) => {
   const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [onChange]);
-  const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date)), [_onChange]);
-  const onSetTimeToNow = useCallback(() => _onChange(_setDateTimeToNow()), [_onChange]);
+  const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
+  const onSetTimeToNow = useCallback(() => _onChange(_setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
   return (
     <DatePicker id={`date-input-datepicker-${name}`}
                 disabled={disabled}
                 title={title}
-                date={value.toString()}
+                date={value}
                 onChange={onDatePicked}>
       <Input type="text"
              id={`date-input-${name}`}
              name={name}
              disabled={disabled}
              className="absolute"
-             value={value.toString()}
+             value={value ? value.toString() : ''}
              onBlur={onBlur}
              onChange={onChange}
              placeholder={DateTime.Formats.DATETIME}
@@ -53,6 +54,21 @@ const DateInputWithPicker = ({ disabled, error, value, onBlur, onChange, name, t
   );
 };
 
-DateInputWithPicker.propTypes = {};
+DateInputWithPicker.propTypes = {
+  disabled: PropTypes.bool,
+  error: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  onBlur: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired,
+  title: PropTypes.string,
+};
+
+DateInputWithPicker.defaultProps = {
+  disabled: false,
+  error: undefined,
+  value: undefined,
+  title: undefined,
+};
 
 export default DateInputWithPicker;

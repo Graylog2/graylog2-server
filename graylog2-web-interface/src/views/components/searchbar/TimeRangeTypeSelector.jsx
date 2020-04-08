@@ -14,8 +14,8 @@ import type { TimeRange } from 'views/logic/queries/Query';
 const migrationStrategies = {
   absolute: (oldTimerange: TimeRange) => ({
     type: 'absolute',
-    from: new DateTime(moment().subtract(oldTimerange.type === 'relative' ? oldTimerange.range : 300, 'seconds')),
-    to: new DateTime(moment()),
+    from: new DateTime(moment().subtract(oldTimerange.type === 'relative' ? oldTimerange.range : 300, 'seconds')).toString(DateTime.Formats.TIMESTAMP),
+    to: new DateTime(moment()).toString(DateTime.Formats.TIMESTAMP),
   }),
   relative: () => ({ type: 'relative', range: 300 }),
   keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),

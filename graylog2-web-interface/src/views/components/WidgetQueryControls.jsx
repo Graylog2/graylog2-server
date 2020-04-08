@@ -81,14 +81,14 @@ const onSubmit = (values, widget: Widget) => {
 
 const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, widget }: Props) => {
   const { streams } = widget;
-  const query = widget.query || createElasticsearchQueryString('');
   const timerange = widget.timerange || DEFAULT_TIMERANGE;
-  const { query_string: queryString } = query || {};
-  const disableSearch = false;
+  const { query_string: queryString } = widget.query || createElasticsearchQueryString('');
+
   const isGloballyOverridden: boolean = globalOverride !== undefined
     && globalOverride !== null
     && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
+
   const _onSubmit = useCallback((values) => onSubmit(values, widget), [widget]);
   return (
     <>
@@ -123,7 +123,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                                        title="Search query syntax documentation"
                                        text={<Icon name="lightbulb-o" />} />
                   </div>
-                  <SearchButton disabled={disableSearch || isGloballyOverridden || isSubmitting || !isValid} />
+                  <SearchButton disabled={isGloballyOverridden || isSubmitting || !isValid} />
 
                   <Field name="queryString">
                     {({ field: { name, value, onChange } }) => (

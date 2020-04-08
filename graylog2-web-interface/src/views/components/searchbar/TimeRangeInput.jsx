@@ -4,56 +4,40 @@ import PropTypes from 'prop-types';
 import { useField } from 'formik';
 
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import DateTime from 'logic/datetimes/DateTime';
 import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
+import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
 
 type Props = {
   disabled: boolean,
   config: SearchesConfig,
 };
 
-const _isValidDateString = (dateString: string) => {
-  return (DateTime.isValidDateString(dateString)
-    ? undefined
-    : `Invalid date: ${dateString}`);
-};
-
-const _validateAbsoluteTimerange = (timerange) => {
-  const fromError = _isValidDateString(timerange.from);
-  const toError = _isValidDateString(timerange.to);
-  const result = {};
-
-  if (fromError) {
-    result.from = fromError;
-  }
-  if (toError) {
-    result.to = toError;
-  }
-
-  return result;
-};
-
 const timerangeStrategies = {
   absolute: {
     component: AbsoluteTimeRangeSelector,
-    validate: _validateAbsoluteTimerange,
   },
   relative: {
     component: RelativeTimeRangeSelector,
-    validate: () => ({}),
   },
   keyword: {
     component: KeywordTimeRangeSelector,
-    validate: () => ({}),
   },
 };
 
+const timerangeStrategy = (type) => {
+  if (type === undefined) {
+    return { component: DisabledTimeRangeSelector };
+  }
+
+  return timerangeStrategies[type] || { component: DisabledTimeRangeSelector };
+};
+
 export default function TimeRangeInput({ disabled, config }: Props) {
-  const [{ value: timerange }] = useField('timerange');
-  const { component: Component } = timerangeStrategies[timerange.type];
-  return <Component disabled={disabled} timerange={timerange} config={config} />;
+  const [{ value }] = useField('timerange.type');
+  const { component: Component } = timerangeStrategy(value);
+  return <Component disabled={disabled} config={config} />;
 }
 
 TimeRangeInput.propTypes = {

@@ -91,7 +91,7 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
         <Field name="timerange.keyword" validate={_validate}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
             <FormGroup controlId="form-inline-keyword"
-                       style={{ marginRight: 5, width: '100%' }}
+                       style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
                        validationState={error ? 'error' : null}>
               <InputGroup>
                 <KeywordInput type="text"

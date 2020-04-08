@@ -7,7 +7,7 @@ import PropTypes from 'views/components/CustomPropTypes';
 const TimeRangeOverrideTypeSelector = ({ onSelect, value }) => (
   <ButtonToolbar className="extended-search-timerange-chooser pull-left">
     <DropdownButton bsStyle="info"
-                    title={<Icon name="clock-o" />}
+                    title={<Icon name="clock" />}
                     onSelect={onSelect}
                     id="dropdown-timerange-selector">
       <MenuItem eventKey="disabled"
