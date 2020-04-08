@@ -50,7 +50,7 @@
       "ts"
     ],
     "moduleNameMapper": {
-      "^file-loader!(.+)$": "$1",
+      "^file-loader(\\?esModule=false)?!(.+)$": "$2",
       "^!style/useable!.*\\.(css|less)$": "<rootDir>/test/css/useable-css-proxy.js",
       "\\.(css|less)$": "identity-obj-proxy",
       "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx",
