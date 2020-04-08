@@ -101,7 +101,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
     private List<SearchResult.Hit<Map, Void>> search(MessagesRequest request, Object[] searchAfterValues) {
         Search search = buildSearchRequest(request, searchAfterValues);
 
-        SearchResult result = JestUtils.execute(jestClient, search, () -> "");
+        SearchResult result = JestUtils.execute(jestClient, search, () -> "Failed to execute Search After request");
 
         return result.getHits(Map.class, false);
     }
