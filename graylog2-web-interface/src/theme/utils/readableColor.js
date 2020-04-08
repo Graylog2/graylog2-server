@@ -1,12 +1,10 @@
 import chroma from 'chroma-js';
-
+import { memoize } from 'lodash';
 import { teinte } from 'theme/colors';
 
-export default function readableColor(
-  hex,
+const readableColor = memoize((hex,
   darkColor = teinte.global.textDefault,
-  lightColor = teinte.global.textAlt,
-) {
+  lightColor = teinte.global.textAlt) => {
   /**
    * Returns `textDefault` or `textAlt` (or optional light and dark return colors) for best contrast depending on the luminosity of the given color. Follows [W3C specs for readability](https://www.w3.org/TR/WCAG20-TECHS/G18.html).
    *
@@ -18,4 +16,6 @@ export default function readableColor(
   const luminanceRatio = 0.179;
 
   return chroma(hex).luminance() < luminanceRatio ? lightColor : darkColor;
-}
+});
+
+export default readableColor;
