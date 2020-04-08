@@ -58,7 +58,7 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
   }
 
   return loaded
-    ? <IfPermitted permissions="dashboards.create"><ExtendedSearchPage route={route} /></IfPermitted>
+    ? <IfPermitted permissions="dashboards:create"><ExtendedSearchPage route={route} /></IfPermitted>
     : <Spinner />;
 };
 
