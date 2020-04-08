@@ -1,5 +1,4 @@
 import chroma from 'chroma-js';
-
 import { teinte } from 'theme/colors';
 
 const readableColor = (hex,
