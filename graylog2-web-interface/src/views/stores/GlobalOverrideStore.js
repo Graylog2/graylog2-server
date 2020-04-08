@@ -1,6 +1,5 @@
 // @flow strict
 import Reflux from 'reflux';
-import moment from 'moment';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
@@ -11,8 +10,6 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import { SearchExecutionStateActions, SearchExecutionStateStore } from './SearchExecutionStateStore';
 
 export type GlobalOverrideActionsType = RefluxActions<{
-  rangeType: (string) => Promise<?GlobalOverride>,
-  rangeParams: (string, string | number) => Promise<?GlobalOverride>,
   query: (string) => Promise<?GlobalOverride>,
   set: (?TimeRange, ?string) => Promise<?GlobalOverride>,
   reset: () => Promise<?GlobalOverride>,
@@ -22,8 +19,6 @@ export type GlobalOverrideActionsType = RefluxActions<{
 export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions(
   'views.GlobalOverride',
   () => Reflux.createActions({
-    rangeType: { asyncResult: true },
-    rangeParams: { asyncResult: true },
     query: { asyncResult: true },
     reset: { asyncResult: true },
     set: { asyncResult: true },
@@ -66,59 +61,6 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
 
       const promise = this._propagateNewGlobalOverride(newGlobalOverride);
       GlobalOverrideActions.timerange.promise(promise);
-      return promise;
-    },
-    rangeType(newType: string) {
-      if (newType === 'disabled') {
-        const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
-        const newGlobalOverride: ?GlobalOverride = currentGlobalOverride.toBuilder().timerange(undefined).build();
-        const promise = this._propagateNewGlobalOverride(newGlobalOverride);
-        GlobalOverrideActions.rangeType.promise(promise);
-        return promise;
-      }
-      const oldTimerange = this.globalOverride && this.globalOverride.timerange ? this.globalOverride.timerange : {};
-      const { type: oldType } = oldTimerange;
-      if (oldType !== newType) {
-        let newTimerange;
-        // eslint-disable-next-line default-case
-        switch (newType) {
-          case 'absolute':
-            newTimerange = {
-              type: newType,
-              from: moment().subtract(oldTimerange.range || 300, 'seconds').toISOString(),
-              to: moment().toISOString(),
-            };
-            break;
-          case 'relative':
-            newTimerange = {
-              type: newType,
-              range: 300,
-            };
-            break;
-          case 'keyword':
-            newTimerange = {
-              type: newType,
-              keyword: 'Last five Minutes',
-            };
-            break;
-        }
-
-        const promise = this.timerange(newTimerange);
-        GlobalOverrideActions.rangeType.promise(promise);
-        return promise;
-      }
-      const promise = Promise.resolve(this.globalOverride);
-      GlobalOverrideActions.rangeType.promise(promise);
-      return promise;
-    },
-    rangeParams(key: string, value: string | number) {
-      const newTimerange: TimeRange = this.globalOverride && this.globalOverride.timerange
-        ? { ...this.globalOverride.timerange, [key]: value }
-        // $FlowFixMe: Flow is unable to validate that timerange is complete
-        : { [key]: value };
-
-      const promise = this.timerange(newTimerange);
-      GlobalOverrideActions.rangeParams.promise(promise);
       return promise;
     },
     reset() {
