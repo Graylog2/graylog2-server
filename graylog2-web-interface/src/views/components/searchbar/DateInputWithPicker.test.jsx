@@ -12,7 +12,7 @@ describe('DateInputWithPicker', () => {
 
   beforeAll(() => { jest.clearAllMocks(); });
 
-  it('should do something', () => {
+  it('renders with minimal props', () => {
     const { container } = render(<DateInputWithPicker value="2020-04-08 13:22:46" onChange={() => {}} name="date-picker" />);
     expect(container).not.toBeNull();
   });
