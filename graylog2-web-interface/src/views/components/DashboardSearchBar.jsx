@@ -43,7 +43,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
       <Row className="content">
         <Col md={12}>
           <DashboardSearchForm initialValues={{ timerange, queryString }} onSubmit={submitForm}>
-            {({ isSubmitting, isValid, handleSubmit }) => (
+            {({ dirty, isSubmitting, isValid, handleSubmit }) => (
               <>
                 <Row className="no-bm extended-search-query-metadata">
                   <Col lg={4} md={6} xs={8}>
@@ -67,7 +67,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                          title="Search query syntax documentation"
                                          text={<Icon name="lightbulb" />} />
                     </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid} glyph="filter" />
+                    <SearchButton disabled={disableSearch || isSubmitting || !isValid} glyph="filter" dirty={dirty} />
 
                     <Field name="queryString">
                       {({ field: { name, value, onChange } }) => (

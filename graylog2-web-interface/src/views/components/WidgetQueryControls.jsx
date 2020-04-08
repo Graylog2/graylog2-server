@@ -96,7 +96,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
       <Wrapper>
         <SearchBarForm initialValues={{ timerange, streams, queryString }}
                        onSubmit={_onSubmit}>
-          {({ isSubmitting, isValid, handleSubmit }) => (
+          {({ dirty, isSubmitting, isValid, handleSubmit }) => (
             <>
               <Row className="no-bm extended-search-query-metadata">
                 <Col md={4}>
@@ -123,7 +123,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                                        title="Search query syntax documentation"
                                        text={<Icon name="lightbulb-o" />} />
                   </div>
-                  <SearchButton disabled={isGloballyOverridden || isSubmitting || !isValid} />
+                  <SearchButton disabled={isGloballyOverridden || isSubmitting || !isValid} dirty={dirty} />
 
                   <Field name="queryString">
                     {({ field: { name, value, onChange } }) => (
