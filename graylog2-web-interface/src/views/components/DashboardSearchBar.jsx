@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 
@@ -33,13 +34,8 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
   if (!config) {
     return <Spinner />;
   }
-  const submitForm = ({ timerange, queryString }) => {
-    return [
-      () => (timerange ? GlobalOverrideActions.timerange(timerange) : Promise.resolve()),
-      () => ((queryString !== undefined && queryString !== null) ? GlobalOverrideActions.query(queryString) : Promise.resolve()),
-      performSearch,
-    ].reduce((prev, cur) => prev.then(cur), Promise.resolve());
-  };
+  const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
+    .then(() => performSearch()), [performSearch]);
   const { timerange, query: { query_string: queryString = '' } = {} } = globalOverride || {};
 
   return (
