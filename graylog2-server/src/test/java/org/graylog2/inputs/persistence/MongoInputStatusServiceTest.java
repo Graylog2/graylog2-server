@@ -40,7 +40,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
-public class InputStatusServiceTest {
+public class MongoInputStatusServiceTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -48,7 +48,7 @@ public class InputStatusServiceTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     // Code Under Test
-    private InputStatusService cut;
+    private MongoInputStatusService cut;
 
     @Mock
     EventBus mockEventBus;
@@ -60,9 +60,9 @@ public class InputStatusServiceTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
-        cut = new InputStatusService(mongodb.mongoConnection(), mapperProvider, mockEventBus);
+        cut = new MongoInputStatusService(mongodb.mongoConnection(), mapperProvider, mockEventBus);
 
-        db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection(InputStatusService.COLLECTION_NAME),
+        db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection(MongoInputStatusService.COLLECTION_NAME),
                 InputStatusRecord.class,
                 ObjectId.class,
                 mapperProvider.get());
