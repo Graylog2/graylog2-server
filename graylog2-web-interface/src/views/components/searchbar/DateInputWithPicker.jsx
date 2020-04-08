@@ -16,15 +16,15 @@ const _onDateSelected = (date) => {
 };
 
 type Props = {
-  disabled: boolean,
+  disabled: ?boolean,
   error: ?string,
   value: string,
-  onBlur: ({}) => void,
+  onBlur: ?(({}) => void),
   onChange: ({ target: { name: string, value: string } }) => void,
   name: string,
-  title: string,
+  title: ?string,
 };
-const DateInputWithPicker = ({ disabled, error, value, onBlur, onChange, name, title }: Props) => {
+const DateInputWithPicker = ({ disabled = false, error, value, onBlur = () => {}, onChange, name, title }: Props) => {
   const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [onChange]);
   const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
   const onSetTimeToNow = useCallback(() => _onChange(_setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
@@ -39,12 +39,12 @@ const DateInputWithPicker = ({ disabled, error, value, onBlur, onChange, name, t
              name={name}
              disabled={disabled}
              className="absolute"
-             value={value ? value.toString() : ''}
+             value={value}
              onBlur={onBlur}
              onChange={onChange}
              placeholder={DateTime.Formats.DATETIME}
              buttonAfter={(
-               <Button disabled={disabled} onClick={onSetTimeToNow}>
+               <Button disabled={disabled} onClick={onSetTimeToNow} title="Insert current date">
                  <Icon name="magic" />
                </Button>
              )}
@@ -66,9 +66,10 @@ DateInputWithPicker.propTypes = {
 
 DateInputWithPicker.defaultProps = {
   disabled: false,
+  onBlur: () => {},
   error: undefined,
   value: undefined,
-  title: undefined,
+  title: '',
 };
 
 export default DateInputWithPicker;
