@@ -50,21 +50,21 @@ const { textDefault } = color.teinte.global;
 
 <>
   <p>
-    <ColorSwatch name='info AAA' color={util.contrastingColor(info)} />
+    <ColorSwatch name='info AAA' color={util.contrastingColor({ color: info })} />
     <ColorSwatch name='info' color={info} />
-    <ColorSwatch name='info AA' color={util.contrastingColor(info, 'AA')} />
+    <ColorSwatch name='info AA' color={util.contrastingColor({ color: info, level: 'AA' })} />
   </p>
   <p>
-    <ColorSwatch name='textDefault AAALarge' color={util.contrastingColor(textDefault, 'AAALarge')} />
-    <ColorSwatch name='textDefault AAA' color={util.contrastingColor(textDefault)} />
+    <ColorSwatch name='textDefault AAALarge' color={util.contrastingColor({ color: textDefault, level: 'AAALarge' })} />
+    <ColorSwatch name='textDefault AAA' color={util.contrastingColor({ color: textDefault })} />
     <ColorSwatch name='textDefault' color={textDefault} />
-    <ColorSwatch name='textDefault AALarge' color={util.contrastingColor(textDefault, 'AALarge')} />
-    <ColorSwatch name='textDefault AA' color={util.contrastingColor(textDefault, 'AA')} />
+    <ColorSwatch name='textDefault AALarge' color={util.contrastingColor({ color: textDefault, level: 'AALarge' })} />
+    <ColorSwatch name='textDefault AA' color={util.contrastingColor({ color: textDefault, level: 'AA' })} />
   </p>
   <p>
-    <ColorSwatch name='primary AAA' color={util.contrastingColor(primary)} />
+    <ColorSwatch name='primary AAA' color={util.contrastingColor({ color: primary })} />
     <ColorSwatch name='primary' color={primary} />
-    <ColorSwatch name='primary AA' color={util.contrastingColor(primary, 'AA')} />
+    <ColorSwatch name='primary AA' color={util.contrastingColor({ color: primary, level: 'AA' })} />
   </p>
 </>
 ```

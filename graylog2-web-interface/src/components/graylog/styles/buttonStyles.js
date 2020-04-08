@@ -24,15 +24,15 @@ const buttonStyles = memoize((bsStyle, color) => {
 
   const defaultBackground = hex;
   const defaultBorder = isLink ? variants.link : chroma.mix(hex, buttonAdjustColor, 0.05);
-  const defaultColor = isLink ? color.global.link : util.contrastingColor(defaultBackground);
+  const defaultColor = isLink ? color.global.link : util.contrastingColor({ color: defaultBackground });
 
   const activeBackground = isLink ? variants.link : chroma.mix(hex, buttonAdjustColor, 0.10);
   const activeBorder = isLink ? variants.link : chroma.mix(hex, buttonAdjustColor, 0.15);
-  const activeColor = isLink ? color.global.linkHover : util.contrastingColor(activeBackground);
+  const activeColor = isLink ? color.global.linkHover : util.contrastingColor({ color: activeBackground });
 
   const disabledBackground = isLink ? variants.link : chroma.mix(hex, buttonAdjustColor, 0.20);
   const disabledBorder = isLink ? variants.link : chroma.mix(hex, buttonAdjustColor, 0.15);
-  const disabledColor = isLink ? color.global.link : util.contrastingColor(disabledBackground, 'AA');
+  const disabledColor = isLink ? color.global.link : util.contrastingColor({ color: disabledBackground, level: 'AA' });
 
   return css`
     background-color: ${defaultBackground};

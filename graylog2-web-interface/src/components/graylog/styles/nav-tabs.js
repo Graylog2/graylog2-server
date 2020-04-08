@@ -16,7 +16,7 @@ const navTabsStyles = css(({ theme }) => {
 
           &:hover {
             background-color: ${theme.color.gray[80]};
-            color: ${util.contrastingColor(theme.color.gray[80])};
+            color: ${util.contrastingColor({ color: theme.color.gray[80] })};
           }
         }
 

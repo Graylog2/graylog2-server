@@ -19,18 +19,18 @@ const alertStyles = (hex) => {
     color: ${util.readableColor(backgroundColor)};
 
     a:not(.btn) {
-      color: ${util.contrastingColor(backgroundColor, 'AA')};
+      color: ${util.contrastingColor({ color: backgroundColor, level: 'AA' })};
       font-weight: bold;
       text-decoration: underline;
 
       &:hover,
       &:focus {
-        color: ${util.contrastingColor(backgroundColor, 'AAA')};
+        color: ${util.contrastingColor({ color: backgroundColor, level: 'AAA' })};
         text-decoration: none;
       }
 
       &:active {
-        color: ${util.contrastingColor(backgroundColor, 'AAA')};
+        color: ${util.contrastingColor({ color: backgroundColor, level: 'AAA' })};
       }
     }
   `;
