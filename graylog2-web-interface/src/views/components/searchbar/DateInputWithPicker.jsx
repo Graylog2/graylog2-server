@@ -58,7 +58,7 @@ DateInputWithPicker.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.string,
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
-  onBlur: PropTypes.func.isRequired,
+  onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   title: PropTypes.string,
