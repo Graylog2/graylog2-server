@@ -8,6 +8,7 @@ import { Scratchpad, Icon, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
+import CurrentUserContext from 'components/contexts/CurrentUserContext';
 
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
@@ -39,21 +40,23 @@ const App = ({ children, currentUser, location }) => {
   }
 
   return (
-    <ScratchpadProvider loginName={currentUser.username}>
-      <Navigation requestPath={location.pathname}
-                  fullName={currentUser.full_name}
-                  loginName={currentUser.username}
-                  permissions={currentUser.permissions} />
-      <ReportedErrorBoundary>
-        <RuntimeErrorBoundary>
-          <ScrollToHint id="scroll-to-hint">
-            <Icon name="arrow-up" />
-          </ScrollToHint>
-          <Scratchpad />
-          {children}
-        </RuntimeErrorBoundary>
-      </ReportedErrorBoundary>
-    </ScratchpadProvider>
+    <CurrentUserContext.Provider value={currentUser}>
+      <ScratchpadProvider loginName={currentUser.username}>
+        <Navigation requestPath={location.pathname}
+                    fullName={currentUser.full_name}
+                    loginName={currentUser.username}
+                    permissions={currentUser.permissions} />
+        <ReportedErrorBoundary>
+          <RuntimeErrorBoundary>
+            <ScrollToHint id="scroll-to-hint">
+              <Icon name="arrow-up" />
+            </ScrollToHint>
+            <Scratchpad />
+            {children}
+          </RuntimeErrorBoundary>
+        </ReportedErrorBoundary>
+      </ScratchpadProvider>
+    </CurrentUserContext.Provider>
   );
 };
 
