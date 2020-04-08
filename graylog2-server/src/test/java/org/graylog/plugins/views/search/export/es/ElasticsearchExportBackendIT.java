@@ -22,7 +22,8 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.SimpleMessage;
-import org.graylog.plugins.views.search.export.SimpleMessages;
+import org.graylog.plugins.views.search.export.SimpleMessageChunk;
+import org.graylog.plugins.views.search.export.TestData;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -33,11 +34,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
@@ -162,6 +161,17 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         assertThat(invocations).containsExactly("4", "done");
     }
 
+    @Test
+    public void marksFirstChunk() {
+        importFixture("messages.json");
+
+        MessagesRequest request = requestBuilderWithAllStreams().build();
+
+        SimpleMessageChunk[] chunks = collectChunksFor(request).toArray(new SimpleMessageChunk[0]);
+
+        assertThat(chunks[0].isFirstChunk()).isTrue();
+    }
+
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public void mockIndexLookupFor(MessagesRequest request, String... indexNames) {
         when(indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get()))
@@ -173,45 +183,38 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .timeRange(allMessagesTimeRange());
     }
 
-    private void runWithExpectedResult(MessagesRequest request, String resultFields, String... resultMessages) {
-        SimpleMessages totalResult = collectTotalResult(request);
+    private void runWithExpectedResult(MessagesRequest request, String resultFields, String... messageValues) {
+        SimpleMessageChunk totalResult = collectTotalResult(request);
 
-        SimpleMessages expected = parseToSimpleMessages(resultFields, resultMessages);
+        Object[][] values = Arrays.stream(messageValues).map(this::toObjectArray).toArray(Object[][]::new);
+
+        SimpleMessageChunk expected = TestData.simpleMessageChunk(resultFields, values);
 
         assertThat(totalResult).isEqualTo(expected);
     }
 
-    private SimpleMessages parseToSimpleMessages(String resultFields, String... messageStrings) {
-        LinkedHashSet<SimpleMessage> messages = Arrays.stream(messageStrings)
-                .map(s -> parse(resultFields, s))
-                .collect(toCollection(LinkedHashSet::new));
-        return SimpleMessages.from(messages);
+    private Object[] toObjectArray(String s) {
+        return Arrays.stream(s.split(",")).map(String::trim).toArray();
     }
 
-    private SimpleMessage parse(String fieldNames, String messageString) {
-        String[] names = fieldNames.split(",");
-        String[] values = messageString.split(",");
-        LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
-        int i = 0;
-        for (String name : names) {
-            fields.put(name, values[i++].trim());
-        }
-        return SimpleMessage.from(fields);
-    }
-
-    private SimpleMessages collectTotalResult(MessagesRequest request) {
-        LinkedHashSet<SimpleMessages> allChunks = new LinkedHashSet<>();
-
-        sut.run(request, allChunks::add, () -> {
-        });
+    private SimpleMessageChunk collectTotalResult(MessagesRequest request) {
+        LinkedHashSet<SimpleMessageChunk> allChunks = collectChunksFor(request);
 
         LinkedHashSet<SimpleMessage> allMessages = new LinkedHashSet<>();
 
-        for (SimpleMessages chunk : allChunks) {
+        for (SimpleMessageChunk chunk : allChunks) {
             allMessages.addAll(chunk.messages());
         }
 
-        return SimpleMessages.from(allMessages);
+        return SimpleMessageChunk.from(request.fieldsInOrder().get(), allMessages);
+    }
+
+    private LinkedHashSet<SimpleMessageChunk> collectChunksFor(MessagesRequest request) {
+        LinkedHashSet<SimpleMessageChunk> allChunks = new LinkedHashSet<>();
+
+        sut.run(request, allChunks::add, () -> {
+        });
+        return allChunks;
     }
 
     private TimeRange allMessagesTimeRange() {

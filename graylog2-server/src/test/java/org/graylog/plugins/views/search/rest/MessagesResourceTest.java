@@ -26,7 +26,7 @@ import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog.plugins.views.search.export.SimpleMessage;
-import org.graylog.plugins.views.search.export.SimpleMessages;
+import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,18 +72,18 @@ public class MessagesResourceTest {
     void writesToChunkedOutputAsResultsComeIn() throws IOException {
         MessagesRequest request = validRequest();
 
-        @SuppressWarnings("unchecked") ChunkedOutput<SimpleMessages> output = mock(ChunkedOutput.class);
+        @SuppressWarnings("unchecked") ChunkedOutput<SimpleMessageChunk> output = mock(ChunkedOutput.class);
 
         sut.chunkedOutputSupplier = () -> output;
 
-        ArgumentCaptor<ChunkForwarder<SimpleMessages>> chunkForwarderArgumentCaptor = ArgumentCaptor.forClass(ChunkForwarder.class);
+        ArgumentCaptor<ChunkForwarder<SimpleMessageChunk>> chunkForwarderArgumentCaptor = ArgumentCaptor.forClass(ChunkForwarder.class);
         doNothing().when(exporter).export(any(), chunkForwarderArgumentCaptor.capture());
 
         sut.retrieve(request);
 
         verify(output, never()).write(any());
 
-        ChunkForwarder<SimpleMessages> forwarder = chunkForwarderArgumentCaptor.getValue();
+        ChunkForwarder<SimpleMessageChunk> forwarder = chunkForwarderArgumentCaptor.getValue();
 
         forwarder.write(singleMessage("field-1:a", "field-2:b"));
         forwarder.write(singleMessage("field-1:c", "field-2:d"));
@@ -96,7 +96,7 @@ public class MessagesResourceTest {
         verifier.verify(output).close();
     }
 
-    private SimpleMessages singleMessage(String... fields) {
+    private SimpleMessageChunk singleMessage(String... fields) {
         LinkedHashMap<String, Object> fieldsMap = new LinkedHashMap<>();
         for (String field : fields) {
             String[] split = field.split(":");
@@ -105,7 +105,10 @@ public class MessagesResourceTest {
             fieldsMap.put(name, value);
         }
         LinkedHashSet<SimpleMessage> messages = new LinkedHashSet<>(ImmutableSet.of(SimpleMessage.from(fieldsMap)));
-        return SimpleMessages.from(messages);
+
+        LinkedHashSet<String> fieldNames = new LinkedHashSet<>(fieldsMap.keySet());
+
+        return SimpleMessageChunk.from(fieldNames, messages);
     }
 
     @Test

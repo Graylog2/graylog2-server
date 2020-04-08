@@ -30,7 +30,7 @@ import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
-import org.graylog.plugins.views.search.export.SimpleMessages;
+import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -62,7 +62,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final PermittedStreams permittedStreams;
 
     //allow mocking
-    Supplier<ChunkedOutput<SimpleMessages>> chunkedOutputSupplier = () -> new ChunkedOutput<>(SimpleMessages.class);
+    Supplier<ChunkedOutput<SimpleMessageChunk>> chunkedOutputSupplier = () -> new ChunkedOutput<>(SimpleMessageChunk.class);
     Consumer<Runnable> asyncRunner = this::runAsync;
 
     private void runAsync(Runnable runnable) {
@@ -81,7 +81,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public ChunkedOutput<SimpleMessages> retrieve(@ApiParam MessagesRequest request) {
+    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam MessagesRequest request) {
         final MessagesRequest req = defaultIfNecessary(request);
 
         executionGuard.checkUserIsPermittedToSeeStreams(req.streams().get(), this::hasStreamReadPermission);
@@ -102,7 +102,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @Path("{searchId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public ChunkedOutput<SimpleMessages> retrieveForSearch(
+    public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam ResultFormat formatFromClient) {
         Search search = loadSearch(searchId);
@@ -116,7 +116,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @Path("{searchId}/{searchTypeId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public ChunkedOutput<SimpleMessages> retrieveForSearchType(
+    public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @PathParam("searchTypeId") String searchTypeId,
             @ApiParam ResultFormat formatFromClient) {
@@ -154,17 +154,17 @@ public class MessagesResource extends RestResource implements PluginRestResource
         return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
-    private ChunkedOutput<SimpleMessages> chunkedOutputFrom(Consumer<ChunkForwarder<SimpleMessages>> call) {
-        ChunkedOutput<SimpleMessages> output = chunkedOutputSupplier.get();
+    private ChunkedOutput<SimpleMessageChunk> chunkedOutputFrom(Consumer<ChunkForwarder<SimpleMessageChunk>> call) {
+        ChunkedOutput<SimpleMessageChunk> output = chunkedOutputSupplier.get();
 
-        ChunkForwarder<SimpleMessages> fwd = ChunkForwarder.create(chunk -> writeTo(output, chunk), () -> close(output));
+        ChunkForwarder<SimpleMessageChunk> fwd = ChunkForwarder.create(chunk -> writeTo(output, chunk), () -> close(output));
 
         asyncRunner.accept(() -> call.accept(fwd));
 
         return output;
     }
 
-    private void close(ChunkedOutput<SimpleMessages> output) {
+    private void close(ChunkedOutput<SimpleMessageChunk> output) {
         try {
             output.close();
         } catch (IOException e) {
@@ -172,7 +172,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
         }
     }
 
-    private void writeTo(ChunkedOutput<SimpleMessages> output, SimpleMessages chunk) {
+    private void writeTo(ChunkedOutput<SimpleMessageChunk> output, SimpleMessageChunk chunk) {
         try {
             output.write(chunk);
         } catch (IOException e) {

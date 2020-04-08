@@ -34,6 +34,10 @@ public abstract class SimpleMessage {
 
     public abstract Builder toBuilder();
 
+    public Object valueFor(String fieldName) {
+        return fields().get(fieldName);
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder fields(LinkedHashMap<String, Object> fields);
