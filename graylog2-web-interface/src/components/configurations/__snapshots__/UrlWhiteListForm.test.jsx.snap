@@ -255,7 +255,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           "componentStyle": ComponentStyle {
             "componentId": "UrlWhiteListForm__StyledTable-sc-1nddwv6-0",
             "isStatic": false,
-            "lastClassName": "bnuvHv",
+            "lastClassName": "hssHQE",
             "rules": Array [
               [Function],
               "margin-top:10px;",
@@ -279,14 +279,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       <Table
         bordered={true}
         bsClass="table"
-        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 bnuvHv"
+        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hssHQE"
         condensed={false}
         hover={false}
         responsive={false}
         striped={true}
       >
         <table
-          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 bnuvHv table table-striped table-bordered"
+          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hssHQE table table-striped table-bordered"
         >
           <thead>
             <tr>

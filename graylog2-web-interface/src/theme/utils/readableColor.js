@@ -1,8 +1,8 @@
 import chroma from 'chroma-js';
-import { memoize } from 'lodash';
+
 import { teinte } from 'theme/colors';
 
-const readableColor = memoize((hex,
+const readableColor = (hex,
   darkColor = teinte.global.textDefault,
   lightColor = teinte.global.textAlt) => {
   /**
@@ -16,6 +16,6 @@ const readableColor = memoize((hex,
   const luminanceRatio = 0.179;
 
   return chroma(hex).luminance() < luminanceRatio ? lightColor : darkColor;
-});
+};
 
 export default readableColor;

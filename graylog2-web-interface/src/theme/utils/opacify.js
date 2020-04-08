@@ -1,7 +1,6 @@
 import chroma from 'chroma-js';
-import { memoize } from 'lodash';
 
-const opacify = memoize((color, amount) => {
+const opacify = (color, amount) => {
   /**
    * Increases the opacity of a color. Its range for the amount is between 0 to 1.
    *
@@ -17,6 +16,6 @@ const opacify = memoize((color, amount) => {
   const newAlpha = (parsedAlpha * 100 + parseFloat(amount) * 100) / 100;
 
   return chroma(color).alpha(newAlpha).css();
-});
+};
 
 export default opacify;
