@@ -570,7 +570,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "eiirfX",
+                          "lastClassName": "HgSfl",
                           "rules": Array [
                             [Function],
                           ],
@@ -593,12 +593,12 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 kIeZnH"
+                      className="Button__StyledButton-c9cbmb-0 eucEpz"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 eucEpz btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
@@ -762,7 +762,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "eiirfX",
+                                            "lastClassName": "HgSfl",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -786,12 +786,12 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                         bsClass="btn"
                                         bsSize="small"
                                         bsStyle="info"
-                                        className="Button__StyledButton-c9cbmb-0 eiirfX"
+                                        className="Button__StyledButton-c9cbmb-0 HgSfl"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-sm btn-info"
+                                          className="Button__StyledButton-c9cbmb-0 HgSfl btn btn-sm btn-info"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
@@ -1371,7 +1371,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "kIeZnH",
+                          "lastClassName": "eucEpz",
                           "rules": Array [
                             [Function],
                           ],
@@ -1394,12 +1394,12 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 kIeZnH"
+                      className="Button__StyledButton-c9cbmb-0 eucEpz"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 eucEpz btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
@@ -2050,7 +2050,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "kIeZnH",
+                          "lastClassName": "eucEpz",
                           "rules": Array [
                             [Function],
                           ],
@@ -2073,12 +2073,12 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 kIeZnH"
+                      className="Button__StyledButton-c9cbmb-0 eucEpz"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 eucEpz btn btn-primary"
                         disabled={true}
                         type="submit"
                       >

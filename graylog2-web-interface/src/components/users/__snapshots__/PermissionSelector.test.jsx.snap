@@ -46,7 +46,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "Tabs-sc-1hzj2zf-0",
               "isStatic": false,
-              "lastClassName": "cZfRbF",
+              "lastClassName": "fvxwon",
               "rules": Array [
                 [Function],
                 ";",
@@ -83,13 +83,13 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
       >
         <ForwardRef
           animation={false}
-          className="Tabs-sc-1hzj2zf-0 cZfRbF"
+          className="Tabs-sc-1hzj2zf-0 fvxwon"
           defaultActiveKey={1}
           id="permissionSelectorTabs"
         >
           <Uncontrolled(Tabs)
             animation={false}
-            className="Tabs-sc-1hzj2zf-0 cZfRbF"
+            className="Tabs-sc-1hzj2zf-0 fvxwon"
             defaultActiveKey={1}
             id="permissionSelectorTabs"
             innerRef={null}
@@ -99,7 +99,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
               animation={false}
               bsClass="tab"
               bsStyle="tabs"
-              className="Tabs-sc-1hzj2zf-0 cZfRbF"
+              className="Tabs-sc-1hzj2zf-0 fvxwon"
               id="permissionSelectorTabs"
               mountOnEnter={false}
               onSelect={[Function]}
@@ -107,12 +107,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
             >
               <TabContainer
                 activeKey={1}
-                className="Tabs-sc-1hzj2zf-0 cZfRbF"
+                className="Tabs-sc-1hzj2zf-0 fvxwon"
                 id="permissionSelectorTabs"
                 onSelect={[Function]}
               >
                 <div
-                  className="Tabs-sc-1hzj2zf-0 cZfRbF"
+                  className="Tabs-sc-1hzj2zf-0 fvxwon"
                   id="permissionSelectorTabs"
                 >
                   <Nav
@@ -602,7 +602,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "csbWtC",
+                                                                "lastClassName": "krPQKW",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -630,7 +630,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             block={false}
                                                             bsClass="btn"
                                                             bsStyle="default"
-                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                             disabled={false}
                                                             style={
                                                               Object {
@@ -640,7 +640,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             type="submit"
                                                           >
                                                             <button
-                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                               disabled={false}
                                                               style={
                                                                 Object {
@@ -701,7 +701,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "csbWtC",
+                                                                "lastClassName": "krPQKW",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -730,7 +730,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             block={false}
                                                             bsClass="btn"
                                                             bsStyle="default"
-                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                             disabled={true}
                                                             onClick={[Function]}
                                                             style={
@@ -741,7 +741,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             type="button"
                                                           >
                                                             <button
-                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                               disabled={true}
                                                               onClick={[Function]}
                                                               style={
@@ -1034,7 +1034,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -1057,12 +1057,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -1107,7 +1107,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -1130,12 +1130,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -1362,7 +1362,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -1385,12 +1385,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -1435,7 +1435,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -1458,12 +1458,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -1988,7 +1988,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "csbWtC",
+                                                                "lastClassName": "krPQKW",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -2016,7 +2016,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             block={false}
                                                             bsClass="btn"
                                                             bsStyle="default"
-                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                             disabled={false}
                                                             style={
                                                               Object {
@@ -2026,7 +2026,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             type="submit"
                                                           >
                                                             <button
-                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                               disabled={false}
                                                               style={
                                                                 Object {
@@ -2087,7 +2087,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "csbWtC",
+                                                                "lastClassName": "krPQKW",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -2116,7 +2116,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             block={false}
                                                             bsClass="btn"
                                                             bsStyle="default"
-                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                             disabled={true}
                                                             onClick={[Function]}
                                                             style={
@@ -2127,7 +2127,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             type="button"
                                                           >
                                                             <button
-                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                               disabled={true}
                                                               onClick={[Function]}
                                                               style={
@@ -2420,7 +2420,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -2443,12 +2443,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -2493,7 +2493,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -2516,12 +2516,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -2748,7 +2748,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -2771,12 +2771,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -2821,7 +2821,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -2844,12 +2844,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -3060,7 +3060,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "Tabs-sc-1hzj2zf-0",
               "isStatic": false,
-              "lastClassName": "cZfRbF",
+              "lastClassName": "fvxwon",
               "rules": Array [
                 [Function],
                 ";",
@@ -3097,13 +3097,13 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
       >
         <ForwardRef
           animation={false}
-          className="Tabs-sc-1hzj2zf-0 cZfRbF"
+          className="Tabs-sc-1hzj2zf-0 fvxwon"
           defaultActiveKey={1}
           id="permissionSelectorTabs"
         >
           <Uncontrolled(Tabs)
             animation={false}
-            className="Tabs-sc-1hzj2zf-0 cZfRbF"
+            className="Tabs-sc-1hzj2zf-0 fvxwon"
             defaultActiveKey={1}
             id="permissionSelectorTabs"
             innerRef={null}
@@ -3113,7 +3113,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
               animation={false}
               bsClass="tab"
               bsStyle="tabs"
-              className="Tabs-sc-1hzj2zf-0 cZfRbF"
+              className="Tabs-sc-1hzj2zf-0 fvxwon"
               id="permissionSelectorTabs"
               mountOnEnter={false}
               onSelect={[Function]}
@@ -3121,12 +3121,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
             >
               <TabContainer
                 activeKey={1}
-                className="Tabs-sc-1hzj2zf-0 cZfRbF"
+                className="Tabs-sc-1hzj2zf-0 fvxwon"
                 id="permissionSelectorTabs"
                 onSelect={[Function]}
               >
                 <div
-                  className="Tabs-sc-1hzj2zf-0 cZfRbF"
+                  className="Tabs-sc-1hzj2zf-0 fvxwon"
                   id="permissionSelectorTabs"
                 >
                   <Nav
@@ -3616,7 +3616,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "csbWtC",
+                                                                "lastClassName": "krPQKW",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -3644,7 +3644,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             block={false}
                                                             bsClass="btn"
                                                             bsStyle="default"
-                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                             disabled={false}
                                                             style={
                                                               Object {
@@ -3654,7 +3654,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             type="submit"
                                                           >
                                                             <button
-                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                               disabled={false}
                                                               style={
                                                                 Object {
@@ -3715,7 +3715,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "csbWtC",
+                                                                "lastClassName": "krPQKW",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -3744,7 +3744,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             block={false}
                                                             bsClass="btn"
                                                             bsStyle="default"
-                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                             disabled={true}
                                                             onClick={[Function]}
                                                             style={
@@ -3755,7 +3755,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             type="button"
                                                           >
                                                             <button
-                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                               disabled={true}
                                                               onClick={[Function]}
                                                               style={
@@ -4048,7 +4048,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -4071,12 +4071,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="info"
-                                                                            className="Button__StyledButton-c9cbmb-0 eiirfX"
+                                                                            className="Button__StyledButton-c9cbmb-0 HgSfl"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-info active"
+                                                                              className="Button__StyledButton-c9cbmb-0 HgSfl btn btn-info active"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -4121,7 +4121,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -4144,12 +4144,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -4376,7 +4376,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -4399,12 +4399,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -4449,7 +4449,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -4472,12 +4472,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="info"
-                                                                            className="Button__StyledButton-c9cbmb-0 eiirfX"
+                                                                            className="Button__StyledButton-c9cbmb-0 HgSfl"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-info active"
+                                                                              className="Button__StyledButton-c9cbmb-0 HgSfl btn btn-info active"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -5002,7 +5002,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "csbWtC",
+                                                                "lastClassName": "krPQKW",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -5030,7 +5030,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             block={false}
                                                             bsClass="btn"
                                                             bsStyle="default"
-                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                             disabled={false}
                                                             style={
                                                               Object {
@@ -5040,7 +5040,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             type="submit"
                                                           >
                                                             <button
-                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                               disabled={false}
                                                               style={
                                                                 Object {
@@ -5101,7 +5101,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "csbWtC",
+                                                                "lastClassName": "krPQKW",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -5130,7 +5130,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             block={false}
                                                             bsClass="btn"
                                                             bsStyle="default"
-                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                             disabled={true}
                                                             onClick={[Function]}
                                                             style={
@@ -5141,7 +5141,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             type="button"
                                                           >
                                                             <button
-                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                               disabled={true}
                                                               onClick={[Function]}
                                                               style={
@@ -5434,7 +5434,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -5457,12 +5457,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -5507,7 +5507,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -5530,12 +5530,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -5762,7 +5762,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -5785,12 +5785,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="info"
-                                                                            className="Button__StyledButton-c9cbmb-0 eiirfX"
+                                                                            className="Button__StyledButton-c9cbmb-0 HgSfl"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-info active"
+                                                                              className="Button__StyledButton-c9cbmb-0 HgSfl btn btn-info active"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
@@ -5835,7 +5835,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "csbWtC",
+                                                                                "lastClassName": "krPQKW",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -5858,12 +5858,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             block={false}
                                                                             bsClass="btn"
                                                                             bsStyle="default"
-                                                                            className="Button__StyledButton-c9cbmb-0 csbWtC"
+                                                                            className="Button__StyledButton-c9cbmb-0 krPQKW"
                                                                             disabled={false}
                                                                             onClick={[Function]}
                                                                           >
                                                                             <button
-                                                                              className="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
+                                                                              className="Button__StyledButton-c9cbmb-0 krPQKW btn btn-default"
                                                                               disabled={false}
                                                                               onClick={[Function]}
                                                                               type="button"
