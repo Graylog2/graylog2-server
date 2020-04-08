@@ -15,9 +15,9 @@ import TimeRangeOverrideTypeSelector from 'views/components/searchbar/TimeRangeO
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
-import { GlobalOverrideActions, GlobalOverrideStore } from '../stores/GlobalOverrideStore';
+import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
+import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import DashboardSearchForm from './DashboardSearchBarForm';
-import type { QueryString, TimeRange } from '../logic/queries/Query';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 
 type Props = {
