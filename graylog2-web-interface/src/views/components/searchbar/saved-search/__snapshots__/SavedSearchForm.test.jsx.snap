@@ -303,7 +303,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                 </StyledComponent>
                               </FormGroup__StyledFormGroup>
                             </Component>
-                            <ForwardRef
+                            <Component
                               bsStyle="info"
                               className="button"
                               disabled={false}
@@ -342,7 +342,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "csbWtC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -366,13 +366,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
+                                    className="Button__StyledButton-c9cbmb-0 eiirfX button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 eiirfX button btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -382,8 +382,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                            </Component>
+                            <Component
                               bsStyle="default"
                               className="button"
                               onClick={[Function]}
@@ -417,7 +417,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "csbWtC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -440,12 +440,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
+                                    className="Button__StyledButton-c9cbmb-0 csbWtC button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 csbWtC button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -455,7 +455,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
+                            </Component>
                           </form>
                         </div>
                       </div>
@@ -775,7 +775,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                 </StyledComponent>
                               </FormGroup__StyledFormGroup>
                             </Component>
-                            <ForwardRef
+                            <Component
                               bsStyle="primary"
                               className="button"
                               onClick={[Function]}
@@ -811,7 +811,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "csbWtC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -835,13 +835,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 hGhRKT button"
+                                    className="Button__StyledButton-c9cbmb-0 kIeZnH button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 hGhRKT button btn btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 kIeZnH button btn btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -851,8 +851,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                            </Component>
+                            <Component
                               bsStyle="info"
                               className="button"
                               disabled={true}
@@ -891,7 +891,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "csbWtC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -915,13 +915,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
+                                    className="Button__StyledButton-c9cbmb-0 eiirfX button"
                                     disabled={true}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 eiirfX button btn btn-info"
                                       disabled={true}
                                       onClick={[Function]}
                                       type="submit"
@@ -931,8 +931,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                            </Component>
+                            <Component
                               bsStyle="default"
                               className="button"
                               onClick={[Function]}
@@ -966,7 +966,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "csbWtC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -989,12 +989,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
+                                    className="Button__StyledButton-c9cbmb-0 csbWtC button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 csbWtC button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -1004,7 +1004,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
+                            </Component>
                           </form>
                         </div>
                       </div>
@@ -1324,7 +1324,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                 </StyledComponent>
                               </FormGroup__StyledFormGroup>
                             </Component>
-                            <ForwardRef
+                            <Component
                               bsStyle="primary"
                               className="button"
                               onClick={[Function]}
@@ -1360,7 +1360,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "csbWtC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1384,13 +1384,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 hGhRKT button"
+                                    className="Button__StyledButton-c9cbmb-0 kIeZnH button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 hGhRKT button btn btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 kIeZnH button btn btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1400,8 +1400,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                            </Component>
+                            <Component
                               bsStyle="info"
                               className="button"
                               disabled={false}
@@ -1440,7 +1440,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "csbWtC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1464,13 +1464,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
+                                    className="Button__StyledButton-c9cbmb-0 eiirfX button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 eiirfX button btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1480,8 +1480,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                            </Component>
+                            <Component
                               bsStyle="default"
                               className="button"
                               onClick={[Function]}
@@ -1515,7 +1515,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "csbWtC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1538,12 +1538,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
+                                    className="Button__StyledButton-c9cbmb-0 csbWtC button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 csbWtC button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -1553,7 +1553,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
+                            </Component>
                           </form>
                         </div>
                       </div>

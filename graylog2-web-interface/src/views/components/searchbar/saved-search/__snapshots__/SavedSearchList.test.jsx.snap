@@ -57,7 +57,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 csbWtC submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 csbWtC reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -92,21 +92,21 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-primary"
               disabled=""
               type="button"
             >
               Load
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
               disabled=""
               type="button"
             >
               Delete
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
               type="button"
             >
               Cancel
@@ -176,7 +176,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 csbWtC submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -187,7 +187,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 csbWtC reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -334,21 +334,21 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-primary"
               disabled=""
               type="button"
             >
               Load
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
               disabled=""
               type="button"
             >
               Delete
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 csbWtC btn btn-default"
               type="button"
             >
               Cancel

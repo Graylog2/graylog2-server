@@ -3,7 +3,7 @@
 exports[`<ContentPackUploadControls /> should render 1`] = `
 <ContentPackUploadControls>
   <span>
-    <ForwardRef
+    <Component
       active={false}
       bsStyle="success"
       className="button"
@@ -42,7 +42,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               "componentStyle": ComponentStyle {
                 "componentId": "Button__StyledButton-c9cbmb-0",
                 "isStatic": false,
-                "lastClassName": "gxhWww",
+                "lastClassName": "eicatY",
                 "rules": Array [
                   [Function],
                 ],
@@ -66,13 +66,13 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
             block={false}
             bsClass="btn"
             bsStyle="success"
-            className="Button__StyledButton-c9cbmb-0 gxhWww button"
+            className="Button__StyledButton-c9cbmb-0 eicatY button"
             disabled={false}
             id="upload-content-pack-button"
             onClick={[Function]}
           >
             <button
-              className="Button__StyledButton-c9cbmb-0 gxhWww button btn btn-success"
+              className="Button__StyledButton-c9cbmb-0 eicatY button btn btn-success"
               disabled={false}
               id="upload-content-pack-button"
               onClick={[Function]}
@@ -83,7 +83,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
           </Button>
         </StyledComponent>
       </Button__StyledButton>
-    </ForwardRef>
+    </Component>
     <BootstrapModalForm
       cancelButtonText="Cancel"
       formProps={Object {}}

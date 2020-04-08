@@ -536,7 +536,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
             <div
               className="col-sm-2 col-sm-offset-10"
             >
-              <ForwardRef
+              <Component
                 bsStyle="primary"
                 disabled={true}
                 type="submit"
@@ -570,7 +570,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "pSZqX",
+                          "lastClassName": "eiirfX",
                           "rules": Array [
                             [Function],
                           ],
@@ -593,12 +593,12 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                      className="Button__StyledButton-c9cbmb-0 kIeZnH"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
@@ -607,7 +607,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </ForwardRef>
+              </Component>
             </div>
           </Col>
         </div>
@@ -728,7 +728,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 PORT
                               </td>
                               <td>
-                                <ForwardRef
+                                <Component
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -762,7 +762,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "pSZqX",
+                                            "lastClassName": "eiirfX",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -786,12 +786,12 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                         bsClass="btn"
                                         bsSize="small"
                                         bsStyle="info"
-                                        className="Button__StyledButton-c9cbmb-0 pSZqX"
+                                        className="Button__StyledButton-c9cbmb-0 eiirfX"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                          className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-sm btn-info"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
@@ -801,7 +801,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                       </Button>
                                     </StyledComponent>
                                   </Button__StyledButton>
-                                </ForwardRef>
+                                </Component>
                               </td>
                             </tr>
                           </DataTableElement>
@@ -1337,7 +1337,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
             <div
               className="col-sm-2 col-sm-offset-10"
             >
-              <ForwardRef
+              <Component
                 bsStyle="primary"
                 disabled={true}
                 type="submit"
@@ -1371,7 +1371,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "hGhRKT",
+                          "lastClassName": "kIeZnH",
                           "rules": Array [
                             [Function],
                           ],
@@ -1394,12 +1394,12 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                      className="Button__StyledButton-c9cbmb-0 kIeZnH"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
@@ -1408,7 +1408,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </ForwardRef>
+              </Component>
             </div>
           </Col>
         </div>
@@ -2016,7 +2016,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
             <div
               className="col-sm-2 col-sm-offset-10"
             >
-              <ForwardRef
+              <Component
                 bsStyle="primary"
                 disabled={true}
                 type="submit"
@@ -2050,7 +2050,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "hGhRKT",
+                          "lastClassName": "kIeZnH",
                           "rules": Array [
                             [Function],
                           ],
@@ -2073,12 +2073,12 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                      className="Button__StyledButton-c9cbmb-0 kIeZnH"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
@@ -2087,7 +2087,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </ForwardRef>
+              </Component>
             </div>
           </Col>
         </div>

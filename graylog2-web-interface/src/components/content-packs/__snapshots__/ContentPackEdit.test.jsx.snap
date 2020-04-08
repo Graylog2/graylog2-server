@@ -299,7 +299,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <div
                       className="col-xs-6"
                     >
-                      <ForwardRef
+                      <Component
                         bsSize="small"
                         bsStyle="info"
                         disabled={true}
@@ -336,7 +336,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "csbWtC",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -360,12 +360,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 pSZqX"
+                              className="Button__StyledButton-c9cbmb-0 eiirfX"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -375,7 +375,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </ForwardRef>
+                      </Component>
                     </div>
                   </Col>
                   <Col
@@ -387,7 +387,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <div
                       className="text-right col-xs-6"
                     >
-                      <ForwardRef
+                      <Component
                         bsSize="small"
                         bsStyle="info"
                         disabled={true}
@@ -424,7 +424,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "csbWtC",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -448,12 +448,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 pSZqX"
+                              className="Button__StyledButton-c9cbmb-0 eiirfX"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -463,7 +463,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </ForwardRef>
+                      </Component>
                     </div>
                   </Col>
                 </div>
@@ -1788,7 +1788,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     }
                                   }
                                 >
-                                  <ForwardRef
+                                  <Component
                                     bsStyle="default"
                                     className="submit-button"
                                     disabled={false}
@@ -1825,7 +1825,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iWqiEF",
+                                              "lastClassName": "csbWtC",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1848,12 +1848,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
+                                          className="Button__StyledButton-c9cbmb-0 csbWtC submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
+                                            className="Button__StyledButton-c9cbmb-0 csbWtC submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -1862,7 +1862,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                         </Button>
                                       </StyledComponent>
                                     </Button__StyledButton>
-                                  </ForwardRef>
+                                  </Component>
                                 </div>
                                 <div
                                   className="form-group"
@@ -1872,7 +1872,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     }
                                   }
                                 >
-                                  <ForwardRef
+                                  <Component
                                     bsStyle="default"
                                     className="reset-button"
                                     onClick={[Function]}
@@ -1908,7 +1908,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iWqiEF",
+                                              "lastClassName": "csbWtC",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1932,13 +1932,13 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
+                                          className="Button__StyledButton-c9cbmb-0 csbWtC reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
+                                            className="Button__StyledButton-c9cbmb-0 csbWtC reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -1948,7 +1948,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                         </Button>
                                       </StyledComponent>
                                     </Button__StyledButton>
-                                  </ForwardRef>
+                                  </Component>
                                 </div>
                               </form>
                             </div>
@@ -2604,7 +2604,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <div
                       className="col-xs-6"
                     >
-                      <ForwardRef
+                      <Component
                         bsSize="small"
                         bsStyle="info"
                         disabled={true}
@@ -2641,7 +2641,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "csbWtC",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -2665,12 +2665,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 pSZqX"
+                              className="Button__StyledButton-c9cbmb-0 eiirfX"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -2680,7 +2680,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </ForwardRef>
+                      </Component>
                     </div>
                   </Col>
                   <Col
@@ -2692,7 +2692,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <div
                       className="text-right col-xs-6"
                     >
-                      <ForwardRef
+                      <Component
                         bsSize="small"
                         bsStyle="info"
                         disabled={false}
@@ -2729,7 +2729,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "csbWtC",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -2753,12 +2753,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 pSZqX"
+                              className="Button__StyledButton-c9cbmb-0 eiirfX"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-sm btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -2768,7 +2768,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </ForwardRef>
+                      </Component>
                     </div>
                   </Col>
                 </div>
@@ -4134,7 +4134,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     }
                                   }
                                 >
-                                  <ForwardRef
+                                  <Component
                                     bsStyle="default"
                                     className="submit-button"
                                     disabled={false}
@@ -4171,7 +4171,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iWqiEF",
+                                              "lastClassName": "csbWtC",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4194,12 +4194,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
+                                          className="Button__StyledButton-c9cbmb-0 csbWtC submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
+                                            className="Button__StyledButton-c9cbmb-0 csbWtC submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -4208,7 +4208,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                         </Button>
                                       </StyledComponent>
                                     </Button__StyledButton>
-                                  </ForwardRef>
+                                  </Component>
                                 </div>
                                 <div
                                   className="form-group"
@@ -4218,7 +4218,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     }
                                   }
                                 >
-                                  <ForwardRef
+                                  <Component
                                     bsStyle="default"
                                     className="reset-button"
                                     onClick={[Function]}
@@ -4254,7 +4254,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iWqiEF",
+                                              "lastClassName": "csbWtC",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4278,13 +4278,13 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
+                                          className="Button__StyledButton-c9cbmb-0 csbWtC reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
+                                            className="Button__StyledButton-c9cbmb-0 csbWtC reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -4294,7 +4294,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                         </Button>
                                       </StyledComponent>
                                     </Button__StyledButton>
-                                  </ForwardRef>
+                                  </Component>
                                 </div>
                               </form>
                             </div>

@@ -187,7 +187,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                             className="btn-toolbar"
                             role="toolbar"
                           >
-                            <ForwardRef
+                            <Component
                               bsSize="small"
                               bsStyle="primary"
                               onClick={[Function]}
@@ -221,7 +221,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "pSZqX",
+                                        "lastClassName": "eiirfX",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -245,12 +245,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                                    className="Button__StyledButton-c9cbmb-0 kIeZnH"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-sm btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 kIeZnH btn btn-sm btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -260,8 +260,8 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                            </Component>
+                            <Component
                               bsSize="small"
                               bsStyle="info"
                               onClick={[Function]}
@@ -295,7 +295,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "pSZqX",
+                                        "lastClassName": "eiirfX",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -319,12 +319,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 pSZqX"
+                                    className="Button__StyledButton-c9cbmb-0 eiirfX"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 eiirfX btn btn-sm btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -334,7 +334,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </ForwardRef>
+                            </Component>
                             <BootstrapModalWrapper
                               backdrop="static"
                               bsSize="large"
