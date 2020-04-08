@@ -60,7 +60,6 @@ describe('ViewActionsMenu', () => {
     </CurrentUserContext.Provider>,
   );
 
-
   it('should open modal to save new dashboard', () => {
     const { getByTestId, getByText } = renderViewActionsMenu()();
     const saveAsMenuItem = getByTestId('dashboard-save-as-button');

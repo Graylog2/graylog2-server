@@ -9,7 +9,6 @@ import Select from 'views/components/Select';
 import Spinner from 'components/common/Spinner';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import StoreProvider from 'injection/StoreProvider';
-import connect from 'stores/connect';
 
 import View from 'views/logic/views/View';
 import { ViewSharingActions } from 'views/stores/ViewSharingStore';
@@ -18,24 +17,15 @@ import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';
+import type { User } from 'stores/users/UsersStore';
 
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const RolesStore = StoreProvider.getStore('Roles');
 
 type Props = {
-  currentUser: {
-    username: string,
-    roles: Array<string>,
-    permissions: Array<string>,
-  },
+  currentUser: User,
   onClose: (?ViewSharing) => void,
   view: View,
   show: boolean,
-};
-
-type User = {
-  roles: Array<string>,
-  permissions: Array<string>,
 };
 
 type State = {
@@ -56,7 +46,7 @@ const Additional = ({ children }: { children: React.Node }) => <div style={{ pad
 const extractValue = ({ value }) => value;
 
 class ShareViewModal extends React.Component<Props, State> {
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       viewSharing: null,
@@ -106,7 +96,7 @@ class ShareViewModal extends React.Component<Props, State> {
     this.setState({ viewSharing });
   };
 
-  _onRolesChange = (newRoles) => {
+  _onRolesChange = (newRoles: Array<{value: string, label: string}>) => {
     const { viewSharing } = this.state;
     if (viewSharing === null || viewSharing.type !== SpecificRoles.Type) {
       return;
@@ -117,7 +107,7 @@ class ShareViewModal extends React.Component<Props, State> {
     this.setState({ viewSharing: specificRoles.toBuilder().roles(roles).build() });
   };
 
-  _onUsersChange = (newUsers) => {
+  _onUsersChange = (newUsers: Array<{value: string, label: string}>) => {
     const { viewSharing } = this.state;
     if (viewSharing === null || viewSharing.type !== SpecificUsers.Type) {
       return;
@@ -198,4 +188,4 @@ class ShareViewModal extends React.Component<Props, State> {
   }
 }
 
-export default connect(ShareViewModal, { currentUser: CurrentUserStore }, ({ currentUser, ...rest }) => ({ ...rest, currentUser: currentUser.currentUser }));
+export default ShareViewModal;

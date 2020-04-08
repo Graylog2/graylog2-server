@@ -1,6 +1,7 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+import { viewsManager } from 'fixtures/users';
 
 import asMock from 'helpers/mocking/AsMock';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
@@ -11,6 +12,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as Permissions from 'views/Permissions';
+import CurrentUserContext from 'components/contexts/CurrentUserContext';
 
 import SavedSearchControls from './SavedSearchControls';
 
@@ -26,6 +28,7 @@ jest.mock('stores/users/CurrentUserStore', () => ({
 }));
 
 describe('SavedSearchControls', () => {
+  const userId = viewsManager.id;
   const createViewStoreState = (dirty = true, id) => ({
     activeQuery: '',
     view: View.builder()
@@ -38,17 +41,24 @@ describe('SavedSearchControls', () => {
       .build(),
     dirty,
   });
+
+  const mountSavedSearchControls = (loadNewView = () => Promise.resolve(), onLoadView, currentUser = viewsManager) => (props) => mount(
+    <CurrentUserContext.Provider value={currentUser}>
+      <NewViewLoaderContext.Provider value={loadNewView}>
+        <ViewLoaderContext.Provider value={onLoadView}>
+          <SavedSearchControls viewStoreState={createViewStoreState()} {...props} />
+        </ViewLoaderContext.Provider>
+      </NewViewLoaderContext.Provider>
+    </CurrentUserContext.Provider>,
+  );
+
   describe('Button handling', () => {
     it('should clear a view', (done) => {
       const loadNewView = jest.fn(() => {
         done();
         return Promise.resolve();
       });
-      const wrapper = mount((
-        <NewViewLoaderContext.Provider value={loadNewView}>
-          <SavedSearchControls viewStoreState={createViewStoreState()} />
-        </NewViewLoaderContext.Provider>
-      ));
+      const wrapper = mountSavedSearchControls(loadNewView)();
       wrapper.find('a[data-testid="reset-search"]').simulate('click');
     });
 
@@ -57,11 +67,7 @@ describe('SavedSearchControls', () => {
       const onLoadView = jest.fn((view) => {
         return new Promise(() => view);
       });
-      const wrapper = mount(
-        <ViewLoaderContext.Provider value={onLoadView}>
-          <SavedSearchControls viewStoreState={createViewStoreState(false)} />
-        </ViewLoaderContext.Provider>,
-      );
+      const wrapper = mountSavedSearchControls(undefined, onLoadView)();
       wrapper.find('button[title="Save search"]').simulate('click');
       wrapper.find('input[value="title"]').simulate('change', { target: { value: 'Test' } });
       wrapper.find('button[children="Create new"]').simulate('click');
@@ -72,25 +78,26 @@ describe('SavedSearchControls', () => {
     });
     describe('has "Share search" option', () => {
       it('includes the option to share the current search', () => {
-        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mountSavedSearchControls()({ viewStoreState: createViewStoreState(false, userId) });
 
         expect(wrapper.find('MenuItem[title="Share search"]')).toExist();
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', () => {
-        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mountSavedSearchControls()({ viewStoreState: createViewStoreState(false, userId) });
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
         expect(shareSearch).toBeDisabled();
       });
+
       it('which should be enabled if current user is owner of search', () => {
         const owningUser = {
+          ...viewsManager,
           username: 'owningUser',
           permissions: [],
         };
-        asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
-        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mountSavedSearchControls(undefined, undefined, owningUser)({ viewStoreState: createViewStoreState(false, userId) });
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -98,11 +105,11 @@ describe('SavedSearchControls', () => {
       });
       it('which should be enabled if current user is permitted to edit search', () => {
         const owningUser = {
+          ...viewsManager,
           username: 'powerfulUser',
-          permissions: [Permissions.View.Edit('some-id')],
+          permissions: [Permissions.View.Edit(userId)],
         };
-        asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
-        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        const wrapper = mountSavedSearchControls(undefined, undefined, owningUser)({ viewStoreState: createViewStoreState(false, userId) });
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -110,23 +117,19 @@ describe('SavedSearchControls', () => {
       });
       it('which should be enabled if current user is admin', () => {
         const owningUser = {
+          ...viewsManager,
           username: 'powerfulUser',
           permissions: ['*'],
         };
-        asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
-        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false, 'some-id')} />);
+        asMock(CurrentUserStore.getInitialState).mockReturnValue();
+        const wrapper = mountSavedSearchControls(undefined, undefined, owningUser)({ viewStoreState: createViewStoreState(false, userId) });
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
         expect(shareSearch).not.toBeDisabled();
       });
       it('which should be disabled if search is unsaved', () => {
-        const owningUser = {
-          username: 'powerfulUser',
-          permissions: ['*'],
-        };
-        asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: owningUser });
-        const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false)} />);
+        const wrapper = mountSavedSearchControls()();
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -137,7 +140,8 @@ describe('SavedSearchControls', () => {
 
   describe('render the SavedSearchControls', () => {
     it('should render not dirty with unsaved view', () => {
-      const wrapper = mount(<SavedSearchControls viewStoreState={createViewStoreState(false)} />);
+      const wrapper = mountSavedSearchControls()({ viewStoreState: createViewStoreState(false) });
+
       const saveButton = wrapper.find('button[title="Save search"]');
       expect(saveButton).toMatchSnapshot();
     });
@@ -153,7 +157,7 @@ describe('SavedSearchControls', () => {
           .build(),
         dirty: false,
       };
-      const wrapper = mount(<SavedSearchControls viewStoreState={viewStoreState} />);
+      const wrapper = mountSavedSearchControls()({ viewStoreState });
       const saveButton = wrapper.find('button[title="Saved search"]');
       expect(saveButton).toMatchSnapshot();
     });
@@ -170,7 +174,7 @@ describe('SavedSearchControls', () => {
         view: view,
         dirty: true,
       };
-      const wrapper = mount(<SavedSearchControls viewStoreState={viewStoreState} />);
+      const wrapper = mountSavedSearchControls()({ viewStoreState });
       const saveButton = wrapper.find('button[title="Unsaved changes"]');
       expect(saveButton).toMatchSnapshot();
     });

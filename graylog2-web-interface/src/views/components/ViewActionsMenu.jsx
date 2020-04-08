@@ -29,8 +29,7 @@ import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration
 
 const { isPermitted } = PermissionsMixin;
 
-// $FlowFixMe currentUser can't be null or undefined
-const _isAllowedToEdit = (view: View, currentUser = {}) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)])
+const _isAllowedToEdit = (view: View, currentUser) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)])
   || (view.type === View.Type.Dashboard && isPermitted(currentUser.permissions, [`dashboards:edit:${view.id}`]));
 
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
@@ -93,7 +92,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
                              onClose={() => setEditViewOpen(false)}
                              onSave={onSaveView} />
       )}
-      {shareViewOpen && <ShareViewModal show view={view} onClose={() => setShareViewOpen(false)} />}
+      {shareViewOpen && <ShareViewModal show view={view} currentUser={currentUser} onClose={() => setShareViewOpen(false)} />}
       {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
     </ButtonGroup>
   );
