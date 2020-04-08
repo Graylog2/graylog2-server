@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 import asMock from 'helpers/mocking/AsMock';
 import DateTime from 'logic/datetimes/DateTime';
@@ -45,7 +45,7 @@ describe('DateInputWithPicker', () => {
 
   it('pressing magic wand inserts current date', () => {
     DateTime.now = jest.fn(DateTime.now);
-    asMock(DateTime.now).mockReturnValue(moment('2020-04-08T17:18:36.315Z'));
+    asMock(DateTime.now).mockReturnValue(moment('2020-04-08T17:18:36.315Z').tz('utc'));
     const onChange = jest.fn();
     const { getByTitle } = render(<DateInputWithPicker value="2020-04-04 13:22:46" onChange={onChange} name="date-picker" />);
 
