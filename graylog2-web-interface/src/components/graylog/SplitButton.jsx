@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import menuItemStyles from './styles/menuItem';
 import { propTypes, defaultProps } from './props/button';
-import { buttonStyles } from './Button';
+import buttonStyles from './styles/buttonStyles';
 
 const StyledSplitButton = styled(BootstrapSplitButton)(({ bsStyle, theme }) => css`
   ${buttonStyles(bsStyle, theme.color)};

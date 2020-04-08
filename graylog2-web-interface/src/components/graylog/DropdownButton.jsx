@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import menuItemStyles from './styles/menuItem';
 import { propTypes, defaultProps } from './props/button';
-import { buttonStyles } from './Button';
+import buttonStyles from './styles/buttonStyles';
 
 const StyledDropdownButton = styled(BootstrapDropdownButton)(({ bsStyle, theme }) => css`
   ${buttonStyles(bsStyle, theme.color)};
