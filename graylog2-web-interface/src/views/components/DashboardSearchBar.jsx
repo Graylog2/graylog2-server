@@ -47,12 +47,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
               <>
                 <Row className="no-bm extended-search-query-metadata">
                   <Col lg={4} md={6} xs={8}>
-                    <Field name="timerange.type">
-                      {({ field: { name, value, onChange } }) => (
-                        <TimeRangeOverrideTypeSelector onSelect={(newType) => onChange({ target: { value: newType, name } })}
-                                                       value={value} />
-                      )}
-                    </Field>
+                    <TimeRangeOverrideTypeSelector />
                     <TimeRangeInput config={config} />
                   </Col>
                   <Col lg={8} md={6} xs={4}>

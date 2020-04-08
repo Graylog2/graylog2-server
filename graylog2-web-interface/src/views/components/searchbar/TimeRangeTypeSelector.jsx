@@ -2,34 +2,12 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { useField } from 'formik';
-import moment from 'moment';
 
-import DateTime from 'logic/datetimes/DateTime';
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
 
 import PropTypes from 'views/components/CustomPropTypes';
-import type { TimeRange } from 'views/logic/queries/Query';
-
-const migrationStrategies = {
-  absolute: (oldTimerange: TimeRange) => ({
-    type: 'absolute',
-    from: new DateTime(moment().subtract(oldTimerange.type === 'relative' ? oldTimerange.range : 300, 'seconds')).toString(DateTime.Formats.TIMESTAMP),
-    to: new DateTime(moment()).toString(DateTime.Formats.TIMESTAMP),
-  }),
-  relative: () => ({ type: 'relative', range: 300 }),
-  keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
-};
-
-const migrateTimeRangeToNewType = (oldTimerange: TimeRange, type: string): TimeRange => {
-  const oldType = oldTimerange.type;
-
-  if (type === oldType) {
-    return oldTimerange;
-  }
-
-  return migrationStrategies[type](oldTimerange);
-};
+import { migrateTimeRangeToNewType } from '../TimerangeForForm';
 
 type Props = {
   disabled: boolean,
