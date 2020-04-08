@@ -53,6 +53,6 @@ describe('DateInputWithPicker', () => {
 
     fireEvent.click(insertCurrentDate);
 
-    expect(onChange).toHaveBeenCalledWith({ target: { name: 'date-picker', value: '2020-04-08 19:18:36.315' } });
+    expect(onChange).toHaveBeenCalledWith({ target: { name: 'date-picker', value: '2020-04-08 17:18:36.315' } });
   });
 });
