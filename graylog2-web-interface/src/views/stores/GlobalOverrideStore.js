@@ -7,14 +7,16 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import { SearchExecutionStateActions, SearchExecutionStateStore } from './SearchExecutionStateStore';
 
 export type GlobalOverrideActionsType = RefluxActions<{
   rangeType: (string) => Promise<?GlobalOverride>,
   rangeParams: (string, string | number) => Promise<?GlobalOverride>,
   query: (string) => Promise<?GlobalOverride>,
+  set: (?TimeRange, ?string) => Promise<?GlobalOverride>,
   reset: () => Promise<?GlobalOverride>,
-  timerange: (TimeRange) => Promise<?GlobalOverride>,
+  timerange: (?TimeRange) => Promise<?GlobalOverride>,
 }>;
 
 export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions(
@@ -24,6 +26,7 @@ export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions
     rangeParams: { asyncResult: true },
     query: { asyncResult: true },
     reset: { asyncResult: true },
+    set: { asyncResult: true },
     timerange: { asyncResult: true },
   }),
 );
@@ -47,6 +50,15 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
     },
     getInitialState() {
       return this.globalOverride;
+    },
+    set(newTimerange: ?TimeRange, newQueryString: ?string): Promise<?GlobalOverride> {
+      const newQuery = newQueryString ? createElasticsearchQueryString(newQueryString) : undefined;
+      const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
+      const newGlobalOverride = currentGlobalOverride.toBuilder().query(newQuery).timerange(newTimerange).build();
+
+      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+      GlobalOverrideActions.set.promise(promise);
+      return promise;
     },
     timerange(newTimerange: TimeRange) {
       const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
