@@ -64,4 +64,3 @@ export const migrateTimeRangeToNewType = (oldTimerange: ?TimeRange, type: string
 
   return migrationStrategies[type](oldTimerange);
 };
-

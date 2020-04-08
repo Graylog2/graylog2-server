@@ -19,7 +19,7 @@ const TimeRangeOverrideTypeSelector = () => {
   return (
     <ButtonToolbar className="extended-search-timerange-chooser pull-left">
       <DropdownButton bsStyle="info"
-                      title={<Icon name="clock"/>}
+                      title={<Icon name="clock" />}
                       onSelect={onSelect}
                       id="dropdown-timerange-selector">
         <MenuItem eventKey="disabled"
