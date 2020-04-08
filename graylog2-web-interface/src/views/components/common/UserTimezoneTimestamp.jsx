@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-import { ActionContext } from 'views/logic/ActionContext';
+import CurrentUserContext from 'components/contexts/CurrentUserContext';
 
 import Timestamp from 'components/common/Timestamp';
 import DateTime from 'logic/datetimes/DateTime';
 
 const UserTimezoneTimestamp = ({ ...rest }) => {
-  const { currentUser: { timezone } = { timezone: 'UTC' } } = useContext(ActionContext);
-
+  const currentUser = useContext(CurrentUserContext);
+  const timezone = currentUser ? currentUser.timezone : 'UTC';
   return <Timestamp tz={timezone} format={DateTime.Formats.DATETIME_TZ} {...rest} />;
 };
 
