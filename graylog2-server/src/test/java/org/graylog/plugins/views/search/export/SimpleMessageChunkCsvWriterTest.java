@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
@@ -123,6 +124,6 @@ class SimpleMessageChunkCsvWriterTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new String(entityStream.toByteArray());
+        return new String(entityStream.toByteArray(), StandardCharsets.UTF_8);
     }
 }
