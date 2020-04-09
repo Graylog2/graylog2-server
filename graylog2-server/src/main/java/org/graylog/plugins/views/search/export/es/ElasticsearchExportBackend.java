@@ -56,7 +56,7 @@ import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 public class ElasticsearchExportBackend implements ExportBackend {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchExportBackend.class);
 
-    private static final int CHUNK_SIZE = 1000;
+    private static final int DEFAULT_CHUNK_SIZE = 1000;
     private static final String TIEBREAKER_FIELD = "gl2_message_id";
 
     private final JestClient jestClient;
@@ -123,7 +123,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
-                .size(CHUNK_SIZE);
+                .size(request.chunkSize().orElse(DEFAULT_CHUNK_SIZE));
 
         addSort(ssb, request.sort().get());
 

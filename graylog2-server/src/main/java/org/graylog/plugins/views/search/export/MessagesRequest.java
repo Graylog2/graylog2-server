@@ -48,6 +48,8 @@ public abstract class MessagesRequest {
 
     public abstract Optional<LinkedHashSet<Sort>> sort();
 
+    public abstract Optional<Integer> chunkSize();
+
     public static MessagesRequest empty() {
         return builder().build();
     }
@@ -100,6 +102,9 @@ public abstract class MessagesRequest {
 
         @JsonProperty
         public abstract Builder sort(LinkedHashSet<Sort> sort);
+
+        @JsonProperty("chunk_size")
+        public abstract Builder chunkSize(int chunkSize);
 
         abstract MessagesRequest autoBuild();
 
