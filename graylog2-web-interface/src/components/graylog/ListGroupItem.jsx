@@ -8,7 +8,7 @@ import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], -5);
+  const backgroundColor = util.colorLevel({ color: theme.color.variant.light[variant], level: -5 });
   const textColor = util.readableColor(backgroundColor);
 
   return css`

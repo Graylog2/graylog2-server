@@ -18,16 +18,16 @@ const { info, primary } = color.teinte.variant;
 
 <>
   <p>
-    <ColorSwatch name='info -5' color={util.colorLevel(info, -5)} />
+    <ColorSwatch name='info -5' color={util.colorLevel({ color: info, level: -5 })} />
     <ColorSwatch name='info' color={info} />
-    <ColorSwatch name='info +5' color={util.colorLevel(info, 5)} />
+    <ColorSwatch name='info +5' color={util.colorLevel({ color: info, level: 5 })} />
   </p>
   <p>
-    <ColorSwatch name='primary -8' color={util.colorLevel(primary, -8)} />
-    <ColorSwatch name='primary -2' color={util.colorLevel(primary, -2)} />
+    <ColorSwatch name='primary -8' color={util.colorLevel({ color: primary, level: -8 })} />
+    <ColorSwatch name='primary -2' color={util.colorLevel({ color: primary, level: -2 })} />
     <ColorSwatch name='primary' color={primary} />
-    <ColorSwatch name='primary +2' color={util.colorLevel(primary, 2)} />
-    <ColorSwatch name='primary +8' color={util.colorLevel(primary, 8)} />
+    <ColorSwatch name='primary +2' color={util.colorLevel({ color: primary, level: 2 })} />
+    <ColorSwatch name='primary +8' color={util.colorLevel({ color: primary, level: 8 })} />
   </p>
 </>
 ```

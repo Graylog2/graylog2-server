@@ -14,9 +14,9 @@ const VALID_STATES = ['error', 'warning', 'success'];
 
 const createCss = (validationState) => css(({ theme }) => {
   const variant = validationState === 'error' ? 'danger' : validationState;
-  const text = util.colorLevel(theme.color.variant[variant], 6);
+  const text = util.colorLevel({ color: theme.color.variant[variant], level: 6 });
   const border = theme.color.variant[variant];
-  const background = util.colorLevel(theme.color.variant[variant], -6);
+  const background = util.colorLevel({ color: theme.color.variant[variant], levev: -6 });
 
   return css`
     &.has-${validationState} {

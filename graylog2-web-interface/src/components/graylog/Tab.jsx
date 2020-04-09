@@ -6,7 +6,7 @@ import { util } from 'theme';
 
 const Tab = styled(BootstrapTab)(({ theme }) => css`
   background-color: ${theme.color.global.contentBackground};
-  border: 1px solid ${util.colorLevel(theme.color.variant.info, -5)};
+  border: 1px solid ${util.colorLevel({ color: theme.color.variant.info, level: -5 })};
   border-top: 0;
   border-radius: 0 0 4px 4px;
   padding: 9px;

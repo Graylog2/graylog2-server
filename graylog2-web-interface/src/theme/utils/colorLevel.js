@@ -1,13 +1,15 @@
 
 import chroma from 'chroma-js';
+import { memoize } from 'lodash';
 
 import { teinte } from 'theme/colors';
 
-const colorLevel = (colorHex, level = 0) => {
+const colorLevel = memoize(({ color, level = 0 }) => {
   /**
    * Recreating `color-level` from Bootstrap's SCSS functions
    * https://github.com/twbs/bootstrap/blob/08ba61e276a6393e8e2b97d56d2feb70a24fe22c/scss/_functions.scss#L97
    *
+   * Object containing a color and level with a positive or negative value
    * @param {string} color - any string that represents a color (ex: "#f00" or "rgb(255, 0, 0)")
    * @param {number} level - any positive or negative number
    */
@@ -16,7 +18,7 @@ const colorLevel = (colorHex, level = 0) => {
   const upperLevel = absLevel > 1 ? 1 : absLevel;
   const mixLevel = absLevel < 0 ? 0 : upperLevel;
 
-  return chroma.mix(colorBase, colorHex, mixLevel).css();
-};
+  return chroma.mix(colorBase, color, mixLevel).css();
+});
 
 export default colorLevel;

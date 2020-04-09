@@ -2,7 +2,7 @@ import { css } from 'styled-components';
 import { breakpoint, util } from 'theme';
 
 const navTabsStyles = css(({ theme }) => {
-  const borderColor = util.colorLevel(theme.color.variant.info, -5);
+  const borderColor = util.colorLevel({ color: theme.color.variant.info, level: -5 });
 
   return css`
     .nav-tabs {

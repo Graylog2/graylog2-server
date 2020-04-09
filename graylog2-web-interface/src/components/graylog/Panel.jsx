@@ -16,8 +16,8 @@ const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
 `);
 
 const panelVariantStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], -9);
-  const borderColor = util.colorLevel(theme.color.variant.dark[variant], -10);
+  const backgroundColor = util.colorLevel({ color: theme.color.variant.light[variant], level: -9 });
+  const borderColor = util.colorLevel({ color: theme.color.variant.dark[variant], level: -10 });
 
   return css`
     border-color: ${borderColor};
@@ -78,7 +78,7 @@ const deprecatedVariantStyles = (hex) => css(({ theme }) => {
     border-color: ${borderColor};
 
     & > .panel-heading {
-      color: ${util.colorLevel(backgroundColor, 9)};
+      color: ${util.colorLevel({ color: backgroundColor, level: 9 })};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 

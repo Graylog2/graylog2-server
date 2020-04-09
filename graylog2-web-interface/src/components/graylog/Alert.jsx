@@ -10,8 +10,8 @@ import bsStyleThemeVariant from './variants/bsStyle';
 const styleVariants = ['danger', 'info', 'success', 'warning'];
 
 const alertStyles = (hex) => {
-  const borderColor = util.colorLevel(hex, -7);
-  const backgroundColor = util.colorLevel(hex, -5);
+  const borderColor = util.colorLevel({ color: hex, level: -7 });
+  const backgroundColor = util.colorLevel({ color: hex, level: -5 });
 
   return css`
     background-color: ${backgroundColor};
