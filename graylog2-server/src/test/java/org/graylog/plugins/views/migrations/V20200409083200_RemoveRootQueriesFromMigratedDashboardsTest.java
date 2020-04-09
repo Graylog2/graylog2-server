@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.migrations.Migration;
@@ -18,17 +19,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.skyscreamer.jsonassert.JSONAssert;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import static com.mongodb.client.model.Filters.eq;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.migrations.V20200409083200_RemoveRootQueriesFromMigratedDashboards.MigrationCompleted;
 import static org.mockito.ArgumentMatchers.any;
@@ -89,32 +86,31 @@ public class V20200409083200_RemoveRootQueriesFromMigratedDashboardsTest {
     public void findsCorrectDocuments() throws JsonProcessingException, JSONException {
         migration.upgrade();
 
-        final ArrayList<Document> searches = mongodb.mongoConnection()
+        assertThat(rootQueryStrings("5d6ce7bd5d1eb45af534399e")).allMatch(String::isEmpty);
+        assertThat(rootQueryStrings("5da9bc1b3a6a1d0d2f07faf2")).allMatch(String::isEmpty);
+        assertThat(rootQueryStrings("5dad673d6131be4f08ceea77")).allMatch(String::isEmpty);
+        assertThat(rootQueryStrings("5dbbf604799412036075d78f")).allMatch(String::isEmpty);
+
+        assertThat(rootQueryStrings("5da9bbb944300ca38bc5da3e")).containsExactlyInAnyOrder("author:\"$author$\" AND project:\"graylog2-server\"", "author:\"$author$\"");
+        assertThat(rootQueryStrings("5da9bbba12993f3904b41217")).containsExactlyInAnyOrder("author:\"$author$\" AND project:\"graylog2-server\"", "author:\"$author$\"");
+    }
+
+    private MongoCollection<Document> afterSearchesCollection() {
+        return mongodb.mongoConnection()
                 .getMongoDatabase()
-                .getCollection("searches")
-                .find()
-                .into(new ArrayList<>());
-        JSONAssert.assertEquals(resourceFile("V20200409083200_RemoveRootQueriesFromMigratedDashboards/sample-expected.json"), toJSON(searches), false);
+                .getCollection("searches");
+    }
+    private List<String> rootQueryStrings(String searchId) {
+        //noinspection unchecked
+        return StreamSupport.stream(afterSearchesCollection().find(eq("_id", new ObjectId(searchId))).spliterator(), false)
+                .flatMap(root -> (Stream<Document>)root.get("queries", List.class).stream())
+                .map(query -> query.get("query", Document.class).getString("query_string"))
+                .collect(Collectors.toList());
     }
 
     private MigrationCompleted captureMigrationCompleted() {
         final ArgumentCaptor<MigrationCompleted> migrationCompletedCaptor = ArgumentCaptor.forClass(MigrationCompleted.class);
         verify(clusterConfigService, times(1)).write(migrationCompletedCaptor.capture());
         return migrationCompletedCaptor.getValue();
-    }
-
-    private String toJSON(Object object) throws JsonProcessingException {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
-    }
-
-    private String resourceFile(String filename) {
-        try {
-            final URL resource = this.getClass().getResource(filename);
-            final Path path = Paths.get(resource.toURI());
-            final byte[] bytes = Files.readAllBytes(path);
-            return new String(bytes, StandardCharsets.UTF_8);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
