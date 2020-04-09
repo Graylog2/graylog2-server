@@ -52,7 +52,13 @@ const webpackConfig = {
     rules: [
       { test: /\.js(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
       { test: /\.ts$/, use: [BABELLOADER, { loader: 'ts-loader' }], exclude: /node_modules|\.node_cache/ },
-      { test: /\.(woff(2)?|ttf|eot|svg)(\?.+)?$/, loader: 'file-loader' },
+      { test: /\.(svg)(\?.+)?$/, loader: 'file-loader' },
+      {
+        test: /\.(woff(2)?|ttf)(\?.+)?$/,
+        use: [{
+          loader: 'file-loader', options: { esModule: false },
+        }],
+      },
       { test: /\.(png|gif|jpg)(\?.+)?$/, use: 'url-loader' },
       {
         test: /bootstrap\.less$/,
