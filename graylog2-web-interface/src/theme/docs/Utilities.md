@@ -91,14 +91,14 @@ const { textDefault } = color.teinte.global;
 <>
   <p>
     <ColorSwatch name='info' color={info} />
-    <ColorSwatch name='info readableColor' color={util.readableColor(info)} />
+    <ColorSwatch name='info readableColor' color={util.readableColor({ color: info })} />
   </p>
   <p>
     <ColorSwatch name='textDefault' color={textDefault} />
-    <ColorSwatch name='textDefault readableColor' color={util.readableColor(textDefault)} />
+    <ColorSwatch name='textDefault readableColor' color={util.readableColor({ color: textDefault })} />
   </p>
   <p>
     <ColorSwatch name='primary' color={primary} />
-    <ColorSwatch name='primary readableColor' color={util.readableColor(primary)} />
+    <ColorSwatch name='primary readableColor' color={util.readableColor({ color: primary })} />
   </p>
 </>

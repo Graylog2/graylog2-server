@@ -16,7 +16,7 @@ const alertStyles = (hex) => {
   return css`
     background-color: ${backgroundColor};
     border-color: ${borderColor};
-    color: ${util.readableColor(backgroundColor)};
+    color: ${util.readableColor({ color: backgroundColor })};
 
     a:not(.btn) {
       color: ${util.contrastingColor({ color: backgroundColor, level: 'AA' })};

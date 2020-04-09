@@ -7,7 +7,7 @@ import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const cssBuilder = (backgroundColor) => {
-  const textColor = util.readableColor(backgroundColor);
+  const textColor = util.readableColor({ color: backgroundColor });
 
   return css`
     background-color: ${backgroundColor};

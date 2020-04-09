@@ -9,7 +9,7 @@ import bsStyleThemeVariant from './variants/bsStyle';
 
 const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
   const backgroundColor = util.colorLevel({ color: theme.color.variant.light[variant], level: -5 });
-  const textColor = util.readableColor(backgroundColor);
+  const textColor = util.readableColor({ color: backgroundColor });
 
   return css`
     &.list-group-item-${variant} {
@@ -34,7 +34,7 @@ const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
         &.active,
         &.active:hover,
         &.active:focus {
-          color: ${util.readableColor(theme.color.variant.light[variant])};
+          color: ${util.readableColor({ color: theme.color.variant.light[variant] })};
           background-color: ${theme.color.variant.light[variant]};
           border-color: ${theme.color.variant.light[variant]};
         }
@@ -99,16 +99,16 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     &:hover:not(.disabled),
     &:focus:not(.disabled) {
       background-color: ${theme.color.gray[40]};
-      color: ${util.readableColor(theme.color.gray[40])};
+      color: ${util.readableColor({ color: theme.color.gray[40] })};
 
       &.active {
-        color: ${util.readableColor(theme.color.variant.primary)};
+        color: ${util.readableColor({ color: theme.color.variant.primary })};
         border-color: ${theme.color.variant.primary};
         background-color: ${theme.color.variant.primary};
       }
 
       .list-group-item-heading {
-        color: ${util.readableColor(theme.color.gray[40])};
+        color: ${util.readableColor({ color: theme.color.gray[40] })};
       }
     }
   }
