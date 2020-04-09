@@ -7,6 +7,7 @@ import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
+import 'opensans-npm-webfont';
 import 'bootstrap/less/bootstrap.less';
 import 'stylesheets/bootstrap-submenus.less';
 import 'toastr/toastr.less';
