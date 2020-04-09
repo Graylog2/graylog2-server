@@ -1,0 +1,6 @@
+rule "stringConcat"
+when true
+then
+    let result = "aa" + "bb";
+    set_field("result", result);
+end

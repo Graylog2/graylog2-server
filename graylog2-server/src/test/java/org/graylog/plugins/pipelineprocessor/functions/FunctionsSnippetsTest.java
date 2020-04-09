@@ -363,6 +363,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void string_concat(){
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
+
+        assertThat(message.hasField("result")).isTrue();
+        assertThat(message.getField("result")).isEqualTo("aabb");
+    }
+
+    @Test
     public void jsonpath() {
         final String json = "{\n" +
                 "    \"store\": {\n" +
