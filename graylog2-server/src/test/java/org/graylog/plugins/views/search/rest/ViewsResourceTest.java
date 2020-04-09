@@ -131,16 +131,6 @@ public class ViewsResourceTest {
     }
 
     @Test
-    public void shouldNotCreateASearchWithoutPermission() throws Exception {
-        when(view.type()).thenReturn(ViewDTO.Type.SEARCH);
-
-        when(subject.isPermitted("views:edit")).thenReturn(false);
-
-        assertThatThrownBy(() -> this.viewsResource.create(view))
-                .isInstanceOf(ForbiddenException.class);
-    }
-
-    @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
         expectedException.expect(NotFoundException.class);
