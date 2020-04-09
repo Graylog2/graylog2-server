@@ -85,7 +85,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -169,8 +169,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -595,7 +595,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>
@@ -692,7 +692,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -776,8 +776,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -1202,7 +1202,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>
@@ -1299,7 +1299,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -1383,8 +1383,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -1866,7 +1866,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>
@@ -1963,7 +1963,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -2047,8 +2047,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -2530,7 +2530,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>
@@ -2627,7 +2627,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -2711,8 +2711,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -3194,7 +3194,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>
@@ -3291,7 +3291,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -3375,8 +3375,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -3858,7 +3858,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>
@@ -3955,7 +3955,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -4039,8 +4039,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -4522,7 +4522,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>
@@ -4619,7 +4619,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -4703,8 +4703,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -5186,7 +5186,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>
@@ -5283,7 +5283,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 <div
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
-                  <Component
+                  <ForwardRef
                     bsStyle="default"
                     onClick={[Function]}
                   >
@@ -5367,8 +5367,8 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
-                  <Component
+                  </ForwardRef>
+                  <ForwardRef
                     bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
@@ -5850,7 +5850,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         </DropdownButton>
                       </StyledComponent>
                     </DropdownButton__StyledDropdownButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </ButtonGroup>
             </StyledComponent>

@@ -83,7 +83,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="submit-button"
               disabled={false}
@@ -157,7 +157,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
           <div
             className="form-group"
@@ -167,7 +167,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="reset-button"
               onClick={[Function]}
@@ -243,7 +243,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
         </form>
       </div>
@@ -323,7 +323,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
       Parameters list
     </h2>
     <br />
-    <Component
+    <ForwardRef
       bsSize="small"
       bsStyle="info"
       onClick={[Function]}
@@ -401,7 +401,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
           </Button>
         </StyledComponent>
       </Button__StyledButton>
-    </Component>
+    </ForwardRef>
     <BootstrapModalWrapper
       backdrop="static"
       bsSize="large"
@@ -577,7 +577,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="submit-button"
               disabled={false}
@@ -651,7 +651,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
           <div
             className="form-group"
@@ -661,7 +661,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="reset-button"
               onClick={[Function]}
@@ -737,7 +737,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
         </form>
       </div>
@@ -883,7 +883,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="submit-button"
               disabled={false}
@@ -957,7 +957,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
           <div
             className="form-group"
@@ -967,7 +967,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="reset-button"
               onClick={[Function]}
@@ -1043,7 +1043,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
         </form>
       </div>
@@ -1309,7 +1309,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
       Parameters list
     </h2>
     <br />
-    <Component
+    <ForwardRef
       bsSize="small"
       bsStyle="info"
       onClick={[Function]}
@@ -1387,7 +1387,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
           </Button>
         </StyledComponent>
       </Button__StyledButton>
-    </Component>
+    </ForwardRef>
     <BootstrapModalWrapper
       backdrop="static"
       bsSize="large"
@@ -1563,7 +1563,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="submit-button"
               disabled={false}
@@ -1637,7 +1637,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
           <div
             className="form-group"
@@ -1647,7 +1647,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="reset-button"
               onClick={[Function]}
@@ -1723,7 +1723,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
         </form>
       </div>
@@ -1961,7 +1961,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                             className="btn-toolbar"
                             role="toolbar"
                           >
-                            <Component
+                            <ForwardRef
                               bsSize="xs"
                               bsStyle="primary"
                               disabled={false}
@@ -2042,8 +2042,8 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
-                            <Component
+                            </ForwardRef>
+                            <ForwardRef
                               bsSize="xsmall"
                               bsStyle="info"
                               onClick={[Function]}
@@ -2121,7 +2121,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
+                            </ForwardRef>
                             <BootstrapModalWrapper
                               backdrop="static"
                               bsSize="large"

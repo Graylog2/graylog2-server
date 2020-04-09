@@ -561,7 +561,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         </Component>
                                                       </Input>
                                                     </TypeAheadInput>
-                                                    <Component
+                                                    <ForwardRef
                                                       bsStyle="default"
                                                       style={
                                                         Object {
@@ -654,8 +654,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           </Button>
                                                         </StyledComponent>
                                                       </Button__StyledButton>
-                                                    </Component>
-                                                    <Component
+                                                    </ForwardRef>
+                                                    <ForwardRef
                                                       bsStyle="default"
                                                       disabled={true}
                                                       onClick={[Function]}
@@ -756,7 +756,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           </Button>
                                                         </StyledComponent>
                                                       </Button__StyledButton>
-                                                    </Component>
+                                                    </ForwardRef>
                                                   </form>
                                                   <ul
                                                     className="pill-list"
@@ -1000,7 +1000,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   <div
                                                                     className="btn-group btn-group-sm"
                                                                   >
-                                                                    <Component
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -1072,8 +1072,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
-                                                                    <Component
+                                                                    </ForwardRef>
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -1145,7 +1145,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
+                                                                    </ForwardRef>
                                                                   </div>
                                                                 </ButtonGroup>
                                                               </div>
@@ -1328,7 +1328,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   <div
                                                                     className="btn-group btn-group-sm"
                                                                   >
-                                                                    <Component
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -1400,8 +1400,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
-                                                                    <Component
+                                                                    </ForwardRef>
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -1473,7 +1473,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
+                                                                    </ForwardRef>
                                                                   </div>
                                                                 </ButtonGroup>
                                                               </div>
@@ -1947,7 +1947,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         </Component>
                                                       </Input>
                                                     </TypeAheadInput>
-                                                    <Component
+                                                    <ForwardRef
                                                       bsStyle="default"
                                                       style={
                                                         Object {
@@ -2040,8 +2040,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           </Button>
                                                         </StyledComponent>
                                                       </Button__StyledButton>
-                                                    </Component>
-                                                    <Component
+                                                    </ForwardRef>
+                                                    <ForwardRef
                                                       bsStyle="default"
                                                       disabled={true}
                                                       onClick={[Function]}
@@ -2142,7 +2142,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           </Button>
                                                         </StyledComponent>
                                                       </Button__StyledButton>
-                                                    </Component>
+                                                    </ForwardRef>
                                                   </form>
                                                   <ul
                                                     className="pill-list"
@@ -2386,7 +2386,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   <div
                                                                     className="btn-group btn-group-sm"
                                                                   >
-                                                                    <Component
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -2458,8 +2458,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
-                                                                    <Component
+                                                                    </ForwardRef>
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -2531,7 +2531,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
+                                                                    </ForwardRef>
                                                                   </div>
                                                                 </ButtonGroup>
                                                               </div>
@@ -2714,7 +2714,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   <div
                                                                     className="btn-group btn-group-sm"
                                                                   >
-                                                                    <Component
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -2786,8 +2786,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
-                                                                    <Component
+                                                                    </ForwardRef>
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -2859,7 +2859,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
+                                                                    </ForwardRef>
                                                                   </div>
                                                                 </ButtonGroup>
                                                               </div>
@@ -3575,7 +3575,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         </Component>
                                                       </Input>
                                                     </TypeAheadInput>
-                                                    <Component
+                                                    <ForwardRef
                                                       bsStyle="default"
                                                       style={
                                                         Object {
@@ -3668,8 +3668,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                           </Button>
                                                         </StyledComponent>
                                                       </Button__StyledButton>
-                                                    </Component>
-                                                    <Component
+                                                    </ForwardRef>
+                                                    <ForwardRef
                                                       bsStyle="default"
                                                       disabled={true}
                                                       onClick={[Function]}
@@ -3770,7 +3770,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                           </Button>
                                                         </StyledComponent>
                                                       </Button__StyledButton>
-                                                    </Component>
+                                                    </ForwardRef>
                                                   </form>
                                                   <ul
                                                     className="pill-list"
@@ -4014,7 +4014,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   <div
                                                                     className="btn-group btn-group-sm"
                                                                   >
-                                                                    <Component
+                                                                    <ForwardRef
                                                                       active={true}
                                                                       bsStyle="info"
                                                                       onClick={[Function]}
@@ -4086,8 +4086,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
-                                                                    <Component
+                                                                    </ForwardRef>
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -4159,7 +4159,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
+                                                                    </ForwardRef>
                                                                   </div>
                                                                 </ButtonGroup>
                                                               </div>
@@ -4342,7 +4342,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   <div
                                                                     className="btn-group btn-group-sm"
                                                                   >
-                                                                    <Component
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -4414,8 +4414,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
-                                                                    <Component
+                                                                    </ForwardRef>
+                                                                    <ForwardRef
                                                                       active={true}
                                                                       bsStyle="info"
                                                                       onClick={[Function]}
@@ -4487,7 +4487,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
+                                                                    </ForwardRef>
                                                                   </div>
                                                                 </ButtonGroup>
                                                               </div>
@@ -4961,7 +4961,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         </Component>
                                                       </Input>
                                                     </TypeAheadInput>
-                                                    <Component
+                                                    <ForwardRef
                                                       bsStyle="default"
                                                       style={
                                                         Object {
@@ -5054,8 +5054,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                           </Button>
                                                         </StyledComponent>
                                                       </Button__StyledButton>
-                                                    </Component>
-                                                    <Component
+                                                    </ForwardRef>
+                                                    <ForwardRef
                                                       bsStyle="default"
                                                       disabled={true}
                                                       onClick={[Function]}
@@ -5156,7 +5156,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                           </Button>
                                                         </StyledComponent>
                                                       </Button__StyledButton>
-                                                    </Component>
+                                                    </ForwardRef>
                                                   </form>
                                                   <ul
                                                     className="pill-list"
@@ -5400,7 +5400,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   <div
                                                                     className="btn-group btn-group-sm"
                                                                   >
-                                                                    <Component
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -5472,8 +5472,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
-                                                                    <Component
+                                                                    </ForwardRef>
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -5545,7 +5545,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
+                                                                    </ForwardRef>
                                                                   </div>
                                                                 </ButtonGroup>
                                                               </div>
@@ -5728,7 +5728,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   <div
                                                                     className="btn-group btn-group-sm"
                                                                   >
-                                                                    <Component
+                                                                    <ForwardRef
                                                                       active={true}
                                                                       bsStyle="info"
                                                                       onClick={[Function]}
@@ -5800,8 +5800,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
-                                                                    <Component
+                                                                    </ForwardRef>
+                                                                    <ForwardRef
                                                                       active={false}
                                                                       bsStyle="default"
                                                                       onClick={[Function]}
@@ -5873,7 +5873,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                           </Button>
                                                                         </StyledComponent>
                                                                       </Button__StyledButton>
-                                                                    </Component>
+                                                                    </ForwardRef>
                                                                   </div>
                                                                 </ButtonGroup>
                                                               </div>

@@ -103,7 +103,7 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
               onlyActiveOnIndex={false}
               to="/path/to/views"
             >
-              <Component
+              <ForwardRef
                 action="push"
                 bsStyle="success"
                 onClick={[Function]}
@@ -181,7 +181,7 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </Component>
+              </ForwardRef>
             </LinkContainer>
           </div>
         </Col>

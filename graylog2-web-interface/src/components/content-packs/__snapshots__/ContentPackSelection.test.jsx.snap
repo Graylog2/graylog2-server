@@ -1311,7 +1311,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                       }
                     }
                   >
-                    <Component
+                    <ForwardRef
                       bsStyle="default"
                       className="submit-button"
                       disabled={false}
@@ -1385,7 +1385,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Component>
+                    </ForwardRef>
                   </div>
                   <div
                     className="form-group"
@@ -1395,7 +1395,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                       }
                     }
                   >
-                    <Component
+                    <ForwardRef
                       bsStyle="default"
                       className="reset-button"
                       onClick={[Function]}
@@ -1471,7 +1471,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Component>
+                    </ForwardRef>
                   </div>
                 </form>
               </div>
@@ -2915,7 +2915,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       }
                     }
                   >
-                    <Component
+                    <ForwardRef
                       bsStyle="default"
                       className="submit-button"
                       disabled={false}
@@ -2989,7 +2989,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Component>
+                    </ForwardRef>
                   </div>
                   <div
                     className="form-group"
@@ -2999,7 +2999,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       }
                     }
                   >
-                    <Component
+                    <ForwardRef
                       bsStyle="default"
                       className="reset-button"
                       onClick={[Function]}
@@ -3075,7 +3075,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Component>
+                    </ForwardRef>
                   </div>
                 </form>
               </div>

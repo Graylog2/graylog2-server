@@ -7108,7 +7108,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                           className="btn-toolbar"
                           role="toolbar"
                         >
-                          <Component
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -7198,8 +7198,8 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -7289,8 +7289,8 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -7363,7 +7363,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </div>
@@ -12524,7 +12524,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                           className="btn-toolbar"
                           role="toolbar"
                         >
-                          <Component
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -12614,8 +12614,8 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -12705,8 +12705,8 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -12779,7 +12779,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </div>
@@ -19919,7 +19919,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                           className="btn-toolbar"
                           role="toolbar"
                         >
-                          <Component
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -20009,8 +20009,8 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -20100,8 +20100,8 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
@@ -20174,7 +20174,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </div>
@@ -27162,7 +27162,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     className="btn-toolbar"
                                     role="toolbar"
                                   >
-                                    <Component
+                                    <ForwardRef
                                       bsSize="sm"
                                       bsStyle="default"
                                       onClick={[Function]}
@@ -27252,8 +27252,8 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           </Button>
                                         </StyledComponent>
                                       </Button__StyledButton>
-                                    </Component>
-                                    <Component
+                                    </ForwardRef>
+                                    <ForwardRef
                                       bsSize="sm"
                                       bsStyle="default"
                                       onClick={[Function]}
@@ -27343,8 +27343,8 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           </Button>
                                         </StyledComponent>
                                       </Button__StyledButton>
-                                    </Component>
-                                    <Component
+                                    </ForwardRef>
+                                    <ForwardRef
                                       bsSize="sm"
                                       bsStyle="default"
                                       onClick={[Function]}
@@ -27417,7 +27417,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           </Button>
                                         </StyledComponent>
                                       </Button__StyledButton>
-                                    </Component>
+                                    </ForwardRef>
                                   </div>
                                 </ButtonToolbar>
                               </div>
@@ -34474,7 +34474,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 className="btn-toolbar"
                                 role="toolbar"
                               >
-                                <Component
+                                <ForwardRef
                                   bsSize="sm"
                                   bsStyle="default"
                                   onClick={[Function]}
@@ -34564,8 +34564,8 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       </Button>
                                     </StyledComponent>
                                   </Button__StyledButton>
-                                </Component>
-                                <Component
+                                </ForwardRef>
+                                <ForwardRef
                                   bsSize="sm"
                                   bsStyle="default"
                                   onClick={[Function]}
@@ -34655,8 +34655,8 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       </Button>
                                     </StyledComponent>
                                   </Button__StyledButton>
-                                </Component>
-                                <Component
+                                </ForwardRef>
+                                <ForwardRef
                                   bsSize="sm"
                                   bsStyle="default"
                                   onClick={[Function]}
@@ -34729,7 +34729,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       </Button>
                                     </StyledComponent>
                                   </Button__StyledButton>
-                                </Component>
+                                </ForwardRef>
                               </div>
                             </ButtonToolbar>
                           </div>
@@ -41473,7 +41473,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                       className="btn-toolbar"
                       role="toolbar"
                     >
-                      <Component
+                      <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
@@ -41563,8 +41563,8 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
-                      <Component
+                      </ForwardRef>
+                      <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
@@ -41654,8 +41654,8 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
-                      <Component
+                      </ForwardRef>
+                      <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
@@ -41728,7 +41728,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
+                      </ForwardRef>
                     </div>
                   </ButtonToolbar>
                 </div>
@@ -48733,7 +48733,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                       className="btn-toolbar"
                       role="toolbar"
                     >
-                      <Component
+                      <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
@@ -48823,8 +48823,8 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
-                      <Component
+                      </ForwardRef>
+                      <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
@@ -48914,8 +48914,8 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
-                      <Component
+                      </ForwardRef>
+                      <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
@@ -48988,7 +48988,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
+                      </ForwardRef>
                     </div>
                   </ButtonToolbar>
                 </div>

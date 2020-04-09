@@ -229,7 +229,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           className="pull-right btn-toolbar"
                           role="toolbar"
                         >
-                          <Component
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="success"
                             onClick={[Function]}
@@ -302,8 +302,8 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             id="action-1"
@@ -701,7 +701,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 </DropdownButton>
                               </StyledComponent>
                             </DropdownButton__StyledDropdownButton>
-                          </Component>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </td>
@@ -870,7 +870,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           className="pull-right btn-toolbar"
                           role="toolbar"
                         >
-                          <Component
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="success"
                             onClick={[Function]}
@@ -943,8 +943,8 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             id="action-2"
@@ -1342,7 +1342,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 </DropdownButton>
                               </StyledComponent>
                             </DropdownButton__StyledDropdownButton>
-                          </Component>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </td>
@@ -1511,7 +1511,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           className="pull-right btn-toolbar"
                           role="toolbar"
                         >
-                          <Component
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="success"
                             onClick={[Function]}
@@ -1584,8 +1584,8 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             id="action-3"
@@ -1983,7 +1983,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 </DropdownButton>
                               </StyledComponent>
                             </DropdownButton__StyledDropdownButton>
-                          </Component>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </td>
@@ -2152,7 +2152,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           className="pull-right btn-toolbar"
                           role="toolbar"
                         >
-                          <Component
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="success"
                             onClick={[Function]}
@@ -2225,8 +2225,8 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 </Button>
                               </StyledComponent>
                             </Button__StyledButton>
-                          </Component>
-                          <Component
+                          </ForwardRef>
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             id="action-4"
@@ -2624,7 +2624,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 </DropdownButton>
                               </StyledComponent>
                             </DropdownButton__StyledDropdownButton>
-                          </Component>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </td>

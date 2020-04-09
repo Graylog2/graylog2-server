@@ -155,7 +155,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
               <div
                 className="col-sm-2"
               >
-                <Component
+                <ForwardRef
                   bsStyle="primary"
                   disabled={true}
                   id="create-token"
@@ -231,7 +231,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
               </div>
             </Col>
           </div>
@@ -490,7 +490,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           </Component>
                         </Input>
                       </TypeAheadInput>
-                      <Component
+                      <ForwardRef
                         bsStyle="default"
                         style={
                           Object {
@@ -583,8 +583,8 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
-                      <Component
+                      </ForwardRef>
+                      <ForwardRef
                         bsStyle="default"
                         disabled={true}
                         onClick={[Function]}
@@ -685,7 +685,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
+                      </ForwardRef>
                     </form>
                     <ul
                       className="pill-list"
@@ -1017,7 +1017,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               <div
                 className="col-sm-2"
               >
-                <Component
+                <ForwardRef
                   bsStyle="primary"
                   disabled={true}
                   id="create-token"
@@ -1093,7 +1093,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
               </div>
             </Col>
           </div>
@@ -1378,7 +1378,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           </Component>
                         </Input>
                       </TypeAheadInput>
-                      <Component
+                      <ForwardRef
                         bsStyle="default"
                         style={
                           Object {
@@ -1471,8 +1471,8 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
-                      <Component
+                      </ForwardRef>
+                      <ForwardRef
                         bsStyle="default"
                         disabled={true}
                         onClick={[Function]}
@@ -1573,7 +1573,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             </Button>
                           </StyledComponent>
                         </Button__StyledButton>
-                      </Component>
+                      </ForwardRef>
                     </form>
                     <ul
                       className="pill-list"
@@ -1715,7 +1715,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                         text="beef2001"
                                         title="Copy to clipboard"
                                       />
-                                      <Component
+                                      <ForwardRef
                                         bsSize="xsmall"
                                         bsStyle="primary"
                                         disabled={false}
@@ -1791,7 +1791,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                             </Button>
                                           </StyledComponent>
                                         </Button__StyledButton>
-                                      </Component>
+                                      </ForwardRef>
                                     </div>
                                   </ButtonGroup>
                                 </div>
@@ -1872,7 +1872,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                         text="beef2002"
                                         title="Copy to clipboard"
                                       />
-                                      <Component
+                                      <ForwardRef
                                         bsSize="xsmall"
                                         bsStyle="primary"
                                         disabled={false}
@@ -1948,7 +1948,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                             </Button>
                                           </StyledComponent>
                                         </Button__StyledButton>
-                                      </Component>
+                                      </ForwardRef>
                                     </div>
                                   </ButtonGroup>
                                 </div>

@@ -563,7 +563,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             <span
                               className="addButton"
                             >
-                              <Component
+                              <ForwardRef
                                 bsSize="xsmall"
                                 bsStyle="primary"
                                 onClick={[Function]}
@@ -636,7 +636,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                     </Button>
                                   </StyledComponent>
                                 </Button__StyledButton>
-                              </Component>
+                              </ForwardRef>
                             </span>
                           </p>
                         </span>
@@ -718,7 +718,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             <span
                               className="addButton"
                             >
-                              <Component
+                              <ForwardRef
                                 bsSize="xsmall"
                                 bsStyle="primary"
                                 onClick={[Function]}
@@ -791,7 +791,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                     </Button>
                                   </StyledComponent>
                                 </Button__StyledButton>
-                              </Component>
+                              </ForwardRef>
                             </span>
                           </p>
                         </span>
@@ -873,7 +873,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             <span
                               className="addButton"
                             >
-                              <Component
+                              <ForwardRef
                                 bsSize="xsmall"
                                 bsStyle="primary"
                                 onClick={[Function]}
@@ -946,7 +946,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                     </Button>
                                   </StyledComponent>
                                 </Button__StyledButton>
-                              </Component>
+                              </ForwardRef>
                             </span>
                           </p>
                         </span>

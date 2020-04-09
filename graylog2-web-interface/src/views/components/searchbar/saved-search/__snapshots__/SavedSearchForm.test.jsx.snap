@@ -303,7 +303,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                 </StyledComponent>
                               </FormGroup__StyledFormGroup>
                             </Component>
-                            <Component
+                            <ForwardRef
                               bsStyle="info"
                               className="button"
                               disabled={false}
@@ -382,8 +382,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
-                            <Component
+                            </ForwardRef>
+                            <ForwardRef
                               bsStyle="default"
                               className="button"
                               onClick={[Function]}
@@ -455,7 +455,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
+                            </ForwardRef>
                           </form>
                         </div>
                       </div>
@@ -775,7 +775,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                 </StyledComponent>
                               </FormGroup__StyledFormGroup>
                             </Component>
-                            <Component
+                            <ForwardRef
                               bsStyle="primary"
                               className="button"
                               onClick={[Function]}
@@ -851,8 +851,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
-                            <Component
+                            </ForwardRef>
+                            <ForwardRef
                               bsStyle="info"
                               className="button"
                               disabled={true}
@@ -931,8 +931,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
-                            <Component
+                            </ForwardRef>
+                            <ForwardRef
                               bsStyle="default"
                               className="button"
                               onClick={[Function]}
@@ -1004,7 +1004,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
+                            </ForwardRef>
                           </form>
                         </div>
                       </div>
@@ -1324,7 +1324,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                 </StyledComponent>
                               </FormGroup__StyledFormGroup>
                             </Component>
-                            <Component
+                            <ForwardRef
                               bsStyle="primary"
                               className="button"
                               onClick={[Function]}
@@ -1400,8 +1400,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
-                            <Component
+                            </ForwardRef>
+                            <ForwardRef
                               bsStyle="info"
                               className="button"
                               disabled={false}
@@ -1480,8 +1480,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
-                            <Component
+                            </ForwardRef>
+                            <ForwardRef
                               bsStyle="default"
                               className="button"
                               onClick={[Function]}
@@ -1553,7 +1553,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
+                            </ForwardRef>
                           </form>
                         </div>
                       </div>

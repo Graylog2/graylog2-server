@@ -137,7 +137,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   Parameters list
                 </h2>
                 <br />
-                <Component
+                <ForwardRef
                   bsSize="small"
                   bsStyle="info"
                   onClick={[Function]}
@@ -215,7 +215,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
                 <BootstrapModalWrapper
                   backdrop="static"
                   bsSize="large"
@@ -391,7 +391,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -465,7 +465,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -475,7 +475,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -551,7 +551,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>
@@ -789,7 +789,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                         className="btn-toolbar"
                                         role="toolbar"
                                       >
-                                        <Component
+                                        <ForwardRef
                                           bsSize="xs"
                                           bsStyle="primary"
                                           disabled={false}
@@ -870,8 +870,8 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               </Button>
                                             </StyledComponent>
                                           </Button__StyledButton>
-                                        </Component>
-                                        <Component
+                                        </ForwardRef>
+                                        <ForwardRef
                                           bsSize="xsmall"
                                           bsStyle="info"
                                           onClick={[Function]}
@@ -949,7 +949,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               </Button>
                                             </StyledComponent>
                                           </Button__StyledButton>
-                                        </Component>
+                                        </ForwardRef>
                                         <BootstrapModalWrapper
                                           backdrop="static"
                                           bsSize="large"
@@ -1341,7 +1341,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -1415,7 +1415,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -1425,7 +1425,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -1501,7 +1501,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>
@@ -1728,7 +1728,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                         className="btn-toolbar"
                                         role="toolbar"
                                       >
-                                        <Component
+                                        <ForwardRef
                                           bsSize="xs"
                                           bsStyle="primary"
                                           disabled={false}
@@ -1804,8 +1804,8 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               </Button>
                                             </StyledComponent>
                                           </Button__StyledButton>
-                                        </Component>
-                                        <Component
+                                        </ForwardRef>
+                                        <ForwardRef
                                           bsSize="xs"
                                           bsStyle="info"
                                           onClick={[Function]}
@@ -1878,7 +1878,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               </Button>
                                             </StyledComponent>
                                           </Button__StyledButton>
-                                        </Component>
+                                        </ForwardRef>
                                       </div>
                                     </ButtonToolbar>
                                   </td>
@@ -2174,7 +2174,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   Parameters list
                 </h2>
                 <br />
-                <Component
+                <ForwardRef
                   bsSize="small"
                   bsStyle="info"
                   onClick={[Function]}
@@ -2252,7 +2252,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
                 <BootstrapModalWrapper
                   backdrop="static"
                   bsSize="large"
@@ -2428,7 +2428,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -2502,7 +2502,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -2512,7 +2512,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -2588,7 +2588,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>
@@ -2858,7 +2858,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -2932,7 +2932,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -2942,7 +2942,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -3018,7 +3018,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>

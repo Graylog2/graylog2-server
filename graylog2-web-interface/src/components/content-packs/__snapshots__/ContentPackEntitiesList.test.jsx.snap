@@ -74,7 +74,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="submit-button"
               disabled={false}
@@ -148,7 +148,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
           <div
             className="form-group"
@@ -158,7 +158,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="reset-button"
               onClick={[Function]}
@@ -234,7 +234,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
         </form>
       </div>
@@ -441,7 +441,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="submit-button"
               disabled={false}
@@ -515,7 +515,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
           <div
             className="form-group"
@@ -525,7 +525,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
               }
             }
           >
-            <Component
+            <ForwardRef
               bsStyle="default"
               className="reset-button"
               onClick={[Function]}
@@ -601,7 +601,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
           </div>
         </form>
       </div>
@@ -849,7 +849,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                             className="btn-toolbar"
                             role="toolbar"
                           >
-                            <Component
+                            <ForwardRef
                               bsSize="xs"
                               bsStyle="primary"
                               disabled={false}
@@ -925,8 +925,8 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
-                            <Component
+                            </ForwardRef>
+                            <ForwardRef
                               bsSize="xs"
                               bsStyle="info"
                               onClick={[Function]}
@@ -999,7 +999,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
+                            </ForwardRef>
                           </div>
                         </ButtonToolbar>
                       </td>
@@ -1316,7 +1316,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                             className="btn-toolbar"
                             role="toolbar"
                           >
-                            <Component
+                            <ForwardRef
                               bsSize="xs"
                               bsStyle="primary"
                               disabled={false}
@@ -1392,8 +1392,8 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
-                            <Component
+                            </ForwardRef>
+                            <ForwardRef
                               bsSize="xs"
                               bsStyle="info"
                               onClick={[Function]}
@@ -1466,7 +1466,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                   </Button>
                                 </StyledComponent>
                               </Button__StyledButton>
-                            </Component>
+                            </ForwardRef>
                           </div>
                         </ButtonToolbar>
                       </td>

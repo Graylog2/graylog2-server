@@ -168,7 +168,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       </FormGroup__StyledFormGroup>
     </Component>
   </Input>
-  <Component
+  <ForwardRef
     bsSize="sm"
     bsStyle="default"
     onClick={[Function]}
@@ -241,7 +241,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
         </Button>
       </StyledComponent>
     </Button__StyledButton>
-  </Component>
+  </ForwardRef>
   <UrlWhiteListForm__StyledTable
     bordered={true}
     striped={true}
@@ -2158,7 +2158,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                 </Input>
               </td>
               <td>
-                <Component
+                <ForwardRef
                   bsStyle="default"
                   onClick={[Function]}
                 >
@@ -2242,7 +2242,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
               </td>
             </tr>
             <tr
@@ -4095,7 +4095,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                 </Input>
               </td>
               <td>
-                <Component
+                <ForwardRef
                   bsStyle="default"
                   onClick={[Function]}
                 >
@@ -4179,7 +4179,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
               </td>
             </tr>
             <tr
@@ -6032,7 +6032,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                 </Input>
               </td>
               <td>
-                <Component
+                <ForwardRef
                   bsStyle="default"
                   onClick={[Function]}
                 >
@@ -6116,7 +6116,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
               </td>
             </tr>
           </tbody>
@@ -6124,7 +6124,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       </Table>
     </StyledComponent>
   </UrlWhiteListForm__StyledTable>
-  <Component
+  <ForwardRef
     bsSize="sm"
     bsStyle="default"
     onClick={[Function]}
@@ -6197,6 +6197,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
         </Button>
       </StyledComponent>
     </Button__StyledButton>
-  </Component>
+  </ForwardRef>
 </UrlWhiteListForm>
 `;

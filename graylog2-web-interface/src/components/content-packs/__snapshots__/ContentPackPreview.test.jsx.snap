@@ -306,7 +306,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -380,7 +380,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -390,7 +390,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -466,7 +466,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>
@@ -598,7 +598,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -672,7 +672,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -682,7 +682,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -758,7 +758,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>
@@ -829,7 +829,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
           <div
             className="col-sm-6"
           >
-            <Component
+            <ForwardRef
               bsStyle="primary"
               id="create"
               onClick={[Function]}
@@ -903,13 +903,13 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
              
             <a
               download="content-pack-dead-beef-1.json"
               href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22%22%2C%0A%20%20%22summary%22%3A%20%22%22%2C%0A%20%20%22description%22%3A%20%22%22%2C%0A%20%20%22vendor%22%3A%20%22%22%2C%0A%20%20%22url%22%3A%20%22%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
             >
-              <Component
+              <ForwardRef
                 bsStyle="info"
                 id="download"
                 onClick={[Function]}
@@ -983,7 +983,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </Component>
+              </ForwardRef>
             </a>
           </div>
         </Col>
@@ -1358,7 +1358,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -1432,7 +1432,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -1442,7 +1442,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -1518,7 +1518,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>
@@ -1650,7 +1650,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -1724,7 +1724,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -1734,7 +1734,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -1810,7 +1810,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>
@@ -1881,7 +1881,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
           <div
             className="col-sm-6"
           >
-            <Component
+            <ForwardRef
               bsStyle="primary"
               id="create"
               onClick={[Function]}
@@ -1955,13 +1955,13 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                   </Button>
                 </StyledComponent>
               </Button__StyledButton>
-            </Component>
+            </ForwardRef>
              
             <a
               download="content-pack-dead-beef-1.json"
               href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22name%22%2C%0A%20%20%22summary%22%3A%20%22summary%22%2C%0A%20%20%22description%22%3A%20%22descr%22%2C%0A%20%20%22vendor%22%3A%20%22vendor%22%2C%0A%20%20%22url%22%3A%20%22http%3A%2F%2Fexample.com%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
             >
-              <Component
+              <ForwardRef
                 bsStyle="info"
                 id="download"
                 onClick={[Function]}
@@ -2035,7 +2035,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </Component>
+              </ForwardRef>
             </a>
           </div>
         </Col>

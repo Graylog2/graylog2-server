@@ -62,7 +62,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                 className="horizontalPreviousNextButtons btn-toolbar"
                 role="toolbar"
               >
-                <Component
+                <ForwardRef
                   bsSize="xsmall"
                   bsStyle="info"
                   disabled={true}
@@ -153,8 +153,8 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
-                <Component
+                </ForwardRef>
+                <ForwardRef
                   bsSize="xsmall"
                   bsStyle="info"
                   onClick={[Function]}
@@ -242,7 +242,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
               </div>
             </ButtonToolbar>
           </div>
@@ -472,7 +472,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                 className="horizontalPreviousNextButtons btn-toolbar"
                 role="toolbar"
               >
-                <Component
+                <ForwardRef
                   bsSize="xsmall"
                   bsStyle="info"
                   disabled={true}
@@ -563,8 +563,8 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
-                <Component
+                </ForwardRef>
+                <ForwardRef
                   bsSize="xsmall"
                   bsStyle="info"
                   onClick={[Function]}
@@ -652,7 +652,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                       </Button>
                     </StyledComponent>
                   </Button__StyledButton>
-                </Component>
+                </ForwardRef>
               </div>
             </ButtonToolbar>
           </div>
@@ -1046,7 +1046,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                 <div
                   className="col-xs-6"
                 >
-                  <Component
+                  <ForwardRef
                     bsSize="small"
                     bsStyle="info"
                     disabled={true}
@@ -1122,7 +1122,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </Col>
               <Col
@@ -1134,7 +1134,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                 <div
                   className="text-right col-xs-6"
                 >
-                  <Component
+                  <ForwardRef
                     bsSize="small"
                     bsStyle="info"
                     onClick={[Function]}
@@ -1207,7 +1207,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </Col>
             </div>
@@ -1445,7 +1445,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                 <div
                   className="col-xs-6"
                 >
-                  <Component
+                  <ForwardRef
                     bsSize="small"
                     bsStyle="info"
                     disabled={true}
@@ -1521,7 +1521,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </Col>
               <Col
@@ -1533,7 +1533,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                 <div
                   className="text-right col-xs-6"
                 >
-                  <Component
+                  <ForwardRef
                     bsSize="small"
                     bsStyle="info"
                     onClick={[Function]}
@@ -1606,7 +1606,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                         </Button>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Component>
+                  </ForwardRef>
                 </div>
               </Col>
             </div>

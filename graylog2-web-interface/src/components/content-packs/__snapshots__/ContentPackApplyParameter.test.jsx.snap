@@ -536,7 +536,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
             <div
               className="col-sm-2 col-sm-offset-10"
             >
-              <Component
+              <ForwardRef
                 bsStyle="primary"
                 disabled={true}
                 type="submit"
@@ -607,7 +607,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </Component>
+              </ForwardRef>
             </div>
           </Col>
         </div>
@@ -728,7 +728,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 PORT
                               </td>
                               <td>
-                                <Component
+                                <ForwardRef
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -801,7 +801,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                       </Button>
                                     </StyledComponent>
                                   </Button__StyledButton>
-                                </Component>
+                                </ForwardRef>
                               </td>
                             </tr>
                           </DataTableElement>
@@ -1337,7 +1337,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
             <div
               className="col-sm-2 col-sm-offset-10"
             >
-              <Component
+              <ForwardRef
                 bsStyle="primary"
                 disabled={true}
                 type="submit"
@@ -1408,7 +1408,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </Component>
+              </ForwardRef>
             </div>
           </Col>
         </div>
@@ -2016,7 +2016,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
             <div
               className="col-sm-2 col-sm-offset-10"
             >
-              <Component
+              <ForwardRef
                 bsStyle="primary"
                 disabled={true}
                 type="submit"
@@ -2087,7 +2087,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                     </Button>
                   </StyledComponent>
                 </Button__StyledButton>
-              </Component>
+              </ForwardRef>
             </div>
           </Col>
         </div>

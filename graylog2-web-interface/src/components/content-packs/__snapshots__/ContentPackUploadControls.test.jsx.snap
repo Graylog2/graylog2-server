@@ -3,7 +3,7 @@
 exports[`<ContentPackUploadControls /> should render 1`] = `
 <ContentPackUploadControls>
   <span>
-    <Component
+    <ForwardRef
       active={false}
       bsStyle="success"
       className="button"
@@ -83,7 +83,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
           </Button>
         </StyledComponent>
       </Button__StyledButton>
-    </Component>
+    </ForwardRef>
     <BootstrapModalForm
       cancelButtonText="Cancel"
       formProps={Object {}}

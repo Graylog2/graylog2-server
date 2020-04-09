@@ -627,7 +627,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -701,7 +701,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                       <div
                         className="form-group"
@@ -711,7 +711,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           }
                         }
                       >
-                        <Component
+                        <ForwardRef
                           bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
@@ -787,7 +787,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               </Button>
                             </StyledComponent>
                           </Button__StyledButton>
-                        </Component>
+                        </ForwardRef>
                       </div>
                     </form>
                   </div>
@@ -943,7 +943,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                         className="btn-toolbar"
                                         role="toolbar"
                                       >
-                                        <Component
+                                        <ForwardRef
                                           bsSize="xs"
                                           bsStyle="info"
                                           onClick={[Function]}
@@ -1016,7 +1016,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                               </Button>
                                             </StyledComponent>
                                           </Button__StyledButton>
-                                        </Component>
+                                        </ForwardRef>
                                       </div>
                                     </ButtonToolbar>
                                   </td>

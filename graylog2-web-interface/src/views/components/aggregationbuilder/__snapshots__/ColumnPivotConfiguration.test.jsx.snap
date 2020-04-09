@@ -160,7 +160,7 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
         }
       }
     >
-      <Component
+      <ForwardRef
         bsStyle="success"
         onClick={[Function]}
       >
@@ -229,7 +229,7 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
             </Button>
           </StyledComponent>
         </Button__StyledButton>
-      </Component>
+      </ForwardRef>
     </div>
   </div>
 </ColumnPivotConfiguration>

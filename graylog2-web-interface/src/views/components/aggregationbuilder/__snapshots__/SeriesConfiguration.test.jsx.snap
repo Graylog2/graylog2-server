@@ -205,7 +205,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
         }
       }
     >
-      <Component
+      <ForwardRef
         bsStyle="success"
         disabled={false}
         onClick={[Function]}
@@ -277,7 +277,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
             </Button>
           </StyledComponent>
         </Button__StyledButton>
-      </Component>
+      </ForwardRef>
     </div>
   </span>
 </SeriesConfiguration>
