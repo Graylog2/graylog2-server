@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MessagesExporter {
@@ -38,21 +39,21 @@ public class MessagesExporter {
         this.backend = backend;
     }
 
-    public void export(MessagesRequest request, ChunkForwarder<SimpleMessageChunk> chunkForwarder) {
+    public void export(MessagesRequest request, Consumer<SimpleMessageChunk> chunkForwarder) {
         MessagesRequest fullRequest = defaults.fillInIfNecessary(request);
 
-        backend.run(fullRequest, chunkForwarder::write, chunkForwarder::close);
+        backend.run(fullRequest, chunkForwarder);
     }
 
-    public void export(Search search, ResultFormat resultFormat, ChunkForwarder<SimpleMessageChunk> chunkForwarder) {
+    public void export(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
         exportWithRequestFrom(search, null, resultFormat, chunkForwarder);
     }
 
-    public void export(Search search, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<SimpleMessageChunk> chunkForwarder) {
+    public void export(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
         exportWithRequestFrom(search, searchTypeId, resultFormat, chunkForwarder);
     }
 
-    private void exportWithRequestFrom(Search search, String searchTypeId, ResultFormat resultFormat, ChunkForwarder<SimpleMessageChunk> chunkForwarder) {
+    private void exportWithRequestFrom(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
         MessagesRequest request = buildRequest(search, searchTypeId, resultFormat);
 
         export(request, chunkForwarder);

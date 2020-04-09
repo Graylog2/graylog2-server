@@ -65,7 +65,6 @@ class ElasticsearchExportBackendTest {
         }
 
         sut.run(request, x -> {
-        }, () -> {
         });
 
         assertThat(captor.getValue().getIndex()).isEqualTo("hasi,mausi");
@@ -76,7 +75,7 @@ class ElasticsearchExportBackendTest {
         MessagesRequest request = MessagesRequest.empty();
 
         assertThatExceptionOfType(ValidationException.class)
-                .isThrownBy(() -> sut.run(request, null, null));
+                .isThrownBy(() -> sut.run(request, null));
     }
 
     private MessagesRequest defaultMessagesRequestWithDummyStream() {

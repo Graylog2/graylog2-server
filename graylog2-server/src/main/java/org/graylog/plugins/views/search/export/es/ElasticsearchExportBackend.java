@@ -69,12 +69,10 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     @Override
-    public void run(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector, Runnable onDone) {
+    public void run(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector) {
         request.ensureCompleteness();
 
         fetchResults(request, chunkCollector);
-
-        onDone.run();
     }
 
     private void fetchResults(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector) {

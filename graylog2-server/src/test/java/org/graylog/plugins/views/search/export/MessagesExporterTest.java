@@ -314,25 +314,21 @@ class MessagesExporterTest {
     private MessagesRequest capture(Runnable call) {
         ArgumentCaptor<MessagesRequest> captor = ArgumentCaptor.forClass(MessagesRequest.class);
 
-        doNothing().when(backend).run(captor.capture(), any(), any());
+        doNothing().when(backend).run(captor.capture(), any());
 
         call.run();
 
         return captor.getValue();
     }
 
-    private ChunkForwarder<SimpleMessageChunk> dummyForwarder() {
-        return new ChunkForwarder<>(c -> {
-        }, () -> {
+    private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat) {
+        sut.export(search, searchTypeId, resultFormat, x -> {
         });
     }
 
-    private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat) {
-        sut.export(search, searchTypeId, resultFormat, dummyForwarder());
-    }
-
     private void exportSearch(Search search, ResultFormat resultFormat) {
-        sut.export(search, resultFormat, dummyForwarder());
+        sut.export(search, resultFormat, x -> {
+        });
     }
 
     private Search searchWithQueries(Query... queries) {

@@ -17,26 +17,17 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
-import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.PermissionException;
-import org.graylog.plugins.views.search.export.ChunkForwarder;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
-import org.graylog.plugins.views.search.export.ResultFormat;
-import org.graylog.plugins.views.search.export.SimpleMessage;
-import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
 
-import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -44,10 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MessagesResourceTest {
@@ -65,50 +53,12 @@ public class MessagesResourceTest {
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
         sut = new MessagesResource(exporter, mock(SearchDomain.class), executionGuard, permittedStreams);
-        sut.asyncRunner = Runnable::run;
-    }
 
-    @Test
-    void writesToChunkedOutputAsResultsComeIn() throws IOException {
-        MessagesRequest request = validRequest();
-
-        @SuppressWarnings("unchecked") ChunkedOutput<SimpleMessageChunk> output = mock(ChunkedOutput.class);
-
-        sut.chunkedOutputSupplier = () -> output;
-
-        ArgumentCaptor<ChunkForwarder<SimpleMessageChunk>> chunkForwarderArgumentCaptor = ArgumentCaptor.forClass(ChunkForwarder.class);
-        doNothing().when(exporter).export(any(), chunkForwarderArgumentCaptor.capture());
-
-        sut.retrieve(request);
-
-        verify(output, never()).write(any());
-
-        ChunkForwarder<SimpleMessageChunk> forwarder = chunkForwarderArgumentCaptor.getValue();
-
-        forwarder.write(singleMessage("field-1:a", "field-2:b"));
-        forwarder.write(singleMessage("field-1:c", "field-2:d"));
-        forwarder.close();
-
-        InOrder verifier = inOrder(output);
-
-        verifier.verify(output).write(singleMessage("field-1:a", "field-2:b"));
-        verifier.verify(output).write(singleMessage("field-1:c", "field-2:d"));
-        verifier.verify(output).close();
-    }
-
-    private SimpleMessageChunk singleMessage(String... fields) {
-        LinkedHashMap<String, Object> fieldsMap = new LinkedHashMap<>();
-        for (String field : fields) {
-            String[] split = field.split(":");
-            String name = split[0];
-            String value = split[1];
-            fieldsMap.put(name, value);
-        }
-        LinkedHashSet<SimpleMessage> messages = new LinkedHashSet<>(ImmutableSet.of(SimpleMessage.from(fieldsMap)));
-
-        LinkedHashSet<String> fieldNames = new LinkedHashSet<>(fieldsMap.keySet());
-
-        return SimpleMessageChunk.from(fieldNames, messages);
+        sut.asyncRunner = c -> {
+            c.accept(x -> {
+            });
+            return null;
+        };
     }
 
     @Test
@@ -139,43 +89,7 @@ public class MessagesResourceTest {
                 .withMessageContaining(exception.getMessage());
     }
 
-    //TODO: reimplement this stuff
-//    @Test
-//    void triggersBulkExport() {
-//        MessagesRequest request = validRequest();
-//
-//        Response response = sut.retrieve(request);
-//
-//        assertThat(response.getStatus()).isEqualTo(200);
-//        assertThat(response.getEntity()).isNotNull();
-//    }
-//
-//    @Test
-//    void responseHasFilenameHeader() {
-//        MessagesRequest request = validRequest();
-//
-//        Response response = sut.retrieve(request);
-//
-//        assertThat((String) response.getHeaders().getFirst("Content-Disposition"))
-//                .as("has header Content-Disposition")
-//                .endsWith(result.filename());
-//    }
-//
-//    @Test
-//    void triggersSearchTypeExport() {
-//        SearchTypeOverrides request = validOverrides();
-//
-//        Response response = sut.retrieveForSearchType("search-id", "search-type-id", request);
-//
-//        assertThat(response.getStatus()).isEqualTo(200);
-//        assertThat(response.getEntity()).isNotNull();
-//    }
-//
     private MessagesRequest validRequest() {
         return MessagesRequest.builder().build();
-    }
-
-    private ResultFormat validOverrides() {
-        return ResultFormat.builder().build();
     }
 }

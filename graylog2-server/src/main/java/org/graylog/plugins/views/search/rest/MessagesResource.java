@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -26,7 +25,7 @@ import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
-import org.graylog.plugins.views.search.export.ChunkForwarder;
+import org.graylog.plugins.views.search.export.ChunkedRunner;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
@@ -44,11 +43,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import java.io.IOException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
 
@@ -56,19 +52,14 @@ import static org.graylog.plugins.views.search.export.Defaults.createDefaultMess
 @Path("/views/search/messages")
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
+
     private final MessagesExporter exporter;
     private final SearchDomain searchDomain;
     private final SearchExecutionGuard executionGuard;
     private final PermittedStreams permittedStreams;
 
     //allow mocking
-    Supplier<ChunkedOutput<SimpleMessageChunk>> chunkedOutputSupplier = () -> new ChunkedOutput<>(SimpleMessageChunk.class);
-    Consumer<Runnable> asyncRunner = this::runAsync;
-
-    private void runAsync(Runnable runnable) {
-        Executor e = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("chunked-messages-request").build());
-        e.execute(runnable);
-    }
+    Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsyncc;
 
     @Inject
     public MessagesResource(MessagesExporter exporter, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams) {
@@ -82,14 +73,15 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
     public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam MessagesRequest request) {
-        final MessagesRequest req = defaultIfNecessary(request);
+        final MessagesRequest req = fillInIfNecessary(request);
 
+        //noinspection OptionalGetWithoutIsPresent
         executionGuard.checkUserIsPermittedToSeeStreams(req.streams().get(), this::hasStreamReadPermission);
 
-        return chunkedOutputFrom(fwd -> exporter.export(req, fwd));
+        return asyncRunner.apply(chunkConsumer -> exporter.export(req, chunkConsumer));
     }
 
-    private MessagesRequest defaultIfNecessary(MessagesRequest requestFromClient) {
+    private MessagesRequest fillInIfNecessary(MessagesRequest requestFromClient) {
         MessagesRequest request = requestFromClient != null ? requestFromClient : createDefaultMessagesRequest();
 
         if (!request.streams().isPresent()) {
@@ -109,7 +101,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         ResultFormat format = emptyIfNull(formatFromClient);
 
-        return chunkedOutputFrom(fwd -> exporter.export(search, format, fwd));
+        return asyncRunner.apply(chunkConsumer -> exporter.export(search, format, chunkConsumer));
     }
 
     @POST
@@ -124,7 +116,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         ResultFormat format = emptyIfNull(formatFromClient);
 
-        return chunkedOutputFrom(fwd -> exporter.export(search, searchTypeId, format, fwd));
+        return asyncRunner.apply(chunkConsumer -> exporter.export(search, searchTypeId, format, chunkConsumer));
     }
 
     private ResultFormat emptyIfNull(ResultFormat format) {
@@ -152,31 +144,5 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
     private boolean hasStreamReadPermission(String streamId) {
         return isPermitted(RestPermissions.STREAMS_READ, streamId);
-    }
-
-    private ChunkedOutput<SimpleMessageChunk> chunkedOutputFrom(Consumer<ChunkForwarder<SimpleMessageChunk>> call) {
-        ChunkedOutput<SimpleMessageChunk> output = chunkedOutputSupplier.get();
-
-        ChunkForwarder<SimpleMessageChunk> fwd = ChunkForwarder.create(chunk -> writeTo(output, chunk), () -> close(output));
-
-        asyncRunner.accept(() -> call.accept(fwd));
-
-        return output;
-    }
-
-    private void close(ChunkedOutput<SimpleMessageChunk> output) {
-        try {
-            output.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to close ChunkedOutput", e);
-        }
-    }
-
-    private void writeTo(ChunkedOutput<SimpleMessageChunk> output, SimpleMessageChunk chunk) {
-        try {
-            output.write(chunk);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to write to ChunkedOutput", e);
-        }
     }
 }

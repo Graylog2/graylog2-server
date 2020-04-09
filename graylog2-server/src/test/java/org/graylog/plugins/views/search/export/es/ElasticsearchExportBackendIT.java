@@ -32,10 +32,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
@@ -149,19 +147,6 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void notifiesDoneOnNoMoreResults() {
-        importFixture("messages.json");
-
-        MessagesRequest request = requestBuilderWithAllStreams().build();
-
-        List<String> invocations = new ArrayList<>();
-
-        sut.run(request, chunk -> invocations.add(String.valueOf(chunk.size())), () -> invocations.add("done"));
-
-        assertThat(invocations).containsExactly("4", "done");
-    }
-
-    @Test
     public void marksFirstChunk() {
         importFixture("messages.json");
 
@@ -212,8 +197,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     private LinkedHashSet<SimpleMessageChunk> collectChunksFor(MessagesRequest request) {
         LinkedHashSet<SimpleMessageChunk> allChunks = new LinkedHashSet<>();
 
-        sut.run(request, allChunks::add, () -> {
-        });
+        sut.run(request, allChunks::add);
         return allChunks;
     }
 
