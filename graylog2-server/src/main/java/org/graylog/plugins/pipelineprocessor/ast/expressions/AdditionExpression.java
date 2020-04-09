@@ -59,10 +59,8 @@ public class AdditionExpression extends BinaryExpression implements NumericExpre
         // special case for date arithmetic
         final boolean leftDate = DateTime.class.equals(leftValue.getClass());
         final boolean leftPeriod = Period.class.equals(leftValue.getClass());
-        final boolean leftString = String.class.equals(leftValue.getClass());
         final boolean rightDate = DateTime.class.equals(rightValue.getClass());
         final boolean rightPeriod = Period.class.equals(rightValue.getClass());
-        final boolean rightString = String.class.equals(rightValue.getClass());
         if (leftDate && rightPeriod) {
             final DateTime date = (DateTime) leftValue;
             final Period period = (Period) rightValue;
@@ -93,7 +91,7 @@ public class AdditionExpression extends BinaryExpression implements NumericExpre
             } else {
                 return new Duration(right, left);
             }
-        }else if( leftString && rightString){
+        }else if(String.class.equals(type) ){
             if(!isPlus){
                 return null;
             }
