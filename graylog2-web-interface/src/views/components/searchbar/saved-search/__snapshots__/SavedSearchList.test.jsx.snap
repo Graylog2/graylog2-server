@@ -241,7 +241,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
               class="list-group"
             >
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 vOBeV list-group-item"
                 type="button"
               >
                 test-0
