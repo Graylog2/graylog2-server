@@ -16,7 +16,7 @@ describe('SearchExecutionError', () => {
     const { getByText } = render(<SearchExecutionErrors errors={[commonError]} />);
     expect(getByText(/stream-id-1/)).not.toBeNull();
   });
-  it('displays error, with uncommen format', () => {
+  it('displays error, with uncommon format', () => {
     const uncommonError = { message: 'Uncommon error message' };
     const { getByText } = render(<SearchExecutionErrors errors={[uncommonError]} />);
     expect(getByText(/Uncommon error message/)).not.toBeNull();
