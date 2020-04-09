@@ -33,6 +33,7 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldList } from 'views/components/sidebar';
+import { FetchError } from 'logic/rest/FetchProvider';
 
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
@@ -87,7 +88,7 @@ const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, vie
   }));
 
 type Props = {
-  errors: Object[],
+  errors: FetchError[],
   route: any,
   searchRefreshHooks: Array<SearchRefreshCondition>,
   router: {

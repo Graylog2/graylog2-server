@@ -7,7 +7,7 @@ import SearchExecutionErrors from './SearchExecutionErrors';
 describe('SearchExecutionError', () => {
   afterEach(cleanup);
   it('displays common errors', () => {
-    const commonError = { additional: { body: { message: 'Common error message', type: 'ApiError' } } };
+    const commonError = { additional: { body: { message: 'Common error message' } } };
     const { getByText } = render(<SearchExecutionErrors errors={[commonError]} />);
     expect(getByText('Common error message')).not.toBeNull();
   });
