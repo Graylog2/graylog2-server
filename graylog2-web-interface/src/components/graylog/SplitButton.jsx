@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { forwardRef, memo } from 'react';
 
 // eslint-disable-next-line no-restricted-imports
 import { SplitButton as BootstrapSplitButton } from 'react-bootstrap';
@@ -20,7 +20,7 @@ const StyledSplitButton = styled(BootstrapSplitButton)(({ bsStyle, theme }) => c
   }
 `);
 
-const SplitButton = memo((props) => <StyledSplitButton {...props} />);
+const SplitButton = memo(forwardRef((props, ref) => <StyledSplitButton {...props} ref={ref} />));
 
 SplitButton.propTypes = propTypes;
 SplitButton.defaultProps = defaultProps;
