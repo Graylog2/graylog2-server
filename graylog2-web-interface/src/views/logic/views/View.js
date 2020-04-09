@@ -96,10 +96,6 @@ export default class View {
     return this._value.type;
   }
 
-  get typeLabel(): string {
-    return this._value.type.toLowerCase();
-  }
-
   get title(): string {
     return this._value.title;
   }
