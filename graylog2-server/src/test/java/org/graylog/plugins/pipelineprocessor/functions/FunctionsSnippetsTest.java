@@ -368,7 +368,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
 
         assertThat(message.hasField("result")).isTrue();
-        assertThat(message.getField("result")).isEqualTo("aabb");
+        assertThat(message.getField("result")).isEqualTo("aabbcc");
     }
 
     @Test
