@@ -3,8 +3,9 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import PropTypes from 'prop-types';
-import type { AutoCompleter, Editor } from './ace-types';
 
+import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import type { AutoCompleter, Editor } from './ace-types';
 import AceEditor from './queryinput/ace';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
 import type { Completer } from './SearchBarAutocompletions';
@@ -24,12 +25,12 @@ const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(com
 
 const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value, completers, completerFactory = defaultCompleterFactory }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
-  const _onExecute = (editor: Editor) => {
+  const _onExecute = useCallback((editor: Editor) => {
     if (editor.completer && editor.completer.popup) {
       editor.completer.popup.hide();
     }
     onExecute(value);
-  };
+  }, [onExecute]);
 
   const editorRef = useCallback((node) => {
     const editor = node && node.editor;
@@ -46,37 +47,41 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
 
       editor.completers = [completer];
     }
-  }, [completer]);
+  }, [completer, _onExecute]);
 
   return (
     <div className="query" style={{ display: 'flex' }} data-testid="query-input">
-      <AceEditor mode="lucene"
-                 disabled={disabled}
-                 ref={editorRef}
-                 readOnly={disabled}
-                 theme="ace-queryinput"
-                 onBlur={onBlur}
-                 onChange={onChange}
-                 value={value}
-                 name="QueryEditor"
-                 showGutter={false}
-                 showPrintMargin={false}
-                 highlightActiveLine={false}
-                 minLines={1}
-                 maxLines={1}
-                 enableBasicAutocompletion
-                 enableLiveAutocompletion
-                 editorProps={{
-                   $blockScrolling: Infinity,
-                   selectionStyle: 'line',
-                 }}
-                 fontSize={13}
-                 style={{
-                   marginTop: '9px',
-                   height: '34px',
-                   width: '100%',
-                 }}
-                 placeholder={placeholder} />
+      <UserPreferencesContext.Consumer>
+        {({ enableSmartSearch = true }) => (
+          <AceEditor mode="lucene"
+                     disabled={disabled}
+                     ref={editorRef}
+                     readOnly={disabled}
+                     theme="ace-queryinput"
+                     onBlur={onBlur}
+                     onChange={onChange}
+                     value={value}
+                     name="QueryEditor"
+                     showGutter={false}
+                     showPrintMargin={false}
+                     highlightActiveLine={false}
+                     minLines={1}
+                     maxLines={1}
+                     enableBasicAutocompletion={enableSmartSearch}
+                     enableLiveAutocompletion={enableSmartSearch}
+                     editorProps={{
+                       $blockScrolling: Infinity,
+                       selectionStyle: 'line',
+                     }}
+                     fontSize={13}
+                     style={{
+                       marginTop: '9px',
+                       height: '34px',
+                       width: '100%',
+                     }}
+                     placeholder={placeholder}/>
+        )}
+      </UserPreferencesContext.Consumer>
     </div>
   );
 };
