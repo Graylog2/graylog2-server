@@ -24,7 +24,7 @@ describe('CurrentUserPreferencesProvider', () => {
         <UserPreferencesContext.Consumer>
           {consume}
         </UserPreferencesContext.Consumer>
-      </CurrentUserPreferencesProvider>
+      </CurrentUserPreferencesProvider>,
     );
     return consume;
   };

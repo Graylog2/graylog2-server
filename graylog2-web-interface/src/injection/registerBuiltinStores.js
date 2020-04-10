@@ -1,6 +1,6 @@
 import CombinedProvider from './CombinedProvider';
 
-/* eslint-disable import/no-require, global-require */
+/* eslint-disable global-require */
 const actions = {
   AlarmCallbackHistory: () => require('actions/alarmcallbacks/AlarmCallbackHistoryActions'),
   AlarmCallbacks: () => require('actions/alarmcallbacks/AlarmCallbacksActions'),
@@ -136,7 +136,7 @@ const stores = {
   UniversalSearch: () => require('stores/search/UniversalSearchStore'),
   Users: () => require('stores/users/UsersStore'),
 };
-/* eslint-enable import/no-require, global-require */
+/* eslint-enable global-require */
 
 export default () => {
   Object.keys(actions).forEach((key) => CombinedProvider.registerAction(key, actions[key]));

@@ -2,7 +2,7 @@
 import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
 
@@ -23,7 +23,7 @@ type PreferencesResponse = {
 
 const PreferencesStore = Reflux.createStore({
   listenables: [PreferencesActions],
-  URL: URLUtils.qualifyUrl('/users/'),
+  URL: qualifyUrl('/users/'),
   convertPreferenceMapToArray(preferencesAsMap: PreferencesMap): Array<Preference> {
     let preferences = Object.keys(preferencesAsMap)
       .map((name) => {
