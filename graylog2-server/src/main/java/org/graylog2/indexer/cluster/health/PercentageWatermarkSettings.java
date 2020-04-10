@@ -16,12 +16,17 @@
  */
 package org.graylog2.indexer.cluster.health;
 
+import javax.annotation.Nullable;
+
 public class PercentageWatermarkSettings implements WatermarkSettings<Double> {
     private Double low;
+
     private Double high;
+
+    @Nullable
     private Double floodStage;
 
-    public PercentageWatermarkSettings(Double low, Double high, Double floodStage) {
+    private PercentageWatermarkSettings(Double low, Double high, Double floodStage) {
         this.low = low;
         this.high = high;
         this.floodStage = floodStage;
@@ -45,5 +50,33 @@ public class PercentageWatermarkSettings implements WatermarkSettings<Double> {
     @Override
     public Double floodStage() {
         return floodStage;
+    }
+
+    public static class Builder {
+        private Double low;
+        private Double high;
+        private Double floodStage;
+
+        public Builder() {
+        }
+
+        public PercentageWatermarkSettings.Builder low(Double low) {
+            this.low = low;
+            return this;
+        }
+
+        public PercentageWatermarkSettings.Builder high(Double high) {
+            this.high = high;
+            return this;
+        }
+
+        public PercentageWatermarkSettings.Builder floodStage(Double floodStage) {
+            this.floodStage = floodStage;
+            return this;
+        }
+
+        public PercentageWatermarkSettings build() {
+            return new PercentageWatermarkSettings(low, high, floodStage);
+        }
     }
 }

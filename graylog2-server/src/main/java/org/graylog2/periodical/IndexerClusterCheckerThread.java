@@ -130,7 +130,7 @@ public class IndexerClusterCheckerThread extends Periodical {
     }
 
     private Notification.Type getDiskUsageNotificationTypeByPercentage(PercentageWatermarkSettings settings, NodeDiskUsageStats nodeDiskUsageStats) {
-        if (nodeDiskUsageStats.diskUsedPercent() >= settings.floodStage()) {
+        if (settings.floodStage() != null && nodeDiskUsageStats.diskUsedPercent() >= settings.floodStage()) {
             return Notification.Type.ES_NODE_DISK_WATERMARK_FLOOD_STAGE;
         } else if (nodeDiskUsageStats.diskUsedPercent() >= settings.high()) {
             return Notification.Type.ES_NODE_DISK_WATERMARK_HIGH;
@@ -141,7 +141,7 @@ public class IndexerClusterCheckerThread extends Periodical {
     }
 
     private Notification.Type getDiskUsageNotificationTypeByAbsoluteValues(AbsoluteValueWatermarkSettings settings, NodeDiskUsageStats nodeDiskUsageStats) {
-        if (nodeDiskUsageStats.diskAvailable().getBytes() <= settings.floodStage().getBytes()) {
+        if (settings.floodStage() != null && nodeDiskUsageStats.diskAvailable().getBytes() <= settings.floodStage().getBytes()) {
             return Notification.Type.ES_NODE_DISK_WATERMARK_FLOOD_STAGE;
         } else if (nodeDiskUsageStats.diskAvailable().getBytes() <= settings.high().getBytes()) {
             return Notification.Type.ES_NODE_DISK_WATERMARK_HIGH;

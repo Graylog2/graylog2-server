@@ -18,13 +18,18 @@ package org.graylog2.indexer.cluster.health;
 
 import org.elasticsearch.common.unit.ByteSizeValue;
 
+import javax.annotation.Nullable;
+
 public class AbsoluteValueWatermarkSettings implements WatermarkSettings<ByteSizeValue> {
 
     private ByteSizeValue low;
+
     private ByteSizeValue high;
+
+    @Nullable
     private ByteSizeValue floodStage;
 
-    protected AbsoluteValueWatermarkSettings(ByteSizeValue low, ByteSizeValue high, ByteSizeValue floodStage) {
+    private AbsoluteValueWatermarkSettings(ByteSizeValue low, ByteSizeValue high, ByteSizeValue floodStage) {
         this.low = low;
         this.high = high;
         this.floodStage = floodStage;
@@ -48,5 +53,32 @@ public class AbsoluteValueWatermarkSettings implements WatermarkSettings<ByteSiz
     @Override
     public ByteSizeValue floodStage() {
         return floodStage;
+    }
+
+    public static class Builder {
+        private ByteSizeValue low;
+        private ByteSizeValue high;
+        private ByteSizeValue floodStage;
+
+        public Builder(){}
+
+        public Builder low(ByteSizeValue low) {
+            this.low = low;
+            return this;
+        }
+
+        public Builder high(ByteSizeValue high) {
+            this.high = high;
+            return this;
+        }
+
+        public Builder floodStage(ByteSizeValue floodStage) {
+            this.floodStage = floodStage;
+            return this;
+        }
+
+        public AbsoluteValueWatermarkSettings build() {
+            return new AbsoluteValueWatermarkSettings(low, high, floodStage);
+        }
     }
 }

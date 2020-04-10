@@ -39,19 +39,22 @@ public class ClusterAllocationDiskSettingsFactory {
     private static WatermarkSettings<?> createWatermarkSettings(String low, String high, String floodStage) throws Exception {
         WatermarkSettings.SettingsType lowType = getType(low);
         WatermarkSettings.SettingsType highType = getType(high);
-        WatermarkSettings.SettingsType floodStageType = getType(floodStage);
-        if (Stream.of(lowType, highType, floodStageType).allMatch(s -> s == WatermarkSettings.SettingsType.ABSOLUTE)) {
-            return new AbsoluteValueWatermarkSettings(
-                    ByteSizeValue.parseBytesSizeValue(low, "lowWatermark"),
-                    ByteSizeValue.parseBytesSizeValue(high, "highWatermark"),
-                    ByteSizeValue.parseBytesSizeValue(floodStage, "floodStageWatermark")
-            );
-        } else if (Stream.of(lowType, highType, floodStageType).allMatch(s -> s == WatermarkSettings.SettingsType.PERCENTAGE)) {
-            return new PercentageWatermarkSettings(
-                    getPercentageValue(low),
-                    getPercentageValue(high),
-                    getPercentageValue(floodStage)
-            );
+        if (Stream.of(lowType, highType).allMatch(s -> s == WatermarkSettings.SettingsType.ABSOLUTE)) {
+            AbsoluteValueWatermarkSettings.Builder builder = new AbsoluteValueWatermarkSettings.Builder()
+                .low(ByteSizeValue.parseBytesSizeValue(low, "lowWatermark"))
+                .high(ByteSizeValue.parseBytesSizeValue(high, "highWatermark"));
+            if (!floodStage.isEmpty()) {
+                builder.floodStage(ByteSizeValue.parseBytesSizeValue(floodStage, "floodStageWatermark"));
+            }
+            return builder.build();
+        } else if (Stream.of(lowType, highType).allMatch(s -> s == WatermarkSettings.SettingsType.PERCENTAGE)) {
+            PercentageWatermarkSettings.Builder builder = new PercentageWatermarkSettings.Builder()
+                .low(getPercentageValue(low))
+                .high(getPercentageValue(high));
+            if (!floodStage.isEmpty()) {
+                builder.floodStage(getPercentageValue(floodStage));
+            }
+            return builder.build();
         }
         throw new Exception("Error creating ClusterAllocationDiskWatermarkSettings. This should never happen.");
     }

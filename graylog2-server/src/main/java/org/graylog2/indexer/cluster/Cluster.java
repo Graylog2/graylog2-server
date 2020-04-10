@@ -165,16 +165,17 @@ public class Cluster {
         final GetAllocationDiskSettings request = new GetAllocationDiskSettings.Builder().build();
         final JestResult response = JestUtils.execute(jestClient, request, () -> "Unable to read Elasticsearch cluster settings");
         final JsonNode json = response.getJsonObject();
+        final JsonNode floodStageSetting = findEffectiveSettingInSettingsGroups(json, "flood_stage", true);
         return ClusterAllocationDiskSettingsFactory.create(
-                findEffectiveSettingInSettingsGroups(json, "threshold_enabled").asBoolean(),
-                findEffectiveSettingInSettingsGroups(json, "low").asText(),
-                findEffectiveSettingInSettingsGroups(json, "high").asText(),
-                findEffectiveSettingInSettingsGroups(json, "flood_stage").asText()
+                findEffectiveSettingInSettingsGroups(json, "threshold_enabled", false).asBoolean(),
+                findEffectiveSettingInSettingsGroups(json, "low", false).asText(),
+                findEffectiveSettingInSettingsGroups(json, "high", false).asText(),
+                floodStageSetting != null ? floodStageSetting.asText() : ""
         );
     }
 
-    private JsonNode findEffectiveSettingInSettingsGroups(JsonNode jsonNode, String setting) throws Exception{
-        List<String> settingsGroup = Arrays.asList("transient", "permanent", "defaults");
+    private JsonNode findEffectiveSettingInSettingsGroups(JsonNode jsonNode, String setting, boolean optional) throws Exception{
+        List<String> settingsGroup = Arrays.asList("transient", "persistent", "defaults");
         for(String group: settingsGroup) {
             JsonNode foundGroup = jsonNode.findPath(group);
             if (!(foundGroup instanceof MissingNode)) {
@@ -183,6 +184,9 @@ public class Cluster {
                     return foundSetting;
                 }
             }
+        }
+        if (optional) {
+            return null;
         }
         throw new Exception(String.format(Locale.ENGLISH, "Could not find setting %s in Elasticsearch response", setting));
     }
