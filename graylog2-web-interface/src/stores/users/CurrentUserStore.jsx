@@ -8,6 +8,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 const { StartpageStore } = CombinedProvider.get('Startpage');
+const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 const CurrentUserStore = Reflux.createStore({
   listenables: [SessionActions],
@@ -16,6 +17,7 @@ const CurrentUserStore = Reflux.createStore({
   init() {
     this.listenTo(SessionStore, this.sessionUpdate, this.sessionUpdate);
     this.listenTo(StartpageStore, this.reload, this.reload);
+    PreferencesActions.saveUserPreferences.completed.listen(this.reload);
   },
 
   getInitialState() {
@@ -40,6 +42,7 @@ const CurrentUserStore = Reflux.createStore({
     if (this.currentUser !== undefined) {
       return this.update(this.currentUser.username);
     }
+    return Promise.resolve();
   },
 
   update(username) {
