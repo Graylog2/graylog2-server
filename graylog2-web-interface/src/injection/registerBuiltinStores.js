@@ -45,6 +45,7 @@ const actions = {
   Notifications: () => require('actions/notifications/NotificationsActions'),
   PipelineConnections: () => require('actions/pipelines/PipelineConnectionsActions'),
   Pipelines: () => require('actions/pipelines/PipelinesActions'),
+  Preferences: () => require('actions/users/PreferencesActions'),
   FilterPreview: () => require('actions/event-definitions/FilterPreviewActions'),
   Rules: () => require('actions/rules/RulesActions'),
   ServerAvailability: () => require('actions/sessions/ServerAvailabilityActions'),
