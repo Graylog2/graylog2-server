@@ -16,6 +16,7 @@
  */
 package org.graylog2.periodical;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog2.indexer.cluster.*;
 import org.graylog2.indexer.cluster.health.*;
 import org.graylog2.notifications.Notification;
@@ -53,7 +54,8 @@ public class IndexerClusterCheckerThread extends Periodical {
         checkDiskUsage();
     }
 
-    private void checkOpenFiles() {
+    @VisibleForTesting
+    void checkOpenFiles() {
         if (notificationExists(Notification.Type.ES_OPEN_FILES)) {
             return;
         }
@@ -92,7 +94,8 @@ public class IndexerClusterCheckerThread extends Periodical {
         }
     }
 
-    private void checkDiskUsage() {
+    @VisibleForTesting()
+    void checkDiskUsage() {
         final Map<Notification.Type, List<String>> notificationTypePerNodeIdentifier = new HashMap<>();
         try {
             ClusterAllocationDiskSettings settings = cluster.getClusterAllocationDiskSettings();

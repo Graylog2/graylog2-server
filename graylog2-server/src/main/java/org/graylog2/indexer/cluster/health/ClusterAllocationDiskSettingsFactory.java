@@ -29,13 +29,6 @@ public class ClusterAllocationDiskSettingsFactory {
         return ClusterAllocationDiskSettings.create(enabled, createWatermarkSettings(low, high, floodStage));
     }
 
-    private static WatermarkSettings.SettingsType getType(String value) {
-        if (value.trim().endsWith("%")) {
-            return WatermarkSettings.SettingsType.PERCENTAGE;
-        }
-        return WatermarkSettings.SettingsType.ABSOLUTE;
-    }
-
     private static WatermarkSettings<?> createWatermarkSettings(String low, String high, String floodStage) throws Exception {
         WatermarkSettings.SettingsType lowType = getType(low);
         WatermarkSettings.SettingsType highType = getType(high);
@@ -57,6 +50,13 @@ public class ClusterAllocationDiskSettingsFactory {
             return builder.build();
         }
         throw new Exception("Error creating ClusterAllocationDiskWatermarkSettings. This should never happen.");
+    }
+
+    private static WatermarkSettings.SettingsType getType(String value) {
+        if (value.trim().endsWith("%")) {
+            return WatermarkSettings.SettingsType.PERCENTAGE;
+        }
+        return WatermarkSettings.SettingsType.ABSOLUTE;
     }
 
     private static Double getPercentageValue(String value) {
