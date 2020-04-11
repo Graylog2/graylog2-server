@@ -24,7 +24,6 @@ import org.graylog2.streams.StreamService;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,16 +46,12 @@ public class MappedFieldTypesService {
     }
 
     public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds) {
-        return mergeCompoundFieldTypes(
-                streamService.loadByIds(streamIds)
-                        .stream()
-                        .filter(Objects::nonNull)
-                        .map(stream -> stream.getIndexSet().getConfig().id())
-                        .flatMap(indexSetId -> this.indexFieldTypesService.findForIndexSet(indexSetId).stream())
-                        .map(IndexFieldTypesDTO::fields)
-                        .flatMap(Collection::stream)
-                        .map(this::mapPhysicalFieldType)
-        );
+        final Set<String> indexSets = streamService.indexSetIdsByIds(streamIds);
+
+        final java.util.stream.Stream<MappedFieldTypeDTO> types = this.indexFieldTypesService.findForIndexSets(indexSets).stream()
+                .flatMap(indexSet -> indexSet.fields().stream())
+                .map(this::mapPhysicalFieldType);
+        return mergeCompoundFieldTypes(types);
     }
 
     private MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType) {
