@@ -168,6 +168,11 @@ public class IndexerClusterCheckerThread extends Periodical {
                         .addSeverity(Notification.Severity.URGENT)
                         .addDetail("nodes", String.join(", ", entry.getValue()));
                 notificationService.publishIfFirst(notification);
+                for (String node: entry.getValue()) {
+                    LOG.warn("Elasticsearch node [{}] triggered [{}] due to low free disk space",
+                            node,
+                            entry.getKey());
+                }
             }
         }
     }
