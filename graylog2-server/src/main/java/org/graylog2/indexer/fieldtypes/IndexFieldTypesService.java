@@ -61,6 +61,7 @@ public class IndexFieldTypesService {
         )), new BasicDBObject("unique", true));
         this.db.createIndex(new BasicDBObject(IndexFieldTypesDTO.FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
         this.db.createIndex(new BasicDBObject(FIELDS_FIELD_NAMES, 1));
+        this.db.createIndex(new BasicDBObject(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, 1));
     }
 
     public Optional<IndexFieldTypesDTO> get(String idOrIndexName) {
@@ -110,11 +111,10 @@ public class IndexFieldTypesService {
         return findByQuery(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId));
     }
 
-    private Collection<IndexFieldTypesDTO> findForIndexSets(Collection<String> indexSetIds) {
-        return findByQuery(DBQuery.or(
-                indexSetIds.stream().map(indexSetId -> DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId))
-                .toArray(DBQuery.Query[]::new)
-        ));
+    public Collection<IndexFieldTypesDTO> findForIndexSets(Collection<String> indexSetIds) {
+        return findByQuery(
+                DBQuery.in(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetIds)
+        );
     }
 
     public Collection<IndexFieldTypesDTO> findForFieldNames(Collection<String> fieldNames) {
