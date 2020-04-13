@@ -81,7 +81,7 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
         getResult(value),
       ],
     )
-    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+    .reduce((prev, [key, value]: [string, Rows | Events]) => ({ ...prev, [key]: value }), {});
   return (
     <FullSizeContainer>
       {({ height, width }) => (
