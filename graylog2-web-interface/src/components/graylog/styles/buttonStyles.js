@@ -1,10 +1,10 @@
 import chroma from 'chroma-js';
-import { memoize } from 'lodash';
 import { css } from 'styled-components';
 
 import { util } from 'theme';
 
-const buttonStyles = memoize((bsStyle, color) => {
+const buttonStyles = (bsStyle) => css(({ theme }) => {
+  const { color } = theme;
   const variants = {
     danger: color.variant.danger,
     default: color.gray[90],
@@ -18,7 +18,7 @@ const buttonStyles = memoize((bsStyle, color) => {
   const hex = variants[bsStyle];
   const isLink = bsStyle === 'link';
 
-  const mixColor = memoize((originalColor) => chroma.mix(originalColor, color.global.textDefault, 0.15));
+  const mixColor = (originalColor) => chroma.mix(originalColor, color.global.textDefault, 0.15);
 
   const buttonAdjustColor = chroma(hex).luminance() > 0.5 ? color.global.textDefault : color.global.textAlt;
 
@@ -34,7 +34,7 @@ const buttonStyles = memoize((bsStyle, color) => {
   const disabledBorder = isLink ? variants.link : chroma.mix(hex, buttonAdjustColor, 0.15);
   const disabledColor = isLink ? color.global.link : util.contrastingColor(disabledBackground, 'AA');
 
-  return css`
+  return `
     background-color: ${defaultBackground};
     border-color: ${defaultBorder};
     color: ${defaultColor};

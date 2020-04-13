@@ -7,8 +7,8 @@ import menuItemStyles from './styles/menuItem';
 import { propTypes, defaultProps } from './props/button';
 import buttonStyles from './styles/buttonStyles';
 
-const StyledDropdownButton = styled(BootstrapDropdownButton)(({ bsStyle, theme }) => css`
-  ${buttonStyles(bsStyle, theme.color)};
+const StyledDropdownButton = styled(BootstrapDropdownButton)(({ bsStyle }) => css`
+  ${buttonStyles(bsStyle)};
 
   & ~ {
     ${menuItemStyles}
