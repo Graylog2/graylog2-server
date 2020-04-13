@@ -3,13 +3,13 @@ import { groupBy } from 'lodash';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 
-export type Event = {
+export type Event = {|
   id: string,
   timestamp: string,
   message: string,
   alert: boolean,
   streams: Array<string>,
-};
+|};
 
 export type Events = Array<Event>;
 

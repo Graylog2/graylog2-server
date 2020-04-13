@@ -16,10 +16,10 @@ type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
 
 type PropsMapper<V, R> = (V) => R;
 
-function id<V, R>(x: V) {
+const id = <V, R>(x: V) => {
   // $FlowFixMe: Casting by force
   return (x: R);
-}
+};
 
 export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: PropsMapper<V, R> = id): R {
   const [storeState, setStoreState] = useState(() => propsMapper(store.getInitialState()));
