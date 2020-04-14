@@ -52,16 +52,25 @@ public class NumberField extends AbstractConfigurationField {
     }
 
     public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional, Attribute... attributes) {
-        this(name, humanName, (Number) defaultValue, description, isOptional, attributes);
+        this(name, humanName, (Number) defaultValue, description, isOptional, ConfigurationField.DEFAULT_POSITION, attributes);
     }
 
     public NumberField(String name, String humanName, double defaultValue, String description, Optional isOptional, Attribute... attributes) {
-        this(name, humanName, (Number) defaultValue, description, isOptional, attributes);
+        this(name, humanName, (Number) defaultValue, description, isOptional, ConfigurationField.DEFAULT_POSITION, attributes);
     }
 
-    private NumberField(String name, String humanName, Number defaultValue, String description, Optional isOptional, Attribute... attributes) {
+    public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional, int position, Attribute... attributes) {
+        this(name, humanName, (Number) defaultValue, description, isOptional, position, attributes);
+    }
+
+    public NumberField(String name, String humanName, double defaultValue, String description, Optional isOptional, int position, Attribute... attributes) {
+        this(name, humanName, (Number) defaultValue, description, isOptional, position, attributes);
+    }
+
+    private NumberField(String name, String humanName, Number defaultValue, String description, Optional isOptional, int position, Attribute... attributes) {
         super(FIELD_TYPE, name, humanName, description, isOptional);
         this.defaultValue = defaultValue;
+        this.position = position;
 
         this.attributes = Lists.newArrayList();
         if (attributes != null) {

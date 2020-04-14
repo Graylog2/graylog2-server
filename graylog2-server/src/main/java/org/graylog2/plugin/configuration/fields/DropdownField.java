@@ -42,6 +42,13 @@ public class DropdownField extends AbstractConfigurationField {
         this.values = values;
     }
 
+    public DropdownField(String name, String humanName, String defaultValue, Map<String, String> values, String description, Optional isOptional, int position) {
+        super(FIELD_TYPE, name, humanName, description, isOptional);
+        this.defaultValue = defaultValue;
+        this.values = values;
+        this.position = position;
+    }
+
     @Override
     public Object getDefaultValue() {
         return defaultValue;

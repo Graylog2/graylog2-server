@@ -37,7 +37,7 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
         this.position = DEFAULT_POSITION;
     }
     public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional1, int position) {
-        this(field_type, name, humanName,description,optional1);
+        this(field_type, name, humanName, description, optional1);
         this.position = position;
     }
 
