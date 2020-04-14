@@ -4,7 +4,7 @@ import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 
-import { exportAllMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
+import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 
 import type { ViewStateMap } from 'views/logic/views/View';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -22,7 +22,7 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import CSVExportModal from './CSVExportModal';
 
 jest.mock('util/MessagesExportUtils', () => ({
-  exportAllMessages: jest.fn(),
+  exportSearchMessages: jest.fn(),
   exportSearchTypeMessages: jest.fn(),
 }));
 
@@ -82,7 +82,7 @@ describe('CSVExportModal', () => {
   // Prepare expected payload
   const direction = Direction.Descending;
   const messageSortConfig = new MessageSortConfig('timestamp', direction);
-  const payloadAllMessages = { fields_in_order: ['timestamp', 'source', 'message'], query_string: undefined, sort: [messageSortConfig], streams: [], timerange: undefined };
+  const payloadSearchMessages = { fields_in_order: ['timestamp', 'source', 'message'], sort: [messageSortConfig] };
   const payloadSearchTypeMessages = { fields_in_order: ['timestamp', 'source'], sort: [messageSortConfig] };
 
   afterEach(() => {
@@ -108,14 +108,14 @@ describe('CSVExportModal', () => {
     });
 
     it('should export all messages when no widget exists', () => {
-      const exportAllMessagesAction = asMock(exportAllMessages);
+      const exportSearchMessagesAction = asMock(exportSearchMessages);
       const { getByTestId } = render(<SimpleCSVExportModal />);
 
       // should trigger correct export
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
-      expect(exportAllMessagesAction).toHaveBeenCalledTimes(1);
-      expect(exportAllMessagesAction).toHaveBeenCalledWith(payloadAllMessages);
+      expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1);
+      expect(exportSearchMessagesAction).toHaveBeenCalledWith(payloadSearchMessages, 'search-id');
     });
 
     it('preselect messages widget when only one exists', () => {

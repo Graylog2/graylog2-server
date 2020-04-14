@@ -21,8 +21,8 @@ const downloadCSV = (fileContent: string, fileName: string = 'search-result.csv'
   download(fileContent, fileName, 'text/csv');
 };
 
-export const exportAllMessages = (exportPayload: ExportPayload) => {
-  const { url } = ApiRoutes.MessagesController.exportAll();
+export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string) => {
+  const { url } = ApiRoutes.MessagesController.exportSearch(searchId);
   fetchFile('POST', qualifyUrl(url), exportPayload)
     .then((result: string) => downloadCSV(result))
     .catch(() => {
