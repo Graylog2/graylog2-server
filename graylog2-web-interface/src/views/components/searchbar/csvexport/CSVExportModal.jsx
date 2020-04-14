@@ -8,8 +8,8 @@ import connect from 'stores/connect';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { defaultSort } from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
 
