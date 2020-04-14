@@ -59,7 +59,9 @@ const NodesStore = Reflux.createStore({
       .then((response: NodesListResponse) => {
         this.nodes = {};
         if (response.nodes) {
-          this.nodes = Object.fromEntries(response.nodes.map((node) => [node.node_id, node]));
+          this.nodes = response.nodes
+            .map((node) => [node.node_id, node])
+            .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
           this.clusterId = this._clusterId();
           this.nodeCount = this._nodeCount();
           this._propagateState();
