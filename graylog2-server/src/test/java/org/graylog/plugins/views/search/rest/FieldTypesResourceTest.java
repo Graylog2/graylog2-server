@@ -144,6 +144,7 @@ public class FieldTypesResourceTest {
     @Test
     public void shouldNotAllowAccessWithoutPermission() {
         when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(false);
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> fieldTypesResource.byStreams(FieldTypesForStreamsRequest.Builder.builder()

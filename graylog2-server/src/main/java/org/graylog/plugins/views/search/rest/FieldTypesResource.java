@@ -36,6 +36,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Api(value = "Field Types")
 @Path("/views/fields")
@@ -67,17 +68,19 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request) {
-        request.streams().forEach(this::checkStreamPermission);
+        checkStreamPermission(request.streams());
 
         return mappedFieldTypesService.fieldTypesByStreamIds(request.streams());
     }
 
-    private void checkStreamPermission(String instanceId) {
-        if (!isPermitted(RestPermissions.STREAMS_READ, instanceId)) {
+    private void checkStreamPermission(Set<String> streamIds) {
+        Set<String> notPermittedStreams = streamIds.stream().filter(s -> !isPermitted(RestPermissions.STREAMS_READ, s))
+                .collect(Collectors.toSet());
+        if (!notPermittedStreams.isEmpty()) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",
-                    instanceId, getSubject().getPrincipal(), RestPermissions.STREAMS_READ, instanceId);
-            throw new MissingStreamPermissionException("Not authorized to access stream id <" + instanceId + ">",
-                    ImmutableSet.of(instanceId));
+                    streamIds, getSubject().getPrincipal(), RestPermissions.STREAMS_READ, streamIds);
+            throw new MissingStreamPermissionException("Not authorized to access streams.",
+                    streamIds);
         }
     }
 }
