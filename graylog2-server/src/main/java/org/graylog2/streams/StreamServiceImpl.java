@@ -236,8 +236,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         return objectIds == null ? Collections.emptyList() : objectIds;
     }
 
-    private Map<String, IndexSet> indexSetsForStreams(List<DBObject> streamsQuery) {
-        final Set<String> indexSetIds = streamsQuery.stream()
+    private Map<String, IndexSet> indexSetsForStreams(List<DBObject> streams) {
+        final Set<String> indexSetIds = streams.stream()
                 .map(stream -> (String)stream.get(StreamImpl.FIELD_INDEX_SET_ID))
                 .filter(s -> !isNullOrEmpty(s))
                 .collect(Collectors.toSet());
