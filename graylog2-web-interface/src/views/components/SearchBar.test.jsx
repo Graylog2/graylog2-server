@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { act } from 'react-dom/test-utils';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
@@ -78,24 +79,14 @@ describe('SearchBar', () => {
     fireEvent.change(parentNode, { target: { name, value: String(value) } });
   };
 
-  it('changing the time range value executes a new search', async () => {
+  it('changing the relative time range value does not execute a new search', async () => {
     const onSubmit = jest.fn();
     const { getByText } = render(<SearchBar config={config} onSubmit={onSubmit} />);
 
     const lastDay = getByText('Search in last day');
 
-    selectOption(lastDay);
+    await act(async () => selectOption(lastDay));
 
-    await wait(() => expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        timerange: expect.objectContaining({
-          type: 'relative',
-          range: 86400,
-        }),
-      }),
-      expect.objectContaining({
-        id: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-      }),
-    ));
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

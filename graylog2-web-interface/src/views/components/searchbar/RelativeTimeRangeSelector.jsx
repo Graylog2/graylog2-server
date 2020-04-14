@@ -46,12 +46,11 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
 
   return (
     <Field name="timerange.range">
-      {({ field: { name, value, onChange }, form: { handleSubmit } }) => {
+      {({ field: { name, value, onChange } }) => {
         const _onChange = useCallback((e) => {
           const { target: { value: newValue } } = e;
           onChange({ target: { name, value: Number.parseInt(newValue, 10) } });
-          handleSubmit();
-        }, [handleSubmit]);
+        }, [onChange]);
         return (
           <div className="timerange-selector relative"
                style={{ marginLeft: 50 }}>

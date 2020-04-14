@@ -112,13 +112,16 @@ describe('WidgetQueryControls', () => {
   });
 
   it('changes the widget\'s timerange when time range input is used', async () => {
-    const { getByDisplayValue, getByText } = renderSUT();
+    const { getByDisplayValue, getByText, getByTitle } = renderSUT();
     const timeRangeSelect = getByDisplayValue('Search in last day');
     expect(timeRangeSelect).not.toBeNull();
 
     const optionForAllMessages = getByText('Search in all messages');
 
     fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
+
+    const searchButton = getByTitle(/Perform search/);
+    fireEvent.click(searchButton);
 
     await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
       timerange: { type: 'relative', range: 0 },
