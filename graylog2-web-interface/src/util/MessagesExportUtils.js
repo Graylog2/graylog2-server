@@ -23,7 +23,7 @@ const downloadCSV = (fileContent: string, fileName: string = 'search-result.csv'
 
 export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string) => {
   const { url } = ApiRoutes.MessagesController.exportSearch(searchId);
-  fetchFile('POST', qualifyUrl(url), exportPayload)
+  return fetchFile('POST', qualifyUrl(url), exportPayload)
     .then((result: string) => downloadCSV(result))
     .catch(() => {
       UserNotification.error('CSV Export failed');
@@ -32,7 +32,7 @@ export const exportSearchMessages = (exportPayload: ExportPayload, searchId: str
 
 export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string) => {
   const { url } = ApiRoutes.MessagesController.exportSearchType(searchId, searchTypeId);
-  fetchFile('POST', qualifyUrl(url), exportPayload)
+  return fetchFile('POST', qualifyUrl(url), exportPayload)
     .then((result: string) => downloadCSV(result))
     .catch(() => {
       UserNotification.error('CSV Export for widget failed');

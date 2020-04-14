@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
+import { cleanup, render, fireEvent, wait } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -22,8 +22,8 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import CSVExportModal from './CSVExportModal';
 
 jest.mock('util/MessagesExportUtils', () => ({
-  exportSearchMessages: jest.fn(),
-  exportSearchTypeMessages: jest.fn(),
+  exportSearchMessages: jest.fn(() => Promise.resolve()),
+  exportSearchTypeMessages: jest.fn(() => Promise.resolve()),
 }));
 
 
@@ -107,14 +107,14 @@ describe('CSVExportModal', () => {
       expect(queryByText('Select different message table')).toBeNull();
     });
 
-    it('should export all messages when no widget exists', () => {
+    it('should export all messages when no widget exists', async () => {
       const exportSearchMessagesAction = asMock(exportSearchMessages);
       const { getByTestId } = render(<SimpleCSVExportModal />);
 
-      // should trigger correct export
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
-      expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1);
+
+      await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
       expect(exportSearchMessagesAction).toHaveBeenCalledWith(payloadSearchMessages, 'search-id');
     });
 
@@ -128,13 +128,12 @@ describe('CSVExportModal', () => {
       expect(queryByText('Select different message table')).toBeNull();
     });
 
-    it('should export messages related to preselected widget', () => {
+    it('should export messages related to preselected widget', async () => {
       const { getByTestId } = render(<SimpleCSVExportModal view={viewWithOneWidget(View.Type.Search)} />);
 
-      // should trigger correct export
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
-      expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1);
+      await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1');
     });
 
@@ -153,14 +152,26 @@ describe('CSVExportModal', () => {
       expect(queryByText('Select different message table')).toBeNull();
     });
 
-    it('should export widget messages on direct export', () => {
+    it('should export widget messages on direct export', async () => {
       const { getByTestId } = render(<SimpleCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
-      // should trigger correct export
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
-      expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1);
+      await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1');
+    });
+
+    it('should show loading indicator after starting download', async () => {
+      const exportSearchMessagesAction = asMock(exportSearchMessages);
+      const { getByTestId, getByText } = render(<SimpleCSVExportModal />);
+
+      expect(getByText('Start Download')).not.toBeNull();
+
+      const submitButton = getByTestId('csv-download-button');
+      fireEvent.click(submitButton);
+
+      expect(getByText('Downloading...')).not.toBeNull();
+      await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
     });
   });
 
@@ -196,13 +207,12 @@ describe('CSVExportModal', () => {
       expect(queryByText('Select different message table')).toBeNull();
     });
 
-    it('should export widget messages on direct export', () => {
+    it('should export widget messages on direct export', async () => {
       const { getByTestId } = render(<SimpleCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
-      // should trigger correct export
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
-      expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1);
+      await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1');
     });
   });

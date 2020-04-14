@@ -14,7 +14,7 @@ const _exportOnDashboard = (defaultExportPayload: ExportPayload, searchType: any
   if (!searchType) {
     throw new Error('CSV exports on a dashboard require a selected widget!');
   }
-  exportSearchTypeMessages(defaultExportPayload, searchId, searchType.id);
+  return exportSearchTypeMessages(defaultExportPayload, searchId, searchType.id);
 };
 
 const _exportOnSearchPage = (defaultExportPayload: ExportPayload, searchQueries: Set<Query>, searchType: ?any, searchId: string) => {
@@ -22,10 +22,9 @@ const _exportOnSearchPage = (defaultExportPayload: ExportPayload, searchQueries:
     throw new Error('Searches must only have a single query!');
   }
   if (searchType) {
-    exportSearchTypeMessages(defaultExportPayload, searchId, searchType.id);
-  } else {
-    exportSearchMessages(defaultExportPayload, searchId);
+    return exportSearchTypeMessages(defaultExportPayload, searchId, searchType.id);
   }
+  return exportSearchMessages(defaultExportPayload, searchId);
 };
 
 const startDownload = (view: View, selectedWidget: ?Widget, selectedFields: { field: string }[], selectedSort: SortConfig[]) => {
@@ -43,12 +42,14 @@ const startDownload = (view: View, selectedWidget: ?Widget, selectedFields: { fi
   }
 
   if (view.type === View.Type.Dashboard) {
-    _exportOnDashboard(defaultExportPayload, searchType, view.search.id);
+    return _exportOnDashboard(defaultExportPayload, searchType, view.search.id);
   }
 
   if (view.type === View.Type.Search) {
-    _exportOnSearchPage(defaultExportPayload, view.search.queries, searchType, view.search.id);
+    return _exportOnSearchPage(defaultExportPayload, view.search.queries, searchType, view.search.id);
   }
+
+  throw new Error(`Message export not supported for defined view type ${view.type}`);
 };
 
 export default startDownload;

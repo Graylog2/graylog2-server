@@ -13,7 +13,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
 
-import { Icon } from 'components/common';
+import { Icon, Spinner } from 'components/common';
 import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import CSVExportSettings from 'views/components/searchbar/csvexport/CSVExportSettings';
@@ -45,6 +45,11 @@ const _onFieldSelect = (newFields, setSelectedFields) => {
   setSelectedFields(newFields.map((field) => ({ field: field.value })));
 };
 
+const _onStartDownload = (view, selectedWidget, selectedFields, selectedSort, setLoading) => {
+  setLoading(true);
+  startDownload(view, selectedWidget, selectedFields, selectedSort).then(() => setLoading(false));
+};
+
 const _wrapFieldOption = (field) => ({ field });
 const _defaultFields = ['timestamp', 'source', 'message'];
 const _defaultFieldOptions = _defaultFields.map(_wrapFieldOption);
@@ -54,6 +59,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId }: Prop
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection } = ExportStategy.createExportStrategy(view.type);
   const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type)).flatten(true);
 
+  const [loading, setLoading] = useState(false);
   const [selectedWidget, setSelectedWidget] = useState<?Widget>(initialWidget(messagesWidgets, directExportWidgetId));
   const [selectedFields, setSelectedFields] = useState<{ field: string }[]>(selectedWidget ? selectedWidget.config.fields.map(_wrapFieldOption) : _defaultFieldOptions);
   const [selectedSort, setSelectedSort] = useState<SortConfig[]>(selectedWidget ? selectedWidget.config.sort : defaultSort);
@@ -93,7 +99,11 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId }: Prop
       <Modal.Footer>
         {allowWidgetSelection && <Button bsStyle="link" onClick={() => setSelectedWidget(null)} className="pull-left">Select different message table</Button>}
         <Button type="button" onClick={closeModal}>Close</Button>
-        <Button type="button" onClick={() => startDownload(view, selectedWidget, selectedFields, selectedSort)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button"><Icon name="cloud-download" /> Start Download</Button>
+        <Button type="button" onClick={() => _onStartDownload(view, selectedWidget, selectedFields, selectedSort, setLoading)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
+          {loading ? <Spinner text="" delay={0} /> : <Icon name="cloud-download" />}
+          &nbsp;
+          {loading ? 'Downloading...' : 'Start Download' }
+        </Button>
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
