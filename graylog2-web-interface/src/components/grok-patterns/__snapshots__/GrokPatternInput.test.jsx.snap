@@ -281,7 +281,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
         <div
           className="col-sm-4"
         >
-          <GrokPatternInput
+          <GrokPatternFilter
             addToPattern={[Function]}
             patterns={
               Array [
@@ -976,7 +976,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                 </div>
               </ListGroup>
             </ListGroup>
-          </GrokPatternInput>
+          </GrokPatternFilter>
         </div>
       </Col>
     </div>
@@ -1250,7 +1250,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
         <div
           className="col-sm-4"
         >
-          <GrokPatternInput
+          <GrokPatternFilter
             addToPattern={[Function]}
             patterns={Array []}
           >
@@ -1464,7 +1464,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                 />
               </ListGroup>
             </ListGroup>
-          </GrokPatternInput>
+          </GrokPatternFilter>
         </div>
       </Col>
     </div>
