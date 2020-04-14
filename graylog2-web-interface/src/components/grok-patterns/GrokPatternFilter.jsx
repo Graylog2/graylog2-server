@@ -5,9 +5,9 @@ import { isEqual } from 'lodash';
 import { ListGroup, ListGroupItem, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
-import GrokPatternInputStyle from './GrokPatternInput.css';
+import GrokPatternFilterStyle from './GrokPatternFilter.css';
 
-class GrokPatternInput extends React.Component {
+class GrokPatternFilter extends React.Component {
   static propTypes = {
     addToPattern: PropTypes.func.isRequired,
     patterns: PropTypes.array.isRequired,
@@ -101,8 +101,8 @@ class GrokPatternInput extends React.Component {
                          bsStyle={active ? 'info' : undefined}
                          onKeyDown={this._onPatternFilterKeyDown}
                          key={displayedPattern.name}>
-            <span className={GrokPatternInputStyle.patternDisplay}>{displayedPattern.pattern}</span>
-            <span className={GrokPatternInputStyle.addButton}>
+            <span className={GrokPatternFilterStyle.patternDisplay}>{displayedPattern.pattern}</span>
+            <span className={GrokPatternFilterStyle.addButton}>
               <Button bsSize="xsmall" bsStyle="primary" onClick={() => { addToPattern(displayedPattern.name); }}>
                 Add
               </Button>
@@ -117,13 +117,13 @@ class GrokPatternInput extends React.Component {
                label="Filter pattern"
                onChange={this._onPatternFilterChange}
                autoComplete="off"
-               formGroupClassName={GrokPatternInputStyle.filterFormGroup}
+               formGroupClassName={GrokPatternFilterStyle.filterFormGroup}
                onKeyDown={this._onPatternFilterKeyDown}
                value={patternFilter} />
-        <ListGroup bsClass={GrokPatternInputStyle.resultList}>{patternsToDisplay}</ListGroup>
+        <ListGroup bsClass={GrokPatternFilterStyle.resultList}>{patternsToDisplay}</ListGroup>
       </>
     );
   }
 }
 
-export default GrokPatternInput;
+export default GrokPatternFilter;
