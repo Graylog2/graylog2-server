@@ -59,11 +59,11 @@ const CSVExportSettings = ({ fields, selectedWidget, selectField, selectedFields
         <FieldSelect fields={fields} onChange={selectField} value={selectedFields} />
       </Row>
       <Row>
-        <span>Select sort:</span>
+        <span>Select sort (removing the sort will result in a faster export):</span>
         <FieldSortSelect fields={fields} sort={selectedSort} onChange={setSelectedSort} />
       </Row>
       <Row>
-        <span>Select sort direction (removing the sort will result in a faster export):</span>
+        <span>Select sort direction:</span>
         <SortDirectionSelect direction={selectedSortDirection ? selectedSortDirection.direction : null}
                              onChange={onSortDirectionChange} />
       </Row>
