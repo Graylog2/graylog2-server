@@ -100,9 +100,9 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId }: Prop
         {allowWidgetSelection && <Button bsStyle="link" onClick={() => setSelectedWidget(null)} className="pull-left">Select different message table</Button>}
         <Button type="button" onClick={closeModal}>Close</Button>
         <Button type="button" onClick={() => _onStartDownload(view, selectedWidget, selectedFields, selectedSort, setLoading)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
-          {loading ? <Spinner text="" delay={0} /> : <Icon name="cloud-download" />}
-          &nbsp;
-          {loading ? 'Downloading...' : 'Start Download' }
+          {loading
+            ? <Spinner text="Downloading..." delay={0} />
+            : <><Icon name="cloud-download" />&nbsp;Start Download</>}
         </Button>
       </Modal.Footer>
     </BootstrapModalWrapper>
