@@ -132,7 +132,6 @@ public class ViewsResourceTest {
 
     @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
         expectedException.expect(NotFoundException.class);
         this.viewsResource.get("invalid");
     }
