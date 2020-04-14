@@ -16,14 +16,18 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -38,6 +42,7 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class FieldTypesResource extends RestResource implements PluginRestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(FieldTypesResource.class);
     private final MappedFieldTypesService mappedFieldTypesService;
     private final PermittedStreams permittedStreams;
 
@@ -62,8 +67,17 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @ApiOperation(value = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request) {
-        request.streams().forEach(s -> checkPermission(RestPermissions.STREAMS_READ, s));
+        request.streams().forEach(this::checkStreamPermission);
 
         return mappedFieldTypesService.fieldTypesByStreamIds(request.streams());
+    }
+
+    private void checkStreamPermission(String instanceId) {
+        if (!isPermitted(RestPermissions.STREAMS_READ, instanceId)) {
+            LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",
+                    instanceId, getSubject().getPrincipal(), RestPermissions.STREAMS_READ, instanceId);
+            throw new MissingStreamPermissionException("Not authorized to access stream id <" + instanceId + ">",
+                    ImmutableSet.of(instanceId));
+        }
     }
 }

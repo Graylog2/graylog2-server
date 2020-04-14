@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
+import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,6 +36,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -137,5 +139,16 @@ public class FieldTypesResourceTest {
 
         assertThat(streamIdCaptor.getValue()).containsExactlyInAnyOrder("2323", "4242");
         assertThat(result).isEqualTo(fieldTypes);
+    }
+
+    @Test
+    public void shouldNotAllowAccessWithoutPermission() {
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(false);
+
+        assertThatExceptionOfType(MissingStreamPermissionException.class)
+                .isThrownBy(() -> fieldTypesResource.byStreams(FieldTypesForStreamsRequest.Builder.builder()
+                        .streams(ImmutableSet.of("2323", "4242"))
+                        .build()))
+                .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).contains("2323"));
     }
 }
