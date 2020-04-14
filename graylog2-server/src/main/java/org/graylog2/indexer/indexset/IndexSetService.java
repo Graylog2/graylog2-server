@@ -61,6 +61,13 @@ public interface IndexSetService {
     List<IndexSetConfig> findAll();
 
     /**
+     * Retrieve all index sets which match one of the specified IDs.
+     *
+     * @return All index sets matching one of the given IDs.
+     */
+    List<IndexSetConfig> findByIds(Set<String> ids);
+
+    /**
      * Retrieve a paginated set of index set.
      *
      * @param indexSetIds List of inde set ids to return
