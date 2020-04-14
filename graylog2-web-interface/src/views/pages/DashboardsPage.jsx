@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import { Col, Row, Button } from 'components/graylog';
 import connect from 'stores/connect';
-import { DocumentTitle, PageHeader } from 'components/common/index';
+import { DocumentTitle, PageHeader, IfPermitted } from 'components/common/index';
 import Routes from 'routing/Routes';
 
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -50,11 +50,13 @@ const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
             for lots of other useful tips.
           </span>
 
-          <span>
-            <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
-              <Button bsStyle="success" bsSize="lg">Create new dashboard</Button>
-            </LinkContainer>
-          </span>
+          <IfPermitted permissions="dashboards:create">
+            <span>
+              <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
+                <Button bsStyle="success" bsSize="lg">Create new dashboard</Button>
+              </LinkContainer>
+            </span>
+          </IfPermitted>
         </PageHeader>
 
         <Row className="content">

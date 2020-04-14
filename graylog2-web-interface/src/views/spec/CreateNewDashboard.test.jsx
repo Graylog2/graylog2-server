@@ -36,7 +36,7 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore(
     currentUser: {
       full_name: 'Betty Holberton',
       username: 'betty',
-      permissions: [],
+      permissions: ['dashboards:create'],
     },
   })],
 ));
