@@ -1,5 +1,4 @@
 // @flow strict
-import { flatten } from 'lodash';
 import { Set } from 'immutable';
 
 import { exportSearchMessages, exportSearchTypeMessages, type ExportPayload } from 'util/MessagesExportUtils';
@@ -35,12 +34,8 @@ const startDownload = (view: View, selectedWidget: ?Widget, selectedFields: { fi
   let searchType;
 
   if (selectedWidget) {
-    const widgetMapping = view.state.map((state) => state.widgetMapping).flatten(true);
-    const searchTypeId = widgetMapping.get(selectedWidget.id).first();
-    const searchTypes = flatten(view.search.queries.map((query) => query.searchTypes).toArray());
-    searchType = searchTypes.find((entry) => entry && entry.id && entry.id === searchTypeId);
+    searchType = view.getSearchTypeByWidgetId(selectedWidget.id);
   }
-
   if (view.type === View.Type.Dashboard) {
     return _exportOnDashboard(defaultExportPayload, searchType, view.search.id);
   }

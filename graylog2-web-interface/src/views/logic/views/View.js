@@ -1,5 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
+import { flatten } from 'lodash';
 import ObjectID from 'bson-objectid';
 
 import ViewState from './ViewState';
@@ -134,6 +135,16 @@ export default class View {
 
   get requires(): Requirements {
     return this._value.requires || {};
+  }
+
+  getSearchTypeByWidgetId(widgetId: string) {
+    const widgetMapping = this.state.map((state) => state.widgetMapping).flatten(true);
+    const searchTypeId = widgetMapping.get(widgetId).first();
+    if (!searchTypeId) {
+      throw new Error(`Search type for widget with id ${widgetId} does not exist`);
+    }
+    const searchTypes = flatten(this.search.queries.map((query) => query.searchTypes).toArray());
+    return searchTypes.find((entry) => entry && entry.id && entry.id === searchTypeId);
   }
 
   // eslint-disable-next-line no-use-before-define
