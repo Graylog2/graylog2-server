@@ -133,11 +133,11 @@ class EditPatternModal extends React.Component {
     }
     return (
       <span>
-        <button type="button"
-                onClick={this.openModal}
-                className={create ? 'btn btn-success' : 'btn btn-info btn-xs'}>
+        <Button onClick={this.openModal}
+                bsStyle={create ? 'success' : 'info'}
+                bsSize={create ? '' : 'xs'}>
           {triggerButtonContent}
-        </button>
+        </Button>
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                             title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
                             bsSize="large"

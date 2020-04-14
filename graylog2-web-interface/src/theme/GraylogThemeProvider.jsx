@@ -14,7 +14,7 @@ const GraylogThemeProvider = ({ children }) => {
       mode: THEME_MODE,
       color: color[THEME_MODE],
       components: {
-        buttonStyles,
+        button: buttonStyles({ color: color[THEME_MODE] }),
       },
     }}>
       {children}

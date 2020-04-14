@@ -3,8 +3,7 @@ import { css } from 'styled-components';
 
 import { util } from 'theme';
 
-const buttonStyles = () => css(({ theme }) => {
-  const { color } = theme;
+const buttonStyles = ({ color }) => {
   const variants = {
     danger: color.variant.danger,
     default: color.gray[90],
@@ -17,7 +16,7 @@ const buttonStyles = () => css(({ theme }) => {
 
   const mixColor = (originalColor) => chroma.mix(originalColor, color.global.textDefault, 0.15);
 
-  const variantStyles = Object.keys(variants).map((variant) => {
+  return Object.keys(variants).map((variant) => {
     const variantColor = variants[variant];
     const isLink = variant === 'link';
 
@@ -35,7 +34,7 @@ const buttonStyles = () => css(({ theme }) => {
     const disabledBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
     const disabledColor = isLink ? color.global.link : util.contrastingColor(disabledBackground, 'AA');
 
-    return `
+    return css`
       &.btn-${variant} {
         background-color: ${defaultBackground};
         border-color: ${defaultBorder};
@@ -77,8 +76,6 @@ const buttonStyles = () => css(({ theme }) => {
       }
     `;
   });
-
-  return css` ${variantStyles} `;
-});
+};
 
 export default buttonStyles;
