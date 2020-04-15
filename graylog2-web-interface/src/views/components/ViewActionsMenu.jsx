@@ -5,7 +5,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
@@ -26,8 +26,6 @@ import ShareViewModal from './views/ShareViewModal';
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 import IfDashboard from './dashboard/IfDashboard';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
-
-const { isPermitted } = PermissionsMixin;
 
 const _isAllowedToEdit = (view: View, currentUser = {}) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)])
   || (view.type === View.Type.Dashboard && isPermitted(currentUser.permissions, [`dashboards:edit:${view.id}`]));
