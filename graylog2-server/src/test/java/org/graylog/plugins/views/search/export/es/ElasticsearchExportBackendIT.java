@@ -36,7 +36,6 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -157,14 +156,13 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         assertThat(chunks[0].isFirstChunk()).isTrue();
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public void mockIndexLookupFor(MessagesRequest request, String... indexNames) {
-        when(indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get()))
+        when(indexLookup.indexNamesForStreamsInTimeRange(request.streams(), request.timeRange()))
                 .thenReturn(ImmutableSet.copyOf(indexNames));
     }
 
     private MessagesRequest.Builder defaultRequestBuilder() {
-        return createDefaultMessagesRequest().toBuilder()
+        return MessagesRequest.withDefaults().toBuilder()
                 .timeRange(allMessagesTimeRange());
     }
 
@@ -193,8 +191,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
             allMessages.addAll(chunk.messages());
         }
 
-        //noinspection OptionalGetWithoutIsPresent
-        return SimpleMessageChunk.from(request.fieldsInOrder().get(), allMessages);
+        return SimpleMessageChunk.from(request.fieldsInOrder(), allMessages);
     }
 
     private LinkedHashSet<SimpleMessageChunk> collectChunksFor(MessagesRequest request) {

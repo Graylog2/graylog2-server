@@ -29,21 +29,17 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class MessagesExporter {
-    private final Defaults defaults;
     private final ExportBackend backend;
     private final ChunkDecorator chunkDecorator;
 
     @Inject
-    public MessagesExporter(Defaults defaults, ExportBackend backend, ChunkDecorator chunkDecorator) {
-        this.defaults = defaults;
+    public MessagesExporter(ExportBackend backend, ChunkDecorator chunkDecorator) {
         this.backend = backend;
         this.chunkDecorator = chunkDecorator;
     }
 
     public void export(MessagesRequest request, Consumer<SimpleMessageChunk> chunkForwarder) {
-        MessagesRequest fullRequest = defaults.fillInIfNecessary(request);
-
-        backend.run(fullRequest, chunkForwarder);
+        backend.run(request, chunkForwarder);
     }
 
     public void export(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
@@ -82,7 +78,7 @@ public class MessagesExporter {
         setTimeRange(query, searchTypeId, requestBuilder);
         trySetQueryString(query, searchTypeId, requestBuilder);
         setStreams(query, searchTypeId, requestBuilder);
-        trySetFields(resultFormat, requestBuilder);
+        setFields(resultFormat, requestBuilder);
         trySetSort(query, searchTypeId, resultFormat, requestBuilder);
 
         return requestBuilder.build();
@@ -132,8 +128,8 @@ public class MessagesExporter {
         }
     }
 
-    private void trySetFields(ResultFormat resultFormat, MessagesRequest.Builder requestBuilder) {
-        resultFormat.fieldsInOrder().ifPresent(requestBuilder::fieldsInOrder);
+    private void setFields(ResultFormat resultFormat, MessagesRequest.Builder requestBuilder) {
+        requestBuilder.fieldsInOrder(resultFormat.fieldsInOrder());
     }
 
     private void trySetSort(Query query, String searchTypeId, ResultFormat resultFormat, MessagesRequest.Builder requestBuilder) {

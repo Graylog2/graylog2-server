@@ -16,95 +16,28 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
-import javax.validation.ValidationException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import static com.google.common.collect.Sets.newLinkedHashSet;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_CHUNK_SIZE;
+import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_FIELDS;
+import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_QUERY;
+import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_SORT;
+import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_STREAMS;
+import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_TIME_RANGE;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MessagesRequestTest {
-
-    private Map<String, Function<MessagesRequest.Builder, MessagesRequest.Builder>> dummySetters = dummySetters();
-
-    private static Map<String, Function<MessagesRequest.Builder, MessagesRequest.Builder>> dummySetters() {
-        HashMap<String, Function<MessagesRequest.Builder, MessagesRequest.Builder>> result = new HashMap<>();
-        result.put("timeRange", b -> b.timeRange(someTimeRange()));
-        result.put("queryString", b -> b.queryString(ElasticsearchQueryString.empty()));
-        result.put("streams", b -> b.streams(ImmutableSet.of("some-stream")));
-        result.put("fieldsInOrder", b -> b.fieldsInOrder("some-field"));
-        result.put("sort", b -> b.sort(newLinkedHashSet()));
-        return result;
-    }
-
-    @CsvSource(value = {"timeRange", "queryString", "streams", "fieldsInOrder", "sort"})
-    @ParameterizedTest
-    void canComplainAboutSingleMissingField(String missingField) {
-        MessagesRequest sut = requestWithMissingFields(missingField);
-
-        assertThatExceptionOfType(ValidationException.class)
-                .isThrownBy(sut::ensureCompleteness)
-                .withMessageContaining("[" + missingField + "]");
-    }
-
     @Test
-    void canComplainAboutMultipleMissingFields() {
-        MessagesRequest sut = requestWithMissingFields("streams", "sort");
+    void fillsDefaults() {
+        MessagesRequest defaultRequest = MessagesRequest.builder().build();
 
-        assertThatExceptionOfType(ValidationException.class)
-                .isThrownBy(sut::ensureCompleteness)
-                .withMessageContaining("[streams, sort]");
-    }
-
-    @Test
-    void requiresNonEmptyStreams() {
-        MessagesRequest sut = requestWithMissingFields();
-        sut = sut.toBuilder().streams(ImmutableSet.of()).build();
-
-        assertThatExceptionOfType(ValidationException.class)
-                .isThrownBy(sut::ensureCompleteness)
-                .withMessageContaining("[streams]");
-    }
-
-    @Test
-    void requiresNonEmptyFieldsInOrder() {
-        MessagesRequest sut = requestWithMissingFields();
-        sut = sut.toBuilder().fieldsInOrder().build();
-
-        assertThatExceptionOfType(ValidationException.class)
-                .isThrownBy(sut::ensureCompleteness)
-                .withMessageContaining("[fieldsInOrder]");
-    }
-
-    private MessagesRequest requestWithMissingFields(String... missingFieldsArray) {
-        List<String> missingFields = Arrays.asList(missingFieldsArray);
-
-        MessagesRequest.Builder builder = MessagesRequest.builder();
-
-        for (String field : dummySetters.keySet())
-            if (!missingFields.contains(field))
-                builder = dummySetters.get(field).apply(builder);
-
-        return builder.build();
-    }
-
-    private static TimeRange someTimeRange() {
-        try {
-            return RelativeRange.create(1);
-        } catch (InvalidRangeParametersException e) {
-            throw new RuntimeException(e);
-        }
+        assertAll("Should fill every empty field with default",
+                () -> assertThat(defaultRequest.timeRange()).isEqualTo(DEFAULT_TIME_RANGE),
+                () -> assertThat(defaultRequest.queryString()).isEqualTo(DEFAULT_QUERY),
+                () -> assertThat(defaultRequest.streams()).isEqualTo(DEFAULT_STREAMS),
+                () -> assertThat(defaultRequest.fieldsInOrder()).isEqualTo(DEFAULT_FIELDS),
+                () -> assertThat(defaultRequest.sort()).isEqualTo(DEFAULT_SORT),
+                () -> assertThat(defaultRequest.chunkSize()).isEqualTo(DEFAULT_CHUNK_SIZE));
     }
 }

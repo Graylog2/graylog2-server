@@ -74,7 +74,7 @@ public class MessagesResourceTest {
         sut.retrieve(request);
 
         assertThat(captor.getValue().streams())
-                .contains(ImmutableSet.of("stream-1", "stream-2"));
+                .containsExactly("stream-1", "stream-2");
     }
 
     @Test

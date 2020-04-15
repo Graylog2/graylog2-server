@@ -20,37 +20,57 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
+import org.elasticsearch.search.sort.SortOrder;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchtypes.Sort;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
+
 @AutoValue
 @JsonDeserialize(builder = MessagesRequest.Builder.class)
 public abstract class MessagesRequest {
-    public abstract Optional<TimeRange> timeRange();
 
-    public abstract Optional<BackendQuery> queryString();
+    public static final TimeRange DEFAULT_TIME_RANGE = lastFiveMinutes();
+    public static final BackendQuery DEFAULT_QUERY = ElasticsearchQueryString.empty();
+    public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
+    public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
+    public static final LinkedHashSet<Sort> DEFAULT_SORT = linkedHashSetOf(Sort.create("timestamp", SortOrder.DESC));
+    public static final int DEFAULT_CHUNK_SIZE = 1000;
+
+    private static RelativeRange lastFiveMinutes() {
+        try {
+            return RelativeRange.create(300);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException("Error creating default time range", e);
+        }
+    }
+
+    public abstract TimeRange timeRange();
+
+    public abstract BackendQuery queryString();
 
     public abstract Optional<BackendQuery> additionalQueryString();
 
-    public abstract Optional<Set<String>> streams();
+    public abstract Set<String> streams();
 
-    public abstract Optional<LinkedHashSet<String>> fieldsInOrder();
+    public abstract LinkedHashSet<String> fieldsInOrder();
 
-    public abstract Optional<LinkedHashSet<Sort>> sort();
+    public abstract LinkedHashSet<Sort> sort();
 
-    public abstract Optional<Integer> chunkSize();
+    public abstract int chunkSize();
 
-    public static MessagesRequest empty() {
+    public static MessagesRequest withDefaults() {
         return builder().build();
     }
 
@@ -59,25 +79,6 @@ public abstract class MessagesRequest {
     }
 
     public abstract Builder toBuilder();
-
-    public void ensureCompleteness() {
-        List<String> missingFields = new ArrayList<>();
-        if (!timeRange().isPresent())
-            missingFields.add("timeRange");
-        if (!queryString().isPresent())
-            missingFields.add("queryString");
-        if (!streams().isPresent() || streams().get().isEmpty())
-            missingFields.add("streams");
-        if (!fieldsInOrder().isPresent() || fieldsInOrder().get().isEmpty())
-            missingFields.add("fieldsInOrder");
-        if (!sort().isPresent())
-            missingFields.add("sort");
-
-        if (!missingFields.isEmpty()) {
-            String message = "Missing fields: " + missingFields;
-            throw new ValidationException(message);
-        }
-    }
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -114,7 +115,13 @@ public abstract class MessagesRequest {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_MessagesRequest.Builder();
+            return new AutoValue_MessagesRequest.Builder()
+                    .timeRange(DEFAULT_TIME_RANGE)
+                    .streams(DEFAULT_STREAMS)
+                    .queryString(DEFAULT_QUERY)
+                    .fieldsInOrder(DEFAULT_FIELDS)
+                    .sort(DEFAULT_SORT)
+                    .chunkSize(DEFAULT_CHUNK_SIZE);
         }
     }
 }

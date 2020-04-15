@@ -51,6 +51,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 class MessagesExporterTest {
 
     private ExportBackend backend;
@@ -61,7 +62,7 @@ class MessagesExporterTest {
     void setUp() {
         backend = mock(ExportBackend.class);
         chunkDecorator = mock(ChunkDecorator.class);
-        sut = new MessagesExporter(new Defaults(), backend, chunkDecorator);
+        sut = new MessagesExporter(backend, chunkDecorator);
     }
 
     @Test
@@ -74,9 +75,9 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s);
 
-        assertThat(request.timeRange()).contains(query.timerange());
-        assertThat(request.queryString()).contains(query.query());
-        assertThat(request.streams()).contains(query.usedStreamIds());
+        assertThat(request.timeRange()).isEqualTo(query.timerange());
+        assertThat(request.queryString()).isEqualTo(query.query());
+        assertThat(request.streams()).isEqualTo(query.usedStreamIds());
     }
 
     @Test
@@ -90,7 +91,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, resultFormat);
 
-        assertThat(request.sort()).isEqualTo(resultFormat.sort());
+        assertThat(request.sort()).isEqualTo(resultFormat.sort().get());
         assertThat(request.fieldsInOrder()).isEqualTo(resultFormat.fieldsInOrder());
     }
 
@@ -103,8 +104,8 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, resultFormat);
 
-        assertThat(request.sort()).contains(Defaults.DEFAULT_SORT);
-        assertThat(request.fieldsInOrder()).contains(Defaults.DEFAULT_FIELDS);
+        assertThat(request.sort()).isEqualTo(MessagesRequest.DEFAULT_SORT);
+        assertThat(request.fieldsInOrder()).isEqualTo(MessagesRequest.DEFAULT_FIELDS);
     }
 
     @Test
@@ -118,7 +119,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
-        assertThat(request.streams()).contains(ml.effectiveStreams());
+        assertThat(request.streams()).isEqualTo(ml.effectiveStreams());
     }
 
     @Test
@@ -131,7 +132,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
-        assertThat(request.streams()).contains(q.usedStreamIds());
+        assertThat(request.streams()).isEqualTo(q.usedStreamIds());
     }
 
     @Test
@@ -145,7 +146,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
-        assertThat(request.queryString()).isEqualTo(ml.query());
+        assertThat(request.queryString()).isEqualTo(ml.query().get());
     }
 
     @Test
@@ -160,7 +161,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
-        assertThat(request.queryString()).contains(q.query());
+        assertThat(request.queryString()).isEqualTo(q.query());
     }
 
     @Test
@@ -176,7 +177,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
-        assertThat(request.queryString()).contains(q.query());
+        assertThat(request.queryString()).isEqualTo(q.query());
         assertThat(request.additionalQueryString()).isEqualTo(ml.query());
     }
 
@@ -190,7 +191,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
-        assertThat(request.timeRange()).contains(timeRange(111));
+        assertThat(request.timeRange()).isEqualTo(timeRange(111));
     }
 
     @Test
@@ -203,7 +204,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
-        assertThat(request.timeRange()).contains(timeRange(222));
+        assertThat(request.timeRange()).isEqualTo(timeRange(222));
     }
 
     @Test
@@ -232,7 +233,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), resultFormat);
 
-        assertThat(request.fieldsInOrder()).contains(Defaults.DEFAULT_FIELDS);
+        assertThat(request.fieldsInOrder()).isEqualTo(MessagesRequest.DEFAULT_FIELDS);
     }
 
     @Test
@@ -251,7 +252,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), resultFormat);
 
-        assertThat(request.sort()).contains(new LinkedHashSet<>(requireNonNull(ml.sort())));
+        assertThat(request.sort()).isEqualTo(new LinkedHashSet<>(requireNonNull(ml.sort())));
     }
 
     @Test
@@ -270,7 +271,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), resultFormat);
 
-        assertThat(request.sort()).isEqualTo(resultFormat.sort());
+        assertThat(request.sort()).isEqualTo(resultFormat.sort().get());
     }
 
     @Test

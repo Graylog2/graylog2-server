@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = ResultFormat.Builder.class)
 public abstract class ResultFormat {
-    public abstract Optional<LinkedHashSet<String>> fieldsInOrder();
+    public abstract LinkedHashSet<String> fieldsInOrder();
 
     public abstract Optional<LinkedHashSet<Sort>> sort();
 
@@ -68,7 +68,8 @@ public abstract class ResultFormat {
 
         @JsonCreator
         public static ResultFormat.Builder create() {
-            return new AutoValue_ResultFormat.Builder();
+            return new AutoValue_ResultFormat.Builder()
+                    .fieldsInOrder(MessagesRequest.DEFAULT_FIELDS);
         }
     }
 }

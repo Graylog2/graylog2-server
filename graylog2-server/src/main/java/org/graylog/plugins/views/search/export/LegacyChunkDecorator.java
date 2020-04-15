@@ -61,12 +61,11 @@ public class LegacyChunkDecorator implements ChunkDecorator {
         return SimpleMessageChunk.from(fieldsInOrder, messages);
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private SearchResponse legacySearchResponseFrom(SimpleMessageChunk chunk, MessagesRequest request) {
         final List<ResultMessageSummary> legacyMessages = legacyMessagesFrom(chunk);
 
-        String queryString = ((ElasticsearchQueryString) request.queryString().get()).queryString();
-        TimeRange timeRange = request.timeRange().get();
+        String queryString = ((ElasticsearchQueryString) request.queryString()).queryString();
+        TimeRange timeRange = request.timeRange();
         return SearchResponse.create(
                 queryString,
                 queryString,

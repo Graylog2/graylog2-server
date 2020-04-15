@@ -24,6 +24,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -73,9 +74,8 @@ class LegacyChunkDecoratorTest {
 
         SearchResponse builtLegacyResponse = captureLegacyResponse(undecoratedChunk, request);
 
-        //noinspection OptionalGetWithoutIsPresent
-        assertThat(builtLegacyResponse.from()).isEqualTo(request.timeRange().get().getFrom());
-        assertThat(builtLegacyResponse.to()).isEqualTo(request.timeRange().get().getTo());
+        assertThat(builtLegacyResponse.from()).isEqualTo(request.timeRange().getFrom());
+        assertThat(builtLegacyResponse.to()).isEqualTo(request.timeRange().getTo());
         assertThat(builtLegacyResponse.query()).isEqualTo("hase");
         assertThat(builtLegacyResponse.builtQuery()).isEqualTo("hase");
         assertThat(builtLegacyResponse.fields()).containsExactlyElementsOf(undecoratedChunk.fieldsInOrder());
@@ -119,6 +119,6 @@ class LegacyChunkDecoratorTest {
     }
 
     private TimeRange someTimeRange() {
-        return AbsoluteRange.create(DateTime.now(), DateTime.now().plus(300));
+        return AbsoluteRange.create(DateTime.now(DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC).plus(300));
     }
 }

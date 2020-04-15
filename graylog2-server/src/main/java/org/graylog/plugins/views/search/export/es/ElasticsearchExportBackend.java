@@ -57,7 +57,6 @@ import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 public class ElasticsearchExportBackend implements ExportBackend {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchExportBackend.class);
 
-    private static final int DEFAULT_CHUNK_SIZE = 1000;
     private static final String TIEBREAKER_FIELD = "gl2_message_id";
 
     private final JestClient jestClient;
@@ -71,8 +70,6 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
     @Override
     public void run(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector) {
-        request.ensureCompleteness();
-
         fetchResults(request, chunkCollector);
     }
 
@@ -87,7 +84,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 return;
             }
 
-            boolean success = publishChunk(chunkCollector, hits, request.fieldsInOrder().get(), isFirstChunk);
+            boolean success = publishChunk(chunkCollector, hits, request.fieldsInOrder(), isFirstChunk);
             if (!success) {
                 return;
             }
@@ -118,15 +115,14 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .build();
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private SearchSourceBuilder searchSourceBuilderFrom(MessagesRequest request, Object[] searchAfterValues) {
         QueryBuilder query = queryFrom(request);
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
-                .size(request.chunkSize().orElse(DEFAULT_CHUNK_SIZE));
+                .size(request.chunkSize());
 
-        addSort(ssb, request.sort().get());
+        addSort(ssb, request.sort());
 
         if (searchAfterValues != null) {
             ssb.searchAfter(searchAfterValues);
@@ -134,9 +130,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return ssb;
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private QueryBuilder queryFrom(MessagesRequest request) {
-        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) request.queryString().get();
+        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) request.queryString();
 
         QueryBuilder query = backendQuery.isEmpty() ?
                 matchAllQuery() :
@@ -144,12 +139,12 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
         BoolQueryBuilder filter = boolQuery()
                 .filter(query)
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(request.timeRange().get())));
+                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(request.timeRange())));
 
         request.additionalQueryString().map(qs -> (ElasticsearchQueryString) qs)
                 .ifPresent(qs -> filter.filter(queryStringQuery(qs.queryString())));
 
-        filter.filter(termsQuery(Message.FIELD_STREAMS, request.streams().get()));
+        filter.filter(termsQuery(Message.FIELD_STREAMS, request.streams()));
 
         return filter;
     }
@@ -162,9 +157,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
         ssb.sort(SortBuilders.fieldSort(TIEBREAKER_FIELD).order(SortOrder.ASC).unmappedType("string"));
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private Set<String> indicesFor(MessagesRequest request) {
-        return indexLookup.indexNamesForStreamsInTimeRange(request.streams().get(), request.timeRange().get());
+        return indexLookup.indexNamesForStreamsInTimeRange(request.streams(), request.timeRange());
     }
 
     private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, boolean isFirstChunk) {

@@ -46,8 +46,6 @@ import javax.ws.rs.Produces;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.graylog.plugins.views.search.export.Defaults.createDefaultMessagesRequest;
-
 @Api(value = "Search Messages")
 @Path("/views/search/messages")
 @RequiresAuthentication
@@ -76,15 +74,15 @@ public class MessagesResource extends RestResource implements PluginRestResource
         final MessagesRequest req = fillInIfNecessary(request);
 
         //noinspection OptionalGetWithoutIsPresent
-        executionGuard.checkUserIsPermittedToSeeStreams(req.streams().get(), this::hasStreamReadPermission);
+        executionGuard.checkUserIsPermittedToSeeStreams(req.streams(), this::hasStreamReadPermission);
 
         return asyncRunner.apply(chunkConsumer -> exporter.export(req, chunkConsumer));
     }
 
     private MessagesRequest fillInIfNecessary(MessagesRequest requestFromClient) {
-        MessagesRequest request = requestFromClient != null ? requestFromClient : createDefaultMessagesRequest();
+        MessagesRequest request = requestFromClient != null ? requestFromClient : MessagesRequest.withDefaults();
 
-        if (!request.streams().isPresent()) {
+        if (request.streams().isEmpty()) {
             request = request.toBuilder().streams(loadAllAllowedStreamsForUser()).build();
         }
         return request;
