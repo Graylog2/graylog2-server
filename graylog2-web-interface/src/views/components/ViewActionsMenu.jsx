@@ -33,7 +33,7 @@ const _isAllowedToEdit = (view: View, currentUser = {}) => isPermitted(currentUs
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
 
 const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
-  const currentUser = useContext(CurrentUserContext) || {};
+  const currentUser = useContext(CurrentUserContext);
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);

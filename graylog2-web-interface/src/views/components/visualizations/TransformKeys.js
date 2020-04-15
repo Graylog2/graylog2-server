@@ -1,12 +1,10 @@
 // @flow strict
 import moment from 'moment-timezone';
-
-import CombinedProvider from 'injection/CombinedProvider';
+import { useContext } from 'react';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { ColLeaf, Leaf, Key, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const formatTimestamp = (timestamp, tz = 'UTC'): string => {
   // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
@@ -33,13 +31,14 @@ const findIndices = <T>(ary: Array<T>, predicate: (T) => boolean): Array<number>
 
 export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((Rows) => Rows) => {
   return (result = []) => {
+    const currentUser = useContext(CurrentUserContext);
     const rowIndices = findIndices(rowPivots, (pivot) => (pivot.type === 'time'));
     const columnIndices = findIndices(columnPivots, (pivot) => (pivot.type === 'time'));
+    console.log(currentUser);
 
     if (rowIndices.length === 0 && columnIndices.length === 0) {
       return result;
     }
-    const currentUser = CurrentUserStore.get();
     const tz = currentUser ? currentUser.timezone : 'UTC';
 
     return result.map((row) => {
