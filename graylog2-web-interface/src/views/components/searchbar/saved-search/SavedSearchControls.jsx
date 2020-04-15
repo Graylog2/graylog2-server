@@ -23,6 +23,7 @@ import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal'
 import ShareViewModal from 'views/components/views/ShareViewModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
+import type { User } from 'stores/users/UsersStore';
 
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import SavedSearchForm from './SavedSearchForm';
@@ -42,9 +43,9 @@ type State = {
   newTitle: string,
 };
 
-const _isAllowedToEdit = (view: View, currentUser = {}) => (
-  view.owner === currentUser.username
-  || isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)])
+const _isAllowedToEdit = (view: View, currentUser: ?User) => (
+  view.owner === currentUser?.username
+  || isPermitted(currentUser?.permissions, [Permissions.View.Edit(view.id)])
 );
 
 class SavedSearchControls extends React.Component<Props, State> {

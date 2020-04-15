@@ -70,10 +70,12 @@ class ShareViewModal extends React.Component<Props, State> {
 
   componentDidMount() {
     const { view, currentUser } = this.props;
+    const isAdmin = this._isAdmin(currentUser);
+    console.log('isAdmin', isAdmin);
     Promise.all([
       ViewSharingActions.get(view.id),
       ViewSharingActions.users(view.id),
-      this._isAdmin(currentUser) ? RolesStore.loadRoles().then((roles) => roles.map(({ name }) => name)) : Promise.resolve(currentUser.roles),
+      this._isAdmin(currentUser) ? RolesStore.loadRoles().then((roles) => roles.map(({ name }) => name)) : Promise.resolve(currentUser?.roles),
     ]).then(([viewSharing, users, roles]) => {
       this.setState({ viewSharing, users, roles, loaded: true });
     });
@@ -130,7 +132,7 @@ class ShareViewModal extends React.Component<Props, State> {
     this.setState({ viewSharing: specificUsers.toBuilder().users(users).build() });
   };
 
-  _isAdmin = (user: ?User = {}) => (user.roles.includes('Admin') || user.permissions.includes('*'));
+  _isAdmin = (user: ?User) => (user?.roles.includes('Admin') || user?.permissions.includes('*'));
 
   render() {
     const { show, view } = this.props;
