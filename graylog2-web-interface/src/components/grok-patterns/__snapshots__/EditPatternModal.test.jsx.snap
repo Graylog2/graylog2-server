@@ -13,13 +13,76 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
   validPatternName={[Function]}
 >
   <span>
-    <button
-      className="btn btn-success"
+    <ForwardRef
+      bsStyle="success"
       onClick={[Function]}
-      type="button"
     >
-      Create pattern
-    </button>
+      <Button__StyledButton
+        bsStyle="success"
+        onClick={[Function]}
+      >
+        <StyledComponent
+          bsStyle="success"
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "SIZES": Array [
+                "large",
+                "small",
+                "xsmall",
+              ],
+              "STYLES": Array [
+                "success",
+                "warning",
+                "danger",
+                "info",
+                "default",
+                "primary",
+                "link",
+              ],
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Button__StyledButton-c9cbmb-0",
+                "isStatic": false,
+                "lastClassName": "eplzcT",
+                "rules": Array [
+                  [Function],
+                ],
+              },
+              "displayName": "Button__StyledButton",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          onClick={[Function]}
+        >
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="success"
+            className="Button__StyledButton-c9cbmb-0 eplzcT"
+            disabled={false}
+            onClick={[Function]}
+          >
+            <button
+              className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-success"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Create pattern
+            </button>
+          </Button>
+        </StyledComponent>
+      </Button__StyledButton>
+    </ForwardRef>
     <BootstrapModalForm
       bsSize="large"
       cancelButtonText="Cancel"
