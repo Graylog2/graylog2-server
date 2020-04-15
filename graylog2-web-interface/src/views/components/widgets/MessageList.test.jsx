@@ -44,7 +44,6 @@ jest.mock('views/stores/ViewStore', () => ({
 }));
 jest.mock('stores/inputs/InputsStore', () => MockStore('listen', 'getInitialState'));
 jest.mock('actions/inputs/InputsActions', () => ({ list: jest.fn(() => Promise.resolve()) }));
-jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 jest.mock('views/stores/SelectedFieldsStore', () => ({
   SelectedFieldsStore: MockStore('listen', 'selectedFields'),
 }));

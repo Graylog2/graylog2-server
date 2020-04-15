@@ -13,8 +13,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
-jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
-
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };
 
