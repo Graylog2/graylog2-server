@@ -19,12 +19,10 @@ package org.graylog2.indexer.fieldtypes;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -35,7 +33,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class MappedFieldTypesServiceTest {
@@ -53,10 +50,7 @@ public class MappedFieldTypesServiceTest {
     @Before
     public void setUp() throws Exception {
         this.mappedFieldTypesService = new MappedFieldTypesService(streamService, indexFieldTypesService, new FieldTypeMapper());
-        final Stream stream = mock(Stream.class, Answers.RETURNS_DEEP_STUBS);
-        when(stream.getIndexSet().getConfig().id()).thenReturn("indexSetId");
-        final Set<Stream> streams = Collections.singleton(stream);
-        when(streamService.loadByIds(Collections.singleton("stream1"))).thenReturn(streams);
+        when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
     }
 
     @Test
@@ -75,7 +69,7 @@ public class MappedFieldTypesServiceTest {
                         FieldTypeDTO.create("field2", "long")
                 )
         );
-        when(indexFieldTypesService.findForIndexSet("indexSetId")).thenReturn(fieldTypes);
+        when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"));
         assertThat(result).containsExactlyInAnyOrder(
@@ -100,7 +94,7 @@ public class MappedFieldTypesServiceTest {
                         FieldTypeDTO.create("field2", "long")
                 )
         );
-        when(indexFieldTypesService.findForIndexSet("indexSetId")).thenReturn(fieldTypes);
+        when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"));
         assertThat(result).containsExactlyInAnyOrder(

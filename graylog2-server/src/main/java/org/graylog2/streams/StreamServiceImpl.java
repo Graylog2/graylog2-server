@@ -52,6 +52,7 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.streams.events.StreamDeletedEvent;
 import org.graylog2.streams.events.StreamsChangedEvent;
+import org.mongojack.DBProjection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,6 +255,18 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         final DBObject query = QueryBuilder.start("_id").in(objectIds).get();
 
         return ImmutableSet.copyOf(loadAll(query));
+    }
+
+    @Override
+    public Set<String> indexSetIdsByIds(Collection<String> streamIds) {
+        final Set<ObjectId> objectIds = streamIds.stream()
+                .map(ObjectId::new)
+                .collect(Collectors.toSet());
+        final DBObject query = QueryBuilder.start("_id").in(objectIds).get();
+        final DBObject onlyIndexSetIdField = DBProjection.include(StreamImpl.FIELD_INDEX_SET_ID);
+        return StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
+                .map(s -> s.get(StreamImpl.FIELD_INDEX_SET_ID).toString())
+                .collect(Collectors.toSet());
     }
 
     @Override
