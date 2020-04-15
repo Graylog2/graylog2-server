@@ -68,7 +68,7 @@ public class V20200409083200_RemoveRootQueriesFromMigratedDashboards extends Mig
     @Inject
     public V20200409083200_RemoveRootQueriesFromMigratedDashboards(ClusterConfigService clusterConfigService,
                                                                    MongoConnection mongoConnection) {
-        this(clusterConfigService, mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME_SEARCHES), mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME_VIEWS));
+        this(clusterConfigService, mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME_VIEWS), mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME_SEARCHES));
     }
 
     @VisibleForTesting
