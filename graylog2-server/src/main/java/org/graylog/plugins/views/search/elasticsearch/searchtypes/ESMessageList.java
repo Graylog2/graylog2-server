@@ -33,13 +33,11 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog2.decorators.Decorator;
-import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
@@ -47,7 +45,6 @@ import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,24 +55,21 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     private final ESQueryDecorators esQueryDecorators;
-    private final DecoratorProcessor decoratorProcessor;
-    private final Map<String, SearchResponseDecorator.Factory> searchResponseDecorators;
+    private final LegacyDecoratorProcessor decoratorProcessor;
     private final boolean allowHighlighting;
 
     @Inject
     public ESMessageList(ESQueryDecorators esQueryDecorators,
-                         DecoratorProcessor decoratorProcessor,
-                         Map<String, SearchResponseDecorator.Factory> searchResponseDecorators,
+                         LegacyDecoratorProcessor decoratorProcessor,
                          @Named("allow_highlighting") boolean allowHighlighting) {
         this.esQueryDecorators = esQueryDecorators;
         this.decoratorProcessor = decoratorProcessor;
-        this.searchResponseDecorators = searchResponseDecorators;
         this.allowHighlighting = allowHighlighting;
     }
 
     @VisibleForTesting
     public ESMessageList(ESQueryDecorators esQueryDecorators) {
-        this(esQueryDecorators, new DecoratorProcessor.Fake(), Collections.emptyMap(), false);
+        this(esQueryDecorators, new LegacyDecoratorProcessor.Fake(), false);
     }
 
     @Override
@@ -147,24 +141,12 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 to
         );
 
-        final SearchResponse decoratedSearchResponse = decorateSearchResponse(searchResponse, searchType.decorators());
+        final SearchResponse decoratedSearchResponse = decoratorProcessor.decorateSearchResponse(searchResponse, searchType.decorators());
 
         final MessageList.Result.Builder resultBuilder = MessageList.Result.result(searchType.id())
                 .messages(decoratedSearchResponse.messages())
                 .effectiveTimerange(AbsoluteRange.create(from, to))
                 .totalResults(decoratedSearchResponse.totalResults());
         return searchType.name().map(resultBuilder::name).orElse(resultBuilder).build();
-    }
-
-    private SearchResponse decorateSearchResponse(SearchResponse searchResponse, List<Decorator> decorators) {
-        if (decorators.isEmpty()) {
-            return searchResponse;
-        }
-        final List<SearchResponseDecorator> searchResponseDecorators = decorators
-                .stream()
-                .sorted(Comparator.comparing(Decorator::order))
-                .map(decorator -> this.searchResponseDecorators.get(decorator.type()).create(decorator))
-                .collect(Collectors.toList());
-        return decoratorProcessor.decorate(searchResponse, searchResponseDecorators);
     }
 }
