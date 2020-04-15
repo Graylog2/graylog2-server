@@ -10,7 +10,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as Permissions from 'views/Permissions';
-import CurrentUserContext from 'components/contexts/CurrentUserContext';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import SavedSearchControls from './SavedSearchControls';
 

@@ -6,7 +6,7 @@ import { viewsManager } from 'fixtures/users';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 
-import CurrentUserContext from 'components/contexts/CurrentUserContext';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import ViewActionsMenu from './ViewActionsMenu';
 
 const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)

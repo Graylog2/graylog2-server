@@ -11,7 +11,7 @@ import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 
-import CurrentUserContext from 'components/contexts/CurrentUserContext';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
 import CustomPropTypes from '../CustomPropTypes';

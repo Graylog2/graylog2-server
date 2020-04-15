@@ -6,7 +6,7 @@ import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
 import { EntityListItem } from 'components/common';
-import CurrentUserContext from 'components/contexts/CurrentUserContext';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
 import withPluginEntities from 'views/logic/withPluginEntities';
 

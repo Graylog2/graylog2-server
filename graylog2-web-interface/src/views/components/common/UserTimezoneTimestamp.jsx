@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import CurrentUserContext from 'components/contexts/CurrentUserContext';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import Timestamp from 'components/common/Timestamp';
 import DateTime from 'logic/datetimes/DateTime';
