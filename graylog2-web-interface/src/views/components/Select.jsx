@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import ReactSelect, { components as Components } from 'react-select';
 import { Overlay } from 'react-overlays';
+import { createFilter } from 'react-select/lib/filters';
 
 const MultiValueRemove = (props) => {
   return (
@@ -65,10 +66,12 @@ const valueContainer = (base) => ({
 
 type Props = {
   components: { [string]: ComponentType<any> },
-  styles: { [string]: any }
+  styles: { [string]: any },
+  ignoreAccents: boolean,
+  ignoreCase: boolean,
 };
 
-const ValueWithTitle = (props: {data: { label: string }}) => {
+const ValueWithTitle = (props: { data: { label: string } }) => {
   const { data: { label } } = props;
   return <Components.MultiValue {...props} innerProps={{ title: label }} />;
 };
@@ -92,7 +95,7 @@ const MenuOverlay = (selectRef) => (props) => {
   );
 };
 
-const Select = ({ components, styles, ...rest }: Props) => {
+const Select = ({ components, styles, ignoreCase = true, ignoreAccents = false, ...rest }: Props) => {
   const selectRef = useRef(null);
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
   const menuStyle = useMemo(() => menu(selectRef), [selectRef]);
@@ -111,17 +114,29 @@ const Select = ({ components, styles, ...rest }: Props) => {
     option,
     valueContainer,
   };
-  return <ReactSelect {...rest} components={_components} styles={_styles} tabSelectsValue={false} ref={selectRef} />;
+  const filterOption = createFilter({ ignoreCase, ignoreAccents });
+  return (
+    <ReactSelect {...rest}
+                 components={_components}
+                 filterOption={filterOption}
+                 styles={_styles}
+                 tabSelectsValue={false}
+                 ref={selectRef} />
+  );
 };
 
 Select.propTypes = {
   components: PropTypes.object,
   styles: PropTypes.object,
+  ignoreAccents: PropTypes.bool,
+  ignoreCase: PropTypes.bool,
 };
 
 Select.defaultProps = {
   components: {},
   styles: {},
+  ignoreAccents: false,
+  ignoreCase: true,
 };
 
 export default Select;

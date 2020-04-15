@@ -20,6 +20,8 @@ exports[`SeriesSelect renders with minimal props 1`] = `
       }
     }
     escapeClearsValue={true}
+    ignoreAccents={false}
+    ignoreCase={true}
     isMulti={true}
     menuShouldScrollIntoView={true}
     onChange={[Function]}
@@ -43,6 +45,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
       defaultMenuIsOpen={false}
       defaultValue={null}
       escapeClearsValue={true}
+      filterOption={[Function]}
       isMulti={true}
       menuShouldScrollIntoView={true}
       onChange={[Function]}

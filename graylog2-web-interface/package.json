@@ -178,7 +178,7 @@
     "less-loader": "^4.1.0",
     "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^2.1.1",
-    "react-select-event": "^3.0.0",
+    "react-select-event": "^4.1.4",
     "react-styleguidist": "^10.6.1",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
