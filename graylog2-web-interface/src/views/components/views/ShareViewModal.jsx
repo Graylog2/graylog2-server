@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { get } from 'lodash';
 import UserNotification from 'util/UserNotification';
+import PropTypes from 'prop-types';
 
 import { FormGroup, HelpBlock, Radio } from 'components/graylog';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
@@ -22,7 +23,7 @@ import type { User } from 'stores/users/UsersStore';
 const RolesStore = StoreProvider.getStore('Roles');
 
 type Props = {
-  currentUser: User,
+  currentUser: ?User,
   onClose: (?ViewSharing) => void,
   view: View,
   show: boolean,
@@ -46,6 +47,17 @@ const Additional = ({ children }: { children: React.Node }) => <div style={{ pad
 const extractValue = ({ value }) => value;
 
 class ShareViewModal extends React.Component<Props, State> {
+  static propTypes = {
+    currentUser: PropTypes.object,
+    onClose: PropTypes.func.isRequired,
+    view: PropTypes.instanceOf(View).isRequired,
+    show: PropTypes.bool.isRequired,
+  }
+
+  static defaultProps = {
+    currentUser: {},
+  };
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -118,7 +130,7 @@ class ShareViewModal extends React.Component<Props, State> {
     this.setState({ viewSharing: specificUsers.toBuilder().users(users).build() });
   };
 
-  _isAdmin = (user: User) => (user.roles.includes('Admin') || user.permissions.includes('*'));
+  _isAdmin = (user: ?User = {}) => (user.roles.includes('Admin') || user.permissions.includes('*'));
 
   render() {
     const { show, view } = this.props;

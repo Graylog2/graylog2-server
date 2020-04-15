@@ -1,10 +1,8 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import { viewsManager } from 'fixtures/users';
+import { viewsManager, admin } from 'fixtures/users';
 
-import asMock from 'helpers/mocking/AsMock';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -16,19 +14,7 @@ import CurrentUserContext from 'components/contexts/CurrentUserContext';
 
 import SavedSearchControls from './SavedSearchControls';
 
-const mockUser = {
-  username: 'someone',
-  permissions: [],
-};
-
-jest.mock('stores/users/CurrentUserStore', () => ({
-  getInitialState: jest.fn(() => ({ currentUser: mockUser })),
-  listen: jest.fn(() => {}),
-  get: jest.fn(() => mockUser),
-}));
-
 describe('SavedSearchControls', () => {
-  const userId = viewsManager.id;
   const createViewStoreState = (dirty = true, id) => ({
     activeQuery: '',
     view: View.builder()
@@ -79,13 +65,13 @@ describe('SavedSearchControls', () => {
 
     describe('has "Share search" option', () => {
       it('includes the option to share the current search', () => {
-        const wrapper = mountSavedSearchControls()({ viewStoreState: createViewStoreState(false, userId) });
+        const wrapper = mountSavedSearchControls()({ viewStoreState: createViewStoreState(false, 'some-id') });
 
         expect(wrapper.find('MenuItem[title="Share search"]')).toExist();
       });
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', () => {
-        const wrapper = mountSavedSearchControls()({ viewStoreState: createViewStoreState(false, userId) });
+        const wrapper = mountSavedSearchControls()({ viewStoreState: createViewStoreState(false, 'some-id') });
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -98,7 +84,7 @@ describe('SavedSearchControls', () => {
           username: 'owningUser',
           permissions: [],
         };
-        const wrapper = mountSavedSearchControls(undefined, undefined, owningUser)({ viewStoreState: createViewStoreState(false, userId) });
+        const wrapper = mountSavedSearchControls(undefined, undefined, owningUser)({ viewStoreState: createViewStoreState(false, owningUser.id) });
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
@@ -108,22 +94,16 @@ describe('SavedSearchControls', () => {
         const owningUser = {
           ...viewsManager,
           username: 'powerfulUser',
-          permissions: [Permissions.View.Edit(userId)],
+          permissions: [Permissions.View.Edit(viewsManager.id)],
         };
-        const wrapper = mountSavedSearchControls(undefined, undefined, owningUser)({ viewStoreState: createViewStoreState(false, userId) });
+        const wrapper = mountSavedSearchControls(undefined, undefined, owningUser)({ viewStoreState: createViewStoreState(false, owningUser.id) });
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
         expect(shareSearch).not.toBeDisabled();
       });
       it('which should be enabled if current user is admin', () => {
-        const owningUser = {
-          ...viewsManager,
-          username: 'powerfulUser',
-          permissions: ['*'],
-        };
-        asMock(CurrentUserStore.getInitialState).mockReturnValue();
-        const wrapper = mountSavedSearchControls(undefined, undefined, owningUser)({ viewStoreState: createViewStoreState(false, userId) });
+        const wrapper = mountSavedSearchControls(undefined, undefined, admin)({ viewStoreState: createViewStoreState(false, admin.id) });
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 

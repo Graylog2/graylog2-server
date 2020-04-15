@@ -42,7 +42,6 @@ describe('ShareViewModal', () => {
     .title('My fabulous view')
     .type(View.Type.Search)
     .build();
-  const currentUser = { roles: [], permissions: [] };
   const onClose = jest.fn();
 
   afterEach(() => {
@@ -131,12 +130,12 @@ describe('ShareViewModal', () => {
     });
   });
   it('displays correct description if view is a search', () => {
-    const wrapper = mount(<ShareViewModal show view={view} currentUser={currentUser} onClose={onClose} />);
-    expect(wrapper).toIncludeText('Who is supposed to access the search My fabulous view');
+    const wrapper = mount(<ShareViewModal show view={view} currentUser={viewsManager} onClose={onClose} />);
+    expect(wrapper.contains(/'Who is supposed to access the search My fabulous view?'/)).toBe(true);
   });
   it('displays correct description if view is a dashboard', () => {
     const dashboardView = view.toBuilder().type(View.Type.Dashboard).build();
-    const wrapper = mount(<ShareViewModal show view={dashboardView} currentUser={currentUser} onClose={onClose} />);
-    expect(wrapper).toIncludeText('Who is supposed to access the dashboard My fabulous view');
+    const wrapper = mount(<ShareViewModal show view={dashboardView} currentUser={viewsManager} onClose={onClose} />);
+    expect(wrapper.contains(/'Who is supposed to access the dashboard My fabulous view?'/)).toBe(true);
   });
 });

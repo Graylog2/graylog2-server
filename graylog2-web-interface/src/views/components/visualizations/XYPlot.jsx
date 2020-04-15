@@ -54,7 +54,7 @@ const XYPlot = ({
   plotLayout = {},
   onZoom = OnZoom,
 }: Props) => {
-  const { timezone } = useContext(CurrentUserContext);
+  const { timezone } = useContext(CurrentUserContext) || { timezone: 'UTC' };
   const yaxis = { fixedrange: true, rangemode: 'tozero' };
   const defaultLayout: {yaxis: Object, legend?: Object} = { yaxis };
   if (height) {

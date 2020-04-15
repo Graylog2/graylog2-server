@@ -8,10 +8,11 @@ import CurrentUserContext from 'components/contexts/CurrentUserContext';
 import DateTime from 'logic/datetimes/DateTime';
 
 const SearchResultOverview = ({ results }) => {
-  const { timestamp } = useContext(CurrentUserContext);
+  const { timezone } = useContext(CurrentUserContext) || { timezone: 'UTC' };
+  const { timestamp } = results;
   return (
     <span>
-      Query executed in {numeral(results.duration).format('0,0')}ms at <Timestamp dateTime={timestamp} format={DateTime.Formats.DATETIME} />.
+      Query executed in {numeral(results.duration).format('0,0')}ms at <Timestamp dateTime={timestamp} format={DateTime.Formats.DATETIME} tz={timezone} />.
     </span>
   );
 };
