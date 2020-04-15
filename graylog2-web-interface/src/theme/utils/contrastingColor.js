@@ -1,5 +1,4 @@
 import chroma from 'chroma-js';
-import { memoize } from 'lodash';
 
 /**
  * Accepts a color and [WCAG distinguishable level](https://www.w3.org/TR/WCAG21/#distinguishable), it then returns a properly contrasting color.
@@ -18,7 +17,7 @@ const contrastRatios = {
   AAALarge: 4.5,
 };
 
-const contrastingColor = memoize((color, wcagLevel = 'AAA') => {
+const contrastingColor = (color, wcagLevel = 'AAA') => {
   const mixStep = 0.05;
   const mixColor = chroma(color).luminance() < 0.5 ? '#fff' : '#000';
   let mixture = 0;
@@ -36,6 +35,6 @@ const contrastingColor = memoize((color, wcagLevel = 'AAA') => {
   }
 
   return outputColor;
-});
+};
 
 export default contrastingColor;

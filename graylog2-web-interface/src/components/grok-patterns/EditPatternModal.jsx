@@ -135,7 +135,7 @@ class EditPatternModal extends React.Component {
       <span>
         <Button onClick={this.openModal}
                 bsStyle={create ? 'success' : 'info'}
-                bsSize={create ? '' : 'xs'}>
+                bsSize={create ? undefined : 'xs'}>
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
