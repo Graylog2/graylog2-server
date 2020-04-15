@@ -2,6 +2,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
+import { MessageDetailsDefinitionList } from 'components/graylog';
+
 type Props = {
   timestamp: string,
   receivedBy: React.Node,
@@ -10,7 +12,7 @@ type Props = {
 };
 
 const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
-  <dl className="message-details">
+  <MessageDetailsDefinitionList>
     {timestamp}
     {receivedBy}
 
@@ -27,7 +29,7 @@ const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
         </dd>
       </>
     )}
-  </dl>
+  </MessageDetailsDefinitionList>
 );
 
 export default MessageMetadata;
