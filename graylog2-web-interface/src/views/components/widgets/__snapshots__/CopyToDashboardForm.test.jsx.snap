@@ -57,7 +57,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 eplzcT submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 eplzcT reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -198,14 +198,14 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 eplzcT btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
               disabled=""
               type="button"
             >
               Select
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 eplzcT btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
               type="button"
             >
               Cancel
@@ -275,7 +275,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 eplzcT submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -286,7 +286,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 eplzcT reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -453,14 +453,14 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 eplzcT btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
               disabled=""
               type="button"
             >
               Select
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 eplzcT btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
               type="button"
             >
               Cancel

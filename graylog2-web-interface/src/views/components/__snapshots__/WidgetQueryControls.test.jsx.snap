@@ -18,7 +18,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           <button
             aria-expanded="false"
             aria-haspopup="true"
-            class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 jtdRtb dropdown-toggle btn btn-info"
+            class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 ZNXPm dropdown-toggle btn btn-info"
             id="dropdown-timerange-selector"
             role="button"
             type="button"
@@ -192,7 +192,7 @@ exports[`WidgetQueryControls should do something 1`] = `
         </a>
       </div>
       <button
-        class="Button__StyledButton-c9cbmb-0 eplzcT pull-left search-button-execute btn btn-success"
+        class="Button__StyledButton-c9cbmb-0 jVYrA pull-left search-button-execute btn btn-success"
         type="submit"
       >
         <svg
