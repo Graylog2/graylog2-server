@@ -70,8 +70,6 @@ class ShareViewModal extends React.Component<Props, State> {
 
   componentDidMount() {
     const { view, currentUser } = this.props;
-    const isAdmin = this._isAdmin(currentUser);
-    console.log('isAdmin', isAdmin);
     Promise.all([
       ViewSharingActions.get(view.id),
       ViewSharingActions.users(view.id),
