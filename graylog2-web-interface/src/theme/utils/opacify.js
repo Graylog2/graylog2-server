@@ -1,6 +1,6 @@
 import chroma from 'chroma-js';
 
-const opacify = (color, amount) => {
+function opacify(color, amount) {
   /**
    * Increases the opacity of a color. Its range for the amount is between 0 to 1.
    *
@@ -16,6 +16,6 @@ const opacify = (color, amount) => {
   const newAlpha = (parsedAlpha * 100 + parseFloat(amount) * 100) / 100;
 
   return chroma(color).alpha(newAlpha).css();
-};
+}
 
 export default opacify;

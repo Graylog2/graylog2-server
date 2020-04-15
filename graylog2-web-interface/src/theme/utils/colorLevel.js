@@ -1,9 +1,8 @@
 
 import chroma from 'chroma-js';
-
 import { teinte } from 'theme/colors';
 
-const colorLevel = (colorHex, level = 0) => {
+export default function colorLevel(colorHex, level = 0) {
   /**
    * Recreating `color-level` from Bootstrap's SCSS functions
    * https://github.com/twbs/bootstrap/blob/08ba61e276a6393e8e2b97d56d2feb70a24fe22c/scss/_functions.scss#L97
@@ -17,6 +16,4 @@ const colorLevel = (colorHex, level = 0) => {
   const mixLevel = absLevel < 0 ? 0 : upperLevel;
 
   return chroma.mix(colorBase, colorHex, mixLevel).css();
-};
-
-export default colorLevel;
+}

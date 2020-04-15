@@ -9,11 +9,10 @@ const StyledButton = styled(BootstrapButton)(({ theme }) => `
   ${theme.components.button}
 `);
 
-const Button = forwardRef((props, ref) => {
-  return <StyledButton {...props} ref={ref} />;
-});
+const Button = forwardRef((props, ref) => <StyledButton {...props} ref={ref} />);
 
 Button.propTypes = propTypes;
 Button.defaultProps = defaultProps;
 
 export default Button;
+export { StyledButton };
