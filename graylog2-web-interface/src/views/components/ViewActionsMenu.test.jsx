@@ -2,6 +2,7 @@
 import React from 'react';
 import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 import { viewsManager } from 'fixtures/users';
+import type { User } from 'stores/users/UsersStore';
 
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
@@ -54,14 +55,18 @@ jest.mock('views/stores/ViewSharingStore', () => ({
 describe('ViewActionsMenu', () => {
   afterEach(cleanup);
 
-  const renderViewActionsMenu = (currentUser = viewsManager) => (props) => render(
+  const SimpleViewActionMenu = ({ currentUser, ...props }: {currentUser?: User}) => (
     <CurrentUserContext.Provider value={currentUser}>
-      <ViewActionsMenu router={{}} {...props} />
-    </CurrentUserContext.Provider>,
+      <ViewActionsMenu {...props} router={{}} />
+    </CurrentUserContext.Provider>
   );
 
+  SimpleViewActionMenu.defaultProps = {
+    currentUser: viewsManager,
+  };
+
   it('should open modal to save new dashboard', () => {
-    const { getByTestId, getByText } = renderViewActionsMenu()();
+    const { getByTestId, getByText } = render(<SimpleViewActionMenu />);
     const saveAsMenuItem = getByTestId('dashboard-save-as-button');
     fireEvent.click(saveAsMenuItem);
 
@@ -69,7 +74,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should open edit dashboard meta information modal', () => {
-    const { getByText } = renderViewActionsMenu()();
+    const { getByText } = render(<SimpleViewActionMenu />);
     const editMenuItem = getByText(/Edit/i);
     fireEvent.click(editMenuItem);
 
@@ -77,7 +82,7 @@ describe('ViewActionsMenu', () => {
   });
 
   it('should dashboard share modal', () => {
-    const { getByText } = renderViewActionsMenu()();
+    const { getByText } = render(<SimpleViewActionMenu />);
     const editMenuItem = getByText(/Share/i);
     fireEvent.click(editMenuItem);
 
