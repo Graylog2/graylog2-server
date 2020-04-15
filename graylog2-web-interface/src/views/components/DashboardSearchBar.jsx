@@ -68,7 +68,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                       {({ field: { name, value, onChange } }) => (
                         <QueryInput value={value}
                                     placeholder="Apply filter to all widgets"
-                                    onChange={(newQuery) => onChange({ target: { value: newQuery, name } })}
+                                    onChange={(newQuery) => { onChange({ target: { value: newQuery, name } }); return Promise.resolve(); }}
                                     onExecute={handleSubmit} />
                       )}
                     </Field>
