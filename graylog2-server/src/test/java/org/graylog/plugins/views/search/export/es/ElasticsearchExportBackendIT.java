@@ -188,6 +188,8 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         LinkedHashSet<SimpleMessage> allMessages = new LinkedHashSet<>();
 
         for (SimpleMessageChunk chunk : allChunks) {
+            for (SimpleMessage msg : chunk.messages())
+                msg.fields().remove("_id");
             allMessages.addAll(chunk.messages());
         }
 
