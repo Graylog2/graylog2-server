@@ -17,7 +17,7 @@ import type {
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
 
-import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
+import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -117,11 +117,10 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
 const ViewAdditionalContextProvider = connect(
   AdditionalContext.Provider,
-  { view: ViewStore, configs: SearchConfigStore, highlightingRules: HighlightingRulesStore },
-  ({ view, configs: { searchesClusterConfig }, highlightingRules }) => ({
+  { view: ViewStore, configs: SearchConfigStore },
+  ({ view, configs: { searchesClusterConfig } }) => ({
     value: {
       analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields,
-      highlightingRules: highlightingRules.reduce((prev, cur) => ({ ...prev, [cur.field]: prev[cur.field] ? [...prev[cur.field], cur] : [cur] }), {}),
       view: view.view,
     },
   }),
