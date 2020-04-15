@@ -42,14 +42,14 @@ describe('SavedSearchControls', () => {
     dirty,
   });
 
-  const mountSavedSearchControls = (loadNewView = () => Promise.resolve(), onLoadView, currentUser = viewsManager) => (props) => mount(
-    <CurrentUserContext.Provider value={currentUser}>
-      <NewViewLoaderContext.Provider value={loadNewView}>
-        <ViewLoaderContext.Provider value={onLoadView}>
+  const mountSavedSearchControls = (loadNewView = () => Promise.resolve(), onLoadView = () => Promise.resolve(), currentUser = viewsManager) => (props) => mount(
+    <ViewLoaderContext.Provider value={onLoadView}>
+      <CurrentUserContext.Provider value={currentUser}>
+        <NewViewLoaderContext.Provider value={loadNewView}>
           <SavedSearchControls viewStoreState={createViewStoreState()} {...props} />
-        </ViewLoaderContext.Provider>
-      </NewViewLoaderContext.Provider>
-    </CurrentUserContext.Provider>,
+        </NewViewLoaderContext.Provider>
+      </CurrentUserContext.Provider>,
+    </ViewLoaderContext.Provider>,
   );
 
   describe('Button handling', () => {
@@ -67,7 +67,7 @@ describe('SavedSearchControls', () => {
       const onLoadView = jest.fn((view) => {
         return new Promise(() => view);
       });
-      const wrapper = mountSavedSearchControls(undefined, onLoadView)();
+      const wrapper = mountSavedSearchControls(undefined, onLoadView)({ viewStoreState: createViewStoreState(false) });
       wrapper.find('button[title="Save search"]').simulate('click');
       wrapper.find('input[value="title"]').simulate('change', { target: { value: 'Test' } });
       wrapper.find('button[children="Create new"]').simulate('click');
@@ -76,6 +76,7 @@ describe('SavedSearchControls', () => {
         done();
       });
     });
+
     describe('has "Share search" option', () => {
       it('includes the option to share the current search', () => {
         const wrapper = mountSavedSearchControls()({ viewStoreState: createViewStoreState(false, userId) });
