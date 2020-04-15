@@ -27,16 +27,17 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class MessagesExporter {
     private final Defaults defaults;
     private final ExportBackend backend;
+    private final ChunkDecorator chunkDecorator;
 
     @Inject
-    public MessagesExporter(Defaults defaults, ExportBackend backend) {
+    public MessagesExporter(Defaults defaults, ExportBackend backend, ChunkDecorator chunkDecorator) {
         this.defaults = defaults;
         this.backend = backend;
+        this.chunkDecorator = chunkDecorator;
     }
 
     public void export(MessagesRequest request, Consumer<SimpleMessageChunk> chunkForwarder) {
@@ -50,7 +51,23 @@ public class MessagesExporter {
     }
 
     public void export(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
-        exportWithRequestFrom(search, searchTypeId, resultFormat, chunkForwarder);
+        Consumer<SimpleMessageChunk> decoratedForwarder = decorateIfNecessary(search, searchTypeId, chunkForwarder);
+
+        exportWithRequestFrom(search, searchTypeId, resultFormat, decoratedForwarder);
+    }
+
+    private Consumer<SimpleMessageChunk> decorateIfNecessary(Search search, String searchTypeId, Consumer<SimpleMessageChunk> chunkForwarder) {
+        Optional<MessageList> messageList = messageListFrom(singleQueryFrom(search), searchTypeId);
+
+        return messageList.isPresent()
+                ? chunk -> decorate(chunkForwarder, messageList.get(), chunk)
+                : chunkForwarder;
+    }
+
+    private void decorate(Consumer<SimpleMessageChunk> chunkForwarder, MessageList messageList, SimpleMessageChunk chunk) {
+        SimpleMessageChunk decoratedChunk = chunkDecorator.decorate(chunk, messageList);
+
+        chunkForwarder.accept(decoratedChunk);
     }
 
     private void exportWithRequestFrom(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
@@ -148,11 +165,5 @@ public class MessagesExporter {
         return query.searchTypes().stream()
                 .filter(st -> st.id().equals(searchTypeId))
                 .findFirst();
-    }
-
-    private String reduce(LinkedHashSet<LinkedHashSet<String>> hits) {
-        return hits.stream()
-                .map(row -> String.join(" ", row))
-                .collect(Collectors.joining("\r\n"));
     }
 }

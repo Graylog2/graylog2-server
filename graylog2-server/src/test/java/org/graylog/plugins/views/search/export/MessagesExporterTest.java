@@ -34,27 +34,33 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.function.Consumer;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
+import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class MessagesExporterTest {
 
     private ExportBackend backend;
     private MessagesExporter sut;
+    private ChunkDecorator chunkDecorator;
 
     @BeforeEach
     void setUp() {
         backend = mock(ExportBackend.class);
-        sut = new MessagesExporter(new Defaults(), backend);
+        chunkDecorator = mock(ChunkDecorator.class);
+        sut = new MessagesExporter(new Defaults(), backend, chunkDecorator);
     }
 
     @Test
@@ -292,6 +298,37 @@ class MessagesExporterTest {
                 .withMessageContaining("multiple queries");
     }
 
+    @Test
+    void appliesMessageListDecorators() {
+        MessageList messageList = MessageList.builder().id("ml-id").build();
+        Search search = searchWithQueries(validQueryBuilderWith(messageList).build());
+
+        SimpleMessageChunk undecoratedChunk = SimpleMessageChunk.from(linkedHashSetOf("field-1"), linkedHashSetOf());
+        SimpleMessageChunk decoratedChunk = SimpleMessageChunk.from(linkedHashSetOf("field-1", "field-2"), linkedHashSetOf());
+
+        when(chunkDecorator.decorate(undecoratedChunk, messageList)).thenReturn(decoratedChunk);
+
+        ArrayList<SimpleMessageChunk> results = exportSearchTypeWithStubbedSingleChunkFromBackend(search, messageList.id(), undecoratedChunk);
+
+        assertThat(results).containsExactly(decoratedChunk);
+    }
+
+    private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {
+        @SuppressWarnings("unchecked") ArgumentCaptor<Consumer<SimpleMessageChunk>> captor = ArgumentCaptor.forClass(Consumer.class);
+
+        doNothing().when(backend).run(any(), captor.capture());
+
+        ArrayList<SimpleMessageChunk> results = new ArrayList<>();
+
+        exportSearchType(s, searchTypeId, ResultFormat.builder().build(), results::add);
+
+        Consumer<SimpleMessageChunk> forwarderFromBackend = captor.getValue();
+
+        forwarderFromBackend.accept(chunkFromBackend);
+
+        return results;
+    }
+
     private AndFilter streamFilter(String... streamIds) {
         StreamFilter[] filters = Arrays.stream(streamIds)
                 .map(StreamFilter::ofId)
@@ -322,13 +359,21 @@ class MessagesExporterTest {
     }
 
     private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat) {
-        sut.export(search, searchTypeId, resultFormat, x -> {
+        exportSearchType(search, searchTypeId, resultFormat, x -> {
         });
     }
 
+    private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> forwarder) {
+        sut.export(search, searchTypeId, resultFormat, forwarder);
+    }
+
     private void exportSearch(Search search, ResultFormat resultFormat) {
-        sut.export(search, resultFormat, x -> {
+        exportSearch(search, resultFormat, x -> {
         });
+    }
+
+    private void exportSearch(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> forwarder) {
+        sut.export(search, resultFormat, forwarder);
     }
 
     private Search searchWithQueries(Query... queries) {

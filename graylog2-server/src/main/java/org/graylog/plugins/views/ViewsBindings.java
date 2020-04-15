@@ -37,7 +37,9 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.export.ChunkDecorator;
 import org.graylog.plugins.views.search.export.ExportBackend;
+import org.graylog.plugins.views.search.export.LegacyChunkDecorator;
 import org.graylog.plugins.views.search.export.SimpleMessageChunkCsvWriter;
 import org.graylog.plugins.views.search.export.es.ElasticsearchExportBackend;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -138,6 +140,7 @@ public class ViewsBindings extends ViewsModule {
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
         bind(ExportBackend.class).to(ElasticsearchExportBackend.class);
+        bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
 
         registerWidgetConfigSubtypes();
 
