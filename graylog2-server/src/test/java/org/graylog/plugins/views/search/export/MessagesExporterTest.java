@@ -46,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -306,7 +307,7 @@ class MessagesExporterTest {
         SimpleMessageChunk undecoratedChunk = SimpleMessageChunk.from(linkedHashSetOf("field-1"), linkedHashSetOf());
         SimpleMessageChunk decoratedChunk = SimpleMessageChunk.from(linkedHashSetOf("field-1", "field-2"), linkedHashSetOf());
 
-        when(chunkDecorator.decorate(undecoratedChunk, messageList)).thenReturn(decoratedChunk);
+        when(chunkDecorator.decorate(eq(undecoratedChunk), eq(messageList.decorators()), any())).thenReturn(decoratedChunk);
 
         ArrayList<SimpleMessageChunk> results = exportSearchTypeWithStubbedSingleChunkFromBackend(search, messageList.id(), undecoratedChunk);
 

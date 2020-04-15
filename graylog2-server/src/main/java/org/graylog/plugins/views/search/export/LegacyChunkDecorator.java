@@ -17,8 +17,10 @@
 package org.graylog.plugins.views.search.export;
 
 import com.google.common.collect.ImmutableMultimap;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
-import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog2.decorators.Decorator;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
@@ -28,8 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.joda.time.DateTime.now;
 
 public class LegacyChunkDecorator implements ChunkDecorator {
 
@@ -41,11 +41,11 @@ public class LegacyChunkDecorator implements ChunkDecorator {
     }
 
     @Override
-    public SimpleMessageChunk decorate(SimpleMessageChunk undecoratedChunk, MessageList messageList) {
+    public SimpleMessageChunk decorate(SimpleMessageChunk undecoratedChunk, List<Decorator> decorators, MessagesRequest request) {
 
-        SearchResponse undecoratedLegacyResponse = legacySearchResponseFrom(undecoratedChunk);
+        SearchResponse undecoratedLegacyResponse = legacySearchResponseFrom(undecoratedChunk, request);
 
-        SearchResponse decoratedLegacyResponse = decoratorProcessor.decorateSearchResponse(undecoratedLegacyResponse, messageList.decorators());
+        SearchResponse decoratedLegacyResponse = decoratorProcessor.decorateSearchResponse(undecoratedLegacyResponse, decorators);
 
         SimpleMessageChunk decoratedChunk = simpleMessageChunkFrom(decoratedLegacyResponse, undecoratedChunk.fieldsInOrder());
 
@@ -57,24 +57,26 @@ public class LegacyChunkDecorator implements ChunkDecorator {
                 .map(legacyMessage -> SimpleMessage.from(legacyMessage.index(), new LinkedHashMap<String, Object>(legacyMessage.message())))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
+        // use fieldsInOrder from undecoratedChunk, because the order can get mixed up when decorators are applied
         return SimpleMessageChunk.from(fieldsInOrder, messages);
     }
 
-    private SearchResponse legacySearchResponseFrom(SimpleMessageChunk chunk) {
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    private SearchResponse legacySearchResponseFrom(SimpleMessageChunk chunk, MessagesRequest request) {
         final List<ResultMessageSummary> legacyMessages = legacyMessagesFrom(chunk);
 
-        // we are only interested in the decorated message fields.
-        //
+        String queryString = ((ElasticsearchQueryString) request.queryString().get()).queryString();
+        TimeRange timeRange = request.timeRange().get();
         return SearchResponse.create(
-                "",
-                "",
+                queryString,
+                queryString,
                 Collections.emptySet(),
                 legacyMessages,
                 chunk.fieldsInOrder(),
-                0,
-                0,
-                now(),
-                now()
+                -1,
+                -1,
+                timeRange.getFrom(),
+                timeRange.getTo()
         );
     }
 

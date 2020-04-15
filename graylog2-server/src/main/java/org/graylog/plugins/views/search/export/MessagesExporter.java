@@ -47,33 +47,31 @@ public class MessagesExporter {
     }
 
     public void export(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
-        exportWithRequestFrom(search, null, resultFormat, chunkForwarder);
+        MessagesRequest request = buildRequest(search, null, resultFormat);
+
+        export(request, chunkForwarder);
     }
 
     public void export(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
-        Consumer<SimpleMessageChunk> decoratedForwarder = decorateIfNecessary(search, searchTypeId, chunkForwarder);
+        MessagesRequest request = buildRequest(search, searchTypeId, resultFormat);
 
-        exportWithRequestFrom(search, searchTypeId, resultFormat, decoratedForwarder);
+        Consumer<SimpleMessageChunk> decoratedForwarder = decorateIfNecessary(search, searchTypeId, chunkForwarder, request);
+
+        export(request, decoratedForwarder);
     }
 
-    private Consumer<SimpleMessageChunk> decorateIfNecessary(Search search, String searchTypeId, Consumer<SimpleMessageChunk> chunkForwarder) {
+    private Consumer<SimpleMessageChunk> decorateIfNecessary(Search search, String searchTypeId, Consumer<SimpleMessageChunk> chunkForwarder, MessagesRequest request) {
         Optional<MessageList> messageList = messageListFrom(singleQueryFrom(search), searchTypeId);
 
         return messageList.isPresent()
-                ? chunk -> decorate(chunkForwarder, messageList.get(), chunk)
+                ? chunk -> decorate(chunkForwarder, messageList.get(), chunk, request)
                 : chunkForwarder;
     }
 
-    private void decorate(Consumer<SimpleMessageChunk> chunkForwarder, MessageList messageList, SimpleMessageChunk chunk) {
-        SimpleMessageChunk decoratedChunk = chunkDecorator.decorate(chunk, messageList);
+    private void decorate(Consumer<SimpleMessageChunk> chunkForwarder, MessageList messageList, SimpleMessageChunk chunk, MessagesRequest request) {
+        SimpleMessageChunk decoratedChunk = chunkDecorator.decorate(chunk, messageList.decorators(), request);
 
         chunkForwarder.accept(decoratedChunk);
-    }
-
-    private void exportWithRequestFrom(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
-        MessagesRequest request = buildRequest(search, searchTypeId, resultFormat);
-
-        export(request, chunkForwarder);
     }
 
     private MessagesRequest buildRequest(Search search, String searchTypeId, ResultFormat resultFormat) {
