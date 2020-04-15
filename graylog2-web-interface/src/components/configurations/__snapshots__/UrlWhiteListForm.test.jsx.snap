@@ -202,7 +202,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "iWqiEF",
+              "lastClassName": "eplzcT",
               "rules": Array [
                 [Function],
               ],
@@ -226,12 +226,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 iWqiEF"
+          className="Button__StyledButton-c9cbmb-0 eplzcT"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
+            className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -2189,7 +2189,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "iWqiEF",
+                            "lastClassName": "eplzcT",
                             "rules": Array [
                               [Function],
                             ],
@@ -2212,12 +2212,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
+                        className="Button__StyledButton-c9cbmb-0 eplzcT"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -4126,7 +4126,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "iWqiEF",
+                            "lastClassName": "eplzcT",
                             "rules": Array [
                               [Function],
                             ],
@@ -4149,12 +4149,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
+                        className="Button__StyledButton-c9cbmb-0 eplzcT"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -6063,7 +6063,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "iWqiEF",
+                            "lastClassName": "eplzcT",
                             "rules": Array [
                               [Function],
                             ],
@@ -6086,12 +6086,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 iWqiEF"
+                        className="Button__StyledButton-c9cbmb-0 eplzcT"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -6158,7 +6158,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "iWqiEF",
+              "lastClassName": "eplzcT",
               "rules": Array [
                 [Function],
               ],
@@ -6182,12 +6182,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 iWqiEF"
+          className="Button__StyledButton-c9cbmb-0 eplzcT"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-sm btn-default"
+            className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"

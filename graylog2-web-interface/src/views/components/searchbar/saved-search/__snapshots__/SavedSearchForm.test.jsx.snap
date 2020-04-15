@@ -82,6 +82,297 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         "warning": "#ffd200",
                       },
                     },
+                    "components": Object {
+                      "button": Array [
+                        Array [
+                          "&.btn-",
+                          "danger",
+                          "{background-color:",
+                          "#ad0707",
+                          ";border-color:",
+                          "#b23939",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#a00e0e",
+                          ";border-color:",
+                          "#a53636",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}&.active{background-color:",
+                          "#b75151",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";:hover{background-color:",
+                          "#a94c4c",
+                          ";border-color:",
+                          "#ad5c5c",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";:hover{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "default",
+                          "{background-color:",
+                          "#e6e6e6",
+                          ";border-color:",
+                          "#e0e0e0",
+                          ";color:",
+                          "rgb(73,73,73)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#d4d4d4",
+                          ";border-color:",
+                          "#cfcfcf",
+                          ";color:",
+                          "#444444",
+                          ";}&.active{background-color:",
+                          "#dadada",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(49,49,49)",
+                          ";:hover{background-color:",
+                          "#cacaca",
+                          ";border-color:",
+                          "#c4c4c4",
+                          ";color:",
+                          "#2f2f2f",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";:hover{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "info",
+                          "{background-color:",
+                          "#0063be",
+                          ";border-color:",
+                          "#3970c2",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0c5cb0",
+                          ";border-color:",
+                          "#3668b3",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}&.active{background-color:",
+                          "#517cc5",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";:hover{background-color:",
+                          "#4b73b6",
+                          ";border-color:",
+                          "#5c7dba",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";:hover{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "link",
+                          "{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebebeb26",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#68267b",
+                          ";}&.active{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#410057",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#3d0c51",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "primary",
+                          "{background-color:",
+                          "#702785",
+                          ";border-color:",
+                          "#7b458e",
+                          ";color:",
+                          "rgb(234,229,236)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#68267b",
+                          ";border-color:",
+                          "#724083",
+                          ";color:",
+                          "#d8d3da",
+                          ";}&.active{background-color:",
+                          "#855996",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(250,249,251)",
+                          ";:hover{background-color:",
+                          "#7c538b",
+                          ";border-color:",
+                          "#846292",
+                          ";color:",
+                          "#e7e6e8",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";:hover{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "success",
+                          "{background-color:",
+                          "#00ae42",
+                          ";border-color:",
+                          "#39b356",
+                          ";color:",
+                          "rgb(249,252,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0ca13e",
+                          ";border-color:",
+                          "#36a550",
+                          ";color:",
+                          "#e6e9e6",
+                          ";}&.active{background-color:",
+                          "#51b866",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(249,252,250)",
+                          ";:hover{background-color:",
+                          "#4baa5f",
+                          ";border-color:",
+                          "#5cae6c",
+                          ";color:",
+                          "#e6e9e7",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";:hover{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "warning",
+                          "{background-color:",
+                          "#ffd200",
+                          ";border-color:",
+                          "#f9cd07",
+                          ";color:",
+                          "rgb(57,47,0)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebc20c",
+                          ";border-color:",
+                          "#e6bd0e",
+                          ";color:",
+                          "#362d0c",
+                          ";}&.active{background-color:",
+                          "#f2c70a",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(54,45,2)",
+                          ";:hover{background-color:",
+                          "#e0b80f",
+                          ";border-color:",
+                          "#d9b310",
+                          ";color:",
+                          "#332b0c",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";:hover{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";}}}",
+                        ],
+                      ],
+                    },
                     "mode": "teinte",
                   }
                 }
@@ -342,7 +633,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "eplzcT",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -366,13 +657,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT button btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -417,7 +708,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "eplzcT",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -440,12 +731,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -554,554 +845,296 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                         "warning": "#ffd200",
                       },
                     },
-                    "mode": "teinte",
-                  }
-                }
-              >
-                <Popover__StyledPopover
-                  id="saved-search-popover"
-                  title="Name of search"
-                >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Popover__StyledPopover-wd1j0g-0",
-                          "isStatic": false,
-                          "lastClassName": "cdMcFy",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Popover__StyledPopover",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Popover__StyledPopover-wd1j0g-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
-                    id="saved-search-popover"
-                    title="Name of search"
-                  >
-                    <Popover
-                      bsClass="popover"
-                      className="Popover__StyledPopover-wd1j0g-0 cdMcFy"
-                      id="saved-search-popover"
-                      placement="right"
-                      title="Name of search"
-                    >
-                      <div
-                        className="Popover__StyledPopover-wd1j0g-0 cdMcFy popover right"
-                        id="saved-search-popover"
-                        role="tooltip"
-                        style={
-                          Object {
-                            "display": "block",
-                            "left": undefined,
-                            "top": undefined,
-                          }
-                        }
-                      >
-                        <div
-                          className="arrow"
-                          style={
-                            Object {
-                              "left": undefined,
-                              "top": undefined,
-                            }
-                          }
-                        />
-                        <h3
-                          className="popover-title"
-                        >
-                          Name of search
-                        </h3>
-                        <div
-                          className="popover-content"
-                        >
-                          <form>
-                            <Component
-                              validationState={null}
-                            >
-                              <FormGroup__StyledFormGroup
-                                validationState={null}
-                              >
-                                <StyledComponent
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                        "isStatic": false,
-                                        "lastClassName": "ekazNr",
-                                        "rules": Array [
-                                          [Function],
-                                          ";",
-                                        ],
-                                      },
-                                      "displayName": "FormGroup__StyledFormGroup",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
-                                  validationState={null}
-                                >
-                                  <FormGroup
-                                    bsClass="form-group"
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
-                                    validationState={null}
-                                  >
-                                    <div
-                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
-                                    >
-                                      <ControlLabel>
-                                        <StyledComponent
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                                "isStatic": false,
-                                                "lastClassName": "hCskeX",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "ControlLabel",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
-                                        >
-                                          <ControlLabel
-                                            bsClass="control-label"
-                                            className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                            srOnly={false}
-                                          >
-                                            <label
-                                              className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                            >
-                                              Title
-                                            </label>
-                                          </ControlLabel>
-                                        </StyledComponent>
-                                      </ControlLabel>
-                                      <FormControl
-                                        onChange={[Function]}
-                                        placeholder="Enter title"
-                                        type="text"
-                                        value="new Title"
-                                      >
-                                        <StyledComponent
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "Feedback": [Function],
-                                              "SIZES": Array [
-                                                "small",
-                                                "large",
-                                              ],
-                                              "Static": [Function],
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "FormControl-sc-1amoaox-0",
-                                                "isStatic": false,
-                                                "lastClassName": "fcGLmv",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "FormControl",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "FormControl-sc-1amoaox-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
-                                          onChange={[Function]}
-                                          placeholder="Enter title"
-                                          type="text"
-                                          value="new Title"
-                                        >
-                                          <FormControl
-                                            bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 fcGLmv"
-                                            componentClass="input"
-                                            onChange={[Function]}
-                                            placeholder="Enter title"
-                                            type="text"
-                                            value="new Title"
-                                          >
-                                            <input
-                                              className="FormControl-sc-1amoaox-0 fcGLmv form-control"
-                                              onChange={[Function]}
-                                              placeholder="Enter title"
-                                              type="text"
-                                              value="new Title"
-                                            />
-                                          </FormControl>
-                                        </StyledComponent>
-                                      </FormControl>
-                                    </div>
-                                  </FormGroup>
-                                </StyledComponent>
-                              </FormGroup__StyledFormGroup>
-                            </Component>
-                            <ForwardRef
-                              bsStyle="primary"
-                              className="button"
-                              onClick={[Function]}
-                              type="submit"
-                            >
-                              <Button__StyledButton
-                                bsStyle="primary"
-                                className="button"
-                                onClick={[Function]}
-                                type="submit"
-                              >
-                                <StyledComponent
-                                  bsStyle="primary"
-                                  className="button"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "iWqiEF",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 hGhRKT button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="submit"
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hGhRKT button btn btn-primary"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="submit"
-                                    >
-                                      Save
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
-                              bsStyle="info"
-                              className="button"
-                              disabled={true}
-                              onClick={[Function]}
-                              type="submit"
-                            >
-                              <Button__StyledButton
-                                bsStyle="info"
-                                className="button"
-                                disabled={true}
-                                onClick={[Function]}
-                                type="submit"
-                              >
-                                <StyledComponent
-                                  bsStyle="info"
-                                  className="button"
-                                  disabled={true}
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "iWqiEF",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
-                                    disabled={true}
-                                    onClick={[Function]}
-                                    type="submit"
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
-                                      disabled={true}
-                                      onClick={[Function]}
-                                      type="submit"
-                                    >
-                                      Save as
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
-                              bsStyle="default"
-                              className="button"
-                              onClick={[Function]}
-                            >
-                              <Button__StyledButton
-                                bsStyle="default"
-                                className="button"
-                                onClick={[Function]}
-                              >
-                                <StyledComponent
-                                  bsStyle="default"
-                                  className="button"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "iWqiEF",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
-                                  onClick={[Function]}
-                                >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                          </form>
-                        </div>
-                      </div>
-                    </Popover>
-                  </StyledComponent>
-                </Popover__StyledPopover>
-              </ThemeProvider>
-            </GraylogThemeProvider>
-          </Popover>
-        </mock-position>
-      </MockPosition>
-    </mock-portal>
-  </MockPortal>
-</SavedSearchForm>
-`;
-
-exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
-<SavedSearchForm
-  disableCreateNew={false}
-  isCreateNew={false}
-  onChangeTitle={[Function]}
-  saveAsSearch={[Function]}
-  saveSearch={[Function]}
-  target={[Function]}
-  toggleModal={[Function]}
-  value="new Title"
->
-  <MockPortal>
-    <mock-portal>
-      <MockPosition
-        container={<body />}
-        placement="left"
-        target={[Function]}
-      >
-        <mock-position
-          container={<body />}
-          placement="left"
-          target={[Function]}
-        >
-          <Popover
-            id="saved-search-popover"
-            title="Name of search"
-          >
-            <GraylogThemeProvider>
-              <ThemeProvider
-                theme={
-                  Object {
-                    "color": Object {
-                      "brand": Object {
-                        "primary": "#ff3633",
-                        "secondary": "#fff",
-                        "tertiary": "#1f1f1f",
-                      },
-                      "global": Object {
-                        "background": "#e8e8e8",
-                        "contentBackground": "#fff",
-                        "link": "#702785",
-                        "linkHover": "#410057",
-                        "textAlt": "#fff",
-                        "textDefault": "#1f1f1f",
-                      },
-                      "gray": Object {
-                        "10": "#1f1f1f",
-                        "100": "#ffffff",
-                        "20": "#383838",
-                        "30": "#515151",
-                        "40": "#6a6a6a",
-                        "50": "#838383",
-                        "60": "#9b9b9b",
-                        "70": "#b4b4b4",
-                        "80": "#cdcdcd",
-                        "90": "#e6e6e6",
-                      },
-                      "variant": Object {
-                        "danger": "#ad0707",
-                        "dark": Object {
-                          "danger": "#5e0000",
-                          "default": "#000000",
-                          "info": "#002775",
-                          "primary": "#2b0042",
-                          "success": "#006600",
-                          "warning": "#ac8a00",
-                        },
-                        "default": "#1f1f1f",
-                        "info": "#0063be",
-                        "light": Object {
-                          "danger": "#e74a32",
-                          "default": "#464646",
-                          "info": "#5890f1",
-                          "primary": "#a155b5",
-                          "success": "#57e170",
-                          "warning": "#ffff52",
-                        },
-                        "primary": "#702785",
-                        "success": "#00ae42",
-                        "warning": "#ffd200",
-                      },
+                    "components": Object {
+                      "button": Array [
+                        Array [
+                          "&.btn-",
+                          "danger",
+                          "{background-color:",
+                          "#ad0707",
+                          ";border-color:",
+                          "#b23939",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#a00e0e",
+                          ";border-color:",
+                          "#a53636",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}&.active{background-color:",
+                          "#b75151",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";:hover{background-color:",
+                          "#a94c4c",
+                          ";border-color:",
+                          "#ad5c5c",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";:hover{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "default",
+                          "{background-color:",
+                          "#e6e6e6",
+                          ";border-color:",
+                          "#e0e0e0",
+                          ";color:",
+                          "rgb(73,73,73)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#d4d4d4",
+                          ";border-color:",
+                          "#cfcfcf",
+                          ";color:",
+                          "#444444",
+                          ";}&.active{background-color:",
+                          "#dadada",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(49,49,49)",
+                          ";:hover{background-color:",
+                          "#cacaca",
+                          ";border-color:",
+                          "#c4c4c4",
+                          ";color:",
+                          "#2f2f2f",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";:hover{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "info",
+                          "{background-color:",
+                          "#0063be",
+                          ";border-color:",
+                          "#3970c2",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0c5cb0",
+                          ";border-color:",
+                          "#3668b3",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}&.active{background-color:",
+                          "#517cc5",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";:hover{background-color:",
+                          "#4b73b6",
+                          ";border-color:",
+                          "#5c7dba",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";:hover{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "link",
+                          "{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebebeb26",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#68267b",
+                          ";}&.active{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#410057",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#3d0c51",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "primary",
+                          "{background-color:",
+                          "#702785",
+                          ";border-color:",
+                          "#7b458e",
+                          ";color:",
+                          "rgb(234,229,236)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#68267b",
+                          ";border-color:",
+                          "#724083",
+                          ";color:",
+                          "#d8d3da",
+                          ";}&.active{background-color:",
+                          "#855996",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(250,249,251)",
+                          ";:hover{background-color:",
+                          "#7c538b",
+                          ";border-color:",
+                          "#846292",
+                          ";color:",
+                          "#e7e6e8",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";:hover{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "success",
+                          "{background-color:",
+                          "#00ae42",
+                          ";border-color:",
+                          "#39b356",
+                          ";color:",
+                          "rgb(249,252,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0ca13e",
+                          ";border-color:",
+                          "#36a550",
+                          ";color:",
+                          "#e6e9e6",
+                          ";}&.active{background-color:",
+                          "#51b866",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(249,252,250)",
+                          ";:hover{background-color:",
+                          "#4baa5f",
+                          ";border-color:",
+                          "#5cae6c",
+                          ";color:",
+                          "#e6e9e7",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";:hover{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "warning",
+                          "{background-color:",
+                          "#ffd200",
+                          ";border-color:",
+                          "#f9cd07",
+                          ";color:",
+                          "rgb(57,47,0)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebc20c",
+                          ";border-color:",
+                          "#e6bd0e",
+                          ";color:",
+                          "#362d0c",
+                          ";}&.active{background-color:",
+                          "#f2c70a",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(54,45,2)",
+                          ";:hover{background-color:",
+                          "#e0b80f",
+                          ";border-color:",
+                          "#d9b310",
+                          ";color:",
+                          "#332b0c",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";:hover{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";}}}",
+                        ],
+                      ],
                     },
                     "mode": "teinte",
                   }
@@ -1360,7 +1393,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "eplzcT",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1384,13 +1417,853 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 hGhRKT button"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 hGhRKT button btn btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT button btn btn-primary"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="submit"
+                                    >
+                                      Save
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                            <ForwardRef
+                              bsStyle="info"
+                              className="button"
+                              disabled={true}
+                              onClick={[Function]}
+                              type="submit"
+                            >
+                              <Button__StyledButton
+                                bsStyle="info"
+                                className="button"
+                                disabled={true}
+                                onClick={[Function]}
+                                type="submit"
+                              >
+                                <StyledComponent
+                                  bsStyle="info"
+                                  className="button"
+                                  disabled={true}
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "eplzcT",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                  type="submit"
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsStyle="info"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT button"
+                                    disabled={true}
+                                    onClick={[Function]}
+                                    type="submit"
+                                  >
+                                    <button
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT button btn btn-info"
+                                      disabled={true}
+                                      onClick={[Function]}
+                                      type="submit"
+                                    >
+                                      Save as
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                            <ForwardRef
+                              bsStyle="default"
+                              className="button"
+                              onClick={[Function]}
+                            >
+                              <Button__StyledButton
+                                bsStyle="default"
+                                className="button"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsStyle="default"
+                                  className="button"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "eplzcT",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsStyle="default"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT button"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT button btn btn-default"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                          </form>
+                        </div>
+                      </div>
+                    </Popover>
+                  </StyledComponent>
+                </Popover__StyledPopover>
+              </ThemeProvider>
+            </GraylogThemeProvider>
+          </Popover>
+        </mock-position>
+      </MockPosition>
+    </mock-portal>
+  </MockPortal>
+</SavedSearchForm>
+`;
+
+exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
+<SavedSearchForm
+  disableCreateNew={false}
+  isCreateNew={false}
+  onChangeTitle={[Function]}
+  saveAsSearch={[Function]}
+  saveSearch={[Function]}
+  target={[Function]}
+  toggleModal={[Function]}
+  value="new Title"
+>
+  <MockPortal>
+    <mock-portal>
+      <MockPosition
+        container={<body />}
+        placement="left"
+        target={[Function]}
+      >
+        <mock-position
+          container={<body />}
+          placement="left"
+          target={[Function]}
+        >
+          <Popover
+            id="saved-search-popover"
+            title="Name of search"
+          >
+            <GraylogThemeProvider>
+              <ThemeProvider
+                theme={
+                  Object {
+                    "color": Object {
+                      "brand": Object {
+                        "primary": "#ff3633",
+                        "secondary": "#fff",
+                        "tertiary": "#1f1f1f",
+                      },
+                      "global": Object {
+                        "background": "#e8e8e8",
+                        "contentBackground": "#fff",
+                        "link": "#702785",
+                        "linkHover": "#410057",
+                        "textAlt": "#fff",
+                        "textDefault": "#1f1f1f",
+                      },
+                      "gray": Object {
+                        "10": "#1f1f1f",
+                        "100": "#ffffff",
+                        "20": "#383838",
+                        "30": "#515151",
+                        "40": "#6a6a6a",
+                        "50": "#838383",
+                        "60": "#9b9b9b",
+                        "70": "#b4b4b4",
+                        "80": "#cdcdcd",
+                        "90": "#e6e6e6",
+                      },
+                      "variant": Object {
+                        "danger": "#ad0707",
+                        "dark": Object {
+                          "danger": "#5e0000",
+                          "default": "#000000",
+                          "info": "#002775",
+                          "primary": "#2b0042",
+                          "success": "#006600",
+                          "warning": "#ac8a00",
+                        },
+                        "default": "#1f1f1f",
+                        "info": "#0063be",
+                        "light": Object {
+                          "danger": "#e74a32",
+                          "default": "#464646",
+                          "info": "#5890f1",
+                          "primary": "#a155b5",
+                          "success": "#57e170",
+                          "warning": "#ffff52",
+                        },
+                        "primary": "#702785",
+                        "success": "#00ae42",
+                        "warning": "#ffd200",
+                      },
+                    },
+                    "components": Object {
+                      "button": Array [
+                        Array [
+                          "&.btn-",
+                          "danger",
+                          "{background-color:",
+                          "#ad0707",
+                          ";border-color:",
+                          "#b23939",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#a00e0e",
+                          ";border-color:",
+                          "#a53636",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}&.active{background-color:",
+                          "#b75151",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";:hover{background-color:",
+                          "#a94c4c",
+                          ";border-color:",
+                          "#ad5c5c",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";:hover{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "default",
+                          "{background-color:",
+                          "#e6e6e6",
+                          ";border-color:",
+                          "#e0e0e0",
+                          ";color:",
+                          "rgb(73,73,73)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#d4d4d4",
+                          ";border-color:",
+                          "#cfcfcf",
+                          ";color:",
+                          "#444444",
+                          ";}&.active{background-color:",
+                          "#dadada",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(49,49,49)",
+                          ";:hover{background-color:",
+                          "#cacaca",
+                          ";border-color:",
+                          "#c4c4c4",
+                          ";color:",
+                          "#2f2f2f",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";:hover{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "info",
+                          "{background-color:",
+                          "#0063be",
+                          ";border-color:",
+                          "#3970c2",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0c5cb0",
+                          ";border-color:",
+                          "#3668b3",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}&.active{background-color:",
+                          "#517cc5",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";:hover{background-color:",
+                          "#4b73b6",
+                          ";border-color:",
+                          "#5c7dba",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";:hover{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "link",
+                          "{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebebeb26",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#68267b",
+                          ";}&.active{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#410057",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#3d0c51",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "primary",
+                          "{background-color:",
+                          "#702785",
+                          ";border-color:",
+                          "#7b458e",
+                          ";color:",
+                          "rgb(234,229,236)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#68267b",
+                          ";border-color:",
+                          "#724083",
+                          ";color:",
+                          "#d8d3da",
+                          ";}&.active{background-color:",
+                          "#855996",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(250,249,251)",
+                          ";:hover{background-color:",
+                          "#7c538b",
+                          ";border-color:",
+                          "#846292",
+                          ";color:",
+                          "#e7e6e8",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";:hover{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "success",
+                          "{background-color:",
+                          "#00ae42",
+                          ";border-color:",
+                          "#39b356",
+                          ";color:",
+                          "rgb(249,252,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0ca13e",
+                          ";border-color:",
+                          "#36a550",
+                          ";color:",
+                          "#e6e9e6",
+                          ";}&.active{background-color:",
+                          "#51b866",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(249,252,250)",
+                          ";:hover{background-color:",
+                          "#4baa5f",
+                          ";border-color:",
+                          "#5cae6c",
+                          ";color:",
+                          "#e6e9e7",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";:hover{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";}}}",
+                        ],
+                        Array [
+                          "&.btn-",
+                          "warning",
+                          "{background-color:",
+                          "#ffd200",
+                          ";border-color:",
+                          "#f9cd07",
+                          ";color:",
+                          "rgb(57,47,0)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebc20c",
+                          ";border-color:",
+                          "#e6bd0e",
+                          ";color:",
+                          "#362d0c",
+                          ";}&.active{background-color:",
+                          "#f2c70a",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(54,45,2)",
+                          ";:hover{background-color:",
+                          "#e0b80f",
+                          ";border-color:",
+                          "#d9b310",
+                          ";color:",
+                          "#332b0c",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";:hover{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";}}}",
+                        ],
+                      ],
+                    },
+                    "mode": "teinte",
+                  }
+                }
+              >
+                <Popover__StyledPopover
+                  id="saved-search-popover"
+                  title="Name of search"
+                >
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Popover__StyledPopover-wd1j0g-0",
+                          "isStatic": false,
+                          "lastClassName": "cdMcFy",
+                          "rules": Array [
+                            [Function],
+                          ],
+                        },
+                        "displayName": "Popover__StyledPopover",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Popover__StyledPopover-wd1j0g-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    id="saved-search-popover"
+                    title="Name of search"
+                  >
+                    <Popover
+                      bsClass="popover"
+                      className="Popover__StyledPopover-wd1j0g-0 cdMcFy"
+                      id="saved-search-popover"
+                      placement="right"
+                      title="Name of search"
+                    >
+                      <div
+                        className="Popover__StyledPopover-wd1j0g-0 cdMcFy popover right"
+                        id="saved-search-popover"
+                        role="tooltip"
+                        style={
+                          Object {
+                            "display": "block",
+                            "left": undefined,
+                            "top": undefined,
+                          }
+                        }
+                      >
+                        <div
+                          className="arrow"
+                          style={
+                            Object {
+                              "left": undefined,
+                              "top": undefined,
+                            }
+                          }
+                        />
+                        <h3
+                          className="popover-title"
+                        >
+                          Name of search
+                        </h3>
+                        <div
+                          className="popover-content"
+                        >
+                          <form>
+                            <Component
+                              validationState={null}
+                            >
+                              <FormGroup__StyledFormGroup
+                                validationState={null}
+                              >
+                                <StyledComponent
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                        "isStatic": false,
+                                        "lastClassName": "ekazNr",
+                                        "rules": Array [
+                                          [Function],
+                                          ";",
+                                        ],
+                                      },
+                                      "displayName": "FormGroup__StyledFormGroup",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  validationState={null}
+                                >
+                                  <FormGroup
+                                    bsClass="form-group"
+                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                    validationState={null}
+                                  >
+                                    <div
+                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                    >
+                                      <ControlLabel>
+                                        <StyledComponent
+                                          forwardedComponent={
+                                            Object {
+                                              "$$typeof": Symbol(react.forward_ref),
+                                              "attrs": Array [],
+                                              "componentStyle": ComponentStyle {
+                                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                                "isStatic": false,
+                                                "lastClassName": "hCskeX",
+                                                "rules": Array [
+                                                  [Function],
+                                                ],
+                                              },
+                                              "displayName": "ControlLabel",
+                                              "foldedComponentIds": Array [],
+                                              "render": [Function],
+                                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                              "target": [Function],
+                                              "toString": [Function],
+                                              "warnTooManyClasses": [Function],
+                                              "withComponent": [Function],
+                                            }
+                                          }
+                                          forwardedRef={null}
+                                        >
+                                          <ControlLabel
+                                            bsClass="control-label"
+                                            className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                            srOnly={false}
+                                          >
+                                            <label
+                                              className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                            >
+                                              Title
+                                            </label>
+                                          </ControlLabel>
+                                        </StyledComponent>
+                                      </ControlLabel>
+                                      <FormControl
+                                        onChange={[Function]}
+                                        placeholder="Enter title"
+                                        type="text"
+                                        value="new Title"
+                                      >
+                                        <StyledComponent
+                                          forwardedComponent={
+                                            Object {
+                                              "$$typeof": Symbol(react.forward_ref),
+                                              "Feedback": [Function],
+                                              "SIZES": Array [
+                                                "small",
+                                                "large",
+                                              ],
+                                              "Static": [Function],
+                                              "attrs": Array [],
+                                              "componentStyle": ComponentStyle {
+                                                "componentId": "FormControl-sc-1amoaox-0",
+                                                "isStatic": false,
+                                                "lastClassName": "fcGLmv",
+                                                "rules": Array [
+                                                  [Function],
+                                                ],
+                                              },
+                                              "displayName": "FormControl",
+                                              "foldedComponentIds": Array [],
+                                              "render": [Function],
+                                              "styledComponentId": "FormControl-sc-1amoaox-0",
+                                              "target": [Function],
+                                              "toString": [Function],
+                                              "warnTooManyClasses": [Function],
+                                              "withComponent": [Function],
+                                            }
+                                          }
+                                          forwardedRef={null}
+                                          onChange={[Function]}
+                                          placeholder="Enter title"
+                                          type="text"
+                                          value="new Title"
+                                        >
+                                          <FormControl
+                                            bsClass="form-control"
+                                            className="FormControl-sc-1amoaox-0 fcGLmv"
+                                            componentClass="input"
+                                            onChange={[Function]}
+                                            placeholder="Enter title"
+                                            type="text"
+                                            value="new Title"
+                                          >
+                                            <input
+                                              className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                              onChange={[Function]}
+                                              placeholder="Enter title"
+                                              type="text"
+                                              value="new Title"
+                                            />
+                                          </FormControl>
+                                        </StyledComponent>
+                                      </FormControl>
+                                    </div>
+                                  </FormGroup>
+                                </StyledComponent>
+                              </FormGroup__StyledFormGroup>
+                            </Component>
+                            <ForwardRef
+                              bsStyle="primary"
+                              className="button"
+                              onClick={[Function]}
+                              type="submit"
+                            >
+                              <Button__StyledButton
+                                bsStyle="primary"
+                                className="button"
+                                onClick={[Function]}
+                                type="submit"
+                              >
+                                <StyledComponent
+                                  bsStyle="primary"
+                                  className="button"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "eplzcT",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                  type="submit"
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsStyle="primary"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT button"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                    type="submit"
+                                  >
+                                    <button
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT button btn btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1440,7 +2313,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "eplzcT",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1464,13 +2337,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 pSZqX button"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 pSZqX button btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT button btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1515,7 +2388,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "eplzcT",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1538,12 +2411,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 iWqiEF button"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 iWqiEF button btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"

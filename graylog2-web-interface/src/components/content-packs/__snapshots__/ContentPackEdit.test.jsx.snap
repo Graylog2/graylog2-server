@@ -336,7 +336,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "eplzcT",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -360,12 +360,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 pSZqX"
+                              className="Button__StyledButton-c9cbmb-0 eplzcT"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -424,7 +424,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "eplzcT",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -448,12 +448,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 pSZqX"
+                              className="Button__StyledButton-c9cbmb-0 eplzcT"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -1825,7 +1825,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iWqiEF",
+                                              "lastClassName": "eplzcT",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1848,12 +1848,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
+                                          className="Button__StyledButton-c9cbmb-0 eplzcT submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
+                                            className="Button__StyledButton-c9cbmb-0 eplzcT submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -1908,7 +1908,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iWqiEF",
+                                              "lastClassName": "eplzcT",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1932,13 +1932,13 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
+                                          className="Button__StyledButton-c9cbmb-0 eplzcT reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
+                                            className="Button__StyledButton-c9cbmb-0 eplzcT reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -2641,7 +2641,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "eplzcT",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -2665,12 +2665,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 pSZqX"
+                              className="Button__StyledButton-c9cbmb-0 eplzcT"
                               disabled={true}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-sm btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="button"
@@ -2729,7 +2729,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "eplzcT",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -2753,12 +2753,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                               bsClass="btn"
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 pSZqX"
+                              className="Button__StyledButton-c9cbmb-0 eplzcT"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 pSZqX btn btn-sm btn-info"
+                                className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-sm btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -4171,7 +4171,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iWqiEF",
+                                              "lastClassName": "eplzcT",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4194,12 +4194,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button"
+                                          className="Button__StyledButton-c9cbmb-0 eplzcT submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
+                                            className="Button__StyledButton-c9cbmb-0 eplzcT submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -4254,7 +4254,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "iWqiEF",
+                                              "lastClassName": "eplzcT",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4278,13 +4278,13 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button"
+                                          className="Button__StyledButton-c9cbmb-0 eplzcT reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
+                                            className="Button__StyledButton-c9cbmb-0 eplzcT reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"

@@ -377,7 +377,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "iWqiEF",
+                                        "lastClassName": "eplzcT",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -399,11 +399,11 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 iWqiEF"
+                                    className="Button__StyledButton-c9cbmb-0 eplzcT"
                                     disabled={false}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-default"
                                       disabled={false}
                                       type="button"
                                     />

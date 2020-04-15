@@ -616,7 +616,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "hGhRKT",
+                                            "lastClassName": "eplzcT",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -640,12 +640,12 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                         bsClass="btn"
                                         bsSize="xsmall"
                                         bsStyle="primary"
-                                        className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                                        className="Button__StyledButton-c9cbmb-0 eplzcT"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                          className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-xs btn-primary"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
@@ -771,7 +771,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "hGhRKT",
+                                            "lastClassName": "eplzcT",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -795,12 +795,12 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                         bsClass="btn"
                                         bsSize="xsmall"
                                         bsStyle="primary"
-                                        className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                                        className="Button__StyledButton-c9cbmb-0 eplzcT"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                          className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-xs btn-primary"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
@@ -926,7 +926,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "hGhRKT",
+                                            "lastClassName": "eplzcT",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -950,12 +950,12 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                         bsClass="btn"
                                         bsSize="xsmall"
                                         bsStyle="primary"
-                                        className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                                        className="Button__StyledButton-c9cbmb-0 eplzcT"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                          className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-xs btn-primary"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"

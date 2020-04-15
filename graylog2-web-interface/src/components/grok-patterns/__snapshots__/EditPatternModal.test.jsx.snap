@@ -165,15 +165,82 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
   validPatternName={[Function]}
 >
   <span>
-    <button
-      className="btn btn-info btn-xs"
+    <ForwardRef
+      bsSize="xs"
+      bsStyle="info"
       onClick={[Function]}
-      type="button"
     >
-      <span>
-        Edit
-      </span>
-    </button>
+      <Button__StyledButton
+        bsSize="xs"
+        bsStyle="info"
+        onClick={[Function]}
+      >
+        <StyledComponent
+          bsSize="xs"
+          bsStyle="info"
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "SIZES": Array [
+                "large",
+                "small",
+                "xsmall",
+              ],
+              "STYLES": Array [
+                "success",
+                "warning",
+                "danger",
+                "info",
+                "default",
+                "primary",
+                "link",
+              ],
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Button__StyledButton-c9cbmb-0",
+                "isStatic": false,
+                "lastClassName": "eplzcT",
+                "rules": Array [
+                  [Function],
+                ],
+              },
+              "displayName": "Button__StyledButton",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          onClick={[Function]}
+        >
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsSize="xs"
+            bsStyle="info"
+            className="Button__StyledButton-c9cbmb-0 eplzcT"
+            disabled={false}
+            onClick={[Function]}
+          >
+            <button
+              className="Button__StyledButton-c9cbmb-0 eplzcT btn btn-xs btn-info"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              <span>
+                Edit
+              </span>
+            </button>
+          </Button>
+        </StyledComponent>
+      </Button__StyledButton>
+    </ForwardRef>
     <BootstrapModalForm
       bsSize="large"
       cancelButtonText="Cancel"
