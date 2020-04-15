@@ -32,19 +32,36 @@ public class TestData {
         return SimpleMessageChunk.from(setFrom(fieldNames), messages);
     }
 
+    public static SimpleMessageChunk simpleMessageChunkWithIndexNames(String fieldNames, Object[]... messageValues) {
+        LinkedHashSet<SimpleMessage> messages = Arrays.stream(messageValues)
+                .map(values -> simpleMessageWithIndexName(fieldNames, values))
+                .collect(toCollection(LinkedHashSet::new));
+        return SimpleMessageChunk.from(setFrom(fieldNames), messages);
+    }
+
+    private static SimpleMessage simpleMessageWithIndexName(String fieldNames, Object[] values) {
+        String indexName = (String) values[0];
+        Object[] fieldValues = Arrays.copyOfRange(values, 1, values.length);
+        return simpleMessage(indexName, fieldNames, fieldValues);
+    }
+
     private static LinkedHashSet<String> setFrom(String fieldNames) {
         return Arrays.stream(fieldNames.split(","))
                 .map(String::trim)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public static SimpleMessage simpleMessage(String fieldNames, Object[] values) {
-        String[] names = fieldNames.split(",");
+    public static SimpleMessage simpleMessage(String indexName, String fieldNames, Object[] values) {
+        LinkedHashSet<String> names = setFrom(fieldNames);
         LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
         int i = 0;
         for (String name : names) {
-            fields.put(name.trim(), values[i++]);
+            fields.put(name, values[i++]);
         }
-        return SimpleMessage.from(fields);
+        return SimpleMessage.from(indexName, fields);
+    }
+
+    public static SimpleMessage simpleMessage(String fieldNames, Object[] values) {
+        return simpleMessage("some-index", fieldNames, values);
     }
 }

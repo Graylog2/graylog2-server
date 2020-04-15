@@ -22,11 +22,13 @@ import java.util.LinkedHashMap;
 
 @AutoValue
 public abstract class SimpleMessage {
-    public static SimpleMessage from(LinkedHashMap<String, Object> fieldsMap) {
-        return builder().fields(fieldsMap).build();
+    public static SimpleMessage from(String index, LinkedHashMap<String, Object> fieldsMap) {
+        return builder().fields(fieldsMap).index(index).build();
     }
 
     public abstract LinkedHashMap<String, Object> fields();
+
+    public abstract String index();
 
     public static Builder builder() {
         return Builder.create();
@@ -41,6 +43,8 @@ public abstract class SimpleMessage {
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder fields(LinkedHashMap<String, Object> fields);
+
+        public abstract Builder index(String index);
 
         public static Builder create() {
             return new AutoValue_SimpleMessage.Builder();

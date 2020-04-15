@@ -21,6 +21,7 @@ import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
+import javax.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class LegacyDecoratorProcessor {
     private final DecoratorProcessor decoratorProcessor;
     private final Map<String, SearchResponseDecorator.Factory> searchResponseDecorators;
 
+    @Inject
     public LegacyDecoratorProcessor(DecoratorProcessor decoratorProcessor,
                                     Map<String, SearchResponseDecorator.Factory> searchResponseDecorators) {
         this.decoratorProcessor = decoratorProcessor;

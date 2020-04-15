@@ -64,9 +64,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         mockIndexLookupFor(request, "graylog_0", "graylog_1");
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "2015-01-01 04:00:00.000, source-2, Ho",
-                "2015-01-01 02:00:00.000, source-2, He",
-                "2015-01-01 01:00:00.000, source-1, Ha"
+                "graylog_0, 2015-01-01 04:00:00.000, source-2, Ho",
+                "graylog_1, 2015-01-01 02:00:00.000, source-2, He",
+                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha"
         );
     }
 
@@ -83,8 +83,8 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "2015-01-01 04:00:00.000, source-2, Ho",
-                "2015-01-01 01:00:00.000, source-1, Ha"
+                "graylog_0, 2015-01-01 04:00:00.000, source-2, Ho",
+                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha"
         );
     }
 
@@ -98,7 +98,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "2015-01-01 01:00:00.000, source-1, Ha"
+                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha"
         );
     }
 
@@ -111,8 +111,8 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "2015-01-01 02:00:00.000, source-2, He",
-                "2015-01-01 01:00:00.000, source-1, Ha"
+                "graylog_1, 2015-01-01 02:00:00.000, source-2, He",
+                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha"
         );
     }
 
@@ -125,10 +125,10 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,message",
-                "2015-01-01 04:00:00.000, Ho",
-                "2015-01-01 03:00:00.000, Hi",
-                "2015-01-01 02:00:00.000, He",
-                "2015-01-01 01:00:00.000, Ha");
+                "graylog_0, 2015-01-01 04:00:00.000, Ho",
+                "graylog_0, 2015-01-01 03:00:00.000, Hi",
+                "graylog_1, 2015-01-01 02:00:00.000, He",
+                "graylog_0, 2015-01-01 01:00:00.000, Ha");
     }
 
     @Test
@@ -140,10 +140,10 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "2015-01-01 03:00:00.000, source-1, Hi",
-                "2015-01-01 01:00:00.000, source-1, Ha",
-                "2015-01-01 04:00:00.000, source-2, Ho",
-                "2015-01-01 02:00:00.000, source-2, He");
+                "graylog_0, 2015-01-01 03:00:00.000, source-1, Hi",
+                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha",
+                "graylog_0, 2015-01-01 04:00:00.000, source-2, Ho",
+                "graylog_1, 2015-01-01 02:00:00.000, source-2, He");
     }
 
     @Test
@@ -173,7 +173,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
 
         Object[][] values = Arrays.stream(messageValues).map(this::toObjectArray).toArray(Object[][]::new);
 
-        SimpleMessageChunk expected = TestData.simpleMessageChunk(resultFields, values);
+        SimpleMessageChunk expected = TestData.simpleMessageChunkWithIndexNames(resultFields, values);
 
         assertThat(totalResult).isEqualTo(expected);
     }
@@ -191,6 +191,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
             allMessages.addAll(chunk.messages());
         }
 
+        //noinspection OptionalGetWithoutIsPresent
         return SimpleMessageChunk.from(request.fieldsInOrder().get(), allMessages);
     }
 

@@ -47,23 +47,21 @@ public class LegacyChunkDecorator implements ChunkDecorator {
 
         SearchResponse decoratedLegacyResponse = decoratorProcessor.decorateSearchResponse(undecoratedLegacyResponse, messageList.decorators());
 
-        SimpleMessageChunk decoratedChunk = simpleMessageChunkFrom(decoratedLegacyResponse);
+        SimpleMessageChunk decoratedChunk = simpleMessageChunkFrom(decoratedLegacyResponse, undecoratedChunk.fieldsInOrder());
 
         return decoratedChunk.toBuilder().isFirstChunk(undecoratedChunk.isFirstChunk()).build();
     }
 
-    private SimpleMessageChunk simpleMessageChunkFrom(SearchResponse searchResponse) {
+    private SimpleMessageChunk simpleMessageChunkFrom(SearchResponse searchResponse, LinkedHashSet<String> fieldsInOrder) {
         LinkedHashSet<SimpleMessage> messages = searchResponse.messages().stream()
-                .map(legacyMessage -> SimpleMessage.from(new LinkedHashMap<String, Object>(legacyMessage.message())))
+                .map(legacyMessage -> SimpleMessage.from(legacyMessage.index(), new LinkedHashMap<String, Object>(legacyMessage.message())))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        return SimpleMessageChunk.from(new LinkedHashSet<>(searchResponse.fields()), messages);
+        return SimpleMessageChunk.from(fieldsInOrder, messages);
     }
 
     private SearchResponse legacySearchResponseFrom(SimpleMessageChunk chunk) {
-        final List<ResultMessageSummary> messages = chunk.messages().stream()
-                .map(simpleMessage -> ResultMessageSummary.create(ImmutableMultimap.of(), simpleMessage.fields(), ""))
-                .collect(Collectors.toList());
+        final List<ResultMessageSummary> legacyMessages = legacyMessagesFrom(chunk);
 
         // we are only interested in the decorated message fields.
         //
@@ -71,12 +69,18 @@ public class LegacyChunkDecorator implements ChunkDecorator {
                 "",
                 "",
                 Collections.emptySet(),
-                messages,
-                Collections.emptySet(),
+                legacyMessages,
+                chunk.fieldsInOrder(),
                 0,
                 0,
                 now(),
                 now()
         );
+    }
+
+    private List<ResultMessageSummary> legacyMessagesFrom(SimpleMessageChunk chunk) {
+        return chunk.messages().stream()
+                .map(simpleMessage -> ResultMessageSummary.create(ImmutableMultimap.of(), simpleMessage.fields(), simpleMessage.index()))
+                .collect(Collectors.toList());
     }
 }

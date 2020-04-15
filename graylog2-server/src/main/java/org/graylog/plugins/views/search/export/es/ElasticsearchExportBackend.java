@@ -44,6 +44,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
@@ -184,19 +185,22 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
     private SimpleMessageChunk buildHitsWithRelevantFields(List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder) {
         LinkedHashSet<SimpleMessage> set = hits.stream()
-                .map(h -> buildHitWithRelevantFields(desiredFieldsInOrder, h.source))
+                .map(h -> buildHitWithRelevantFields(desiredFieldsInOrder, h.source, h.index))
                 .collect(toCollection(LinkedHashSet::new));
         return SimpleMessageChunk.from(desiredFieldsInOrder, set);
     }
 
-    private SimpleMessage buildHitWithRelevantFields(Set<String> desiredFieldsInOrder, Map source) {
+    private SimpleMessage buildHitWithRelevantFields(Set<String> desiredFieldsInOrder, Map source, String index) {
         LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
 
         for (String name : desiredFieldsInOrder) {
             fields.put(name, source.get(name));
         }
 
-        return SimpleMessage.from(fields);
+        // _id is needed, because the old decorators relies on it
+        fields.put("_id", UUID.randomUUID().toString());
+
+        return SimpleMessage.from(index, fields);
     }
 
     private Object[] lastHitSortFrom(List<SearchResult.Hit<Map, Void>> hits) {
