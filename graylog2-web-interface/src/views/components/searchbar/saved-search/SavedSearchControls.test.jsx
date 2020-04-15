@@ -1,6 +1,5 @@
 // @flow strict
 import React from 'react';
-import PropTypes from 'prop-types';
 import { mount } from 'wrappedEnzyme';
 import { viewsManager, admin } from 'fixtures/users';
 
@@ -33,13 +32,13 @@ describe('SavedSearchControls', () => {
   });
 
   type SimpleSavedSearchControlsProps = {
-    loadNewView: NewViewLoaderContextType,
-    onLoadView: ViewLoaderContextType,
-    currentUser: User,
-    viewStoreState: ViewStoreState,
+    loadNewView?: NewViewLoaderContextType,
+    onLoadView?: ViewLoaderContextType,
+    currentUser?: User,
+    viewStoreState?: ViewStoreState,
   }
 
-  const SimpleSavedSearchControls = ({ loadNewView, onLoadView, currentUser, ...props }: SimpleSavedSearchControlsProps) => (
+  const SimpleSavedSearchControls = ({ loadNewView = () => Promise.resolve(), onLoadView, currentUser, ...props }: SimpleSavedSearchControlsProps) => (
     <ViewLoaderContext.Provider value={onLoadView}>
       <CurrentUserContext.Provider value={currentUser}>
         <NewViewLoaderContext.Provider value={loadNewView}>
@@ -48,13 +47,6 @@ describe('SavedSearchControls', () => {
       </CurrentUserContext.Provider>
     </ViewLoaderContext.Provider>
   );
-
-  SimpleSavedSearchControls.propTypes = {
-    loadNewView: PropTypes.func,
-    onLoadView: PropTypes.func,
-    currentUser: PropTypes.object,
-    viewStoreState: PropTypes.object,
-  };
 
   SimpleSavedSearchControls.defaultProps = {
     loadNewView: () => Promise.resolve(),
