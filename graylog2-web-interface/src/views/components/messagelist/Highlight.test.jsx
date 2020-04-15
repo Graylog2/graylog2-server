@@ -5,7 +5,7 @@ import { mount } from 'wrappedEnzyme';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import Highlight from './Highlight';
 
-const messageFor = ranges => ({ highlight_ranges: ranges });
+const messageFor = (ranges) => ({ highlight_ranges: ranges });
 describe('Highlight', () => {
   it('works for empty field & value', () => {
     const wrapper = mount(<Highlight field="" value="" />);

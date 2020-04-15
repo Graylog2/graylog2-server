@@ -135,7 +135,7 @@ class EditConfigurationVariableModal extends React.Component {
     }
 
     return (
-      <React.Fragment>
+      <>
         <Button onClick={this.openModal}
                 bsStyle={create ? 'success' : 'info'}
                 bsSize={create ? 'small' : 'xsmall'}
@@ -143,7 +143,7 @@ class EditConfigurationVariableModal extends React.Component {
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
-                            title={<React.Fragment>{create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;</React.Fragment>}
+                            title={<>{create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;</>}
                             onSubmitForm={this._save}
                             onModalClose={this._cleanState}
                             submitButtonDisabled={this._hasErrors()}
@@ -182,7 +182,7 @@ class EditConfigurationVariableModal extends React.Component {
                    required />
           </fieldset>
         </BootstrapModalForm>
-      </React.Fragment>
+      </>
     );
   }
 }

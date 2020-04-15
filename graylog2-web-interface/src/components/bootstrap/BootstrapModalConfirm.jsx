@@ -13,7 +13,10 @@ class BootstrapModalConfirm extends React.Component {
     /** Indicates whether the modal should be shown by default or not. */
     showModal: PropTypes.bool,
     /** Title to use in the modal. */
-    title: PropTypes.string.isRequired,
+    title: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.element,
+    ]).isRequired,
     /** Text to use in the cancel button. */
     cancelButtonText: PropTypes.string,
     /** Text to use in the confirmation button. */

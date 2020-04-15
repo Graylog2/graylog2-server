@@ -210,7 +210,7 @@ class CacheForm extends React.Component {
 
     const cachePlugins = PluginStore.exports('lookupTableCaches');
 
-    const plugin = cachePlugins.filter(p => p.type === type);
+    const plugin = cachePlugins.filter((p) => p.type === type);
     let configFieldSet = null;
     let documentationComponent = null;
     let pluginDisplayName = cache.config.type;

@@ -27,7 +27,7 @@ const MetricsMapper = createReactClass({
   },
 
   componentWillMount() {
-    Object.keys(this.props.map).forEach(name => MetricsActions.addGlobal(this.props.map[name]));
+    Object.keys(this.props.map).forEach((name) => MetricsActions.addGlobal(this.props.map[name]));
   },
 
   shouldComponentUpdate(_, nextState) {
@@ -39,7 +39,7 @@ const MetricsMapper = createReactClass({
   },
 
   componentWillUnmount() {
-    Object.keys(this.props.map).forEach(name => MetricsActions.removeGlobal(this.props.map[name]));
+    Object.keys(this.props.map).forEach((name) => MetricsActions.removeGlobal(this.props.map[name]));
   },
 
   render() {

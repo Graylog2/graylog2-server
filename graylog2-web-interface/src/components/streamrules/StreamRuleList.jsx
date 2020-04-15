@@ -35,7 +35,7 @@ class StreamRuleList extends React.Component {
         streamRuleTypes,
       } = this.props;
 
-      return streamRules.map(streamRule => (
+      return streamRules.map((streamRule) => (
         <StreamRule key={streamRule.id}
                     permissions={permissions}
                     matchData={matchData}

@@ -8,7 +8,7 @@ import Icon from './Icon';
 
 type Option = { [string]: any };
 
-const MultiValueRemove = props => (
+const MultiValueRemove = (props) => (
   <Components.MultiValueRemove {...props}>
     &times;
   </Components.MultiValueRemove>
@@ -54,7 +54,7 @@ const CustomSingleValue = (valueRenderer: (Option) => React.Node) => (
 );
 
 const CustomInput = (inputProps: { [string]: any }) => (
-  props => <Components.Input {...props} {...inputProps} />
+  (props) => <Components.Input {...props} {...inputProps} />
 );
 
 const dropdownIndicator = (base, state) => ({
@@ -65,26 +65,26 @@ const dropdownIndicator = (base, state) => ({
   transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
 });
 
-const clearIndicator = base => ({
+const clearIndicator = (base) => ({
   ...base,
   padding: '5px',
 });
 
-const multiValue = base => ({
+const multiValue = (base) => ({
   ...base,
   backgroundColor: '#ebf5ff',
   color: '#007eff',
   border: '1px solid rgba(0,126,255,.24)',
 });
 
-const multiValueLabel = base => ({
+const multiValueLabel = (base) => ({
   ...base,
   color: 'unset',
   paddingLeft: '5px',
   paddingRight: '5px',
 });
 
-const multiValueRemove = base => ({
+const multiValueRemove = (base) => ({
   ...base,
   borderLeft: '1px solid rgba(0,126,255,.24)',
   paddingLeft: '5px',
@@ -103,14 +103,14 @@ const controlNormal = {
   minHeight: '34px',
 };
 
-const menu = base => ({
+const menu = (base) => ({
   ...base,
   zIndex: 5,
   border: '1px solid rgba(102, 175, 233, 0.5)',
   boxShadow: '0 0 4px rgba(102, 175, 233, 0.3)',
 });
 
-const singleValueAndPlaceholder = base => ({
+const singleValueAndPlaceholder = (base) => ({
   ...base,
   lineHeight: '28px',
   fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -119,7 +119,7 @@ const singleValueAndPlaceholder = base => ({
   color: '#666',
 });
 
-const placeholder = base => ({
+const placeholder = (base) => ({
   ...base,
   lineHeight: '28px',
   fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -133,7 +133,7 @@ const placeholder = base => ({
   paddingRight: '20px',
 });
 
-const controlFocus = props => (base, { isFocused }) => {
+const controlFocus = (props) => (base, { isFocused }) => {
   const { size } = props;
 
   const borderColor = isFocused ? '#66afe9' : base.borderColor;
@@ -154,7 +154,7 @@ const controlFocus = props => (base, { isFocused }) => {
   };
 };
 
-const valueContainer = base => ({
+const valueContainer = (base) => ({
   ...base,
   padding: '2px 12px',
 });
@@ -165,7 +165,7 @@ const _components: { [string]: React.ComponentType<any> } = {
   IndicatorSeparator,
 };
 
-const _styles = props => ({
+const _styles = (props) => ({
   dropdownIndicator,
   clearIndicator,
   multiValue,
@@ -329,7 +329,7 @@ class Select extends React.Component<Props, State> {
     const { multi, valueKey, delimiter } = this.props;
 
     if (option) {
-      return multi ? option.map(i => i[valueKey]).join(delimiter) : option[valueKey || ''];
+      return multi ? option.map((i) => i[valueKey]).join(delimiter) : option[valueKey || ''];
     }
     return '';
   };
@@ -376,7 +376,7 @@ class Select extends React.Component<Props, State> {
     if (value && allowCreate) {
       formattedValue = this._formatInputValue(value);
     } else {
-      formattedValue = (value || '').split(delimiter).map(v => options.find(option => option[valueKey || ''] === v));
+      formattedValue = (value || '').split(delimiter).map((v) => options.find((option) => option[valueKey || ''] === v));
     }
 
     const {
@@ -390,7 +390,7 @@ class Select extends React.Component<Props, State> {
       ...rest
     } = this.props;
 
-    const stringify = option => option[matchProp];
+    const stringify = (option) => option[matchProp];
     const customFilter = matchProp === 'any' ? createFilter() : createFilter({ stringify });
 
     const mergedComponents: { [string]: React.ComponentType<any> } = {
@@ -404,11 +404,11 @@ class Select extends React.Component<Props, State> {
                        isMulti={isMulti}
                        isDisabled={isDisabled}
                        isClearable={isClearable}
-                       getOptionLabel={option => option[displayKey]}
-                       getOptionValue={option => option[valueKey]}
+                       getOptionLabel={(option) => option[displayKey]}
+                       getOptionValue={(option) => option[valueKey]}
                        filterOption={customFilter}
                        components={mergedComponents}
-                       isOptionDisabled={option => !!option.disabled}
+                       isOptionDisabled={(option) => !!option.disabled}
                        styles={{
                          ..._styles(this.props),
                        }}

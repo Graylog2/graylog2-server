@@ -38,7 +38,7 @@ const LdapStore = Reflux.createStore({
         this.loadSettings();
         UserNotification.success('LDAP settings saved successfully');
       },
-      error => UserNotification.error(`Saving LDAP settings failed: ${error}`, 'Could not save LDAP settings'),
+      (error) => UserNotification.error(`Saving LDAP settings failed: ${error}`, 'Could not save LDAP settings'),
     );
 
     LdapActions.update.promise(promise);

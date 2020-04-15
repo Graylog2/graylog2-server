@@ -85,8 +85,7 @@ class ContentPackParameterList extends React.Component {
             </Button>{this._parameterModal(parameter)}
           </ButtonToolbar>
         </td>
-        )
-        }
+        )}
       </tr>
     );
   };
@@ -153,7 +152,7 @@ class ContentPackParameterList extends React.Component {
     );
 
     return (
-      <React.Fragment>
+      <>
         <Button bsStyle="info"
                 bsSize={size}
                 title="Edit Modal"
@@ -161,7 +160,7 @@ class ContentPackParameterList extends React.Component {
           {name}
         </Button>
         {modal}
-      </React.Fragment>
+      </>
     );
   }
 

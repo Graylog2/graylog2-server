@@ -16,7 +16,7 @@ import { SearchExecutionStateActions } from 'views/stores/SearchExecutionStateSt
 
 import ShowViewPage from './ShowViewPage';
 
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.reject()),
@@ -27,7 +27,7 @@ jest.mock('views/stores/ViewManagementStore', () => ({
     },
   },
 }));
-jest.mock('views/logic/views/ViewDeserializer', () => jest.fn(x => Promise.resolve(x)));
+jest.mock('views/logic/views/ViewDeserializer', () => jest.fn((x) => Promise.resolve(x)));
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: mockAction(jest.fn()),
@@ -55,7 +55,7 @@ describe('ShowViewPage', () => {
     owner: 'admin',
     requires: {},
   };
-  const SimpleShowViewPage = props => (
+  const SimpleShowViewPage = (props) => (
     <ShowViewPage location={{ query: {} }}
                   params={{ viewId: 'foo' }}
                   route={{}}
@@ -66,7 +66,7 @@ describe('ShowViewPage', () => {
     jest.resetModules();
   });
   it('renders Spinner while loading', () => {
-    const promise = () => new Promise<ViewJson>(resolve => setTimeout(resolve, 30000, viewJson));
+    const promise = () => new Promise<ViewJson>((resolve) => setTimeout(resolve, 30000, viewJson));
     ViewManagementActions.get = mockAction(jest.fn(promise));
     const wrapper = mount(<SimpleShowViewPage />);
     expect(wrapper.find('Spinner')).toExist();

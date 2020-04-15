@@ -16,7 +16,6 @@
  */
 package org.graylog2.savedsearches;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -24,12 +23,9 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.database.ValidationException;
-import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Map;
 
 public class SavedSearchServiceImpl extends PersistedServiceImpl implements SavedSearchService {
     @Inject
@@ -61,30 +57,5 @@ public class SavedSearchServiceImpl extends PersistedServiceImpl implements Save
         }
 
         return new SavedSearchImpl((ObjectId) o.get("_id"), o.toMap());
-    }
-
-    @Override
-    public SavedSearch create(String title, Map<String, Object> query, String creatorUserId, DateTime createdAt) {
-        // Create saved search
-        final Map<String, Object> searchData = ImmutableMap.of(
-                SavedSearchImpl.FIELD_TITLE, title,
-                SavedSearchImpl.FIELD_QUERY, query,
-                SavedSearchImpl.FIELD_CREATOR_USER_ID, creatorUserId,
-                SavedSearchImpl.FIELD_CREATED_AT, createdAt);
-
-        return new SavedSearchImpl(searchData);
-    }
-
-    @Override
-    public void update(SavedSearch search, String title, Map<String, Object> query) throws ValidationException {
-        if (title != null) {
-            search.getFields().put(SavedSearchImpl.FIELD_TITLE, title);
-        }
-
-        if (query != null) {
-            search.getFields().put(SavedSearchImpl.FIELD_QUERY, query);
-        }
-
-        save(search);
     }
 }

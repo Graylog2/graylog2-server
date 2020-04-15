@@ -4,7 +4,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 
 import IfPermitted from './IfPermitted';
 
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 jest.mock('injection/StoreProvider', () => ({ getStore: () => {} }));
 
 describe('IfPermitted', () => {

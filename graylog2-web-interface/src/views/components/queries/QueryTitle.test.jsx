@@ -14,7 +14,7 @@ jest.mock('views/stores/ViewStore', () => ({ ViewActions: {} }));
 describe('QueryTitle', () => {
   beforeEach(() => {
     QueriesActions.duplicate = mockAction(jest.fn(() => Promise.resolve(Query.builder().newId().build())));
-    ViewActions.selectQuery = mockAction(jest.fn(queryId => Promise.resolve(queryId)));
+    ViewActions.selectQuery = mockAction(jest.fn((queryId) => Promise.resolve(queryId)));
   });
 
   const findAction = (wrapper, name) => {

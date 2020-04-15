@@ -70,7 +70,7 @@ const FilterPreviewStore = Reflux.createStore({
       }
       return resolve(Bluebird.delay(250)
         .then(() => this.jobStatus(job.id))
-        .then(jobStatus => this.trackJobStatus(jobStatus, search)));
+        .then((jobStatus) => this.trackJobStatus(jobStatus, search)));
     });
   },
 
@@ -83,7 +83,7 @@ const FilterPreviewStore = Reflux.createStore({
   },
 
   trackJob(search, executionState) {
-    return this.run(search, executionState).then(job => this.trackJobStatus(job, search));
+    return this.run(search, executionState).then((job) => this.trackJobStatus(job, search));
   },
 
   /**

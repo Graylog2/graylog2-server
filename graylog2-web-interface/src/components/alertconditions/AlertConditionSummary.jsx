@@ -26,7 +26,7 @@ class AlertConditionSummary extends React.Component {
     const { stream } = this.props;
     const condition = this.props.alertCondition;
     const { conditionType } = this.props;
-    const conditionPlugin = PluginStore.exports('alertConditions').find(c => c.type === condition.type) || {};
+    const conditionPlugin = PluginStore.exports('alertConditions').find((c) => c.type === condition.type) || {};
     const SummaryComponent = conditionPlugin.summaryComponent || GenericAlertConditionSummary;
 
     const description = (stream

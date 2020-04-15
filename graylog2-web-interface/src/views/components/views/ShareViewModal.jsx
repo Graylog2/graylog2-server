@@ -6,6 +6,7 @@ import { FormGroup, HelpBlock, Radio } from 'components/graylog';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 import Select from 'views/components/Select';
 import Spinner from 'components/common/Spinner';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
 
@@ -54,19 +55,22 @@ const Additional = ({ children }: { children: React.Node }) => <div style={{ pad
 const extractValue = ({ value }) => value;
 
 class ShareViewModal extends React.Component<Props, State> {
-  state = {
-    viewSharing: null,
-    loaded: false,
-    users: undefined,
-    roles: undefined,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      viewSharing: null,
+      loaded: false,
+      users: undefined,
+      roles: undefined,
+    };
+  }
 
   componentDidMount() {
     const { view, currentUser } = this.props;
     Promise.all([
       ViewSharingActions.get(view.id),
       ViewSharingActions.users(view.id),
-      this._isAdmin(currentUser) ? RolesStore.loadRoles().then(roles => roles.map(({ name }) => name)) : Promise.resolve(currentUser.roles),
+      this._isAdmin(currentUser) ? RolesStore.loadRoles().then((roles) => roles.map(({ name }) => name)) : Promise.resolve(currentUser.roles),
     ]).then(([viewSharing, users, roles]) => {
       this.setState({ viewSharing, users, roles, loaded: true });
     });
@@ -126,16 +130,17 @@ class ShareViewModal extends React.Component<Props, State> {
     const userOptions = users ? users
       // eslint-disable-next-line camelcase
       .map(({ username, fullname }) => ({ value: username, label: fullname })) : null;
-    const userValue = get(viewSharing, 'users', []).map(user => (userOptions || []).find(option => option.value === user));
-    const rolesOptions = roles ? roles.map(rolename => ({ value: rolename, label: rolename })) : null;
-    const rolesValue = get(viewSharing, 'roles', []).map(role => ({ label: role, value: role }));
+    const userValue = get(viewSharing, 'users', []).map((user) => (userOptions || []).find((option) => option.value === user));
+    const rolesOptions = roles ? roles.map((rolename) => ({ value: rolename, label: rolename })) : null;
+    const rolesValue = get(viewSharing, 'roles', []).map((role) => ({ label: role, value: role }));
+    const viewTypeLabel = <ViewTypeLabel type={view.type} />;
     const content = !loaded ? <Spinner /> : (
       <FormGroup style={formStyle}>
         <Radio name={AllUsersOfInstance.Type} checked={type === AllUsersOfInstance.Type} onChange={this._onChange}>
           Any user of this Graylog
         </Radio>{' '}
         <Additional>
-          <HelpBlock>Anyone with an account can access the dashboard.</HelpBlock>
+          <HelpBlock>Anyone with an account can access the {viewTypeLabel}.</HelpBlock>
         </Additional>
 
         <Radio name={SpecificRoles.Type} checked={type === SpecificRoles.Type} onChange={this._onChange}>
@@ -146,9 +151,10 @@ class ShareViewModal extends React.Component<Props, State> {
                   isDisabled={type !== SpecificRoles.Type}
                   value={rolesValue}
                   placeholder="Select roles"
+                  stripDiacritics
                   onChange={this._onRolesChange}
                   options={rolesOptions} />
-          <HelpBlock>Only users with these roles can access the dashboard.</HelpBlock>
+          <HelpBlock>Only users with these roles can access the {viewTypeLabel}.</HelpBlock>
         </Additional>
 
         <Radio name={SpecificUsers.Type} checked={type === SpecificUsers.Type} onChange={this._onChange}>
@@ -159,23 +165,24 @@ class ShareViewModal extends React.Component<Props, State> {
                   isDisabled={type !== SpecificUsers.Type}
                   value={userValue}
                   placeholder="Select users"
+                  stripDiacritics
                   onChange={this._onUsersChange}
                   options={userOptions || []} />
-          <HelpBlock>Only these users can access the dashboard.</HelpBlock>
+          <HelpBlock>Only these users can access the {viewTypeLabel}.</HelpBlock>
         </Additional>
 
         <Radio name="none" checked={type === 'none'} onChange={this._onChange}>
           Only me
         </Radio>
         <Additional>
-          <HelpBlock>Noone but you can access the dashboard.</HelpBlock>
+          <HelpBlock>Noone but you can access the {viewTypeLabel}.</HelpBlock>
         </Additional>
       </FormGroup>
     );
     return (
       <BootstrapModalConfirm onCancel={() => this._onClose()}
                              onConfirm={() => this._onSave()}
-                             title={`Who is supposed to access the dashboard ${view.title}?`}
+                             title={<>Who is supposed to access the {viewTypeLabel} {view.title}</>}
                              confirmButtonText="Save"
                              showModal={show}>
         {content}
@@ -184,4 +191,4 @@ class ShareViewModal extends React.Component<Props, State> {
   }
 }
 
-export default connect(ShareViewModal, { currentUser: CurrentUserStore }, ({ currentUser, ...rest }) => Object.assign({}, rest, { currentUser: currentUser.currentUser }));
+export default connect(ShareViewModal, { currentUser: CurrentUserStore }, ({ currentUser, ...rest }) => ({ ...rest, currentUser: currentUser.currentUser }));

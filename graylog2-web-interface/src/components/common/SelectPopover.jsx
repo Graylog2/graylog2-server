@@ -66,7 +66,7 @@ class SelectPopover extends React.Component {
     placement: 'bottom',
     triggerAction: 'click',
     items: [],
-    itemFormatter: item => item,
+    itemFormatter: (item) => item,
     multiple: false,
     selectedItems: [],
     displayDataFilter: true,
@@ -125,7 +125,7 @@ class SelectPopover extends React.Component {
   };
 
   filterData = (filterText, items) => {
-    const newFilteredItems = items.filter(item => item.match(new RegExp(filterText, 'i')));
+    const newFilteredItems = items.filter((item) => item.match(new RegExp(filterText, 'i')));
     this.setState({ filterText: filterText, filteredItems: newFilteredItems });
   };
 

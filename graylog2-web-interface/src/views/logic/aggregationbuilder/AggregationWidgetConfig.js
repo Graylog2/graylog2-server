@@ -100,7 +100,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   get isEmpty(): boolean {
-    const empty = arr => !arr.length;
+    const empty = (arr) => !arr.length;
     return empty(this.rowPivots) && empty(this.columnPivots) && empty(this.series);
   }
 
@@ -158,7 +158,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
         'visualization',
         'formattingSettings',
       ]
-        .every(key => isDeepEqual(this[key], other[key]));
+        .every((key) => isDeepEqual(this[key], other[key]));
     }
     return false;
   }
@@ -166,7 +166,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   equalsForSearch(other: any) {
     if (other instanceof AggregationWidgetConfig) {
       return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig']
-        .every(key => isEqualForSearch(this[key], other[key]));
+        .every((key) => isEqualForSearch(this[key], other[key]));
     }
     return false;
   }
@@ -264,8 +264,8 @@ class Builder {
     } = this.value.toObject();
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
-    const filteredSorts = sort.filter(s => availableSorts
-      .find(availableSort => (s.field === availableSort.function || s.field === availableSort.field)));
+    const filteredSorts = sort.filter((s) => availableSorts
+      .find((availableSort) => (s.field === availableSort.function || s.field === availableSort.field)));
     const computedRollup = columnPivots.length > 0 ? rollup : true;
     return new AggregationWidgetConfig(
       columnPivots,

@@ -98,7 +98,7 @@ class AddDecoratorButton extends React.Component {
                            cancelAction={this._handleCancel} />
       ) : null);
     return (
-      <React.Fragment>
+      <>
         <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
           <div className={DecoratorStyles.addDecoratorSelect}>
             <Select ref={(select) => { this.select = select; }}
@@ -113,7 +113,7 @@ class AddDecoratorButton extends React.Component {
         {showHelp && <PopoverHelp />}
 
         {typeName && <ConfigurationFormContainer>{configurationForm}</ConfigurationFormContainer>}
-      </React.Fragment>
+      </>
     );
   }
 }

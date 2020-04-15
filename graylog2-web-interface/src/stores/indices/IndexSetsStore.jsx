@@ -18,7 +18,7 @@ const IndexSetsStore = Reflux.createStore({
     const promise = fetch('GET', url);
     promise
       .then(
-        response => this.trigger({
+        (response) => this.trigger({
           indexSetsCount: response.total,
           indexSets: response.index_sets,
           indexSetStats: response.stats,
@@ -37,7 +37,7 @@ const IndexSetsStore = Reflux.createStore({
     const promise = fetch('GET', url);
     promise
       .then(
-        response => this.trigger({
+        (response) => this.trigger({
           indexSetsCount: response.total,
           indexSets: response.index_sets,
           indexSetStats: response.stats,
@@ -136,7 +136,7 @@ const IndexSetsStore = Reflux.createStore({
     const promise = fetch('GET', url);
     promise
       .then(
-        response => this.trigger({
+        (response) => this.trigger({
           globalIndexSetStats: {
             indices: response.indices,
             documents: response.documents,

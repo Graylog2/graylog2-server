@@ -67,7 +67,7 @@ public abstract class WorldMapConfig extends WidgetConfigBase implements WidgetC
     static WorldMapConfig create(
             @JsonProperty("field") String field,
             @JsonProperty("stream_id") @Nullable String streamId,
-            @JsonProperty("query") String query,
+            @JsonProperty("query") @Nullable String query,
             @JsonProperty("timerange") TimeRange timerange
     ) {
         return new AutoValue_WorldMapConfig(

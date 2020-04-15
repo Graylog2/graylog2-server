@@ -45,7 +45,7 @@ class LegacyNotificationSummary extends React.Component {
     }
 
     return (
-      <React.Fragment>
+      <>
         {!typeData && (
           <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
             Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>,
@@ -53,11 +53,11 @@ class LegacyNotificationSummary extends React.Component {
           </Alert>
         )}
         <CommonNotificationSummary {...this.props}>
-          <React.Fragment>
+          <>
             {content}
-          </React.Fragment>
+          </>
         </CommonNotificationSummary>
-      </React.Fragment>
+      </>
     );
   }
 }

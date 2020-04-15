@@ -20,16 +20,16 @@ export type KeyJoiner = (Array<any>) => string;
 
 export type Generator = (string, string, Array<string>, Array<any>, Array<Array<any>>, number, number, AggregationWidgetConfig) => ChartDefinition;
 
-const _defaultKeyJoiner = keys => keys.join('-');
+const _defaultKeyJoiner = (keys) => keys.join('-');
 
 const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
 
 export const flattenLeafs = (leafs: Array<Leaf>, matcher: Value => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => {
-  return flatten(leafs.map(l => l.values.filter(value => matcher(value)).map(v => [l.key, v])));
+  return flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));
 };
 
 export const formatSeries = ({ valuesBySeries = {}, xLabels = [] }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
-  return Object.keys(valuesBySeries).map(value => [
+  return Object.keys(valuesBySeries).map((value) => [
     value,
     xLabels,
     valuesBySeries[value],
@@ -39,7 +39,7 @@ export const formatSeries = ({ valuesBySeries = {}, xLabels = [] }: {valuesBySer
 
 export const getLeafsFromRows = (rows: Rows): Array<Leaf> => {
   // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
-  return rows.filter(row => (row.source === 'leaf'));
+  return rows.filter((row) => (row.source === 'leaf'));
 };
 
 export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<Array<Key>> => leafs.map(({ key }) => key);
@@ -52,7 +52,7 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
     const valuesBySeries = {};
     flatLeafs.forEach(([key, value]) => {
       const joinedKey = keyJoiner(value.key);
-      const targetIdx = xLabels.findIndex(l => isEqual(l, key));
+      const targetIdx = xLabels.findIndex((l) => isEqual(l, key));
       if (value.value !== null && value.value !== undefined) {
         set(valuesBySeries, [joinedKey, targetIdx], value.value);
       }
@@ -66,7 +66,7 @@ export const generateChart = (chartType: string, generator: Generator = _default
     const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
       chartType,
       value,
-      x.map(key => key.join('-')),
+      x.map((key) => key.join('-')),
       values,
       z,
     ]);
@@ -84,7 +84,7 @@ export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => {
   });
 };
 
-const doNotSuffixTraceForSingleSeries = keys => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
+const doNotSuffixTraceForSingleSeries = (keys) => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
 
 export const chartData = (
   config: AggregationWidgetConfig,

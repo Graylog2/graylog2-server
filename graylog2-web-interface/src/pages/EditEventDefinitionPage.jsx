@@ -37,7 +37,7 @@ class EditEventDefinitionPage extends React.Component {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
       EventDefinitionsActions.get(params.definitionId)
         .then(
-          eventDefinition => this.setState({ eventDefinition: eventDefinition }),
+          (eventDefinition) => this.setState({ eventDefinition: eventDefinition }),
           (error) => {
             if (error.status === 404) {
               history.push(Routes.ALERTS.DEFINITIONS.LIST);

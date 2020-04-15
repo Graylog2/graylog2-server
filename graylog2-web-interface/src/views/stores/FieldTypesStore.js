@@ -3,14 +3,14 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { QueryFiltersStore } from './QueryFiltersStore';
 
-const fieldTypesUrl = URLUtils.qualifyUrl('/views/fields');
+const fieldTypesUrl = qualifyUrl('/views/fields');
 
 type FieldTypesActionsType = RefluxActions<{
   all: () => Promise<void>,
@@ -29,7 +29,9 @@ export type FieldTypesStoreState = {
   queryFields: Immutable.Map<string, FieldTypeMappingsList>,
 };
 
-export const FieldTypesStore = singletonStore(
+export type FieldTypesStoreType = Store<FieldTypesStoreState>;
+
+export const FieldTypesStore: FieldTypesStoreType = singletonStore(
   'views.FieldTypes',
   () => Reflux.createStore({
     listenables: [FieldTypesActions],
@@ -48,10 +50,10 @@ export const FieldTypesStore = singletonStore(
 
     onQueryFiltersUpdate(newFilters) {
       const promises = newFilters
-        .filter(filter => filter !== undefined && filter !== null)
-        .map(filter => filter.get('filters', Immutable.List()).filter(f => f.get('type') === 'stream').map(f => f.get('id')))
-        .filter(streamFilters => streamFilters.size > 0)
-        .map((filters, queryId) => this.forStreams(filters.toArray()).then(response => ({
+        .filter((filter) => filter !== undefined && filter !== null)
+        .map((filter) => filter.get('filters', Immutable.List()).filter((f) => f.get('type') === 'stream').map((f) => f.get('id')))
+        .filter((streamFilters) => streamFilters.size > 0)
+        .map((filters, queryId) => this.forStreams(filters.toArray()).then((response) => ({
           queryId,
           response,
         })))
@@ -88,7 +90,7 @@ export const FieldTypesStore = singletonStore(
 
     _deserializeFieldTypes(response) {
       return response
-        .map(fieldTypeMapping => FieldTypeMapping.fromJSON(fieldTypeMapping));
+        .map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
     },
 
     _state(): FieldTypesStoreState {

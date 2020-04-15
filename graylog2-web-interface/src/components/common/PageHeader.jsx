@@ -79,8 +79,7 @@ class PageHeader extends React.Component {
                 {children[2]}
               </div>
             </div>
-            )
-            }
+            )}
 
             <h1>
               {title} <small>{this.renderLifecycleIndicator()}</small>
@@ -90,16 +89,14 @@ class PageHeader extends React.Component {
             <p className="description">
               {children[0]}
             </p>
-            )
-            }
+            )}
 
             {children[1]
             && (
             <SupportLink>
               {children[1]}
             </SupportLink>
-            )
-            }
+            )}
           </Col>
 
           {children[2]
@@ -107,8 +104,7 @@ class PageHeader extends React.Component {
             <Col sm={12} lgHidden mdHidden className="actions-sm">
               {children[2]}
             </Col>
-            )
-          }
+            )}
         </ContentHeadRow>
       </div>
     );

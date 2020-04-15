@@ -36,7 +36,7 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore(
     currentUser: {
       full_name: 'Betty Holberton',
       username: 'betty',
-      permissions: [],
+      permissions: ['dashboards:create'],
     },
   })],
 ));
@@ -51,6 +51,7 @@ jest.mock('stores/sessions/SessionStore', () => ({
   isLoggedIn: jest.fn(() => true),
   getSessionId: jest.fn(() => 'foobar'),
 }));
+jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Editor</span>);
 
 jest.unmock('logic/rest/FetchProvider');
 

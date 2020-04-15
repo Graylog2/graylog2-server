@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,12 +39,15 @@ import org.graylog.plugins.views.search.SearchMetadata;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +93,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final PermittedStreams permittedStreams;
     private final SearchExecutionGuard executionGuard;
     private final SearchDomain searchDomain;
+    private final EventBus serverEventBus;
 
     @Inject
     public SearchResource(QueryEngine queryEngine,
@@ -97,7 +102,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           ObjectMapper objectMapper,
                           PermittedStreams permittedStreams,
                           SearchExecutionGuard executionGuard,
-                          SearchDomain searchDomain) {
+                          SearchDomain searchDomain,
+                          EventBus serverEventBus) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
@@ -105,6 +111,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
         this.permittedStreams = permittedStreams;
         this.executionGuard = executionGuard;
         this.searchDomain = searchDomain;
+        this.serverEventBus = serverEventBus;
     }
 
     @VisibleForTesting
@@ -164,7 +171,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Execute the referenced search query asynchronously",
             notes = "Starts a new search, irrespective whether or not another is already running")
     @Path("{id}/execute")
-    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_JOB_CREATE)
+    @NoAuditEvent("Creating audit event manually in method body.")
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam Map<String, Object> executionState) {
         Search search = getSearch(id);
@@ -177,11 +184,18 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         final SearchJob searchJob = searchJobService.create(search, username());
 
+        postAuditEvent(searchJob);
+
         final SearchJob runningSearchJob = queryEngine.execute(searchJob);
 
         return Response.created(URI.create(BASE_PATH + "/status/" + runningSearchJob.getId()))
                 .entity(runningSearchJob)
                 .build();
+    }
+
+    private void postAuditEvent(SearchJob searchJob) {
+        final SearchJobExecutionEvent searchJobExecutionEvent = SearchJobExecutionEvent.create(getCurrentUser(), searchJob, DateTime.now(DateTimeZone.UTC));
+        this.serverEventBus.post(searchJobExecutionEvent);
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser() {
@@ -199,7 +213,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result")
     @Path("sync")
-    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_EXECUTE)
+    @NoAuditEvent("Creating audit event manually in method body.")
     public Response executeSyncJob(@ApiParam Search search,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
@@ -210,6 +224,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
         guard(search);
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
+
+        postAuditEvent(searchJob);
 
         try {
             //noinspection UnstableApiUsage

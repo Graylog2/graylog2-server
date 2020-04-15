@@ -19,9 +19,15 @@ class Completer {
 }
 
 describe('QueryInput', () => {
-  const SimpleQueryInput = props => (
+  beforeAll(() => {
+    /* eslint-disable no-undef */
+    // $FlowFixMe: `ace` is defined by external import
+    ace.config.set('basePath', 'path');
+    /* eslint-enable no-undef */
+  });
+  const SimpleQueryInput = (props) => (
     <QueryInput value="*"
-                onChange={s => Promise.resolve(s)}
+                onChange={(s) => Promise.resolve(s)}
                 onExecute={() => {}}
                 completerClass={Completer}
                 {...props} />
@@ -69,7 +75,7 @@ describe('QueryInput', () => {
   });
   it('does trigger onChange/onExecute if input receives blur with changed value', () => {
     const onBlur = jest.fn();
-    const onChange = jest.fn(newQuery => Promise.resolve(newQuery));
+    const onChange = jest.fn((newQuery) => Promise.resolve(newQuery));
     const onExecute = jest.fn();
     const currentQueryString = 'source:example.com';
     const wrapper = mount((<SimpleQueryInput onExecute={onExecute}

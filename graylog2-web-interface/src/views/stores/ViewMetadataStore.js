@@ -2,6 +2,7 @@
 import Reflux from 'reflux';
 import { isEqual } from 'lodash';
 
+import type { Store } from 'stores/StoreTypes';
 import { singletonStore } from 'views/logic/singleton';
 import { ViewStore } from './ViewStore';
 
@@ -13,8 +14,10 @@ export type ViewMetaData = {
   title: string,
 };
 
+export type ViewMetadataStoreType = Store<ViewMetaData>;
+
 // eslint-disable-next-line import/prefer-default-export
-export const ViewMetadataStore = singletonStore(
+export const ViewMetadataStore: ViewMetadataStoreType = singletonStore(
   'views.ViewMetadata',
   () => Reflux.createStore({
     state: {},

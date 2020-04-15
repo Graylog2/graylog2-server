@@ -13,6 +13,9 @@ import View from 'views/logic/views/View';
 import NewDashboardPage from './NewDashboardPage';
 
 jest.mock('./ExtendedSearchPage', () => () => <div>Extended search page</div>);
+jest.mock('components/common', () => ({
+  IfPermitted: jest.fn(({ children }) => <>{children}</>),
+}));
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: { create: jest.fn(() => Promise.resolve()), load: jest.fn(() => Promise.resolve()) },
 }));
@@ -21,7 +24,7 @@ jest.mock('views/logic/views/ViewLoader', () => ({
 }));
 
 describe('NewDashboardPage', () => {
-  const SimpleNewDashboardPage = props => <NewDashboardPage route={{}} location={{}} {...props} />;
+  const SimpleNewDashboardPage = (props) => <NewDashboardPage route={{}} location={{}} {...props} />;
 
   beforeAll(() => {
     jest.useFakeTimers();

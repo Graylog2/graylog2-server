@@ -143,7 +143,7 @@ class QueryInput extends Component<Props, State> {
   };
 
   _onChange = (newValue: string) => {
-    return new Promise(resolve => this.setState({ value: newValue }, resolve));
+    return new Promise((resolve) => this.setState({ value: newValue }, resolve));
   };
 
   _onBlur = () => {
@@ -175,7 +175,7 @@ class QueryInput extends Component<Props, State> {
       editor.completer.popup.hide();
     }
     const { value } = this.state;
-    new Promise(resolve => this.setState({ lastValue: value }, resolve))
+    new Promise((resolve) => this.setState({ lastValue: value }, resolve))
       .then(() => onChange(value))
       .then(onExecute);
   };
@@ -192,7 +192,7 @@ class QueryInput extends Component<Props, State> {
     return (
       <div className="query" style={{ display: 'flex' }} data-testid="query-input">
         <AceEditor mode="lucene"
-                   ref={editor => editor && this._bindEditor(editor)}
+                   ref={(editor) => editor && this._bindEditor(editor)}
                    readOnly={disabled}
                    theme="ace-queryinput"
                    onBlur={this._onBlur}

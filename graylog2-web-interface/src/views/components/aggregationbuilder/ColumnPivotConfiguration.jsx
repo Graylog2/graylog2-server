@@ -11,7 +11,7 @@ const ColumnPivotConfiguration = ({ onClose, onRollupChange, rollup }) => (
            name="rollup"
            label="Rollup"
            autoFocus
-           onChange={e => onRollupChange(e.target.checked)}
+           onChange={(e) => onRollupChange(e.target.checked)}
            help="When rollup is enabled, an additional trace totalling individual subtraces will be included."
            checked={rollup} />
     <div className="pull-right" style={{ marginBottom: '10px' }}>

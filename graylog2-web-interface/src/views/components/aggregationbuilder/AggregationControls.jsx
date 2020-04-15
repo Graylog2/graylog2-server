@@ -59,7 +59,7 @@ const BottomRow = styled(Row)`
 `;
 
 const _visualizationConfigFor = (type: string) => PluginStore.exports('visualizationConfigTypes')
-  .find(visualizationConfigType => visualizationConfigType && visualizationConfigType.type === type);
+  .find((visualizationConfigType) => visualizationConfigType && visualizationConfigType.type === type);
 
 export default class AggregationControls extends React.Component<Props, State> {
   static propTypes = {
@@ -79,44 +79,44 @@ export default class AggregationControls extends React.Component<Props, State> {
   }
 
   _onColumnPivotChange = (columnPivots: $PropertyType<$PropertyType<Props, 'config'>, 'columnPivots'>) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().columnPivots(columnPivots).build() }));
+    this._setAndPropagate((state) => ({ config: state.config.toBuilder().columnPivots(columnPivots).build() }));
   };
 
   _onRowPivotChange = (rowPivots: $PropertyType<$PropertyType<Props, 'config'>, 'rowPivots'>) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().rowPivots(rowPivots).build() }));
+    this._setAndPropagate((state) => ({ config: state.config.toBuilder().rowPivots(rowPivots).build() }));
   };
 
   _onSeriesChange = (series: $PropertyType<$PropertyType<Props, 'config'>, 'series'>) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().series(series).build() }));
+    this._setAndPropagate((state) => ({ config: state.config.toBuilder().series(series).build() }));
     return true;
   };
 
   _onSortChange = (sort: $PropertyType<$PropertyType<Props, 'config'>, 'sort'>) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(sort).build() }));
+    this._setAndPropagate((state) => ({ config: state.config.toBuilder().sort(sort).build() }));
   };
 
   _onSortDirectionChange = (direction: $PropertyType<$PropertyType<Props, 'config'>, 'direction'>) => {
-    this._setAndPropagate(state => ({
+    this._setAndPropagate((state) => ({
       config: state.config.toBuilder().sort(state.config.sort
-        .map(sort => sort.toBuilder().direction(direction).build())).build(),
+        .map((sort) => sort.toBuilder().direction(direction).build())).build(),
     }));
   };
 
   _onSetEventAnnotation = (value: boolean) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().eventAnnotation(value).build() }));
+    this._setAndPropagate((state) => ({ config: state.config.toBuilder().eventAnnotation(value).build() }));
   };
 
   // eslint-disable-next-line no-undef
   _onRollupChange = (rollup: $PropertyType<$PropertyType<Props, 'config'>, 'rollup'>) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().rollup(rollup).build() }));
+    this._setAndPropagate((state) => ({ config: state.config.toBuilder().rollup(rollup).build() }));
   };
 
   _onVisualizationChange = (visualization: $PropertyType<$PropertyType<Props, 'config'>, 'visualization'>) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().visualization(visualization).visualizationConfig(undefined).build() }));
+    this._setAndPropagate((state) => ({ config: state.config.toBuilder().visualization(visualization).visualizationConfig(undefined).build() }));
   };
 
   _onVisualizationConfigChange = (visualizationConfig: $PropertyType<$PropertyType<Props, 'config'>, 'visualizationConfig'>) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }));
+    this._setAndPropagate((state) => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }));
   };
 
   _setAndPropagate = (fn: (State) => State) => this.setState(fn, this._propagateState);
@@ -132,20 +132,20 @@ export default class AggregationControls extends React.Component<Props, State> {
     const { config } = this.state;
     const { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig } = config;
 
-    const sortDirection = Immutable.Set(sort.map(s => s.direction)).first();
+    const sortDirection = Immutable.Set(sort.map((s) => s.direction)).first();
 
     const formattedFields = fields
       ? fields
-        .map(fieldType => fieldType.name)
+        .map((fieldType) => fieldType.name)
         .valueSeq()
         .toJS()
         .sort(defaultCompare)
       : [];
-    const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
+    const formattedFieldsOptions = formattedFields.map((v) => ({ label: v, value: v }));
     const suggester = new SeriesFunctionsSuggester(formattedFields);
 
-    const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter', 'area'].findIndex(x => x === visualization) >= 0;
-    const childrenWithCallback = React.Children.map(children, child => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
+    const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter', 'area'].findIndex((x) => x === visualization) >= 0;
+    const childrenWithCallback = React.Children.map(children, (child) => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     const VisualizationConfigType = _visualizationConfigFor(visualization);
     return (
       <Container>

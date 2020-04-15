@@ -43,7 +43,7 @@ class MessageLoader extends React.Component {
     }
     this.setState({ loading: true });
     const promise = MessagesActions.loadMessage.triggerPromise(index, messageId);
-    promise.then(data => this.props.onMessageLoaded(data));
+    promise.then((data) => this.props.onMessageLoaded(data));
     promise.finally(() => this.setState({ loading: false }));
 
     event.preventDefault();

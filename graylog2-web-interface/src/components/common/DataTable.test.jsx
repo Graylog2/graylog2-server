@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash';
 import DataTable from 'components/common/DataTable';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
-const rowFormatter = row => <tr><td>{row.title}</td></tr>;
+const rowFormatter = (row) => <tr><td>{row.title}</td></tr>;
 
 const simulateTypeAheadFilter = (wrapper, filterText) => {
   const filter = wrapper.find(TypeAheadDataFilter);
@@ -14,7 +14,7 @@ const simulateTypeAheadFilter = (wrapper, filterText) => {
 };
 
 const filterRows = (rows, filterText) => {
-  return rows.filter(row => row.title.match(filterText));
+  return rows.filter((row) => row.title.match(filterText));
 };
 
 describe('<DataTable />', () => {

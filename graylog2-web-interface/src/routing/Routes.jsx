@@ -20,12 +20,12 @@ const Routes = {
     DEFINITIONS: {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',
-      edit: definitionId => `/alerts/definitions/${definitionId}/edit`,
+      edit: (definitionId) => `/alerts/definitions/${definitionId}/edit`,
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
       CREATE: '/alerts/notifications/new',
-      edit: notificationId => `/alerts/notifications/${notificationId}/edit`,
+      edit: (notificationId) => `/alerts/notifications/${notificationId}/edit`,
     },
   },
   SOURCES: '/sources',
@@ -38,7 +38,7 @@ const Routes = {
       EXPORT: '/system/contentpacks/export',
       CREATE: '/system/contentpacks/create',
       edit: (contentPackId, contentPackRev) => { return `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`; },
-      show: contentPackId => `/system/contentpacks/${contentPackId}`,
+      show: (contentPackId) => `/system/contentpacks/${contentPackId}`,
     },
     GROKPATTERNS: '/system/grokpatterns',
     INDICES: {
@@ -52,76 +52,76 @@ const Routes = {
         }
         return `/system/index_sets/${indexSetId}/configuration`;
       },
-      SHOW: indexSetId => `/system/index_sets/${indexSetId}`,
+      SHOW: (indexSetId) => `/system/index_sets/${indexSetId}`,
       CREATE: '/system/index_sets/create',
     },
     INPUTS: '/system/inputs',
     LOGGING: '/system/logging',
-    METRICS: nodeId => `/system/metrics/node/${nodeId}`,
+    METRICS: (nodeId) => `/system/metrics/node/${nodeId}`,
     NODES: {
       LIST: '/system/nodes',
-      SHOW: nodeId => `/system/nodes/${nodeId}`,
+      SHOW: (nodeId) => `/system/nodes/${nodeId}`,
     },
-    THREADDUMP: nodeId => `/system/threaddump/${nodeId}`,
+    THREADDUMP: (nodeId) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
-    PROCESSBUFFERDUMP: nodeId => `/system/processbufferdump/${nodeId}`,
+    PROCESSBUFFERDUMP: (nodeId) => `/system/processbufferdump/${nodeId}`,
     AUTHENTICATION: {
       OVERVIEW: '/system/authentication',
       ROLES: '/system/authentication/roles',
       USERS: {
         CREATE: '/system/authentication/users/new',
-        edit: username => `/system/authentication/users/edit/${username}`,
+        edit: (username) => `/system/authentication/users/edit/${username}`,
         TOKENS: {
-          edit: username => `/system/authentication/users/tokens/${username}`,
+          edit: (username) => `/system/authentication/users/tokens/${username}`,
         },
         LIST: '/system/authentication/users',
       },
       PROVIDERS: {
         CONFIG: '/system/authentication/config',
-        provider: name => `/system/authentication/config/${name}`,
+        provider: (name) => `/system/authentication/config/${name}`,
       },
     },
     LOOKUPTABLES: {
       OVERVIEW: '/system/lookuptables',
       CREATE: '/system/lookuptables/create',
-      show: tableName => `/system/lookuptables/table/${tableName}`,
-      edit: tableName => `/system/lookuptables/table/${tableName}/edit`,
+      show: (tableName) => `/system/lookuptables/table/${tableName}`,
+      edit: (tableName) => `/system/lookuptables/table/${tableName}/edit`,
       CACHES: {
         OVERVIEW: '/system/lookuptables/caches',
         CREATE: '/system/lookuptables/caches/create',
-        show: cacheName => `/system/lookuptables/caches/${cacheName}`,
-        edit: cacheName => `/system/lookuptables/caches/${cacheName}/edit`,
+        show: (cacheName) => `/system/lookuptables/caches/${cacheName}`,
+        edit: (cacheName) => `/system/lookuptables/caches/${cacheName}/edit`,
       },
       DATA_ADAPTERS: {
         OVERVIEW: '/system/lookuptables/data_adapters',
         CREATE: '/system/lookuptables/data_adapters/create',
-        show: adapterName => `/system/lookuptables/data_adapter/${adapterName}`,
-        edit: adapterName => `/system/lookuptables/data_adapter/${adapterName}/edit`,
+        show: (adapterName) => `/system/lookuptables/data_adapter/${adapterName}`,
+        edit: (adapterName) => `/system/lookuptables/data_adapter/${adapterName}/edit`,
       },
     },
     PIPELINES: {
       OVERVIEW: '/system/pipelines',
-      PIPELINE: pipelineId => `/system/pipelines/${pipelineId}`,
+      PIPELINE: (pipelineId) => `/system/pipelines/${pipelineId}`,
       RULES: '/system/pipelines/rules',
-      RULE: ruleId => `/system/pipelines/rules/${ruleId}`,
+      RULE: (ruleId) => `/system/pipelines/rules/${ruleId}`,
       SIMULATOR: '/system/pipelines/simulate',
     },
     ENTERPRISE: '/system/enterprise',
     SIDECARS: {
       OVERVIEW: '/system/sidecars',
-      STATUS: sidecarId => `/system/sidecars/${sidecarId}/status`,
+      STATUS: (sidecarId) => `/system/sidecars/${sidecarId}/status`,
       ADMINISTRATION: '/system/sidecars/administration',
       CONFIGURATION: '/system/sidecars/configuration',
       NEW_CONFIGURATION: '/system/sidecars/configuration/new',
-      EDIT_CONFIGURATION: configurationId => `/system/sidecars/configuration/edit/${configurationId}`,
+      EDIT_CONFIGURATION: (configurationId) => `/system/sidecars/configuration/edit/${configurationId}`,
       NEW_COLLECTOR: '/system/sidecars/collector/new',
-      EDIT_COLLECTOR: collectorId => `/system/sidecars/collector/edit/${collectorId}`,
+      EDIT_COLLECTOR: (collectorId) => `/system/sidecars/collector/edit/${collectorId}`,
     },
   },
   VIEWS: {
     LIST: viewsPath,
-    VIEWID: id => `${viewsPath}/${id}`,
+    VIEWID: (id) => `${viewsPath}/${id}`,
   },
   EXTENDEDSEARCH: extendedSearchPath,
   search_with_query: (query, rangeType, timeRange) => {
@@ -155,26 +155,26 @@ const Routes = {
     return Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution);
   },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,
-  stream_edit: streamId => `/streams/${streamId}/edit`,
+  stream_edit: (streamId) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId, index, messageId) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
-  stream_outputs: streamId => `/streams/${streamId}/outputs`,
+  stream_outputs: (streamId) => `/streams/${streamId}/outputs`,
   stream_search: (streamId, query, timeRange, resolution) => {
     return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
   },
-  stream_alerts: streamId => `/alerts/?stream_id=${streamId}`,
+  stream_alerts: (streamId) => `/alerts/?stream_id=${streamId}`,
 
-  legacy_stream_search: streamId => `/streams/${streamId}/messages`,
-  show_alert: alertId => `${Routes.LEGACY_ALERTS.LIST}/${alertId}`,
+  legacy_stream_search: (streamId) => `/streams/${streamId}/messages`,
+  show_alert: (alertId) => `${Routes.LEGACY_ALERTS.LIST}/${alertId}`,
   show_alert_condition: (streamId, conditionId) => `${Routes.LEGACY_ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
-  new_alert_condition_for_stream: streamId => `${Routes.LEGACY_ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
-  new_alert_notification_for_stream: streamId => `${Routes.LEGACY_ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
+  new_alert_condition_for_stream: (streamId) => `${Routes.LEGACY_ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
+  new_alert_notification_for_stream: (streamId) => `${Routes.LEGACY_ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
 
-  dashboard_show: dashboardId => `/dashboards/${dashboardId}`,
+  dashboard_show: (dashboardId) => `/dashboards/${dashboardId}`,
 
-  node: nodeId => `/system/nodes/${nodeId}`,
+  node: (nodeId) => `/system/nodes/${nodeId}`,
 
-  node_inputs: nodeId => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
-  global_input_extractors: inputId => `/system/inputs/${inputId}/extractors`,
+  node_inputs: (nodeId) => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
+  global_input_extractors: (inputId) => `/system/inputs/${inputId}/extractors`,
   local_input_extractors: (nodeId, inputId) => `/system/inputs/${nodeId}/${inputId}/extractors`,
   export_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/export`,
   import_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/import`,
@@ -193,7 +193,7 @@ const Routes = {
   edit_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 
   edit_input_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
-  getting_started: fromMenu => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
+  getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
   filtered_metrics: (nodeId, filter) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
 };
 
@@ -247,8 +247,8 @@ defaultExport.pluginRoute = (routeKey) => {
   PluginStore.exports('routes').forEach((pluginRoute) => {
     const uri = new URI(pluginRoute.path);
     const segments = uri.segment();
-    const key = segments.map(segment => segment.replace(':', '')).join('_').toUpperCase();
-    const paramNames = segments.filter(segment => segment.startsWith(':'));
+    const key = segments.map((segment) => segment.replace(':', '')).join('_').toUpperCase();
+    const paramNames = segments.filter((segment) => segment.startsWith(':'));
 
     if (paramNames.length > 0) {
       pluginRoutes[key] = (...paramValues) => {

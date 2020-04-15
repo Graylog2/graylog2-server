@@ -64,15 +64,16 @@ class AggregationConditionsForm extends React.Component {
     if (nextConditions) {
       // Keep series up-to-date with changes in conditions
       const seriesReferences = extractSeriesReferences(nextConditions);
-      nextSeries = (changes.series || eventDefinition.config.series).filter(s => seriesReferences.includes(s.id));
+      nextSeries = (changes.series || eventDefinition.config.series).filter((s) => seriesReferences.includes(s.id));
     } else {
       nextSeries = [];
     }
 
-    onChange(Object.assign({}, changes, {
+    onChange({
+      ...changes,
       conditions: { expression: nextConditions },
       series: nextSeries,
-    }));
+    });
   };
 
   render() {
@@ -82,7 +83,7 @@ class AggregationConditionsForm extends React.Component {
     const expressionValidation = validateExpression(expression, eventDefinition.config.series);
 
     return (
-      <React.Fragment>
+      <>
         <h3 className={commonStyles.title}>Create Events for Definition</h3>
         {validation.errors.conditions && (
           <StyledAlert bsStyle="danger">
@@ -103,7 +104,7 @@ class AggregationConditionsForm extends React.Component {
                                           expressionValidation={expressionValidation}
                                           showInlineValidation={showInlineValidation}
                                           toggleShowValidation={this.toggleShowInlineValidation} />
-      </React.Fragment>
+      </>
     );
   }
 }

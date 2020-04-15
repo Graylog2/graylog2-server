@@ -11,7 +11,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import AggregationControls from './AggregationControls';
 
-jest.mock('stores/connect', () => x => x);
+jest.mock('stores/connect', () => (x) => x);
 jest.mock('views/components/aggregationbuilder/PivotSelect', () => 'pivot-select');
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: { exports: jest.fn(() => []) },
@@ -104,7 +104,7 @@ describe('AggregationControls', () => {
   it('shows custom visualization config component', () => {
     const CustomVisualizationConfigComponent = () => <div>This is a custom visualization config</div>;
     const OtherCustomVisualizationConfigComponent = () => <div>This text should not be rendered</div>;
-    asMock(PluginStore.exports).mockImplementation(type => ({
+    asMock(PluginStore.exports).mockImplementation((type) => ({
       visualizationConfigTypes: [{
         type: 'other',
         component: OtherCustomVisualizationConfigComponent,

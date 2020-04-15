@@ -127,7 +127,7 @@ class ExtractorsListItem extends React.Component {
 
   _formatConverters = (converters) => {
     const converterKeys = Object.keys(converters);
-    const formattedConverters = converterKeys.map(converterKey => this._formatConverter(converterKey, converters[converterKey]));
+    const formattedConverters = converterKeys.map((converterKey) => this._formatConverter(converterKey, converters[converterKey]));
     if (formattedConverters.length === 0) {
       return <div />;
     }

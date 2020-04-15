@@ -12,7 +12,7 @@ const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 
 function filterRules(state) {
-  return state.rules ? state.rules.filter(r => r.id === this.props.params.ruleId)[0] : undefined;
+  return state.rules ? state.rules.filter((r) => r.id === this.props.params.ruleId)[0] : undefined;
 }
 
 const RuleDetailsPage = createReactClass({
@@ -55,7 +55,7 @@ const RuleDetailsPage = createReactClass({
     }
 
     const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter((pipeline) => {
-      return pipeline.stages.some(stage => stage.rules.indexOf(this.state.rule.title) !== -1);
+      return pipeline.stages.some((stage) => stage.rules.indexOf(this.state.rule.title) !== -1);
     });
 
     const pageTitle = (this.props.params.ruleId === 'new' ? 'New pipeline rule' : `Pipeline rule ${this.state.rule.title}`);

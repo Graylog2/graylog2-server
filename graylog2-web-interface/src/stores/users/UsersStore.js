@@ -50,7 +50,7 @@ const UsersStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.list().url);
     const promise = fetch('GET', url)
       .then(
-        response => response.users,
+        (response) => response.users,
         (error) => {
           if (error.additional.status !== 404) {
             UserNotification.error(`Loading user list failed with status: ${error}`,
@@ -130,7 +130,7 @@ const UsersStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(username)).url);
     const promise = fetch('GET', url)
       .then(
-        response => response.tokens,
+        (response) => response.tokens,
         (error) => {
           UserNotification.error(`Loading tokens of user failed with status: ${error}`,
             `Could not load tokens of user ${username}`);

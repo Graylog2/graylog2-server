@@ -22,7 +22,7 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
-jest.mock('react-router', () => ({ withRouter: x => x }));
+jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/layout/Footer', () => <div />);
 jest.mock('util/History', () => ({ push: jest.fn() }));
 jest.mock('views/stores/ViewMetadataStore', () => ({
@@ -79,17 +79,17 @@ jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
 jest.mock('views/stores/StreamsStore', () => ({ StreamsActions: { refresh: jest.fn() } }));
 jest.mock('views/components/common/WindowLeaveMessage', () => mockComponent('WindowLeaveMessage'));
-jest.mock('views/components/WithSearchStatus', () => x => x);
+jest.mock('views/components/WithSearchStatus', () => (x) => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
 jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
-jest.mock('views/logic/withPluginEntities', () => x => x);
+jest.mock('views/logic/withPluginEntities', () => (x) => x);
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 
 const mockPromise = (res) => {
   const promise = Promise.resolve(res);
   // $FlowFixMe: On purpose for a promise that does not need to be resolved
-  promise.then = x => x(res);
+  promise.then = (x) => x(res);
   return promise;
 };
 
@@ -117,7 +117,7 @@ describe('ExtendedSearchPage', () => {
     asMock(CurrentViewTypeProvider).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 
-  const SimpleExtendedSearchPage = props => (
+  const SimpleExtendedSearchPage = (props) => (
     <ExtendedSearchPage route={{}}
                         location={{ query: {} }}
                         searchRefreshHooks={[]}

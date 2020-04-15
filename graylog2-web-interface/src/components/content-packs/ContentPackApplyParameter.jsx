@@ -85,25 +85,25 @@ class ContentPackApplyParameter extends React.Component {
 
     const configKeys = Object.keys(configPaths)
       .sort(naturalSort)
-      .filter(configKey => configPaths[configKey].isValueRef()) // Only allow value-refs as parameters
+      .filter((configKey) => configPaths[configKey].isValueRef()) // Only allow value-refs as parameters
       .filter((configKey) => {
         return this.props.appliedParameter.findIndex((paramMap) => {
           return configKey === paramMap.configKey;
         }) < 0;
       });
     const emptyOption = (name) => { return (<option key="EMPTY" value="">{name}</option>); };
-    const configOptions = [emptyOption('Choose Config Key')].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
+    const configOptions = [emptyOption('Choose Config Key')].concat(configKeys.map((key) => <option key={key} value={key}>{key}</option>));
     let { parameters } = this.props;
     let emptyName = parameters.length <= 0 ? 'Create a parameter first' : 'Choose...';
     if (this.state.config_key !== '' && parameters.length > 0) {
       const configKeyType = configPaths[this.state.config_key].getValueType();
-      if (['string', 'integer', 'boolean', 'double'].findIndex(type => type === configKeyType) >= 0) {
-        parameters = parameters.filter(parameter => parameter.type === configKeyType);
+      if (['string', 'integer', 'boolean', 'double'].findIndex((type) => type === configKeyType) >= 0) {
+        parameters = parameters.filter((parameter) => parameter.type === configKeyType);
       }
       emptyName = parameters.length <= 0 ? `No parameter from type ${configKeyType}` : 'Choose...';
     }
     const parameterOptions = [emptyOption(emptyName)]
-      .concat(parameters.map(key => <option key={key.name} value={key.name}>{key.title} ({key.name})</option>));
+      .concat(parameters.map((key) => <option key={key.name} value={key.name}>{key.title} ({key.name})</option>));
     return (
       <div>
         <form className="apply-parameter-form" id="apply-parameter-form" onSubmit={this._applyParameter}>

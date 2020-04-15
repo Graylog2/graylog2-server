@@ -32,7 +32,7 @@ class MetricsComponent extends React.Component {
     let filteredNames;
     try {
       const filterRegex = new RegExp(filter, 'i');
-      filteredNames = this.props.names.filter(metric => String(metric.full_name).match(filterRegex));
+      filteredNames = this.props.names.filter((metric) => String(metric.full_name).match(filterRegex));
     } catch (e) {
       filteredNames = [];
     }

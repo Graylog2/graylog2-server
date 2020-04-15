@@ -1,29 +1,11 @@
-/* eslint-disable */
-const modes = [
-  'json',
-  'lua',
-  'markdown',
-  'text',
-  'yaml',
-];
+import 'ace-builds/webpack-resolver';
 
-modes.forEach((mode) => {
-  ace.config.setModuleUrl(
-    'ace/mode/' + mode, require('file-loader!ace-builds/src-min-noconflict/mode-' + mode + '.js')
-  );
-});
+import 'ace-builds/src-min-noconflict/mode-json';
+import 'ace-builds/src-min-noconflict/mode-lua';
+import 'ace-builds/src-min-noconflict/mode-markdown';
+import 'ace-builds/src-min-noconflict/mode-text';
+import 'ace-builds/src-min-noconflict/mode-yaml';
+import 'components/rules/mode-pipeline';
 
-ace.config.setModuleUrl(
-  `ace/mode/pipeline`, require(`file-loader!components/rules/mode-pipeline-hax.js`)
-);
-
-const themes = [
-  'tomorrow',
-  'monokai',
-];
-
-themes.forEach((theme) => {
-  ace.config.setModuleUrl(
-    'ace/theme/' + theme, require('file-loader!ace-builds/src-min-noconflict/theme-' + theme + '.js')
-  );
-});
+import 'ace-builds/src-noconflict/theme-tomorrow';
+import 'ace-builds/src-noconflict/theme-monokai';

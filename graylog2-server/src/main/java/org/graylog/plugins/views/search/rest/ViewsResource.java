@@ -156,6 +156,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
     public ViewDTO create(@ApiParam @Valid ViewDTO dto) throws ValidationException {
+        if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
+            checkPermission(RestPermissions.DASHBOARDS_CREATE);
+        }
         final String username = getCurrentUser() == null ? null : getCurrentUser().getName();
         final ViewDTO savedDto = dbService.save(dto.toBuilder().owner(username).build());
         ensureUserPermissions(savedDto);

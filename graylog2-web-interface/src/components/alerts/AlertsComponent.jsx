@@ -80,8 +80,8 @@ const AlertsComponent = createReactClass({
   _formatAlert(alert) {
     const { allAlertConditions, streams, availableConditions } = this.state;
 
-    const condition = allAlertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
-    const stream = streams.find(s => s.id === alert.stream_id);
+    const condition = allAlertConditions.find((alertCondition) => alertCondition.id === alert.condition_id);
+    const stream = streams.find((s) => s.id === alert.stream_id);
     const conditionType = condition ? availableConditions[condition.type] : {};
 
     return (
@@ -129,7 +129,7 @@ const AlertsComponent = createReactClass({
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle={displayAllAlerts ? 'info' : 'success'}
                       noItemsText={displayAllAlerts ? 'There are no alerts to display' : 'Good news! Currently there are no unresolved alerts.'}
-                      items={alerts.alerts.map(alert => this._formatAlert(alert))} />
+                      items={alerts.alerts.map((alert) => this._formatAlert(alert))} />
         </PaginatedList>
       </div>
     );

@@ -102,7 +102,7 @@ const Stream = createReactClass({
     const { stream } = this.props;
 
     this.setState({ loading: true });
-    StreamsStore.resume(stream.id, response => response)
+    StreamsStore.resume(stream.id, (response) => response)
       .finally(() => this.setState({ loading: false }));
   },
 
@@ -126,7 +126,7 @@ const Stream = createReactClass({
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
       this.setState({ loading: true });
-      StreamsStore.pause(stream.id, response => response)
+      StreamsStore.pause(stream.id, (response) => response)
         .finally(() => this.setState({ loading: false }));
     }
   },
@@ -217,7 +217,7 @@ const Stream = createReactClass({
       </OverlayElement>
     );
 
-    const indexSet = indexSets.find(is => is.id === stream.index_set_id) || indexSets.find(is => is.is_default);
+    const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.is_default);
     const indexSetDetails = this.isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
 
     return (

@@ -34,7 +34,7 @@ class WidgetOverrideElements extends React.Component<Props, State> {
       return <OverrideComponent retry={retry} />;
     }
 
-    const override = thrownComponent => this.setState({ thrownComponent });
+    const override = (thrownComponent) => this.setState({ thrownComponent });
 
     const { children, widgetOverrideElements } = this.props;
     const widgetOverrideChecks = widgetOverrideElements
@@ -42,10 +42,10 @@ class WidgetOverrideElements extends React.Component<Props, State> {
       .map((Component, idx) => <Component key={idx} override={override} />);
 
     return (
-      <React.Fragment>
+      <>
         {widgetOverrideChecks}
         {children}
-      </React.Fragment>
+      </>
     );
   }
 }

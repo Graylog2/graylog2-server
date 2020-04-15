@@ -41,9 +41,9 @@ export default class ViewPropertiesModal extends React.Component {
     }
 
     switch (name) {
-      case 'title': return this.setState(state => ({ view: state.view.toBuilder().title(value).build() }));
-      case 'summary': return this.setState(state => ({ view: state.view.toBuilder().summary(value).build() }));
-      case 'description': return this.setState(state => ({ view: state.view.toBuilder().description(value).build() }));
+      case 'title': return this.setState((state) => ({ view: state.view.toBuilder().title(value).build() }));
+      case 'summary': return this.setState((state) => ({ view: state.view.toBuilder().summary(value).build() }));
+      case 'description': return this.setState((state) => ({ view: state.view.toBuilder().description(value).build() }));
       default: break;
     }
   };

@@ -39,7 +39,7 @@ class SidecarStatusPage extends React.Component {
 
   reloadSidecar = () => {
     SidecarsActions.getSidecar(this.props.params.sidecarId).then(
-      sidecar => this.setState({ sidecar }),
+      (sidecar) => this.setState({ sidecar }),
       (error) => {
         if (error.status === 404) {
           history.push(Routes.SYSTEM.SIDECARS.OVERVIEW);
@@ -49,7 +49,7 @@ class SidecarStatusPage extends React.Component {
   };
 
   reloadCollectors = () => {
-    CollectorsActions.all().then(response => this.setState({ collectors: response.collectors }));
+    CollectorsActions.all().then((response) => this.setState({ collectors: response.collectors }));
   };
 
   render() {

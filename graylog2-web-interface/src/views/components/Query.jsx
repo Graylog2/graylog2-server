@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import DocsHelper from 'util/DocsHelper';
+import styled from 'styled-components';
 
+import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Spinner } from 'components/common';
@@ -14,6 +15,15 @@ import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
+
+const StyledJumbotron = styled(Jumbotron)(({ theme }) => `
+  .container-fluid & {
+    border: 1px solid ${theme.color.gray[80]};
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-bottom: 0;
+  }
+`);
 
 const MAXIMUM_GRID_SIZE = 12;
 
@@ -30,10 +40,10 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
 
   widgetDefs.forEach((widget) => {
     const widgetType = widgetDefinition(widget.type);
-    const dataTransformer = widgetType.searchResultTransformer || (x => x);
+    const dataTransformer = widgetType.searchResultTransformer || ((x) => x);
     const searchTypeIds = (widgetMapping[widget.id] || []);
-    const widgetData = searchTypeIds.map(searchTypeId => searchTypes[searchTypeId]).filter(result => result);
-    const widgetErrors = results.errors.filter(e => searchTypeIds.includes(e.searchTypeId));
+    const widgetData = searchTypeIds.map((searchTypeId) => searchTypes[searchTypeId]).filter((result) => result);
+    const widgetErrors = results.errors.filter((e) => searchTypeIds.includes(e.searchTypeId));
 
     widgets[widget.id] = widget;
     data[widget.id] = dataTransformer(widgetData, widget);
@@ -43,7 +53,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
     }
 
     if (!widgetData || widgetData.length === 0) {
-      const queryErrors = results.errors.filter(e => e.type === 'query');
+      const queryErrors = results.errors.filter((e) => e.type === 'query');
       if (queryErrors.length > 0) {
         errors[widget.id] = errors[widget.id] ? [].concat(errors[widget.id], queryErrors) : queryErrors;
       }
@@ -51,13 +61,13 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
   });
   return (
     <InteractiveContext.Consumer>
-      {interactive => (
+      {(interactive) => (
         <WidgetGrid allFields={allFields}
                     data={data}
                     errors={errors}
                     fields={fields}
                     locked={!interactive}
-                    onPositionsChange={p => _onPositionsChange(p)}
+                    onPositionsChange={(p) => _onPositionsChange(p)}
                     positions={positions}
                     widgets={widgets} />
       )}
@@ -66,7 +76,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
 };
 
 const EmptyDashboardInfo = () => (
-  <Jumbotron style={{ marginBottom: 0 }}>
+  <StyledJumbotron>
     <h2>
       <IfDashboard>
         This dashboard has no widgets yet
@@ -93,7 +103,7 @@ const EmptyDashboardInfo = () => (
     <p>
       You can also have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />, to learn more about the widget creation.
     </p>
-  </Jumbotron>
+  </StyledJumbotron>
 );
 
 

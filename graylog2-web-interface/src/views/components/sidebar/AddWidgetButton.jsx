@@ -109,7 +109,7 @@ class AddWidgetButton extends React.Component<Props, State> {
   );
 
   _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.Node => {
-    const typeCreators = creators.filter(c => (c.type === type));
+    const typeCreators = creators.filter((c) => (c.type === type));
     const sortedCreators = sortBy(typeCreators, 'title');
     return sortedCreators.map(this._createMenuItem);
   }
@@ -122,7 +122,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     // $FlowFixMe: Object.value signature is in the way
     const components: Array<React.Node> = Object.values(overflowingComponents);
     return (
-      <React.Fragment>
+      <>
         <Group>
           <GroupHeadline>Generic</GroupHeadline>
           {generic}
@@ -137,7 +137,7 @@ class AddWidgetButton extends React.Component<Props, State> {
             {components}
           </Group>
         )}
-      </React.Fragment>
+      </>
     );
   }
 }

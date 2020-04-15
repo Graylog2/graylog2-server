@@ -14,30 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.search.requests;
+package org.graylog.plugins.views.search.events;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog2.plugin.database.users.User;
+import org.joda.time.DateTime;
 
-import javax.validation.constraints.NotEmpty;
-import java.util.Map;
-
-@JsonAutoDetect
 @AutoValue
-@WithBeanGetter
-public abstract class CreateSavedSearchRequest {
-    @JsonProperty
-    public abstract String title();
+@JsonAutoDetect
+public abstract class SearchJobExecutionEvent {
+    public abstract User user();
+    public abstract SearchJob searchJob();
+    public abstract DateTime executionStart();
 
-    @JsonProperty
-    public abstract Map<String, Object> query();
-
-    @JsonCreator
-    public static CreateSavedSearchRequest create(@JsonProperty("title") @NotEmpty String title,
-                                                  @JsonProperty("query") @NotEmpty Map<String, Object> query) {
-        return new AutoValue_CreateSavedSearchRequest(title, query);
+    public static SearchJobExecutionEvent create(User user, SearchJob searchJob, DateTime executionStart) {
+        return new AutoValue_SearchJobExecutionEvent(user, searchJob, executionStart);
     }
 }

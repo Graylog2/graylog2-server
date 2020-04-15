@@ -281,159 +281,137 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
         <div
           className="col-sm-4"
         >
-          <Input
-            addonAfter={null}
-            autoComplete="off"
-            bsStyle={null}
-            buttonAfter={null}
-            formGroupClassName="filterFormGroup"
-            help=""
-            id="pattern-selector"
-            label="Filter pattern"
-            onChange={[Function]}
-            onKeyDown={[Function]}
-            placeholder=""
-            type="text"
-            value=""
+          <GrokPatternFilter
+            addToPattern={[Function]}
+            patterns={
+              Array [
+                Object {
+                  "name": "COMMONMAC",
+                  "pattern": "(?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})",
+                },
+                Object {
+                  "name": "DATA",
+                  "pattern": ".*?",
+                },
+                Object {
+                  "name": "DATE",
+                  "pattern": "%{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}",
+                },
+              ]
+            }
           >
-            <Component
-              bsClass="filterFormGroup"
-              controlId="pattern-selector"
-              validationState={null}
+            <Input
+              addonAfter={null}
+              autoComplete="off"
+              bsStyle={null}
+              buttonAfter={null}
+              formGroupClassName="filterFormGroup"
+              help=""
+              id="pattern-selector"
+              label="Filter pattern"
+              onChange={[Function]}
+              onKeyDown={[Function]}
+              placeholder=""
+              type="text"
+              value=""
             >
-              <FormGroup__StyledFormGroup
+              <Component
                 bsClass="filterFormGroup"
                 controlId="pattern-selector"
                 validationState={null}
               >
-                <StyledComponent
+                <FormGroup__StyledFormGroup
                   bsClass="filterFormGroup"
                   controlId="pattern-selector"
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "SIZES": Array [
-                        "large",
-                        "small",
-                      ],
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                        "isStatic": false,
-                        "lastClassName": "ekazNr",
-                        "rules": Array [
-                          [Function],
-                          ";",
-                        ],
-                      },
-                      "displayName": "FormGroup__StyledFormGroup",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                      "target": [Function],
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
                   validationState={null}
                 >
-                  <FormGroup
+                  <StyledComponent
                     bsClass="filterFormGroup"
-                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
                     controlId="pattern-selector"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                          "isStatic": false,
+                          "lastClassName": "ekazNr",
+                          "rules": Array [
+                            [Function],
+                            ";",
+                          ],
+                        },
+                        "displayName": "FormGroup__StyledFormGroup",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
                     validationState={null}
                   >
-                    <div
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr filterFormGroup"
+                    <FormGroup
+                      bsClass="filterFormGroup"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                      controlId="pattern-selector"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "hCskeX",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr filterFormGroup"
+                      >
+                        <ControlLabel>
+                          <StyledComponent
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "ControlLabel-sc-1edmum5-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hCskeX",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "ControlLabel",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
                             }
-                          }
-                          forwardedRef={null}
-                        >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 hCskeX"
-                            srOnly={false}
+                            forwardedRef={null}
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                              htmlFor="pattern-selector"
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="ControlLabel-sc-1edmum5-0 hCskeX"
+                              srOnly={false}
                             >
-                              Filter pattern
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            autoComplete="off"
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Filter pattern"
-                            name="pattern-selector"
-                            onChange={[Function]}
-                            onKeyDown={[Function]}
-                            placeholder=""
-                            type="text"
-                            value=""
-                          >
-                            <StyledComponent
+                              <label
+                                className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                htmlFor="pattern-selector"
+                              >
+                                Filter pattern
+                              </label>
+                            </ControlLabel>
+                          </StyledComponent>
+                        </ControlLabel>
+                        <InputWrapper>
+                          <span>
+                            <FormControl
                               autoComplete="off"
                               componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fcGLmv",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
                               inputRef={[Function]}
                               label="Filter pattern"
                               name="pattern-selector"
@@ -443,11 +421,38 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               type="text"
                               value=""
                             >
-                              <FormControl
+                              <StyledComponent
                                 autoComplete="off"
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 fcGLmv"
                                 componentClass="input"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "Feedback": [Function],
+                                    "SIZES": Array [
+                                      "small",
+                                      "large",
+                                    ],
+                                    "Static": [Function],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "FormControl-sc-1amoaox-0",
+                                      "isStatic": false,
+                                      "lastClassName": "fcGLmv",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "FormControl",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 inputRef={[Function]}
                                 label="Filter pattern"
                                 name="pattern-selector"
@@ -457,10 +462,12 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                 type="text"
                                 value=""
                               >
-                                <input
+                                <FormControl
                                   autoComplete="off"
-                                  className="FormControl-sc-1amoaox-0 fcGLmv form-control"
-                                  id="pattern-selector"
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 fcGLmv"
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="Filter pattern"
                                   name="pattern-selector"
                                   onChange={[Function]}
@@ -468,495 +475,508 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                   placeholder=""
                                   type="text"
                                   value=""
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                        </span>
-                      </InputWrapper>
-                    </div>
-                  </FormGroup>
-                </StyledComponent>
-              </FormGroup__StyledFormGroup>
-            </Component>
-          </Input>
-          <ListGroup
-            bsClass="resultList"
-          >
+                                >
+                                  <input
+                                    autoComplete="off"
+                                    className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                    id="pattern-selector"
+                                    label="Filter pattern"
+                                    name="pattern-selector"
+                                    onChange={[Function]}
+                                    onKeyDown={[Function]}
+                                    placeholder=""
+                                    type="text"
+                                    value=""
+                                  />
+                                </FormControl>
+                              </StyledComponent>
+                            </FormControl>
+                          </span>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </StyledComponent>
+                </FormGroup__StyledFormGroup>
+              </Component>
+            </Input>
             <ListGroup
               bsClass="resultList"
             >
-              <div
-                className="resultList"
+              <ListGroup
+                bsClass="resultList"
               >
-                <ForwardRef
-                  header="COMMONMAC"
-                  id="list-item-0"
-                  key="COMMONMAC"
-                  onKeyDown={[Function]}
+                <div
+                  className="resultList"
                 >
-                  <ListGroupItem__StyledListGroupItem
+                  <ForwardRef
                     header="COMMONMAC"
                     id="list-item-0"
+                    key="COMMONMAC"
                     onKeyDown={[Function]}
                   >
-                    <StyledComponent
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                            "isStatic": false,
-                            "lastClassName": "kRfOAP",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "ListGroupItem__StyledListGroupItem",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
+                    <ListGroupItem__StyledListGroupItem
                       header="COMMONMAC"
                       id="list-item-0"
                       onKeyDown={[Function]}
                     >
-                      <ListGroupItem
-                        bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "STYLES": Array [
+                              "success",
+                              "warning",
+                              "danger",
+                              "info",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                              "isStatic": false,
+                              "lastClassName": "kRfOAP",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "ListGroupItem__StyledListGroupItem",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
                         header="COMMONMAC"
                         id="list-item-0"
-                        listItem={false}
                         onKeyDown={[Function]}
                       >
-                        <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                        <ListGroupItem
+                          bsClass="list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                          header="COMMONMAC"
                           id="list-item-0"
+                          listItem={false}
                           onKeyDown={[Function]}
                         >
-                          <h4
-                            className="list-group-item-heading"
+                          <span
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                            id="list-item-0"
+                            onKeyDown={[Function]}
                           >
-                            COMMONMAC
-                          </h4>
-                          <p
-                            className="list-group-item-text"
-                          >
-                            <span
-                              className="patternDisplay"
+                            <h4
+                              className="list-group-item-heading"
                             >
-                              (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
-                            </span>
-                            <span
-                              className="addButton"
+                              COMMONMAC
+                            </h4>
+                            <p
+                              className="list-group-item-text"
                             >
-                              <ForwardRef
-                                bsSize="xsmall"
-                                bsStyle="primary"
-                                onClick={[Function]}
+                              <span
+                                className="patternDisplay"
                               >
-                                <Button__StyledButton
+                                (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
+                              </span>
+                              <span
+                                className="addButton"
+                              >
+                                <ForwardRef
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <StyledComponent
+                                  <Button__StyledButton
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "SIZES": Array [
-                                          "large",
-                                          "small",
-                                          "xsmall",
-                                        ],
-                                        "STYLES": Array [
-                                          "success",
-                                          "warning",
-                                          "danger",
-                                          "info",
-                                          "default",
-                                          "primary",
-                                          "link",
-                                        ],
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Button__StyledButton-c9cbmb-0",
-                                          "isStatic": false,
-                                          "lastClassName": "hGhRKT",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Button__StyledButton",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
+                                    <StyledComponent
                                       bsSize="xsmall"
                                       bsStyle="primary"
-                                      className="Button__StyledButton-c9cbmb-0 hGhRKT"
-                                      disabled={false}
+                                      forwardedComponent={
+                                        Object {
+                                          "$$typeof": Symbol(react.forward_ref),
+                                          "SIZES": Array [
+                                            "large",
+                                            "small",
+                                            "xsmall",
+                                          ],
+                                          "STYLES": Array [
+                                            "success",
+                                            "warning",
+                                            "danger",
+                                            "info",
+                                            "default",
+                                            "primary",
+                                            "link",
+                                          ],
+                                          "attrs": Array [],
+                                          "componentStyle": ComponentStyle {
+                                            "componentId": "Button__StyledButton-c9cbmb-0",
+                                            "isStatic": false,
+                                            "lastClassName": "hGhRKT",
+                                            "rules": Array [
+                                              [Function],
+                                            ],
+                                          },
+                                          "displayName": "Button__StyledButton",
+                                          "foldedComponentIds": Array [],
+                                          "render": [Function],
+                                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                          "target": [Function],
+                                          "toString": [Function],
+                                          "warnTooManyClasses": [Function],
+                                          "withComponent": [Function],
+                                        }
+                                      }
+                                      forwardedRef={null}
                                       onClick={[Function]}
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                      <Button
+                                        active={false}
+                                        block={false}
+                                        bsClass="btn"
+                                        bsSize="xsmall"
+                                        bsStyle="primary"
+                                        className="Button__StyledButton-c9cbmb-0 hGhRKT"
                                         disabled={false}
                                         onClick={[Function]}
-                                        type="button"
                                       >
-                                        Add
-                                      </button>
-                                    </Button>
-                                  </StyledComponent>
-                                </Button__StyledButton>
-                              </ForwardRef>
-                            </span>
-                          </p>
-                        </span>
-                      </ListGroupItem>
-                    </StyledComponent>
-                  </ListGroupItem__StyledListGroupItem>
-                </ForwardRef>
-                <ForwardRef
-                  header="DATA"
-                  id="list-item-1"
-                  key="DATA"
-                  onKeyDown={[Function]}
-                >
-                  <ListGroupItem__StyledListGroupItem
+                                        <button
+                                          className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                          disabled={false}
+                                          onClick={[Function]}
+                                          type="button"
+                                        >
+                                          Add
+                                        </button>
+                                      </Button>
+                                    </StyledComponent>
+                                  </Button__StyledButton>
+                                </ForwardRef>
+                              </span>
+                            </p>
+                          </span>
+                        </ListGroupItem>
+                      </StyledComponent>
+                    </ListGroupItem__StyledListGroupItem>
+                  </ForwardRef>
+                  <ForwardRef
                     header="DATA"
                     id="list-item-1"
+                    key="DATA"
                     onKeyDown={[Function]}
                   >
-                    <StyledComponent
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                            "isStatic": false,
-                            "lastClassName": "kRfOAP",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "ListGroupItem__StyledListGroupItem",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
+                    <ListGroupItem__StyledListGroupItem
                       header="DATA"
                       id="list-item-1"
                       onKeyDown={[Function]}
                     >
-                      <ListGroupItem
-                        bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "STYLES": Array [
+                              "success",
+                              "warning",
+                              "danger",
+                              "info",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                              "isStatic": false,
+                              "lastClassName": "kRfOAP",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "ListGroupItem__StyledListGroupItem",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
                         header="DATA"
                         id="list-item-1"
-                        listItem={false}
                         onKeyDown={[Function]}
                       >
-                        <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                        <ListGroupItem
+                          bsClass="list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                          header="DATA"
                           id="list-item-1"
+                          listItem={false}
                           onKeyDown={[Function]}
                         >
-                          <h4
-                            className="list-group-item-heading"
+                          <span
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                            id="list-item-1"
+                            onKeyDown={[Function]}
                           >
-                            DATA
-                          </h4>
-                          <p
-                            className="list-group-item-text"
-                          >
-                            <span
-                              className="patternDisplay"
+                            <h4
+                              className="list-group-item-heading"
                             >
-                              .*?
-                            </span>
-                            <span
-                              className="addButton"
+                              DATA
+                            </h4>
+                            <p
+                              className="list-group-item-text"
                             >
-                              <ForwardRef
-                                bsSize="xsmall"
-                                bsStyle="primary"
-                                onClick={[Function]}
+                              <span
+                                className="patternDisplay"
                               >
-                                <Button__StyledButton
+                                .*?
+                              </span>
+                              <span
+                                className="addButton"
+                              >
+                                <ForwardRef
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <StyledComponent
+                                  <Button__StyledButton
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "SIZES": Array [
-                                          "large",
-                                          "small",
-                                          "xsmall",
-                                        ],
-                                        "STYLES": Array [
-                                          "success",
-                                          "warning",
-                                          "danger",
-                                          "info",
-                                          "default",
-                                          "primary",
-                                          "link",
-                                        ],
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Button__StyledButton-c9cbmb-0",
-                                          "isStatic": false,
-                                          "lastClassName": "hGhRKT",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Button__StyledButton",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
+                                    <StyledComponent
                                       bsSize="xsmall"
                                       bsStyle="primary"
-                                      className="Button__StyledButton-c9cbmb-0 hGhRKT"
-                                      disabled={false}
+                                      forwardedComponent={
+                                        Object {
+                                          "$$typeof": Symbol(react.forward_ref),
+                                          "SIZES": Array [
+                                            "large",
+                                            "small",
+                                            "xsmall",
+                                          ],
+                                          "STYLES": Array [
+                                            "success",
+                                            "warning",
+                                            "danger",
+                                            "info",
+                                            "default",
+                                            "primary",
+                                            "link",
+                                          ],
+                                          "attrs": Array [],
+                                          "componentStyle": ComponentStyle {
+                                            "componentId": "Button__StyledButton-c9cbmb-0",
+                                            "isStatic": false,
+                                            "lastClassName": "hGhRKT",
+                                            "rules": Array [
+                                              [Function],
+                                            ],
+                                          },
+                                          "displayName": "Button__StyledButton",
+                                          "foldedComponentIds": Array [],
+                                          "render": [Function],
+                                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                          "target": [Function],
+                                          "toString": [Function],
+                                          "warnTooManyClasses": [Function],
+                                          "withComponent": [Function],
+                                        }
+                                      }
+                                      forwardedRef={null}
                                       onClick={[Function]}
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                      <Button
+                                        active={false}
+                                        block={false}
+                                        bsClass="btn"
+                                        bsSize="xsmall"
+                                        bsStyle="primary"
+                                        className="Button__StyledButton-c9cbmb-0 hGhRKT"
                                         disabled={false}
                                         onClick={[Function]}
-                                        type="button"
                                       >
-                                        Add
-                                      </button>
-                                    </Button>
-                                  </StyledComponent>
-                                </Button__StyledButton>
-                              </ForwardRef>
-                            </span>
-                          </p>
-                        </span>
-                      </ListGroupItem>
-                    </StyledComponent>
-                  </ListGroupItem__StyledListGroupItem>
-                </ForwardRef>
-                <ForwardRef
-                  header="DATE"
-                  id="list-item-2"
-                  key="DATE"
-                  onKeyDown={[Function]}
-                >
-                  <ListGroupItem__StyledListGroupItem
+                                        <button
+                                          className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                          disabled={false}
+                                          onClick={[Function]}
+                                          type="button"
+                                        >
+                                          Add
+                                        </button>
+                                      </Button>
+                                    </StyledComponent>
+                                  </Button__StyledButton>
+                                </ForwardRef>
+                              </span>
+                            </p>
+                          </span>
+                        </ListGroupItem>
+                      </StyledComponent>
+                    </ListGroupItem__StyledListGroupItem>
+                  </ForwardRef>
+                  <ForwardRef
                     header="DATE"
                     id="list-item-2"
+                    key="DATE"
                     onKeyDown={[Function]}
                   >
-                    <StyledComponent
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                            "isStatic": false,
-                            "lastClassName": "kRfOAP",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "ListGroupItem__StyledListGroupItem",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
+                    <ListGroupItem__StyledListGroupItem
                       header="DATE"
                       id="list-item-2"
                       onKeyDown={[Function]}
                     >
-                      <ListGroupItem
-                        bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "STYLES": Array [
+                              "success",
+                              "warning",
+                              "danger",
+                              "info",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                              "isStatic": false,
+                              "lastClassName": "kRfOAP",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "ListGroupItem__StyledListGroupItem",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
                         header="DATE"
                         id="list-item-2"
-                        listItem={false}
                         onKeyDown={[Function]}
                       >
-                        <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                        <ListGroupItem
+                          bsClass="list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                          header="DATE"
                           id="list-item-2"
+                          listItem={false}
                           onKeyDown={[Function]}
                         >
-                          <h4
-                            className="list-group-item-heading"
+                          <span
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                            id="list-item-2"
+                            onKeyDown={[Function]}
                           >
-                            DATE
-                          </h4>
-                          <p
-                            className="list-group-item-text"
-                          >
-                            <span
-                              className="patternDisplay"
+                            <h4
+                              className="list-group-item-heading"
                             >
-                              %{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}
-                            </span>
-                            <span
-                              className="addButton"
+                              DATE
+                            </h4>
+                            <p
+                              className="list-group-item-text"
                             >
-                              <ForwardRef
-                                bsSize="xsmall"
-                                bsStyle="primary"
-                                onClick={[Function]}
+                              <span
+                                className="patternDisplay"
                               >
-                                <Button__StyledButton
+                                %{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}
+                              </span>
+                              <span
+                                className="addButton"
+                              >
+                                <ForwardRef
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <StyledComponent
+                                  <Button__StyledButton
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "SIZES": Array [
-                                          "large",
-                                          "small",
-                                          "xsmall",
-                                        ],
-                                        "STYLES": Array [
-                                          "success",
-                                          "warning",
-                                          "danger",
-                                          "info",
-                                          "default",
-                                          "primary",
-                                          "link",
-                                        ],
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Button__StyledButton-c9cbmb-0",
-                                          "isStatic": false,
-                                          "lastClassName": "hGhRKT",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Button__StyledButton",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
+                                    <StyledComponent
                                       bsSize="xsmall"
                                       bsStyle="primary"
-                                      className="Button__StyledButton-c9cbmb-0 hGhRKT"
-                                      disabled={false}
+                                      forwardedComponent={
+                                        Object {
+                                          "$$typeof": Symbol(react.forward_ref),
+                                          "SIZES": Array [
+                                            "large",
+                                            "small",
+                                            "xsmall",
+                                          ],
+                                          "STYLES": Array [
+                                            "success",
+                                            "warning",
+                                            "danger",
+                                            "info",
+                                            "default",
+                                            "primary",
+                                            "link",
+                                          ],
+                                          "attrs": Array [],
+                                          "componentStyle": ComponentStyle {
+                                            "componentId": "Button__StyledButton-c9cbmb-0",
+                                            "isStatic": false,
+                                            "lastClassName": "hGhRKT",
+                                            "rules": Array [
+                                              [Function],
+                                            ],
+                                          },
+                                          "displayName": "Button__StyledButton",
+                                          "foldedComponentIds": Array [],
+                                          "render": [Function],
+                                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                          "target": [Function],
+                                          "toString": [Function],
+                                          "warnTooManyClasses": [Function],
+                                          "withComponent": [Function],
+                                        }
+                                      }
+                                      forwardedRef={null}
                                       onClick={[Function]}
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                      <Button
+                                        active={false}
+                                        block={false}
+                                        bsClass="btn"
+                                        bsSize="xsmall"
+                                        bsStyle="primary"
+                                        className="Button__StyledButton-c9cbmb-0 hGhRKT"
                                         disabled={false}
                                         onClick={[Function]}
-                                        type="button"
                                       >
-                                        Add
-                                      </button>
-                                    </Button>
-                                  </StyledComponent>
-                                </Button__StyledButton>
-                              </ForwardRef>
-                            </span>
-                          </p>
-                        </span>
-                      </ListGroupItem>
-                    </StyledComponent>
-                  </ListGroupItem__StyledListGroupItem>
-                </ForwardRef>
-              </div>
+                                        <button
+                                          className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                          disabled={false}
+                                          onClick={[Function]}
+                                          type="button"
+                                        >
+                                          Add
+                                        </button>
+                                      </Button>
+                                    </StyledComponent>
+                                  </Button__StyledButton>
+                                </ForwardRef>
+                              </span>
+                            </p>
+                          </span>
+                        </ListGroupItem>
+                      </StyledComponent>
+                    </ListGroupItem__StyledListGroupItem>
+                  </ForwardRef>
+                </div>
+              </ListGroup>
             </ListGroup>
-          </ListGroup>
+          </GrokPatternFilter>
         </div>
       </Col>
     </div>
@@ -1230,159 +1250,122 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
         <div
           className="col-sm-4"
         >
-          <Input
-            addonAfter={null}
-            autoComplete="off"
-            bsStyle={null}
-            buttonAfter={null}
-            formGroupClassName="filterFormGroup"
-            help=""
-            id="pattern-selector"
-            label="Filter pattern"
-            onChange={[Function]}
-            onKeyDown={[Function]}
-            placeholder=""
-            type="text"
-            value=""
+          <GrokPatternFilter
+            addToPattern={[Function]}
+            patterns={Array []}
           >
-            <Component
-              bsClass="filterFormGroup"
-              controlId="pattern-selector"
-              validationState={null}
+            <Input
+              addonAfter={null}
+              autoComplete="off"
+              bsStyle={null}
+              buttonAfter={null}
+              formGroupClassName="filterFormGroup"
+              help=""
+              id="pattern-selector"
+              label="Filter pattern"
+              onChange={[Function]}
+              onKeyDown={[Function]}
+              placeholder=""
+              type="text"
+              value=""
             >
-              <FormGroup__StyledFormGroup
+              <Component
                 bsClass="filterFormGroup"
                 controlId="pattern-selector"
                 validationState={null}
               >
-                <StyledComponent
+                <FormGroup__StyledFormGroup
                   bsClass="filterFormGroup"
                   controlId="pattern-selector"
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "SIZES": Array [
-                        "large",
-                        "small",
-                      ],
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                        "isStatic": false,
-                        "lastClassName": "ekazNr",
-                        "rules": Array [
-                          [Function],
-                          ";",
-                        ],
-                      },
-                      "displayName": "FormGroup__StyledFormGroup",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                      "target": [Function],
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
                   validationState={null}
                 >
-                  <FormGroup
+                  <StyledComponent
                     bsClass="filterFormGroup"
-                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
                     controlId="pattern-selector"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                          "isStatic": false,
+                          "lastClassName": "ekazNr",
+                          "rules": Array [
+                            [Function],
+                            ";",
+                          ],
+                        },
+                        "displayName": "FormGroup__StyledFormGroup",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
                     validationState={null}
                   >
-                    <div
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr filterFormGroup"
+                    <FormGroup
+                      bsClass="filterFormGroup"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                      controlId="pattern-selector"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "hCskeX",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr filterFormGroup"
+                      >
+                        <ControlLabel>
+                          <StyledComponent
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "ControlLabel-sc-1edmum5-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hCskeX",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "ControlLabel",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
                             }
-                          }
-                          forwardedRef={null}
-                        >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 hCskeX"
-                            srOnly={false}
+                            forwardedRef={null}
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                              htmlFor="pattern-selector"
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="ControlLabel-sc-1edmum5-0 hCskeX"
+                              srOnly={false}
                             >
-                              Filter pattern
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            autoComplete="off"
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Filter pattern"
-                            name="pattern-selector"
-                            onChange={[Function]}
-                            onKeyDown={[Function]}
-                            placeholder=""
-                            type="text"
-                            value=""
-                          >
-                            <StyledComponent
+                              <label
+                                className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                htmlFor="pattern-selector"
+                              >
+                                Filter pattern
+                              </label>
+                            </ControlLabel>
+                          </StyledComponent>
+                        </ControlLabel>
+                        <InputWrapper>
+                          <span>
+                            <FormControl
                               autoComplete="off"
                               componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fcGLmv",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
                               inputRef={[Function]}
                               label="Filter pattern"
                               name="pattern-selector"
@@ -1392,11 +1375,38 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                               type="text"
                               value=""
                             >
-                              <FormControl
+                              <StyledComponent
                                 autoComplete="off"
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 fcGLmv"
                                 componentClass="input"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "Feedback": [Function],
+                                    "SIZES": Array [
+                                      "small",
+                                      "large",
+                                    ],
+                                    "Static": [Function],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "FormControl-sc-1amoaox-0",
+                                      "isStatic": false,
+                                      "lastClassName": "fcGLmv",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "FormControl",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 inputRef={[Function]}
                                 label="Filter pattern"
                                 name="pattern-selector"
@@ -1406,10 +1416,12 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                 type="text"
                                 value=""
                               >
-                                <input
+                                <FormControl
                                   autoComplete="off"
-                                  className="FormControl-sc-1amoaox-0 fcGLmv form-control"
-                                  id="pattern-selector"
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 fcGLmv"
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="Filter pattern"
                                   name="pattern-selector"
                                   onChange={[Function]}
@@ -1417,29 +1429,42 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                   placeholder=""
                                   type="text"
                                   value=""
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                        </span>
-                      </InputWrapper>
-                    </div>
-                  </FormGroup>
-                </StyledComponent>
-              </FormGroup__StyledFormGroup>
-            </Component>
-          </Input>
-          <ListGroup
-            bsClass="resultList"
-          >
+                                >
+                                  <input
+                                    autoComplete="off"
+                                    className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                    id="pattern-selector"
+                                    label="Filter pattern"
+                                    name="pattern-selector"
+                                    onChange={[Function]}
+                                    onKeyDown={[Function]}
+                                    placeholder=""
+                                    type="text"
+                                    value=""
+                                  />
+                                </FormControl>
+                              </StyledComponent>
+                            </FormControl>
+                          </span>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </StyledComponent>
+                </FormGroup__StyledFormGroup>
+              </Component>
+            </Input>
             <ListGroup
               bsClass="resultList"
             >
-              <ul
-                className="resultList"
-              />
+              <ListGroup
+                bsClass="resultList"
+              >
+                <ul
+                  className="resultList"
+                />
+              </ListGroup>
             </ListGroup>
-          </ListGroup>
+          </GrokPatternFilter>
         </div>
       </Col>
     </div>

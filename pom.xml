@@ -139,7 +139,7 @@
         <pkts.version>3.0.5</pkts.version>
         <protobuf.version>3.11.4</protobuf.version>
         <reflections.version>0.9.12</reflections.version>
-        <retrofit.version>2.7.2</retrofit.version>
+        <retrofit.version>2.8.1</retrofit.version>
         <scala.version>2.11.8</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.5.1</shiro.version>
@@ -303,7 +303,7 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.8.0</version>
+                    <version>1.9.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>

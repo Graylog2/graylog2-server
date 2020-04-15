@@ -188,12 +188,12 @@ class MessageTable extends React.Component<Props, State> {
   };
 
   _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) => {
-    return ((fields && fields.find(f => f.name === fieldName)) || { type: FieldType.Unknown }).type;
+    return ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
   };
 
   _getFormattedMessages = (): Array<Object> => {
     const { messages } = this.props;
-    return messages.map(m => ({
+    return messages.map((m) => ({
       fields: m.message,
       formatted_fields: MessageFieldsFilter.filterFields(m.message),
       id: m.message._id,
@@ -254,7 +254,7 @@ class MessageTable extends React.Component<Props, State> {
               <AdditionalContext.Provider key={messageKey}
                                           value={{ message }}>
                 <HighlightMessageContext.Consumer>
-                  {highlightMessageId => (
+                  {(highlightMessageId) => (
                     <MessageTableEntry fields={fields}
                                        message={message}
                                        showMessageRow={config && config.showMessageRow}

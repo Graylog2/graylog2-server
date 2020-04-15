@@ -7,7 +7,7 @@ import { DataTable } from 'components/common';
 import 'components/content-packs/ContentPackDetails.css';
 
 const ContentPackInstallEntityList = (props) => {
-  const rowFormatter = entity => (<tr><td>{entity.title}</td><td>{entity.type.name}</td></tr>);
+  const rowFormatter = (entity) => (<tr><td>{entity.title}</td><td>{entity.type.name}</td></tr>);
   const headers = ['Title', 'Type'];
   const headerTitle = props.uninstall ? 'Entites to be uninstalled' : 'Installed Entities';
 

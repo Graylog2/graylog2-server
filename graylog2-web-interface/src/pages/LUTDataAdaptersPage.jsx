@@ -43,7 +43,7 @@ class LUTDataAdaptersPage extends React.Component {
       const { dataAdapters } = this.props;
       let names = null;
       if (dataAdapters) {
-        names = dataAdapters.map(t => t.name);
+        names = dataAdapters.map((t) => t.name);
       }
       if (names) {
         LookupTablesActions.getErrors(null, null, names || null);

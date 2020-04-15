@@ -11,7 +11,7 @@ const fieldTypeFor = (field: string, types: (FieldTypeMappingsList | Array<Field
     const { type } = inferTypeForSeries(Series.forFunction(field), types);
     return type;
   }
-  const fieldType = types && types.find(f => f.name === field);
+  const fieldType = types && types.find((f) => f.name === field);
   return fieldType ? fieldType.type : FieldType.Unknown;
 };
 

@@ -116,7 +116,7 @@ export default class ContentPack {
       entities,
     } = this._value;
 
-    const entitiesJSON = entities.map(e => e.toJSON());
+    const entitiesJSON = entities.map((e) => e.toJSON());
     return {
       v,
       id,
@@ -226,7 +226,7 @@ class Builder {
 
   removeParameter(value) {
     const parameters = this.value.get('parameters').slice(0);
-    remove(parameters, parameter => parameter.name === value.name);
+    remove(parameters, (parameter) => parameter.name === value.name);
     this.value = this.value.set('parameters', parameters);
     return this;
   }

@@ -47,22 +47,35 @@ class FieldNameCompletion implements Completer {
 
   fields: FieldTypesStoreState;
 
+  currentQueryFieldNames: { [string]: string };
+
   staticSuggestions: Array<Suggestion>;
 
   constructor(staticSuggestions: Array<Suggestion> = [existsOperator]) {
     this.staticSuggestions = staticSuggestions;
-    this.fields = FieldTypesStore.getInitialState();
-    FieldTypesStore.listen((newState) => {
-      this.fields = newState;
-    });
-
     this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
     ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
+
+    this._newFields(FieldTypesStore.getInitialState());
+    FieldTypesStore.listen((newState) => this._newFields(newState));
   }
+
+  _newFields = (fields: FieldTypesStoreState) => {
+    this.fields = fields;
+    const { queryFields } = this.fields;
+    if (this.activeQuery) {
+      const currentQueryFields: FieldTypeMappingsList = queryFields.get(this.activeQuery, Immutable.List());
+      this.currentQueryFieldNames = currentQueryFields.map((fieldMapping) => fieldMapping.name)
+        .reduce((prev, cur) => ({ ...prev, [cur]: cur }), {});
+    }
+  };
 
   onViewMetadataStoreUpdate = (newState: { activeQuery: string }) => {
     const { activeQuery } = newState;
     this.activeQuery = activeQuery;
+    if (this.fields) {
+      this._newFields(this.fields);
+    }
   };
 
   _isFollowingExistsOperator = (lastToken: ?Token) => ((lastToken && lastToken.value === `${existsOperator.name}:`) === true);
@@ -82,16 +95,15 @@ class FieldNameCompletion implements Completer {
 
     const valuePosition = this._isFollowingExistsOperator(lastToken);
 
-    const currentQueryFieldNames = currentQueryFields.map(fieldMapping => fieldMapping.name);
-    const allButInCurrent = all.filter(field => !currentQueryFieldNames.includes(field.name));
+    const allButInCurrent = all.filter((field) => !this.currentQueryFieldNames[field.name]);
     const fieldsToMatchIn = valuePosition
       ? [...currentQueryFields]
       : [...this.staticSuggestions, ...currentQueryFields];
     const currentQuery = fieldsToMatchIn.filter(matchesFieldName)
-      .map(field => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
+      .map((field) => _fieldResult(field, 10 + matchesFieldName(field), valuePosition));
     const allFields = allButInCurrent.filter(matchesFieldName)
-      .map(field => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
-      .map(result => ({ ...result, meta: `${result.meta} (not in streams)` }));
+      .map((field) => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
+      .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
     return [...currentQuery, ...allFields];
   }
 }

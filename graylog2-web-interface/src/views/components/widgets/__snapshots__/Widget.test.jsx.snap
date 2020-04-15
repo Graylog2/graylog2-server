@@ -4,7 +4,7 @@ exports[`<Widget /> should render with empty props 1`] = `
 <body>
   <div>
     <div
-      class="widget"
+      class="WidgetFrame__WidgetWrap-sc-1uccjgg-0 kljUyp"
       data-widget-id="widgetId"
       style="overflow: hidden;"
     >

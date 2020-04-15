@@ -31,7 +31,7 @@ const SavedSearchesActions: SavedSearchesActionsType = singletonActions(
   }),
 );
 
-const savedSearchesUrl = URLUtils.qualifyUrl('/views/savedSearches');
+const savedSearchesUrl = URLUtils.qualifyUrl('/search/saved');
 
 const SavedSearchesStore = singletonStore(
   'views.SavedSearches',

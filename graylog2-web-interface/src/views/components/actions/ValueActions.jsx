@@ -52,7 +52,7 @@ class ValueActions extends React.Component<Props, State> {
     };
   }
 
-  _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
+  _onMenuToggle = () => this.setState((state) => ({ open: !state.open }));
 
   static contextType = ActionContext;
 
@@ -68,7 +68,7 @@ class ValueActions extends React.Component<Props, State> {
         return !isHidden(handlerArgs);
       })
       .map((action: ActionDefinition) => {
-        const setActionComponents = fn => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
+        const setActionComponents = (fn) => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
         const handler = createHandlerFor(action, setActionComponents);
         const onSelect = () => {
           this._onMenuToggle();
@@ -87,7 +87,7 @@ class ValueActions extends React.Component<Props, State> {
       });
 
     return (
-      <React.Fragment>
+      <>
         <OverlayDropdown show={open}
                          toggle={element}
                          placement="right"
@@ -104,7 +104,7 @@ class ValueActions extends React.Component<Props, State> {
           {valueActions}
         </OverlayDropdown>
         {overflowingComponents}
-      </React.Fragment>
+      </>
     );
   }
 }

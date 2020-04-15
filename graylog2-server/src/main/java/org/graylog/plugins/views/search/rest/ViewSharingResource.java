@@ -34,7 +34,9 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -73,7 +75,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
     @POST
     @ApiOperation("Configure sharing for a view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_SHARING_CREATE)
-    public ViewSharing create(@ApiParam(name="id") @PathParam("id") @NotEmpty String id, ViewSharing viewSharing) {
+    public ViewSharing create(@ApiParam(name="id") @PathParam("id") @NotEmpty String id, @Valid @NotNull ViewSharing viewSharing) {
         ensureUserIsPermittedForView(id);
         ensureUserIsPermittedToEditView(id);
         return viewSharingService.create(viewSharing);

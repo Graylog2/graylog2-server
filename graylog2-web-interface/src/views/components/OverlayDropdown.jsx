@@ -21,7 +21,7 @@ const oppositePlacement = {
 };
 
 const FilterProps = ({ children, style }) => React.Children.map(children,
-  child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }));
+  (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }));
 
 const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggle }) => {
   const [currentPlacement, setCurrentPlacement] = useState(placement);

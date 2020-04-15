@@ -40,8 +40,8 @@ const InputStatesStore = Reflux.createStore({
   },
 
   _checkInputStateChangeResponse(input, response, action) {
-    const nodes = Object.keys(response).filter(node => (input.global ? true : node === input.node));
-    const failedNodes = nodes.filter(nodeId => response[nodeId] === null);
+    const nodes = Object.keys(response).filter((node) => (input.global ? true : node === input.node));
+    const failedNodes = nodes.filter((nodeId) => response[nodeId] === null);
 
     if (failedNodes.length === 0) {
       UserNotification.success(`Request to ${action.toLowerCase()} input '${input.title}' was sent successfully.`,

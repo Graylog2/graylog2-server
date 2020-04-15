@@ -86,7 +86,7 @@ export const CurrentViewStateStore = singletonStore(
 
     widgets(nextWidgets) {
       const positionsMap = Immutable.Map(this._activeState().widgetPositions);
-      const newWidgets = nextWidgets.filter(widget => !positionsMap.get(widget.id));
+      const newWidgets = nextWidgets.filter((widget) => !positionsMap.get(widget.id));
       const nextWidgetIds = nextWidgets.map(({ id }) => id);
       const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId));
 

@@ -23,7 +23,7 @@ const mockView = View.create()
   .search(Search.builder().build())
   .build();
 
-jest.mock('react-router', () => ({ withRouter: x => x }));
+jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('./ExtendedSearchPage', () => mockExtendedSearchPage);
 jest.mock('views/stores/SearchStore', () => {});
 jest.mock('views/stores/ViewStore', () => ({
@@ -58,7 +58,7 @@ describe('NewSearchPage', () => {
       relative: '300',
     },
   };
-  const SimpleNewSearchPage = props => <NewSearchPage route={{}} router={mockRouter} location={{}} {...props} />;
+  const SimpleNewSearchPage = (props) => <NewSearchPage route={{}} router={mockRouter} location={{}} {...props} />;
 
   beforeAll(() => {
     jest.useFakeTimers();
@@ -100,7 +100,7 @@ describe('NewSearchPage', () => {
     it('should be possible with specific view id', async () => {
       mockExtendedSearchPage.mockImplementationOnce(() => (
         <ViewLoaderContext.Consumer>
-          {loadView => <button type="button" onClick={() => loadView && loadView('special-view-id')}>Load view</button>}
+          {(loadView) => <button type="button" onClick={() => loadView && loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
       ));
 
@@ -117,7 +117,7 @@ describe('NewSearchPage', () => {
     beforeEach(() => {
       mockExtendedSearchPage.mockImplementationOnce(() => (
         <NewViewLoaderContext.Consumer>
-          {loadNewView => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
+          {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>
       ));
     });

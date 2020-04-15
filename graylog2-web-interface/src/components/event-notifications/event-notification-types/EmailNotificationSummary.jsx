@@ -21,7 +21,7 @@ class EmailNotificationSummary extends React.Component {
     const { notification } = this.props;
     return (
       <CommonNotificationSummary {...this.props}>
-        <React.Fragment>
+        <>
           <tr>
             <td>Sender</td>
             <td>{notification.config.sender}</td>
@@ -48,7 +48,7 @@ class EmailNotificationSummary extends React.Component {
               </Well>
             </td>
           </tr>
-        </React.Fragment>
+        </>
       </CommonNotificationSummary>
     );
   }

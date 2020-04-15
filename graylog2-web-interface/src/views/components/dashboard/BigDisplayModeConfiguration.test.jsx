@@ -103,7 +103,7 @@ describe('BigDisplayModeConfiguration', () => {
   describe('redirects to tv mode page', () => {
     beforeEach(() => {
       history.push = jest.fn();
-      Routes.pluginRoute = jest.fn(() => viewId => `/dashboards/tv/${viewId}`);
+      Routes.pluginRoute = jest.fn(() => (viewId) => `/dashboards/tv/${viewId}`);
     });
 
     it('on form submit', () => {

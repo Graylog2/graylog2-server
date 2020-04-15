@@ -123,9 +123,9 @@ class TypeAheadDataFilter extends React.Component {
       let dataToFilter = datum[filterByKey];
 
       if (filterSuggestionAccessor) {
-        dataToFilter = dataToFilter.map(data => data[filterSuggestionAccessor].toLocaleLowerCase());
+        dataToFilter = dataToFilter.map((data) => data[filterSuggestionAccessor].toLocaleLowerCase());
       } else {
-        dataToFilter = dataToFilter.map(data => data.toLocaleLowerCase());
+        dataToFilter = dataToFilter.map((data) => data.toLocaleLowerCase());
       }
 
       return dataToFilter.indexOf(filter.toLocaleLowerCase()) !== -1;
@@ -150,7 +150,7 @@ class TypeAheadDataFilter extends React.Component {
       };
 
       if (typeof key === 'object') {
-        return key.some(arrayEntry => containsFilter(arrayEntry, value));
+        return key.some((arrayEntry) => containsFilter(arrayEntry, value));
       }
       return containsFilter(key, value);
     }, this);
@@ -192,12 +192,12 @@ class TypeAheadDataFilter extends React.Component {
     let suggestions;
 
     if (filterSuggestionAccessor) {
-      suggestions = filterSuggestions.map(filterSuggestion => filterSuggestion[filterSuggestionAccessor].toLocaleLowerCase());
+      suggestions = filterSuggestions.map((filterSuggestion) => filterSuggestion[filterSuggestionAccessor].toLocaleLowerCase());
     } else {
-      suggestions = filterSuggestions.map(filterSuggestion => filterSuggestion.toLocaleLowerCase());
+      suggestions = filterSuggestions.map((filterSuggestion) => filterSuggestion.toLocaleLowerCase());
     }
 
-    suggestions.filter(filterSuggestion => !filters.includes(filterSuggestion));
+    suggestions.filter((filterSuggestion) => !filters.includes(filterSuggestion));
 
     return (
       <div className="filter">

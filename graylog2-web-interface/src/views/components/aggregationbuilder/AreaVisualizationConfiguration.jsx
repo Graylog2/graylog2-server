@@ -10,19 +10,19 @@ type Props = {
   config: AreaVisualizationConfig,
 };
 
-const _makeOption = value => ({ label: capitalize(value), value });
+const _makeOption = (value) => ({ label: capitalize(value), value });
 const interpolationOptions = ['linear', 'step-after', 'spline'].map(_makeOption);
 
 const AreaVisualizationConfiguration = ({ config = AreaVisualizationConfig.empty(), onChange }: Props) => {
   const _onChange = useCallback(({ value }) => onChange(config.toBuilder().interpolation(value).build()), [config, onChange]);
   return (
-    <React.Fragment>
+    <>
       <span>Interpolation:</span>
       <Select placeholder="Select Interpolation Mode"
               onChange={_onChange}
               options={interpolationOptions}
               value={_makeOption(config.interpolation)} />
-    </React.Fragment>
+    </>
   );
 };
 

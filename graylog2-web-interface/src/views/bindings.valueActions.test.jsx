@@ -15,7 +15,7 @@ describe('Views bindings value actions', () => {
     },
     type: FieldType.Unknown,
   };
-  const findAction = type => valueActions.find(binding => binding.type === type);
+  const findAction = (type) => valueActions.find((binding) => binding.type === type);
   describe('CreateExtractor', () => {
     // $FlowFixMe: We are assuming here it is generally present
     const action: ValueAction = findAction('create-extractor');

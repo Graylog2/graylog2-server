@@ -38,8 +38,8 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
   const [refreshInterval, setRefreshInterval] = useState(10);
   const [queryTabs, setQueryTabs] = useState(availableTabs.map(([idx]) => idx));
   const [queryCycleInterval, setQueryCycleInterval] = useState(30);
-  const addQueryTab = useCallback(idx => setQueryTabs([...queryTabs, idx]), [queryTabs, setQueryTabs]);
-  const removeQueryTab = useCallback(idx => setQueryTabs(queryTabs.filter(tab => tab !== idx)), [queryTabs, setQueryTabs]);
+  const addQueryTab = useCallback((idx) => setQueryTabs([...queryTabs, idx]), [queryTabs, setQueryTabs]);
+  const removeQueryTab = useCallback((idx) => setQueryTabs(queryTabs.filter((tab) => tab !== idx)), [queryTabs, setQueryTabs]);
   const _onSave = useCallback(() => onSave({
     refreshInterval,
     queryTabs,
@@ -72,7 +72,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
             <li key={`${idx}-${title}`}>
               <Checkbox inline
                         checked={queryTabs.includes(idx)}
-                        onChange={event => (event.target.checked ? addQueryTab(idx) : removeQueryTab(idx))}>
+                        onChange={(event) => (event.target.checked ? addQueryTab(idx) : removeQueryTab(idx))}>
                 {title}
               </Checkbox>
             </li>
@@ -128,7 +128,7 @@ const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
   const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view));
 
   return (
-    <React.Fragment>
+    <>
       {showConfigurationModal && (
         <ConfigurationModal onClose={() => setShowConfigurationModal(false)}
                             onSave={onSave}
@@ -138,7 +138,7 @@ const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
       <MenuItem disabled={disabled} onSelect={() => setShowConfigurationModal(true)}>
         <Icon name="desktop" /> Full Screen
       </MenuItem>
-    </React.Fragment>
+    </>
   );
 };
 

@@ -53,15 +53,15 @@ class FilterAggregationSummary extends React.Component {
     }
 
     return streamIds
-      .map(id => streams.find(s => s.id === id) || id)
+      .map((id) => streams.find((s) => s.id === id) || id)
       .sort((s1, s2) => naturalSortIgnoreCase(s1.title || s1, s2.title || s2))
       .map(this.formatStreamOrId);
   };
 
   renderQueryParameters = (queryParameters) => {
-    if (queryParameters.some(p => p.embryonic)) {
-      const undeclaredParameters = queryParameters.filter(p => p.embryonic)
-        .map(p => p.name)
+    if (queryParameters.some((p) => p.embryonic)) {
+      const undeclaredParameters = queryParameters.filter((p) => p.embryonic)
+        .map((p) => p.name)
         .join(', ');
       return (
         <Alert bsStyle="danger">
@@ -70,7 +70,7 @@ class FilterAggregationSummary extends React.Component {
       );
     }
 
-    return <dd>{queryParameters.map(p => p.name).join(', ')}</dd>;
+    return <dd>{queryParameters.map((p) => p.name).join(', ')}</dd>;
   }
 
   render() {
@@ -110,7 +110,7 @@ class FilterAggregationSummary extends React.Component {
         <dt>Execute search every</dt>
         <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
         {conditionType === 'aggregation' && (
-          <React.Fragment>
+          <>
             <dt>Group by Field(s)</dt>
             <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
             <dt>Create Events if</dt>
@@ -121,10 +121,9 @@ class FilterAggregationSummary extends React.Component {
                   <Alert bsSize="small" bsStyle="danger"><Icon name="exclamation-triangle" />&nbsp;
                     Condition is not valid: {validationResults.errors.join(', ')}
                   </Alert>
-                )
-              }
+                )}
             </dd>
-          </React.Fragment>
+          </>
         )}
       </dl>
     );

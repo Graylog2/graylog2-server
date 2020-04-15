@@ -6,7 +6,8 @@ import { Pagination } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 
-const defaultPageSizes = [10, 50, 100];
+const DEFAULT_PAGE_SIZES = [10, 50, 100];
+const INITIAL_PAGE = 1;
 
 type Props = {
   children: React.Node,
@@ -53,8 +54,8 @@ class PaginatedList extends React.Component<Props, State> {
 
   static defaultProps = {
     activePage: 0,
-    pageSizes: defaultPageSizes,
-    pageSize: defaultPageSizes[0],
+    pageSizes: DEFAULT_PAGE_SIZES,
+    pageSize: DEFAULT_PAGE_SIZES[0],
     showPageSizeSelect: true,
   };
 
@@ -62,7 +63,7 @@ class PaginatedList extends React.Component<Props, State> {
     super(props);
     const { activePage, pageSize } = props;
     this.state = {
-      currentPage: activePage > 0 ? activePage : 1,
+      currentPage: activePage > 0 ? activePage : INITIAL_PAGE,
       pageSize: pageSize,
     };
   }
@@ -80,11 +81,10 @@ class PaginatedList extends React.Component<Props, State> {
 
   _onChangePageSize = (event: SyntheticInputEvent<HTMLLinkElement>) => {
     const { onChange } = this.props;
-    const { currentPage } = this.state;
     event.preventDefault();
     const pageSize = Number(event.target.value);
-    this.setState({ pageSize: pageSize });
-    onChange(currentPage, pageSize);
+    this.setState({ currentPage: INITIAL_PAGE, pageSize: pageSize });
+    onChange(INITIAL_PAGE, pageSize);
   };
 
   _onChangePage = (pageNo: number, event: MouseEvent) => {
@@ -104,7 +104,7 @@ class PaginatedList extends React.Component<Props, State> {
     return (
       <div className="form-inline page-size" style={{ float: 'right' }}>
         <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={this._onChangePageSize}>
-          {pageSizes.map(size => <option key={`option-${size}`} value={size}>{size}</option>)}
+          {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
         </Input>
       </div>
     );

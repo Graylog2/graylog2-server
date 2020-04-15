@@ -18,12 +18,12 @@ class ContentPackEntityConfig extends React.Component {
   };
 
   _getParameterForConfigKey = (configKey) => {
-    const paramMapIndex = this.props.appliedParameter.findIndex(paramMap => paramMap.configKey === configKey);
+    const paramMapIndex = this.props.appliedParameter.findIndex((paramMap) => paramMap.configKey === configKey);
     if (paramMapIndex < 0) {
       return undefined;
     }
     const paramMap = this.props.appliedParameter[paramMapIndex];
-    const paramIndex = this.props.parameters.findIndex(parameter => parameter.name === paramMap.paramName);
+    const paramIndex = this.props.parameters.findIndex((parameter) => parameter.name === paramMap.paramName);
     return this.props.parameters[paramIndex];
   };
 

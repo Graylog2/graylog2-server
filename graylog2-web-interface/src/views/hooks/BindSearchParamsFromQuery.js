@@ -33,8 +33,8 @@ const _getStreams = (query = {}): Array<string> => {
     return [];
   }
   return String(rawStreams).split(',')
-    .map(stream => stream.trim())
-    .filter(stream => (stream !== ''));
+    .map((stream) => stream.trim())
+    .filter((stream) => (stream !== ''));
 };
 
 const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {

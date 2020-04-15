@@ -31,7 +31,7 @@ class ConfigurationList extends React.Component {
 
   _collectorConfigurationFormatter = (configuration) => {
     const { collectors, onClone, onDelete, validateConfiguration } = this.props;
-    const configurationCollector = collectors.find(collector => collector.id === configuration.collector_id);
+    const configurationCollector = collectors.find((collector) => collector.id === configuration.collector_id);
     return (
       <ConfigurationRow key={configuration.id}
                         configuration={configuration}
