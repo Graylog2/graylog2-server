@@ -1,6 +1,6 @@
 import CombinedProvider from './CombinedProvider';
 
-/* eslint-disable import/no-require, global-require */
+/* eslint-disable global-require */
 const actions = {
   AlarmCallbackHistory: () => require('actions/alarmcallbacks/AlarmCallbackHistoryActions'),
   AlarmCallbacks: () => require('actions/alarmcallbacks/AlarmCallbacksActions'),
@@ -45,6 +45,7 @@ const actions = {
   Notifications: () => require('actions/notifications/NotificationsActions'),
   PipelineConnections: () => require('actions/pipelines/PipelineConnectionsActions'),
   Pipelines: () => require('actions/pipelines/PipelinesActions'),
+  Preferences: () => require('actions/users/PreferencesActions'),
   FilterPreview: () => require('actions/event-definitions/FilterPreviewActions'),
   Rules: () => require('actions/rules/RulesActions'),
   ServerAvailability: () => require('actions/sessions/ServerAvailabilityActions'),
@@ -135,7 +136,7 @@ const stores = {
   UniversalSearch: () => require('stores/search/UniversalSearchStore'),
   Users: () => require('stores/users/UsersStore'),
 };
-/* eslint-enable import/no-require, global-require */
+/* eslint-enable global-require */
 
 export default () => {
   Object.keys(actions).forEach((key) => CombinedProvider.registerAction(key, actions[key]));

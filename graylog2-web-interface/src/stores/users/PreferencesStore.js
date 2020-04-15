@@ -2,8 +2,11 @@
 import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import ActionsProvider from 'injection/ActionsProvider';
+
+const PreferencesActions = ActionsProvider.getActions('Preferences');
 
 type Preference = {
   name: string,
@@ -19,7 +22,8 @@ type PreferencesResponse = {
 };
 
 const PreferencesStore = Reflux.createStore({
-  URL: URLUtils.qualifyUrl('/users/'),
+  listenables: [PreferencesActions],
+  URL: qualifyUrl('/users/'),
   convertPreferenceMapToArray(preferencesAsMap: PreferencesMap): Array<Preference> {
     let preferences = Object.keys(preferencesAsMap)
       .map((name) => {
@@ -45,7 +49,7 @@ const PreferencesStore = Reflux.createStore({
     }
     const preferencesAsMap = this.convertPreferenceArrayToMap(preferences);
     const url = `${this.URL + this._userName}/preferences`;
-    fetch('PUT', url, { preferences: preferencesAsMap })
+    const promise = fetch('PUT', url, { preferences: preferencesAsMap })
       .then(() => {
         UserNotification.success('User preferences successfully saved');
         callback(preferences);
@@ -53,6 +57,10 @@ const PreferencesStore = Reflux.createStore({
         UserNotification.error(`Saving of preferences for "${this._userName}" failed with status: ${errorThrown}`,
           'Could not save user preferences');
       });
+
+    PreferencesActions.saveUserPreferences.promise(promise);
+
+    return promise;
   },
   loadUserPreferences(userName: string, callback: (preferences: Array<any>) => void): void {
     this._userName = userName;
@@ -68,8 +76,12 @@ const PreferencesStore = Reflux.createStore({
         'Could not retrieve user preferences from server',
       );
     };
-    fetch('GET', url)
+    const promise = fetch('GET', url)
       .then(successCallback, failCallback);
+
+    PreferencesActions.loadUserPreferences.promise(promise);
+
+    return promise;
   },
 });
 
