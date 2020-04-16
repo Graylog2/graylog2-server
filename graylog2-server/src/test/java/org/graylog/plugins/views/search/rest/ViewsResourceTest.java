@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import org.apache.shiro.subject.Subject;
-import org.graylog.plugins.views.search.rest.ViewsResource;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
@@ -34,10 +33,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -45,6 +46,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ViewsResourceTest {
+    @Before
+    public void setUpInjector() {
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
+    }
+
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -98,11 +104,14 @@ public class ViewsResourceTest {
         final ViewDTO.Builder builder = mock(ViewDTO.Builder.class);
 
         when(view.toBuilder()).thenReturn(builder);
+        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
         when(builder.owner(any())).thenReturn(builder);
         when(builder.build()).thenReturn(view);
 
         when(currentUser.getName()).thenReturn("basti");
         when(currentUser.isLocalAdmin()).thenReturn(true);
+
+        when(subject.isPermitted("dashboards:create")).thenReturn(true);
 
         this.viewsResource.create(view);
 
@@ -112,8 +121,17 @@ public class ViewsResourceTest {
     }
 
     @Test
+    public void shouldNotCreateADashboardWithoutPermission() throws Exception {
+        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+
+        when(subject.isPermitted("dashboards:create")).thenReturn(false);
+
+        assertThatThrownBy(() -> this.viewsResource.create(view))
+                .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
         expectedException.expect(NotFoundException.class);
         this.viewsResource.get("invalid");
     }

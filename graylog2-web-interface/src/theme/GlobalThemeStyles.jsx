@@ -1,45 +1,12 @@
 import { createGlobalStyle, css } from 'styled-components';
 
-import openSansRegular from './fonts/OpenSans-Regular.woff';
-import openSansRegular2 from './fonts/OpenSans-Regular.woff2';
-import openSansItalic from './fonts/OpenSans-Italic.woff';
-import openSansItalic2 from './fonts/OpenSans-Italic.woff2';
-import openSansBold from './fonts/OpenSans-Bold.woff';
-import openSansBold2 from './fonts/OpenSans-Bold.woff2';
+import 'opensans-npm-webfont/open_sans.css';
+import 'opensans-npm-webfont/open_sans_italic.css';
+import 'opensans-npm-webfont/open_sans_bold.css';
 
 const fontFamily = '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
 
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
-  @font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Open Sans'),
-      local('OpenSans'),
-      url(${openSansRegular2}) format('woff2'),
-      url(${openSansRegular}) format('woff');
-  }
-
-  @font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 700;
-    src: local('Open Sans'),
-      local('OpenSans'),
-      url(${openSansBold2}) format('woff2'),
-      url(${openSansBold}) format('woff');
-  }
-
-  @font-face {
-    font-family: 'Open Sans';
-    font-style: italic;
-    font-weight: 400;
-    src: local('Open Sans'),
-      local('OpenSans'),
-      url(${openSansItalic2}) format('woff2'),
-      url(${openSansItalic}) format('woff');
-  }
-
   #editor {
     height: 256px;
   }
@@ -539,86 +506,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .message-loader-form input {
     margin-right: 5px;
-  }
-
-  ul.entity-list {
-    padding: 0;
-    margin: 0;
-
-    li.entity-list-item {
-      display: block;
-      padding: 15px 0;
-
-      h2 .label {
-        margin-left: 5px;
-        line-height: 2;
-        vertical-align: bottom;
-      }
-
-      .item-description {
-        min-height: 17px;
-        margin: 5px 0;
-      }
-
-      .item-actions > .btn,
-      .item-actions > .btn-group,
-      .item-actions > span > .btn {
-        margin-left: 5px;
-        margin-bottom: 5px;
-      }
-    }
-
-    li.entity-list-item:not(:last-child) {
-      border-bottom: 1px solid ${theme.color.variant.light.info};
-    }
-  }
-
-  dl.message-details {
-    margin-top: 10px;
-    margin-bottom: 0;
-  }
-
-  dl.message-details dt {
-    font-weight: bold;
-    margin-left: 1px;
-  }
-
-  dl.message-details dd {
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-    margin-left: 1px; /* Ensures that italic text is not cut */
-  }
-
-  dl.message-details-fields span:not(:last-child) dd {
-    border-bottom: 1px solid ${theme.color.gray[90]};
-  }
-
-  dl.message-details-fields dd {
-    white-space: pre-wrap;
-  }
-
-  dl.message-details-fields .field-value {
-    font-family: monospace;
-  }
-
-  dl.message-details-fields dd.message-field .field-value {
-    max-height: 500px;
-    overflow: auto;
-  }
-
-  dl.message-details dd.stream-list ul {
-    list-style-type: disc;
-    padding-left: 25px;
-  }
-
-  dl.message-details dd.stream-list ul li {
-    margin-top: 3px;
-  }
-
-  dl.message-details dd div.message-field-actions {
-    padding-left: 10px;
-    position: relative;
-    top: -10px;
   }
 
   nav.navbar-fixed-top ul.dropdown-menu li a {

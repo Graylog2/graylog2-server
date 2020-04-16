@@ -44,9 +44,9 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
     case 'time':
       // $FlowFixMe: ConfigType is not properly typed yet
       if (newConfig.interval.type === 'timeunit') {
+        const { interval } = newConfig;
         // $FlowFixMe: We know this is the right type
-        const { interval }: { interval: TimeConfig } = newConfig;
-        const { unit, value } = interval;
+        const { unit, value } = (interval: { interval: TimeConfig });
         newConfig.interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
       }
       break;

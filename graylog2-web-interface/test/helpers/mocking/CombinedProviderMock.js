@@ -3,7 +3,9 @@ export default class CombinedProviderMock {
     get: () => jest.fn(() => ({})),
     listen: jest.fn(),
   };
+
   static defaultActions = {};
+
   constructor(rules = {}, defaultStore = CombinedProviderMock.defaultStore, defaultActions = CombinedProviderMock.defaultActions) {
     this.rules = rules;
     this.store = defaultStore;

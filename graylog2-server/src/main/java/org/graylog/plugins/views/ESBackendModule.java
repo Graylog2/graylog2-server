@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESEventList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESDateRangeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESValuesHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESAverageHandler;
@@ -37,6 +38,7 @@ import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.E
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
@@ -75,5 +77,6 @@ public class ESBackendModule extends ViewsModule {
 
         registerPivotBucketHandler(Values.NAME, ESValuesHandler.class);
         registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);
+        registerPivotBucketHandler(DateRangeBucket.NAME, ESDateRangeHandler.class);
     }
 }

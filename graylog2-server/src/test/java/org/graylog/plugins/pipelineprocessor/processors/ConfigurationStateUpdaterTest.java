@@ -323,5 +323,11 @@ public class ConfigurationStateUpdaterTest {
                                                             Map<String, Object> fields) {
             throw new IllegalStateException("no implemented");
         }
+
+
+        @Override
+        public Set<String> indexSetIdsByIds(Collection<String> streamIds) {
+            throw new IllegalStateException("not implemented");
+        }
     }
 }
