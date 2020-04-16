@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
@@ -52,7 +53,7 @@ public class MessagesResourceTest {
         permittedStreams = mock(PermittedStreams.class);
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
-        sut = new MessagesResource(exporter, mock(SearchDomain.class), executionGuard, permittedStreams);
+        sut = new MessagesResource(exporter, mock(SearchDomain.class), executionGuard, permittedStreams, mock(ObjectMapper.class));
 
         sut.asyncRunner = c -> {
             c.accept(x -> {

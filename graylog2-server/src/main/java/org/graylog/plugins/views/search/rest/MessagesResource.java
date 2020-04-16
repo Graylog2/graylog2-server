@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -44,6 +45,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -56,16 +58,23 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final SearchDomain searchDomain;
     private final SearchExecutionGuard executionGuard;
     private final PermittedStreams permittedStreams;
+    private final ObjectMapper objectMapper;
 
     //allow mocking
     Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsyncc;
 
     @Inject
-    public MessagesResource(MessagesExporter exporter, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams) {
+    public MessagesResource(
+            MessagesExporter exporter,
+            SearchDomain searchDomain,
+            SearchExecutionGuard executionGuard,
+            PermittedStreams permittedStreams,
+            ObjectMapper objectMapper) {
         this.exporter = exporter;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
         this.permittedStreams = permittedStreams;
+        this.objectMapper = objectMapper;
     }
 
     @POST
@@ -95,9 +104,9 @@ public class MessagesResource extends RestResource implements PluginRestResource
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @Valid ResultFormat formatFromClient) {
-        Search search = loadSearch(searchId);
-
         ResultFormat format = emptyIfNull(formatFromClient);
+
+        Search search = loadSearch(searchId, format.executionState());
 
         return asyncRunner.apply(chunkConsumer -> exporter.export(search, format, chunkConsumer));
     }
@@ -110,9 +119,9 @@ public class MessagesResource extends RestResource implements PluginRestResource
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @PathParam("searchTypeId") String searchTypeId,
             @ApiParam @Valid ResultFormat formatFromClient) {
-        Search search = loadSearch(searchId);
-
         ResultFormat format = emptyIfNull(formatFromClient);
+
+        Search search = loadSearch(searchId, format.executionState());
 
         return asyncRunner.apply(chunkConsumer -> exporter.export(search, searchTypeId, format, chunkConsumer));
     }
@@ -121,11 +130,13 @@ public class MessagesResource extends RestResource implements PluginRestResource
         return format == null ? ResultFormat.empty() : format;
     }
 
-    private Search loadSearch(String searchId) {
+    private Search loadSearch(String searchId, Map<String, Object> executionState) {
         Search search = searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
+
+        search = search.applyExecutionState(objectMapper, executionState);
 
         executionGuard.check(search, this::hasStreamReadPermission);
 

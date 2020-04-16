@@ -31,11 +31,13 @@ import java.util.function.Consumer;
 public class MessagesExporter {
     private final ExportBackend backend;
     private final ChunkDecorator chunkDecorator;
+    private final QueryStringDecorator queryStringDecorator;
 
     @Inject
-    public MessagesExporter(ExportBackend backend, ChunkDecorator chunkDecorator) {
+    public MessagesExporter(ExportBackend backend, ChunkDecorator chunkDecorator, QueryStringDecorator queryStringDecorator) {
         this.backend = backend;
         this.chunkDecorator = chunkDecorator;
+        this.queryStringDecorator = queryStringDecorator;
     }
 
     public void export(MessagesRequest request, Consumer<SimpleMessageChunk> chunkForwarder) {
@@ -76,7 +78,7 @@ public class MessagesExporter {
         MessagesRequest.Builder requestBuilder = MessagesRequest.builder();
 
         setTimeRange(query, searchTypeId, requestBuilder);
-        trySetQueryString(query, searchTypeId, requestBuilder);
+        trySetQueryString(search, searchTypeId, requestBuilder);
         setStreams(query, searchTypeId, requestBuilder);
         setFields(resultFormat, requestBuilder);
         trySetSort(query, searchTypeId, resultFormat, requestBuilder);
@@ -101,7 +103,9 @@ public class MessagesExporter {
         }
     }
 
-    private void trySetQueryString(Query query, String searchTypeId, MessagesRequest.Builder requestBuilder) {
+    private void trySetQueryString(Search search, String searchTypeId, MessagesRequest.Builder requestBuilder) {
+        Query query = singleQueryFrom(search);
+
         Optional<MessageList> ml = messageListFrom(query, searchTypeId);
         boolean messageListHasQueryString = ml.isPresent() && ml.get().query().isPresent();
         boolean queryHasQueryString = query.query() instanceof ElasticsearchQueryString;
@@ -113,6 +117,24 @@ public class MessagesExporter {
             requestBuilder.queryString(query.query());
         } else if (messageListHasQueryString) {
             requestBuilder.queryString(ml.get().query().get());
+        }
+
+        decorateQueryString(requestBuilder, search, query);
+    }
+
+    private void decorateQueryString(MessagesRequest.Builder requestBuilder, Search search, Query query) {
+        String queryString = ((ElasticsearchQueryString) requestBuilder.build().queryString()).queryString();
+
+        String decorated = queryStringDecorator.decorateQueryString(queryString, search, query);
+
+        requestBuilder.queryString(ElasticsearchQueryString.builder().queryString(decorated).build());
+
+        if (requestBuilder.build().additionalQueryString().isPresent()) {
+            String additionalQueryString = ((ElasticsearchQueryString) requestBuilder.build().additionalQueryString().get()).queryString();
+
+            String decoratedAdditionalQueryString = queryStringDecorator.decorateQueryString(additionalQueryString, search, query);
+
+            requestBuilder.additionalQueryString(ElasticsearchQueryString.builder().queryString(decoratedAdditionalQueryString).build());
         }
     }
 

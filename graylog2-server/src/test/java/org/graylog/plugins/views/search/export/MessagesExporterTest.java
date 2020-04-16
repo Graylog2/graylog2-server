@@ -57,12 +57,14 @@ class MessagesExporterTest {
     private ExportBackend backend;
     private MessagesExporter sut;
     private ChunkDecorator chunkDecorator;
+    private QueryStringDecorator queryStringDecorator;
 
     @BeforeEach
     void setUp() {
         backend = mock(ExportBackend.class);
         chunkDecorator = mock(ChunkDecorator.class);
-        sut = new MessagesExporter(backend, chunkDecorator);
+        queryStringDecorator = mock(QueryStringDecorator.class);
+        sut = new MessagesExporter(backend, chunkDecorator, queryStringDecorator);
     }
 
     @Test
@@ -313,6 +315,18 @@ class MessagesExporterTest {
         ArrayList<SimpleMessageChunk> results = exportSearchTypeWithStubbedSingleChunkFromBackend(search, messageList.id(), undecoratedChunk);
 
         assertThat(results).containsExactly(decoratedChunk);
+    }
+
+    @Test
+    void appliesQueryDecorators() {
+        Query q = validQueryBuilder().query(ElasticsearchQueryString.builder().queryString("undecorated").build()).build();
+        Search s = searchWithQueries(q);
+
+        when(queryStringDecorator.decorateQueryString("undecorated", s, q)).thenReturn("decorated");
+
+        MessagesRequest request = captureRequest(s, ResultFormat.builder().build());
+
+        assertThat(request.queryString()).isEqualTo(ElasticsearchQueryString.builder().queryString("decorated").build());
     }
 
     private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {

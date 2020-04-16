@@ -24,7 +24,9 @@ import org.graylog.plugins.views.search.searchtypes.Sort;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @AutoValue
@@ -34,6 +36,8 @@ public abstract class ResultFormat {
     public abstract LinkedHashSet<String> fieldsInOrder();
 
     public abstract LinkedHashSet<Sort> sort();
+
+    public abstract Map<String, Object> executionState();
 
     public static ResultFormat.Builder builder() {
         return ResultFormat.Builder.create();
@@ -61,6 +65,9 @@ public abstract class ResultFormat {
             return sort(sortsSet);
         }
 
+        @JsonProperty
+        public abstract Builder executionState(Map<String, Object> executionState);
+
         abstract ResultFormat autoBuild();
 
         public ResultFormat build() {
@@ -71,6 +78,7 @@ public abstract class ResultFormat {
         public static ResultFormat.Builder create() {
             return new AutoValue_ResultFormat.Builder()
                     .fieldsInOrder(MessagesRequest.DEFAULT_FIELDS)
+                    .executionState(Collections.emptyMap())
                     .sort();
         }
     }
