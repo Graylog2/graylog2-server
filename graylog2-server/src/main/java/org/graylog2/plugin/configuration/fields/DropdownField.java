@@ -43,9 +43,7 @@ public class DropdownField extends AbstractConfigurationField {
     }
 
     public DropdownField(String name, String humanName, String defaultValue, Map<String, String> values, String description, Optional isOptional, int position) {
-        super(FIELD_TYPE, name, humanName, description, isOptional);
-        this.defaultValue = defaultValue;
-        this.values = values;
+        this(name, humanName, defaultValue, values, description, isOptional);
         this.position = position;
     }
 
@@ -73,7 +71,7 @@ public class DropdownField extends AbstractConfigurationField {
         public static Map<String, String> timeUnits() {
             Map<String, String> units = Maps.newHashMap();
 
-            for(TimeUnit unit : TimeUnit.values()) {
+            for (TimeUnit unit : TimeUnit.values()) {
                 String human = unit.toString().toLowerCase(Locale.ENGLISH);
                 units.put(unit.toString(), Character.toUpperCase(human.charAt(0)) + human.substring(1));
             }

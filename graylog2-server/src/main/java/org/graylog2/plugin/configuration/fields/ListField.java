@@ -48,13 +48,8 @@ public class ListField extends AbstractConfigurationField {
     }
 
     public ListField(String name, String humanName, List<String> defaultValue, Map<String, String> values, String description, Optional isOptional, int position, Attribute... attributes) {
-        super(FIELD_TYPE, name, humanName, description, isOptional);
-        this.defaultValue = defaultValue;
-        this.values = values;
+        this(name, humanName, defaultValue, values, description, isOptional, attributes);
         this.position = position;
-        this.attributes = Arrays.stream(attributes)
-                .map(attribute -> attribute.toString().toLowerCase(Locale.ENGLISH))
-                .collect(Collectors.toList());
     }
 
     @Override
