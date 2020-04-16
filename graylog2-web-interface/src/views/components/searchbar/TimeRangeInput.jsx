@@ -7,6 +7,7 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
+import type { TimeRangeTypes } from 'views/logic/queries/Query';
 import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
 
 type Props = {
@@ -26,8 +27,8 @@ const timerangeStrategies = {
   },
 };
 
-const timerangeStrategy = (type) => {
-  if (type === undefined) {
+const timerangeStrategy = (type: ?TimeRangeTypes) => {
+  if (!type) {
     return { component: DisabledTimeRangeSelector };
   }
 
