@@ -9,7 +9,6 @@ import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
-import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 
 const useActionListeners = (actions, callback, dependencies) => {
   useEffect(() => {
