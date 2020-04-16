@@ -21,12 +21,12 @@ import StreamStateBadge from './StreamStateBadge';
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
-const StreamListItem = styled.li`
+const StreamListItem = styled.li(({ theme }) => `
   display: block;
   padding: 15px 0;
 
   &:not(:last-child) {
-    border-bottom: 1px solid #6dcff6;
+    border-bottom: 1px solid ${theme.color.variant.light.info};
   }
 
   .stream-data {
@@ -60,7 +60,7 @@ const StreamListItem = styled.li`
       margin-right: 5px;
     }
   }
-`;
+`);
 
 const ToggleButton = styled(Button)`
   width: 8.5em;
