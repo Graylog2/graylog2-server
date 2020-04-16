@@ -17,8 +17,13 @@
 package org.graylog2.periodical;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.graylog2.indexer.cluster.*;
-import org.graylog2.indexer.cluster.health.*;
+import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.cluster.health.AbsoluteValueWatermarkSettings;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
+import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.PercentageWatermarkSettings;
+import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -26,7 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
