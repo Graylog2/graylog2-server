@@ -8,7 +8,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 
 import SortableListItem from './SortableListItem';
 
-const SortableListGroup = styled(ListGroup)(({ disableDragging }) => css`
+const SortableListGroup = styled(ListGroup)(({ disableDragging, theme }) => css`
   cursor: ${disableDragging ? 'default' : 'move'};
   margin: 0 0 15px;
 
@@ -17,7 +17,7 @@ const SortableListGroup = styled(ListGroup)(({ disableDragging }) => css`
   }
 
   .over {
-    border: 1px dashed #8c8e86;
+    border: 1px dashed ${theme.color.gray[50]};
   }
 
   .list-group-item {
