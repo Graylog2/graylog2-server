@@ -15,8 +15,8 @@ const formatTitle = (title, id, disabled = false) => (disabled
   : <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(id)}>{title}</Link>);
 
 const OwnerTag = ({ owner }) => {
-  const currentUser = useContext(CurrentUserContext) || {};
-  if (!owner || owner === currentUser.username) {
+  const currentUser = useContext(CurrentUserContext);
+  if (!owner || owner === currentUser?.username) {
     return <span>Last saved</span>;
   }
   return <span>Shared by {owner}, last saved</span>;

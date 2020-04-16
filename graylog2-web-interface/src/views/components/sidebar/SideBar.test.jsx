@@ -85,7 +85,7 @@ describe('<Sidebar />', () => {
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     wrapper.find('div[children="Description"]').simulate('click');
-    expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 14:39:26.');
+    expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 16:39:26.');
   });
 
   it('should render with a specific default title in the context of a new search', () => {

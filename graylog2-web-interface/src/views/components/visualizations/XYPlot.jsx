@@ -5,6 +5,7 @@ import moment from 'moment-timezone';
 import { merge } from 'lodash';
 
 import connect from 'stores/connect';
+import AppConfig from 'util/AppConfig';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
@@ -18,7 +19,7 @@ import CustomPropTypes from '../CustomPropTypes';
 import type { ChartColor, ChartConfig, ColorMap } from './GenericPlot';
 import ViewTypeContext from '../contexts/ViewTypeContext';
 
-type Props = {
+export type Props = {
   config: AggregationWidgetConfig,
   chartData: any,
   currentQuery: Query,
@@ -54,7 +55,8 @@ const XYPlot = ({
   plotLayout = {},
   onZoom = OnZoom,
 }: Props) => {
-  const { timezone } = useContext(CurrentUserContext) || { timezone: 'UTC' };
+  const currentUser = useContext(CurrentUserContext);
+  const timezone = currentUser?.timezone || AppConfig.rootTimeZone();
   const yaxis = { fixedrange: true, rangemode: 'tozero' };
   const defaultLayout: {yaxis: Object, legend?: Object} = { yaxis };
   if (height) {

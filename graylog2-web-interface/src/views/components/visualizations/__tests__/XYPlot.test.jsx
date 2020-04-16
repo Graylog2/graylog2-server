@@ -3,8 +3,11 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
 
+import type { User } from 'stores/users/UsersStore';
+import { viewsManager } from 'fixtures/users';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import asMock from 'helpers/mocking/AsMock';
-import XYPlot from 'views/components/visualizations/XYPlot';
+import XYPlot, { type Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Query from 'views/logic/queries/Query';
@@ -32,8 +35,44 @@ describe('XYPlot', () => {
   const timestampPivot = new Pivot('timestamp', 'time', {});
   const config = AggregationWidgetConfig.builder().rowPivots([timestampPivot]).build();
   const getChartColor = () => {};
-  const setChartColor = () => {};
+  const setChartColor = () => ({});
   const chartData = [{ y: [23, 42] }];
+  type SimpleXYPlotProps = {
+    currentUser?: User,
+    config?: $PropertyType<XYPlotProps, 'chartData'>,
+    chartData?: $PropertyType<XYPlotProps, 'chartData'>,
+    currentQuery?: $PropertyType<XYPlotProps, 'currentQuery'>,
+    effectiveTimerange?: $PropertyType<XYPlotProps, 'effectiveTimerange'>,
+    getChartColor?: $PropertyType<XYPlotProps, 'getChartColor'>,
+    height?: $PropertyType<XYPlotProps, 'height'>,
+    setChartColor?: $PropertyType<XYPlotProps, 'setChartColor'>,
+    plotLayout?: $PropertyType<XYPlotProps, 'plotLayout'>,
+    onZoom?: $PropertyType<XYPlotProps, 'onZoom'>,
+  }
+
+  const SimpleXYPlot = ({ currentUser, ...props }: SimpleXYPlotProps) => (
+    <CurrentUserContext.Provider value={currentUser}>
+      <XYPlot chartData={chartData}
+              config={config}
+              getChartColor={getChartColor}
+              setChartColor={setChartColor}
+              currentQuery={currentQuery}
+              {...props} />
+    </CurrentUserContext.Provider>
+  );
+
+  SimpleXYPlot.defaultProps = {
+    currentUser: viewsManager,
+    config: config,
+    chartData: chartData,
+    currentQuery: currentQuery,
+    effectiveTimerange: undefined,
+    getChartColor: getChartColor,
+    height: undefined,
+    setChartColor: setChartColor,
+    plotLayout: undefined,
+    onZoom: undefined,
+  };
 
   beforeEach(() => {
     asMock(QueriesActions.timerange).mockReturnValueOnce(Promise.resolve());
@@ -42,15 +81,7 @@ describe('XYPlot', () => {
   it('renders generic X/Y-Plot when no timeline config is passed', () => {
     const emptyConfig = AggregationWidgetConfig.builder().build();
     const timerange = { from: 'foo', to: 'bar' };
-    const wrapper = mount((
-      <XYPlot chartData={chartData}
-              config={emptyConfig}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              timezone="UTC"
-              currentQuery={currentQuery}
-              effectiveTimerange={timerange} />
-    ));
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} config={emptyConfig} />);
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', { yaxis: { fixedrange: true, rangemode: 'tozero' }, xaxis: { fixedrange: true } });
     expect(genericPlot).toHaveProp('chartData', chartData);
@@ -62,15 +93,7 @@ describe('XYPlot', () => {
   it('adds zoom handler for timeline plot', () => {
     CurrentUserStore.get.mockReturnValue({ timezone: 'UTC' });
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' };
-    const wrapper = mount((
-      <XYPlot chartData={chartData}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              config={config}
-              timezone="UTC"
-              currentQuery={currentQuery}
-              effectiveTimerange={timerange} />
-    ));
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
@@ -88,19 +111,10 @@ describe('XYPlot', () => {
   });
 
   it('uses effective time range from pivot result if all messages are selected', () => {
-    const effectiveTimerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' };
+    const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' };
     const allMessages = { type: 'relative', range: 0 };
     const currentQueryForAllMessages = currentQuery.toBuilder().timerange(allMessages).build();
-
-    const wrapper = mount((
-      <XYPlot chartData={chartData}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              config={config}
-              timezone="UTC"
-              currentQuery={currentQueryForAllMessages}
-              effectiveTimerange={effectiveTimerange} />
-    ));
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
@@ -109,15 +123,7 @@ describe('XYPlot', () => {
   });
 
   it('sets correct plot legend position for small containers', () => {
-    const wrapper = mount((
-      <XYPlot chartData={chartData}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              height={140}
-              config={config}
-              currentQuery={currentQuery}
-              timezone="UTC" />
-    ));
+    const wrapper = mount(<SimpleXYPlot height={140} />);
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
@@ -127,15 +133,7 @@ describe('XYPlot', () => {
   });
 
   it('sets correct plot legend position for containers with medium height', () => {
-    const wrapper = mount((
-      <XYPlot chartData={chartData}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              height={350}
-              config={config}
-              currentQuery={currentQuery}
-              timezone="UTC" />
-    ));
+    const wrapper = mount(<SimpleXYPlot height={350} />);
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
@@ -145,15 +143,7 @@ describe('XYPlot', () => {
   });
 
   it('sets correct plot legend position for containers with huge height', () => {
-    const wrapper = mount((
-      <XYPlot chartData={chartData}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              height={700}
-              config={config}
-              currentQuery={currentQuery}
-              timezone="UTC" />
-    ));
+    const wrapper = mount(<SimpleXYPlot height={700} />);
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },

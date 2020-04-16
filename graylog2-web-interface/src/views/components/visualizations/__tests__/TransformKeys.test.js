@@ -62,7 +62,38 @@ describe('TransformKeys', () => {
   });
 
   it('transforms column keys using current user\'s timezone', () => {
-    CurrentUserStore.get.mockReturnValueOnce({ timezone: 'Europe/Berlin' });
+    CurrentUserStore.get.mockReturnValueOnce({ timezone: 'America/Los_Angeles' });
+    const input = [
+      {
+        source: 'leaf',
+        key: ['2018-10-01T15:10:55.323Z'],
+        values: [],
+      },
+      {
+        source: 'leaf',
+        key: ['2017-03-12T09:32:21.283-08:00'],
+        values: [],
+      },
+    ];
+
+    const result = transformKeys([Pivot.create('timestamp', 'time')], [])(input);
+
+    expect(result).toEqual([
+      {
+        key: ['2018-10-01T08:10:55.323-07:00'],
+        source: 'leaf',
+        values: [],
+      }, {
+        key: ['2017-03-12T10:32:21.283-07:00'],
+        source: 'leaf',
+        values: [],
+      },
+    ]);
+  });
+
+  it('transforms column keys using AppConfig rootTimeZone if user\'s timezone is null', () => {
+    CurrentUserStore.get.mockReturnValueOnce({ timezone: null });
+
     const input = [
       {
         source: 'leaf',
@@ -85,36 +116,6 @@ describe('TransformKeys', () => {
         values: [],
       }, {
         key: ['2017-03-12T18:32:21.283+01:00'],
-        source: 'leaf',
-        values: [],
-      },
-    ]);
-  });
-
-  it('transforms column keys using UTC if user\'s timezone is null', () => {
-    CurrentUserStore.get.mockReturnValueOnce({ timezone: null });
-    const input = [
-      {
-        source: 'leaf',
-        key: ['2018-10-01T15:10:55.323Z'],
-        values: [],
-      },
-      {
-        source: 'leaf',
-        key: ['2017-03-12T09:32:21.283-08:00'],
-        values: [],
-      },
-    ];
-
-    const result = transformKeys([Pivot.create('timestamp', 'time')], [])(input);
-
-    expect(result).toEqual([
-      {
-        key: ['2018-10-01T15:10:55.323+00:00'],
-        source: 'leaf',
-        values: [],
-      }, {
-        key: ['2017-03-12T17:32:21.283+00:00'],
         source: 'leaf',
         values: [],
       },

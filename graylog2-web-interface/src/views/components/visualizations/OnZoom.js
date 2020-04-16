@@ -1,5 +1,7 @@
 // @flow strict
 import moment from 'moment-timezone';
+
+import AppConfig from 'util/AppConfig';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { QueriesActions } from 'views/stores/QueriesStore';
@@ -12,7 +14,8 @@ import SearchActions from 'views/actions/SearchActions';
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const onZoom = (currentQuery: Query, from: string, to: string, viewType: ?ViewType) => {
-  const { timezone } = CurrentUserStore.get();
+  const currentUser = CurrentUserStore.get();
+  const timezone = currentUser?.timezone || AppConfig.rootTimeZone();
 
   const newTimerange = {
     type: 'absolute',
