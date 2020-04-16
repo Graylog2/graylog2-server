@@ -34,9 +34,9 @@ exports[`<WidgetGrid /> should render with minimal props 1`] = `
                 "$$typeof": Symbol(react.forward_ref),
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
-                  "componentId": "WidgetGrid__DashboardWrap-sc-1bqopuh-0",
+                  "componentId": "WidgetGrid__DashboardWrap-sc-1bqopuh-1",
                   "isStatic": false,
-                  "lastClassName": "jaucQL",
+                  "lastClassName": "bWtHrP",
                   "rules": Array [
                     [Function],
                   ],
@@ -44,7 +44,7 @@ exports[`<WidgetGrid /> should render with minimal props 1`] = `
                 "displayName": "WidgetGrid__DashboardWrap",
                 "foldedComponentIds": Array [],
                 "render": [Function],
-                "styledComponentId": "WidgetGrid__DashboardWrap-sc-1bqopuh-0",
+                "styledComponentId": "WidgetGrid__DashboardWrap-sc-1bqopuh-1",
                 "target": "div",
                 "toString": [Function],
                 "warnTooManyClasses": [Function],
@@ -54,7 +54,7 @@ exports[`<WidgetGrid /> should render with minimal props 1`] = `
             forwardedRef={null}
           >
             <div
-              className="WidgetGrid__DashboardWrap-sc-1bqopuh-0 jaucQL"
+              className="WidgetGrid__DashboardWrap-sc-1bqopuh-1 bWtHrP"
             >
               <span
                 width={200}

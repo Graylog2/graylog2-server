@@ -16,7 +16,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 DnwXA in modal"
+      class="fade Modal-nuree8-0 UjHmV in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -135,7 +135,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 DnwXA in modal"
+      class="fade Modal-nuree8-0 UjHmV in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"

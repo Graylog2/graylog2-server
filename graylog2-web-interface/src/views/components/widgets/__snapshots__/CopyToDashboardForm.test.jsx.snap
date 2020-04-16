@@ -16,7 +16,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 DnwXA in modal"
+      class="fade Modal-nuree8-0 UjHmV in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -234,7 +234,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 DnwXA in modal"
+      class="fade Modal-nuree8-0 UjHmV in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"

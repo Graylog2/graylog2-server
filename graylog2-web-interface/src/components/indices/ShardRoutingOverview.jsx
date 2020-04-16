@@ -35,7 +35,7 @@ const ShardRoutingWrap = styled.div(({ theme }) => `
     .shard-primary .id {
       font-weight: bold;
       margin-bottom: 3px;
-      border-bottom: 1px solid ${theme.color.gray[0]};
+      border-bottom: 1px solid ${theme.color.gray[10]};
     }
   }
 

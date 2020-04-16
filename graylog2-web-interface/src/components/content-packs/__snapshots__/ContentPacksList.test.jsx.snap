@@ -954,60 +954,128 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               className="list-group"
             >
               <ControlledTableListHeader>
-                <ForwardRef
-                  className="listGroupHeader"
-                >
-                  <ListGroupItem__StyledListGroupItem
-                    className="listGroupHeader"
-                  >
-                    <StyledComponent
-                      className="listGroupHeader"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
+                <ControlledTableListHeader__StyledListGroupItem>
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                          "isStatic": false,
+                          "lastClassName": "krEqXw",
+                          "rules": Array [
+                            [Function],
                           ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                            "isStatic": false,
-                            "lastClassName": "kRfOAP",
-                            "rules": Array [
-                              [Function],
-                            ],
+                        },
+                        "displayName": "ControlledTableListHeader__StyledListGroupItem",
+                        "foldedComponentIds": Array [],
+                        "propTypes": Object {
+                          "bsStyle": [Function],
+                        },
+                        "render": [Function],
+                        "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                        "target": Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "defaultProps": Object {
+                            "bsStyle": undefined,
                           },
-                          "displayName": "ListGroupItem__StyledListGroupItem",
-                          "foldedComponentIds": Array [],
+                          "propTypes": Object {
+                            "bsStyle": [Function],
+                          },
                           "render": [Function],
-                          "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
+                        },
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
                       }
-                      forwardedRef={null}
+                    }
+                    forwardedRef={null}
+                  >
+                    <ForwardRef
+                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                     >
-                      <ListGroupItem
-                        bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader"
-                        listItem={false}
+                      <ListGroupItem__StyledListGroupItem
+                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                       >
-                        <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader list-group-item"
+                        <StyledComponent
+                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                "isStatic": false,
+                                "lastClassName": "kRfOAP",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "ListGroupItem__StyledListGroupItem",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
                         >
-                          <div
-                            className="headerWrapper"
-                          />
-                        </span>
-                      </ListGroupItem>
-                    </StyledComponent>
-                  </ListGroupItem__StyledListGroupItem>
-                </ForwardRef>
+                          <ListGroupItem
+                            bsClass="list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                            listItem={false}
+                          >
+                            <span
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw list-group-item"
+                            >
+                              <ControlledTableListHeader__HeaderWrapper>
+                                <StyledComponent
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "ControlledTableListHeader__HeaderWrapper-tr2y34-1",
+                                        "isStatic": false,
+                                        "lastClassName": "ekhgZW",
+                                        "rules": Array [
+                                          "margin:10px 0;min-height:20px;",
+                                        ],
+                                      },
+                                      "displayName": "ControlledTableListHeader__HeaderWrapper",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "ControlledTableListHeader__HeaderWrapper-tr2y34-1",
+                                      "target": "div",
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                >
+                                  <div
+                                    className="ControlledTableListHeader__HeaderWrapper-tr2y34-1 ekhgZW"
+                                  />
+                                </StyledComponent>
+                              </ControlledTableListHeader__HeaderWrapper>
+                            </span>
+                          </ListGroupItem>
+                        </StyledComponent>
+                      </ListGroupItem__StyledListGroupItem>
+                    </ForwardRef>
+                  </StyledComponent>
+                </ControlledTableListHeader__StyledListGroupItem>
               </ControlledTableListHeader>
               <ControlledTableListItem
                 key="1"
@@ -1279,7 +1347,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1304,7 +1372,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -1729,7 +1797,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -1754,7 +1822,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -2111,7 +2179,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2136,7 +2204,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -2561,7 +2629,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -2586,7 +2654,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -2879,7 +2947,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2904,7 +2972,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -3329,7 +3397,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -3354,7 +3422,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -3646,7 +3714,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3671,7 +3739,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -4096,7 +4164,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -4121,7 +4189,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -4414,7 +4482,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4439,7 +4507,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -4864,7 +4932,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -4889,7 +4957,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -5182,7 +5250,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5207,7 +5275,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -5632,7 +5700,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -5657,7 +5725,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -5950,7 +6018,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5975,7 +6043,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -6400,7 +6468,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -6425,7 +6493,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -6718,7 +6786,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6743,7 +6811,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -7168,7 +7236,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -7193,7 +7261,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -7485,7 +7553,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -7510,7 +7578,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -7935,7 +8003,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -7960,7 +8028,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -8253,7 +8321,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "DnwXA",
+                                              "lastClassName": "UjHmV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -8278,7 +8346,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 DnwXA"
+                                          className="Modal-nuree8-0 UjHmV"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -8703,7 +8771,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "DnwXA",
+                                                "lastClassName": "UjHmV",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -8728,7 +8796,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 DnwXA"
+                                            className="Modal-nuree8-0 UjHmV"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}

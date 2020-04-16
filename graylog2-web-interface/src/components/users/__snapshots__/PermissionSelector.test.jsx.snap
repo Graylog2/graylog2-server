@@ -779,166 +779,206 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                 className="list-group"
                                               >
                                                 <ControlledTableListHeader>
-                                                  <ForwardRef
-                                                    className="listGroupHeader"
-                                                  >
-                                                    <ListGroupItem__StyledListGroupItem
-                                                      className="listGroupHeader"
-                                                    >
-                                                      <StyledComponent
-                                                        className="listGroupHeader"
-                                                        forwardedComponent={
-                                                          Object {
-                                                            "$$typeof": Symbol(react.forward_ref),
-                                                            "STYLES": Array [
-                                                              "success",
-                                                              "warning",
-                                                              "danger",
-                                                              "info",
+                                                  <ControlledTableListHeader__StyledListGroupItem>
+                                                    <StyledComponent
+                                                      forwardedComponent={
+                                                        Object {
+                                                          "$$typeof": Symbol(react.forward_ref),
+                                                          "attrs": Array [],
+                                                          "componentStyle": ComponentStyle {
+                                                            "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                                                            "isStatic": false,
+                                                            "lastClassName": "krEqXw",
+                                                            "rules": Array [
+                                                              [Function],
                                                             ],
-                                                            "attrs": Array [],
-                                                            "componentStyle": ComponentStyle {
-                                                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                                              "isStatic": false,
-                                                              "lastClassName": "kRfOAP",
-                                                              "rules": Array [
-                                                                [Function],
-                                                              ],
+                                                          },
+                                                          "displayName": "ControlledTableListHeader__StyledListGroupItem",
+                                                          "foldedComponentIds": Array [],
+                                                          "propTypes": Object {
+                                                            "bsStyle": [Function],
+                                                          },
+                                                          "render": [Function],
+                                                          "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                                                          "target": Object {
+                                                            "$$typeof": Symbol(react.forward_ref),
+                                                            "defaultProps": Object {
+                                                              "bsStyle": undefined,
                                                             },
-                                                            "displayName": "ListGroupItem__StyledListGroupItem",
-                                                            "foldedComponentIds": Array [],
+                                                            "propTypes": Object {
+                                                              "bsStyle": [Function],
+                                                            },
                                                             "render": [Function],
-                                                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                                            "target": [Function],
-                                                            "toString": [Function],
-                                                            "warnTooManyClasses": [Function],
-                                                            "withComponent": [Function],
-                                                          }
+                                                          },
+                                                          "toString": [Function],
+                                                          "warnTooManyClasses": [Function],
+                                                          "withComponent": [Function],
                                                         }
-                                                        forwardedRef={null}
+                                                      }
+                                                      forwardedRef={null}
+                                                    >
+                                                      <ForwardRef
+                                                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                                                       >
-                                                        <ListGroupItem
-                                                          bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader"
-                                                          listItem={false}
+                                                        <ListGroupItem__StyledListGroupItem
+                                                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                                                         >
-                                                          <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader list-group-item"
+                                                          <StyledComponent
+                                                            className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                                                            forwardedComponent={
+                                                              Object {
+                                                                "$$typeof": Symbol(react.forward_ref),
+                                                                "STYLES": Array [
+                                                                  "success",
+                                                                  "warning",
+                                                                  "danger",
+                                                                  "info",
+                                                                ],
+                                                                "attrs": Array [],
+                                                                "componentStyle": ComponentStyle {
+                                                                  "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                                                  "isStatic": false,
+                                                                  "lastClassName": "kRfOAP",
+                                                                  "rules": Array [
+                                                                    [Function],
+                                                                  ],
+                                                                },
+                                                                "displayName": "ListGroupItem__StyledListGroupItem",
+                                                                "foldedComponentIds": Array [],
+                                                                "render": [Function],
+                                                                "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                                                "target": [Function],
+                                                                "toString": [Function],
+                                                                "warnTooManyClasses": [Function],
+                                                                "withComponent": [Function],
+                                                              }
+                                                            }
+                                                            forwardedRef={null}
                                                           >
-                                                            <Input
-                                                              addonAfter={null}
-                                                              bsStyle={null}
-                                                              buttonAfter={null}
-                                                              checked={false}
-                                                              disabled={false}
-                                                              help=""
-                                                              id="select-all-checkbox"
-                                                              label="Select all"
-                                                              onChange={[Function]}
-                                                              placeholder=""
-                                                              type="checkbox"
-                                                              wrapperClassName="form-group-inline"
+                                                            <ListGroupItem
+                                                              bsClass="list-group-item"
+                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                                                              listItem={false}
                                                             >
-                                                              <Component
-                                                                controlId="select-all-checkbox"
-                                                                validationState={null}
+                                                              <span
+                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw list-group-item"
                                                               >
-                                                                <FormGroup__StyledFormGroup
-                                                                  controlId="select-all-checkbox"
-                                                                  validationState={null}
+                                                                <Input
+                                                                  addonAfter={null}
+                                                                  bsStyle={null}
+                                                                  buttonAfter={null}
+                                                                  checked={false}
+                                                                  disabled={false}
+                                                                  help=""
+                                                                  id="select-all-checkbox"
+                                                                  label="Select all"
+                                                                  onChange={[Function]}
+                                                                  placeholder=""
+                                                                  type="checkbox"
+                                                                  wrapperClassName="form-group-inline"
                                                                 >
-                                                                  <StyledComponent
+                                                                  <Component
                                                                     controlId="select-all-checkbox"
-                                                                    forwardedComponent={
-                                                                      Object {
-                                                                        "$$typeof": Symbol(react.forward_ref),
-                                                                        "SIZES": Array [
-                                                                          "large",
-                                                                          "small",
-                                                                        ],
-                                                                        "attrs": Array [],
-                                                                        "componentStyle": ComponentStyle {
-                                                                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                          "isStatic": false,
-                                                                          "lastClassName": "ekazNr",
-                                                                          "rules": Array [
-                                                                            [Function],
-                                                                            ";",
-                                                                          ],
-                                                                        },
-                                                                        "displayName": "FormGroup__StyledFormGroup",
-                                                                        "foldedComponentIds": Array [],
-                                                                        "render": [Function],
-                                                                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                        "target": [Function],
-                                                                        "toString": [Function],
-                                                                        "warnTooManyClasses": [Function],
-                                                                        "withComponent": [Function],
-                                                                      }
-                                                                    }
-                                                                    forwardedRef={null}
                                                                     validationState={null}
                                                                   >
-                                                                    <FormGroup
-                                                                      bsClass="form-group"
-                                                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                                                    <FormGroup__StyledFormGroup
                                                                       controlId="select-all-checkbox"
                                                                       validationState={null}
                                                                     >
-                                                                      <div
-                                                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                                                      <StyledComponent
+                                                                        controlId="select-all-checkbox"
+                                                                        forwardedComponent={
+                                                                          Object {
+                                                                            "$$typeof": Symbol(react.forward_ref),
+                                                                            "SIZES": Array [
+                                                                              "large",
+                                                                              "small",
+                                                                            ],
+                                                                            "attrs": Array [],
+                                                                            "componentStyle": ComponentStyle {
+                                                                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                                                              "isStatic": false,
+                                                                              "lastClassName": "ekazNr",
+                                                                              "rules": Array [
+                                                                                [Function],
+                                                                                ";",
+                                                                              ],
+                                                                            },
+                                                                            "displayName": "FormGroup__StyledFormGroup",
+                                                                            "foldedComponentIds": Array [],
+                                                                            "render": [Function],
+                                                                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                                                            "target": [Function],
+                                                                            "toString": [Function],
+                                                                            "warnTooManyClasses": [Function],
+                                                                            "withComponent": [Function],
+                                                                          }
+                                                                        }
+                                                                        forwardedRef={null}
+                                                                        validationState={null}
                                                                       >
-                                                                        <InputWrapper
-                                                                          className="form-group-inline"
+                                                                        <FormGroup
+                                                                          bsClass="form-group"
+                                                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                                                          controlId="select-all-checkbox"
+                                                                          validationState={null}
                                                                         >
                                                                           <div
-                                                                            className="form-group-inline"
+                                                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                                                                           >
-                                                                            <Checkbox
-                                                                              bsClass="checkbox"
-                                                                              checked={false}
-                                                                              disabled={false}
-                                                                              inline={false}
-                                                                              inputRef={[Function]}
-                                                                              label="Select all"
-                                                                              name="select-all-checkbox"
-                                                                              onChange={[Function]}
-                                                                              placeholder=""
-                                                                              title=""
-                                                                              type="checkbox"
+                                                                            <InputWrapper
+                                                                              className="form-group-inline"
                                                                             >
                                                                               <div
-                                                                                className="checkbox"
+                                                                                className="form-group-inline"
                                                                               >
-                                                                                <label
+                                                                                <Checkbox
+                                                                                  bsClass="checkbox"
+                                                                                  checked={false}
+                                                                                  disabled={false}
+                                                                                  inline={false}
+                                                                                  inputRef={[Function]}
+                                                                                  label="Select all"
+                                                                                  name="select-all-checkbox"
+                                                                                  onChange={[Function]}
+                                                                                  placeholder=""
                                                                                   title=""
+                                                                                  type="checkbox"
                                                                                 >
-                                                                                  <input
-                                                                                    checked={false}
-                                                                                    disabled={false}
-                                                                                    label="Select all"
-                                                                                    name="select-all-checkbox"
-                                                                                    onChange={[Function]}
-                                                                                    placeholder=""
-                                                                                    type="checkbox"
-                                                                                  />
-                                                                                  Select all
-                                                                                </label>
+                                                                                  <div
+                                                                                    className="checkbox"
+                                                                                  >
+                                                                                    <label
+                                                                                      title=""
+                                                                                    >
+                                                                                      <input
+                                                                                        checked={false}
+                                                                                        disabled={false}
+                                                                                        label="Select all"
+                                                                                        name="select-all-checkbox"
+                                                                                        onChange={[Function]}
+                                                                                        placeholder=""
+                                                                                        type="checkbox"
+                                                                                      />
+                                                                                      Select all
+                                                                                    </label>
+                                                                                  </div>
+                                                                                </Checkbox>
                                                                               </div>
-                                                                            </Checkbox>
+                                                                            </InputWrapper>
                                                                           </div>
-                                                                        </InputWrapper>
-                                                                      </div>
-                                                                    </FormGroup>
-                                                                  </StyledComponent>
-                                                                </FormGroup__StyledFormGroup>
-                                                              </Component>
-                                                            </Input>
-                                                          </span>
-                                                        </ListGroupItem>
-                                                      </StyledComponent>
-                                                    </ListGroupItem__StyledListGroupItem>
-                                                  </ForwardRef>
+                                                                        </FormGroup>
+                                                                      </StyledComponent>
+                                                                    </FormGroup__StyledFormGroup>
+                                                                  </Component>
+                                                                </Input>
+                                                              </span>
+                                                            </ListGroupItem>
+                                                          </StyledComponent>
+                                                        </ListGroupItem__StyledListGroupItem>
+                                                      </ForwardRef>
+                                                    </StyledComponent>
+                                                  </ControlledTableListHeader__StyledListGroupItem>
                                                 </ControlledTableListHeader>
                                                 <ControlledTableListItem
                                                   key="item-01"
@@ -2165,166 +2205,206 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                 className="list-group"
                                               >
                                                 <ControlledTableListHeader>
-                                                  <ForwardRef
-                                                    className="listGroupHeader"
-                                                  >
-                                                    <ListGroupItem__StyledListGroupItem
-                                                      className="listGroupHeader"
-                                                    >
-                                                      <StyledComponent
-                                                        className="listGroupHeader"
-                                                        forwardedComponent={
-                                                          Object {
-                                                            "$$typeof": Symbol(react.forward_ref),
-                                                            "STYLES": Array [
-                                                              "success",
-                                                              "warning",
-                                                              "danger",
-                                                              "info",
+                                                  <ControlledTableListHeader__StyledListGroupItem>
+                                                    <StyledComponent
+                                                      forwardedComponent={
+                                                        Object {
+                                                          "$$typeof": Symbol(react.forward_ref),
+                                                          "attrs": Array [],
+                                                          "componentStyle": ComponentStyle {
+                                                            "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                                                            "isStatic": false,
+                                                            "lastClassName": "krEqXw",
+                                                            "rules": Array [
+                                                              [Function],
                                                             ],
-                                                            "attrs": Array [],
-                                                            "componentStyle": ComponentStyle {
-                                                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                                              "isStatic": false,
-                                                              "lastClassName": "kRfOAP",
-                                                              "rules": Array [
-                                                                [Function],
-                                                              ],
+                                                          },
+                                                          "displayName": "ControlledTableListHeader__StyledListGroupItem",
+                                                          "foldedComponentIds": Array [],
+                                                          "propTypes": Object {
+                                                            "bsStyle": [Function],
+                                                          },
+                                                          "render": [Function],
+                                                          "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                                                          "target": Object {
+                                                            "$$typeof": Symbol(react.forward_ref),
+                                                            "defaultProps": Object {
+                                                              "bsStyle": undefined,
                                                             },
-                                                            "displayName": "ListGroupItem__StyledListGroupItem",
-                                                            "foldedComponentIds": Array [],
+                                                            "propTypes": Object {
+                                                              "bsStyle": [Function],
+                                                            },
                                                             "render": [Function],
-                                                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                                            "target": [Function],
-                                                            "toString": [Function],
-                                                            "warnTooManyClasses": [Function],
-                                                            "withComponent": [Function],
-                                                          }
+                                                          },
+                                                          "toString": [Function],
+                                                          "warnTooManyClasses": [Function],
+                                                          "withComponent": [Function],
                                                         }
-                                                        forwardedRef={null}
+                                                      }
+                                                      forwardedRef={null}
+                                                    >
+                                                      <ForwardRef
+                                                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                                                       >
-                                                        <ListGroupItem
-                                                          bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader"
-                                                          listItem={false}
+                                                        <ListGroupItem__StyledListGroupItem
+                                                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                                                         >
-                                                          <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader list-group-item"
+                                                          <StyledComponent
+                                                            className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                                                            forwardedComponent={
+                                                              Object {
+                                                                "$$typeof": Symbol(react.forward_ref),
+                                                                "STYLES": Array [
+                                                                  "success",
+                                                                  "warning",
+                                                                  "danger",
+                                                                  "info",
+                                                                ],
+                                                                "attrs": Array [],
+                                                                "componentStyle": ComponentStyle {
+                                                                  "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                                                  "isStatic": false,
+                                                                  "lastClassName": "kRfOAP",
+                                                                  "rules": Array [
+                                                                    [Function],
+                                                                  ],
+                                                                },
+                                                                "displayName": "ListGroupItem__StyledListGroupItem",
+                                                                "foldedComponentIds": Array [],
+                                                                "render": [Function],
+                                                                "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                                                "target": [Function],
+                                                                "toString": [Function],
+                                                                "warnTooManyClasses": [Function],
+                                                                "withComponent": [Function],
+                                                              }
+                                                            }
+                                                            forwardedRef={null}
                                                           >
-                                                            <Input
-                                                              addonAfter={null}
-                                                              bsStyle={null}
-                                                              buttonAfter={null}
-                                                              checked={false}
-                                                              disabled={false}
-                                                              help=""
-                                                              id="select-all-checkbox"
-                                                              label="Select all"
-                                                              onChange={[Function]}
-                                                              placeholder=""
-                                                              type="checkbox"
-                                                              wrapperClassName="form-group-inline"
+                                                            <ListGroupItem
+                                                              bsClass="list-group-item"
+                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                                                              listItem={false}
                                                             >
-                                                              <Component
-                                                                controlId="select-all-checkbox"
-                                                                validationState={null}
+                                                              <span
+                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw list-group-item"
                                                               >
-                                                                <FormGroup__StyledFormGroup
-                                                                  controlId="select-all-checkbox"
-                                                                  validationState={null}
+                                                                <Input
+                                                                  addonAfter={null}
+                                                                  bsStyle={null}
+                                                                  buttonAfter={null}
+                                                                  checked={false}
+                                                                  disabled={false}
+                                                                  help=""
+                                                                  id="select-all-checkbox"
+                                                                  label="Select all"
+                                                                  onChange={[Function]}
+                                                                  placeholder=""
+                                                                  type="checkbox"
+                                                                  wrapperClassName="form-group-inline"
                                                                 >
-                                                                  <StyledComponent
+                                                                  <Component
                                                                     controlId="select-all-checkbox"
-                                                                    forwardedComponent={
-                                                                      Object {
-                                                                        "$$typeof": Symbol(react.forward_ref),
-                                                                        "SIZES": Array [
-                                                                          "large",
-                                                                          "small",
-                                                                        ],
-                                                                        "attrs": Array [],
-                                                                        "componentStyle": ComponentStyle {
-                                                                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                          "isStatic": false,
-                                                                          "lastClassName": "ekazNr",
-                                                                          "rules": Array [
-                                                                            [Function],
-                                                                            ";",
-                                                                          ],
-                                                                        },
-                                                                        "displayName": "FormGroup__StyledFormGroup",
-                                                                        "foldedComponentIds": Array [],
-                                                                        "render": [Function],
-                                                                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                        "target": [Function],
-                                                                        "toString": [Function],
-                                                                        "warnTooManyClasses": [Function],
-                                                                        "withComponent": [Function],
-                                                                      }
-                                                                    }
-                                                                    forwardedRef={null}
                                                                     validationState={null}
                                                                   >
-                                                                    <FormGroup
-                                                                      bsClass="form-group"
-                                                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                                                    <FormGroup__StyledFormGroup
                                                                       controlId="select-all-checkbox"
                                                                       validationState={null}
                                                                     >
-                                                                      <div
-                                                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                                                      <StyledComponent
+                                                                        controlId="select-all-checkbox"
+                                                                        forwardedComponent={
+                                                                          Object {
+                                                                            "$$typeof": Symbol(react.forward_ref),
+                                                                            "SIZES": Array [
+                                                                              "large",
+                                                                              "small",
+                                                                            ],
+                                                                            "attrs": Array [],
+                                                                            "componentStyle": ComponentStyle {
+                                                                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                                                              "isStatic": false,
+                                                                              "lastClassName": "ekazNr",
+                                                                              "rules": Array [
+                                                                                [Function],
+                                                                                ";",
+                                                                              ],
+                                                                            },
+                                                                            "displayName": "FormGroup__StyledFormGroup",
+                                                                            "foldedComponentIds": Array [],
+                                                                            "render": [Function],
+                                                                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                                                            "target": [Function],
+                                                                            "toString": [Function],
+                                                                            "warnTooManyClasses": [Function],
+                                                                            "withComponent": [Function],
+                                                                          }
+                                                                        }
+                                                                        forwardedRef={null}
+                                                                        validationState={null}
                                                                       >
-                                                                        <InputWrapper
-                                                                          className="form-group-inline"
+                                                                        <FormGroup
+                                                                          bsClass="form-group"
+                                                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                                                          controlId="select-all-checkbox"
+                                                                          validationState={null}
                                                                         >
                                                                           <div
-                                                                            className="form-group-inline"
+                                                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                                                                           >
-                                                                            <Checkbox
-                                                                              bsClass="checkbox"
-                                                                              checked={false}
-                                                                              disabled={false}
-                                                                              inline={false}
-                                                                              inputRef={[Function]}
-                                                                              label="Select all"
-                                                                              name="select-all-checkbox"
-                                                                              onChange={[Function]}
-                                                                              placeholder=""
-                                                                              title=""
-                                                                              type="checkbox"
+                                                                            <InputWrapper
+                                                                              className="form-group-inline"
                                                                             >
                                                                               <div
-                                                                                className="checkbox"
+                                                                                className="form-group-inline"
                                                                               >
-                                                                                <label
+                                                                                <Checkbox
+                                                                                  bsClass="checkbox"
+                                                                                  checked={false}
+                                                                                  disabled={false}
+                                                                                  inline={false}
+                                                                                  inputRef={[Function]}
+                                                                                  label="Select all"
+                                                                                  name="select-all-checkbox"
+                                                                                  onChange={[Function]}
+                                                                                  placeholder=""
                                                                                   title=""
+                                                                                  type="checkbox"
                                                                                 >
-                                                                                  <input
-                                                                                    checked={false}
-                                                                                    disabled={false}
-                                                                                    label="Select all"
-                                                                                    name="select-all-checkbox"
-                                                                                    onChange={[Function]}
-                                                                                    placeholder=""
-                                                                                    type="checkbox"
-                                                                                  />
-                                                                                  Select all
-                                                                                </label>
+                                                                                  <div
+                                                                                    className="checkbox"
+                                                                                  >
+                                                                                    <label
+                                                                                      title=""
+                                                                                    >
+                                                                                      <input
+                                                                                        checked={false}
+                                                                                        disabled={false}
+                                                                                        label="Select all"
+                                                                                        name="select-all-checkbox"
+                                                                                        onChange={[Function]}
+                                                                                        placeholder=""
+                                                                                        type="checkbox"
+                                                                                      />
+                                                                                      Select all
+                                                                                    </label>
+                                                                                  </div>
+                                                                                </Checkbox>
                                                                               </div>
-                                                                            </Checkbox>
+                                                                            </InputWrapper>
                                                                           </div>
-                                                                        </InputWrapper>
-                                                                      </div>
-                                                                    </FormGroup>
-                                                                  </StyledComponent>
-                                                                </FormGroup__StyledFormGroup>
-                                                              </Component>
-                                                            </Input>
-                                                          </span>
-                                                        </ListGroupItem>
-                                                      </StyledComponent>
-                                                    </ListGroupItem__StyledListGroupItem>
-                                                  </ForwardRef>
+                                                                        </FormGroup>
+                                                                      </StyledComponent>
+                                                                    </FormGroup__StyledFormGroup>
+                                                                  </Component>
+                                                                </Input>
+                                                              </span>
+                                                            </ListGroupItem>
+                                                          </StyledComponent>
+                                                        </ListGroupItem__StyledListGroupItem>
+                                                      </ForwardRef>
+                                                    </StyledComponent>
+                                                  </ControlledTableListHeader__StyledListGroupItem>
                                                 </ControlledTableListHeader>
                                                 <ControlledTableListItem
                                                   key="item-01"
@@ -3793,166 +3873,206 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                 className="list-group"
                                               >
                                                 <ControlledTableListHeader>
-                                                  <ForwardRef
-                                                    className="listGroupHeader"
-                                                  >
-                                                    <ListGroupItem__StyledListGroupItem
-                                                      className="listGroupHeader"
-                                                    >
-                                                      <StyledComponent
-                                                        className="listGroupHeader"
-                                                        forwardedComponent={
-                                                          Object {
-                                                            "$$typeof": Symbol(react.forward_ref),
-                                                            "STYLES": Array [
-                                                              "success",
-                                                              "warning",
-                                                              "danger",
-                                                              "info",
+                                                  <ControlledTableListHeader__StyledListGroupItem>
+                                                    <StyledComponent
+                                                      forwardedComponent={
+                                                        Object {
+                                                          "$$typeof": Symbol(react.forward_ref),
+                                                          "attrs": Array [],
+                                                          "componentStyle": ComponentStyle {
+                                                            "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                                                            "isStatic": false,
+                                                            "lastClassName": "krEqXw",
+                                                            "rules": Array [
+                                                              [Function],
                                                             ],
-                                                            "attrs": Array [],
-                                                            "componentStyle": ComponentStyle {
-                                                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                                              "isStatic": false,
-                                                              "lastClassName": "kRfOAP",
-                                                              "rules": Array [
-                                                                [Function],
-                                                              ],
+                                                          },
+                                                          "displayName": "ControlledTableListHeader__StyledListGroupItem",
+                                                          "foldedComponentIds": Array [],
+                                                          "propTypes": Object {
+                                                            "bsStyle": [Function],
+                                                          },
+                                                          "render": [Function],
+                                                          "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                                                          "target": Object {
+                                                            "$$typeof": Symbol(react.forward_ref),
+                                                            "defaultProps": Object {
+                                                              "bsStyle": undefined,
                                                             },
-                                                            "displayName": "ListGroupItem__StyledListGroupItem",
-                                                            "foldedComponentIds": Array [],
+                                                            "propTypes": Object {
+                                                              "bsStyle": [Function],
+                                                            },
                                                             "render": [Function],
-                                                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                                            "target": [Function],
-                                                            "toString": [Function],
-                                                            "warnTooManyClasses": [Function],
-                                                            "withComponent": [Function],
-                                                          }
+                                                          },
+                                                          "toString": [Function],
+                                                          "warnTooManyClasses": [Function],
+                                                          "withComponent": [Function],
                                                         }
-                                                        forwardedRef={null}
+                                                      }
+                                                      forwardedRef={null}
+                                                    >
+                                                      <ForwardRef
+                                                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                                                       >
-                                                        <ListGroupItem
-                                                          bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader"
-                                                          listItem={false}
+                                                        <ListGroupItem__StyledListGroupItem
+                                                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                                                         >
-                                                          <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader list-group-item"
+                                                          <StyledComponent
+                                                            className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                                                            forwardedComponent={
+                                                              Object {
+                                                                "$$typeof": Symbol(react.forward_ref),
+                                                                "STYLES": Array [
+                                                                  "success",
+                                                                  "warning",
+                                                                  "danger",
+                                                                  "info",
+                                                                ],
+                                                                "attrs": Array [],
+                                                                "componentStyle": ComponentStyle {
+                                                                  "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                                                  "isStatic": false,
+                                                                  "lastClassName": "kRfOAP",
+                                                                  "rules": Array [
+                                                                    [Function],
+                                                                  ],
+                                                                },
+                                                                "displayName": "ListGroupItem__StyledListGroupItem",
+                                                                "foldedComponentIds": Array [],
+                                                                "render": [Function],
+                                                                "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                                                "target": [Function],
+                                                                "toString": [Function],
+                                                                "warnTooManyClasses": [Function],
+                                                                "withComponent": [Function],
+                                                              }
+                                                            }
+                                                            forwardedRef={null}
                                                           >
-                                                            <Input
-                                                              addonAfter={null}
-                                                              bsStyle={null}
-                                                              buttonAfter={null}
-                                                              checked={false}
-                                                              disabled={false}
-                                                              help=""
-                                                              id="select-all-checkbox"
-                                                              label="Select all"
-                                                              onChange={[Function]}
-                                                              placeholder=""
-                                                              type="checkbox"
-                                                              wrapperClassName="form-group-inline"
+                                                            <ListGroupItem
+                                                              bsClass="list-group-item"
+                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                                                              listItem={false}
                                                             >
-                                                              <Component
-                                                                controlId="select-all-checkbox"
-                                                                validationState={null}
+                                                              <span
+                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw list-group-item"
                                                               >
-                                                                <FormGroup__StyledFormGroup
-                                                                  controlId="select-all-checkbox"
-                                                                  validationState={null}
+                                                                <Input
+                                                                  addonAfter={null}
+                                                                  bsStyle={null}
+                                                                  buttonAfter={null}
+                                                                  checked={false}
+                                                                  disabled={false}
+                                                                  help=""
+                                                                  id="select-all-checkbox"
+                                                                  label="Select all"
+                                                                  onChange={[Function]}
+                                                                  placeholder=""
+                                                                  type="checkbox"
+                                                                  wrapperClassName="form-group-inline"
                                                                 >
-                                                                  <StyledComponent
+                                                                  <Component
                                                                     controlId="select-all-checkbox"
-                                                                    forwardedComponent={
-                                                                      Object {
-                                                                        "$$typeof": Symbol(react.forward_ref),
-                                                                        "SIZES": Array [
-                                                                          "large",
-                                                                          "small",
-                                                                        ],
-                                                                        "attrs": Array [],
-                                                                        "componentStyle": ComponentStyle {
-                                                                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                          "isStatic": false,
-                                                                          "lastClassName": "ekazNr",
-                                                                          "rules": Array [
-                                                                            [Function],
-                                                                            ";",
-                                                                          ],
-                                                                        },
-                                                                        "displayName": "FormGroup__StyledFormGroup",
-                                                                        "foldedComponentIds": Array [],
-                                                                        "render": [Function],
-                                                                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                        "target": [Function],
-                                                                        "toString": [Function],
-                                                                        "warnTooManyClasses": [Function],
-                                                                        "withComponent": [Function],
-                                                                      }
-                                                                    }
-                                                                    forwardedRef={null}
                                                                     validationState={null}
                                                                   >
-                                                                    <FormGroup
-                                                                      bsClass="form-group"
-                                                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                                                    <FormGroup__StyledFormGroup
                                                                       controlId="select-all-checkbox"
                                                                       validationState={null}
                                                                     >
-                                                                      <div
-                                                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                                                      <StyledComponent
+                                                                        controlId="select-all-checkbox"
+                                                                        forwardedComponent={
+                                                                          Object {
+                                                                            "$$typeof": Symbol(react.forward_ref),
+                                                                            "SIZES": Array [
+                                                                              "large",
+                                                                              "small",
+                                                                            ],
+                                                                            "attrs": Array [],
+                                                                            "componentStyle": ComponentStyle {
+                                                                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                                                              "isStatic": false,
+                                                                              "lastClassName": "ekazNr",
+                                                                              "rules": Array [
+                                                                                [Function],
+                                                                                ";",
+                                                                              ],
+                                                                            },
+                                                                            "displayName": "FormGroup__StyledFormGroup",
+                                                                            "foldedComponentIds": Array [],
+                                                                            "render": [Function],
+                                                                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                                                            "target": [Function],
+                                                                            "toString": [Function],
+                                                                            "warnTooManyClasses": [Function],
+                                                                            "withComponent": [Function],
+                                                                          }
+                                                                        }
+                                                                        forwardedRef={null}
+                                                                        validationState={null}
                                                                       >
-                                                                        <InputWrapper
-                                                                          className="form-group-inline"
+                                                                        <FormGroup
+                                                                          bsClass="form-group"
+                                                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                                                          controlId="select-all-checkbox"
+                                                                          validationState={null}
                                                                         >
                                                                           <div
-                                                                            className="form-group-inline"
+                                                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                                                                           >
-                                                                            <Checkbox
-                                                                              bsClass="checkbox"
-                                                                              checked={false}
-                                                                              disabled={false}
-                                                                              inline={false}
-                                                                              inputRef={[Function]}
-                                                                              label="Select all"
-                                                                              name="select-all-checkbox"
-                                                                              onChange={[Function]}
-                                                                              placeholder=""
-                                                                              title=""
-                                                                              type="checkbox"
+                                                                            <InputWrapper
+                                                                              className="form-group-inline"
                                                                             >
                                                                               <div
-                                                                                className="checkbox"
+                                                                                className="form-group-inline"
                                                                               >
-                                                                                <label
+                                                                                <Checkbox
+                                                                                  bsClass="checkbox"
+                                                                                  checked={false}
+                                                                                  disabled={false}
+                                                                                  inline={false}
+                                                                                  inputRef={[Function]}
+                                                                                  label="Select all"
+                                                                                  name="select-all-checkbox"
+                                                                                  onChange={[Function]}
+                                                                                  placeholder=""
                                                                                   title=""
+                                                                                  type="checkbox"
                                                                                 >
-                                                                                  <input
-                                                                                    checked={false}
-                                                                                    disabled={false}
-                                                                                    label="Select all"
-                                                                                    name="select-all-checkbox"
-                                                                                    onChange={[Function]}
-                                                                                    placeholder=""
-                                                                                    type="checkbox"
-                                                                                  />
-                                                                                  Select all
-                                                                                </label>
+                                                                                  <div
+                                                                                    className="checkbox"
+                                                                                  >
+                                                                                    <label
+                                                                                      title=""
+                                                                                    >
+                                                                                      <input
+                                                                                        checked={false}
+                                                                                        disabled={false}
+                                                                                        label="Select all"
+                                                                                        name="select-all-checkbox"
+                                                                                        onChange={[Function]}
+                                                                                        placeholder=""
+                                                                                        type="checkbox"
+                                                                                      />
+                                                                                      Select all
+                                                                                    </label>
+                                                                                  </div>
+                                                                                </Checkbox>
                                                                               </div>
-                                                                            </Checkbox>
+                                                                            </InputWrapper>
                                                                           </div>
-                                                                        </InputWrapper>
-                                                                      </div>
-                                                                    </FormGroup>
-                                                                  </StyledComponent>
-                                                                </FormGroup__StyledFormGroup>
-                                                              </Component>
-                                                            </Input>
-                                                          </span>
-                                                        </ListGroupItem>
-                                                      </StyledComponent>
-                                                    </ListGroupItem__StyledListGroupItem>
-                                                  </ForwardRef>
+                                                                        </FormGroup>
+                                                                      </StyledComponent>
+                                                                    </FormGroup__StyledFormGroup>
+                                                                  </Component>
+                                                                </Input>
+                                                              </span>
+                                                            </ListGroupItem>
+                                                          </StyledComponent>
+                                                        </ListGroupItem__StyledListGroupItem>
+                                                      </ForwardRef>
+                                                    </StyledComponent>
+                                                  </ControlledTableListHeader__StyledListGroupItem>
                                                 </ControlledTableListHeader>
                                                 <ControlledTableListItem
                                                   key="item-01"
@@ -5179,166 +5299,206 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                 className="list-group"
                                               >
                                                 <ControlledTableListHeader>
-                                                  <ForwardRef
-                                                    className="listGroupHeader"
-                                                  >
-                                                    <ListGroupItem__StyledListGroupItem
-                                                      className="listGroupHeader"
-                                                    >
-                                                      <StyledComponent
-                                                        className="listGroupHeader"
-                                                        forwardedComponent={
-                                                          Object {
-                                                            "$$typeof": Symbol(react.forward_ref),
-                                                            "STYLES": Array [
-                                                              "success",
-                                                              "warning",
-                                                              "danger",
-                                                              "info",
+                                                  <ControlledTableListHeader__StyledListGroupItem>
+                                                    <StyledComponent
+                                                      forwardedComponent={
+                                                        Object {
+                                                          "$$typeof": Symbol(react.forward_ref),
+                                                          "attrs": Array [],
+                                                          "componentStyle": ComponentStyle {
+                                                            "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                                                            "isStatic": false,
+                                                            "lastClassName": "krEqXw",
+                                                            "rules": Array [
+                                                              [Function],
                                                             ],
-                                                            "attrs": Array [],
-                                                            "componentStyle": ComponentStyle {
-                                                              "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                                              "isStatic": false,
-                                                              "lastClassName": "kRfOAP",
-                                                              "rules": Array [
-                                                                [Function],
-                                                              ],
+                                                          },
+                                                          "displayName": "ControlledTableListHeader__StyledListGroupItem",
+                                                          "foldedComponentIds": Array [],
+                                                          "propTypes": Object {
+                                                            "bsStyle": [Function],
+                                                          },
+                                                          "render": [Function],
+                                                          "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                                                          "target": Object {
+                                                            "$$typeof": Symbol(react.forward_ref),
+                                                            "defaultProps": Object {
+                                                              "bsStyle": undefined,
                                                             },
-                                                            "displayName": "ListGroupItem__StyledListGroupItem",
-                                                            "foldedComponentIds": Array [],
+                                                            "propTypes": Object {
+                                                              "bsStyle": [Function],
+                                                            },
                                                             "render": [Function],
-                                                            "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                                            "target": [Function],
-                                                            "toString": [Function],
-                                                            "warnTooManyClasses": [Function],
-                                                            "withComponent": [Function],
-                                                          }
+                                                          },
+                                                          "toString": [Function],
+                                                          "warnTooManyClasses": [Function],
+                                                          "withComponent": [Function],
                                                         }
-                                                        forwardedRef={null}
+                                                      }
+                                                      forwardedRef={null}
+                                                    >
+                                                      <ForwardRef
+                                                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                                                       >
-                                                        <ListGroupItem
-                                                          bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader"
-                                                          listItem={false}
+                                                        <ListGroupItem__StyledListGroupItem
+                                                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
                                                         >
-                                                          <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader list-group-item"
+                                                          <StyledComponent
+                                                            className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                                                            forwardedComponent={
+                                                              Object {
+                                                                "$$typeof": Symbol(react.forward_ref),
+                                                                "STYLES": Array [
+                                                                  "success",
+                                                                  "warning",
+                                                                  "danger",
+                                                                  "info",
+                                                                ],
+                                                                "attrs": Array [],
+                                                                "componentStyle": ComponentStyle {
+                                                                  "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                                                  "isStatic": false,
+                                                                  "lastClassName": "kRfOAP",
+                                                                  "rules": Array [
+                                                                    [Function],
+                                                                  ],
+                                                                },
+                                                                "displayName": "ListGroupItem__StyledListGroupItem",
+                                                                "foldedComponentIds": Array [],
+                                                                "render": [Function],
+                                                                "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                                                "target": [Function],
+                                                                "toString": [Function],
+                                                                "warnTooManyClasses": [Function],
+                                                                "withComponent": [Function],
+                                                              }
+                                                            }
+                                                            forwardedRef={null}
                                                           >
-                                                            <Input
-                                                              addonAfter={null}
-                                                              bsStyle={null}
-                                                              buttonAfter={null}
-                                                              checked={false}
-                                                              disabled={false}
-                                                              help=""
-                                                              id="select-all-checkbox"
-                                                              label="Select all"
-                                                              onChange={[Function]}
-                                                              placeholder=""
-                                                              type="checkbox"
-                                                              wrapperClassName="form-group-inline"
+                                                            <ListGroupItem
+                                                              bsClass="list-group-item"
+                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw"
+                                                              listItem={false}
                                                             >
-                                                              <Component
-                                                                controlId="select-all-checkbox"
-                                                                validationState={null}
+                                                              <span
+                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP ControlledTableListHeader__StyledListGroupItem-tr2y34-0 krEqXw list-group-item"
                                                               >
-                                                                <FormGroup__StyledFormGroup
-                                                                  controlId="select-all-checkbox"
-                                                                  validationState={null}
+                                                                <Input
+                                                                  addonAfter={null}
+                                                                  bsStyle={null}
+                                                                  buttonAfter={null}
+                                                                  checked={false}
+                                                                  disabled={false}
+                                                                  help=""
+                                                                  id="select-all-checkbox"
+                                                                  label="Select all"
+                                                                  onChange={[Function]}
+                                                                  placeholder=""
+                                                                  type="checkbox"
+                                                                  wrapperClassName="form-group-inline"
                                                                 >
-                                                                  <StyledComponent
+                                                                  <Component
                                                                     controlId="select-all-checkbox"
-                                                                    forwardedComponent={
-                                                                      Object {
-                                                                        "$$typeof": Symbol(react.forward_ref),
-                                                                        "SIZES": Array [
-                                                                          "large",
-                                                                          "small",
-                                                                        ],
-                                                                        "attrs": Array [],
-                                                                        "componentStyle": ComponentStyle {
-                                                                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                          "isStatic": false,
-                                                                          "lastClassName": "ekazNr",
-                                                                          "rules": Array [
-                                                                            [Function],
-                                                                            ";",
-                                                                          ],
-                                                                        },
-                                                                        "displayName": "FormGroup__StyledFormGroup",
-                                                                        "foldedComponentIds": Array [],
-                                                                        "render": [Function],
-                                                                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                                                        "target": [Function],
-                                                                        "toString": [Function],
-                                                                        "warnTooManyClasses": [Function],
-                                                                        "withComponent": [Function],
-                                                                      }
-                                                                    }
-                                                                    forwardedRef={null}
                                                                     validationState={null}
                                                                   >
-                                                                    <FormGroup
-                                                                      bsClass="form-group"
-                                                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                                                    <FormGroup__StyledFormGroup
                                                                       controlId="select-all-checkbox"
                                                                       validationState={null}
                                                                     >
-                                                                      <div
-                                                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                                                      <StyledComponent
+                                                                        controlId="select-all-checkbox"
+                                                                        forwardedComponent={
+                                                                          Object {
+                                                                            "$$typeof": Symbol(react.forward_ref),
+                                                                            "SIZES": Array [
+                                                                              "large",
+                                                                              "small",
+                                                                            ],
+                                                                            "attrs": Array [],
+                                                                            "componentStyle": ComponentStyle {
+                                                                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                                                              "isStatic": false,
+                                                                              "lastClassName": "ekazNr",
+                                                                              "rules": Array [
+                                                                                [Function],
+                                                                                ";",
+                                                                              ],
+                                                                            },
+                                                                            "displayName": "FormGroup__StyledFormGroup",
+                                                                            "foldedComponentIds": Array [],
+                                                                            "render": [Function],
+                                                                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                                                            "target": [Function],
+                                                                            "toString": [Function],
+                                                                            "warnTooManyClasses": [Function],
+                                                                            "withComponent": [Function],
+                                                                          }
+                                                                        }
+                                                                        forwardedRef={null}
+                                                                        validationState={null}
                                                                       >
-                                                                        <InputWrapper
-                                                                          className="form-group-inline"
+                                                                        <FormGroup
+                                                                          bsClass="form-group"
+                                                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                                                          controlId="select-all-checkbox"
+                                                                          validationState={null}
                                                                         >
                                                                           <div
-                                                                            className="form-group-inline"
+                                                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                                                                           >
-                                                                            <Checkbox
-                                                                              bsClass="checkbox"
-                                                                              checked={false}
-                                                                              disabled={false}
-                                                                              inline={false}
-                                                                              inputRef={[Function]}
-                                                                              label="Select all"
-                                                                              name="select-all-checkbox"
-                                                                              onChange={[Function]}
-                                                                              placeholder=""
-                                                                              title=""
-                                                                              type="checkbox"
+                                                                            <InputWrapper
+                                                                              className="form-group-inline"
                                                                             >
                                                                               <div
-                                                                                className="checkbox"
+                                                                                className="form-group-inline"
                                                                               >
-                                                                                <label
+                                                                                <Checkbox
+                                                                                  bsClass="checkbox"
+                                                                                  checked={false}
+                                                                                  disabled={false}
+                                                                                  inline={false}
+                                                                                  inputRef={[Function]}
+                                                                                  label="Select all"
+                                                                                  name="select-all-checkbox"
+                                                                                  onChange={[Function]}
+                                                                                  placeholder=""
                                                                                   title=""
+                                                                                  type="checkbox"
                                                                                 >
-                                                                                  <input
-                                                                                    checked={false}
-                                                                                    disabled={false}
-                                                                                    label="Select all"
-                                                                                    name="select-all-checkbox"
-                                                                                    onChange={[Function]}
-                                                                                    placeholder=""
-                                                                                    type="checkbox"
-                                                                                  />
-                                                                                  Select all
-                                                                                </label>
+                                                                                  <div
+                                                                                    className="checkbox"
+                                                                                  >
+                                                                                    <label
+                                                                                      title=""
+                                                                                    >
+                                                                                      <input
+                                                                                        checked={false}
+                                                                                        disabled={false}
+                                                                                        label="Select all"
+                                                                                        name="select-all-checkbox"
+                                                                                        onChange={[Function]}
+                                                                                        placeholder=""
+                                                                                        type="checkbox"
+                                                                                      />
+                                                                                      Select all
+                                                                                    </label>
+                                                                                  </div>
+                                                                                </Checkbox>
                                                                               </div>
-                                                                            </Checkbox>
+                                                                            </InputWrapper>
                                                                           </div>
-                                                                        </InputWrapper>
-                                                                      </div>
-                                                                    </FormGroup>
-                                                                  </StyledComponent>
-                                                                </FormGroup__StyledFormGroup>
-                                                              </Component>
-                                                            </Input>
-                                                          </span>
-                                                        </ListGroupItem>
-                                                      </StyledComponent>
-                                                    </ListGroupItem__StyledListGroupItem>
-                                                  </ForwardRef>
+                                                                        </FormGroup>
+                                                                      </StyledComponent>
+                                                                    </FormGroup__StyledFormGroup>
+                                                                  </Component>
+                                                                </Input>
+                                                              </span>
+                                                            </ListGroupItem>
+                                                          </StyledComponent>
+                                                        </ListGroupItem__StyledListGroupItem>
+                                                      </ForwardRef>
+                                                    </StyledComponent>
+                                                  </ControlledTableListHeader__StyledListGroupItem>
                                                 </ControlledTableListHeader>
                                                 <ControlledTableListItem
                                                   key="item-01"
