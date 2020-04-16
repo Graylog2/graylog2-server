@@ -5,9 +5,8 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
-import type { ThemeInterface } from 'theme/index';
 
-const DirtyButton: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled(Button)`
+const DirtyButton: StyledComponent<{}, void, HTMLButtonElement> = styled(Button)`
   position: relative;
 
   ::after {
