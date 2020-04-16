@@ -9,8 +9,8 @@ import { Icon } from 'components/common';
 
 import HoverForHelp from './HoverForHelp';
 
-const StyledDescriptionBox = styled.div`
-  background-color: #eee;
+const StyledDescriptionBox = styled.div(({ theme }) => `
+  background-color: ${theme.color.gray[90]};
   padding: 10px;
   margin: 5px;
   border-radius: 6px;
@@ -19,7 +19,7 @@ const StyledDescriptionBox = styled.div`
     padding-bottom: 5px;
     text-transform: uppercase;
   }
-`;
+`);
 
 const ConfigButton = styled.button`
   border: 0;
