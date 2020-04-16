@@ -97,7 +97,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                     <div className="pull-right search-help">
                       <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                          title="Search query syntax documentation"
-                                         text={<Icon name="lightbulb-o" />} />
+                                         text={<Icon name="lightbulb" />} />
                     </div>
                     <SearchButton disabled={disableSearch || isSubmitting || !isValid} dirty={dirty} />
 

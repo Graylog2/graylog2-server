@@ -40,7 +40,7 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
       </Field>
 
       <p className={`text-center ${styles.separator}`}>
-        <Icon name="long-arrow-right" />
+        <Icon name="long-arrow-alt-right" />
       </p>
 
       <Field name="timerange.to" validate={_isValidDateString}>

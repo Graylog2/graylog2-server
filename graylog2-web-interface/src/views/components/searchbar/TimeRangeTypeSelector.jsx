@@ -27,7 +27,7 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
       <DropdownButton bsStyle="info"
                       id="timerange-type"
                       disabled={disabled}
-                      title={<Icon name="clock-o" />}
+                      title={<Icon name="clock" />}
                       onSelect={onSelect}>
         <MenuItem eventKey="relative"
                   active={type === 'relative'}>
