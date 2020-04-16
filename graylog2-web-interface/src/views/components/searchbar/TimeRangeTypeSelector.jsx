@@ -8,6 +8,7 @@ import { Icon } from 'components/common';
 
 import PropTypes from 'views/components/CustomPropTypes';
 import { migrateTimeRangeToNewType } from '../TimerangeForForm';
+import TimeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
 
 type Props = {
   disabled: boolean,
@@ -29,18 +30,7 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
                       disabled={disabled}
                       title={<Icon name="clock" />}
                       onSelect={onSelect}>
-        <MenuItem eventKey="relative"
-                  active={type === 'relative'}>
-          Relative
-        </MenuItem>
-        <MenuItem eventKey="absolute"
-                  active={type === 'absolute'}>
-          Absolute
-        </MenuItem>
-        <MenuItem eventKey="keyword"
-                  active={type === 'keyword'}>
-          Keyword
-        </MenuItem>
+        <TimeRangeTypeMenuItems type={type} />
       </DropdownButton>
     </ButtonToolbar>
   );

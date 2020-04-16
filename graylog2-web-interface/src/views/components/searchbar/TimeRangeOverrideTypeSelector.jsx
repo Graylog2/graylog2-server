@@ -6,6 +6,7 @@ import { useField } from 'formik';
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import { Icon } from 'components/common';
 import { migrateTimeRangeToNewType } from '../TimerangeForForm';
+import TimeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
 
 const TimeRangeOverrideTypeSelector = () => {
   const [{ value, onChange, name }] = useField('timerange');
@@ -26,23 +27,10 @@ const TimeRangeOverrideTypeSelector = () => {
                   active={type === undefined}>
           No Override
         </MenuItem>
-        <MenuItem eventKey="relative"
-                  active={type === 'relative'}>
-          Relative
-        </MenuItem>
-        <MenuItem eventKey="absolute"
-                  active={type === 'absolute'}>
-          Absolute
-        </MenuItem>
-        <MenuItem eventKey="keyword"
-                  active={type === 'keyword'}>
-          Keyword
-        </MenuItem>
+        <TimeRangeTypeMenuItems type={type} />
       </DropdownButton>
     </ButtonToolbar>
   );
 };
-
-TimeRangeOverrideTypeSelector.propTypes = {};
 
 export default TimeRangeOverrideTypeSelector;
