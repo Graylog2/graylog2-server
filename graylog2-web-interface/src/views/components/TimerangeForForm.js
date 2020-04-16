@@ -62,5 +62,9 @@ export const migrateTimeRangeToNewType = (oldTimerange: ?TimeRange, type: string
     return oldTimerange;
   }
 
+  if (!migrationStrategies[type]) {
+    throw new Error(`Invalid time range type: ${type}`);
+  }
+
   return migrationStrategies[type](oldTimerange);
 };
