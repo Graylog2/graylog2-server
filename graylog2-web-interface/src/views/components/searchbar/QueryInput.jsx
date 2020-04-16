@@ -79,7 +79,7 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
                        height: '34px',
                        width: '100%',
                      }}
-                     placeholder={placeholder}/>
+                     placeholder={placeholder} />
         )}
       </UserPreferencesContext.Consumer>
     </div>
