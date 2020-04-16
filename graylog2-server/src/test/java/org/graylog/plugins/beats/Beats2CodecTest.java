@@ -134,6 +134,19 @@ public class Beats2CodecTest {
     }
 
     @Test
+    public void decodeMessagesHandlesWinlogbeatv7Messages() throws Exception {
+        final Message message = codec.decode(messageFromJson("winlogbeat-v7.json"));
+        assertThat(message).isNotNull();
+        assertThat(message.getSource()).isEqualTo("example.local");
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 11, 24, 12, 13, DateTimeZone.UTC));
+        assertThat(message.getField("beats_type")).isEqualTo("winlogbeat");
+        assertThat(message.getField("winlogbeat_winlog_level")).isEqualTo("Information");
+        assertThat(message.getField("winlogbeat_winlog_event_id")).isEqualTo(5024);
+        assertThat(message.getField("winlogbeat_winlog_process_id")).isEqualTo(500);
+        assertThat(message.getField("winlogbeat_winlog_log_name")).isEqualTo("Security");
+    }
+
+    @Test
     public void decodeMessagesHandleGenericBeatMessages() throws Exception {
         final Message message = codec.decode(messageFromJson("generic.json"));
         assertThat(message).isNotNull();
