@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.export.es;
 
 import com.google.common.collect.ImmutableSet;
-import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
@@ -26,23 +25,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ElasticsearchExportBackendTest {
-    private JestClient client;
+    private JestWrapper client;
     private ElasticsearchExportBackend sut;
     private IndexLookup indexLookup;
 
     @BeforeEach
     void setUp() {
         indexLookup = mock(IndexLookup.class);
-        client = mock(JestClient.class);
-        sut = new ElasticsearchExportBackend(client, indexLookup);
+        client = mock(JestWrapper.class);
+        sut = new ElasticsearchExportBackend(client, indexLookup, false);
     }
 
     @Test
@@ -53,13 +50,10 @@ class ElasticsearchExportBackendTest {
         MessagesRequest request = defaultMessagesRequestWithDummyStream();
 
         ArgumentCaptor<Search> captor = ArgumentCaptor.forClass(Search.class);
-        try {
-            SearchResult searchResult = mock(SearchResult.class);
-            when(searchResult.isSucceeded()).thenReturn(true);
-            when(client.execute(captor.capture())).thenReturn(searchResult);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        SearchResult searchResult = mock(SearchResult.class);
+        when(searchResult.isSucceeded()).thenReturn(true);
+        when(client.execute(captor.capture(), any())).thenReturn(searchResult);
 
         sut.run(request, x -> {
         });

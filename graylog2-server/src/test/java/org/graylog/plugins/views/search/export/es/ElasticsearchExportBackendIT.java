@@ -20,12 +20,14 @@ import com.google.common.collect.ImmutableSet;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.export.ExportException;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.export.TestData;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -36,6 +38,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -49,7 +52,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     @Before
     public void setUp() {
         indexLookup = mock(IndexLookup.class);
-        sut = new ElasticsearchExportBackend(jestClient(), indexLookup);
+        sut = new ElasticsearchExportBackend(new JestWrapper(jestClient()), indexLookup, false);
     }
 
     @Test
@@ -154,6 +157,17 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         SimpleMessageChunk[] chunks = collectChunksFor(request).toArray(new SimpleMessageChunk[0]);
 
         assertThat(chunks[0].isFirstChunk()).isTrue();
+    }
+
+    @Test
+    public void failsWithLeadingHighlightQueryIfDisallowed() {
+        importFixture("messages.json");
+
+        MessagesRequest request = requestBuilderWithAllStreams().queryString(ElasticsearchQueryString.builder().queryString("*a").build()).build();
+
+        assertThatExceptionOfType(ExportException.class)
+                .isThrownBy(() -> sut.run(request, chunk -> {}))
+                .withCauseInstanceOf(ElasticsearchException.class);
     }
 
     public void mockIndexLookupFor(MessagesRequest request, String... indexNames) {

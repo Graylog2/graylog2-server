@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.export.es;
 
-import io.searchbox.client.JestClient;
+import com.google.inject.name.Named;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -33,7 +33,6 @@ import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +58,15 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
     private static final String TIEBREAKER_FIELD = "gl2_message_id";
 
-    private final JestClient jestClient;
+    private final JestWrapper jestWrapper;
     private final IndexLookup indexLookup;
+    private final boolean allowLeadingWildcard;
 
     @Inject
-    public ElasticsearchExportBackend(JestClient jestClient, IndexLookup indexLookup) {
-        this.jestClient = jestClient;
+    public ElasticsearchExportBackend(JestWrapper jestWrapper, IndexLookup indexLookup, @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+        this.jestWrapper = jestWrapper;
         this.indexLookup = indexLookup;
+        this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
     @Override
@@ -97,7 +98,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
     private List<SearchResult.Hit<Map, Void>> search(MessagesRequest request, Object[] searchAfterValues) {
         Search search = buildSearchRequest(request, searchAfterValues);
 
-        SearchResult result = JestUtils.execute(jestClient, search, () -> "Failed to execute Search After request");
+        SearchResult result = jestWrapper.execute(search, () -> "Failed to execute Search After request");
 
         return result.getHits(Map.class, false);
     }
@@ -135,7 +136,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
         QueryBuilder query = backendQuery.isEmpty() ?
                 matchAllQuery() :
-                queryStringQuery(backendQuery.queryString());//.allowLeadingWildcard(allowLeadingWildcardSearches);
+                queryStringQuery(backendQuery.queryString()).allowLeadingWildcard(allowLeadingWildcard);
 
         BoolQueryBuilder filter = boolQuery()
                 .filter(query)
