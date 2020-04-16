@@ -5,6 +5,7 @@ import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import 'bootstrap/less/bootstrap.less';
 import 'stylesheets/bootstrap-submenus.less';
@@ -39,7 +40,12 @@ export const AppFacade = ({ currentUser, server, sessionId }) => {
     Page = <LoggedInPage />;
   }
 
-  return Page;
+  return (
+    <>
+      <GlobalThemeStyles />
+      {Page}
+    </>
+  );
 };
 
 AppFacade.propTypes = {

@@ -7,8 +7,8 @@ import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import { IfPermitted, Spinner, Icon } from 'components/common';
 
-const NodeRow = styled.div`
-  border-bottom: 1px solid #ccc;
+const NodeRow = styled.div(({ theme }) => `
+  border-bottom: 1px solid ${theme.color.gray[80]};
   padding-bottom: 8px;
   margin-bottom: 8px;
   margin-top: 0;
@@ -43,7 +43,7 @@ const NodeRow = styled.div`
   .dropdown-menu a.selected {
     font-weight: bold;
   }
-`;
+`);
 
 const NodeRowInfo = styled.div`
   position: relative;
