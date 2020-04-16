@@ -1,0 +1,31 @@
+{
+  "@metadata": {
+    "beat": "winlogbeat"
+  },
+  "@timestamp": "2016-11-24T12:13:00.000Z",
+  "agent": {
+    "hostname": "example.local",
+    "version": "7.6.2"
+  },
+  "gl2_source_collector": "5a4b9161-2f6a-48f6-b121-109dc85c8481",
+  "winlog": {
+    "computer_name": "windows",
+    "event_id": 5024,
+    "keywords": [
+      "Audit Success"
+    ],
+    "level": "Information",
+    "log_name": "Security",
+    "message": "The Windows Firewall service started successfully.",
+    "opcode": "Info",
+    "process_id": 500,
+    "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+    "record_number": "2126",
+    "source_name": "Microsoft-Windows-Security-Auditing",
+    "tags": [
+      "windows",
+      "iis"
+    ],
+    "task": "Other System Events"
+  }
+}
