@@ -71,10 +71,6 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
     @Override
     public void run(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector) {
-        fetchResults(request, chunkCollector);
-    }
-
-    private void fetchResults(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector) {
         Object[] searchAfterValues = null;
         boolean isFirstChunk = true;
 
