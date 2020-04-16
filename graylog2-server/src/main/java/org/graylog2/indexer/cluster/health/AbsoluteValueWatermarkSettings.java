@@ -16,46 +16,24 @@
  */
 package org.graylog2.indexer.cluster.health;
 
+import com.google.auto.value.AutoValue;
 import org.elasticsearch.common.unit.ByteSizeValue;
-
 import javax.annotation.Nullable;
 
-public class AbsoluteValueWatermarkSettings implements WatermarkSettings<ByteSizeValue> {
+@AutoValue
+public abstract class AbsoluteValueWatermarkSettings implements WatermarkSettings<ByteSizeValue> {
 
-    private ByteSizeValue low;
+    public abstract SettingsType type();
 
-    private ByteSizeValue high;
+    public abstract ByteSizeValue low();
+
+    public abstract ByteSizeValue high();
 
     @Nullable
-    private ByteSizeValue floodStage;
-
-    private AbsoluteValueWatermarkSettings(ByteSizeValue low, ByteSizeValue high, ByteSizeValue floodStage) {
-        this.low = low;
-        this.high = high;
-        this.floodStage = floodStage;
-    }
-
-    @Override
-    public SettingsType type() {
-        return SettingsType.ABSOLUTE;
-    }
-
-    @Override
-    public ByteSizeValue low() {
-        return low;
-    }
-
-    @Override
-    public ByteSizeValue high() {
-        return high;
-    }
-
-    @Override
-    public ByteSizeValue floodStage() {
-        return floodStage;
-    }
+    public abstract ByteSizeValue floodStage();
 
     public static class Builder {
+        private SettingsType type = SettingsType.ABSOLUTE;
         private ByteSizeValue low;
         private ByteSizeValue high;
         private ByteSizeValue floodStage;
@@ -78,7 +56,7 @@ public class AbsoluteValueWatermarkSettings implements WatermarkSettings<ByteSiz
         }
 
         public AbsoluteValueWatermarkSettings build() {
-            return new AbsoluteValueWatermarkSettings(low, high, floodStage);
+            return new AutoValue_AbsoluteValueWatermarkSettings(type, low, high, floodStage);
         }
     }
 }

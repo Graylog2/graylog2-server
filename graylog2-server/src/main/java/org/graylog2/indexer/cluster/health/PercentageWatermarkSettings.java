@@ -16,43 +16,23 @@
  */
 package org.graylog2.indexer.cluster.health;
 
+import com.google.auto.value.AutoValue;
 import javax.annotation.Nullable;
 
-public class PercentageWatermarkSettings implements WatermarkSettings<Double> {
-    private Double low;
+@AutoValue
+public abstract class PercentageWatermarkSettings implements WatermarkSettings<Double> {
 
-    private Double high;
+    public abstract SettingsType type();
+
+    public abstract Double low();
+
+    public abstract Double high();
 
     @Nullable
-    private Double floodStage;
-
-    private PercentageWatermarkSettings(Double low, Double high, Double floodStage) {
-        this.low = low;
-        this.high = high;
-        this.floodStage = floodStage;
-    }
-
-    @Override
-    public SettingsType type() {
-        return SettingsType.PERCENTAGE;
-    }
-
-    @Override
-    public Double low() {
-        return low;
-    }
-
-    @Override
-    public Double high() {
-        return high;
-    }
-
-    @Override
-    public Double floodStage() {
-        return floodStage;
-    }
+    public abstract Double floodStage();
 
     public static class Builder {
+        private SettingsType type = SettingsType.PERCENTAGE;
         private Double low;
         private Double high;
         private Double floodStage;
@@ -76,7 +56,7 @@ public class PercentageWatermarkSettings implements WatermarkSettings<Double> {
         }
 
         public PercentageWatermarkSettings build() {
-            return new PercentageWatermarkSettings(low, high, floodStage);
+            return new AutoValue_PercentageWatermarkSettings(type, low, high, floodStage);
         }
     }
 }
