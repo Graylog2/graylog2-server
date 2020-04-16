@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { css, createGlobalStyle } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
@@ -18,6 +18,7 @@ import type {
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
 
+import { type ThemeInterface } from 'theme';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -46,7 +47,7 @@ import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters'
 
 import HighlightMessageInQuery from '../components/messagelist/HighlightMessageInQuery';
 
-const ExtendedSearchPageGlobalStyles = createGlobalStyle(({ theme }) => `
+const ExtendedSearchPageGlobalStyles: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   .extended-search-timerange-chooser .btn {
     padding: 6px 7px;
     margin-right: 5px;
@@ -172,48 +173,49 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   useSyncWithQueryParameters(query);
 
   return (
-    <CurrentViewTypeProvider>
-      <ExtendedSearchPageGlobalStyles />
-      <IfInteractive>
-        <IfDashboard>
-          <WindowLeaveMessage route={route} />
-        </IfDashboard>
-      </IfInteractive>
-      <InteractiveContext.Consumer>
-        {(interactive) => (
-          <ViewAdditionalContextProvider>
-            <GridContainer id="main-row" interactive={interactive}>
-              <IfInteractive>
-                <ConnectedSideBar>
-                  <ConnectedFieldList />
-                </ConnectedSideBar>
-              </IfInteractive>
-              <SearchArea>
+    <ExtendedSearchPageGlobalStyles>
+      <CurrentViewTypeProvider>
+        <IfInteractive>
+          <IfDashboard>
+            <WindowLeaveMessage route={route} />
+          </IfDashboard>
+        </IfInteractive>
+        <InteractiveContext.Consumer>
+          {(interactive) => (
+            <ViewAdditionalContextProvider>
+              <GridContainer id="main-row" interactive={interactive}>
                 <IfInteractive>
-                  <HeaderElements />
-                  <IfDashboard>
-                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfDashboard>
-                  <IfSearch>
-                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfSearch>
-
-                  <QueryBarElements />
-
-                  <IfDashboard>
-                    <QueryBar />
-                  </IfDashboard>
+                  <ConnectedSideBar>
+                    <ConnectedFieldList />
+                  </ConnectedSideBar>
                 </IfInteractive>
-                <HighlightMessageInQuery query={location.query}>
-                  <SearchResult />
-                </HighlightMessageInQuery>
-                <Footer />
-              </SearchArea>
-            </GridContainer>
-          </ViewAdditionalContextProvider>
-        )}
-      </InteractiveContext.Consumer>
-    </CurrentViewTypeProvider>
+                <SearchArea>
+                  <IfInteractive>
+                    <HeaderElements />
+                    <IfDashboard>
+                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfDashboard>
+                    <IfSearch>
+                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfSearch>
+
+                    <QueryBarElements />
+
+                    <IfDashboard>
+                      <QueryBar />
+                    </IfDashboard>
+                  </IfInteractive>
+                  <HighlightMessageInQuery query={location.query}>
+                    <SearchResult />
+                  </HighlightMessageInQuery>
+                  <Footer />
+                </SearchArea>
+              </GridContainer>
+            </ViewAdditionalContextProvider>
+          )}
+        </InteractiveContext.Consumer>
+      </CurrentViewTypeProvider>
+    </ExtendedSearchPageGlobalStyles>
   );
 };
 

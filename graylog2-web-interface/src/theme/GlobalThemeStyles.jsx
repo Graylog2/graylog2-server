@@ -1,9 +1,6 @@
 import { createGlobalStyle, css } from 'styled-components';
 
 import { util } from 'theme';
-import 'opensans-npm-webfont/open_sans.css';
-import 'opensans-npm-webfont/open_sans_italic.css';
-import 'opensans-npm-webfont/open_sans_bold.css';
 
 const fontFamily = '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
 
@@ -113,11 +110,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.color.global.contentBackground};
     border: 1px solid ${theme.color.gray[80]};
     margin-bottom: 10px;
-  }
 
-  .content p.description {
-    margin-top: 3px;
-    color: ${theme.color.gray[50]};
+    p.description {
+      margin-top: 3px;
+      color: ${theme.color.gray[50]};
+    }
   }
 
   .actions-lg .actions-container {

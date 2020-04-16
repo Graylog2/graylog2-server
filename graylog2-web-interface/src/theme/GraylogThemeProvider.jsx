@@ -5,6 +5,12 @@ import { ThemeProvider } from 'styled-components';
 import { color } from 'theme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 
+import 'opensans-npm-webfont/open_sans.css';
+import 'opensans-npm-webfont/open_sans_italic.css';
+import 'opensans-npm-webfont/open_sans_bold.css';
+
+import GlobalThemeStyles from './GlobalThemeStyles';
+
 /* NOTE: mode will eventually need to come from User Preferences */
 const THEME_MODE = 'teinte';
 
@@ -17,7 +23,10 @@ const GraylogThemeProvider = ({ children }) => {
         button: buttonStyles({ color: color[THEME_MODE] }),
       },
     }}>
-      {children}
+      <>
+        <GlobalThemeStyles />
+        {children}
+      </>
     </ThemeProvider>
   );
 };
