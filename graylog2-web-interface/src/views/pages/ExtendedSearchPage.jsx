@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { css } from 'styled-components';
+import styled, { css, createGlobalStyle } from 'styled-components';
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
@@ -44,9 +44,27 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import style from '!style/useable!css!./ExtendedSearchPage.css';
 import HighlightMessageInQuery from '../components/messagelist/HighlightMessageInQuery';
+
+const ExtendedSearchPageGlobalStyles = createGlobalStyle(({ theme }) => `
+  .extended-search-timerange-chooser .btn {
+    padding: 6px 7px;
+    margin-right: 5px;
+  }
+
+  .extended-search-query-metadata {
+    margin-bottom: 10px !important;
+  }
+
+  .search-button-execute {
+    margin-right: 7px;
+  }
+
+  .xtick text,
+  .ytick text {
+    fill: ${theme.color.gray[50]} !important;
+  }
+`);
 
 const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ${({ interactive }) => (interactive ? css`
@@ -123,13 +141,6 @@ const ViewAdditionalContextProvider = connect(
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
-const useStyle = () => {
-  useEffect(() => {
-    style.use();
-    return () => style.unuse();
-  }, []);
-};
-
 const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
@@ -140,8 +151,6 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
 
     bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
   }, [query]);
-
-  useStyle();
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -164,6 +173,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
 
   return (
     <CurrentViewTypeProvider>
+      <ExtendedSearchPageGlobalStyles />
       <IfInteractive>
         <IfDashboard>
           <WindowLeaveMessage route={route} />
