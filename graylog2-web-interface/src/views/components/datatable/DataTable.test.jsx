@@ -2,7 +2,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import 'helpers/mocking/react-dom_mock';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
