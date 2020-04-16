@@ -29,7 +29,7 @@ const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   -ms-grid-column: 1;
 `;
 
-const Table: StyledComponent<StyleProps, ThemeInterface, *> = styled.table(({ theme }) => `
+const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.table(({ theme }) => `
   position: relative;
   font-size: 11px;
   margin-top: 0;
@@ -126,7 +126,7 @@ const Table: StyledComponent<StyleProps, ThemeInterface, *> = styled.table(({ th
   }
 `);
 
-const TableHead: StyledComponent<StyleProps, ThemeInterface, *> = styled.thead(({ theme }) => `
+const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = styled.thead(({ theme }) => `
   background-color: ${theme.color.gray[90]};
   color: ${util.readableColor(theme.color.gray[90])};
 

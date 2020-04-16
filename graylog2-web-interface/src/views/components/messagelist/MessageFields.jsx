@@ -1,8 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import { MessageDetailsDefinitionList } from 'components/graylog';
+import { type ThemeInterface } from 'theme';
 
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -11,7 +12,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import CustomHighlighting from './CustomHighlighting';
 
-const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }) => `
+const MessageDetailsDL: StyledComponent<{}, ThemeInterface, HTMLDListElement> = styled(MessageDetailsDefinitionList)(({ theme }) => `
   color: ${theme.color.gray[40]};
 
   dd {

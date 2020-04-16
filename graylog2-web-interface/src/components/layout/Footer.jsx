@@ -18,7 +18,7 @@ type Props = {
   },
 };
 
-const StyledFooter: StyledComponent<StyleProps, ThemeInterface, *> = styled.footer(({ theme }) => css`
+const StyledFooter: StyledComponent<{}, ThemeInterface, *> = styled.footer(({ theme }) => css`
   text-align: center;
   font-size: 11px;
   color: ${theme.color.gray[70]};

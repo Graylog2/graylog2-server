@@ -1,8 +1,10 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withTheme } from 'styled-components';
 import { browserHistory } from 'react-router';
 
+import { type ThemeInterface } from 'theme';
 import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -32,6 +34,7 @@ type Props = {
     username: string,
     permissions: Array<string>,
   },
+  theme: ThemeInterface,
 };
 
 type State = {
@@ -54,6 +57,9 @@ class SavedSearchControls extends React.Component<Props, State> {
     viewStoreState: PropTypes.object.isRequired,
     currentUser: PropTypes.shape({
       username: PropTypes.string.isRequired,
+    }).isRequired,
+    theme: PropTypes.shape({
+      color: PropTypes.object,
     }).isRequired,
   };
 
@@ -184,7 +190,7 @@ class SavedSearchControls extends React.Component<Props, State> {
 
   render() {
     const { showForm, showList, newTitle, showCSVExport, showShareSearch } = this.state;
-    const { currentUser, viewStoreState } = this.props;
+    const { currentUser, theme, viewStoreState } = this.props;
     const { view, dirty } = viewStoreState;
 
     const csvExport = showCSVExport && (
@@ -205,7 +211,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const savedSearchStyle = loaded ? 'star' : 'star-o';
     let savedSearchColor: string = '';
     if (loaded) {
-      savedSearchColor = dirty ? '#ffc107' : '#007bff';
+      savedSearchColor = dirty ? theme.color.variant.warning : theme.color.variant.info;
     }
 
     const disableReset = !(dirty || loaded);
@@ -265,7 +271,7 @@ class SavedSearchControls extends React.Component<Props, State> {
 }
 
 export default connect(
-  SavedSearchControls,
+  withTheme(SavedSearchControls),
   {
     currentUser: CurrentUserStore,
     viewStoreState: ViewStore,
