@@ -99,7 +99,9 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                                          title="Search query syntax documentation"
                                          text={<Icon name="lightbulb" />} />
                     </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid} dirty={dirty} />
+                    <SearchButton running={isSubmitting}
+                                  disabled={disableSearch || isSubmitting || !isValid}
+                                  dirty={dirty} />
 
                     <Field name="queryString">
                       {({ field: { name, value, onChange } }) => (

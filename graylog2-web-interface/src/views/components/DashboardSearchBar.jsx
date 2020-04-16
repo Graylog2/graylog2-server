@@ -62,7 +62,10 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                                          title="Search query syntax documentation"
                                          text={<Icon name="lightbulb" />} />
                     </div>
-                    <SearchButton disabled={disableSearch || isSubmitting || !isValid} glyph="filter" dirty={dirty} />
+                    <SearchButton running={isSubmitting}
+                                  disabled={disableSearch || isSubmitting || !isValid}
+                                  glyph="filter"
+                                  dirty={dirty} />
 
                     <Field name="queryString">
                       {({ field: { name, value, onChange } }) => (

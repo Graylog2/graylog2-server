@@ -123,7 +123,9 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                                        title="Search query syntax documentation"
                                        text={<Icon name="lightbulb-o" />} />
                   </div>
-                  <SearchButton disabled={isGloballyOverridden || isSubmitting || !isValid} dirty={dirty} />
+                  <SearchButton running={isSubmitting}
+                                disabled={isGloballyOverridden || isSubmitting || !isValid}
+                                dirty={dirty} />
 
                   <Field name="queryString">
                     {({ field: { name, value, onChange } }) => (

@@ -1,14 +1,13 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import type { StyledComponent } from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Spinner, Icon } from 'components/common';
 import type { ThemeInterface } from 'theme/index';
 
-const DirtyButton: StyledComponent<{}, ThemeInterface, any> = styled(Button)`
+const DirtyButton: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled(Button)`
   position: relative;
 
   ::after {
@@ -24,35 +23,32 @@ const DirtyButton: StyledComponent<{}, ThemeInterface, any> = styled(Button)`
 `;
 
 type Props = {
-  running: boolean,
   disabled: boolean,
   glyph: string,
   dirty: boolean,
 };
 
-const SearchButton = ({ running, disabled, glyph, dirty }: Props) => {
+const SearchButton = ({ disabled, glyph, dirty }: Props) => {
   const ButtonComponent = dirty ? DirtyButton : Button;
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform search';
   return (
     <ButtonComponent type="submit"
-                     bsStyle={running ? 'warning' : 'success'}
+                     bsStyle="success"
                      disabled={disabled}
                      title={title}
                      className="pull-left search-button-execute">
-      {running ? <Spinner fixedWidth pulse text="" /> : <Icon name={glyph} />}
+      <Icon name={glyph} />
     </ButtonComponent>
   );
 };
 
 SearchButton.defaultProps = {
-  running: false,
   disabled: false,
   dirty: false,
   glyph: 'search',
 };
 
 SearchButton.propTypes = {
-  running: PropTypes.bool,
   disabled: PropTypes.bool,
   dirty: PropTypes.bool,
   glyph: PropTypes.string,
