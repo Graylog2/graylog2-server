@@ -223,6 +223,7 @@ class SourceCodeEditor extends React.Component {
             <AceEditor ref={(c) => { this.reactAce = c; }}
                        annotations={annotations}
                        editorProps={{ $blockScrolling: 'Infinity' }}
+                       setOptions={{ newLineMode: 'unix' }}
                        focus={focus}
                        fontSize={fontSize}
                        mode={mode}
