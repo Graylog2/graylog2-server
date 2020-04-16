@@ -47,6 +47,11 @@ public class ListField extends AbstractConfigurationField {
                 .collect(Collectors.toList());
     }
 
+    public ListField(String name, String humanName, List<String> defaultValue, Map<String, String> values, String description, Optional isOptional, int position, Attribute... attributes) {
+        this(name, humanName, defaultValue, values, description, isOptional, attributes);
+        this.position = position;
+    }
+
     @Override
     public Object getDefaultValue() {
         return defaultValue;
