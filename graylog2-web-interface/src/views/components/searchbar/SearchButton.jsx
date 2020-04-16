@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { Button } from 'components/graylog';
-import { Spinner, Icon } from 'components/common';
+import { Icon } from 'components/common';
 import type { ThemeInterface } from 'theme/index';
 
 const DirtyButton: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled(Button)`

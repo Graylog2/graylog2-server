@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useField } from 'formik';
 
-import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
+import { ButtonToolbar, DropdownButton } from 'components/graylog';
 import { Icon } from 'components/common';
 
 import PropTypes from 'views/components/CustomPropTypes';
