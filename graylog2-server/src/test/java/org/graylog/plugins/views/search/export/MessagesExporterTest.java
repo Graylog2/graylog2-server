@@ -91,7 +91,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, resultFormat);
 
-        assertThat(request.sort()).isEqualTo(resultFormat.sort().get());
+        assertThat(request.sort()).isEqualTo(resultFormat.sort());
         assertThat(request.fieldsInOrder()).isEqualTo(resultFormat.fieldsInOrder());
     }
 
@@ -271,7 +271,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), resultFormat);
 
-        assertThat(request.sort()).isEqualTo(resultFormat.sort().get());
+        assertThat(request.sort()).isEqualTo(resultFormat.sort());
     }
 
     @Test

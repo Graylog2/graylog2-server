@@ -29,6 +29,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -64,8 +65,10 @@ public abstract class MessagesRequest {
 
     public abstract Set<String> streams();
 
+    @NotEmpty
     public abstract LinkedHashSet<String> fieldsInOrder();
 
+    @NotEmpty
     public abstract LinkedHashSet<Sort> sort();
 
     public abstract int chunkSize();

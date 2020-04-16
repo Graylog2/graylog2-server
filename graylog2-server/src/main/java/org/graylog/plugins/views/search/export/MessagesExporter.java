@@ -134,8 +134,8 @@ public class MessagesExporter {
 
     private void trySetSort(Query query, String searchTypeId, ResultFormat resultFormat, MessagesRequest.Builder requestBuilder) {
         Optional<MessageList> ml = messageListFrom(query, searchTypeId);
-        if (resultFormat.sort().isPresent()) {
-            requestBuilder.sort(resultFormat.sort().get());
+        if (!resultFormat.sort().isEmpty()) {
+            requestBuilder.sort(resultFormat.sort());
         } else if (ml.isPresent() && ml.get().sort() != null) {
             requestBuilder.sort(new LinkedHashSet<>(ml.get().sort()));
         }

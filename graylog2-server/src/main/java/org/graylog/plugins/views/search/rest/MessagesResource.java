@@ -38,6 +38,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -70,10 +71,9 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
-    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam MessagesRequest request) {
+    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest request) {
         final MessagesRequest req = fillInIfNecessary(request);
 
-        //noinspection OptionalGetWithoutIsPresent
         executionGuard.checkUserIsPermittedToSeeStreams(req.streams(), this::hasStreamReadPermission);
 
         return asyncRunner.apply(chunkConsumer -> exporter.export(req, chunkConsumer));
@@ -94,7 +94,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
             @ApiParam @PathParam("searchId") String searchId,
-            @ApiParam ResultFormat formatFromClient) {
+            @ApiParam @Valid ResultFormat formatFromClient) {
         Search search = loadSearch(searchId);
 
         ResultFormat format = emptyIfNull(formatFromClient);
@@ -109,7 +109,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @PathParam("searchTypeId") String searchTypeId,
-            @ApiParam ResultFormat formatFromClient) {
+            @ApiParam @Valid ResultFormat formatFromClient) {
         Search search = loadSearch(searchId);
 
         ResultFormat format = emptyIfNull(formatFromClient);

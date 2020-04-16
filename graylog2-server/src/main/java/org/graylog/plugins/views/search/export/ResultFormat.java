@@ -22,17 +22,18 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = ResultFormat.Builder.class)
 public abstract class ResultFormat {
+    @NotEmpty
     public abstract LinkedHashSet<String> fieldsInOrder();
 
-    public abstract Optional<LinkedHashSet<Sort>> sort();
+    public abstract LinkedHashSet<Sort> sort();
 
     public static ResultFormat.Builder builder() {
         return ResultFormat.Builder.create();
@@ -69,7 +70,8 @@ public abstract class ResultFormat {
         @JsonCreator
         public static ResultFormat.Builder create() {
             return new AutoValue_ResultFormat.Builder()
-                    .fieldsInOrder(MessagesRequest.DEFAULT_FIELDS);
+                    .fieldsInOrder(MessagesRequest.DEFAULT_FIELDS)
+                    .sort();
         }
     }
 }
