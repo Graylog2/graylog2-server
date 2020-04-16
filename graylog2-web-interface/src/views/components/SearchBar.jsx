@@ -47,7 +47,12 @@ const defaultOnSubmit = ({ timerange, streams, queryString }, currentQuery: Quer
   return QueriesActions.update(newQuery.id, newQuery);
 };
 
-const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, queryFilters, onSubmit = defaultOnSubmit }: Props) => {
+const defaultProps = {
+  disableSearch: false,
+  onSubmit: defaultOnSubmit,
+};
+
+const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = defaultProps.disableSearch, queryFilters, onSubmit = defaultProps.onSubmit }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -131,10 +136,7 @@ SearchBar.propTypes = {
   onSubmit: PropTypes.func,
 };
 
-SearchBar.defaultProps = {
-  disableSearch: false,
-  onSubmit: defaultOnSubmit,
-};
+SearchBar.defaultProps = defaultProps;
 
 export default connect(
   SearchBar,
