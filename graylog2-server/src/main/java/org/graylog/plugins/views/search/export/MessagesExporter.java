@@ -82,6 +82,7 @@ public class MessagesExporter {
         setStreams(query, searchTypeId, requestBuilder);
         setFields(resultFormat, requestBuilder);
         trySetSort(query, searchTypeId, resultFormat, requestBuilder);
+        trySetLimit(resultFormat, requestBuilder);
 
         return requestBuilder.build();
     }
@@ -162,6 +163,10 @@ public class MessagesExporter {
         } else if (ml.isPresent() && ml.get().sort() != null) {
             requestBuilder.sort(new LinkedHashSet<>(ml.get().sort()));
         }
+    }
+
+    private void trySetLimit(ResultFormat resultFormat, MessagesRequest.Builder requestBuilder) {
+        resultFormat.limit().ifPresent(requestBuilder::limit);
     }
 
     private Optional<MessageList> messageListFrom(Query query, String searchTypeId) {

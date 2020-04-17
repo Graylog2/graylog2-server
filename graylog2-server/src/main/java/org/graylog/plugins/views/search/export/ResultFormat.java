@@ -23,10 +23,12 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 @AutoValue
@@ -36,6 +38,9 @@ public abstract class ResultFormat {
     public abstract LinkedHashSet<String> fieldsInOrder();
 
     public abstract LinkedHashSet<Sort> sort();
+
+    @Positive
+    public abstract OptionalInt limit();
 
     public abstract Map<String, Object> executionState();
 
@@ -64,6 +69,9 @@ public abstract class ResultFormat {
             LinkedHashSet<Sort> sortsSet = Arrays.stream(sorts).collect(Collectors.toCollection(LinkedHashSet::new));
             return sort(sortsSet);
         }
+
+        @JsonProperty
+        public abstract Builder limit(Integer limit);
 
         @JsonProperty
         public abstract Builder executionState(Map<String, Object> executionState);

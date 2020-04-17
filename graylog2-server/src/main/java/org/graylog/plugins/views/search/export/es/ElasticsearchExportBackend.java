@@ -73,6 +73,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
     public void run(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector) {
         Object[] searchAfterValues = null;
         boolean isFirstChunk = true;
+        int totalCount = 0;
+
 
         while (true) {
             List<SearchResult.Hit<Map, Void>> hits = search(request, searchAfterValues);
@@ -83,6 +85,12 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
             boolean success = publishChunk(chunkCollector, hits, request.fieldsInOrder(), isFirstChunk);
             if (!success) {
+                return;
+            }
+
+            totalCount += hits.size();
+            if (request.limit().isPresent() && totalCount >= request.limit().getAsInt()) {
+                LOG.info("Limit of {} reached. Stopping message retrieval.", request.limit().getAsInt());
                 return;
             }
 

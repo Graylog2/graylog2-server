@@ -170,6 +170,28 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .withCauseInstanceOf(ElasticsearchException.class);
     }
 
+    @Test
+    public void respectsResultLimitIfSet() {
+        importFixture("messages.json");
+
+        MessagesRequest request = requestBuilderWithAllStreams().chunkSize(1).limit(3).build();
+
+        SimpleMessageChunk totalResult = collectTotalResult(request);
+
+        assertThat(totalResult.messages()).hasSize(3);
+    }
+
+    @Test
+    public void deliversCompleteLastChunkIfLimitIsReached() {
+        importFixture("messages.json");
+
+        MessagesRequest request = requestBuilderWithAllStreams().chunkSize(2).limit(3).build();
+
+        SimpleMessageChunk totalResult = collectTotalResult(request);
+
+        assertThat(totalResult.messages()).hasSize(4);
+    }
+
     public void mockIndexLookupFor(MessagesRequest request, String... indexNames) {
         when(indexLookup.indexNamesForStreamsInTimeRange(request.streams(), request.timeRange()))
                 .thenReturn(ImmutableSet.copyOf(indexNames));
@@ -200,8 +222,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         LinkedHashSet<SimpleMessage> allMessages = new LinkedHashSet<>();
 
         for (SimpleMessageChunk chunk : allChunks) {
-            for (SimpleMessage msg : chunk.messages())
+            for (SimpleMessage msg : chunk.messages()) {
                 msg.fields().remove("_id");
+            }
             allMessages.addAll(chunk.messages());
         }
 
@@ -219,7 +242,6 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         return timerange("2015-01-01T00:00:00.000Z", "2015-01-03T00:00:00.000Z");
     }
 
-    @SuppressWarnings("SameParameterValue")
     private TimeRange timerange(String from, String to) {
         try {
             return AbsoluteRange.create(from, to);

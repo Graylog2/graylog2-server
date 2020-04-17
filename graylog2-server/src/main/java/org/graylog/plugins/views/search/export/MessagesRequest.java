@@ -30,9 +30,11 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -73,6 +75,9 @@ public abstract class MessagesRequest {
 
     public abstract int chunkSize();
 
+    @Positive
+    public abstract OptionalInt limit();
+
     public static MessagesRequest withDefaults() {
         return builder().build();
     }
@@ -109,6 +114,9 @@ public abstract class MessagesRequest {
 
         @JsonProperty("chunk_size")
         public abstract Builder chunkSize(int chunkSize);
+
+        @JsonProperty
+        public abstract Builder limit(Integer limit);
 
         abstract MessagesRequest autoBuild();
 

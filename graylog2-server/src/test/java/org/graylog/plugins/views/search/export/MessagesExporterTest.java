@@ -52,7 +52,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("OptionalGetWithoutIsPresent")
 class MessagesExporterTest {
 
     private ExportBackend backend;
@@ -92,12 +91,14 @@ class MessagesExporterTest {
         ResultFormat resultFormat = ResultFormat.builder()
                 .fieldsInOrder("field-1", "field-2")
                 .sort(Sort.create("field-1", SortOrder.ASC))
+                .limit(100)
                 .build();
 
         MessagesRequest request = captureRequest(s, resultFormat);
 
         assertThat(request.sort()).isEqualTo(resultFormat.sort());
         assertThat(request.fieldsInOrder()).isEqualTo(resultFormat.fieldsInOrder());
+        assertThat(request.limit()).isEqualTo(resultFormat.limit());
     }
 
     @Test
@@ -151,6 +152,7 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
+        //noinspection OptionalGetWithoutIsPresent
         assertThat(request.queryString()).isEqualTo(ml.query().get());
     }
 
@@ -333,6 +335,7 @@ class MessagesExporterTest {
     }
 
     private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<Consumer<SimpleMessageChunk>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         doNothing().when(backend).run(any(), captor.capture());
