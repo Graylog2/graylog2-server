@@ -363,7 +363,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void string_concat(){
+    public void stringConcat(){
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
 

@@ -91,12 +91,13 @@ public class AdditionExpression extends BinaryExpression implements NumericExpre
             } else {
                 return new Duration(right, left);
             }
-        }else if(String.class.equals(type) ){
-            if(!isPlus){
+        } else if(String.class.equals(type)) {
+            if (!isPlus) {
                 return null;
             }
-            final String left = (String) leftValue;
-            final String right = (String) rightValue;
+
+            final String left = String.valueOf(leftValue);
+            final String right = String.valueOf(rightValue);
             return left + right;
         }
         if (isIntegral()) {
