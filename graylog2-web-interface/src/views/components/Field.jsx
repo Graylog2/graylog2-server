@@ -30,7 +30,7 @@ const Field = ({ children, disabled = false, menuContainer, name, queryId, type 
           {name} = {type.type}
         </FieldActions>
       )
-      : <span>{name}</span>)}
+      : <span>{children}</span>)}
   </InteractiveContext.Consumer>
 );
 
