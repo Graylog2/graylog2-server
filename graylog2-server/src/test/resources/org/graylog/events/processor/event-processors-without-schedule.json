@@ -1,0 +1,28 @@
+{
+  "event_definitions": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "title" : "Test",
+      "description" : "A test event definition",
+      "priority" : 2,
+      "alert": true,
+      "notification_settings": {
+        "grace_period_ms": 60000
+      },
+      "config" : {
+        "type" : "__test_event_processor_config__",
+        "message" : "This is a test event processor",
+        "search_within_ms": 300000,
+        "execute_every_ms": 60000
+      },
+      "field_spec" : {},
+      "key_spec" : [
+        "username"
+      ],
+      "notifications" : [],
+      "storage": []
+    }
+  ]
+}

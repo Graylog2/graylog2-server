@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.reset;
@@ -138,7 +139,6 @@ public class EventDefinitionHandlerTest {
         final Optional<JobTriggerDto> jobTrigger = jobTriggerService.nextRunnableTrigger();
 
         assertThat(jobTrigger).isPresent().get().satisfies(trigger -> {
-            //noinspection OptionalGetWithoutIsPresent
             assertThat(trigger.jobDefinitionId()).isEqualTo(jobDefinition.get().id());
             assertThat(trigger.schedule()).isInstanceOf(IntervalJobSchedule.class);
 
@@ -298,5 +298,88 @@ public class EventDefinitionHandlerTest {
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isNotPresent();
         assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isNotPresent();
         assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).isNotPresent();
+    }
+
+    @Test
+    @MongoDBFixtures("event-processors-without-schedule.json")
+    public void schedule() {
+        assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
+        assertThat(jobDefinitionService.streamAll().count()).isEqualTo(0);
+        assertThat(jobTriggerService.all()).isEmpty();
+
+        handler.schedule("54e3deadbeefdeadbeef0000");
+
+        assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
+
+        assertThat(jobDefinitionService.getByConfigField("event_definition_id", "54e3deadbeefdeadbeef0000"))
+                .get()
+                .satisfies(definition -> {
+                    assertThat(definition.title()).isEqualTo("Test");
+                    assertThat(definition.description()).isEqualTo("A test event definition");
+                    assertThat(definition.config()).isInstanceOf(EventProcessorExecutionJob.Config.class);
+
+                    final EventProcessorExecutionJob.Config config = (EventProcessorExecutionJob.Config) definition.config();
+
+
+                    assertThat(config.processingWindowSize()).isEqualTo(300000);
+                    assertThat(config.processingHopSize()).isEqualTo(60000);
+
+                    assertThat(jobTriggerService.nextRunnableTrigger()).get().satisfies(trigger -> {
+                        assertThat(trigger.jobDefinitionId()).isEqualTo(definition.id());
+                        assertThat(trigger.schedule()).isInstanceOf(IntervalJobSchedule.class);
+
+                        final IntervalJobSchedule schedule = (IntervalJobSchedule) trigger.schedule();
+
+                        assertThat(schedule.interval()).isEqualTo(60000);
+                        assertThat(schedule.unit()).isEqualTo(TimeUnit.MILLISECONDS);
+                    });
+                });
+
+
+        assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isNotPresent();
+        assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).isNotPresent();
+    }
+
+    @Test
+    @MongoDBFixtures("event-processors-without-schedule.json")
+    public void scheduleWithMissingEventDefinition() {
+        final String id = "54e3deadbeefdeadbeef9999";
+
+        // The event definition should not exist so our test works
+        assertThat(eventDefinitionService.get(id)).isNotPresent();
+
+        assertThatThrownBy(() -> handler.schedule(id))
+                .hasMessageContaining("doesn't exist")
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @MongoDBFixtures("event-processors.json")
+    public void unschedule() {
+        assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
+        assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isPresent();
+        assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).isPresent();
+
+        handler.unschedule("54e3deadbeefdeadbeef0000");
+
+        // Unschedule should NOT delete the event definition!
+        assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
+
+        // Only the job definition and the trigger
+        assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isNotPresent();
+        assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).isNotPresent();
+    }
+
+    @Test
+    @MongoDBFixtures("event-processors.json")
+    public void unscheduleWithMissingEventDefinition() {
+        final String id = "54e3deadbeefdeadbeef9999";
+
+        // The event definition should not exist so our test works
+        assertThat(eventDefinitionService.get(id)).isNotPresent();
+
+        assertThatThrownBy(() -> handler.unschedule(id))
+                .hasMessageContaining("doesn't exist")
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

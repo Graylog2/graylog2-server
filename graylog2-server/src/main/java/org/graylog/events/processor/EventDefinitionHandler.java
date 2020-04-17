@@ -125,10 +125,39 @@ public class EventDefinitionHandler {
         return eventDefinitionService.delete(eventDefinitionId) > 0;
     }
 
+    /**
+     * Creates a job definition and a trigger to schedule the given event definition.
+     *
+     * @param eventDefinitionId the event definition to schedule
+     */
+    public void schedule(String eventDefinitionId) {
+        final EventDefinitionDto eventDefinition = getEventDefinitionOrThrowIAE(eventDefinitionId);
+
+        createJobDefinitionAndTriggerIfScheduled(eventDefinition);
+    }
+
+    /**
+     * Removes job definition and trigger for the given event definition to disable it.
+     *
+     * @param eventDefinitionId the event definition to unschedule
+     */
+    public void unschedule(String eventDefinitionId) {
+        final EventDefinitionDto eventDefinition = getEventDefinitionOrThrowIAE(eventDefinitionId);
+
+        getJobDefinition(eventDefinition)
+                .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
+    }
+
+
     private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition) {
         final EventDefinitionDto eventDefinition = eventDefinitionService.save(unsavedEventDefinition);
         LOG.debug("Created event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
         return eventDefinition;
+    }
+
+    private EventDefinitionDto getEventDefinitionOrThrowIAE(String eventDefinitionId) {
+        return eventDefinitionService.get(eventDefinitionId)
+                .orElseThrow(() -> new IllegalArgumentException("Event definition <" + eventDefinitionId + "> doesn't exist"));
     }
 
     private EventDefinitionDto updateEventDefinition(EventDefinitionDto updatedEventDefinition) {
