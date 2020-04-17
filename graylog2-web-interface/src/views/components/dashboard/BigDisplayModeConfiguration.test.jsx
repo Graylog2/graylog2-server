@@ -11,6 +11,7 @@ import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import type { ViewStateMap } from 'views/logic/views/View';
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
+import { asElement } from '../../../../test/wrappedTestingLibrary';
 
 jest.mock('util/History', () => ({}));
 jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
@@ -85,7 +86,7 @@ describe('BigDisplayModeConfiguration', () => {
   it('should not allow strings for the refresh interval', () => {
     const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} show />);
 
-    const refreshInterval = getByLabelText('Refresh Interval');
+    const refreshInterval = asElement(getByLabelText('Refresh Interval'), HTMLInputElement);
 
     fireEvent.change(refreshInterval, { target: { value: 'a string' } });
     expect(refreshInterval.value).toBe('');
@@ -94,7 +95,7 @@ describe('BigDisplayModeConfiguration', () => {
   it('should not allow strings for the cycle interval', () => {
     const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} show />);
 
-    const cycleInterval = getByLabelText('Tab cycle interval');
+    const cycleInterval = asElement(getByLabelText('Tab cycle interval'), HTMLInputElement);
 
     fireEvent.change(cycleInterval, { target: { value: 'a string' } });
     expect(cycleInterval.value).toBe('');

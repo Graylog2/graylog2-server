@@ -53,15 +53,18 @@ describe('UrlWhitelistForm', () => {
                                         onUpdate={onUpdate} />);
       expect(wrapper.find('.form-group')).toBeDefined();
       const title = wrapper.find('input#title-input0').at(0);
-      expect(title.instance().value).toBe(config.entries[0].title);
+      expect(title.instance()?.value).toBe(config.entries[0].title);
     });
 
     it('should validate and update on input change', () => {
       wrapper = mount(<UrlWhiteListForm urls={config.entries}
                                         disabled={config.disabled}
                                         onUpdate={onUpdate} />);
-      const title = wrapper.find('input#title-input0').at(0);
-      title.instance().value = 'world';
+      const title = wrapper.find('input#title-input0').at(0)
+      const instance = title.instance();
+      if (instance) {
+        instance.value = 'world';
+      }
       title.simulate('change');
       expect(onUpdate).toHaveBeenCalled();
     });
