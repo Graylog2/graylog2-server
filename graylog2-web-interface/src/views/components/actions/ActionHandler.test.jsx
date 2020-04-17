@@ -40,7 +40,7 @@ describe('ActionHandler', () => {
         const state = setState.mock.calls[0][0];
         expect(Object.entries(state)).toHaveLength(1);
 
-        const Component = state['foo'];
+        const Component = state[Object.keys(state)[0]];
         const component = mount(Component);
         expect(component).toHaveProp('field', 'bar');
         expect(component).toHaveProp('queryId', 'foo');
