@@ -8,7 +8,7 @@ import { Icon } from 'components/common';
 
 import PropTypes from 'views/components/CustomPropTypes';
 import { migrateTimeRangeToNewType } from '../TimerangeForForm';
-import TimeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
+import timeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
 
 type Props = {
   disabled: boolean,
@@ -16,7 +16,7 @@ type Props = {
 
 export default function TimeRangeTypeSelector({ disabled }: Props) {
   const [{ value, onChange, name }] = useField('timerange');
-  const { type } = value;
+  const { type: currentType } = value;
   const onSelect = useCallback((newType) => onChange({
     target: {
       value: migrateTimeRangeToNewType(value, newType),
@@ -30,7 +30,7 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
                       disabled={disabled}
                       title={<Icon name="clock" />}
                       onSelect={onSelect}>
-        <TimeRangeTypeMenuItems type={type} />
+        {timeRangeTypeMenuItems(currentType)}
       </DropdownButton>
     </ButtonToolbar>
   );

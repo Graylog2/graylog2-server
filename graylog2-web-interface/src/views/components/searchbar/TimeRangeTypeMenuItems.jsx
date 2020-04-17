@@ -1,31 +1,15 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { MenuItem } from 'components/graylog';
+import { availableTimeRangeTypes } from 'views/Constants';
 
-type Props = {
-  type: string;
-}
-const TimeRangeTypeMenuItems = ({ type }: Props) => (
-  <>
-    <MenuItem eventKey="relative"
-              active={type === 'relative'}>
-      Relative
-    </MenuItem>
-    <MenuItem eventKey="absolute"
-              active={type === 'absolute'}>
-      Absolute
-    </MenuItem>
-    <MenuItem eventKey="keyword"
-              active={type === 'keyword'}>
-      Keyword
-    </MenuItem>
-  </>
-);
+const timeRangeTypeMenuItems = (currentType: string) => availableTimeRangeTypes.map(({ type, name }) => (
+  <MenuItem key={`time-range-type-selector-${type}`}
+            eventKey={type}
+            active={currentType === type}>
+    {name}
+  </MenuItem>
+));
 
-TimeRangeTypeMenuItems.propTypes = {
-  type: PropTypes.string.isRequired,
-};
-
-export default TimeRangeTypeMenuItems;
+export default timeRangeTypeMenuItems;
