@@ -2,18 +2,18 @@
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
 import * as Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 import { trim } from 'lodash';
+import { connect, Field, useFormikContext } from 'formik';
 
+import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
-import { connect, Field, useFormikContext } from 'formik';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const KeywordPreview = styled(Alert)`
+const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   display: flex;
   align-items: center;
   min-height: 34px;
@@ -22,7 +22,7 @@ const KeywordPreview = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput = styled(FormControl)`
+const KeywordInput: StyledComponent<{}, void, *> = styled(FormControl)`
   min-height: 34px;
   font-size: 14px;
 `;
