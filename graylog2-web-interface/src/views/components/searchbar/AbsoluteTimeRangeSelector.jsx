@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
@@ -14,15 +14,15 @@ type Props = {
   disabled: boolean,
 };
 
-const StyledTimerangeSelector = styled(TimerangeSelector)`
+const StyledTimerangeSelector: StyledComponent<{}, void, *> = styled(TimerangeSelector)`
   display: flex;
 `;
 
-const InputWrap = styled.div`
+const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   width: 200px;
 `;
 
-const Separator = styled.p`
+const Separator: StyledComponent<{}, void, HTMLParagraphElement> = styled.p`
   margin: 0;
   line-height: 34px;
   font-size: 18px;
