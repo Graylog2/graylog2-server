@@ -60,169 +60,255 @@ public class EventDefinitionHandler {
     /**
      * Creates a new event definition and a corresponding scheduler job definition and trigger.
      *
-     * @param unsavedDto the event definition to save
+     * @param unsavedEventDefinition the event definition to save
      * @return the created event definition
      */
-    public EventDefinitionDto create(EventDefinitionDto unsavedDto) {
-        final EventDefinitionDto dto = eventDefinitionService.save(unsavedDto);
-
-        LOG.debug("Created event definition <{}/{}>", dto.id(), dto.title());
+    public EventDefinitionDto create(EventDefinitionDto unsavedEventDefinition) {
+        final EventDefinitionDto eventDefinition = createEventDefinition(unsavedEventDefinition);
 
         try {
-            dto.config().toJobSchedulerConfig(dto, clock).ifPresent(schedulerConfig -> {
-                final JobDefinitionDto unsavedJobDefinition = JobDefinitionDto.builder()
-                        .title(dto.title())
-                        .description(dto.description())
-                        .config(schedulerConfig.jobDefinitionConfig())
-                        .build();
-
-                final JobDefinitionDto jobDefinition = jobDefinitionService.save(unsavedJobDefinition);
-
-                LOG.debug("Created scheduler job definition <{}/{}> for event definition <{}/{}>", jobDefinition.id(),
-                        jobDefinition.title(), dto.id(), dto.title());
-
-                final JobTriggerDto jobTrigger = JobTriggerDto.builderWithClock(clock)
-                        .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
-                        .nextTime(clock.nowUTC())
-                        .schedule(schedulerConfig.schedule())
-                        .build();
-
-                try {
-                    final JobTriggerDto savedTrigger = jobTriggerService.create(jobTrigger);
-                    LOG.debug("Created job trigger <{}> for job definition <{}/{}> and event definition <{}/{}>", savedTrigger.id(),
-                            jobDefinition.id(), jobDefinition.title(), dto.id(), dto.title());
-                } catch (Exception e) {
-                    // Cleanup if anything goes wrong
-                    LOG.error("Removing job definition <{}/{}> because of an error creating the job trigger",
-                            jobDefinition.id(), jobDefinition.title(), e);
-                    jobDefinitionService.delete(jobDefinition.id());
-                    throw e;
-                }
-            });
+            createJobDefinitionAndTriggerIfScheduled(eventDefinition);
         } catch (Exception e) {
             // Cleanup if anything goes wrong
             LOG.error("Removing event definition <{}/{}> because of an error creating the job definition",
-                    dto.id(), dto.title(), e);
-            eventDefinitionService.delete(dto.id());
+                    eventDefinition.id(), eventDefinition.title(), e);
+            eventDefinitionService.delete(eventDefinition.id());
             throw e;
         }
 
-        return dto;
+        return eventDefinition;
     }
 
     /**
      * Updates an existing event definition and its corresponding scheduler job definition and trigger.
      *
-     * @param updatedDto the event definition to update
+     * @param updatedEventDefinition the event definition to update
      * @return the updated event definition
      */
-    public EventDefinitionDto update(EventDefinitionDto updatedDto) {
+    public EventDefinitionDto update(EventDefinitionDto updatedEventDefinition) {
         // Grab the old record so we can revert to it if something goes wrong
-        final Optional<EventDefinitionDto> oldDto = eventDefinitionService.get(updatedDto.id());
+        final Optional<EventDefinitionDto> oldEventDefinition = eventDefinitionService.get(updatedEventDefinition.id());
 
-        final EventDefinitionDto dto = eventDefinitionService.save(updatedDto);
-
-        LOG.debug("Updated event definition <{}/{}>", dto.id(), dto.title());
+        final EventDefinitionDto eventDefinition = updateEventDefinition(updatedEventDefinition);
 
         try {
-            dto.config().toJobSchedulerConfig(dto, clock).ifPresent(schedulerConfig -> {
-                // Grab the old record so we can revert to it if something goes wrong
-                final JobDefinitionDto oldJobDefinition = jobDefinitionService.getByConfigField(EventProcessorExecutionJob.Config.FIELD_EVENT_DEFINITION_ID, updatedDto.id())
-                        .orElseThrow(() -> new IllegalStateException("Couldn't find job definition for event definition <" + updatedDto.id() + ">"));
-
-                // Update the existing object to make sure we keep the ID
-                final JobDefinitionDto unsavedJobDefinition = oldJobDefinition.toBuilder()
-                        .title(dto.title())
-                        .description(dto.description())
-                        .config(schedulerConfig.jobDefinitionConfig())
-                        .build();
-
-                final JobDefinitionDto jobDefinition = jobDefinitionService.save(unsavedJobDefinition);
-
-                LOG.debug("Updated scheduler job definition <{}/{}> for event definition <{}/{}>", jobDefinition.id(),
-                        jobDefinition.title(), dto.id(), dto.title());
-
-                final List<JobTriggerDto> jobTriggers = jobTriggerService.getForJob(jobDefinition.id());
-                if (!jobTriggers.isEmpty()) {
-                    // DBJobTriggerService#getForJob currently returns only one trigger. (raises an exception otherwise)
-                    // Once we allow multiple triggers per job definition, this code will fail. We need some kind of label
-                    // to figure out which trigger was created automatically. (e.g. event processor)
-                    // TODO: Fix this code for multiple triggers per job definition
-                    final JobTriggerDto jobTrigger = jobTriggers.get(0);
-
-                    // Update the existing object to make sure we keep the ID
-                    final JobTriggerDto.Builder unsavedJobTriggerBuilder = jobTrigger.toBuilder()
-                            .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
-                            .schedule(schedulerConfig.schedule())
-                            .nextTime(clock.nowUTC());
-
-                    // Calculate new scheduling times
-                    if (jobTrigger.data().isPresent()) {
-                        final EventProcessorExecutionJob.Config config = (EventProcessorExecutionJob.Config) jobDefinition.config();
-                        final EventProcessorExecutionJob.Data oldData = (EventProcessorExecutionJob.Data) jobTrigger.data().get();
-                        EventProcessorExecutionJob.Data newData = EventProcessorExecutionJob.Data.builder()
-                                .timerangeFrom(oldData.timerangeFrom())
-                                .timerangeTo(oldData.timerangeFrom().plus(config.processingWindowSize()))
-                                .build();
-                        unsavedJobTriggerBuilder.data(newData);
-                        unsavedJobTriggerBuilder.nextTime(newData.timerangeTo());
-                    }
-
-                    final JobTriggerDto unsavedJobTrigger = unsavedJobTriggerBuilder.build();
-                    try {
-                        jobTriggerService.update(unsavedJobTrigger);
-                        LOG.debug("Updated scheduler job trigger <{}> for job definition <{}/{}> and event definition <{}/{}>",
-                                unsavedJobTrigger.id(), jobDefinition.id(), jobDefinition.title(), dto.id(), dto.title());
-                    } catch (Exception e) {
-                        // Cleanup if anything goes wrong
-                        LOG.error("Reverting to old job definition <{}/{}> because of an error updating the job trigger",
-                                jobDefinition.id(), jobDefinition.title(), e);
-                        jobDefinitionService.save(oldJobDefinition);
-                        throw e;
-                    }
-                }
-            });
+            updateJobDefinitionAndTriggerIfScheduled(eventDefinition);
         } catch (Exception e) {
             // Cleanup if anything goes wrong
             LOG.error("Reverting to old event definition <{}/{}> because of an error updating the job definition",
-                    dto.id(), dto.title(), e);
-            oldDto.ifPresent(eventDefinitionService::save);
+                    eventDefinition.id(), eventDefinition.title(), e);
+            oldEventDefinition.ifPresent(eventDefinitionService::save);
             throw e;
         }
 
-        return dto;
+        return eventDefinition;
     }
 
     /**
      * Deletes an existing event definition and its corresponding scheduler job definition and trigger.
      *
-     * @param dtoId the event definition to delete
+     * @param eventDefinitionId the event definition to delete
      * @return true if the event definition got deleted, false otherwise
      */
-    public boolean delete(String dtoId) {
-        final Optional<EventDefinitionDto> dto = eventDefinitionService.get(dtoId);
-        if (!dto.isPresent()) {
+    public boolean delete(String eventDefinitionId) {
+        final Optional<EventDefinitionDto> optionalEventDefinition = eventDefinitionService.get(eventDefinitionId);
+        if (!optionalEventDefinition.isPresent()) {
             return false;
         }
 
-        jobDefinitionService.getByConfigField(EventProcessorExecutionJob.Config.FIELD_EVENT_DEFINITION_ID, dtoId)
-                .ifPresent(jobDefinition -> {
-                    final List<JobTriggerDto> jobTriggers = jobTriggerService.getForJob(jobDefinition.id());
-                    // DBJobTriggerService#getForJob currently returns only one trigger. (raises an exception otherwise)
-                    // Once we allow multiple triggers per job definition, this code will fail. We need some kind of label
-                    // to figure out which trigger was created automatically. (e.g. event processor)
-                    // TODO: Fix this code for multiple triggers per job definition
-                    if (!jobTriggers.isEmpty()) {
-                        LOG.debug("Deleting scheduler job trigger <{}> for job definition <{}/{}> and event definition <{}/{}>",
-                                jobTriggers.get(0).id(), jobDefinition.id(), jobDefinition.title(), dto.get().id(), dto.get().title());
-                        jobTriggerService.delete(jobTriggers.get(0).id());
-                    }
-                    LOG.debug("Deleting job definition <{}/{}> for event definition <{}/{}>", jobDefinition.id(),
-                            jobDefinition.title(), dto.get().id(), dto.get().title());
-                    jobDefinitionService.delete(jobDefinition.id());
-                });
+        final EventDefinitionDto eventDefinition = optionalEventDefinition.get();
 
-        LOG.debug("Deleting event definition <{}/{}>", dto.get().id(), dto.get().title());
-        return eventDefinitionService.delete(dtoId) > 0;
+        getJobDefinition(eventDefinition)
+                .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));
+
+        LOG.debug("Deleting event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
+        return eventDefinitionService.delete(eventDefinitionId) > 0;
+    }
+
+    private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition) {
+        final EventDefinitionDto eventDefinition = eventDefinitionService.save(unsavedEventDefinition);
+        LOG.debug("Created event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
+        return eventDefinition;
+    }
+
+    private EventDefinitionDto updateEventDefinition(EventDefinitionDto updatedEventDefinition) {
+        final EventDefinitionDto eventDefinition = eventDefinitionService.save(updatedEventDefinition);
+        LOG.debug("Updated event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
+        return eventDefinition;
+    }
+
+    private JobDefinitionDto newJobDefinition(EventDefinitionDto eventDefinition, EventProcessorSchedulerConfig schedulerConfig) {
+        return JobDefinitionDto.builder()
+                .title(eventDefinition.title())
+                .description(eventDefinition.description())
+                .config(schedulerConfig.jobDefinitionConfig())
+                .build();
+    }
+
+    private JobDefinitionDto createJobDefinition(EventDefinitionDto eventDefinition, EventProcessorSchedulerConfig schedulerConfig) {
+        final JobDefinitionDto jobDefinition = jobDefinitionService.save(newJobDefinition(eventDefinition, schedulerConfig));
+        LOG.debug("Created scheduler job definition <{}/{}> for event definition <{}/{}>", jobDefinition.id(),
+                jobDefinition.title(), eventDefinition.id(), eventDefinition.title());
+        return jobDefinition;
+    }
+
+    private void createJobDefinitionAndTrigger(EventDefinitionDto eventDefinition,
+                                               EventProcessorSchedulerConfig schedulerConfig) {
+        final JobDefinitionDto jobDefinition = createJobDefinition(eventDefinition, schedulerConfig);
+
+        try {
+            createJobTrigger(eventDefinition, jobDefinition, schedulerConfig);
+        } catch (Exception e) {
+            // Cleanup if anything goes wrong
+            LOG.error("Removing job definition <{}/{}> because of an error creating the job trigger",
+                    jobDefinition.id(), jobDefinition.title(), e);
+            jobDefinitionService.delete(jobDefinition.id());
+            throw e;
+        }
+    }
+
+    private void createJobDefinitionAndTriggerIfScheduled(EventDefinitionDto eventDefinition) {
+        getJobSchedulerConfig(eventDefinition)
+                .ifPresent(schedulerConfig -> createJobDefinitionAndTrigger(eventDefinition, schedulerConfig));
+    }
+
+    private Optional<JobDefinitionDto> getJobDefinition(EventDefinitionDto eventDefinition) {
+        return jobDefinitionService.getByConfigField(EventProcessorExecutionJob.Config.FIELD_EVENT_DEFINITION_ID, eventDefinition.id());
+    }
+
+    private JobDefinitionDto getJobDefinitionOrThrowISE(EventDefinitionDto eventDefinition) {
+        return getJobDefinition(eventDefinition)
+                .orElseThrow(() -> new IllegalStateException("Couldn't find job definition for event definition <" + eventDefinition.id() + ">"));
+    }
+
+    private JobDefinitionDto updateJobDefinition(EventDefinitionDto eventDefinition,
+                                                 JobDefinitionDto oldJobDefinition,
+                                                 EventProcessorSchedulerConfig schedulerConfig) {
+        // Update the existing object to make sure we keep the ID
+        final JobDefinitionDto unsavedJobDefinition = oldJobDefinition.toBuilder()
+                .title(eventDefinition.title())
+                .description(eventDefinition.description())
+                .config(schedulerConfig.jobDefinitionConfig())
+                .build();
+
+        final JobDefinitionDto jobDefinition = jobDefinitionService.save(unsavedJobDefinition);
+
+        LOG.debug("Updated scheduler job definition <{}/{}> for event definition <{}/{}>", jobDefinition.id(),
+                jobDefinition.title(), eventDefinition.id(), eventDefinition.title());
+
+        return jobDefinition;
+    }
+
+    private void updateJobDefinitionAndTrigger(EventDefinitionDto eventDefinition,
+                                               EventProcessorSchedulerConfig schedulerConfig) {
+        // Grab the old record so we can revert to it if something goes wrong
+        final JobDefinitionDto oldJobDefinition = getJobDefinitionOrThrowISE(eventDefinition);
+
+        final JobDefinitionDto jobDefinition = updateJobDefinition(eventDefinition, oldJobDefinition, schedulerConfig);
+
+        try {
+            updateJobTrigger(eventDefinition, jobDefinition, schedulerConfig);
+        } catch (Exception e) {
+            // Cleanup if anything goes wrong
+            LOG.error("Reverting to old job definition <{}/{}> because of an error updating the job trigger",
+                    jobDefinition.id(), jobDefinition.title(), e);
+            jobDefinitionService.save(oldJobDefinition);
+            throw e;
+        }
+    }
+
+    private void updateJobDefinitionAndTriggerIfScheduled(EventDefinitionDto eventDefinition) {
+        getJobSchedulerConfig(eventDefinition)
+                .ifPresent(schedulerConfig -> updateJobDefinitionAndTrigger(eventDefinition, schedulerConfig));
+    }
+
+    private void deleteJobDefinition(JobDefinitionDto jobDefinition, EventDefinitionDto eventDefinition) {
+        LOG.debug("Deleting job definition <{}/{}> for event definition <{}/{}>", jobDefinition.id(),
+                jobDefinition.title(), eventDefinition.id(), eventDefinition.title());
+        jobDefinitionService.delete(jobDefinition.id());
+    }
+
+    private void deleteJobDefinitionAndTrigger(JobDefinitionDto jobDefinition, EventDefinitionDto eventDefinition) {
+        deleteJobTrigger(jobDefinition, eventDefinition);
+        deleteJobDefinition(jobDefinition, eventDefinition);
+    }
+
+    private JobTriggerDto newJobTrigger(JobDefinitionDto jobDefinition, EventProcessorSchedulerConfig schedulerConfig) {
+        return JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
+                .nextTime(clock.nowUTC())
+                .schedule(schedulerConfig.schedule())
+                .build();
+    }
+
+    private void createJobTrigger(EventDefinitionDto dto, JobDefinitionDto jobDefinition, EventProcessorSchedulerConfig schedulerConfig) {
+        final JobTriggerDto jobTrigger = jobTriggerService.create(newJobTrigger(jobDefinition, schedulerConfig));
+        LOG.debug("Created job trigger <{}> for job definition <{}/{}> and event definition <{}/{}>", jobTrigger.id(),
+                jobDefinition.id(), jobDefinition.title(), dto.id(), dto.title());
+    }
+
+    private Optional<JobTriggerDto> getJobTrigger(JobDefinitionDto jobDefinition) {
+        final List<JobTriggerDto> jobTriggers = jobTriggerService.getForJob(jobDefinition.id());
+
+        if (jobTriggers.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // DBJobTriggerService#getForJob currently returns only one trigger. (raises an exception otherwise)
+        // Once we allow multiple triggers per job definition, this code will fail. We need some kind of label
+        // to figure out which trigger was created automatically. (e.g. event processor)
+        // TODO: Fix this code for multiple triggers per job definition
+        return Optional.ofNullable(jobTriggers.get(0));
+    }
+
+    private void updateJobTrigger(EventDefinitionDto eventDefinition,
+                                  JobDefinitionDto jobDefinition,
+                                  EventProcessorSchedulerConfig schedulerConfig) {
+        final Optional<JobTriggerDto> optionalOldJobTrigger = getJobTrigger(jobDefinition);
+        if (!optionalOldJobTrigger.isPresent()) {
+            // Nothing to do if there are no job triggers to update
+            return;
+        }
+
+        final JobTriggerDto oldJobTrigger = optionalOldJobTrigger.get();
+
+        // Update the existing object to make sure we keep the ID
+        final JobTriggerDto.Builder unsavedJobTriggerBuilder = oldJobTrigger.toBuilder()
+                .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
+                .schedule(schedulerConfig.schedule())
+                .nextTime(clock.nowUTC());
+
+        // Calculate new scheduling times
+        if (oldJobTrigger.data().isPresent()) {
+            final EventProcessorExecutionJob.Config config = (EventProcessorExecutionJob.Config) jobDefinition.config();
+            final EventProcessorExecutionJob.Data oldData = (EventProcessorExecutionJob.Data) oldJobTrigger.data().get();
+            EventProcessorExecutionJob.Data newData = EventProcessorExecutionJob.Data.builder()
+                    .timerangeFrom(oldData.timerangeFrom())
+                    .timerangeTo(oldData.timerangeFrom().plus(config.processingWindowSize()))
+                    .build();
+            unsavedJobTriggerBuilder.data(newData);
+            unsavedJobTriggerBuilder.nextTime(newData.timerangeTo());
+        }
+
+        final JobTriggerDto jobTrigger = unsavedJobTriggerBuilder.build();
+        jobTriggerService.update(jobTrigger);
+        LOG.debug("Updated scheduler job trigger <{}> for job definition <{}/{}> and event definition <{}/{}>",
+                jobTrigger.id(), jobDefinition.id(), jobDefinition.title(), eventDefinition.id(), eventDefinition.title());
+    }
+
+    private void deleteJobTrigger(JobDefinitionDto jobDefinition, EventDefinitionDto eventDefinition) {
+        final Optional<JobTriggerDto> optionalJobTrigger = getJobTrigger(jobDefinition);
+        if (!optionalJobTrigger.isPresent()) {
+            return;
+        }
+
+        final JobTriggerDto jobTrigger = optionalJobTrigger.get();
+        LOG.debug("Deleting scheduler job trigger <{}> for job definition <{}/{}> and event definition <{}/{}>",
+                jobTrigger.id(), jobDefinition.id(), jobDefinition.title(), eventDefinition.id(), eventDefinition.title());
+        jobTriggerService.delete(jobTrigger.id());
+    }
+
+    private Optional<EventProcessorSchedulerConfig> getJobSchedulerConfig(EventDefinitionDto eventDefinition) {
+        return eventDefinition.config().toJobSchedulerConfig(eventDefinition, clock);
     }
 }
