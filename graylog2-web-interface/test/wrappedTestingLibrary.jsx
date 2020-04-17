@@ -16,7 +16,9 @@ export function asElement<T>(elem: HTMLElement, elementType: Class<T>): T {
     return (elem: T);
   }
 
-  throw new Error(`Unable to cast ${elem?.constructor?.name ?? 'unknown'} to ${String(elementType)}!`);
+  // $FlowFixMe: Why is it not possible to extract the name of the class?
+  const { name } = elementType;
+  throw new Error(`Unable to cast ${elem?.constructor?.name ?? 'unknown'} to ${name}!`);
 }
 
 export * from '@testing-library/react';
