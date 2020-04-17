@@ -26,10 +26,11 @@ const _exportOnSearchPage = (defaultExportPayload: ExportPayload, searchQueries:
   return exportSearchMessages(defaultExportPayload, searchId);
 };
 
-const startDownload = (view: View, selectedWidget: ?Widget, selectedFields: { field: string }[], selectedSort: SortConfig[]) => {
+const startDownload = (view: View, selectedWidget: ?Widget, selectedFields: { field: string }[], selectedSort: SortConfig[], limit: ?number) => {
   const defaultExportPayload = {
     fields_in_order: selectedFields.map((field) => field.field),
     sort: selectedSort.map((sortConfig) => new MessageSortConfig(sortConfig.field, sortConfig.direction)),
+    limit,
   };
   let searchType;
 

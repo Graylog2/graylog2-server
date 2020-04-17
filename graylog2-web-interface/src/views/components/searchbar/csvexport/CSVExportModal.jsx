@@ -45,9 +45,9 @@ const _onFieldSelect = (newFields, setSelectedFields) => {
   setSelectedFields(newFields.map((field) => ({ field: field.value })));
 };
 
-const _onStartDownload = (view, selectedWidget, selectedFields, selectedSort, setLoading) => {
+const _onStartDownload = (view, selectedWidget, selectedFields, selectedSort, limit, setLoading) => {
   setLoading(true);
-  startDownload(view, selectedWidget, selectedFields, selectedSort).then(() => setLoading(false));
+  startDownload(view, selectedWidget, selectedFields, selectedSort, limit).then(() => setLoading(false));
 };
 
 const _wrapFieldOption = (field) => ({ field });
@@ -64,6 +64,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId }: Prop
   const [selectedFields, setSelectedFields] = useState<{ field: string }[]>(selectedWidget ? selectedWidget.config.fields.map(_wrapFieldOption) : _defaultFieldOptions);
   const [selectedSort, setSelectedSort] = useState<SortConfig[]>(selectedWidget ? selectedWidget.config.sort : defaultSort);
   const [selectedSortDirection] = selectedSort.map((s) => s.direction);
+  const [limit, setLimit] = useState<?number>();
 
   const singleWidgetDownload = !!directExportWidgetId;
   const widgetTitles = viewStates.flatMap((state) => state.titles.get('widget'));
@@ -92,6 +93,8 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId }: Prop
                                selectField={(newFields) => _onFieldSelect(newFields, setSelectedFields)}
                                setSelectedSort={setSelectedSort}
                                selectedWidget={selectedWidget}
+                               setLimit={setLimit}
+                               limit={limit}
                                widgetTitles={widgetTitles} />
           )}
         </Content>
@@ -99,7 +102,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId }: Prop
       <Modal.Footer>
         {allowWidgetSelection && <Button bsStyle="link" onClick={() => setSelectedWidget(null)} className="pull-left">Select different message table</Button>}
         <Button type="button" onClick={closeModal}>Close</Button>
-        <Button type="button" onClick={() => _onStartDownload(view, selectedWidget, selectedFields, selectedSort, setLoading)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
+        <Button type="button" onClick={() => _onStartDownload(view, selectedWidget, selectedFields, selectedSort, limit, setLoading)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
           {loading
             ? <Spinner text="Downloading..." delay={0} />
             : <><Icon name="cloud-download" />&nbsp;Start Download</>}

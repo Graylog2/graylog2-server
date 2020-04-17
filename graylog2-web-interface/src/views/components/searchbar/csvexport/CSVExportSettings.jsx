@@ -8,6 +8,7 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Widget from 'views/logic/widgets/Widget';
 
+import { Input } from 'components/bootstrap';
 import { Row } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
@@ -17,6 +18,8 @@ import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 
 type CSVExportSettingsType = {
   fields: List<FieldTypeMapping>,
+  limit: ?number,
+  setLimit: (limit: number) => void,
   selectedWidget: ?Widget,
   selectField: ({ label: string, value: string }[]) => void,
   selectedFields: ?{field: string}[],
@@ -42,7 +45,18 @@ const SelectedWidgetInfo = ({ selectedWidget, widgetTitles }: {selectedWidget: W
   );
 };
 
-const CSVExportSettings = ({ fields, selectedWidget, selectField, selectedFields, setSelectedSort, selectedSortDirection, selectedSort, widgetTitles }: CSVExportSettingsType) => {
+const CSVExportSettings = ({
+  fields,
+  widgetTitles,
+  selectedWidget,
+  selectField,
+  selectedFields,
+  selectedSort,
+  setSelectedSort,
+  selectedSortDirection,
+  limit,
+  setLimit,
+}: CSVExportSettingsType) => {
   const onSortDirectionChange = (newDirection) => {
     const newSort = selectedSort.map((sort) => sort.toBuilder().direction(newDirection).build());
     setSelectedSort(newSort);
@@ -66,6 +80,16 @@ const CSVExportSettings = ({ fields, selectedWidget, selectField, selectedFields
         <span>Select sort direction:</span>
         <SortDirectionSelect direction={selectedSortDirection ? selectedSortDirection.direction : null}
                              onChange={onSortDirectionChange} />
+      </Row>
+      <Row>
+        <span>Appoximate message limit:</span>
+        <Input type="number"
+               id="export-message-limit"
+               onChange={({ target: { value } }) => setLimit(Number(value))}
+               value={limit} />
+      </Row>
+      <Row>
+        There is no limit by default. Once the limit is reached, no further chunks will be exported. This means the limit does not equal the exact message amount.
       </Row>
     </>
   );
