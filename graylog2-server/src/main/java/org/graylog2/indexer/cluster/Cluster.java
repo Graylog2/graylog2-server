@@ -29,7 +29,12 @@ import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.jest.GetAllocationDiskSettings;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettingsFactory;
+import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
+import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +43,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -137,6 +144,56 @@ public class Cluster {
         }
 
         return setBuilder.build();
+    }
+
+    public Set<NodeDiskUsageStats> getDiskUsageStats() {
+        final JsonNode nodes = catNodes("name", "host", "ip", "diskUsed", "diskTotal","diskUsedPercent");
+        final ImmutableSet.Builder<NodeDiskUsageStats> setBuilder = ImmutableSet.builder();
+        for (JsonNode jsonElement : nodes) {
+            if (jsonElement.isObject()) {
+                setBuilder.add(
+                    NodeDiskUsageStats.create(
+                        jsonElement.path("name").asText(),
+                        jsonElement.path("ip").asText(),
+                        jsonElement.path("host").asText(null),
+                        jsonElement.path("diskUsed").asText(),
+                        jsonElement.path("diskTotal").asText(),
+                        jsonElement.path("diskUsedPercent").asDouble(NodeDiskUsageStats.DEFAULT_DISK_USED_PERCENT)
+                    )
+                );
+            }
+        }
+        return setBuilder.build();
+    }
+
+    public ClusterAllocationDiskSettings getClusterAllocationDiskSettings() throws Exception {
+        final GetAllocationDiskSettings request = new GetAllocationDiskSettings.Builder().build();
+        final JestResult response = JestUtils.execute(jestClient, request, () -> "Unable to read Elasticsearch cluster settings");
+        final JsonNode json = response.getJsonObject();
+        final JsonNode floodStageSetting = findEffectiveSettingInSettingsGroups(json, "flood_stage", true);
+        return ClusterAllocationDiskSettingsFactory.create(
+                findEffectiveSettingInSettingsGroups(json, "threshold_enabled", false).asBoolean(),
+                findEffectiveSettingInSettingsGroups(json, "low", false).asText(),
+                findEffectiveSettingInSettingsGroups(json, "high", false).asText(),
+                floodStageSetting != null ? floodStageSetting.asText() : ""
+        );
+    }
+
+    private JsonNode findEffectiveSettingInSettingsGroups(JsonNode jsonNode, String setting, boolean optional) throws Exception{
+        List<String> settingsGroup = Arrays.asList("transient", "persistent", "defaults");
+        for(String group: settingsGroup) {
+            JsonNode foundGroup = jsonNode.findPath(group);
+            if (!(foundGroup instanceof MissingNode)) {
+                JsonNode foundSetting = foundGroup.findPath(setting);
+                if (!(foundSetting instanceof MissingNode)) {
+                    return foundSetting;
+                }
+            }
+        }
+        if (optional) {
+            return null;
+        }
+        throw new Exception(String.format(Locale.ENGLISH, "Could not find setting %s in Elasticsearch response", setting));
     }
 
     public Optional<String> nodeIdToName(String nodeId) {
