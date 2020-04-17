@@ -180,7 +180,7 @@ class MessageTable extends React.Component<Props, State> {
     selectedFields: Immutable.Set<string>(),
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     this.state = {

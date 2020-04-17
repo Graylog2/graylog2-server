@@ -1,5 +1,5 @@
 // @flow strict
-import React, { useEffect, type ComponentType } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css, type StyledComponent } from 'styled-components';
@@ -78,7 +78,7 @@ const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElem
   ` : '')}
 `;
 
-const SearchArea: StyledComponent<{}, void, ComponentType> = styled(AppContentGrid)`
+const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
   height: 100%;
   grid-column: 2;
   -ms-grid-column: 2;
