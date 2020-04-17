@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { type StyledComponent } from 'styled-components';
 
+import { util, type ThemeInterface } from 'theme';
+
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -20,14 +22,14 @@ import Field from 'views/components/Field';
 
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
-const TableWrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   grid-row: 1;
   -ms-grid-row: 1;
   grid-column: 1;
   -ms-grid-column: 1;
 `;
 
-const Table = styled.table`
+const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.table(({ theme }) => `
   position: relative;
   font-size: 11px;
   margin-top: 0;
@@ -37,71 +39,75 @@ const Table = styled.table`
   width: 100%;
   word-break: break-all;
 
-  table.messages td,
-  table.messages th {
-    position: relative;
-    left: 13px;
+  &.messages {
+    td,
+    th {
+      position: relative;
+      left: 13px;
+    }
   }
 
   tr {
     border: 0 !important;
+
+    &.fields-row {
+      cursor: pointer;
+
+      td {
+        padding-top: 10px;
+      }
+    }
+
+    &.message-row {
+      margin-bottom: 5px;
+      cursor: pointer;
+
+      td {
+        border-top: 0;
+        padding-top: 0;
+        padding-bottom: 5px;
+        font-family: monospace;
+        color: ${theme.color.variant.light.info};
+      }
+
+      .message-wrapper {
+        line-height: 1.5em;
+        white-space: pre-line;
+        max-height: 6em; /* show 4 lines: line-height * 4 */
+        overflow: hidden;
+      }
+    }
+
+    &.message-detail-row {
+      display: none;
+
+      td {
+        padding-top: 5px;
+        border-top: 0;
+      }
+
+      .row {
+        margin-right: 0;
+      }
+
+      div[class*="col-"] {
+        padding-right: 0;
+      }
+    }
   }
 
-  tbody.message-group {
-    border-top: 0;
-  }
+  tbody {
+    &.message-group {
+      border-top: 0;
+    }
 
-  tbody.message-group-toggled {
-    border-left: 7px solid #16ace3;
-  }
+    &.message-group-toggled {
+      border-left: 7px solid ${theme.color.variant.light.info};
+    }
 
-  tbody.message-highlight {
-    border-left: 7px solid #8dc63f;
-  }
-
-  tr.fields-row {
-    cursor: pointer;
-  }
-
-  tr.fields-row td {
-    padding-top: 10px;
-  }
-
-  tr.message-row td {
-    border-top: 0;
-    padding-top: 0;
-    padding-bottom: 5px;
-    font-family: monospace;
-    color: #16ace3;
-  }
-
-  tr.message-row {
-    margin-bottom: 5px;
-    cursor: pointer;
-  }
-
-  tr.message-row .message-wrapper {
-    line-height: 1.5em;
-    white-space: pre-line;
-    max-height: 6em; /* show 4 lines: line-height * 4 */
-    overflow: hidden;
-  }
-
-  tr.message-detail-row {
-    display: none;
-  }
-
-  tr.message-detail-row td {
-    padding-top: 5px;
-    border-top: 0;
-  }
-
-  tr.message-detail-row .row {
-    margin-right: 0;
-  }
-
-  tr.message-detail-row div[class*="col-"] {
-    padding-right: 0;
+    &.message-highlight {
+      border-left: 7px solid ${theme.color.variant.light.success};
+    }
   }
 
   @media print {
@@ -116,27 +122,27 @@ const Table = styled.table`
 
     th,
     td {
-      border: 1px #ccc solid !important;
+      border: 1px ${theme.color.gray[80]} solid !important;
       left: 0;
       padding: 5px;
       position: static;
     }
   }
-`;
+`);
 
-const TableHead = styled.thead`
-  background-color: #eee;
-  color: #333;
+const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = styled.thead(({ theme }) => `
+  background-color: ${theme.color.gray[90]};
+  color: ${util.readableColor(theme.color.gray[90])};
 
   th {
     border: 0;
     font-size: 11px;
     font-weight: normal;
     white-space: nowrap;
-    background-color: #eee;
-    color: #333;
+    background-color: ${theme.color.gray[90]};
+    color: ${util.readableColor(theme.color.gray[90])};
   }
-`;
+`);
 
 type State = {
   expandedMessages: Immutable.Set<string>,
@@ -174,9 +180,13 @@ class MessageTable extends React.Component<Props, State> {
     selectedFields: Immutable.Set<string>(),
   };
 
-  state = {
-    expandedMessages: Immutable.Set<string>(),
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      expandedMessages: Immutable.Set<string>(),
+    };
+  }
 
   _columnStyle = (fieldName: string) => {
     const { fields } = this.props;
