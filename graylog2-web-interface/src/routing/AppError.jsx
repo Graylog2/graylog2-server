@@ -11,10 +11,10 @@ import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
 const AppError = ({ children, router }) => {
   const [appError, setAppError] = useState();
 
-  const displayError = (newError: AppErrorClass) => setAppError(newError);
+  const report = (newError: AppErrorClass) => setAppError(newError);
 
   useEffect(() => {
-    ErrorsActions.displayError.listen(displayError);
+    ErrorsActions.report.listen(report);
     const unlistenRouter = router.listen(() => setAppError(null));
     return () => unlistenRouter();
   }, []);

@@ -19,7 +19,7 @@ class RuntimeErrorBoundary extends React.Component<Props> {
   };
 
   componentDidCatch(error: Error, info: { componentStack: string }) {
-    ErrorsActions.displayError(new AppError(error, AppError.Type.Runtime, info.componentStack));
+    ErrorsActions.report(new AppError(error, AppError.Type.Runtime, info.componentStack));
   }
 
   render() {

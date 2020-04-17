@@ -3,7 +3,7 @@ import { singletonActions } from 'views/logic/singleton';
 
 const ErrorsActions = singletonActions(
   'Errors',
-  () => Reflux.createActions(['displayError']),
+  () => Reflux.createActions(['report']),
 );
 
 export default ErrorsActions;
