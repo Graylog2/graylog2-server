@@ -17,6 +17,7 @@ const ErrorMessage = styled.div`
   margin-left: auto;
   margin-right: auto;
   text-align: left;
+
   dt {
     font-size: 1.2em;
     font-weight: normal;
