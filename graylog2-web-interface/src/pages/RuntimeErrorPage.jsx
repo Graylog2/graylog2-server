@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { DocumentTitle, Icon } from 'components/common';
 import { Button } from 'components/graylog';
@@ -8,7 +9,21 @@ import AppConfig from 'util/AppConfig';
 import SupportSources from 'components/support/SupportSources';
 import ClipboardButton from 'components/common/ClipboardButton';
 import ErrorJumbotron, { H1 } from './ErrorJumbotron';
-import errorPageStyles from './RuntimeErrorPage.css';
+
+const ErrorMessage = styled.div`
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  dt {
+    font-size: 1.2em;
+    font-weight: normal;
+    overflow: auto;
+  }
+`;
+
+const ToggleDetails = styled.div`
+  font-weight: normal;
+`;
 
 class RuntimeErrorPage extends React.Component {
   static propTypes = {
@@ -44,20 +59,20 @@ class RuntimeErrorPage extends React.Component {
             <H1>Something went wrong.</H1>
             <p>It seems like the page you navigated to contained an error.</p>
             <p>You can use the navigation to reach other parts of the product, refresh the page or submit an error report.</p>
-            <div className={errorPageStyles.errorMessage}>
+            <ErrorMessage>
               <div className="content" style={{ padding: '2em' }}>
                 <SupportSources />
               </div>
               <dl>
                 <dt>
                   Error:
-                  <div className={`pull-right ${errorPageStyles.toggleDetails}`}>
+                  <ToggleDetails className="pull-right">
                     <Button bsStyle="link" tabIndex={0} onClick={this._toggleDetails}>
                       {showDetails ? 'Show less' : 'Show more'}
                     </Button>
-                  </div>
+                  </ToggleDetails>
                 </dt>
-                <dd className={errorPageStyles.greyBackground}>
+                <dt>
                   <pre className="content">
                     <div className="pull-right">
                       <ClipboardButton title={<Icon name="copy" fixedWidth />}
@@ -68,9 +83,9 @@ class RuntimeErrorPage extends React.Component {
                     {error.message}
                     {showDetails && errorDetails}
                   </pre>
-                </dd>
+                </dt>
               </dl>
-            </div>
+            </ErrorMessage>
           </ErrorJumbotron>
         </DocumentTitle>
       </div>
