@@ -87,8 +87,9 @@ public class MessagesExporter {
     }
 
     private Query singleQueryFrom(Search s) {
-        if (s.queries().size() > 1)
+        if (s.queries().size() > 1) {
             throw new ExportException("Can't get messages for search with id" + s.id() + ", because it contains multiple queries");
+        }
 
         return s.queries().stream().findFirst()
                 .orElseThrow(() -> new ExportException("Invalid Search object with empty Query"));

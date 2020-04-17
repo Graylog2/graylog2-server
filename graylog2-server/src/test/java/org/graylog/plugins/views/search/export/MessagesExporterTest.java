@@ -45,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -64,6 +65,8 @@ class MessagesExporterTest {
         backend = mock(ExportBackend.class);
         chunkDecorator = mock(ChunkDecorator.class);
         queryStringDecorator = mock(QueryStringDecorator.class);
+        when(queryStringDecorator.decorateQueryString(any(), any(), any()))
+                .then(returnsFirstArg());
         sut = new MessagesExporter(backend, chunkDecorator, queryStringDecorator);
     }
 
@@ -330,7 +333,7 @@ class MessagesExporterTest {
     }
 
     private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {
-        @SuppressWarnings("unchecked") ArgumentCaptor<Consumer<SimpleMessageChunk>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<SimpleMessageChunk>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         doNothing().when(backend).run(any(), captor.capture());
 
