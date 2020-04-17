@@ -56,7 +56,7 @@ import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 public class ElasticsearchExportBackend implements ExportBackend {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchExportBackend.class);
 
-    private static final String TIEBREAKER_FIELD = "gl2_message_id";
+    private static final String TIEBREAKER_FIELD = Message.FIELD_GL2_MESSAGE_ID;
 
     private final JestWrapper jestWrapper;
     private final IndexLookup indexLookup;
