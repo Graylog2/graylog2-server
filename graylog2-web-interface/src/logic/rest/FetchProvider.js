@@ -4,7 +4,7 @@ import BluebirdPromise from 'bluebird';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-import AppError from 'logic/errors/AppError';
+import ReportedError from 'logic/errors/ReportedError';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -77,7 +77,7 @@ export class Builder {
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
         if (SessionStore.isLoggedIn() && error.status === 403) {
-          ErrorsActions.report(new AppError(error, AppError.Type.Unauthorized));
+          ErrorsActions.report(ReportedError.createUnauthorizedError(error));
         }
 
         if (error.originalError && !error.originalError.status) {

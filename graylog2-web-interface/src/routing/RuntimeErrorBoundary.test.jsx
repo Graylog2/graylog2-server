@@ -4,7 +4,7 @@ import { render } from 'wrappedTestingLibrary';
 
 import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import AppError from 'logic/errors/AppError';
+import { ReactErrorType } from 'logic/errors/ReportedError';
 import RuntimeErrorBoundary from './RuntimeErrorBoundary';
 
 jest.mock('actions/errors/ErrorsActions', () => ({
@@ -45,7 +45,7 @@ describe('RuntimeErrorBoundary', () => {
         message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
         stack: 'This the stack trace.',
       });
-      expect(ErrorsActions.displayError.mock.calls[0][0].type).toEqual(AppError.Type.Runtime);
+      expect(ErrorsActions.displayError.mock.calls[0][0].type).toEqual(ReactErrorType);
       expect(ErrorsActions.displayError.mock.calls[0][0].componentStack).not.toBeNull();
     });
   });

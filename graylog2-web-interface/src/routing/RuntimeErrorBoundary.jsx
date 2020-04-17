@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import AppError from 'logic/errors/AppError';
+import ReportedError from 'logic/errors/ReportedError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 
 type Props = {
@@ -19,7 +19,7 @@ class RuntimeErrorBoundary extends React.Component<Props> {
   };
 
   componentDidCatch(error: Error, info: { componentStack: string }) {
-    ErrorsActions.report(new AppError(error, AppError.Type.Runtime, info.componentStack));
+    ErrorsActions.report(ReportedError.createReactError(error, info));
   }
 
   render() {
