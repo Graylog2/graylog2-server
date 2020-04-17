@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Set } from 'immutable';
+import styled from 'styled-components';
 
 import { DataTable, Icon } from 'components/common';
 import { Badge } from 'components/graylog';
-import './ContentPackConstraints.css';
+
+const StyledBadge = styled(({ isFulfilled, theme, ...rest }) => <Badge {...rest} />)`
+  background-color: ${({ isFulfilled, theme }) => (isFulfilled ? theme.color.variant.success : theme.color.variant.danger)};
+`;
 
 class ContentPackConstraints extends React.Component {
   static propTypes = {
@@ -21,25 +25,23 @@ class ContentPackConstraints extends React.Component {
   };
 
   _rowFormatter = (item) => {
+    const { isFulfilled = item.fulfilled } = this.props;
     const constraint = item.constraint || item;
-    const fulfilledIcon = (item.fulfilled || this.props.isFulfilled)
-      ? <Icon name="check" />
-      : <Icon name="times" />;
-    const fulfilledBg = item.fulfilled || this.props.isFulfilled ? 'success' : 'failure';
     const name = constraint.type === 'server-version' ? 'Graylog' : constraint.plugin;
     return (
       <tr key={constraint.id}>
         <td>{name}</td>
         <td>{constraint.type}</td>
         <td>{constraint.version}</td>
-        <td><Badge className={fulfilledBg}>{fulfilledIcon}</Badge></td>
+        <td><StyledBadge isFulfilled={isFulfilled}><Icon name={isFulfilled ? 'check' : 'times'} /></StyledBadge></td>
       </tr>
     );
   };
 
   render() {
+    const { constraints: unfilteredConstraints } = this.props;
     const headers = ['Name', 'Type', 'Version', 'Fulfilled'];
-    let constraints = this.props.constraints.map((constraint) => {
+    let constraints = unfilteredConstraints.map((constraint) => {
       const newConstraint = constraint.constraint || constraint;
       newConstraint.fulfilled = constraint.fulfilled;
       return newConstraint;
