@@ -54,8 +54,7 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
           onChange({ target: { name, value: Number.parseInt(newValue, 10) } });
         }, [onChange]);
         return (
-          <TimerangeSelector className="timerange-selector relative"
-                             style={{ marginLeft: 50 }}>
+          <TimerangeSelector className="relative" style={{ marginLeft: 50 }}>
             <Input id="relative-timerange-selector"
                    disabled={disabled}
                    type="select"

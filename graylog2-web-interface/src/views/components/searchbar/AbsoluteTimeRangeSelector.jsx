@@ -2,16 +2,33 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
+import styled from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
-import DateInputWithPicker from './DateInputWithPicker';
 
-import styles from './AbsoluteTimeRangeSelector.css';
+import TimerangeSelector from './TimerangeSelector';
+import DateInputWithPicker from './DateInputWithPicker';
 
 type Props = {
   disabled: boolean,
 };
+
+const StyledTimerangeSelector = styled(TimerangeSelector)`
+  display: flex;
+`;
+
+const InputWrap = styled.div`
+  width: 200px;
+`;
+
+const Separator = styled.p`
+  margin: 0;
+  line-height: 34px;
+  font-size: 18px;
+  padding-left: 15px;
+  padding-right: 15px;
+`;
 
 const _isValidDateString = (dateString: string) => {
   if (dateString === undefined) {
@@ -24,10 +41,10 @@ const _isValidDateString = (dateString: string) => {
 
 const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
   return (
-    <div className={`timerange-selector absolute ${styles.selectorContainer}`}>
+    <StyledTimerangeSelector className="absolute">
       <Field name="timerange.from" validate={_isValidDateString}>
         {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
-          <div className={styles.inputWidth}>
+          <InputWrap>
             <DateInputWithPicker disabled={disabled}
                                  onChange={onChange}
                                  onBlur={onBlur}
@@ -35,17 +52,17 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
                                  name={name}
                                  title="Search start date"
                                  error={error} />
-          </div>
+          </InputWrap>
         )}
       </Field>
 
-      <p className={`text-center ${styles.separator}`}>
+      <Separator className="text-center">
         <Icon name="long-arrow-alt-right" />
-      </p>
+      </Separator>
 
       <Field name="timerange.to" validate={_isValidDateString}>
         {({ field: { value, onChange, onBlur, name }, meta: { error } }) => (
-          <div className={styles.inputWidth}>
+          <InputWrap>
             <DateInputWithPicker disabled={disabled}
                                  onChange={onChange}
                                  onBlur={onBlur}
@@ -53,10 +70,10 @@ const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
                                  name={name}
                                  title="Search end date"
                                  error={error} />
-          </div>
+          </InputWrap>
         )}
       </Field>
-    </div>
+    </StyledTimerangeSelector>
   );
 };
 
