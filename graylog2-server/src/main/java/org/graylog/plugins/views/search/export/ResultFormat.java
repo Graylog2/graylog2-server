@@ -24,12 +24,12 @@ import org.graylog.plugins.views.search.searchtypes.Sort;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
+
+import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
 @AutoValue
 @JsonDeserialize(builder = ResultFormat.Builder.class)
@@ -58,16 +58,14 @@ public abstract class ResultFormat {
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
 
         public Builder fieldsInOrder(String... fields) {
-            LinkedHashSet<String> fieldsSet = Arrays.stream(fields).collect(Collectors.toCollection(LinkedHashSet::new));
-            return fieldsInOrder(fieldsSet);
+            return fieldsInOrder(linkedHashSetOf(fields));
         }
 
         @JsonProperty
         public abstract Builder sort(LinkedHashSet<Sort> sort);
 
         public Builder sort(Sort... sorts) {
-            LinkedHashSet<Sort> sortsSet = Arrays.stream(sorts).collect(Collectors.toCollection(LinkedHashSet::new));
-            return sort(sortsSet);
+            return sort(linkedHashSetOf(sorts));
         }
 
         @JsonProperty

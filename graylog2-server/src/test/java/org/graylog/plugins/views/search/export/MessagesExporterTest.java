@@ -390,8 +390,7 @@ class MessagesExporterTest {
     }
 
     private void exportSearch(Search search, ResultFormat resultFormat) {
-        exportSearch(search, resultFormat, x -> {
-        });
+        exportSearch(search, resultFormat, x -> {});
     }
 
     private void exportSearch(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> forwarder) {

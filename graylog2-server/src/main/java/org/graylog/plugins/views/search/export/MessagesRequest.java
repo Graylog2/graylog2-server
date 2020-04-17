@@ -31,12 +31,10 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
@@ -105,8 +103,7 @@ public abstract class MessagesRequest {
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
 
         public Builder fieldsInOrder(String... fieldsInOrder) {
-            LinkedHashSet<String> fields = Arrays.stream(fieldsInOrder).collect(Collectors.toCollection(LinkedHashSet::new));
-            return fieldsInOrder(fields);
+            return fieldsInOrder(linkedHashSetOf(fieldsInOrder));
         }
 
         @JsonProperty
