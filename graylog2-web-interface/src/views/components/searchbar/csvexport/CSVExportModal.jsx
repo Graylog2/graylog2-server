@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import connect from 'stores/connect';
 
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { defaultSort } from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -31,6 +33,7 @@ const Content = styled.div`
 type Props = {
   closeModal: () => void,
   directExportWidgetId?: string,
+  executionState: SearchExecutionState,
   fields: List<FieldTypeMapping>,
   view: View
 };
@@ -45,16 +48,16 @@ const _onFieldSelect = (newFields, setSelectedFields) => {
   setSelectedFields(newFields.map((field) => ({ field: field.value })));
 };
 
-const _onStartDownload = (view, selectedWidget, selectedFields, selectedSort, limit, setLoading) => {
+const _onStartDownload = (view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading) => {
   setLoading(true);
-  startDownload(view, selectedWidget, selectedFields, selectedSort, limit).then(() => setLoading(false));
+  startDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit).then(() => setLoading(false));
 };
 
 const _wrapFieldOption = (field) => ({ field });
 const _defaultFields = ['timestamp', 'source', 'message'];
 const _defaultFieldOptions = _defaultFields.map(_wrapFieldOption);
 
-const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId }: Props) => {
+const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection } = ExportStategy.createExportStrategy(view.type);
   const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type)).flatten(true);
@@ -102,7 +105,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId }: Prop
       <Modal.Footer>
         {allowWidgetSelection && <Button bsStyle="link" onClick={() => setSelectedWidget(null)} className="pull-left">Select different message table</Button>}
         <Button type="button" onClick={closeModal}>Close</Button>
-        <Button type="button" onClick={() => _onStartDownload(view, selectedWidget, selectedFields, selectedSort, limit, setLoading)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
+        <Button type="button" onClick={() => _onStartDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
           {loading
             ? <Spinner text="Downloading..." delay={0} />
             : <><Icon name="cloud-download" />&nbsp;Start Download</>}
@@ -127,9 +130,11 @@ export default connect(
   CSVExportModal,
   {
     fields: FieldTypesStore,
+    executionState: SearchExecutionStateStore,
   },
-  ({ fields: { all }, ...rest }) => ({
+  ({ fields: { all }, executionState, ...rest }) => ({
     ...rest,
+    executionState,
     fields: all,
   }),
 );

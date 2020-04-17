@@ -17,6 +17,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import Widget from 'views/logic/widgets/Widget';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import CSVExportModal from './CSVExportModal';
@@ -82,8 +83,16 @@ describe('CSVExportModal', () => {
   // Prepare expected payload
   const direction = Direction.Descending;
   const messageSortConfig = new MessageSortConfig('timestamp', direction);
-  const payloadSearchMessages = { fields_in_order: ['timestamp', 'source', 'message'], sort: [messageSortConfig] };
-  const payloadSearchTypeMessages = { fields_in_order: ['timestamp', 'source'], sort: [messageSortConfig] };
+  const payloadSearchMessages = {
+    fields_in_order: ['timestamp', 'source', 'message'],
+    sort: [messageSortConfig],
+    limit: undefined,
+    execution_state: new SearchExecutionState(),
+  };
+  const payloadSearchTypeMessages = {
+    ...payloadSearchMessages,
+    fields_in_order: ['timestamp', 'source'],
+  };
 
   afterEach(() => {
     cleanup();

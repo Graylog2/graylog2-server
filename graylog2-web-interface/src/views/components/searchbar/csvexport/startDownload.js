@@ -8,6 +8,7 @@ import Query from 'views/logic/queries/Query';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 const _exportOnDashboard = (defaultExportPayload: ExportPayload, searchType: any, searchId: string) => {
   if (!searchType) {
@@ -26,8 +27,9 @@ const _exportOnSearchPage = (defaultExportPayload: ExportPayload, searchQueries:
   return exportSearchMessages(defaultExportPayload, searchId);
 };
 
-const startDownload = (view: View, selectedWidget: ?Widget, selectedFields: { field: string }[], selectedSort: SortConfig[], limit: ?number) => {
+const startDownload = (view: View, executionState: SearchExecutionState, selectedWidget: ?Widget, selectedFields: { field: string }[], selectedSort: SortConfig[], limit: ?number) => {
   const defaultExportPayload = {
+    execution_state: executionState,
     fields_in_order: selectedFields.map((field) => field.field),
     sort: selectedSort.map((sortConfig) => new MessageSortConfig(sortConfig.field, sortConfig.direction)),
     limit,
