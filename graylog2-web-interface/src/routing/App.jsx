@@ -8,7 +8,8 @@ import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 
-import AppErrorBoundary from './AppErrorBoundary';
+import AppError from './AppError';
+import RuntimeErrorBoundary from './RuntimeErrorBoundary';
 
 import 'stylesheets/typeahead.less';
 
@@ -47,9 +48,11 @@ const App = ({ children, currentUser, location }) => {
         <Icon name="arrow-up" />
       </ScrollToHint>
       <Scratchpad />
-      <AppErrorBoundary>
-        {children}
-      </AppErrorBoundary>
+      <AppError>
+        <RuntimeErrorBoundary>
+          {children}
+        </RuntimeErrorBoundary>
+      </AppError>
     </ScratchpadProvider>
   );
 };

@@ -4,23 +4,19 @@ import PropTypes from 'prop-types';
 import { DocumentTitle, Icon } from 'components/common';
 import { Button } from 'components/graylog';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import errorPageStyles from './ErrorPage.css';
-
+import AppConfig from 'util/AppConfig';
+import SupportSources from 'components/support/SupportSources';
+import ClipboardButton from 'components/common/ClipboardButton';
 import ErrorJumbotron, { H1 } from './ErrorJumbotron';
-import SupportSources from '../components/support/SupportSources';
-import ClipboardButton from '../components/common/ClipboardButton';
-import AppConfig from '../util/AppConfig';
+import errorPageStyles from './RuntimeErrorPage.css';
 
-class ErrorPage extends React.Component {
+class RuntimeErrorPage extends React.Component {
   static propTypes = {
     error: PropTypes.shape({
       message: PropTypes.string.isRequired,
       stack: PropTypes.string,
     }).isRequired,
-    info: PropTypes.shape({
-      componentStack: PropTypes.string.isRequired,
-    }).isRequired,
+    componentStack: PropTypes.string.isRequired,
   };
 
   constructor(props) {
@@ -36,12 +32,11 @@ class ErrorPage extends React.Component {
   };
 
   render() {
-    const { error, info } = this.props;
+    const { error, componentStack } = this.props;
     const { showDetails } = this.state;
 
-    const errorDetails = `\n\nStack Trace:\n\n${error.stack}\n\nComponent Stack:\n${info.componentStack}`;
+    const errorDetails = `\n\nStack Trace:\n\n${error.stack}\n\nComponent Stack:\n${componentStack}`;
 
-    /* eslint-disable jsx-a11y/href-no-hash */
     return (
       <div className="container-fluid">
         <DocumentTitle title="Something went wrong.">
@@ -80,8 +75,7 @@ class ErrorPage extends React.Component {
         </DocumentTitle>
       </div>
     );
-    /* eslint-enable jsx-a11y/href-no-hash */
   }
 }
 
-export default ErrorPage;
+export default RuntimeErrorPage;

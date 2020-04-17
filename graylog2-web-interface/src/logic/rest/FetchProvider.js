@@ -1,9 +1,10 @@
 import request from 'superagent-bluebird-promise';
 import BluebirdPromise from 'bluebird';
 
+import ErrorsActions from 'actions/errors/ErrorsActions';
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
+import AppError from 'logic/errors/AppError';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
