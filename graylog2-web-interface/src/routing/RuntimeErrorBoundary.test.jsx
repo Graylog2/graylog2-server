@@ -8,7 +8,7 @@ import AppError from 'logic/errors/AppError';
 import RuntimeErrorBoundary from './RuntimeErrorBoundary';
 
 jest.mock('actions/errors/ErrorsActions', () => ({
-  displayError: jest.fn(),
+  report: jest.fn(),
 }));
 
 const ErroneusComponent = () => {
