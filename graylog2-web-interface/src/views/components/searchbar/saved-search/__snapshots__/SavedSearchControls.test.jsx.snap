@@ -12,7 +12,7 @@ exports[`SavedSearchControls render the SavedSearchControls should render dirty 
     name="star"
     style={
       Object {
-        "color": "#ffc107",
+        "color": "#ffd200",
       }
     }
   >
@@ -25,7 +25,7 @@ exports[`SavedSearchControls render the SavedSearchControls should render dirty 
       }
       style={
         Object {
-          "color": "#ffc107",
+          "color": "#ffd200",
         }
       }
     >
@@ -50,7 +50,7 @@ exports[`SavedSearchControls render the SavedSearchControls should render not di
     name="star"
     style={
       Object {
-        "color": "#007bff",
+        "color": "#0063be",
       }
     }
   >
@@ -63,7 +63,7 @@ exports[`SavedSearchControls render the SavedSearchControls should render not di
       }
       style={
         Object {
-          "color": "#007bff",
+          "color": "#0063be",
         }
       }
     >
