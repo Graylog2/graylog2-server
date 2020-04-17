@@ -1,5 +1,4 @@
 // @flow strict
-import * as React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
 import { util, type ThemeInterface } from 'theme';
 import { Title as NavItemTitle } from './NavItem.styles';
