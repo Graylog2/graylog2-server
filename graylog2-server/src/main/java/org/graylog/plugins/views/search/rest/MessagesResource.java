@@ -61,7 +61,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final ObjectMapper objectMapper;
 
     //allow mocking
-    Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsyncc;
+    Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsync;
 
     @Inject
     public MessagesResource(

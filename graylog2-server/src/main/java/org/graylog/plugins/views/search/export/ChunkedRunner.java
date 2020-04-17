@@ -32,15 +32,15 @@ public class ChunkedRunner {
 
     private final ChunkedOutput<SimpleMessageChunk> output = new ChunkedOutput<>(SimpleMessageChunk.class);
 
-    public static ChunkedOutput<SimpleMessageChunk> runAsyncc(Consumer<Consumer<SimpleMessageChunk>> call) {
+    public static ChunkedOutput<SimpleMessageChunk> runAsync(Consumer<Consumer<SimpleMessageChunk>> call) {
 
         ChunkedRunner r = new ChunkedRunner();
-        r.runAsync(call);
+        r.run(call);
 
         return r.output;
     }
 
-    private void runAsync(Consumer<Consumer<SimpleMessageChunk>> call) {
+    private void run(Consumer<Consumer<SimpleMessageChunk>> call) {
         ExecutorService e = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("chunked-messages-request").build());
 
         e.submit(() -> {
