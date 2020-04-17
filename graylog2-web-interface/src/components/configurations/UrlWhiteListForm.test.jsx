@@ -60,7 +60,7 @@ describe('UrlWhitelistForm', () => {
       wrapper = mount(<UrlWhiteListForm urls={config.entries}
                                         disabled={config.disabled}
                                         onUpdate={onUpdate} />);
-      const title = wrapper.find('input#title-input0').at(0)
+      const title = wrapper.find('input#title-input0').at(0);
       const instance = title.instance();
       if (instance) {
         instance.value = 'world';
