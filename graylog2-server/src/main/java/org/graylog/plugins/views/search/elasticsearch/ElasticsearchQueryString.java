@@ -43,7 +43,8 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
 
     @JsonIgnore
     public boolean isEmpty() {
-        return queryString().isEmpty() || queryString().equals("*");
+        String trimmed = queryString().trim();
+        return trimmed.equals("") || trimmed.equals("*");
     }
 
     public static Builder builder() {
