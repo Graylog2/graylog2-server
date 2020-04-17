@@ -39,7 +39,7 @@ describe('ReplaySearchButton', () => {
     };
     it('from default drilldown context', () => {
       const { getByTitle } = render(<ReplaySearchButton />);
-      const button = asElement(getByTitle('Replay search'), HTMLBaseElement);
+      const button = asElement(getByTitle('Replay search'), HTMLAnchorElement);
 
       expect(button.href).toEqual('http://localhost/search?rangetype=relative&relative=300');
     });
