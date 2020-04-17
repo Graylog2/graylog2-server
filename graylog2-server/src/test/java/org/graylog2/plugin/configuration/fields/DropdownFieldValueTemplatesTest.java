@@ -18,8 +18,10 @@ package org.graylog2.plugin.configuration.fields;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,11 +30,34 @@ public class DropdownFieldValueTemplatesTest {
         ONE, TWO
     }
 
+    private enum TestUTCDefaults {
+
+        ONE(1), NINETY(90);
+
+        private int utcQuickValues;
+
+        TestUTCDefaults(int i){
+            utcQuickValues = i;
+        }
+        public int getValue() { return utcQuickValues; }
+
+    }
+
+
     @Test
     public void testBuildEnumMap() throws Exception {
         final Map<String, String> enumMap = DropdownField.ValueTemplates.valueMapFromEnum(TestEnum.class, (t) -> t.name().toLowerCase(Locale.ENGLISH));
         assertThat(enumMap)
-            .containsEntry("ONE", "one")
-            .containsEntry("TWO", "two");
+                .containsEntry("ONE", "one")
+                .containsEntry("TWO", "two");
+    }
+
+    @Test
+    public void testSinceTimeDefaults() throws Exception {
+        Map<String, Integer> enumMap = Arrays.stream(TestUTCDefaults.class.getEnumConstants()).collect(Collectors.toMap(Enum::toString, TestUTCDefaults::getValue));
+        assertThat(enumMap)
+                .containsEntry("ONE",Integer.valueOf(1))
+                .containsEntry("NINETY",Integer.valueOf(90));
+
     }
 }
