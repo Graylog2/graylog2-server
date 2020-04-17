@@ -1,170 +1,143 @@
+// @flow strict
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import * as Immutable from 'immutable';
+import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { Formik, Form } from 'formik';
+import { act } from 'react-dom/test-utils';
 
-import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
+import ToolsStore from 'stores/tools/ToolsStore';
+
+import OriginalKeywordTimeRangeSelector from './KeywordTimeRangeSelector';
+
+jest.mock('stores/tools/ToolsStore', () => ({}));
+
+const KeywordTimeRangeSelector = ({ value, ...props }: { value: string }) => (
+  <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }}
+          onSubmit={() => {}}
+          validateOnMount>
+    <Form>
+      <OriginalKeywordTimeRangeSelector {...props} />
+    </Form>
+  </Formik>
+);
 
 jest.mock('logic/datetimes/DateTime', () => ({ fromUTCDateTime: (date) => date }));
 
 describe('KeywordTimeRangeSelector', () => {
-  let KeywordTimeRangeSelector;
-  const ToolsStore = {};
   beforeEach(() => {
     ToolsStore.testNaturalDate = jest.fn(() => Promise.resolve({
       from: '2018-11-14 13:52:38',
       to: '2018-11-14 13:57:38',
     }));
-    jest.doMock('injection/CombinedProvider', () => new CombinedProviderMock({
-      CurrentUser: { CurrentUserStore: new StoreMock('get', 'listen') },
-      Tools: {
-        ToolsStore,
-      },
-    }));
-    // eslint-disable-next-line global-require
-    KeywordTimeRangeSelector = require('./KeywordTimeRangeSelector');
   });
 
-  it('renders value passed to it', () => {
-    const value = Immutable.Map({ keyword: 'Last hour' });
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
-    const input = wrapper.find('input').at(0);
-    expect(input).toHaveProp('value', 'Last hour');
+  afterEach(cleanup);
+
+  const findValidationState = (container) => {
+    const formGroup = container.querySelector('.form-group');
+    return formGroup && formGroup.className.includes('has-error')
+      ? 'error'
+      : null;
+  };
+
+  const changeInput = async (input, value) => act(async () => {
+    const { name } = input;
+    fireEvent.change(input, { target: { value, name } });
   });
 
-  it('calls onChange if value changes', (done) => {
-    const value = Immutable.Map({ keyword: 'Last hour' });
-    const onChange = jest.fn((type, newValue) => {
-      expect(type).toBe('keyword');
-      expect(newValue).toBe('last year');
-      done();
-    });
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={onChange} />);
-    const input = wrapper.find('input').at(0);
-    input.simulate('change', { target: { value: 'last year' } });
+  const asyncRender = async (element) => {
+    let wrapper;
+    await act(async () => { wrapper = render(element); });
+    if (!wrapper) {
+      throw new Error('Render returned `null`.');
+    }
+    return wrapper;
+  };
+
+  it('renders value passed to it', async () => {
+    const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
+    expect(getByDisplayValue('Last hour')).not.toBeNull();
   });
 
-  it('calls testNaturalDate', () => {
-    const value = Immutable.Map({ keyword: 'Last hour' });
+  it('calls onChange if value changes', async () => {
+    const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
+    const input = getByDisplayValue('Last hour');
+
+    await changeInput(input, 'last year');
+  });
+
+  it('calls testNaturalDate', async () => {
     expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
 
-    mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
+    await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
 
     expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour');
   });
 
-  it('sets validation state to error if initial value is empty', () => {
-    const value = Immutable.Map({ keyword: '' });
+  it('sets validation state to error if initial value is empty', async () => {
+    const { container } = render(<KeywordTimeRangeSelector value="" />);
 
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
-
-    expect(wrapper.find('FormGroup')).toHaveProp('validationState', 'error');
+    await wait(() => expect(findValidationState(container)).toEqual('error'));
   });
 
-  it('sets validation state to error if parsing fails initially', (done) => {
-    const value = Immutable.Map({ keyword: 'invalid' });
+  it('sets validation state to error if parsing fails initially', async () => {
     ToolsStore.testNaturalDate = () => Promise.reject();
 
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
+    const { container } = render(<KeywordTimeRangeSelector value="invalid" />);
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find('FormGroup')).toHaveProp('validationState', 'error');
-      done();
-    });
+    await wait(() => expect(findValidationState(container)).toEqual('error'));
   });
 
-  it('sets validation state to error if parsing fails after changing input', (done) => {
-    const value = Immutable.Map({ keyword: 'last week' });
+  it('sets validation state to error if parsing fails after changing input', async () => {
     ToolsStore.testNaturalDate = () => Promise.reject();
 
-    const onChange = jest.fn();
+    const { container, getByDisplayValue } = render(<KeywordTimeRangeSelector value="last week" />);
+    const input = getByDisplayValue('last week');
 
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={onChange} />);
+    await changeInput(input, 'invalid');
 
-    const input = wrapper.find('input').at(0);
-    input.simulate('change', { target: { value: 'invalid' } });
-
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find('FormGroup')).toHaveProp('validationState', 'error');
-      expect(onChange).not.toHaveBeenCalled();
-      done();
-    });
+    await wait(() => expect(findValidationState(container)).toEqual('error'));
   });
 
-  it('resets validation state if parsing succeeds after changing input', (done) => {
-    const value = Immutable.Map({ keyword: 'last week' });
+  it('resets validation state if parsing succeeds after changing input', async () => {
+    const { container, getByDisplayValue } = render(<KeywordTimeRangeSelector value="last week" />);
+    const input = getByDisplayValue('last week');
 
-    const onChange = jest.fn();
+    await changeInput(input, 'last hour');
 
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={onChange} />);
-
-    const input = wrapper.find('input').at(0);
-    input.simulate('change', { target: { value: 'last hour' } });
-
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find('FormGroup')).toHaveProp('validationState', null);
-      expect(onChange).toHaveBeenLastCalledWith('keyword', 'last hour');
-      done();
-    });
+    await wait(() => expect(findValidationState(container)).toEqual(null));
   });
 
-  it('shows keyword preview if parsing succeeded', (done) => {
-    const value = Immutable.Map({ keyword: 'last five minutes' });
+  it('shows keyword preview if parsing succeeded', async () => {
+    const { queryByText } = render(<KeywordTimeRangeSelector value="last five minutes" />);
 
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
-
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find('Alert').at(0)).toIncludeText('Preview:2018-11-14 13:52:38 to 2018-11-14 13:57:38');
-      done();
-    });
+    await wait(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
   });
 
-  it('does not show keyword preview if parsing fails', (done) => {
+  it('does not show keyword preview if parsing fails', () => {
     ToolsStore.testNaturalDate = () => Promise.reject();
-    const value = Immutable.Map({ keyword: 'invalid' });
+    const { queryByText } = render(<KeywordTimeRangeSelector value="invalid" />);
 
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
-
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find('Alert')).not.toExist();
-      done();
-    });
+    expect(queryByText('Preview:')).toBeNull();
   });
 
-  it('shows keyword preview if parsing succeeded after changing input', (done) => {
-    const success = ToolsStore.testNaturalDate;
-    const value = Immutable.Map({ keyword: '' });
+  it('shows keyword preview if parsing succeeded after changing input', async () => {
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="" />);
+    const input = getByDisplayValue('');
 
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
+    await changeInput(input, 'last hour');
 
-    ToolsStore.testNaturalDate = success;
-    const input = wrapper.find('input').at(0);
-    input.simulate('change', { target: { value: 'last hour' } });
-
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find('Alert').at(0)).toIncludeText('Preview:2018-11-14 13:52:38 to 2018-11-14 13:57:38');
-      done();
-    });
+    await wait(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
   });
 
-  it('does not show keyword preview if parsing fails after changing input', (done) => {
-    const value = Immutable.Map({ keyword: 'last week' });
+  it('does not show keyword preview if parsing fails after changing input', async () => {
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="last week" />);
 
-    const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
+    const input = getByDisplayValue('last week');
 
-    ToolsStore.testNaturalDate = () => Promise.reject();
-    const input = wrapper.find('input').at(0);
-    input.simulate('change', { target: { value: 'invalid' } });
+    await changeInput(input, 'invalid');
 
-    setImmediate(() => {
-      wrapper.update();
-      expect(wrapper.find('Alert')).not.toExist();
-      done();
-    });
+    expect(queryByText('Preview:')).toBeNull();
   });
 });

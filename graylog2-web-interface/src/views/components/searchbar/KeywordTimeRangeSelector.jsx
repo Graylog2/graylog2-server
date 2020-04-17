@@ -1,11 +1,15 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import styled from 'styled-components';
+import { trim } from 'lodash';
 
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
+import { connect, Field, useFormikContext } from 'formik';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
@@ -18,101 +22,104 @@ const KeywordPreview = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const TimeRangeInput = styled(FormControl)`
+const KeywordInput = styled(FormControl)`
   min-height: 34px;
   font-size: 14px;
 `;
 
-export default class KeywordTimeRangeSelector extends React.Component {
-  static propTypes = {
-    disabled: PropTypes.bool,
-    value: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
+const _parseKeywordPreview = (data) => {
+  const from = DateTime.fromUTCDateTime(data.from).toString();
+  const to = DateTime.fromUTCDateTime(data.to).toString();
+  return Immutable.Map({ from, to });
+};
 
-  static defaultProps = {
-    disabled: false,
-  };
+type Props = {
+  disabled: boolean,
+};
 
-  constructor(props) {
-    super(props);
-
-    const { value } = props;
-    const keyword = value.get('keyword');
-
-    this.state = {
-      value: keyword,
-      keywordPreview: Immutable.Map(),
-      validationState: keyword === '' ? 'error' : null,
-    };
-
-    ToolsStore.testNaturalDate(keyword)
-      .then((data) => {
-        this.setState({ validationState: null }, () => this._onKeywordPreviewLoaded(data));
-      })
-      .catch(() => this.setState({ validationState: 'error' }, this._resetKeywordPreview));
+const _validateKeyword = (
+  keyword: string,
+  _setSuccessfullPreview: ({ from: string, to: string }) => void,
+  _setFailedPreview: () => string,
+): ?Promise<string> => {
+  if (keyword === undefined) {
+    return undefined;
   }
+  return trim(keyword) === ''
+    ? Promise.resolve('Keyword must not be empty!')
+    : ToolsStore.testNaturalDate(keyword)
+      .then(_setSuccessfullPreview, _setFailedPreview);
+};
 
-  _onKeywordPreviewLoaded = (data) => {
-    const from = DateTime.fromUTCDateTime(data.from).toString();
-    const to = DateTime.fromUTCDateTime(data.to).toString();
-    this.setState({ keywordPreview: Immutable.Map({ from, to }) });
-  };
+const KeywordTimeRangeSelector = ({ disabled }: Props) => {
+  const [keywordPreview, setKeywordPreview] = useState(Immutable.Map());
+  const _setSuccessfullPreview = useCallback(
+    (response: { from: string, to: string }) => setKeywordPreview(_parseKeywordPreview(response)),
+    [setKeywordPreview],
+  );
+  const _setFailedPreview = useCallback(() => {
+    setKeywordPreview(Immutable.Map());
+    return 'Unable to parse keyword.';
+  }, [setKeywordPreview]);
 
-  _resetKeywordPreview = () => {
-    this.setState({ keywordPreview: Immutable.Map() });
-  };
+  const formik = useFormikContext();
 
-  _keywordSearchChanged = (event) => {
-    const { value } = event.target;
-    this.setState({ value });
+  const _validate = useCallback(
+    (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
+    [_setSuccessfullPreview, _setFailedPreview],
+  );
 
-    if (value === '') {
-      this.setState({ validationState: 'error' });
-      this._resetKeywordPreview();
-    } else {
-      ToolsStore.testNaturalDate(value)
-        .then((data) => {
-          const { onChange } = this.props;
-          onChange('keyword', value);
-          this.setState({ validationState: null }, () => this._onKeywordPreviewLoaded(data));
-        })
-        .catch(() => this.setState({ validationState: 'error' }, this._resetKeywordPreview));
-    }
-  };
+  useEffect(() => {
+    const { values: { timerange: { keyword } } } = formik;
+    ToolsStore.testNaturalDate(keyword)
+      .then(_setSuccessfullPreview, _setFailedPreview);
 
-  render() {
-    const { keywordPreview, validationState, value } = this.state;
-    const { disabled } = this.props;
-    const { from, to } = keywordPreview.toObject();
-    const keywordPreviewElement = keywordPreview.size > 0 && (
-      <KeywordPreview bsStyle="info">
-        <strong style={{ marginRight: 8 }}>Preview:</strong>
-        {from} to {to}
-      </KeywordPreview>
-    );
-    return (
-      <div className="timerange-selector keyword">
-        <Row className="no-bm" style={{ marginLeft: 50 }}>
-          <Col xs={3} style={{ padding: 0 }}>
-            <FormGroup controlId="form-inline-keyword" style={{ marginRight: 5, width: '100%' }} validationState={validationState}>
+    return () => formik.unregisterField('timerange.keyword');
+  }, []);
+
+  const { from, to } = keywordPreview.toObject();
+  const keywordPreviewElement = !keywordPreview.isEmpty() && (
+    <KeywordPreview bsStyle="info">
+      <strong style={{ marginRight: 8 }}>Preview:</strong>
+      {from} to {to}
+    </KeywordPreview>
+  );
+
+  return (
+    <Row className="no-bm" style={{ marginLeft: 50 }}>
+      <Col xs={3} style={{ padding: 0 }}>
+        <Field name="timerange.keyword" validate={_validate}>
+          {({ field: { name, value, onChange }, meta: { error } }) => (
+            <FormGroup controlId="form-inline-keyword"
+                       style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
+                       validationState={error ? 'error' : null}>
               <InputGroup>
-                <TimeRangeInput type="text"
-                                className="input-sm"
-                                name="keyword"
-                                disabled={disabled}
-                                placeholder="Last week"
-                                onChange={this._keywordSearchChanged}
-                                required
-                                value={value} />
+                <KeywordInput type="text"
+                              className="input-sm"
+                              name={name}
+                              disabled={disabled}
+                              placeholder="Last week"
+                              onChange={onChange}
+                              required
+                              value={value} />
               </InputGroup>
             </FormGroup>
-          </Col>
-          <Col xs={8} style={{ paddingRight: 0 }}>
-            {keywordPreviewElement}
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-}
+          )}
+        </Field>
+      </Col>
+      <Col xs={8} style={{ paddingRight: 0 }}>
+        {keywordPreviewElement}
+      </Col>
+    </Row>
+  );
+};
+
+KeywordTimeRangeSelector.propTypes = {
+  disabled: PropTypes.bool,
+};
+
+KeywordTimeRangeSelector.defaultProps = {
+  disabled: false,
+};
+
+export default connect(KeywordTimeRangeSelector);

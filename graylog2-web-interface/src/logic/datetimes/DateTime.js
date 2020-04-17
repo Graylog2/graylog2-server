@@ -5,7 +5,7 @@ import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 let currentUser = CurrentUserStore.get();
-CurrentUserStore.listen((state) => currentUser = state.currentUser);
+CurrentUserStore.listen((state) => { currentUser = state.currentUser; });
 
 class DateTime {
   static get Formats() {
@@ -58,6 +58,11 @@ class DateTime {
     }
 
     return new DateTime(parsedDateTime);
+  }
+
+  static isValidDateString(dateTimeString) {
+    const parsedDateTime = moment.tz(DateTime._cleanDateTimeString(dateTimeString), DateTime.getAcceptedFormats(), true, DateTime.getUserTimezone());
+    return parsedDateTime.isValid();
   }
 
   static getUserTimezone() {
