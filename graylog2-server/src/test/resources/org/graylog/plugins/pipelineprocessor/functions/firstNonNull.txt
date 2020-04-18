@@ -1,0 +1,8 @@
+rule "firstNonNull"
+when true
+then
+    set_field(field: "not_found", value: firstNonNull([$message.null, $message.null]));
+    set_field(field: "first_found", value: firstNonNull(["first", $message.no, "c", $message.null]));
+    set_field(field: "middle_found", value: firstNonNull([$message.null, "middle", "e"]));
+    set_field(field: "last_found", value: firstNonNull([$message.null, $message.null, $message.null, $message.null, "last"]));
+end
