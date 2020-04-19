@@ -1,12 +1,12 @@
 // @flow strict
 import React from 'react';
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Widget from 'views/logic/widgets/Widget';
+import View from 'views/logic/views/View';
 
 import { Input } from 'components/bootstrap';
 import { Row } from 'components/graylog';
@@ -26,11 +26,11 @@ type CSVExportSettingsType = {
   setSelectedSort: (Array<*>) => any,
   selectedSortDirection: Direction,
   selectedSort: SortConfig[],
-  widgetTitles: Map<string, string>,
+  view: View,
 }
 
-const SelectedWidgetInfo = ({ selectedWidget, widgetTitles }: {selectedWidget: Widget, widgetTitles: Map<string, string>}) => {
-  const selectedWidgetTitle = widgetTitles.get(selectedWidget.id) || MessagesWidget.defaultTitle;
+const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, view: View}) => {
+  const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);
   return (
     <Row>
       <i>
@@ -47,15 +47,15 @@ const SelectedWidgetInfo = ({ selectedWidget, widgetTitles }: {selectedWidget: W
 
 const CSVExportSettings = ({
   fields,
-  widgetTitles,
   selectedWidget,
   selectField,
   selectedFields,
   selectedSort,
   setSelectedSort,
   selectedSortDirection,
-  limit,
   setLimit,
+  limit,
+  view,
 }: CSVExportSettingsType) => {
   const onSortDirectionChange = (newDirection) => {
     const newSort = selectedSort.map((sort) => sort.toBuilder().direction(newDirection).build());
@@ -63,7 +63,7 @@ const CSVExportSettings = ({
   };
   return (
     <>
-      {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} widgetTitles={widgetTitles} />}
+      {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
       <Row>
         Define the fields and sorting for your CSV file. You can change the field order with drag and drop.<br />
         When you&apos;ve finished the configuration, click on &quot;Start Download&quot;.

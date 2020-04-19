@@ -149,7 +149,7 @@ describe('CSVExportModal', () => {
     const submitButton = getByTestId('csv-download-button');
     fireEvent.click(submitButton);
 
-    await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledWith(expectedPayload, 'search-id'));
+    await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
   });
 
   it('should show loading indicator after starting download', async () => {
@@ -188,7 +188,7 @@ describe('CSVExportModal', () => {
       fireEvent.click(submitButton);
 
       await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
-      expect(exportSearchMessagesAction).toHaveBeenCalledWith(payloadSearchMessages, 'search-id');
+      expect(exportSearchMessagesAction).toHaveBeenCalledWith(payloadSearchMessages, 'search-id', 'Untitled-Search-search-result');
     });
 
     it('preselect messages widget when only one exists', () => {
@@ -207,7 +207,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
     });
 
     it('show widget selection if more than one exists', () => {
@@ -231,7 +231,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
     });
   });
 
@@ -271,7 +271,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
     });
   });
 });

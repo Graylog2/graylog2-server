@@ -70,7 +70,6 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
   const [limit, setLimit] = useState<?number>();
 
   const singleWidgetDownload = !!directExportWidgetId;
-  const widgetTitles = viewStates.flatMap((state) => state.titles.get('widget'));
   const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, messagesWidgets);
   const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, messagesWidgets);
   const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields);
@@ -84,8 +83,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
         <Content>
           {showWidgetSelection && (
             <CSVExportWidgetSelection selectWidget={(selection) => _onSelectWidget(selection, setSelectedWidget, setSelectedFields, setSelectedSort)}
-                                      viewStates={viewStates}
-                                      widgetTitles={widgetTitles}
+                                      view={view}
                                       widgets={messagesWidgets} />
           )}
           {!showWidgetSelection && (
@@ -98,7 +96,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
                                selectedWidget={selectedWidget}
                                setLimit={setLimit}
                                limit={limit}
-                               widgetTitles={widgetTitles} />
+                               view={view} />
           )}
         </Content>
       </Modal.Body>

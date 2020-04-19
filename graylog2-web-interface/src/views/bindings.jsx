@@ -158,7 +158,7 @@ export default {
         if (widget.config.series.length > 0) {
           return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')}`;
         }
-        return 'Untitled Aggregation';
+        return AggregationWidget.defaultTitle;
       },
     },
     {

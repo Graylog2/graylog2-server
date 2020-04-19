@@ -2,8 +2,8 @@
 import React from 'react';
 import { Map } from 'immutable';
 
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import Widget from 'views/logic/widgets/Widget';
+import View from 'views/logic/views/View';
 
 import { Row, Alert } from 'components/graylog';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
@@ -13,11 +13,11 @@ import Select from 'views/components/Select';
 type WidgetSelectionProps = {
   selectWidget: {label: string, value: Widget} => void,
   widgets: Map<string, Widget>,
-  widgetTitles: Map<string, string>,
+  view: View
 }
 
-const WidgetSelection = ({ selectWidget, widgets, widgetTitles }: WidgetSelectionProps) => {
-  const widgetOption = (widget) => ({ label: widgetTitles.get(widget.id) || MessagesWidget.defaultTitle, value: widget });
+const WidgetSelection = ({ selectWidget, widgets, view }: WidgetSelectionProps) => {
+  const widgetOption = (widget) => ({ label: view.getWidgetTitleByWidget(widget), value: widget });
   const widgetOptions = widgets.map((widget) => (widgetOption(widget))).toArray();
   return (
     <>
