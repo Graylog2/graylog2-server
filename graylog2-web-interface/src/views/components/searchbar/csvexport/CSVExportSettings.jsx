@@ -82,14 +82,14 @@ const CSVExportSettings = ({
                              onChange={onSortDirectionChange} />
       </Row>
       <Row>
-        <span>Appoximate message limit:</span>
+        <span>Appoximate limit:</span>
         <Input type="number"
                id="export-message-limit"
                onChange={({ target: { value } }) => setLimit(Number(value))}
                value={limit} />
       </Row>
       <Row>
-        There is no limit by default. Once the limit is reached, no further chunks will be exported. This means the limit does not equal the exact message amount.
+        There is no limit by default. Once the limit is reached, no further chunks will be exported. Which means the limit does not equal the exact message amount.
       </Row>
     </>
   );
