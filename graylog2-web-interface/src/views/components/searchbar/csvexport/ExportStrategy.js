@@ -35,8 +35,8 @@ const SearchExportStrategy: ExportStrategy = {
 const DashboardExportStrategy: ExportStrategy = {
   title: 'Export message table search results to CSV',
   shouldEnableDownload: (showWidgetSelection, selectedWidget, selectedFields) => !!selectedWidget && !!selectedFields && selectedFields.length > 0,
-  shouldAllowWidgetSelection: (singeWidgetDownload, showWidgetSelection) => !singeWidgetDownload && !showWidgetSelection,
-  shouldShowWidgetSelection: (singeWidgetDownload, selectedWidget) => !singeWidgetDownload && !selectedWidget,
+  shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection) => !singleWidgetDownload && !showWidgetSelection,
+  shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget) => !singleWidgetDownload && !selectedWidget,
   initialWidget: (widget, directExportWidgetId) => (directExportWidgetId ? _getWidgetById(widget, directExportWidgetId) : null),
 };
 

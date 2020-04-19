@@ -30,7 +30,7 @@ const Content = styled.div`
   margin-right: 15px;
 `;
 
-type Props = {
+export type Props = {
   closeModal: () => void,
   directExportWidgetId?: string,
   executionState: SearchExecutionState,
