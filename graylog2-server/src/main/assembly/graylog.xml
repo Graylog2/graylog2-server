@@ -19,7 +19,7 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../lib/sigar-${sigar.version}</directory>
-            <outputDirectory>/lib/sigar</outputDirectory>
+            <outputDirectory>lib/sigar</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
@@ -28,7 +28,7 @@
         <!-- empty directories -->
         <fileSet>
             <directory>./</directory>
-            <outputDirectory>/log</outputDirectory>
+            <outputDirectory>log</outputDirectory>
             <excludes>
                 <exclude>*/**</exclude>
             </excludes>
@@ -45,7 +45,7 @@
         <file>
             <source>${project.build.directory}/graylog2-server-${project.version}-shaded.jar</source>
             <destName>graylog.jar</destName>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </file>
         <file>
             <source>${project.basedir}/../bin/graylogctl</source>
@@ -55,7 +55,7 @@
         <file>
             <source>${project.basedir}/../misc/graylog.conf</source>
             <destName>graylog.conf.example</destName>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </file>
     </files>
 </assembly>
