@@ -16,7 +16,7 @@ const ReportedError = ({ children, router }) => {
 
   useEffect(() => {
     ErrorsActions.report.listen(report);
-    const unlistenRouter = router.listen(() => setReportedError(null));
+    const unlistenRouter = router.listen(() => !!reportedError && setReportedError(null));
     return () => unlistenRouter();
   }, []);
 
