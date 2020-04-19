@@ -17,7 +17,10 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View, { type ViewType } from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import Widget from 'views/logic/widgets/Widget';
+import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import CSVExportModal, { type Props as CSVExportModalProps } from './CSVExportModal';
@@ -27,6 +30,13 @@ jest.mock('util/MessagesExportUtils', () => ({
   exportSearchTypeMessages: jest.fn(() => Promise.resolve()),
 }));
 
+const MockSearchExecutionState = new SearchExecutionState();
+jest.mock('views/stores/SearchExecutionStateStore', () => ({
+  SearchExecutionStateStore: {
+    getInitialState: jest.fn(() => MockSearchExecutionState),
+    listen: () => jest.fn(),
+  },
+}));
 
 describe('CSVExportModal', () => {
   const searchType = {
@@ -103,7 +113,6 @@ describe('CSVExportModal', () => {
     viewType?: ViewType,
     closeModal?: $PropertyType<CSVExportModalProps, 'closeModal'>,
     directExportWidgetId?: $PropertyType<CSVExportModalProps, 'directExportWidgetId'>,
-    executionState?: $PropertyType<CSVExportModalProps, 'executionState'>,
     fields?: $PropertyType<CSVExportModalProps, 'fields'>,
     view?: $PropertyType<CSVExportModalProps, 'view'>,
   }
@@ -118,11 +127,30 @@ describe('CSVExportModal', () => {
     viewType: View.Type.Search,
     closeModal: () => {},
     directExportWidgetId: undefined,
-    executionState: new SearchExecutionState(),
     fields: Immutable.List(),
     view: viewWithoutWidget(View.Type.Search),
   };
 
+
+  it('should provide current execution state on export', async () => {
+    const exportSearchMessagesAction = asMock(exportSearchMessages);
+    const parameterBindings = Immutable.Map({ mainSource: new ParameterBinding('value', 'example.org') });
+    const effectiveTimeRange = { type: 'absolute', from: '2020-01-01T12:18:17.827Z', to: '2020-01-01T12:23:17.827Z' };
+    const globalQuery = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
+    const globalOverride = new GlobalOverride(effectiveTimeRange, globalQuery);
+    const executionState = new SearchExecutionState(parameterBindings, globalOverride);
+    SearchExecutionStateStore.getInitialState.mockReturnValueOnce(executionState);
+    const expectedPayload = {
+      ...payloadSearchMessages,
+      execution_state: executionState,
+    };
+    const { getByTestId } = render(<SimpleCSVExportModal />);
+
+    const submitButton = getByTestId('csv-download-button');
+    fireEvent.click(submitButton);
+
+    await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledWith(expectedPayload, 'search-id'));
+  });
 
   it('should show loading indicator after starting download', async () => {
     const exportSearchMessagesAction = asMock(exportSearchMessages);
@@ -209,7 +237,7 @@ describe('CSVExportModal', () => {
 
   describe('on dashboard', () => {
     const DashboardCSVExportModal = (props) => (
-      <SimpleCSVExportModal viewType={View.Type.Dashboard} {...props} />
+      <SimpleCSVExportModal viewType={View.Type.Dashboard} view={viewWithoutWidget(View.Type.Dashboard)} {...props} />
     );
 
     it('show warning when no messages widget exists', () => {
