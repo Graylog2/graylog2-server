@@ -10,7 +10,7 @@ import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
 
 const ReportedError = ({ children, router }) => {
-  const [reportedError, setReportedError] = useState();
+  const [reportedError, setReportedError] = useState<?ReportedErrorType>();
 
   const report = (newError: ReportedErrorType) => setReportedError(newError);
 
@@ -21,7 +21,7 @@ const ReportedError = ({ children, router }) => {
   }, []);
 
   if (reportedError && reportedError.type === ReactErrorType) {
-    return <RuntimeErrorPage error={reportedError.error} componentStack={reportedError.componentStack} />;
+    return <RuntimeErrorPage error={reportedError.error} componentStack={reportedError.info.componentStack} />;
   }
 
   if (reportedError && reportedError.type === UnauthoriedErrorType) {
