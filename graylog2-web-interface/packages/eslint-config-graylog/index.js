@@ -43,5 +43,22 @@ module.exports = {
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
     'react/static-property-placement': 'off',
+
+    // eslint-plugin-flowtype configs, `recommended` is too weak in a couple of places:
+    'flowtype/delimiter-dangle': [1, 'always-multiline'],
+    'flowtype/no-weak-types': [
+      2,
+      {
+        any: false,
+      },
+    ],
+    'flowtype/require-valid-file-annotation': [
+      2,
+      'always', {
+        annotationStyle: 'line',
+        strict: true,
+      },
+    ],
+    'flowtype/semi': [2, 'always'],
   },
 };
