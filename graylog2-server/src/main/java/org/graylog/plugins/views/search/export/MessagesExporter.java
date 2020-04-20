@@ -59,7 +59,8 @@ public class MessagesExporter {
     }
 
     private Consumer<SimpleMessageChunk> decorateIfNecessary(Search search, String searchTypeId, Consumer<SimpleMessageChunk> chunkForwarder, MessagesRequest request) {
-        Optional<MessageList> messageList = messageListFrom(singleQueryFrom(search), searchTypeId);
+        Query query = queryFrom(search, searchTypeId);
+        Optional<MessageList> messageList = messageListFrom(query, searchTypeId);
 
         return messageList.isPresent()
                 ? chunk -> decorate(chunkForwarder, messageList.get(), chunk, request)
@@ -73,7 +74,7 @@ public class MessagesExporter {
     }
 
     private MessagesRequest buildRequest(Search search, String searchTypeId, ResultFormat resultFormat) {
-        Query query = singleQueryFrom(search);
+        Query query = queryFrom(search, searchTypeId);
 
         MessagesRequest.Builder requestBuilder = MessagesRequest.builder();
 
@@ -87,9 +88,13 @@ public class MessagesExporter {
         return requestBuilder.build();
     }
 
-    private Query singleQueryFrom(Search s) {
+    private Query queryFrom(Search s, String searchTypeId) {
+        if (searchTypeId != null) {
+            return s.queryForSearchType(searchTypeId);
+        }
+
         if (s.queries().size() > 1) {
-            throw new ExportException("Can't get messages for search with id" + s.id() + ", because it contains multiple queries");
+            throw new ExportException("Can't get messages for search with id " + s.id() + ", because it contains multiple queries");
         }
 
         return s.queries().stream().findFirst()
@@ -106,7 +111,7 @@ public class MessagesExporter {
     }
 
     private void trySetQueryString(Search search, String searchTypeId, MessagesRequest.Builder requestBuilder) {
-        Query query = singleQueryFrom(search);
+        Query query = queryFrom(search, searchTypeId);
 
         Optional<MessageList> ml = messageListFrom(query, searchTypeId);
         boolean messageListHasQueryString = ml.isPresent() && ml.get().query().isPresent();

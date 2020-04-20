@@ -97,7 +97,6 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         return Optional.ofNullable(parameterIndex.get(parameterName));
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     public Search applyExecutionState(ObjectMapper objectMapper, Map<String, Object> executionState) {
         final Builder builder = toBuilder();
 
@@ -166,6 +165,13 @@ public abstract class Search implements ContentPackable<SearchEntity> {
                 .reduce(Collections.emptySet(), Sets::union);
 
         return Sets.union(queryStreamIds, searchTypeStreamIds);
+    }
+
+    public Query queryForSearchType(String searchTypeId) {
+        return queries().stream()
+                .filter(q -> q.hasSearchType(searchTypeId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Search " + id() + " doesn't have a query for search type " + searchTypeId));
     }
 
     @AutoValue.Builder

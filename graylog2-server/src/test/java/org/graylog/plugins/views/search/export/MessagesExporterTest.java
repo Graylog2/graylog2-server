@@ -299,12 +299,25 @@ class MessagesExporterTest {
     }
 
     @Test
-    void searchWithMultipleQueriesLeadsToException() {
+    void searchWithMultipleQueriesLeadsToExceptionIfNoSearchTypeProvided() {
         Search s = searchWithQueries(validQueryBuilder().build(), validQueryBuilder().build());
 
         assertThatExceptionOfType(ExportException.class)
                 .isThrownBy(() -> exportSearch(s, ResultFormat.builder().build()))
                 .withMessageContaining("multiple queries");
+    }
+
+    @Test
+    void picksCorrectQueryIfSearchTypeProvided() {
+        MessageList ml = MessageList.builder().id("ml-id").build();
+        Query correctQuery = validQueryBuilderWith(ml).timerange(timeRange(222)).build();
+        Query otherQuery = validQueryBuilder().build();
+
+        Search s = searchWithQueries(correctQuery, otherQuery);
+
+        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
+
+        assertThat(request.timeRange()).isEqualTo(timeRange(222));
     }
 
     @Test
@@ -335,7 +348,6 @@ class MessagesExporterTest {
     }
 
     private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {
-        @SuppressWarnings("unchecked")
         ArgumentCaptor<Consumer<SimpleMessageChunk>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         doNothing().when(backend).run(any(), captor.capture());

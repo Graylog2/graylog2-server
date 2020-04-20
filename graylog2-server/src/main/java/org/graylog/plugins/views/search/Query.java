@@ -153,8 +153,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         final String key = "keep_search_types";
         final Set<String> results = new HashSet<>();
         if (state.has(key) && state.get(key).isArray()) {
-            for (JsonNode n : state.get(key))
+            for (JsonNode n : state.get(key)) {
                 results.add(n.asText());
+            }
         }
         return results;
     }
@@ -165,8 +166,9 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return searchTypes.stream().map(st -> {
             if (searchTypesState.has(st.id())) {
                 return st.applyExecutionContext(objectMapper, searchTypesState.path(st.id()));
-            } else
+            } else {
                 return st;
+            }
         }).collect(toSet());
     }
 
@@ -179,10 +181,11 @@ public abstract class Query implements ContentPackable<QueryEntity> {
                 .build();
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public Set<String> usedStreamIds() {
         return Optional.ofNullable(filter())
                 .map(optFilter -> {
-                    @SuppressWarnings("UnstableApiUsage") final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
+                    final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
                     return StreamSupport.stream(filterTraverser.breadthFirst(optFilter).spliterator(), false)
                             .filter(filter -> filter instanceof StreamFilter)
                             .map(streamFilter -> ((StreamFilter) streamFilter).streamId())
@@ -207,6 +210,12 @@ public abstract class Query implements ContentPackable<QueryEntity> {
             return streamIdFilter;
         }
         return AndFilter.and(streamIdFilter, filter);
+    }
+
+    public boolean hasSearchType(String searchTypeId) {
+        return searchTypes().stream()
+                .map(SearchType::id)
+                .anyMatch(id -> id.equals(searchTypeId));
     }
 
     @AutoValue.Builder
