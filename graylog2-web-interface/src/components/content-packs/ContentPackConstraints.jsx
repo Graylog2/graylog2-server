@@ -25,15 +25,21 @@ class ContentPackConstraints extends React.Component {
   };
 
   _rowFormatter = (item) => {
-    const { isFulfilled = item.fulfilled } = this.props;
+    const { isFulfilled } = this.props;
     const constraint = item.constraint || item;
+    constraint.fulfilled = isFulfilled || item.fulfilled;
     const name = constraint.type === 'server-version' ? 'Graylog' : constraint.plugin;
+
     return (
       <tr key={constraint.id}>
         <td>{name}</td>
         <td>{constraint.type}</td>
         <td>{constraint.version}</td>
-        <td><StyledBadge isFulfilled={isFulfilled}><Icon name={isFulfilled ? 'check' : 'times'} /></StyledBadge></td>
+        <td>
+          <StyledBadge isFulfilled={constraint.fulfilled}>
+            <Icon name={constraint.fulfilled ? 'check' : 'times'} />
+          </StyledBadge>
+        </td>
       </tr>
     );
   };
