@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
+import { asElement, render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
@@ -116,7 +116,7 @@ describe('WidgetQueryControls', () => {
     const timeRangeSelect = getByDisplayValue('Search in last day');
     expect(timeRangeSelect).not.toBeNull();
 
-    const optionForAllMessages = getByText('Search in all messages');
+    const optionForAllMessages = asElement(getByText('Search in all messages'), HTMLOptionElement);
 
     fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
 
