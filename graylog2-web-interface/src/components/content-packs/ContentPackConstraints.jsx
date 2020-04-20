@@ -27,7 +27,7 @@ class ContentPackConstraints extends React.Component {
   _rowFormatter = (item) => {
     const { isFulfilled } = this.props;
     const constraint = item.constraint || item;
-    constraint.fulfilled = isFulfilled || item.fulfilled;
+    constraint.fulfilled = isFulfilled || constraint.fulfilled;
     const name = constraint.type === 'server-version' ? 'Graylog' : constraint.plugin;
 
     return (
