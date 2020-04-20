@@ -72,6 +72,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, location));
+  const pluginItems = PluginStore.exports('navigationItems');
 
   return (
     <StyledNavbar inverse fluid fixedTop>
@@ -82,7 +83,8 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           </LinkContainer>
         </Navbar.Brand>
         <Navbar.Toggle />
-        <HeaderBadge />
+        <HeaderBadge smallScreen />
+        {pluginItems.map((Item) => <Item smallScreen />)}
       </Navbar.Header>
 
       <Navbar.Collapse>
@@ -115,6 +117,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
         <Nav navbar pullRight className="header-meta-nav">
           <InactiveNavItem className="dev-badge-wrap">
             <HeaderBadge />
+            {pluginItems.map((Item) => <Item />)}
           </InactiveNavItem>
 
           <LinkContainer to={Routes.SYSTEM.NODES.LIST}>

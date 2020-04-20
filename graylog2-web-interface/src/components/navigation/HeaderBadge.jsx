@@ -1,19 +1,25 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import AppConfig from 'util/AppConfig';
 import { Badge } from 'components/graylog';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
-const HeaderBadge = () => {
-  const PluginHeader = (PluginStore.exports('navigation')[0] || {}).badgeComponent || <span />;
-
-  const devBadge = AppConfig.gl2DevMode() ? <Badge className="dev-badge" bsStyle="danger">DEV</Badge> : null;
+const HeaderBadge = ({ smallScreen = false }) => {
+  const smallScreenClass = smallScreen ? 'small-scrn-badge' : '';
+  const devBadge = AppConfig.gl2DevMode() ? <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">DEV</Badge> : null;
   return (
     <>
       {devBadge}
-      <PluginHeader />
     </>
   );
+};
+
+HeaderBadge.propTypes = {
+  smallScreen: PropTypes.bool,
+};
+
+HeaderBadge.defaultProps = {
+  smallScreen: false,
 };
 
 export default HeaderBadge;
