@@ -30,11 +30,13 @@ public class PaginatedResponse<T> {
     private final String listKey;
     private final PaginatedList<T> paginatedList;
     private final String query;
+    private final Map<String, Object> context;
 
-    private PaginatedResponse(String listKey, PaginatedList<T> paginatedList, @Nullable String query) {
+    private PaginatedResponse(String listKey, PaginatedList<T> paginatedList, @Nullable String query, @Nullable Map<String, Object> context) {
         this.listKey = listKey;
         this.paginatedList = paginatedList;
         this.query = query;
+        this.context = context;
     }
 
     @JsonValue
@@ -51,14 +53,26 @@ public class PaginatedResponse<T> {
             builder.put("grand_total", paginatedList.grandTotal().get());
         }
 
+        if (context != null && !context.isEmpty()) {
+            builder.put("context", context);
+        }
+
         return builder.build();
     }
 
     public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList) {
-        return new PaginatedResponse<>(listKey, paginatedList, null);
+        return new PaginatedResponse<>(listKey, paginatedList, null, null);
+    }
+
+    public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList, Map<String, Object> context) {
+        return new PaginatedResponse<>(listKey, paginatedList, null, context);
     }
 
     public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList, String query) {
-        return new PaginatedResponse<>(listKey, paginatedList, query);
+        return new PaginatedResponse<>(listKey, paginatedList, query, null);
+    }
+
+    public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList, String query, Map<String, Object> context) {
+        return new PaginatedResponse<>(listKey, paginatedList, query, context);
     }
 }
