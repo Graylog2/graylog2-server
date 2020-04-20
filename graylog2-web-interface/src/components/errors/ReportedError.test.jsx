@@ -82,7 +82,7 @@ describe('ReportedError', () => {
 
     expect(getByText('Hello World!')).not.toBeNull();
 
-    suppressConsole(async () => {
+    suppressConsole(() => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
     });
 
