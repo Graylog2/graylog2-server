@@ -10,6 +10,7 @@ import { QueriesActions } from 'views/stores/QueriesStore';
 // eslint-disable-next-line import/no-named-default
 import { default as MockQuery } from 'views/logic/queries/Query';
 import SearchBar from './SearchBar';
+import { asElement } from '../../../test/wrappedTestingLibrary';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
@@ -74,9 +75,10 @@ describe('SearchBar', () => {
   });
 
   const selectOption = (option) => {
-    const { parentNode, value } = option;
-    const { name } = parentNode;
-    fireEvent.change(parentNode, { target: { name, value: String(value) } });
+    const { parentNode, value } = asElement(option, HTMLOptionElement);
+    const input = asElement(parentNode, HTMLSelectElement);
+    const { name } = input;
+    fireEvent.change(input, { target: { name, value: String(value) } });
   };
 
   it('changing the relative time range value does not execute a new search', async () => {
