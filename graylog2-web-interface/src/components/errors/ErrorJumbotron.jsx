@@ -15,7 +15,7 @@ const ContainerRow = styled(Row)`
 `;
 
 const StyledErrorJumbotron = styled(Jumbotron)(({ theme }) => css`
-  background-color: ${chroma(theme.color.global.contentBackground).alpha(0.2).css()};
+  background-color: ${chroma(theme.color.global.contentBackground).alpha(0.8).css()};
   text-align: center;
 `);
 
