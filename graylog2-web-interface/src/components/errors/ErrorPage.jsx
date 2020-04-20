@@ -26,11 +26,6 @@ const ErrorMessage = styled.div`
   }
 `;
 
-const H1 = styled.h1`
-  font-size: 52px;
-  margin-bottom: 15px;
-`;
-
 type Props = {
   backgroundImage?: string,
   children?: React.Node,
@@ -43,8 +38,7 @@ const ErrorPage = ({ children, title, description, backgroundImage }: Props) => 
     {backgroundImage && <GlobalStyle backgroundImage={backgroundImage} />}
     <div className="container-fluid">
       <DocumentTitle title={title}>
-        <ErrorJumbotron>
-          <H1>{title}</H1>
+        <ErrorJumbotron title={title}>
           {description}
           {children && (
             <ErrorMessage>

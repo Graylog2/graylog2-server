@@ -5,6 +5,11 @@ import chroma from 'chroma-js';
 
 import { Col, Jumbotron, Row } from 'components/graylog';
 
+const H1 = styled.h1`
+  font-size: 52px;
+  margin-bottom: 15px;
+`;
+
 const ContainerRow = styled(Row)`
   height: 82vh;
 `;
@@ -14,11 +19,12 @@ const StyledErrorJumbotron = styled(Jumbotron)(({ theme }) => css`
   text-align: center;
 `);
 
-const ErrorJumbotron = ({ children }) => {
+const ErrorJumbotron = ({ children, title }) => {
   return (
     <ContainerRow>
       <Col mdOffset={2} md={8}>
         <StyledErrorJumbotron>
+          <H1>{title}</H1>
           {children}
         </StyledErrorJumbotron>
       </Col>
@@ -28,6 +34,7 @@ const ErrorJumbotron = ({ children }) => {
 
 ErrorJumbotron.propTypes = {
   children: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
 };
 
 export default ErrorJumbotron;
