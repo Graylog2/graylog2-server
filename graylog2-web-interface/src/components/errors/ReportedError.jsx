@@ -16,12 +16,17 @@ const ReportedError = ({ children, router }) => {
 
   useEffect(() => {
     const unlistenErrorsReport = ErrorsActions.report.listen(report);
-    const unlistenRouter = router.listen(() => { if (reportedError) setReportedError(null); });
     return () => {
-      unlistenRouter();
       unlistenErrorsReport();
     };
   }, []);
+
+  useEffect(() => {
+    const unlistenRouter = router.listen(() => reportedError && setReportedError(null));
+    return () => {
+      unlistenRouter();
+    };
+  }, [reportedError]);
 
   if (reportedError && reportedError.type === ReactErrorType) {
     return <RuntimeErrorPage error={reportedError.error} componentStack={reportedError.info.componentStack} />;
