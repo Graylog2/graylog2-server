@@ -4,7 +4,7 @@ import { render, cleanup, waitForElement, waitForElementToBeRemoved } from 'wrap
 
 import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { ReactError, UnauthorizedError } from 'logic/errors/ReportedError';
+import { createReactError, createUnauthorizedError } from 'logic/errors/ReportedErrors';
 import { FetchError } from 'logic/rest/FetchProvider';
 import ReportedError from './ReportedError';
 
@@ -52,7 +52,7 @@ describe('ReportedError', () => {
     suppressConsole(async () => {
       const { getByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
 
-      ErrorsActions.report(ReactError(new Error('The error message'), { componentStack: 'The component stack' }));
+      ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
 
       await waitForElementToBeRemoved(() => getByText('Hello World!'));
       await waitForElement(() => getByText('Something went wrong.'));
@@ -64,7 +64,7 @@ describe('ReportedError', () => {
     suppressConsole(async () => {
       const { getByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
 
-      ErrorsActions.report(UnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
+      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
 
       await waitForElementToBeRemoved(() => getByText('Hello World!'));
       await waitForElement(() => getByText('Missing Permissions'));
@@ -82,7 +82,7 @@ describe('ReportedError', () => {
 
       expect(getByText('Hello World!')).not.toBeNull();
 
-      ErrorsActions.report(UnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
+      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
 
       await waitForElement(() => getByText('Missing Permissions'));
 

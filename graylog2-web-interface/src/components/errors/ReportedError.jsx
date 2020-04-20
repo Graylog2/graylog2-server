@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { withRouter } from 'react-router';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { type ReportedError as ReportedErrorType, ReactErrorType, UnauthoriedErrorType } from 'logic/errors/ReportedError';
+import { type ReportedError as ReportedErrorType, ReactErrorType, UnauthoriedErrorType } from 'logic/errors/ReportedErrors';
 
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';

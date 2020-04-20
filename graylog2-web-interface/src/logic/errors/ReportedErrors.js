@@ -5,26 +5,26 @@ import { FetchError } from 'logic/rest/FetchProvider';
 export const ReactErrorType = 'ReactError';
 export const UnauthoriedErrorType = 'UnauthorizedError';
 
-type ReactErrorInternal = {
+type ReactError = {
   error: Error,
   info: { componentStack: string },
   type: 'ReactError'
 }
 
-type UnauthorizedErrorInternal = {
+type UnauthorizedError = {
   error: FetchError,
   type: 'UnauthorizedError'
 }
 
-export type ReportedError = ReactErrorInternal | UnauthorizedErrorInternal
+export type ReportedError = ReactError | UnauthorizedError
 
-export const ReactError = (error: $PropertyType<ReactErrorInternal, 'error'>, info: $PropertyType<ReactErrorInternal, 'info'>): ReactErrorInternal => ({
+export const createReactError = (error: $PropertyType<ReactError, 'error'>, info: $PropertyType<ReactError, 'info'>): ReactError => ({
   error,
   info,
   type: ReactErrorType,
 });
 
-export const UnauthorizedError = (error: $PropertyType<UnauthorizedErrorInternal, 'error'>): UnauthorizedErrorInternal => ({
+export const createUnauthorizedError = (error: $PropertyType<UnauthorizedError, 'error'>): UnauthorizedError => ({
   error,
   type: UnauthoriedErrorType,
 });

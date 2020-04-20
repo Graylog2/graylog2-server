@@ -4,7 +4,7 @@ import { render } from 'wrappedTestingLibrary';
 
 import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { ReactErrorType } from 'logic/errors/ReportedError';
+import { ReactErrorType } from 'logic/errors/ReportedErrors';
 import RuntimeErrorBoundary from './RuntimeErrorBoundary';
 
 jest.mock('actions/errors/ErrorsActions', () => ({

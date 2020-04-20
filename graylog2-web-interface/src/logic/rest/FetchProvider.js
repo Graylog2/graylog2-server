@@ -5,7 +5,7 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 // eslint-disable-next-line import/no-cycle
-import { UnauthorizedError } from 'logic/errors/ReportedError';
+import { createUnauthorizedError } from 'logic/errors/ReportedErrors';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -78,7 +78,7 @@ export class Builder {
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
         if (SessionStore.isLoggedIn() && error.status === 403) {
-          ErrorsActions.report((UnauthorizedError(error)));
+          ErrorsActions.report((createUnauthorizedError(error)));
         }
 
         if (error.originalError && !error.originalError.status) {
