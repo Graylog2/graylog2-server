@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, fireEvent, waitForElement } from 'wrappedTestingLibrary';
+import { render, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 
 import RuntimeErrorPage from './RuntimeErrorPage';
 
@@ -25,6 +25,6 @@ describe('RuntimeErrorPage', () => {
     const showMoreButton = getByText('Show more');
     fireEvent.click(showMoreButton);
 
-    waitForElement(() => getByText('The component stack'));
+    wait(() => expect(getByText('The component stack')).not.toBeNull());
   });
 });

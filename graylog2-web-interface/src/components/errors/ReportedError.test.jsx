@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, waitForElement, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import { render, cleanup, wait, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import suppressConsole from 'helpers/suppressConsole';
@@ -57,8 +57,8 @@ describe('ReportedError', () => {
     });
 
     await waitForElementToBeRemoved(() => getByText('Hello World!'));
-    await waitForElement(() => getByText('Something went wrong.'));
-    await waitForElement(() => getByText('The error message'));
+    await wait(() => expect(getByText('Something went wrong.')).not.toBeNull());
+    await wait(() => expect(getByText('The error message')).not.toBeNull());
   });
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
@@ -69,8 +69,8 @@ describe('ReportedError', () => {
     });
 
     await waitForElementToBeRemoved(() => getByText('Hello World!'));
-    await waitForElement(() => getByText('Missing Permissions'));
-    await waitForElement(() => getByText(/The request error message/));
+    await wait(() => expect(getByText('Missing Permissions')).not.toBeNull());
+    await wait(() => expect(getByText(/The request error message/)).not.toBeNull());
   });
 
   it('resets error when navigation changes', async () => {
@@ -86,10 +86,10 @@ describe('ReportedError', () => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
     });
 
-    await waitForElement(() => getByText('Missing Permissions'));
+    await wait(() => expect(getByText('Missing Permissions')).not.toBeNull());
     const listenCallback = mockRouter.listen.mock.calls[1][0];
     act(() => listenCallback());
 
-    await waitForElement(() => getByText('Hello World!'));
+    await wait(() => expect(getByText('Hello World!')).not.toBeNull());
   });
 });
