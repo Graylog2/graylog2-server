@@ -16,7 +16,7 @@ const renderWithForm = (element) => render((
 ));
 
 const _findValidationState = (container) => {
-  const formGroup = container.matches('.form-group') ? container : container.querySelector('.form-group');
+  const formGroup = container?.matches('.form-group') ? container : container?.querySelector('.form-group');
   return formGroup && formGroup.className.includes('has-error')
     ? 'error'
     : null;
