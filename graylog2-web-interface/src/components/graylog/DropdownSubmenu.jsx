@@ -30,16 +30,16 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLAnchorElement> = styled.a.
   }
 `);
 
-const StyledSubmenu: StyledComponent<{left: boolean}, ThemeInterface, HTMLLIElement> = styled(Dropdown)(({ theme }) => `
+const StyledSubmenu: StyledComponent<{left: boolean}, ThemeInterface, HTMLLIElement> = styled(Dropdown)(({ left, theme }) => `
   position: relative;
 
   > .dropdown-menu {
     top: 0;
-    left: ${({ left }) => (left ? 'auto' : '100%')};
-    right: ${({ left }) => (left ? '98%' : 'auto')};
+    left: ${left ? 'auto' : '100%'};
+    right: ${left ? '98%' : 'auto'};
     margin-top: -6px;
-    margin-left: ${({ left }) => (left ? '10px' : '-1px')};
-    border-radius: ${({ left }) => (left ? '6px 0 6px 6px' : '0 6px 6px 6px')};
+    margin-left: ${left ? '10px' : '-1px'};
+    border-radius: ${left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
   }
 
   &:hover > .dropdown-menu {
