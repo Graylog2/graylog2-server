@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import { useStore } from 'stores/connect';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+
 import FieldTypesContext from './FieldTypesContext';
 
 const FieldTypesProvider = ({ children }: { children: React.Node }) => {

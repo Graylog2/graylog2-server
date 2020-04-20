@@ -2,9 +2,10 @@
 import * as React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
 import { Map, List } from 'immutable';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+
 import FieldTypesContext from './FieldTypesContext';
 import FieldTypesProvider from './FieldTypesProvider';
 
