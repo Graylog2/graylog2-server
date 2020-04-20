@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import RuntimeErrorPage from '../pages/RuntimeErrorPage';
+import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 
 class RouterErrorBoundary extends React.Component {
   static propTypes = {

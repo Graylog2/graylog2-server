@@ -85,7 +85,7 @@ import {
   ThreadDumpPage,
   UsersPage,
 } from 'pages';
-import RouterErrorBoundary from './RouterErrorBoundary';
+import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes');

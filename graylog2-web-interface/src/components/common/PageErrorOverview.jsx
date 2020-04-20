@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ErrorJumbotron, { H1 } from 'pages/ErrorJumbotron';
+import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
 /**
  * Component that renders a page when there was an error and certain information can't be fetched. Use it

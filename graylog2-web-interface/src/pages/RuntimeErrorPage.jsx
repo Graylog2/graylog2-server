@@ -5,8 +5,9 @@ import styled from 'styled-components';
 import AppConfig from 'util/AppConfig';
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 
-import { Icon, ReportedErrorDetails } from 'components/common';
+import { Icon } from 'components/common';
 import { Button } from 'components/graylog';
+import ErrorPage from 'components/errors/ErrorPage';
 import SupportSources from 'components/support/SupportSources';
 import ClipboardButton from 'components/common/ClipboardButton';
 
@@ -47,7 +48,7 @@ class RuntimeErrorPage extends React.Component {
     );
 
     return (
-      <ReportedErrorDetails title="Something went wrong." description={description} backgroundImage={NotFoundBackgroundImage}>
+      <ErrorPage title="Something went wrong." description={description} backgroundImage={NotFoundBackgroundImage}>
         <div className="content" style={{ padding: '2em' }}>
           <SupportSources />
         </div>
@@ -73,7 +74,7 @@ class RuntimeErrorPage extends React.Component {
             </pre>
           </dt>
         </dl>
-      </ReportedErrorDetails>
+      </ErrorPage>
     );
   }
 }

@@ -15,8 +15,6 @@ export { default as DocumentTitle } from './DocumentTitle';
 export { default as EmptyEntity } from './EmptyEntity';
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';
-export { default as ErrorJumbotron } from './ErrorJumbotron';
-export { default as ReportedErrorDetails } from './ReportedErrorDetails';
 export { default as ExpandableList } from './ExpandableList';
 export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExternalLink } from './ExternalLink';

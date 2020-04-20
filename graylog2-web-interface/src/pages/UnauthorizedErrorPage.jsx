@@ -5,7 +5,8 @@ import { withRouter } from 'react-router';
 
 import { FetchError } from 'logic/rest/FetchProvider';
 
-import { Icon, ReportedErrorDetails, ClipboardButton } from 'components/common';
+import { Icon, ClipboardButton } from 'components/common';
+import ErrorPage from 'components/errors/ErrorPage';
 
 type Props = {
   error: FetchError,
@@ -24,7 +25,7 @@ const UnauthorizedErrorPage = ({ error, location: { pathname } }: Props) => {
     </>
   );
   return (
-    <ReportedErrorDetails title="Missing Permissions" description={description}>
+    <ErrorPage title="Missing Permissions" description={description}>
       <dl>
         <dd>
           <pre className="content">
@@ -41,7 +42,7 @@ const UnauthorizedErrorPage = ({ error, location: { pathname } }: Props) => {
           </pre>
         </dd>
       </dl>
-    </ReportedErrorDetails>
+    </ErrorPage>
   );
 };
 

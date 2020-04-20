@@ -1,7 +1,7 @@
 import React from 'react';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
-import { ReportedErrorDetails } from 'components/common';
+import ErrorPage from 'components/errors/ErrorPage';
 
 const NotFoundPage = () => {
   const description = (
@@ -10,7 +10,7 @@ const NotFoundPage = () => {
       <p>Oh, party gorilla! How we miss you! Will we ever see you again?</p>
     </>
   );
-  return (<ReportedErrorDetails title="Page not found" description={description} backgroundImage={NotFoundBackgroundImage} />);
+  return (<ErrorPage title="Page not found" description={description} backgroundImage={NotFoundBackgroundImage} />);
 };
 
 export default NotFoundPage;

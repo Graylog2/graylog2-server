@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 
 import AppContentGrid from 'components/layout/AppContentGrid';
-import { DocumentTitle, ErrorJumbotron } from 'components/common';
+import { DocumentTitle } from 'components/common';
+import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -37,7 +38,7 @@ type Props = {
   title: string,
 }
 
-const ReportedErrorDetails = ({ children, title, description, backgroundImage }: Props) => (
+const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
   <AppContentGrid>
     {backgroundImage && <GlobalStyle backgroundImage={backgroundImage} />}
     <div className="container-fluid">
@@ -46,9 +47,9 @@ const ReportedErrorDetails = ({ children, title, description, backgroundImage }:
           <H1>{title}</H1>
           {description}
           {children && (
-          <ErrorMessage>
-            {children}
-          </ErrorMessage>
+            <ErrorMessage>
+              {children}
+            </ErrorMessage>
           )}
         </ErrorJumbotron>
       </DocumentTitle>
@@ -56,16 +57,16 @@ const ReportedErrorDetails = ({ children, title, description, backgroundImage }:
   </AppContentGrid>
 );
 
-ReportedErrorDetails.propTypes = {
+ErrorPage.propTypes = {
   children: PropTypes.node,
   description: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
   backgroundImage: PropTypes.string,
 };
 
-ReportedErrorDetails.defaultProps = {
+ErrorPage.defaultProps = {
   children: undefined,
   backgroundImage: undefined,
 };
 
-export default ReportedErrorDetails;
+export default ErrorPage;

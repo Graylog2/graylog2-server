@@ -8,8 +8,8 @@ import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 
-import ReportedError from './ReportedError';
-import RuntimeErrorBoundary from './RuntimeErrorBoundary';
+import ReportedError from 'components/errors/ReportedError';
+import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
 import 'stylesheets/typeahead.less';
 
