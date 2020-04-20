@@ -158,7 +158,10 @@ describe('WidgetQueryControls', () => {
     const streamFilter = container.querySelector('div[data-testid="streams-filter"] > div');
     expect(streamFilter).not.toBeNull();
 
-    await selectEvent.select(streamFilter, 'PFLog');
+    // Flow is not parsing the jest assertion before
+    if (streamFilter) {
+      await selectEvent.select(streamFilter, 'PFLog');
+    }
 
     const searchButton = getByTitle(/Perform search/);
     fireEvent.click(searchButton);
