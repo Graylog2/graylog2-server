@@ -160,7 +160,7 @@ declare module '@testing-library/react' {
   declare export var act: ReactDOMTestUtilsAct;
   declare export function cleanup(): void;
   declare export function wait(
-    callback?: () => void,
+    callback?: () => mixed,
     options?: {
       timeout?: number,
       interval?: number,
