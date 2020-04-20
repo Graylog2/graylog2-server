@@ -7,7 +7,7 @@ import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
-import { appPrefixed } from 'util/URLUtils';
+import URLUtils from 'util/URLUtils';
 
 import Routes from 'routing/Routes';
 
@@ -85,6 +85,7 @@ import {
   ThreadDumpPage,
   UsersPage,
 } from 'pages';
+
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 
 const AppRouter = () => {
@@ -92,21 +93,21 @@ const AppRouter = () => {
   const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-             path={appPrefixed(pluginRoute.path)}
+             path={URLUtils.appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     );
   });
   const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map((pluginRoute) => (
     <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
            component={pluginRoute.parentComponent}>
-      <Route path={appPrefixed(pluginRoute.path)}
+      <Route path={URLUtils.appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     </Route>
   ));
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-             path={appPrefixed(pluginRoute.path)}
+             path={URLUtils.appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     );
   });
