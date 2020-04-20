@@ -78,7 +78,7 @@ export class Builder {
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
         if (SessionStore.isLoggedIn() && error.status === 403) {
-          ErrorsActions.report((createUnauthorizedError(error)));
+          ErrorsActions.report(createUnauthorizedError(error));
         }
 
         if (error.originalError && !error.originalError.status) {
