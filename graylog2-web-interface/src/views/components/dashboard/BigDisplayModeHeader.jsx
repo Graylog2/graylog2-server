@@ -14,7 +14,7 @@ type Props = {
   view: {
     activeQuery: ?QueryId,
     view: ?View,
-  }
+  },
 };
 
 const PositioningWrapper = styled.div`

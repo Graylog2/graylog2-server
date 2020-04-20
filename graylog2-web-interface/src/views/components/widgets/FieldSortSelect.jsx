@@ -19,8 +19,8 @@ type Props = {
 
 type Option = {
   label: string,
-  value: number
-}
+  value: number,
+};
 
 const findOptionByLabel = (options: Immutable.List<Option>, label: string) => options.find((option) => option.label === label);
 

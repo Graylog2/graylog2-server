@@ -5,12 +5,12 @@ import type { FieldTypeJSON } from './FieldType';
 export type FieldTypeMappingJSON = {
   name: string,
   type: FieldTypeJSON,
-}
+};
 
 class FieldTypeMapping {
   value: {
     name: string,
-    type: FieldType
+    type: FieldType,
   };
 
   constructor(name: string, type: FieldType) {

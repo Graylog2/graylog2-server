@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, keyframes, type StyledComponent } from 'styled-components';

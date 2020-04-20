@@ -140,7 +140,7 @@ const TableHead = styled.thead`
 
 type State = {
   expandedMessages: Immutable.Set<string>,
-}
+};
 
 type Props = {
   activeQueryId: string,

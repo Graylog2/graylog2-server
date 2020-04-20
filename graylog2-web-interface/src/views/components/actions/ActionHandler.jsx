@@ -15,7 +15,7 @@ export type ActionHandlerArguments = {|
   field: FieldName,
   value?: FieldValue,
   type: FieldType,
-  contexts: ActionContexts
+  contexts: ActionContexts,
 |};
 
 export type ActionHandler = (ActionHandlerArguments) => Promise<mixed>;

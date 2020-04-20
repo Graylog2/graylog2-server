@@ -8,8 +8,8 @@ import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
 
 type Props = {
-  children: React.Node
-}
+  children: React.Node,
+};
 
 const StyledRow = styled(Row)`
   margin-bottom: 0;

@@ -24,7 +24,7 @@ type Shape = {
   opacity: number,
   line: {
     color: string,
-  }
+  },
 };
 
 export type Shapes = Array<Shape>;

@@ -28,15 +28,15 @@ const FIELD_CHARTS_MIGRATED_KEY = 'pinned-field-charts-migrated';
 
 type LegacySeries = 'mean' | 'max' | 'min' | 'total' | 'count' | 'cardinality';
 type LegacyInterpolation = 'linear' | 'step-after' | 'basis' | 'bundle' | 'cardinal' | 'monotone';
-type LegacyInterval = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year'
-type LegacyVisualization = 'bar' | 'area' | 'line' | 'scatterplot'
+type LegacyInterval = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year';
+type LegacyVisualization = 'bar' | 'area' | 'line' | 'scatterplot';
 type LegacyFieldChart = {
   field: string,
   renderer: LegacyVisualization,
   interpolation: LegacyInterpolation,
   valuetype: LegacySeries,
   interval: LegacyInterval,
-}
+};
 
 const Actions = styled.div`
   margin-top: 10px;

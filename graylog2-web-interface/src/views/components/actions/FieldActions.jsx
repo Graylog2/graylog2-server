@@ -24,7 +24,7 @@ type Props = {|
 type State = {
   open: boolean,
   overflowingComponents: { [string]: React.Node },
-}
+};
 
 class FieldActions extends React.Component<Props, State> {
   static contextType = ActionContext;

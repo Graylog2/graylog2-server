@@ -9,7 +9,7 @@ export type MessageSortConfigJson = {
 type InternalState = {
   field: string,
   direction: Direction,
-}
+};
 
 export default class MessageSortConfig {
   _value: InternalState

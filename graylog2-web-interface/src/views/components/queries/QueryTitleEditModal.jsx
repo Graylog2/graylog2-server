@@ -15,11 +15,11 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 
 type Props = {
   onTitleChange: (newTitle: string) => Promise<TitlesMap>,
-}
+};
 
 type State = {
   titleDraft: string,
-}
+};
 
 class QueryTitleEditModal extends React.Component<Props, State> {
   modal: BootstrapModalForm = React.createRef();

@@ -13,7 +13,7 @@ export type ChartDefinition = {
   z?: Array<Array<any>>,
 };
 
-export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>]
+export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
 export type ExtractedSeries = Array<ChartData>;
 
 export type KeyJoiner = (Array<any>) => string;

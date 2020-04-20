@@ -19,7 +19,7 @@ const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
 type State = {
   config: WhiteListConfig,
-  isValid: boolean
+  isValid: boolean,
 };
 
 type Props = {

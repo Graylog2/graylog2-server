@@ -21,12 +21,12 @@ type Props = {
   queryId: QueryId,
   type: FieldType,
   value: React.Node,
-}
+};
 
 type State = {
   open: boolean,
   overflowingComponents: { [string]: React.Node },
-}
+};
 
 class ValueActions extends React.Component<Props, State> {
   static propTypes = {
