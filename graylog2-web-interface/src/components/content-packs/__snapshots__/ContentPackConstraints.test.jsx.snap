@@ -163,7 +163,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                                 "componentStyle": ComponentStyle {
                                   "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
                                   "isStatic": false,
-                                  "lastClassName": "veRUI",
+                                  "lastClassName": "fBopeI",
                                   "rules": Array [
                                     "background-color:",
                                     [Function],
@@ -278,7 +278,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                       </td>
                       <td>
                         <ContentPackConstraints__StyledBadge
-                          isFulfilled={false}
+                          isFulfilled={true}
                         >
                           <StyledComponent
                             forwardedComponent={
@@ -288,7 +288,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                                 "componentStyle": ComponentStyle {
                                   "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
                                   "isStatic": false,
-                                  "lastClassName": "veRUI",
+                                  "lastClassName": "fBopeI",
                                   "rules": Array [
                                     "background-color:",
                                     [Function],
@@ -306,20 +306,20 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                               }
                             }
                             forwardedRef={null}
-                            isFulfilled={false}
+                            isFulfilled={true}
                           >
                             <Component
-                              className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                              isFulfilled={false}
+                              className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                              isFulfilled={true}
                             >
                               <ForwardRef
-                                className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
                               >
                                 <Badge__StyledBadge
-                                  className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                  className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
                                 >
                                   <StyledComponent
-                                    className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                    className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
                                     forwardedComponent={
                                       Object {
                                         "$$typeof": Symbol(react.forward_ref),
@@ -346,25 +346,25 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                                   >
                                     <Badge
                                       bsClass="badge"
-                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
                                       pullRight={false}
                                     >
                                       <span
-                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI badge"
+                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI badge"
                                       >
                                         <Icon
-                                          name="times"
+                                          name="check"
                                         >
                                           <FontAwesomeIcon
                                             icon={
                                               Object {
-                                                "iconName": "times",
+                                                "iconName": "check",
                                                 "prefix": "fas",
                                               }
                                             }
                                           >
                                             <svg
-                                              className="svg-inline--fa fa-times"
+                                              className="svg-inline--fa fa-check"
                                             />
                                           </FontAwesomeIcon>
                                         </Icon>
@@ -395,12 +395,12 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
   constraints={
     Array [
       Object {
-        "fulfilled": undefined,
+        "fulfilled": true,
         "type": "server-version",
         "version": ">=3.0.0-alpha.2+af8d8e0",
       },
       Object {
-        "fulfilled": undefined,
+        "fulfilled": true,
         "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
         "type": "plugin-version",
         "version": ">=3.0.0-alpha.2",
@@ -438,13 +438,13 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
       rows={
         Array [
           Object {
-            "fulfilled": undefined,
+            "fulfilled": true,
             "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
             "type": "plugin-version",
             "version": ">=3.0.0-alpha.2",
           },
           Object {
-            "fulfilled": undefined,
+            "fulfilled": true,
             "type": "server-version",
             "version": ">=3.0.0-alpha.2+af8d8e0",
           },
@@ -515,7 +515,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                   <DataTableElement
                     element={
                       Object {
-                        "fulfilled": undefined,
+                        "fulfilled": true,
                         "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
                         "type": "plugin-version",
                         "version": ">=3.0.0-alpha.2",
@@ -641,7 +641,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                   <DataTableElement
                     element={
                       Object {
-                        "fulfilled": undefined,
+                        "fulfilled": true,
                         "type": "server-version",
                         "version": ">=3.0.0-alpha.2+af8d8e0",
                       }
@@ -920,9 +920,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                         &gt;=3.0.0-alpha.2
                       </td>
                       <td>
-                        <ContentPackConstraints__StyledBadge
-                          isFulfilled={false}
-                        >
+                        <ContentPackConstraints__StyledBadge>
                           <StyledComponent
                             forwardedComponent={
                               Object {
@@ -949,11 +947,9 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                               }
                             }
                             forwardedRef={null}
-                            isFulfilled={false}
                           >
                             <Component
                               className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                              isFulfilled={false}
                             >
                               <ForwardRef
                                 className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
@@ -1045,9 +1041,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                         &gt;=3.0.0-alpha.2+af8d8e0
                       </td>
                       <td>
-                        <ContentPackConstraints__StyledBadge
-                          isFulfilled={false}
-                        >
+                        <ContentPackConstraints__StyledBadge>
                           <StyledComponent
                             forwardedComponent={
                               Object {
@@ -1074,11 +1068,9 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                               }
                             }
                             forwardedRef={null}
-                            isFulfilled={false}
                           >
                             <Component
                               className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                              isFulfilled={false}
                             >
                               <ForwardRef
                                 className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
