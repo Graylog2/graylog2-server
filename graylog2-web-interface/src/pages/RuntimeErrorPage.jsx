@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
-import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 
 import { Icon } from 'components/common';
 import { Button } from 'components/graylog';
@@ -48,7 +47,7 @@ class RuntimeErrorPage extends React.Component {
     );
 
     return (
-      <ErrorPage title="Something went wrong." description={description} backgroundImage={NotFoundBackgroundImage}>
+      <ErrorPage title="Something went wrong." description={description}>
         <div className="content" style={{ padding: '2em' }}>
           <SupportSources />
         </div>

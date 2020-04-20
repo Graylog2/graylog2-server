@@ -3,6 +3,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 
+import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
+
 import AppContentGrid from 'components/layout/AppContentGrid';
 import { DocumentTitle } from 'components/common';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
@@ -60,7 +62,7 @@ ErrorPage.propTypes = {
 
 ErrorPage.defaultProps = {
   children: undefined,
-  backgroundImage: undefined,
+  backgroundImage: NotFoundBackgroundImage,
 };
 
 export default ErrorPage;

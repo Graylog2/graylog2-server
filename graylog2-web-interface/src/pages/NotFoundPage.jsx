@@ -1,6 +1,5 @@
 import React from 'react';
 
-import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 import ErrorPage from 'components/errors/ErrorPage';
 
 const NotFoundPage = () => {
@@ -10,7 +9,7 @@ const NotFoundPage = () => {
       <p>Oh, party gorilla! How we miss you! Will we ever see you again?</p>
     </>
   );
-  return (<ErrorPage title="Page not found" description={description} backgroundImage={NotFoundBackgroundImage} />);
+  return (<ErrorPage title="Page not found" description={description} />);
 };
 
 export default NotFoundPage;
