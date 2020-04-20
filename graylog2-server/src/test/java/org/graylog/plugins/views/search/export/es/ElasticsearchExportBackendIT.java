@@ -66,9 +66,9 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         mockIndexLookupFor(request, "graylog_0", "graylog_1");
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "graylog_0, 2015-01-01 04:00:00.000, source-2, Ho",
-                "graylog_1, 2015-01-01 02:00:00.000, source-2, He",
-                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha"
+                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
+                "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He",
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
     }
 
@@ -85,8 +85,8 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "graylog_0, 2015-01-01 04:00:00.000, source-2, Ho",
-                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha"
+                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
     }
 
@@ -100,7 +100,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha"
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
     }
 
@@ -113,8 +113,8 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "graylog_1, 2015-01-01 02:00:00.000, source-2, He",
-                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha"
+                "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He",
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
     }
 
@@ -127,10 +127,10 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,message",
-                "graylog_0, 2015-01-01 04:00:00.000, Ho",
-                "graylog_0, 2015-01-01 03:00:00.000, Hi",
-                "graylog_1, 2015-01-01 02:00:00.000, He",
-                "graylog_0, 2015-01-01 01:00:00.000, Ha");
+                "graylog_0, 2015-01-01T04:00:00.000Z, Ho",
+                "graylog_0, 2015-01-01T03:00:00.000Z, Hi",
+                "graylog_1, 2015-01-01T02:00:00.000Z, He",
+                "graylog_0, 2015-01-01T01:00:00.000Z, Ha");
     }
 
     @Test
@@ -142,10 +142,10 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .build();
 
         runWithExpectedResult(request, "timestamp,source,message",
-                "graylog_0, 2015-01-01 03:00:00.000, source-1, Hi",
-                "graylog_0, 2015-01-01 01:00:00.000, source-1, Ha",
-                "graylog_0, 2015-01-01 04:00:00.000, source-2, Ho",
-                "graylog_1, 2015-01-01 02:00:00.000, source-2, He");
+                "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
+                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
+                "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He");
     }
 
     @Test

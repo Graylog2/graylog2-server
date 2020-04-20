@@ -52,6 +52,7 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 public class ElasticsearchExportBackend implements ExportBackend {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchExportBackend.class);
@@ -193,13 +194,30 @@ public class ElasticsearchExportBackend implements ExportBackend {
         LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
 
         for (String name : desiredFieldsInOrder) {
-            fields.put(name, source.get(name));
+            Object value = valueFrom(source, name);
+            fields.put(name, value);
         }
 
         // _id is needed, because the old decorators relies on it
         fields.put("_id", UUID.randomUUID().toString());
 
         return SimpleMessage.from(index, fields);
+    }
+
+    private Object valueFrom(Map source, String name) {
+        if (name.equals(Message.FIELD_TIMESTAMP)) {
+            return fixTimestampFormat(source.get(Message.FIELD_TIMESTAMP));
+        }
+        return source.get(name);
+    }
+
+    private Object fixTimestampFormat(Object rawTimestamp) {
+        try {
+            return ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(rawTimestamp)).toString();
+        } catch (IllegalArgumentException e) {
+            LOG.warn("Could not parse timestamp {}", rawTimestamp, e);
+            return rawTimestamp;
+        }
     }
 
     private Object[] lastHitSortFrom(List<SearchResult.Hit<Map, Void>> hits) {
