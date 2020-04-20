@@ -17,10 +17,10 @@ type Props = {
 
 const UnauthorizedErrorPage = ({ error, location: { pathname } }: Props) => {
   const errorMessage = error?.message || JSON.stringify(error);
-  const pageDetails = `The permissions check for the following request failed,\nwhile tying to access ${pathname}.`;
+  const pageDetails = `The permissions check for the following request failed,\nwhile trying to access ${pathname}.`;
   const description = (
     <>
-      <p>You do not have the required permissions to view this ressource.</p>
+      <p>You do not have the required permissions to view this resource.</p>
       <p>Please contact your administrator and provide the error details.</p>
     </>
   );

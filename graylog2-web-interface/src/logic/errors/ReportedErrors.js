@@ -3,7 +3,7 @@
 import { FetchError } from 'logic/rest/FetchProvider';
 
 export const ReactErrorType = 'ReactError';
-export const UnauthoriedErrorType = 'UnauthorizedError';
+export const UnauthorizedErrorType = 'UnauthorizedError';
 
 type ReactError = {
   error: Error,
@@ -16,7 +16,7 @@ type UnauthorizedError = {
   type: 'UnauthorizedError'
 }
 
-export type ReportedError = ReactError | UnauthorizedError
+export type ReportedError = ReactError | UnauthorizedError;
 
 export const createReactError = (error: $PropertyType<ReactError, 'error'>, info: $PropertyType<ReactError, 'info'>): ReactError => ({
   error,
@@ -26,5 +26,5 @@ export const createReactError = (error: $PropertyType<ReactError, 'error'>, info
 
 export const createUnauthorizedError = (error: $PropertyType<UnauthorizedError, 'error'>): UnauthorizedError => ({
   error,
-  type: UnauthoriedErrorType,
+  type: UnauthorizedErrorType,
 });

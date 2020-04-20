@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { withRouter } from 'react-router';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { type ReportedError as ReportedErrorType, ReactErrorType, UnauthoriedErrorType } from 'logic/errors/ReportedErrors';
+import { type ReportedError as ReportedErrorType, ReactErrorType, UnauthorizedErrorType } from 'logic/errors/ReportedErrors';
 
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
@@ -32,7 +32,7 @@ const ReportedError = ({ children, router }) => {
     return <RuntimeErrorPage error={reportedError.error} componentStack={reportedError.info.componentStack} />;
   }
 
-  if (reportedError && reportedError.type === UnauthoriedErrorType) {
+  if (reportedError && reportedError.type === UnauthorizedErrorType) {
     return <UnauthorizedErrorPage error={reportedError.error} />;
   }
 
