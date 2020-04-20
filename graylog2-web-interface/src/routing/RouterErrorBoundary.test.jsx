@@ -17,14 +17,10 @@ const ErroneusComponent = () => {
 
 const WorkingComponent = () => <div>Hello World!</div>;
 
-const router = {
-  listen: () => {},
-};
-
 describe('RouterErrorBoundary', () => {
   it('displays child component if there is no error', () => {
     const { getByText } = render(
-      <RouterErrorBoundary router={router}>
+      <RouterErrorBoundary>
         <WorkingComponent />
       </RouterErrorBoundary>,
     );
@@ -35,7 +31,7 @@ describe('RouterErrorBoundary', () => {
   it('displays error after catching', () => {
     suppressConsole(() => {
       const { getByText } = render(
-        <RouterErrorBoundary router={router}>
+        <RouterErrorBoundary>
           <ErroneusComponent />
         </RouterErrorBoundary>,
       );
