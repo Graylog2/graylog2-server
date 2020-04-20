@@ -51,7 +51,11 @@ UnauthorizedErrorPage.propTypes = {
   }).isRequired,
   location: PropTypes.shape({
     pathname: PropTypes.string,
-  }).isRequired,
+  }),
+};
+
+UnauthorizedErrorPage.defaultProps = {
+  location: {},
 };
 
 export default withRouter(UnauthorizedErrorPage);
