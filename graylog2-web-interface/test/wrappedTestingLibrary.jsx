@@ -11,8 +11,8 @@ export const renderWithWrapper = (Component: Element<any>, options: ?RenderOptio
   ...options,
 });
 
-export function asElement<T>(elem: HTMLElement, elementType: Class<T>): T {
-  if (elem instanceof elementType) {
+export function asElement<T>(elem: ?(HTMLElement | Node), elementType: Class<T>): T {
+  if (elem && elem instanceof elementType) {
     return (elem: T);
   }
 
