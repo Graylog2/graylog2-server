@@ -45,7 +45,7 @@ type Props = {
   queries: Array<QueryIdsStore>,
   selectedQueryId: string,
   titles: Immutable.Map<string, string>,
-}
+};
 
 class QueryTabs extends React.Component<Props> {
   queryTitleEditModal: ?QueryTitleEditModal

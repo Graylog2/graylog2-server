@@ -15,14 +15,14 @@ type Props = {
   fieldName: string,
   onSortChange: (SortConfig[]) => Promise<void>,
   setLoadingState: (loading: boolean) => void,
-}
+};
 
 type DirectionStrategy = {
   handleSortChange: (changeSort: (direction: Direction) => void) => void,
   icon: string,
   sortActive: boolean,
   tooltip: (fieldName: string) => string,
-}
+};
 
 const SortIcon: StyledComponent<{sortActive: boolean}, {}, HTMLButtonElement> = styled.button(({ sortActive }) => {
   const color = sortActive ? '#333' : '#bdbdbd';

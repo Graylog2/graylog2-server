@@ -12,7 +12,7 @@ type NodeId = string;
 type NodeInfo = {
   short_node_id: string,
   hostname: string,
-}
+};
 type Props = {
   nodeId: NodeId,
   nodes: { [NodeId]: NodeInfo },

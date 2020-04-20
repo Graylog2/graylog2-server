@@ -17,8 +17,8 @@ type Props = {
   url: string,
   labelClassName: string,
   wrapperClassName: string,
-  urlType: string
-}
+  urlType: string,
+};
 const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, labelClassName, wrapperClassName, urlType }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);

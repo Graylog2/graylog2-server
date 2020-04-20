@@ -14,7 +14,7 @@ export const Properties: { [string]: Property } = {
 export type FieldTypeJSON = {
   type: string,
   properties: Array<Property>,
-  index_names: Array<string>
+  index_names: Array<string>,
 };
 
 export type FieldName = string;

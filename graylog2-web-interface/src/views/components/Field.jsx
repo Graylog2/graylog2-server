@@ -15,7 +15,7 @@ type Props = {|
   menuContainer: ?HTMLElement,
   queryId: string,
   type: FieldType,
-|}
+|};
 
 const Field = ({ children, disabled = false, menuContainer, name, queryId, type }: Props) => (
   <InteractiveContext.Consumer>

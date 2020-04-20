@@ -16,7 +16,7 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { ExtendedSearchPage } from 'views/pages';
 import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
-type URLQuery = { [string]: any }
+type URLQuery = { [string]: any };
 
 type Props = {
   route: {},
@@ -25,7 +25,7 @@ type Props = {
   },
   location: {
     query: URLQuery,
-    pathname: string
+    pathname: string,
   },
   executingViewHooks: Array<ViewHook>,
   loadingViewHooks: Array<ViewHook>,

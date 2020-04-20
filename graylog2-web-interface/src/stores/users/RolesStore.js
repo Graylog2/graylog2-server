@@ -12,7 +12,7 @@ type Role = {
   name: string,
   description: string,
   permissions: string[],
-}
+};
 
 type RoleMembership = {
   role: string,
