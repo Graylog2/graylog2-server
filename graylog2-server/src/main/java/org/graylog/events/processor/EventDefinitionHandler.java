@@ -80,6 +80,18 @@ public class EventDefinitionHandler {
     }
 
     /**
+     * Creates a new event definition without scheduling it. Normally the {@link #create(EventDefinitionDto)} method
+     * should be used to ensure proper scheduling of the event definition. In some cases new event definitions
+     * must be created without a schedule, though. (e.g. content packs)
+     *
+     * @param unsavedEventDefinition the event definition to save
+     * @return the created event definition
+     */
+    public EventDefinitionDto createWithoutSchedule(EventDefinitionDto unsavedEventDefinition) {
+        return createEventDefinition(unsavedEventDefinition);
+    }
+
+    /**
      * Updates an existing event definition and its corresponding scheduler job definition and trigger.
      *
      * @param updatedEventDefinition the event definition to update

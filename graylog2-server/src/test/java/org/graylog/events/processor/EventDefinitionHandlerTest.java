@@ -150,6 +150,35 @@ public class EventDefinitionHandlerTest {
     }
 
     @Test
+    public void createWithoutSchedule() {
+        final EventDefinitionDto newDto = EventDefinitionDto.builder()
+                .title("Test")
+                .description("A test event definition")
+                .config(TestEventProcessorConfig.builder()
+                        .message("This is a test event processor")
+                        .searchWithinMs(300000)
+                        .executeEveryMs(60001)
+                        .build())
+                .priority(3)
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .keySpec(ImmutableList.of("a", "b"))
+                .notifications(ImmutableList.of())
+                .build();
+
+        final EventDefinitionDto dto = handler.createWithoutSchedule(newDto);
+
+        // Handler should create the event definition
+        assertThat(eventDefinitionService.get(dto.id())).isPresent();
+
+        // Handler should NOT create a job definition for the event definition/processor
+        assertThat(jobDefinitionService.getByConfigField("event_definition_id", dto.id())).isNotPresent();
+
+        // And the handler should also NOT create a job trigger for the created job definition
+        assertThat(jobTriggerService.nextRunnableTrigger()).isNotPresent();
+    }
+
+    @Test
     @MongoDBFixtures("event-processors.json")
     public void update() {
         final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
