@@ -54,7 +54,7 @@ module.exports = {
     ],
     'flowtype/require-valid-file-annotation': [
       2,
-      'always', {
+      'never', {
         annotationStyle: 'line',
         strict: true,
       },
