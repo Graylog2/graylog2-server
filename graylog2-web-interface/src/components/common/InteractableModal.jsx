@@ -47,7 +47,7 @@ const Header = styled.header(({ theme }) => css`
   display: flex;
   align-items: center;
   background-color: ${theme.color.gray[30]};
-  border-bottom: 1px solid ${theme.color.gray[0]};
+  border-bottom: 1px solid ${theme.color.gray[10]};
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   cursor: move;
