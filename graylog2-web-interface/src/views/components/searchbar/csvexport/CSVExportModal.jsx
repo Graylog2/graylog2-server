@@ -35,7 +35,7 @@ export type Props = {
   directExportWidgetId?: string,
   executionState: SearchExecutionState,
   fields: List<FieldTypeMapping>,
-  view: View
+  view: View,
 };
 
 const _onSelectWidget = ({ value: newWidget }, setSelectedWidget, setSelectedFields, setSelectedSort) => {

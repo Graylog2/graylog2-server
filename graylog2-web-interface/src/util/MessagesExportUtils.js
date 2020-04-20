@@ -14,8 +14,8 @@ export type ExportPayload = {
   query_string?: QueryString,
   streams?: string[],
   fields_in_order: ?string[],
-  sort: MessageSortConfig[]
-}
+  sort: MessageSortConfig[],
+};
 
 const downloadCSV = (fileContent: string, filename: string = 'search-result') => {
   download(fileContent, `${filename}.csv`, 'text/csv');

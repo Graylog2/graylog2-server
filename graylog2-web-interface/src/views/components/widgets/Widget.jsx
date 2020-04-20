@@ -70,7 +70,7 @@ type State = {
   loading: boolean;
   oldWidget?: WidgetModel,
   showCopyToDashboard: boolean,
-  showCsvExport: boolean
+  showCsvExport: boolean,
 };
 
 export type Result = {

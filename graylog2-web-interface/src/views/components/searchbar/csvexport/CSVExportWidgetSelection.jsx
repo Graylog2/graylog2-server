@@ -13,8 +13,8 @@ import Select from 'views/components/Select';
 type WidgetSelectionProps = {
   selectWidget: {label: string, value: Widget} => void,
   widgets: Map<string, Widget>,
-  view: View
-}
+  view: View,
+};
 
 const WidgetSelection = ({ selectWidget, widgets, view }: WidgetSelectionProps) => {
   const widgetOption = (widget) => ({ label: view.getWidgetTitleByWidget(widget), value: widget });

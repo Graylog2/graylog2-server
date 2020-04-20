@@ -27,7 +27,7 @@ type CSVExportSettingsType = {
   selectedSortDirection: Direction,
   selectedSort: SortConfig[],
   view: View,
-}
+};
 
 const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, view: View}) => {
   const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);

@@ -10,7 +10,7 @@ type ExportStrategy = {
     shouldEnableDownload: (showWidgetSelection: boolean, selectedWidget: ?Widget, selectedFields: { field: string }[]) => boolean,
     shouldShowWidgetSelection: (singleWidgetDownload: boolean, selectedWidget: ?Widget, widgets: Map<string, Widget>) => boolean,
     initialWidget: (widgets: Map<string, Widget>, directExportWidgetId: ?string) => ?Widget,
-  }
+  };
 
 const _getWidgetById = (widgets, id) => widgets.find((item) => item.id === id);
 

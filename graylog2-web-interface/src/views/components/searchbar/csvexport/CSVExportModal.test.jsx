@@ -115,7 +115,7 @@ describe('CSVExportModal', () => {
     directExportWidgetId?: $PropertyType<CSVExportModalProps, 'directExportWidgetId'>,
     fields?: $PropertyType<CSVExportModalProps, 'fields'>,
     view?: $PropertyType<CSVExportModalProps, 'view'>,
-  }
+  };
 
   const SimpleCSVExportModal = ({ viewType = View.Type.Search, ...props }: SimpleCSVExportModalProps) => (
     <ViewTypeContext.Provider value={viewType}>
