@@ -11,9 +11,9 @@ import ErrorPage from 'components/errors/ErrorPage';
 type Props = {
   error: FetchError,
   location: {
-    pathname: string
-  }
-}
+    pathname: string,
+  },
+};
 
 const UnauthorizedErrorPage = ({ error, location: { pathname } }: Props) => {
   const errorMessage = error?.message || JSON.stringify(error);

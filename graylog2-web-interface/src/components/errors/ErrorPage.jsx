@@ -33,7 +33,7 @@ type Props = {
   children?: React.Node,
   description: React.Node,
   title: string,
-}
+};
 
 const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
   <AppContentGrid>

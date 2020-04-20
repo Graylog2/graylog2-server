@@ -8,13 +8,13 @@ export const UnauthorizedErrorType = 'UnauthorizedError';
 type ReactError = {
   error: Error,
   info: { componentStack: string },
-  type: 'ReactError'
-}
+  type: 'ReactError',
+};
 
 type UnauthorizedError = {
   error: FetchError,
-  type: 'UnauthorizedError'
-}
+  type: 'UnauthorizedError',
+};
 
 export type ReportedError = ReactError | UnauthorizedError;
 
