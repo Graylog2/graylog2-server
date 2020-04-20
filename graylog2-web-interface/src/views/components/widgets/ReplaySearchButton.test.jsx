@@ -1,12 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { asElement, cleanup, render } from 'wrappedTestingLibrary';
 
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import DrilldownContext from '../contexts/DrilldownContext';
 import ReplaySearchButton from './ReplaySearchButton';
-import { asElement } from '../../../../test/wrappedTestingLibrary';
 
 type OptionalOverrides = {
   streams?: Array<string>,
@@ -17,7 +16,7 @@ type OptionalOverrides = {
 describe('ReplaySearchButton', () => {
   afterEach(cleanup);
   it('renders play button', () => {
-    const { getByTitle } = render(<ReplaySearchButton />);
+    const { getByTitle } = render(<ReplaySearchButton/>);
     expect(getByTitle('Replay search')).not.toBeNull();
   });
   describe('generates link', () => {
@@ -30,7 +29,7 @@ describe('ReplaySearchButton', () => {
               timerange: timerange || context.timerange,
               streams: streams || context.streams,
             }}>
-              <ReplaySearchButton />
+              <ReplaySearchButton/>
             </DrilldownContext.Provider>
           )}
         </DrilldownContext.Consumer>
@@ -38,7 +37,7 @@ describe('ReplaySearchButton', () => {
       return asElement(getByTitle('Replay search'), HTMLAnchorElement);
     };
     it('from default drilldown context', () => {
-      const { getByTitle } = render(<ReplaySearchButton />);
+      const { getByTitle } = render(<ReplaySearchButton/>);
       const button = asElement(getByTitle('Replay search'), HTMLAnchorElement);
 
       expect(button.href).toEqual('http://localhost/search?rangetype=relative&relative=300');

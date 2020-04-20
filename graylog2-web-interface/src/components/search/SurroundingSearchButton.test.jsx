@@ -1,11 +1,10 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, fireEvent, render } from 'wrappedTestingLibrary';
+import { asElement, cleanup, fireEvent, render } from 'wrappedTestingLibrary';
 
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import SurroundingSearchButton from './SurroundingSearchButton';
 import type { SearchesConfig } from './SearchConfig';
-import { asElement } from '../../../test/wrappedTestingLibrary';
 
 const getOption = (optionText, getByText) => {
   const button = getByText('Show surrounding messages');
@@ -109,7 +108,7 @@ describe('SurroundingSearchButton', () => {
       <DrilldownContext.Consumer>
         {(drilldown) => (
           <DrilldownContext.Provider value={{ ...drilldown, streams }}>
-            <TestComponent />
+            <TestComponent/>
           </DrilldownContext.Provider>
         )}
       </DrilldownContext.Consumer>
