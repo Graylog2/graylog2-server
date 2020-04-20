@@ -53,6 +53,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_NOTIFICATIONS = "notifications";
     private static final String FIELD_STORAGE = "storage";
+    private static final String FIELD_IS_SCHEDULED = "is_scheduled";
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -84,6 +85,9 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
 
+    @JsonProperty(FIELD_IS_SCHEDULED)
+    public abstract boolean isScheduled();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -94,7 +98,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDefinitionEntity.Builder();
+            return new AutoValue_EventDefinitionEntity.Builder().isScheduled(true);
         }
 
         @JsonProperty(FIELD_TITLE)
@@ -126,6 +130,9 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
 
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storage);
+
+        @JsonProperty(FIELD_IS_SCHEDULED)
+        public abstract Builder isScheduled(boolean isScheduled);
 
         public abstract EventDefinitionEntity build();
     }

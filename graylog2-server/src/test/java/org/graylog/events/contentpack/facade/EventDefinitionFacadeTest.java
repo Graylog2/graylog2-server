@@ -73,14 +73,14 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -124,15 +124,19 @@ public class EventDefinitionFacadeTest {
         jobSchedulerClock = mock(JobSchedulerClock.class);
         eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService);
         eventDefinitionHandler = new EventDefinitionHandler(
-            eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
+                eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
-        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData,  eventDefinitionService);
+        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService);
     }
 
     @Test
     @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void exportEntity() {
         final ModelId id = ModelId.of("5d4032513d2746703d1467f6");
+
+        when(jobDefinitionService.getByConfigField(eq("event_definition_id"), eq(id.id())))
+                .thenReturn(Optional.of(mock(JobDefinitionDto.class)));
+
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.EVENT_DEFINITION_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Optional<Entity> entity = facade.exportEntity(descriptor, entityDescriptorIds);
@@ -143,6 +147,28 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionEntity.title().asString()).isEqualTo("title");
         assertThat(eventDefinitionEntity.description().asString()).isEqualTo("description");
         assertThat(eventDefinitionEntity.config().type()).isEqualTo(AggregationEventProcessorConfigEntity.TYPE_NAME);
+        assertThat(eventDefinitionEntity.isScheduled()).isTrue();
+    }
+
+    @Test
+    @MongoDBFixtures("EventDefinitionFacadeTest.json")
+    public void exportEntityWithoutScheduling() {
+        final ModelId id = ModelId.of("5d4032513d2746703d1467f6");
+
+        when(jobDefinitionService.getByConfigField(eq("event_definition_id"), eq(id.id())))
+                .thenReturn(Optional.empty());
+
+        final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.EVENT_DEFINITION_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Optional<Entity> entity = facade.exportEntity(descriptor, entityDescriptorIds);
+        assertThat(entity).isPresent();
+        final EntityV1 entityV1 = (EntityV1) entity.get();
+        final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entityV1.data(),
+                EventDefinitionEntity.class);
+        assertThat(eventDefinitionEntity.title().asString()).isEqualTo("title");
+        assertThat(eventDefinitionEntity.description().asString()).isEqualTo("description");
+        assertThat(eventDefinitionEntity.config().type()).isEqualTo(AggregationEventProcessorConfigEntity.TYPE_NAME);
+        assertThat(eventDefinitionEntity.isScheduled()).isFalse();
     }
 
     private EntityV1 createTestEntity() {

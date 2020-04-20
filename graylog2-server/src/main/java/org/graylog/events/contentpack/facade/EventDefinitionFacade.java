@@ -28,6 +28,9 @@ import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventProcessorExecutionJob;
+import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
@@ -56,6 +59,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     private final ObjectMapper objectMapper;
     private final EventDefinitionHandler eventDefinitionHandler;
+    private final DBJobDefinitionService jobDefinitionService;
     private final DBEventDefinitionService eventDefinitionService;
     private final Set<PluginMetaData> pluginMetaData;
 
@@ -63,16 +67,24 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     public EventDefinitionFacade(ObjectMapper objectMapper,
                                  EventDefinitionHandler eventDefinitionHandler,
                                  Set<PluginMetaData> pluginMetaData,
+                                 DBJobDefinitionService jobDefinitionService,
                                  DBEventDefinitionService eventDefinitionService) {
         this.objectMapper = objectMapper;
         this.pluginMetaData = pluginMetaData;
         this.eventDefinitionHandler = eventDefinitionHandler;
+        this.jobDefinitionService = jobDefinitionService;
         this.eventDefinitionService = eventDefinitionService;
     }
 
     @VisibleForTesting
     private Entity exportNativeEntity(EventDefinitionDto eventDefinition, EntityDescriptorIds entityDescriptorIds) {
-        final EventDefinitionEntity entity = eventDefinition.toContentPackEntity(entityDescriptorIds);
+        // Presence of a job definition means that the event definition should be scheduled
+        final Optional<JobDefinitionDto> jobDefinition = jobDefinitionService.getByConfigField(EventProcessorExecutionJob.Config.FIELD_EVENT_DEFINITION_ID, eventDefinition.id());
+
+        final EventDefinitionEntity entity = eventDefinition.toContentPackEntity(entityDescriptorIds)
+                .toBuilder()
+                .isScheduled(jobDefinition.isPresent())
+                .build();
 
         final JsonNode data = objectMapper.convertValue(entity, JsonNode.class);
         return EntityV1.builder()
@@ -120,7 +132,12 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entity.data(),
                 EventDefinitionEntity.class);
         final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
-        final EventDefinitionDto savedDto = eventDefinitionHandler.create(eventDefinition);
+        final EventDefinitionDto savedDto;
+        if (eventDefinitionEntity.isScheduled()) {
+            savedDto = eventDefinitionHandler.create(eventDefinition);
+        } else {
+            savedDto = eventDefinitionHandler.createWithoutSchedule(eventDefinition);
+        }
         return NativeEntity.create(entity.id(), savedDto.id(), ModelTypes.EVENT_DEFINITION_V1, savedDto.title(), savedDto);
     }
 
@@ -160,12 +177,11 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
         final ModelId modelId = entityDescriptor.id();
         final Optional<EventDefinitionDto> eventDefinition = eventDefinitionService.get(modelId.id());
-        if (!eventDefinition.isPresent()) {
+        if (eventDefinition.isPresent()) {
+            eventDefinition.get().resolveNativeEntity(entityDescriptor, mutableGraph);
+        } else {
             LOG.debug("Couldn't find event definition {}", entityDescriptor);
         }
-
-        //noinspection OptionalGetWithoutIsPresent
-        eventDefinition.get().resolveNativeEntity(entityDescriptor, mutableGraph);
 
         return ImmutableGraph.copyOf(mutableGraph);
     }
