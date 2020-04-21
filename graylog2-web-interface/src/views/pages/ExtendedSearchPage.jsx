@@ -5,10 +5,10 @@ import * as Immutable from 'immutable';
 import styled, { css, type StyledComponent } from 'styled-components';
 import { withRouter } from 'react-router';
 
+import FieldTypesProvider from 'views/components/contexts/FieldTypesProvider';
 import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
-
 import SideBar from 'views/components/sidebar/SideBar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
@@ -16,8 +16,7 @@ import type {
   SearchRefreshCondition,
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
-
-import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
+import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
@@ -32,7 +31,6 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldsOverview } from 'views/components/sidebar';
-
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
@@ -74,13 +72,6 @@ const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, sea
     ...props,
     queryId: props.viewMetadata.activeQuery,
     results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
-  }));
-const ConnectedFieldsOverview = connect(FieldsOverview, { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
-  (props) => ({
-
-    ...props,
-    allFields: props.fieldTypes.all,
-    fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
   }));
 
 type Props = {
@@ -160,38 +151,40 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       </IfInteractive>
       <InteractiveContext.Consumer>
         {(interactive) => (
-          <ViewAdditionalContextProvider>
-            <HighlightingRulesProvider>
-              <GridContainer id="main-row" interactive={interactive}>
-                <IfInteractive>
-                  <ConnectedSideBar>
-                    <ConnectedFieldsOverview />
-                  </ConnectedSideBar>
-                </IfInteractive>
-                <SearchArea>
+          <FieldTypesProvider>
+            <ViewAdditionalContextProvider>
+              <HighlightingRulesProvider>
+                <GridContainer id="main-row" interactive={interactive}>
                   <IfInteractive>
-                    <HeaderElements />
-                    <IfDashboard>
-                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    </IfDashboard>
-                    <IfSearch>
-                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    </IfSearch>
-
-                    <QueryBarElements />
-
-                    <IfDashboard>
-                      <QueryBar />
-                    </IfDashboard>
+                    <ConnectedSideBar>
+                      <FieldsOverview />
+                    </ConnectedSideBar>
                   </IfInteractive>
-                  <HighlightMessageInQuery query={location.query}>
-                    <SearchResult />
-                  </HighlightMessageInQuery>
-                  <Footer />
-                </SearchArea>
-              </GridContainer>
-            </HighlightingRulesProvider>
-          </ViewAdditionalContextProvider>
+                  <SearchArea>
+                    <IfInteractive>
+                      <HeaderElements />
+                      <IfDashboard>
+                        <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                      </IfDashboard>
+                      <IfSearch>
+                        <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                      </IfSearch>
+
+                      <QueryBarElements />
+
+                      <IfDashboard>
+                        <QueryBar />
+                      </IfDashboard>
+                    </IfInteractive>
+                    <HighlightMessageInQuery query={location.query}>
+                      <SearchResult />
+                    </HighlightMessageInQuery>
+                    <Footer />
+                  </SearchArea>
+                </GridContainer>
+              </HighlightingRulesProvider>
+            </ViewAdditionalContextProvider>
+          </FieldTypesProvider>
         )}
       </InteractiveContext.Consumer>
     </CurrentViewTypeProvider>

@@ -5,7 +5,6 @@ import { List } from 'immutable';
 
 import { type ThemeInterface } from 'theme';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-
 import Field from 'views/components/Field';
 import FieldTypeIcon from 'views/components/sidebar/FieldTypeIcon';
 
@@ -18,7 +17,7 @@ export type ListItemStyle = {
 };
 
 type Props = {
-  fields: List<FieldTypeMapping>,
+  activeQueryFields: List<FieldTypeMapping>,
   fieldType: FieldTypeMapping,
   selectedQuery: string,
   style: ListItemStyle,
@@ -30,9 +29,9 @@ const StyledListItem: StyledComponent<{}, ThemeInterface, HTMLLIElement> = style
   white-space: nowrap;
 `;
 
-const ListItem = ({ fields, fieldType, selectedQuery, style }: Props) => {
+const ListItem = ({ activeQueryFields, fieldType, selectedQuery, style }: Props) => {
   const { name, type } = fieldType;
-  const disabled = !fields.find((f) => f.name === name);
+  const disabled = !activeQueryFields.find((f) => f.name === name);
   return (
     <StyledListItem style={style}>
       <FieldTypeIcon type={type} />
