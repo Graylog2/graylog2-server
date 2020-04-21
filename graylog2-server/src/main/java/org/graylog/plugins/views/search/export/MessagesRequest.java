@@ -32,7 +32,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -60,8 +59,6 @@ public abstract class MessagesRequest {
     public abstract TimeRange timeRange();
 
     public abstract BackendQuery queryString();
-
-    public abstract Optional<BackendQuery> additionalQueryString();
 
     public abstract Set<String> streams();
 
@@ -96,8 +93,6 @@ public abstract class MessagesRequest {
 
         @JsonProperty("query_string")
         public abstract Builder queryString(BackendQuery queryString);
-
-        public abstract Builder additionalQueryString(BackendQuery queryString);
 
         @JsonProperty("fields_in_order")
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);

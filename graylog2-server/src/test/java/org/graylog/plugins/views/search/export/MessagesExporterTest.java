@@ -172,7 +172,7 @@ class MessagesExporterTest {
     }
 
     @Test
-    void addsAdditionalQueryStringIfSpecifiedOnMessageListAndQuery() {
+    void combinesQueryStringIfSpecifiedOnMessageListAndQuery() {
         MessageList ml = MessageList.builder().id("ml-id")
                 .query(ElasticsearchQueryString.builder().queryString("from-messagelist").build())
                 .build();
@@ -184,8 +184,11 @@ class MessagesExporterTest {
 
         MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
 
-        assertThat(request.queryString()).isEqualTo(q.query());
-        assertThat(request.additionalQueryString()).isEqualTo(ml.query());
+        ElasticsearchQueryString combined = ElasticsearchQueryString.builder()
+                .queryString("from-query AND from-messagelist").build();
+
+        assertThat(request.queryString())
+                .isEqualTo(combined);
     }
 
     @Test
@@ -348,6 +351,7 @@ class MessagesExporterTest {
     }
 
     private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<Consumer<SimpleMessageChunk>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         doNothing().when(backend).run(any(), captor.capture());

@@ -113,36 +113,43 @@ public class MessagesExporter {
     private void trySetQueryString(Search search, String searchTypeId, MessagesRequest.Builder requestBuilder) {
         Query query = queryFrom(search, searchTypeId);
 
+        ElasticsearchQueryString undecorated = pickQueryString(searchTypeId, query);
+
+        ElasticsearchQueryString decorated = decorateQueryString(search, query, undecorated);
+
+        requestBuilder.queryString(decorated);
+    }
+
+    private ElasticsearchQueryString pickQueryString(String searchTypeId, Query query) {
         Optional<MessageList> ml = messageListFrom(query, searchTypeId);
         boolean messageListHasQueryString = ml.isPresent() && ml.get().query().isPresent();
         boolean queryHasQueryString = query.query() instanceof ElasticsearchQueryString;
 
         if (messageListHasQueryString && queryHasQueryString) {
-            requestBuilder.queryString(query.query());
-            requestBuilder.additionalQueryString(ml.get().query().get());
+            return esQueryStringFrom(query).concatenate(esQueryStringFrom(ml.get()));
         } else if (queryHasQueryString) {
-            requestBuilder.queryString(query.query());
+            return esQueryStringFrom(query);
         } else if (messageListHasQueryString) {
-            requestBuilder.queryString(ml.get().query().get());
+            return esQueryStringFrom(ml.get());
         }
-
-        decorateQueryString(requestBuilder, search, query);
+        return ElasticsearchQueryString.empty();
     }
 
-    private void decorateQueryString(MessagesRequest.Builder requestBuilder, Search search, Query query) {
-        String queryString = ((ElasticsearchQueryString) requestBuilder.build().queryString()).queryString();
+    private ElasticsearchQueryString esQueryStringFrom(MessageList ml) {
+        //noinspection OptionalGetWithoutIsPresent
+        return (ElasticsearchQueryString) ml.query().get();
+    }
+
+    private ElasticsearchQueryString esQueryStringFrom(Query query) {
+        return (ElasticsearchQueryString) query.query();
+    }
+
+    private ElasticsearchQueryString decorateQueryString(Search search, Query query, ElasticsearchQueryString undecorated) {
+        String queryString = undecorated.queryString();
 
         String decorated = queryStringDecorator.decorateQueryString(queryString, search, query);
 
-        requestBuilder.queryString(ElasticsearchQueryString.builder().queryString(decorated).build());
-
-        if (requestBuilder.build().additionalQueryString().isPresent()) {
-            String additionalQueryString = ((ElasticsearchQueryString) requestBuilder.build().additionalQueryString().get()).queryString();
-
-            String decoratedAdditionalQueryString = queryStringDecorator.decorateQueryString(additionalQueryString, search, query);
-
-            requestBuilder.additionalQueryString(ElasticsearchQueryString.builder().queryString(decoratedAdditionalQueryString).build());
-        }
+        return ElasticsearchQueryString.builder().queryString(decorated).build();
     }
 
     private void setStreams(Query query, String searchTypeId, MessagesRequest.Builder requestBuilder) {

@@ -19,8 +19,8 @@ package org.graylog.plugins.views.search.export.es;
 import com.google.inject.name.Named;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -138,22 +138,25 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     private QueryBuilder queryFrom(MessagesRequest request) {
-        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) request.queryString();
+        return boolQuery()
+                .filter(queryStringFilter(request))
+                .filter(timestampFilter(request))
+                .filter(streamsFilter(request));
+    }
 
-        QueryBuilder query = backendQuery.isEmpty() ?
+    private QueryBuilder queryStringFilter(MessagesRequest request) {
+        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) request.queryString();
+        return backendQuery.isEmpty() ?
                 matchAllQuery() :
                 queryStringQuery(backendQuery.queryString()).allowLeadingWildcard(allowLeadingWildcard);
+    }
 
-        BoolQueryBuilder filter = boolQuery()
-                .filter(query)
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(request.timeRange())));
+    private QueryBuilder timestampFilter(MessagesRequest request) {
+        return requireNonNull(IndexHelper.getTimestampRangeFilter(request.timeRange()));
+    }
 
-        request.additionalQueryString().map(qs -> (ElasticsearchQueryString) qs)
-                .ifPresent(qs -> filter.filter(queryStringQuery(qs.queryString())));
-
-        filter.filter(termsQuery(Message.FIELD_STREAMS, request.streams()));
-
-        return filter;
+    private TermsQueryBuilder streamsFilter(MessagesRequest request) {
+        return termsQuery(Message.FIELD_STREAMS, request.streams());
     }
 
     private void addSort(SearchSourceBuilder ssb, LinkedHashSet<Sort> sorts) {

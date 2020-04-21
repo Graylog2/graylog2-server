@@ -93,20 +93,6 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void usesAdditionalQueryStringIfPresent() {
-        importFixture("messages.json");
-
-        MessagesRequest request = requestBuilderWithAllStreams()
-                .queryString(ElasticsearchQueryString.builder().queryString("H*").build())
-                .additionalQueryString(ElasticsearchQueryString.builder().queryString("*a").build())
-                .build();
-
-        runWithExpectedResult(request, "timestamp,source,message",
-                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
-        );
-    }
-
-    @Test
     public void usesTimeRange() {
         importFixture("messages.json");
 
