@@ -9,7 +9,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Field.css';
 import { createHandlerFor } from './ActionHandler';
-import type { ActionDefinition, ActionHandlerCondition } from './ActionHandler';
+import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
 
 type Props = {|
   children: React.Node,
@@ -23,7 +23,7 @@ type Props = {|
 
 type State = {
   open: boolean,
-  overflowingComponents: { [string]: React.Node },
+  overflowingComponents: ActionComponents,
 };
 
 class FieldActions extends React.Component<Props, State> {

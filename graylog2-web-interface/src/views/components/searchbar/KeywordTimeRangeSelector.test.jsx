@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
 
@@ -41,7 +41,7 @@ describe('KeywordTimeRangeSelector', () => {
   };
 
   const changeInput = async (input, value) => act(async () => {
-    const { name } = input;
+    const { name } = asElement(input, HTMLInputElement);
     fireEvent.change(input, { target: { value, name } });
   });
 
