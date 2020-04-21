@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 
@@ -64,7 +64,6 @@ describe('<FieldsOverview />', () => {
 
     expect(wrapper).toContainReact(hint);
   });
-
 
   it('should show hint when no fields are returned after filtering', () => {
     const hint = <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
