@@ -8,7 +8,8 @@ import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 
-import AppErrorBoundary from './AppErrorBoundary';
+import ReportedError from 'components/errors/ReportedError';
+import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
 import 'stylesheets/typeahead.less';
 
@@ -43,13 +44,15 @@ const App = ({ children, currentUser, location }) => {
                   fullName={currentUser.full_name}
                   loginName={currentUser.username}
                   permissions={currentUser.permissions} />
-      <ScrollToHint id="scroll-to-hint">
-        <Icon name="arrow-up" />
-      </ScrollToHint>
-      <Scratchpad />
-      <AppErrorBoundary>
-        {children}
-      </AppErrorBoundary>
+      <ReportedError>
+        <RuntimeErrorBoundary>
+          <ScrollToHint id="scroll-to-hint">
+            <Icon name="arrow-up" />
+          </ScrollToHint>
+          <Scratchpad />
+          {children}
+        </RuntimeErrorBoundary>
+      </ReportedError>
     </ScratchpadProvider>
   );
 };
