@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 import { Dropdown } from './bootstrap-import';
@@ -30,28 +30,29 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLAnchorElement> = styled.a.
   }
 `);
 
-const StyledSubmenu: StyledComponent<{left: boolean}, ThemeInterface, HTMLLIElement> = styled(Dropdown)(({ left, theme }) => `
-  position: relative;
+const StyledSubmenu: StyledComponent<{left: boolean}, ThemeInterface, HTMLLIElement> = styled(Dropdown)(({ left, theme }) => {
+  return css`
+    /* $FlowFixMe: Upset with Toggle reference - https://styled-components.com/docs/advanced#referring-to-other-components */
+    position: relative;
 
-  > .dropdown-menu {
-    top: 0;
-    left: ${left ? 'auto' : '100%'};
-    right: ${left ? '98%' : 'auto'};
-    margin-top: -6px;
-    margin-left: ${left ? '10px' : '-1px'};
-    border-radius: ${left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
-  }
+    > .dropdown-menu {
+      top: 0;
+      left: ${left ? 'auto' : '100%'};
+      right: ${left ? '98%' : 'auto'};
+      margin-top: -6px;
+      margin-left: ${left ? '10px' : '-1px'};
+      border-radius: ${left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
+    }
 
-  &:hover > .dropdown-menu {
-    display: block;
-  }
+    &:hover > .dropdown-menu {
+      display: block;
+    }
 
-  /* stylelint unable to determine interpolation */
-  /* stylelint-disable-next-line */
-  &:hover > ${Toggle}::after {
-    border-left-color: ${theme.color.gray[100]};
-  }
-`);
+    &:hover > ${/* sc-selector */Toggle}::after {
+      border-left-color: ${theme.color.gray[100]};
+    }
+  `;
+});
 
 const DropdownSubmenu = ({ children, left, title }: Props) => {
   return (
