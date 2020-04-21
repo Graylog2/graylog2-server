@@ -49,7 +49,7 @@ describe('SearchResult', () => {
     jest.clearAllMocks();
   });
 
-  const fieldTypesStroreState = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
+  const initialFieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
   const SimpleSearchResult = ({ fieldTypes }) => (
     <FieldTypesContext.Provider value={fieldTypes}>
       <SearchResult />
@@ -59,7 +59,7 @@ describe('SearchResult', () => {
     fieldTypes: PropTypes.object,
   };
   SimpleSearchResult.defaultProps = {
-    fieldTypes: fieldTypesStroreState,
+    fieldTypes: initialFieldTypes,
   };
 
   it('should show spinner with undefined fields', () => {
