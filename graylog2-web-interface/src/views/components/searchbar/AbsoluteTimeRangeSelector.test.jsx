@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
 
@@ -16,7 +16,7 @@ const renderWithForm = (element) => render((
 ));
 
 const _findValidationState = (container) => {
-  const formGroup = container.matches('.form-group') ? container : container.querySelector('.form-group');
+  const formGroup = container?.matches('.form-group') ? container : container?.querySelector('.form-group');
   return formGroup && formGroup.className.includes('has-error')
     ? 'error'
     : null;
@@ -27,7 +27,7 @@ const _findFormGroup = (element) => element.closest('.form-group');
 const getValidationStateOfInput = (input) => _findValidationState(_findFormGroup(input));
 
 const changeInput = async (input, value) => {
-  const { name } = input;
+  const { name } = asElement(input, HTMLInputElement);
   await act(async () => { fireEvent.change(input, { target: { value, name } }); });
 };
 

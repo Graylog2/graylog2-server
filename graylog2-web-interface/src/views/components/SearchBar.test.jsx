@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
@@ -74,9 +74,10 @@ describe('SearchBar', () => {
   });
 
   const selectOption = (option) => {
-    const { parentNode, value } = option;
-    const { name } = parentNode;
-    fireEvent.change(parentNode, { target: { name, value: String(value) } });
+    const { parentNode, value } = asElement(option, HTMLOptionElement);
+    const input = asElement(parentNode, HTMLSelectElement);
+    const { name } = input;
+    fireEvent.change(input, { target: { name, value: String(value) } });
   };
 
   it('changing the relative time range value does not execute a new search', async () => {

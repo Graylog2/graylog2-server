@@ -6,7 +6,17 @@ import type { ActionContexts } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
-export type ActionComponents = { [string]: React.Node };
+export type ActionComponentProps = {
+  onClose: () => void,
+  queryId: QueryId,
+  field: FieldName,
+  type: FieldType,
+  value: ?FieldValue,
+};
+
+export type ActionComponentType = React.AbstractComponent<ActionComponentProps>;
+
+export type ActionComponents = { [string]: React.Element<ActionComponentType> };
 
 export type SetActionComponents = ((ActionComponents) => ActionComponents) => void;
 
@@ -26,15 +36,6 @@ export type ActionHandlerConditions = {
   isHidden?: ActionHandlerCondition,
 };
 
-export type ActionComponentProps = {
-  onClose: () => void,
-  queryId: QueryId,
-  field: FieldName,
-  type: FieldType,
-  value: ?FieldValue,
-};
-
-export type ActionComponentType = React.AbstractComponent<ActionComponentProps>;
 export type HandlerAction = {|
   type: string,
   title: string,

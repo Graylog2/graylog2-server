@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Title = styled.h3`
+const Title = styled.h3(({ theme }) => `
   height: 30px;
 
   a {
-    color: #000;
+    color: ${theme.color.global.textDefault};
   }
 
   .label {
@@ -14,7 +14,7 @@ const Title = styled.h3`
     margin-left: 5px;
     vertical-align: bottom;
   }
-`;
+`);
 
 const MessageDetailsTitle = (props) => {
   return (

@@ -35,7 +35,7 @@ export const ContentOverlay: StyledComponent<{}, {}, HTMLDivElement> = styled.di
   background: rgba(3, 3, 3, 0.25);
 `;
 
-export const SidebarHeader: StyledComponent<{open: boolean, hasTitle: boolean}, {}, React.ComponentType> = styled(NavItemTitle)`
+export const SidebarHeader: StyledComponent<{open: boolean, hasTitle: boolean}, {}, typeof NavItemTitle> = styled(NavItemTitle)`
   ${(({ open, hasTitle }) => {
     let justifyContent = 'center';
     if (open && hasTitle) justifyContent = 'space-between';
