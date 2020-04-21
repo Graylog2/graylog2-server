@@ -6,10 +6,10 @@ import { Overlay, Transition } from 'react-overlays';
 
 import styles from './OverlayDropdown.css';
 
-const StyledList = styled.ul(({ show }) => `
+const StyledList = styled.ul(({ show, theme }) => `
   padding-left: 5px;
   padding-right: 5px;
-  color: #666666;
+  color: ${theme.color.gray[40]};
   z-index: 1050;
   min-width: 'max-content';
   display: ${show ? 'block' : 'none'};
