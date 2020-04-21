@@ -3,16 +3,15 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Table } from 'components/graylog';
-
 import { SystemMessage } from 'components/systemmessages';
 
-const SystemMessagesTable = styled(Table)`
+const SystemMessagesTable = styled(Table)(({ theme }) => `
   font-size: 12px;
 
   a {
-    color: #000;
+    color: ${theme.color.global.textDefault};
   }
-`;
+`);
 
 const TimestampTH = styled.th`
   width: 200px;
