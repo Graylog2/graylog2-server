@@ -3,6 +3,7 @@ import * as React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
 import { Map, List } from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
+import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 
@@ -40,11 +41,7 @@ describe('DefaultFieldTypesProvider', () => {
   });
 
   it('provides field types of field types store', () => {
-    const _createField = (name) => ({ name, type: { type: 'string' } });
-    const _createQueryFields = (fields) => ({ get: () => fields });
-    const fieldsFixtures = ['source', 'message', 'timestamp'].map(_createField);
-    const fieldStoreState = { all: fieldsFixtures, queryFields: _createQueryFields(fieldsFixtures) };
-
+    const fieldStoreState = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
     asMock(FieldTypesStore.getInitialState).mockReturnValue(fieldStoreState);
 
     const consume = renderSUT();
