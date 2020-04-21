@@ -111,22 +111,16 @@ export class Builder {
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
-<<<<<<< HEAD
 
-        // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-        handleForbidden(error, SessionStore);
-        handleUnauthorized(error, SessionStore);]
-
-=======
         if (error.status === 401) {
           this._handleUnauthorized(error, SessionStore);
         }
         if (error.status === 403) {
           this._handleForbidden(error, SessionStore);
         }
->>>>>>> Implement unauthorized and forbidden handling as customizable builder methods for fetch provider
+
         reportError(error);
-        
+
         throw new FetchError(error.statusText, error);
       });
 
