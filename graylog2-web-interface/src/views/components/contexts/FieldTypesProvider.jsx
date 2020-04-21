@@ -10,9 +10,13 @@ import FieldTypesContext from './FieldTypesContext';
 const FieldTypesProvider = ({ children }: { children: React.Node }) => {
   const fieldTypes = useStore(FieldTypesStore);
   return (
-    <FieldTypesContext.Provider value={fieldTypes}>
-      {children}
-    </FieldTypesContext.Provider>
+    fieldTypes
+      ? (
+        <FieldTypesContext.Provider value={fieldTypes}>
+          {children}
+        </FieldTypesContext.Provider>
+      )
+      : children
   );
 };
 

@@ -44,23 +44,20 @@ describe('SearchResult', () => {
   beforeAll(() => {
     jest.useFakeTimers();
   });
-  beforeEach(() => {
+  afterEach(() => {
     cleanup();
     jest.clearAllMocks();
   });
 
   const fieldTypesStroreState = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
-
   const SimpleSearchResult = ({ fieldTypes }) => (
     <FieldTypesContext.Provider value={fieldTypes}>
       <SearchResult />
     </FieldTypesContext.Provider>
   );
-
   SimpleSearchResult.propTypes = {
     fieldTypes: PropTypes.object,
   };
-
   SimpleSearchResult.defaultProps = {
     fieldTypes: fieldTypesStroreState,
   };

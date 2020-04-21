@@ -33,10 +33,10 @@ describe('FieldTypesProvider', () => {
     return consume;
   };
 
-  it('provides empty field types with empty store', () => {
+  it('provides no field types with empty store', () => {
+    asMock(FieldTypesStore.getInitialState).mockReturnValue(undefined);
     const consume = renderSUT();
-
-    expect(consume).toHaveBeenCalledWith({ all: List(), queryFields: Map() });
+    expect(consume).toHaveBeenCalledWith(undefined);
   });
 
   it('provides field types of field types store', () => {

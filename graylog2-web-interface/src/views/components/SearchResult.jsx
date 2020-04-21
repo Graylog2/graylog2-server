@@ -73,7 +73,6 @@ export default connect(SearchResult, {
   viewMetadata: ViewMetadataStore,
   viewState: CurrentViewStateStore,
 }, (props) => ({
-
   ...props,
   searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping },
   queryId: props.viewMetadata.activeQuery,
