@@ -1,5 +1,6 @@
 // @flow strict
-import React, { useContext } from 'react';
+import * as React from 'react';
+import { useContext } from 'react';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
