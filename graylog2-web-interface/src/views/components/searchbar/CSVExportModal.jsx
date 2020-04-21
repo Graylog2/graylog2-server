@@ -1,5 +1,6 @@
 // @flow strict
-import React, { useState, useContext } from 'react';
+import * as React from 'react';
+import { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { sortBy } from 'lodash';
 import URI from 'urijs';

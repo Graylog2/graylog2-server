@@ -1,5 +1,6 @@
 // @flow strict
-import React, { useContext } from 'react';
+import * as React from 'react';
+import { useContext } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
