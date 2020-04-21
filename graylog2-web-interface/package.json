@@ -140,7 +140,7 @@
     "@testing-library/react": "^9.4.1",
     "@types/bluebird": "^3.5.8",
     "@types/jquery": "^3.3.30",
-    "@types/node": "^11.11.0",
+    "@types/node": "^13.13.1",
     "@types/sockjs-client": "^1.0.31",
     "@types/toastr": "^2.1.34",
     "@types/typeahead": "^0.11.29",
