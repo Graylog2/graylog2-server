@@ -18,7 +18,7 @@ const StreamPermissionErrorPage = ({ error }: Props) => {
       <p>Please contact your administrator and provide the error details which indlude a list of streams you need access to.</p>
     </>
   );
-  const streamIds = error?.body?.streams;
+  const streamIds = error?.additional.body?.streams;
   const errorDetails = streamIds && streamIds.length > 0 && (
     <p>
       You need permission to streams with the id: {streamIds.join(', ')}

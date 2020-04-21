@@ -40,7 +40,7 @@ export const createStreamPermissionError = (error: $PropertyType<StreamPermissio
 export const createFromFetchError = (error: FetchError) => {
   switch (error.status) {
     case 403:
-      return error?.body?.type === 'MissingStreamPermission' ? createStreamPermissionError(error) : createUnauthorizedError(error);
+      return error?.additional?.body?.type === 'MissingStreamPermission' ? createStreamPermissionError(error) : createUnauthorizedError(error);
     default:
       throw Error(`Provided FetchError is not a valid ReportedError because status code ${error.status} is not supported`);
   }
