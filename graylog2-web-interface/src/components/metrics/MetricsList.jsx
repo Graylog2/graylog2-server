@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { Metric } from 'components/metrics';
 
-const MetricListWrap = styled(({ theme }) => `
+const MetricListWrap = styled.ul(({ theme }) => `
   padding: 0;
 
   li {
