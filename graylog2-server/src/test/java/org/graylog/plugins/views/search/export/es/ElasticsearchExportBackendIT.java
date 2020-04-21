@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.export.es;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
@@ -36,6 +37,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -192,6 +194,34 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         assertThat(totalResult.messages()).hasSize(4);
     }
 
+    @Test
+    public void resultsHaveAllMessageFields() {
+        importFixture("messages.json");
+
+        MessagesRequest request = requestBuilderWithAllStreams()
+                .fieldsInOrder("timestamp", "message")
+                .build();
+
+        LinkedHashSet<SimpleMessageChunk> allChunks = collectChunksFor(request);
+        SimpleMessageChunk totalResult = allChunks.iterator().next();
+
+        Set<String> allFieldsInResult = actualFieldNamesFrom(totalResult);
+
+        assertThat(allFieldsInResult).containsExactlyInAnyOrder(
+                "gl2_message_id",
+                "source",
+                "message",
+                "timestamp",
+                "streams",
+                "_id");
+    }
+
+    private Set<String> actualFieldNamesFrom(SimpleMessageChunk chunk) {
+        return chunk.messages()
+                .stream().map(m -> m.fields().keySet()).reduce(Sets::union)
+                .orElseThrow(() -> new RuntimeException("failed to collect field names"));
+    }
+
     public void mockIndexLookupFor(MessagesRequest request, String... indexNames) {
         when(indexLookup.indexNamesForStreamsInTimeRange(request.streams(), request.timeRange()))
                 .thenReturn(ImmutableSet.copyOf(indexNames));
@@ -222,13 +252,22 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         LinkedHashSet<SimpleMessage> allMessages = new LinkedHashSet<>();
 
         for (SimpleMessageChunk chunk : allChunks) {
-            for (SimpleMessage msg : chunk.messages()) {
-                msg.fields().remove("_id");
-            }
+            keepOnlyRelevantFields(chunk, request.fieldsInOrder());
             allMessages.addAll(chunk.messages());
         }
 
         return SimpleMessageChunk.from(request.fieldsInOrder(), allMessages);
+    }
+
+    private void keepOnlyRelevantFields(SimpleMessageChunk chunk, LinkedHashSet<String> relevantFields) {
+        for (SimpleMessage msg : chunk.messages()) {
+            Set<String> allFieldsInMessage = ImmutableSet.copyOf(msg.fields().keySet());
+            for (String name : allFieldsInMessage) {
+                if (!relevantFields.contains(name)) {
+                    msg.fields().remove(name);
+                }
+            }
+        }
     }
 
     private LinkedHashSet<SimpleMessageChunk> collectChunksFor(MessagesRequest request) {
@@ -242,7 +281,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         return timerange("2015-01-01T00:00:00.000Z", "2015-01-03T00:00:00.000Z");
     }
 
-    private TimeRange timerange(String from, String to) {
+    private TimeRange timerange(@SuppressWarnings("SameParameterValue") String from, String to) {
         try {
             return AbsoluteRange.create(from, to);
         } catch (InvalidRangeParametersException e) {

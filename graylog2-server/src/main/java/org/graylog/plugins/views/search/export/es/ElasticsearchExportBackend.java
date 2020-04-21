@@ -54,6 +54,7 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
+@SuppressWarnings("rawtypes")
 public class ElasticsearchExportBackend implements ExportBackend {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchExportBackend.class);
 
@@ -185,20 +186,21 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
     private SimpleMessageChunk buildHitsWithRelevantFields(List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder) {
         LinkedHashSet<SimpleMessage> set = hits.stream()
-                .map(h -> buildHitWithRelevantFields(desiredFieldsInOrder, h.source, h.index))
+                .map(h -> buildHitWithAllFields(h.source, h.index))
                 .collect(toCollection(LinkedHashSet::new));
         return SimpleMessageChunk.from(desiredFieldsInOrder, set);
     }
 
-    private SimpleMessage buildHitWithRelevantFields(Set<String> desiredFieldsInOrder, Map source, String index) {
+    private SimpleMessage buildHitWithAllFields(Map source, String index) {
         LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
 
-        for (String name : desiredFieldsInOrder) {
+        for (Object key : source.keySet()) {
+            String name = (String) key;
             Object value = valueFrom(source, name);
             fields.put(name, value);
         }
 
-        // _id is needed, because the old decorators relies on it
+        // _id is needed, because the old decorators implementation relies on it
         fields.put("_id", UUID.randomUUID().toString());
 
         return SimpleMessage.from(index, fields);
