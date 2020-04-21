@@ -5,7 +5,6 @@ import * as Immutable from 'immutable';
 import styled, { css, type StyledComponent } from 'styled-components';
 import { withRouter } from 'react-router';
 
-import FieldTypesProvider from 'views/components/contexts/FieldTypesProvider';
 import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
@@ -39,6 +38,7 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
+import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
@@ -143,15 +143,15 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   useSyncWithQueryParameters(query);
 
   return (
-    <CurrentViewTypeProvider>
-      <IfInteractive>
-        <IfDashboard>
-          <WindowLeaveMessage route={route} />
-        </IfDashboard>
-      </IfInteractive>
-      <InteractiveContext.Consumer>
-        {(interactive) => (
-          <FieldTypesProvider>
+    <DefaultFieldTypesProvider>
+      <CurrentViewTypeProvider>
+        <IfInteractive>
+          <IfDashboard>
+            <WindowLeaveMessage route={route} />
+          </IfDashboard>
+        </IfInteractive>
+        <InteractiveContext.Consumer>
+          {(interactive) => (
             <ViewAdditionalContextProvider>
               <HighlightingRulesProvider>
                 <GridContainer id="main-row" interactive={interactive}>
@@ -184,10 +184,10 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
                 </GridContainer>
               </HighlightingRulesProvider>
             </ViewAdditionalContextProvider>
-          </FieldTypesProvider>
-        )}
-      </InteractiveContext.Consumer>
-    </CurrentViewTypeProvider>
+          )}
+        </InteractiveContext.Consumer>
+      </CurrentViewTypeProvider>
+    </DefaultFieldTypesProvider>
   );
 };
 

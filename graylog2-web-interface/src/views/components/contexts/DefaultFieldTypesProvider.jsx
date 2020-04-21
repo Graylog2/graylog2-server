@@ -7,7 +7,7 @@ import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 
 import FieldTypesContext from './FieldTypesContext';
 
-const FieldTypesProvider = ({ children }: { children: React.Node }) => {
+const DefaultFieldTypesProvider = ({ children }: { children: React.Node }) => {
   const fieldTypes = useStore(FieldTypesStore);
   return (
     fieldTypes
@@ -20,8 +20,8 @@ const FieldTypesProvider = ({ children }: { children: React.Node }) => {
   );
 };
 
-FieldTypesProvider.propTypes = {
+DefaultFieldTypesProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default FieldTypesProvider;
+export default DefaultFieldTypesProvider;
