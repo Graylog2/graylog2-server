@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, wait, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import { render, cleanup, wait } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import suppressConsole from 'helpers/suppressConsole';
@@ -50,25 +50,24 @@ describe('ReportedError', () => {
   });
 
   it('displays runtime error page when react error got reported', async () => {
-    const { getByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
+    const { getByText, queryByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
 
     suppressConsole(() => {
       ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
     });
-
-    await waitForElementToBeRemoved(() => getByText('Hello World!'));
+    await wait(() => expect(queryByText('Hello World!')).toBeNull());
     await wait(() => expect(getByText('Something went wrong.')).not.toBeNull());
     await wait(() => expect(getByText('The error message')).not.toBeNull());
   });
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
-    const { getByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
+    const { getByText, queryByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
 
     suppressConsole(() => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
     });
 
-    await waitForElementToBeRemoved(() => getByText('Hello World!'));
+    await wait(() => expect(queryByText('Hello World!')).toBeNull());
     await wait(() => expect(getByText('Missing Permissions')).not.toBeNull());
     await wait(() => expect(getByText(/The request error message/)).not.toBeNull());
   });
