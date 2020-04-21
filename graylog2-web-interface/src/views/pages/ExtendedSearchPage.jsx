@@ -33,11 +33,9 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldList } from 'views/components/sidebar';
-import { FetchError } from 'logic/rest/FetchProvider';
 
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
-import SearchExecutionErrors from 'views/components/SearchExecutionErrors';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import IfSearch from 'views/components/search/IfSearch';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -88,7 +86,6 @@ const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, vie
   }));
 
 type Props = {
-  errors: FetchError[],
   route: any,
   searchRefreshHooks: Array<SearchRefreshCondition>,
   router: {
@@ -133,7 +130,7 @@ const useStyle = () => {
   }, []);
 };
 
-const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks, errors }: Props) => {
+const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
   const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
@@ -164,14 +161,6 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   }, []);
 
   useSyncWithQueryParameters(query);
-
-  if (errors && errors.length > 0) {
-    return (
-      <CurrentViewTypeProvider>
-        <SearchExecutionErrors errors={errors} />
-      </CurrentViewTypeProvider>
-    );
-  }
 
   return (
     <CurrentViewTypeProvider>
@@ -224,12 +213,10 @@ ExtendedSearchPage.propTypes = {
     query: PropTypes.object.isRequired,
   }),
   router: PropTypes.object,
-  errors: PropTypes.arrayOf(PropTypes.object),
   searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
 };
 
 ExtendedSearchPage.defaultProps = {
-  errors: undefined,
   location: { query: {} },
   router: {
     getCurrentLocation: () => ({ pathname: '', search: '' }),
@@ -243,14 +230,8 @@ ExtendedSearchPage.defaultProps = {
   },
 };
 
-const ExtendedSearchPageWithStores = connect(ExtendedSearchPage, {
-  searches: SearchStore,
-}, ({ searches: { errors } }) => ({
-  errors,
-}));
-
 const mapping = {
   searchRefreshHooks: 'views.hooks.searchRefresh',
 };
 
-export default withPluginEntities<$Rest<Props, {| router: any |}>, typeof mapping>(withRouter(ExtendedSearchPageWithStores), mapping);
+export default withPluginEntities<$Rest<Props, {| router: any |}>, typeof mapping>(withRouter(ExtendedSearchPage), mapping);

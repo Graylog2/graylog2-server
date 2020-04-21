@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { withRouter } from 'react-router';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { type ReportedError as ReportedErrorType, ReactErrorType, UnauthorizedErrorType } from 'logic/errors/ReportedErrors';
+import { type ReportedError as ReportedErrorType, ReactErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
 
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
+import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
 
 const ReportedError = ({ children, router }) => {
   const [reportedError, setReportedError] = useState<?ReportedErrorType>();
@@ -34,6 +35,10 @@ const ReportedError = ({ children, router }) => {
 
   if (reportedError && reportedError.type === UnauthorizedErrorType) {
     return <UnauthorizedErrorPage error={reportedError.error} />;
+  }
+
+  if (reportedError && reportedError.type === StreamPermissionErrorType) {
+    return <StreamPermissionErrorPage error={reportedError.error} />;
   }
 
   return children;

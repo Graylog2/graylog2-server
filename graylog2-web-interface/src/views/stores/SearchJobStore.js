@@ -1,32 +1,16 @@
 // @flow strict
 import Reflux from 'reflux';
 
-import fetch, { Builder as FetchBuilder, queuePromiseIfNotLoggedin, redirectIfForbidden } from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
+import URLUtils from 'util/URLUtils';
 
 import Search from 'views/logic/search/Search';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
-const executeQueryUrl = (id) => qualifyUrl(`/views/search/${id}/execute`);
-const jobStatusUrl = (jobId) => qualifyUrl(`/views/search/status/${jobId}`);
-
-const executeSearch = (search, executionState) => {
-  const url = executeQueryUrl(search.id);
-  const payload = JSON.stringify(executionState);
-  const handleForbidden = (error, SessionStore) => {
-    if (error.body && error.body.type !== 'MissingStreamPermission') {
-      redirectIfForbidden(error, SessionStore);
-    }
-  };
-  const promise = () => new FetchBuilder('POST', url)
-    .authenticated()
-    .handleForbidden(handleForbidden)
-    .json(payload)
-    .build();
-  return queuePromiseIfNotLoggedin(promise)();
-};
+const executeQueryUrl = (id) => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
+const jobStatusUrl = (jobId) => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);
 
 type InternalState = {};
 
@@ -80,7 +64,7 @@ export const SearchJobStore = singletonStore(
     },
 
     run(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
-      const promise = executeSearch(search, executionState);
+      const promise = fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
       SearchJobActions.run.promise(promise);
       return promise;
     },
@@ -90,5 +74,6 @@ export const SearchJobStore = singletonStore(
       SearchJobActions.jobStatus.promise(promise);
       return promise;
     },
+
   }),
 );

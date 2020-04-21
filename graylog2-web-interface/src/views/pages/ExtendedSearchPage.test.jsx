@@ -9,7 +9,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import { SearchActions, SearchStore } from 'views/stores/SearchStore';
+import { SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
@@ -260,12 +260,5 @@ describe('ExtendedSearchPage', () => {
       .then(() => {
         expect(SearchActions.execute).not.toHaveBeenCalled();
       });
-  });
-
-  it('displays SearchStore errors', () => {
-    asMock(SearchStore.getInitialState).mockReturnValueOnce({ errors: [new Error('The error message')] });
-    const wrapper = mount(<SimpleExtendedSearchPage />);
-
-    expect(wrapper.contains('The error message.')).not.toBeNull();
   });
 });
