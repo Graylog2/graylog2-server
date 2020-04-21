@@ -62,8 +62,8 @@ describe('SearchResult', () => {
     fieldTypes: fieldTypesStroreState,
   };
 
-  it('should show spinner while loading field types', () => {
-    const { getByText } = render(<SimpleSearchResult fieldTypes={null} />);
+  it('should show spinner with undefined fields', () => {
+    const { getByText } = render(<SearchResult />);
     act(() => jest.advanceTimersByTime(200));
     expect(getByText('Loading...')).not.toBeNull();
   });
