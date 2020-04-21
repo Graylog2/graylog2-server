@@ -108,7 +108,7 @@ describe('SurroundingSearchButton', () => {
       <DrilldownContext.Consumer>
         {(drilldown) => (
           <DrilldownContext.Provider value={{ ...drilldown, streams }}>
-            <TestComponent/>
+            <TestComponent />
           </DrilldownContext.Provider>
         )}
       </DrilldownContext.Consumer>
