@@ -69,15 +69,15 @@ const CSVExportSettings = ({
         When you&apos;ve finished the configuration, click on &quot;Start Download&quot;.
       </Row>
       <Row>
-        <span>Select fields to export:</span>
+        <span>Fields to export:</span>
         <FieldSelect fields={fields} onChange={selectField} value={selectedFields} />
       </Row>
       <Row>
-        <span>Select sort (removing the sort will result in a faster export):</span>
+        <span>Sort (removing the sort will result in a faster export):</span>
         <FieldSortSelect fields={fields} sort={selectedSort} onChange={setSelectedSort} />
       </Row>
       <Row>
-        <span>Select sort direction:</span>
+        <span>Sort direction:</span>
         <SortDirectionSelect direction={selectedSortDirection ? selectedSortDirection.direction : null}
                              onChange={onSortDirectionChange} />
       </Row>
