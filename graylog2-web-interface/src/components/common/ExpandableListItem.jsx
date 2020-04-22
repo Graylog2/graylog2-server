@@ -58,6 +58,13 @@ const HeaderWrap = styled.span`
   font-size: 14px;
 `;
 
+const Header = styled.button`
+  border: 0;
+  padding: 0;
+  text-align: left;
+  background: transparent;
+`;
+
 const Subheader = styled.span`
   font-size: 0.95em;
   margin-left: 0.5em;
@@ -119,35 +126,45 @@ class ExpandableListItem extends React.Component {
     padded: true,
   };
 
-  state = {
-    expanded: this.props.expanded,
-    selectable: false,
-    subheader: '',
-  };
+  constructor(props) {
+    super(props);
+
+    this._checkbox = undefined;
+
+    this.state = {
+      expanded: props.expanded,
+    };
+  }
+
 
   componentDidMount() {
-    if (this.props.indetermined && this._checkbox) {
-      this._checkbox.indeterminate = this.props.indetermined;
+    const { indetermined } = this.props;
+
+    if (indetermined && this._checkbox) {
+      this._checkbox.indeterminate = indetermined;
     }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.expanded !== this.props.expanded) {
+    const { expanded, indetermined } = this.props;
+
+    if (prevProps.expanded !== expanded) {
       this._toggleExpand();
     }
 
     if (this._checkbox) {
-      this._checkbox.indeterminate = this.props.indetermined;
+      this._checkbox.indeterminate = indetermined;
     }
   }
 
-  _checkbox = undefined;
-
   _toggleExpand = () => {
-    if (this.props.stayExpanded) {
+    const { stayExpanded } = this.props;
+    const { expanded } = this.state;
+
+    if (stayExpanded) {
       this.setState({ expanded: true });
     } else {
-      this.setState({ expanded: !this.state.expanded });
+      this.setState({ expanded: !expanded });
     }
   };
 
@@ -166,7 +183,7 @@ class ExpandableListItem extends React.Component {
     const { expanded } = this.state;
     const { padded } = this.props;
     const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
-    const headerToRender = selectable ? (<span role="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</span>) : header;
+    const headerToRender = selectable ? (<Header type="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</Header>) : header;
     const inputProps = this._filterInputProps(otherProps);
 
     return (
