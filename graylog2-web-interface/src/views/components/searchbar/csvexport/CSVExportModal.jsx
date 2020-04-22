@@ -25,6 +25,8 @@ import CustomPropTypes from 'views/components/CustomPropTypes';
 import ExportStategy from './ExportStrategy';
 import startDownload from './startDownload';
 
+const DEFAULT_FIELDS = ['timestamp', 'source', 'message'];
+
 const Content = styled.div`
   margin-left: 15px;
   margin-right: 15px;
@@ -53,9 +55,14 @@ const _onStartDownload = (view, executionState, selectedWidget, selectedFields, 
   startDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit).then(() => setLoading(false));
 };
 
-const _wrapFieldOption = (field) => ({ field });
-const _defaultFields = ['timestamp', 'source', 'message'];
-const _defaultFieldOptions = _defaultFields.map(_wrapFieldOption);
+const _getInitialFields = (selectedWidget) => {
+  let initialFields = DEFAULT_FIELDS;
+  if (selectedWidget) {
+    // Because the message table always displays the message, we need to add it as an initial field.
+    initialFields = [...new Set([...selectedWidget.config.fields, 'message'])];
+  }
+  return initialFields.map((field) => ({ field }));
+};
 
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
@@ -64,7 +71,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
 
   const [loading, setLoading] = useState(false);
   const [selectedWidget, setSelectedWidget] = useState<?Widget>(initialWidget(messagesWidgets, directExportWidgetId));
-  const [selectedFields, setSelectedFields] = useState<{ field: string }[]>(selectedWidget ? selectedWidget.config.fields.map(_wrapFieldOption) : _defaultFieldOptions);
+  const [selectedFields, setSelectedFields] = useState<{ field: string }[]>(_getInitialFields(selectedWidget));
   const [selectedSort, setSelectedSort] = useState<SortConfig[]>(selectedWidget ? selectedWidget.config.sort : defaultSort);
   const [selectedSortDirection] = selectedSort.map((s) => s.direction);
   const [limit, setLimit] = useState<?number>();

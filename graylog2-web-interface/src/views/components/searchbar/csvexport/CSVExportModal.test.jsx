@@ -46,8 +46,8 @@ describe('CSVExportModal', () => {
   const queries = [
     Query.builder().id('query-id-1').searchTypes([searchType]).build(),
   ];
-  const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending);
-  const config = new MessagesWidgetConfig(['timestamp', 'source'], true, [], [currentSort]);
+  const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'level', Direction.Descending);
+  const config = new MessagesWidgetConfig(['level', 'http_method'], true, [], [currentSort]);
   const widget1 = Widget.builder().id('widget-id-1').type(MessagesWidget.type).config(config)
     .build();
   const widget2 = Widget.builder().id('widget-id-2').type(MessagesWidget.type).config(config)
@@ -91,17 +91,14 @@ describe('CSVExportModal', () => {
     .state(statesWithMultipleWidgets)
     .build();
   // Prepare expected payload
-  const direction = Direction.Descending;
-  const messageSortConfig = new MessageSortConfig('timestamp', direction);
-  const payloadSearchMessages = {
-    fields_in_order: ['timestamp', 'source', 'message'],
+  const defaultDirection = Direction.Descending;
+  const messageSortConfig = new MessageSortConfig('level', defaultDirection);
+  const defaultSort = new MessageSortConfig('timestamp', defaultDirection);
+  const payload = {
+    fields_in_order: ['level', 'http_method', 'message'],
     sort: [messageSortConfig],
     limit: undefined,
     execution_state: new SearchExecutionState(),
-  };
-  const payloadSearchTypeMessages = {
-    ...payloadSearchMessages,
-    fields_in_order: ['timestamp', 'source'],
   };
 
   afterEach(() => {
@@ -141,7 +138,13 @@ describe('CSVExportModal', () => {
     const executionState = new SearchExecutionState(parameterBindings, globalOverride);
     SearchExecutionStateStore.getInitialState.mockReturnValueOnce(executionState);
     const expectedPayload = {
-      ...payloadSearchMessages,
+      ...payload,
+      fields_in_order: [
+        'timestamp',
+        'source',
+        'message',
+      ],
+      sort: [defaultSort],
       execution_state: executionState,
     };
     const { getByTestId } = render(<SimpleCSVExportModal />);
@@ -180,7 +183,7 @@ describe('CSVExportModal', () => {
       expect(queryByText('Select different message table')).toBeNull();
     });
 
-    it('should export all messages when no widget exists', async () => {
+    it('should export all messages with default fields when no widget exists', async () => {
       const exportSearchMessagesAction = asMock(exportSearchMessages);
       const { getByTestId } = render(<SearchCSVExportModal />);
 
@@ -188,7 +191,19 @@ describe('CSVExportModal', () => {
       fireEvent.click(submitButton);
 
       await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
-      expect(exportSearchMessagesAction).toHaveBeenCalledWith(payloadSearchMessages, 'search-id', 'Untitled-Search-search-result');
+      expect(exportSearchMessagesAction).toHaveBeenCalledWith(
+        {
+          ...payload,
+          sort: [defaultSort],
+          fields_in_order: [
+            'timestamp',
+            'source',
+            'message',
+          ],
+        },
+        'search-id',
+        'Untitled-Search-search-result',
+      );
     });
 
     it('preselect messages widget when only one exists', () => {
@@ -207,7 +222,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
     });
 
     it('show widget selection if more than one exists', () => {
@@ -231,7 +246,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
     });
   });
 
@@ -271,7 +286,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payloadSearchTypeMessages, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
     });
   });
 });
