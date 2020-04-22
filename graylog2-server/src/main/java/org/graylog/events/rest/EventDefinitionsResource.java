@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
+import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
@@ -84,15 +85,18 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     private final DBEventDefinitionService dbService;
     private final EventDefinitionHandler eventDefinitionHandler;
+    private final EventDefinitionContextService contextService;
     private final EventProcessorEngine engine;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
                                     EventDefinitionHandler eventDefinitionHandler,
+                                    EventDefinitionContextService contextService,
                                     EventProcessorEngine engine) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
+        this.contextService = contextService;
         this.engine = engine;
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -105,8 +109,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
             return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-            }, "title", page, perPage);
-        return PaginatedResponse.create("event_definitions", result, query);
+        }, "title", page, perPage);
+        final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
+        return PaginatedResponse.create("event_definitions", result, query, context);
     }
 
     @GET
@@ -164,6 +169,24 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         eventDefinitionHandler.delete(definitionId);
     }
 
+    @PUT
+    @Path("{definitionId}/schedule")
+    @ApiOperation("Delete event definition")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
+    public void schedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+        checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
+        eventDefinitionHandler.schedule(definitionId);
+    }
+
+    @PUT
+    @Path("{definitionId}/unschedule")
+    @ApiOperation("Delete event definition")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
+    public void unschedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+        checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
+        eventDefinitionHandler.unschedule(definitionId);
+    }
+
     @POST
     @ApiOperation("Execute event definition")
     @Path("{definitionId}/execute")
@@ -194,8 +217,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     private void checkEventDefinitionPermissions(EventDefinitionDto dto, String action) {
         final Set<String> missingPermissions = dto.requiredPermissions().stream()
-            .filter(permission -> !isPermitted(permission))
-            .collect(Collectors.toSet());
+                .filter(permission -> !isPermitted(permission))
+                .collect(Collectors.toSet());
 
         if (!missingPermissions.isEmpty()) {
             LOG.info("Not authorized to {} event definition. User <{}> is missing permissions: {}", action, getSubject().getPrincipal(), missingPermissions);

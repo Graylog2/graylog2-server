@@ -14,6 +14,7 @@ const EventDefinitionsStore = Reflux.createStore({
   sourceUrl: '/events/definitions',
   all: undefined,
   eventDefinitions: undefined,
+  context: undefined,
   query: undefined,
   pagination: {
     count: undefined,
@@ -35,6 +36,7 @@ const EventDefinitionsStore = Reflux.createStore({
     return {
       all: this.all,
       eventDefinitions: this.eventDefinitions,
+      context: this.context,
       query: this.query,
       pagination: this.pagination,
     };
@@ -67,6 +69,7 @@ const EventDefinitionsStore = Reflux.createStore({
 
     promise.then((response) => {
       this.all = response.event_definitions;
+      this.context = response.context;
       this.propagateChanges();
       return response;
     });
@@ -85,6 +88,7 @@ const EventDefinitionsStore = Reflux.createStore({
 
     promise.then((response) => {
       this.eventDefinitions = response.event_definitions;
+      this.context = response.context;
       this.query = response.query;
       this.pagination = {
         count: response.count,
@@ -171,6 +175,44 @@ const EventDefinitionsStore = Reflux.createStore({
     );
 
     EventDefinitionsActions.delete.promise(promise);
+  },
+
+  enable(eventDefinition) {
+    const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'schedule'] }));
+    promise.then(
+      (response) => {
+        UserNotification.success('Event Definition successfully enabled',
+          `Event Definition "${eventDefinition.title}" was successfully enabled.`);
+        this.refresh();
+        return response;
+      },
+      (error) => {
+        if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+          UserNotification.error(`Enabling Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+            'Could not enable Event Definition');
+        }
+      },
+    );
+    EventDefinitionsActions.enable.promise(promise);
+  },
+
+  disable(eventDefinition) {
+    const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'unschedule'] }));
+    promise.then(
+      (response) => {
+        UserNotification.success('Event Definition successfully disabled',
+          `Event Definition "${eventDefinition.title}" was successfully disabled.`);
+        this.refresh();
+        return response;
+      },
+      (error) => {
+        if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+          UserNotification.error(`Disabling Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+            'Could not disable Event Definition');
+        }
+      },
+    );
+    EventDefinitionsActions.disable.promise(promise);
   },
 });
 
