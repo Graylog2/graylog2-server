@@ -154,9 +154,9 @@ describe('CSVExportModal', () => {
 
   it('should show loading indicator after starting download', async () => {
     const exportSearchMessagesAction = asMock(exportSearchMessages);
-    const { getByTestId, getByText } = render(<SimpleCSVExportModal />);
+    const { getByTestId, getByText, getAllByText } = render(<SimpleCSVExportModal />);
 
-    expect(getByText('Start Download')).not.toBeNull();
+    expect(getAllByText('Start Download')).toHaveLength(2);
 
     const submitButton = getByTestId('csv-download-button');
     fireEvent.click(submitButton);
