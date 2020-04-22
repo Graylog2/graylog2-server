@@ -65,12 +65,19 @@ const CSVExportSettings = ({
     <>
       {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
       <Row>
-        Define the fields and sorting for your CSV file. You can change the field order with drag and drop.<br />
-        When you&apos;ve finished the configuration, click on &quot;Start Download&quot;.
+        <p>
+          Define the fields and sorting for your CSV file. You can change the field order with drag and drop.<br />
+        </p>
+        <p>
+          The export supports fields created by decorators, but they do not appear in the fields list. If you want to export a decorated field, enter the name and select the option <i>Create &quot;decorated_field&quot;</i>.
+        </p>
+        <p>
+          When you&apos;ve finished the configuration, click on <i>Start Download</i>.
+        </p>
       </Row>
       <Row>
         <span>Fields to export:</span>
-        <FieldSelect fields={fields} onChange={selectField} value={selectedFields} />
+        <FieldSelect fields={fields} onChange={selectField} value={selectedFields} allowOptionCreation />
       </Row>
       <Row>
         <span>Sort (removing the sort will result in a faster export):</span>

@@ -20,7 +20,7 @@ type Props = {
   value: ?{field: string}[],
 };
 
-const FieldSelect = ({ fields, onChange, value }: Props) => {
+const FieldSelect = ({ fields, onChange, value, ...rest }: Props) => {
   const fieldsForSelect = fields
     .map((fieldType) => fieldType.name)
     .map((fieldName) => ({ label: fieldName, value: fieldName }))
@@ -29,7 +29,8 @@ const FieldSelect = ({ fields, onChange, value }: Props) => {
     .sort((v1, v2) => defaultCompare(v1.label, v2.label));
 
   return (
-    <SortableSelect options={fieldsForSelect}
+    <SortableSelect {...rest}
+                    options={fieldsForSelect}
                     onChange={onChange}
                     valueComponent={({ children: _children }) => <ValueComponent>{_children}</ValueComponent>}
                     value={value} />
