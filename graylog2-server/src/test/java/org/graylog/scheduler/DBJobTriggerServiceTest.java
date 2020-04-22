@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -196,6 +197,38 @@ public class DBJobTriggerServiceTest {
 
         // We expect a ISE when there is more than one trigger for a single job definition
         assertThatCode(() -> dbJobTriggerService.getForJob("54e3deadbeefdeadbeefaff3"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("54e3deadbeefdeadbeefaff3");
+    }
+
+    @Test
+    @MongoDBFixtures("job-triggers.json")
+    public void getForJobs() {
+        assertThatCode(() -> dbJobTriggerService.getForJobs(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("jobDefinitionId");
+
+        assertThat(dbJobTriggerService.getForJobs(Collections.emptySet())).isEmpty();
+        assertThat(dbJobTriggerService.getForJobs(Collections.singleton("doesntexist"))).isEmpty();
+
+        assertThat(dbJobTriggerService.getForJobs(ImmutableSet.of("54e3deadbeefdeadbeefaff4", "54e3deadbeefdeadbeefaff5")))
+                .hasSize(2)
+                .satisfies(triggers -> {
+                    assertThat(triggers.get("54e3deadbeefdeadbeefaff4")).hasSize(1);
+                    assertThat(triggers.get("54e3deadbeefdeadbeefaff4").get(0)).satisfies(trigger -> {
+                        assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0002");
+                        assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff4");
+                    });
+
+                    assertThat(triggers.get("54e3deadbeefdeadbeefaff5")).hasSize(1);
+                    assertThat(triggers.get("54e3deadbeefdeadbeefaff5").get(0)).satisfies(trigger -> {
+                        assertThat(trigger.id()).isEqualTo("54e3deadbeefdeadbeef0003");
+                        assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff5");
+                    });
+                });
+
+        // We expect a ISE when there is more than one trigger for a single job definition
+        assertThatCode(() -> dbJobTriggerService.getForJobs(Collections.singleton("54e3deadbeefdeadbeefaff3")))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("54e3deadbeefdeadbeefaff3");
     }
@@ -691,18 +724,18 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("stale-job-triggers.json")
     public void forceReleaseOwnedTriggers() {
         final Set<String> triggerIds = dbJobTriggerService.all().stream()
-            .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
-            .map(JobTriggerDto::id)
-            .collect(Collectors.toSet());
+                .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
+                .map(JobTriggerDto::id)
+                .collect(Collectors.toSet());
 
         assertThat(triggerIds).containsOnly("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002", "54e3deadbeefdeadbeef0004");
 
         assertThat(dbJobTriggerService.forceReleaseOwnedTriggers()).isEqualTo(2);
 
         final Set<String> newTriggerIds = dbJobTriggerService.all().stream()
-            .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
-            .map(JobTriggerDto::id)
-            .collect(Collectors.toSet());
+                .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
+                .map(JobTriggerDto::id)
+                .collect(Collectors.toSet());
 
         // Running triggers not owned by this node should not be released
         assertThat(newTriggerIds).containsOnly("54e3deadbeefdeadbeef0002");

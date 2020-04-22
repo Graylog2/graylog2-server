@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
+import one.util.streamex.StreamEx;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
@@ -33,12 +34,15 @@ import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
@@ -46,9 +50,9 @@ import static java.util.Objects.requireNonNull;
 // This class does NOT use PaginatedDbService because we use the triggers collection for locking and need to handle
 // updates very carefully.
 public class DBJobTriggerService {
-    private static final String COLLECTION_NAME = "scheduler_triggers";
+    static final String COLLECTION_NAME = "scheduler_triggers";
     private static final String FIELD_ID = "_id";
-    private static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
+    static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
     private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
     private static final String FIELD_LAST_LOCK_TIME = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_LOCK_TIME;
     private static final String FIELD_NEXT_TIME = JobTriggerDto.FIELD_NEXT_TIME;
@@ -106,9 +110,7 @@ public class DBJobTriggerService {
     /**
      * Returns all job triggers for the given job definition ID.
      *
-     * TODO: Don't throw exception when there is more than one trigger for a job definition.
-     *       To be able to do this, we need some kind of label system to make sure we can differentiate between
-     *       automatically created triggers (e.g. by event definition) and manually created ones.
+     * TODO: Don't throw exception when there is more than one trigger for a job definition. (see source code)
      *
      * @param jobDefinitionId the job definition ID
      * @return list of found job triggers
@@ -125,12 +127,51 @@ public class DBJobTriggerService {
 
             // We are currently expecting only one trigger per job definition. This will most probably change in the
             // future once we extend our scheduler usage.
+            // TODO: Don't throw exception when there is more than one trigger for a job definition.
+            //       To be able to do this, we need some kind of label system to make sure we can differentiate between
+            //       automatically created triggers (e.g. by event definition) and manually created ones.
             if (triggers.size() > 1) {
                 throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
             }
 
             return triggers;
         }
+    }
+
+    /**
+     * Returns all job triggers for the given job definition IDs, grouped by job definition ID.
+     *
+     * TODO: Don't throw exception when there is more than one trigger for a job definition. (see source code)
+     *
+     * @param jobDefinitionIds the job definition IDs
+     * @return list of found job triggers
+     */
+    public Map<String, List<JobTriggerDto>> getForJobs(Collection<String> jobDefinitionIds) {
+        if (jobDefinitionIds == null) {
+            throw new IllegalArgumentException("jobDefinitionIds cannot be null");
+        }
+
+        final Set<String> queryValues = jobDefinitionIds.stream()
+                .filter(Objects::nonNull)
+                .filter(id -> !isNullOrEmpty(id))
+                .collect(Collectors.toSet());
+
+        final DBQuery.Query query = DBQuery.in(FIELD_JOB_DEFINITION_ID, queryValues);
+        final Map<String, List<JobTriggerDto>> groupedTriggers = StreamEx.of(db.find(query).toArray())
+                .groupingBy(JobTriggerDto::jobDefinitionId);
+
+        // We are currently expecting only one trigger per job definition. This will most probably change in the
+        // future once we extend our scheduler usage.
+        // TODO: Don't throw exception when there is more than one trigger for a job definition.
+        //       To be able to do this, we need some kind of label system to make sure we can differentiate between
+        //       automatically created triggers (e.g. by event definition) and manually created ones.
+        for (Map.Entry<String, List<JobTriggerDto>> entry : groupedTriggers.entrySet()) {
+            if (entry.getValue().size() > 1) {
+                throw new IllegalStateException("More than one trigger for job definition <" + entry.getKey() + ">");
+            }
+        }
+
+        return groupedTriggers;
     }
 
     /**
@@ -226,8 +267,9 @@ public class DBJobTriggerService {
 
     /**
      * Deletes completed {@link OnceJobSchedule} triggers that are older than the provided time
+     *
      * @param timeValue the time range of triggers to be removed
-     * @param unit the unit of the provided timeValue
+     * @param unit      the unit of the provided timeValue
      * @return the number of deleted triggers
      */
     public int deleteCompletedOnceSchedulesOlderThan(long timeValue, TimeUnit unit) {
@@ -236,7 +278,7 @@ public class DBJobTriggerService {
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE),
                 DBQuery.is(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
                 DBQuery.lessThan(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))
-                );
+        );
         return db.remove(query).getN();
     }
 
@@ -344,12 +386,12 @@ public class DBJobTriggerService {
      */
     public int forceReleaseOwnedTriggers() {
         final DBQuery.Query query = DBQuery.and(
-            // Only select trigger for force release which are owned by the calling node
-            DBQuery.is(FIELD_LOCK_OWNER, nodeId),
-            DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
+                // Only select trigger for force release which are owned by the calling node
+                DBQuery.is(FIELD_LOCK_OWNER, nodeId),
+                DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
         );
         final DBUpdate.Builder update = DBUpdate.set(FIELD_LOCK_OWNER, null)
-            .set(FIELD_STATUS, JobTriggerStatus.RUNNABLE);
+                .set(FIELD_STATUS, JobTriggerStatus.RUNNABLE);
 
         return db.updateMulti(query, update).getN();
     }
