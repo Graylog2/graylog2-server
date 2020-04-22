@@ -153,7 +153,7 @@ type Props = {
   config: MessagesWidgetConfig,
   editing?: boolean,
   fields: Immutable.List<FieldTypeMapping>,
-  messages: Array<Object>,
+  messages: Array<{[string]: mixed}>,
   onSortChange: (SortConfig[]) => Promise<void>,
   selectedFields?: Immutable.Set<string>,
   setLoadingState: (loading: boolean) => void,
@@ -201,7 +201,7 @@ class MessageTable extends React.Component<Props, State> {
     return ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
   };
 
-  _getFormattedMessages = (): Array<Object> => {
+  _getFormattedMessages = (): Array<{[string]: mixed}> => {
     const { messages } = this.props;
     return messages.map((m) => ({
       fields: m.message,
