@@ -116,7 +116,6 @@ public abstract class Search implements ContentPackable<SearchEntity> {
                                 : state.path("queries").path(query.id());
                         return query.applyExecutionState(objectMapper, queryOverride);
                     })
-                    .filter(Query::hasSearchTypes)
                     .collect(toImmutableSet());
             builder.queries(queries);
         }

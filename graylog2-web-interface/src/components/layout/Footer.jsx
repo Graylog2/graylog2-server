@@ -12,7 +12,7 @@ const SystemStore = StoreProvider.getStore('System');
 type Props = {
   system?: {
     version: string,
-    hostname: string
+    hostname: string,
   },
 };
 

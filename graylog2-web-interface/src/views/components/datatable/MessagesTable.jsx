@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import chroma from 'chroma-js';
 
 import { Table } from 'components/graylog';
 
@@ -9,7 +10,7 @@ const MessagesContainer = styled.div`
   width: 100%;
 `;
 
-const StyledTable = styled(Table)`
+const StyledTable = styled(Table)(({ theme }) => `
   position: relative;
   font-size: 11px;
   margin-top: 15px;
@@ -20,7 +21,7 @@ const StyledTable = styled(Table)`
   word-break: break-all;
 
   thead > tr {
-    color: #fff;
+    color: ${theme.color.global.textAlt};
   }
 
   td,
@@ -33,7 +34,7 @@ const StyledTable = styled(Table)`
     border: 0;
     font-size: 11px;
     font-weight: normal;
-    background-color: #222;
+    background-color: ${theme.color.gray[10]};
     white-space: nowrap;
   }
 
@@ -46,11 +47,11 @@ const StyledTable = styled(Table)`
   }
 
   tbody.message-group-toggled {
-    border-left: 7px solid #16ace3;
+    border-left: 7px solid ${theme.color.variant.light.info};
   }
 
   tbody.message-highlight {
-    border-left: 7px solid #8dc63f;
+    border-left: 7px solid ${theme.color.variant.light.success};
   }
 
   tr.fields-row {
@@ -66,7 +67,7 @@ const StyledTable = styled(Table)`
     padding-top: 0;
     padding-bottom: 5px;
     font-family: monospace;
-    color: #16ace3;
+    color: ${theme.color.variant.light.info};
   }
 
   tr.message-row {
@@ -87,7 +88,7 @@ const StyledTable = styled(Table)`
         left: 5px;
         top: 4.5em;
         height: 1.5em;
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
+        background: linear-gradient(to bottom, ${chroma(theme.color.global.contentBackground).alpha(0).css()}, ${chroma(theme.color.global.contentBackground).alpha(1).css()} 95%);
       }
     }
   }
@@ -116,14 +117,15 @@ const StyledTable = styled(Table)`
 
   th i.sort-order-item {
     margin-right: 2px;
-    color: #222; /* same color as .messsages th cannot display: none it because it would push the table columns out on hover :( */
+    color: ${theme.color.gray[10]};
+    visiblity: hidden;
   }
 
   th i.sort-order-active,
   th:hover i.sort-order-item {
-    color: #fff;
+    color: ${theme.color.global.textAlt};
   }
-`;
+`);
 
 const MessagesTable = ({ children }) => {
   return (

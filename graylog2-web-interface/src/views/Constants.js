@@ -33,3 +33,9 @@ export const extendedSearchPath = '/extendedsearch';
 export const showSearchPath = `${searchPath}/:viewId`;
 export const showViewsPath = `${viewsPath}/:viewId`;
 export const showDashboardsPath = `${dashboardsPath}/:viewId`;
+
+export const availableTimeRangeTypes = [
+  { type: 'relative', name: 'Relative' },
+  { type: 'absolute', name: 'Absolute' },
+  { type: 'keyword', name: 'Keyword' },
+];

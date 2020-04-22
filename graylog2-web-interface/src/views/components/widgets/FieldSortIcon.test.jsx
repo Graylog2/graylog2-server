@@ -1,4 +1,4 @@
-// @flow stric
+// @flow strict
 import React from 'react';
 import { render, fireEvent, cleanup, wait } from 'wrappedTestingLibrary';
 

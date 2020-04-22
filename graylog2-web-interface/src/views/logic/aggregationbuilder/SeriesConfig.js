@@ -2,7 +2,7 @@
 import * as Immutable from 'immutable';
 
 export type SeriesConfigJson = {
-  name: string
+  name: string,
 };
 
 type InternalState = {

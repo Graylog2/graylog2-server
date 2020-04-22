@@ -16,13 +16,13 @@ type Props = {
   pageSize: number,
   pageSizes: Array<number>,
   totalItems: number,
-  showPageSizeSelect: boolean
-}
+  showPageSizeSelect: boolean,
+};
 
 type State = {
   currentPage: number,
-  pageSize: number
-}
+  pageSize: number,
+};
 
 /**
  * Wrapper component around an element that renders pagination

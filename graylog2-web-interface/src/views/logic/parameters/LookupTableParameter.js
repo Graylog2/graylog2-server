@@ -10,7 +10,7 @@ type InternalBuilderState = Immutable.Map<string, any>;
 type InternalState = {
   lookupTable: string,
   key: string,
-}
+};
 
 export type LookupTableParameterJson = ParameterJson & {
   lookup_table: string,

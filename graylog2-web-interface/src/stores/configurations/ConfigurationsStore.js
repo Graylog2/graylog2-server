@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -18,7 +18,7 @@ export type Url = {
 
 export type WhiteListConfig = {
   entries: Array<Url>,
-  disabled: boolean
+  disabled: boolean,
 };
 const ConfigurationsStore = Reflux.createStore({
   listenables: [ConfigurationActions],

@@ -9,7 +9,7 @@ import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore'
 
 type State = {
   config: WhiteListConfig,
-  isValid: boolean
+  isValid: boolean,
 };
 
 type Props = {

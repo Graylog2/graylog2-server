@@ -209,10 +209,6 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return AndFilter.and(streamIdFilter, filter);
     }
 
-    boolean hasSearchTypes() {
-        return !searchTypes().isEmpty();
-    }
-
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder {

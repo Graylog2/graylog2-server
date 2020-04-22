@@ -1,14 +1,14 @@
 // @flow strict
 import * as React from 'react';
+import styled, { type StyledComponent } from 'styled-components';
 
 import { MessageDetailsDefinitionList } from 'components/graylog';
-
+import { type ThemeInterface } from 'theme';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
-import styles from './MessageFields.css';
 import CustomHighlighting from './CustomHighlighting';
 
 type Props = {
@@ -17,6 +17,18 @@ type Props = {
   },
   fields: FieldTypeMappingsList,
 };
+
+const MessageDetailsDL: StyledComponent<{}, ThemeInterface, HTMLDListElement> = styled(MessageDetailsDefinitionList)(({ theme }) => `
+  color: ${theme.color.gray[40]};
+
+  dd {
+    font-family: monospace;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid  ${theme.color.gray[90]};
+    }
+  }
+`);
 
 const MessageFields = ({ message, fields }: Props) => {
   const formattedFields = message.formatted_fields;
@@ -38,9 +50,9 @@ const MessageFields = ({ message, fields }: Props) => {
     });
 
   return (
-    <MessageDetailsDefinitionList className={`message-details-fields ${styles.messageFields}`}>
+    <MessageDetailsDL className="message-details-fields">
       {renderedFields}
-    </MessageDetailsDefinitionList>
+    </MessageDetailsDL>
   );
 };
 

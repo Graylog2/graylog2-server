@@ -11,7 +11,7 @@ import OverlayDropdown from '../OverlayDropdown';
 import style from '../Value.css';
 import CustomPropTypes from '../CustomPropTypes';
 import { createHandlerFor } from './ActionHandler';
-import type { ActionDefinition, ActionHandlerCondition } from './ActionHandler';
+import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
 
 type Props = {
   children: React.Node,
@@ -21,12 +21,12 @@ type Props = {
   queryId: QueryId,
   type: FieldType,
   value: React.Node,
-}
+};
 
 type State = {
   open: boolean,
-  overflowingComponents: { [string]: React.Node },
-}
+  overflowingComponents: ActionComponents,
+};
 
 class ValueActions extends React.Component<Props, State> {
   static propTypes = {
@@ -44,6 +44,8 @@ class ValueActions extends React.Component<Props, State> {
     type: FieldType.Unknown,
   };
 
+  static contextType = ActionContext;
+
   constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
     this.state = {
@@ -53,8 +55,6 @@ class ValueActions extends React.Component<Props, State> {
   }
 
   _onMenuToggle = () => this.setState((state) => ({ open: !state.open }));
-
-  static contextType = ActionContext;
 
   render() {
     const { children, element, field, menuContainer, queryId, type, value } = this.props;

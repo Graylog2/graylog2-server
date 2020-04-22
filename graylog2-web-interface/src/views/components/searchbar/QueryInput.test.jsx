@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import QueryInput from './QueryInput';
+import UserPreferencesContext, { defaultUserPreferences } from '../../../contexts/UserPreferencesContext';
 
 jest.mock('./SearchBarAutocompletions', () => ({}));
 jest.mock('views/stores/FieldTypesStore', () => ({
@@ -19,77 +20,65 @@ class Completer {
 }
 
 describe('QueryInput', () => {
-  beforeAll(() => {
-    /* eslint-disable no-undef */
-    // $FlowFixMe: `ace` is defined by external import
-    ace.config.set('basePath', 'path');
-    /* eslint-enable no-undef */
-  });
   const SimpleQueryInput = (props) => (
     <QueryInput value="*"
-                onChange={(s) => Promise.resolve(s)}
+                onChange={() => {}}
                 onExecute={() => {}}
-                completerClass={Completer}
+                completerFactory={() => new Completer()}
                 {...props} />
   );
 
-  it('should update its state when props change', () => {
+  const _mount = (component) => {
+    const wrapper = mount(component);
+    return wrapper.find('ReactAce');
+  };
+
+  it('renders with minimal props', () => {
     const wrapper = mount(<SimpleQueryInput />);
-    const reactAce = wrapper.find('ReactAce');
-
-    expect(reactAce).toHaveProp('value', '*');
-
-    wrapper.setProps({ value: 'updated' });
-
-    const updatedReactAce = wrapper.find('ReactAce');
-    expect(updatedReactAce).toHaveProp('value', 'updated');
+    expect(wrapper).not.toBeNull();
   });
-  it('does not try to close popup if it does not exist while executing query', (done) => {
-    const onExecute = jest.fn();
-    const wrapper = mount(<SimpleQueryInput onExecute={onExecute} />);
 
-    wrapper.find('QueryInput').instance()._onExecute({});
+  it('triggers onChange when input is changed', () => {
+    const _onChange = jest.fn();
+    const aceEditor = _mount(<SimpleQueryInput onChange={_onChange} />);
+    const { onChange } = aceEditor.props();
 
-    setImmediate(() => {
-      expect(onExecute).toHaveBeenCalledWith('*');
-      done();
-    });
+    onChange('new input');
+
+    expect(_onChange).toHaveBeenCalledWith('new input');
   });
-  it('does not trigger onChange/onExecute if input receives blur without changed value', () => {
-    const onBlur = jest.fn();
-    const onChange = jest.fn();
-    const onExecute = jest.fn();
-    const currentQueryString = 'source:example.com';
-    const wrapper = mount((<SimpleQueryInput onExecute={onExecute}
-                                             onChange={onChange}
-                                             onBlur={onBlur}
-                                             value={currentQueryString} />));
 
-    const { onBlur: _onBlur } = wrapper.find('ReactAce').props();
+  it('triggers onBlur when input is blurred', () => {
+    const _onBlur = jest.fn();
+    const aceEditor = _mount(<SimpleQueryInput onBlur={_onBlur} />);
+    const { onBlur } = aceEditor.props();
 
-    _onBlur().then(() => {
-      expect(onExecute).not.toHaveBeenCalled();
-      expect(onChange).not.toHaveBeenCalled();
-      expect(onBlur).toHaveBeenCalledWith(currentQueryString);
-    });
+    onBlur();
+
+    expect(_onBlur).toHaveBeenCalled();
   });
-  it('does trigger onChange/onExecute if input receives blur with changed value', () => {
-    const onBlur = jest.fn();
-    const onChange = jest.fn((newQuery) => Promise.resolve(newQuery));
-    const onExecute = jest.fn();
-    const currentQueryString = 'source:example.com';
-    const wrapper = mount((<SimpleQueryInput onExecute={onExecute}
-                                             onChange={onChange}
-                                             onBlur={onBlur}
-                                             value={currentQueryString} />));
 
-    const { onBlur: _onBlur, onChange: _onChange } = wrapper.find('ReactAce').props();
+  it('disables auto completion if `enableSmartSearch` is false', () => {
+    const aceEditor = _mount((
+      <UserPreferencesContext.Provider value={{ ...defaultUserPreferences, enableSmartSearch: false }}>
+        <SimpleQueryInput />
+      </UserPreferencesContext.Provider>
+    ));
+    const { enableBasicAutocompletion, enableLiveAutocompletion } = aceEditor.props();
 
-    return _onChange('source:foobar')
-      .then(_onBlur)
-      .then(() => {
-        expect(onChange).toHaveBeenCalledWith('source:foobar');
-        expect(onBlur).toHaveBeenCalledWith('source:foobar');
-      });
+    expect(enableBasicAutocompletion).toBe(false);
+    expect(enableLiveAutocompletion).toBe(false);
+  });
+
+  it('enables auto completion if `enableSmartSearch` is true', () => {
+    const aceEditor = _mount((
+      <UserPreferencesContext.Provider value={{ ...defaultUserPreferences, enableSmartSearch: true }}>
+        <SimpleQueryInput />
+      </UserPreferencesContext.Provider>
+    ));
+    const { enableBasicAutocompletion, enableLiveAutocompletion } = aceEditor.props();
+
+    expect(enableBasicAutocompletion).toBe(true);
+    expect(enableLiveAutocompletion).toBe(true);
   });
 });

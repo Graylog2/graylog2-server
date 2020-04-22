@@ -8,8 +8,8 @@ import bindings from './bindings';
 describe('Views bindings enterprise widgets', () => {
   const { enterpriseWidgets } = bindings;
   type WidgetCondig = {
-    needsControlledHeight: (widget?: Widget) => boolean
-  }
+    needsControlledHeight: (widget?: Widget) => boolean,
+  };
   const findWidgetConfig = (type) => enterpriseWidgets.find((widgetConfig) => widgetConfig.type === type);
 
   describe('Aggregations', () => {

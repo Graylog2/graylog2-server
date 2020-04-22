@@ -128,19 +128,6 @@ public class SearchTest {
         assertThat(searchTypeIdsFrom(after)).containsExactlyInAnyOrder("oans", "gsuffa");
     }
 
-    @Test
-    public void removesQueryIfNoneOfItsSearchTypesIsRequired() {
-        Search before = Search.builder().queries(queriesWithSearchTypes("oans,zwoa", "gsuffa")).build();
-
-        Map<String, Object> executionState = partialResultsMapWithSearchTypes("oans");
-
-        Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
-
-        String expected = idOfQueryWithSearchType(before.queries(), "oans");
-
-        assertThat(after.queries()).extracting(Query::id).containsExactly(expected);
-    }
-
     private Set<String> searchTypeIdsFrom(Search search) {
         return search.queries().stream()
                 .flatMap(q -> q.searchTypes().stream().map(SearchType::id))

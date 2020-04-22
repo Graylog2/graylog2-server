@@ -1,9 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { asElement, cleanup, render } from 'wrappedTestingLibrary';
 
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import DrilldownContext from '../contexts/DrilldownContext';
 import ReplaySearchButton from './ReplaySearchButton';
 
@@ -34,11 +34,11 @@ describe('ReplaySearchButton', () => {
           )}
         </DrilldownContext.Consumer>
       ));
-      return getByTitle('Replay search');
+      return asElement(getByTitle('Replay search'), HTMLAnchorElement);
     };
     it('from default drilldown context', () => {
       const { getByTitle } = render(<ReplaySearchButton />);
-      const button = getByTitle('Replay search');
+      const button = asElement(getByTitle('Replay search'), HTMLAnchorElement);
 
       expect(button.href).toEqual('http://localhost/search?rangetype=relative&relative=300');
     });

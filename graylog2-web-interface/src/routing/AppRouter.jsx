@@ -85,7 +85,8 @@ import {
   ThreadDumpPage,
   UsersPage,
 } from 'pages';
-import AppErrorBoundary from './AppErrorBoundary';
+
+import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes');
@@ -113,7 +114,7 @@ const AppRouter = () => {
 
   return (
     <Router history={history}>
-      <Route component={AppErrorBoundary}>
+      <Route component={RouterErrorBoundary}>
         {pluginRoutesWithNullParent}
         <Route path={Routes.STARTPAGE} component={App}>
           <Route component={AppWithGlobalNotifications}>

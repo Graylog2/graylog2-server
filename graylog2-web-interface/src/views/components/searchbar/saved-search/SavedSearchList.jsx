@@ -19,14 +19,14 @@ type Props = {
   toggleModal: () => void,
   deleteSavedSearch: (View) => Promise<View>,
   views: SavedSearchesState,
-}
+};
 
 type State = {
   selectedSavedSearch?: string,
   query: string,
   page: number,
   perPage: number,
-}
+};
 
 const AlertIcon: StyledComponent<{}, ThemeInterface, *> = styled(Icon)(({ theme }) => css`
   margin-right: 6px;

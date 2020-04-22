@@ -62,7 +62,10 @@ public interface Notification extends Persisted {
         JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
         OUTPUT_DISABLED,
         INDEX_RANGES_RECALCULATION,
-        GENERIC
+        GENERIC,
+        ES_NODE_DISK_WATERMARK_LOW,
+        ES_NODE_DISK_WATERMARK_HIGH,
+        ES_NODE_DISK_WATERMARK_FLOOD_STAGE
     }
 
     enum Severity {

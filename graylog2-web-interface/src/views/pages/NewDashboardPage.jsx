@@ -19,7 +19,7 @@ type Props = {
     state?: {
       view?: View | ViewJson,
     },
-    query: { [string]: any }
+    query: { [string]: any },
   };
   loadingViewHooks: Array<ViewHook>,
   executingViewHooks: Array<ViewHook>,
