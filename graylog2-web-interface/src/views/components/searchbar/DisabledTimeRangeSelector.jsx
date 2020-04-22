@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
+
 import Input from 'components/bootstrap/Input';
+import TimerangeSelector from './TimerangeSelector';
 
 const DisabledTimeRangeSelector = () => (
-  <div className="timerange-selector"
-       style={{ marginLeft: 50 }}>
+  <TimerangeSelector style={{ marginLeft: 50 }}>
     <Input id="no-override-timerange-selector"
            type="select"
            disabled
@@ -13,9 +14,7 @@ const DisabledTimeRangeSelector = () => (
            name="no-override">
       <option value="disabled">No Override</option>
     </Input>
-  </div>
+  </TimerangeSelector>
 );
-
-DisabledTimeRangeSelector.propTypes = {};
 
 export default DisabledTimeRangeSelector;

@@ -8,6 +8,8 @@ import { Field } from 'formik';
 import Input from 'components/bootstrap/Input';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
+import TimerangeSelector from './TimerangeSelector';
+
 type Props = {
   disabled: boolean,
   config: SearchesConfig,
@@ -52,8 +54,7 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
           onChange({ target: { name, value: Number.parseInt(newValue, 10) } });
         }, [onChange]);
         return (
-          <div className="timerange-selector relative"
-               style={{ marginLeft: 50 }}>
+          <TimerangeSelector className="relative" style={{ marginLeft: 50 }}>
             <Input id="relative-timerange-selector"
                    disabled={disabled}
                    type="select"
@@ -64,7 +65,7 @@ export default function RelativeTimeRangeSelector({ config, disabled }: Props) {
                    onChange={_onChange}>
               {options}
             </Input>
-          </div>
+          </TimerangeSelector>
         );
       }}
     </Field>

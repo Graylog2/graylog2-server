@@ -1,8 +1,9 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import connect from 'stores/connect';
 import Field from 'views/components/Field';
 import Value from 'views/components/Value';
@@ -26,10 +27,10 @@ type Props = {
   },
 };
 
-const DecoratedField = styled.small`
-  color: #aaa;
+const DecoratedField: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.small(({ theme }) => `
+  color: ${theme.color.gray[70]};
   font-weight: normal;
-`;
+`);
 
 const MessageField = ({ fieldName, fieldType, message, value, currentView }: Props) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
