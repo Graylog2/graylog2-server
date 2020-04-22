@@ -1,9 +1,76 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+
 import { Checkbox } from 'components/graylog';
 import Icon from './Icon';
 
-import style from './ExpandableListItem.css';
+const ItemWrap = styled.li(({ padded }) => `
+  padding: ${padded ? '10px 5px' : ''};
+`);
+
+const Container = styled.div`
+  font-size: 14px;
+  line-height: 20px;
+
+  label {
+    min-height: 20px;
+    margin-bottom: 2px;
+    margin-right: 5px;
+
+    * {
+      cursor: pointer;
+    }
+  }
+`;
+
+const Toggle = styled.div`
+  display: inline-block;
+  width: 20px;
+  margin-right: 5px;
+`;
+
+const IconStack = styled.div`
+  &.fa-stack {
+    cursor: pointer;
+    font-size: 1.4em;
+    line-height: 20px;
+    width: 1em;
+    height: 1em;
+    vertical-align: text-top;
+
+    &:hover [class*="fa-"] {
+      color: #731748;
+      opacity: 1;
+    }
+  }
+
+  [class*="fa-"]:first-child {
+    opacity: 0;
+
+    ~ [class*="fa-"]:hover {
+      color: #fff;
+    }
+  }
+`;
+
+const HeaderWrap = styled.span`
+  font-size: 14px;
+`;
+
+const Subheader = styled.span`
+  font-size: 0.95em;
+  margin-left: 0.5em;
+  color: #aaa;
+`;
+
+const ExpandableContent = styled.div`
+  border-left: 1px #eee solid;
+  margin-left: 35px;
+  margin-top: 10px;
+  padding-left: 5px;
+`;
+
 
 /**
  * The ExpandableListItem is needed to render a ExpandableList.
@@ -97,30 +164,34 @@ class ExpandableListItem extends React.Component {
 
   render() {
     const { expanded } = this.state;
+    const { padded } = this.props;
     const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
     const headerToRender = selectable ? (<span role="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</span>) : header;
     const inputProps = this._filterInputProps(otherProps);
-    const liClassName = this.props.padded ? style.listItemPadding : '';
 
     return (
-      <li className={liClassName}>
-        <div className={style.listItemContainer}>
+      <ItemWrap padded={padded}>
+        <Container>
           {selectable && <Checkbox inputRef={(c) => { this._checkbox = c; }} inline checked={checked} {...inputProps} />}
           {expandable
           && (
-          <div className={style.expandBoxContainer}>
-            <div className={`fa-stack ${style.expandBox}`} role="button" tabIndex={0} onClick={this._toggleExpand}>
-              <Icon name="circle" className={`fa-stack-1x ${style.iconBackground}`} />
-              <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
-            </div>
-          </div>
+            <Toggle>
+              <IconStack className="fa-stack" tabIndex={0} onClick={this._toggleExpand}>
+                <Icon name="circle" className="fa-stack-1x" />
+                <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
+              </IconStack>
+            </Toggle>
           )}
-          <span className={style.header}>{headerToRender}{subheader && <span className={style.subheader}>{subheader}</span>}</span>
-        </div>
-        <div className={style.expandableContent}>
+          <HeaderWrap>
+            {headerToRender}
+            {subheader && <Subheader>{subheader}</Subheader>}
+          </HeaderWrap>
+        </Container>
+
+        <ExpandableContent>
           {expanded && children}
-        </div>
-      </li>
+        </ExpandableContent>
+      </ItemWrap>
     );
   }
 }
