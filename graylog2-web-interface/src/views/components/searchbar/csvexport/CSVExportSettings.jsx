@@ -80,7 +80,7 @@ const CSVExportSettings = ({
         <FieldSelect fields={fields} onChange={selectField} value={selectedFields} allowOptionCreation />
       </Row>
       <Row>
-        <span>Sort (removing the sort will result in a faster export):</span>
+        <span>Sort:</span>
         <FieldSortSelect fields={fields} sort={selectedSort} onChange={setSelectedSort} />
       </Row>
       <Row>
