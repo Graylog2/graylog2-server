@@ -14,7 +14,7 @@ type Props = {
 const StreamPermissionErrorPage = ({ error }: Props) => {
   const description = (
     <>
-      <p>This ressource includes streams you do not have permissions to.</p>
+      <p>This resource includes streams you do not have permissions to.</p>
       <p>Please contact your administrator and provide the error details which indlude a list of streams you need access to.</p>
     </>
   );
