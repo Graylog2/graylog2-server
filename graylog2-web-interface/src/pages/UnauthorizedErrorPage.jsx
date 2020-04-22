@@ -37,7 +37,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
   );
   const errorMessageString = createErrorMessageString(errorDetails, pageDetails, errorMessage);
   return (
-    <ErrorPage title={title} description={description || defaultDescription}>
+    <ErrorPage title={title} description={description ?? defaultDescription}>
       <dl>
         <dd>
           <pre className="content">
