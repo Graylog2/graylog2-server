@@ -15,7 +15,7 @@ const MultiValueRemove = (props) => {
   );
 };
 
-const OverlayInner = ({ children, style }: {children: Node, style?: Object}) => React.Children.map(children,
+const OverlayInner = ({ children, style }: {children: Node, style?: { left: number, top: number }}) => React.Children.map(children,
   (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }));
 
 const getRefContainerWidth = (selectRef, allowOptionCreation) => {
