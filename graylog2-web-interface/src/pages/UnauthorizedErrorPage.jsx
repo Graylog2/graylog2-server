@@ -8,6 +8,14 @@ import { FetchError } from 'logic/rest/FetchProvider';
 import { Icon, ClipboardButton } from 'components/common';
 import ErrorPage from 'components/errors/ErrorPage';
 
+const createErrorMessageString = (errorDetails: ?string, pageDetails: string, errorMessage: string) => {
+  const defaultText = `${pageDetails}\n${errorMessage}`;
+  if (errorDetails) {
+    return `${errorDetails}\n${defaultText}`;
+  }
+  return defaultText;
+};
+
 type Props = {
   description?: React.Node,
   error: FetchError,
@@ -27,6 +35,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
       <p>Please contact your administrator and provide the error details.</p>
     </>
   );
+  const errorMessageString = createErrorMessageString(errorDetails, pageDetails, errorMessage);
   return (
     <ErrorPage title={title} description={description || defaultDescription}>
       <dl>
@@ -35,7 +44,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
             <div className="pull-right">
               <ClipboardButton title={<Icon name="copy" fixedWidth />}
                                bsSize="sm"
-                               text={`${pageDetails}\n${errorMessage}`}
+                               text={errorMessageString}
                                buttonTitle="Copy error details to clipboard" />
             </div>
             {errorDetails && (

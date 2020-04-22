@@ -16,7 +16,7 @@ describe('StreamPermissionErrorPage', () => {
       const { getByText } = render(<StreamPermissionErrorPage error={new FetchError('The request error message', response)} />);
 
       expect(getByText('Missing Stream Permissions')).not.toBeNull();
-      expect(getByText('You need permission to streams with the id: stream-1-id, stream-2-id')).not.toBeNull();
+      expect(getByText('You need permission to streams with the id: stream-1-id, stream-2-id.')).not.toBeNull();
     });
   });
 });
