@@ -33,14 +33,14 @@ const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, v
   const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);
   return (
     <Row>
-      <i>
+      <b>
         <IfSearch>
           {selectedWidget && `The following settings are based on the message table: ${selectedWidgetTitle}`}<br />
         </IfSearch>
         <IfDashboard>
           {selectedWidget && `You are currently exporting the search results for the message table: ${selectedWidgetTitle}`}<br />
         </IfDashboard>
-      </i>
+      </b>
     </Row>
   );
 };
