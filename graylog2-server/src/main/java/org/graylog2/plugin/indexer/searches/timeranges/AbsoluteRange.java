@@ -24,7 +24,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.Map;
@@ -115,14 +114,13 @@ public abstract class AbsoluteRange extends TimeRange {
                 throw new IllegalArgumentException("Null or empty string");
             }
 
-            final DateTimeFormatter formatter;
             if (s.contains("T")) {
-                formatter = ISODateTimeFormat.dateTime();
+                // Use withOffsetParsed() to keep the timezone!
+                return ISODateTimeFormat.dateTime().withOffsetParsed().parseDateTime(s);
             } else {
-                formatter = Tools.timeFormatterWithOptionalMilliseconds();
+                // Our Elasticsearch timestamp format is always UTC
+                return Tools.timeFormatterWithOptionalMilliseconds().withZoneUTC().parseDateTime(s);
             }
-            // Use withOffsetParsed() to keep the timezone!
-            return formatter.withOffsetParsed().parseDateTime(s);
         }
     }
 }
