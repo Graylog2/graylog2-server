@@ -199,7 +199,7 @@ class ExpandableListItem extends React.Component {
               </IconStack>
             </Toggle>
           )}
-          <HeaderWrap>
+          <HeaderWrap className="header">
             {headerToRender}
             {subheader && <Subheader>{subheader}</Subheader>}
           </HeaderWrap>

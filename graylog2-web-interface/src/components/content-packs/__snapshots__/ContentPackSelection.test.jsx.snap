@@ -3117,96 +3117,312 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   selectable={true}
                   stayExpanded={false}
                 >
-                  <li
-                    className=""
+                  <ExpandableListItem__ItemWrap
+                    padded={false}
                   >
-                    <div
-                      className="listItemContainer"
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ExpandableListItem__ItemWrap-sc-10hsq3a-0",
+                            "isStatic": false,
+                            "lastClassName": "ettoSy",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "ExpandableListItem__ItemWrap",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ExpandableListItem__ItemWrap-sc-10hsq3a-0",
+                          "target": "li",
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                      padded={false}
                     >
-                      <Checkbox
-                        bsClass="checkbox"
-                        checked={false}
-                        disabled={false}
-                        inline={true}
-                        inputRef={[Function]}
-                        onChange={[Function]}
-                        title=""
+                      <li
+                        className="ExpandableListItem__ItemWrap-sc-10hsq3a-0 ettoSy"
                       >
-                        <label
-                          className="checkbox-inline"
-                          title=""
-                        >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            onChange={[Function]}
-                            type="checkbox"
-                          />
-                        </label>
-                      </Checkbox>
-                      <div
-                        className="expandBoxContainer"
-                      >
-                        <div
-                          className="fa-stack expandBox"
-                          onClick={[Function]}
-                          role="button"
-                          tabIndex={0}
-                        >
-                          <Icon
-                            className="fa-stack-1x iconBackground"
-                            name="circle"
-                          >
-                            <FontAwesomeIcon
-                              className="fa-stack-1x iconBackground"
-                              icon={
-                                Object {
-                                  "iconName": "circle",
-                                  "prefix": "fas",
-                                }
+                        <ExpandableListItem__Container>
+                          <StyledComponent
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "ExpandableListItem__Container-sc-10hsq3a-1",
+                                  "isStatic": false,
+                                  "lastClassName": "fxCnlF",
+                                  "rules": Array [
+                                    "font-size:14px;line-height:20px;label{min-height:20px;margin-bottom:2px;margin-right:5px;*{cursor:pointer;}}",
+                                  ],
+                                },
+                                "displayName": "ExpandableListItem__Container",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "ExpandableListItem__Container-sc-10hsq3a-1",
+                                "target": "div",
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
                               }
-                            >
-                              <svg
-                                className="svg-inline--fa fa-circle"
-                              />
-                            </FontAwesomeIcon>
-                          </Icon>
-                          <Icon
-                            className="fa-stack-1x"
-                            name="angle-up"
+                            }
+                            forwardedRef={null}
                           >
-                            <FontAwesomeIcon
-                              className="fa-stack-1x"
-                              icon={
-                                Object {
-                                  "iconName": "angle-up",
-                                  "prefix": "fas",
-                                }
-                              }
+                            <div
+                              className="ExpandableListItem__Container-sc-10hsq3a-1 fxCnlF"
                             >
-                              <svg
-                                className="svg-inline--fa fa-angle-up"
-                              />
-                            </FontAwesomeIcon>
-                          </Icon>
-                        </div>
-                      </div>
-                      <span
-                        className="header"
-                      >
-                        <span
-                          onClick={[Function]}
-                          role="button"
-                          tabIndex={0}
-                        >
-                          Spaceship
-                        </span>
-                      </span>
-                    </div>
-                    <div
-                      className="expandableContent"
-                    />
-                  </li>
+                              <Checkbox
+                                bsClass="checkbox"
+                                checked={false}
+                                disabled={false}
+                                inline={true}
+                                inputRef={[Function]}
+                                onChange={[Function]}
+                                title=""
+                              >
+                                <label
+                                  className="checkbox-inline"
+                                  title=""
+                                >
+                                  <input
+                                    checked={false}
+                                    disabled={false}
+                                    onChange={[Function]}
+                                    type="checkbox"
+                                  />
+                                </label>
+                              </Checkbox>
+                              <ExpandableListItem__Toggle>
+                                <StyledComponent
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "ExpandableListItem__Toggle-sc-10hsq3a-2",
+                                        "isStatic": false,
+                                        "lastClassName": "hwyxtE",
+                                        "rules": Array [
+                                          "display:inline-block;width:20px;margin-right:5px;",
+                                        ],
+                                      },
+                                      "displayName": "ExpandableListItem__Toggle",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "ExpandableListItem__Toggle-sc-10hsq3a-2",
+                                      "target": "div",
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                >
+                                  <div
+                                    className="ExpandableListItem__Toggle-sc-10hsq3a-2 hwyxtE"
+                                  >
+                                    <ExpandableListItem__IconStack
+                                      className="fa-stack"
+                                      onClick={[Function]}
+                                      tabIndex={0}
+                                    >
+                                      <StyledComponent
+                                        className="fa-stack"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "ExpandableListItem__IconStack-sc-10hsq3a-3",
+                                              "isStatic": false,
+                                              "lastClassName": "ilxhxM",
+                                              "rules": Array [
+                                                "&.fa-stack{cursor:pointer;font-size:1.4em;line-height:20px;width:1em;height:1em;vertical-align:text-top;&:hover [class*=\\"fa-\\"]{color:#731748;opacity:1;}}[class*=\\"fa-\\"]:first-child{opacity:0;~ [class*=\\"fa-\\"]:hover{color:#fff;}}",
+                                              ],
+                                            },
+                                            "displayName": "ExpandableListItem__IconStack",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "ExpandableListItem__IconStack-sc-10hsq3a-3",
+                                            "target": "div",
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
+                                        onClick={[Function]}
+                                        tabIndex={0}
+                                      >
+                                        <div
+                                          className="ExpandableListItem__IconStack-sc-10hsq3a-3 ilxhxM fa-stack"
+                                          onClick={[Function]}
+                                          tabIndex={0}
+                                        >
+                                          <Icon
+                                            className="fa-stack-1x"
+                                            name="circle"
+                                          >
+                                            <FontAwesomeIcon
+                                              className="fa-stack-1x"
+                                              icon={
+                                                Object {
+                                                  "iconName": "circle",
+                                                  "prefix": "fas",
+                                                }
+                                              }
+                                            >
+                                              <svg
+                                                className="svg-inline--fa fa-circle"
+                                              />
+                                            </FontAwesomeIcon>
+                                          </Icon>
+                                          <Icon
+                                            className="fa-stack-1x"
+                                            name="angle-up"
+                                          >
+                                            <FontAwesomeIcon
+                                              className="fa-stack-1x"
+                                              icon={
+                                                Object {
+                                                  "iconName": "angle-up",
+                                                  "prefix": "fas",
+                                                }
+                                              }
+                                            >
+                                              <svg
+                                                className="svg-inline--fa fa-angle-up"
+                                              />
+                                            </FontAwesomeIcon>
+                                          </Icon>
+                                        </div>
+                                      </StyledComponent>
+                                    </ExpandableListItem__IconStack>
+                                  </div>
+                                </StyledComponent>
+                              </ExpandableListItem__Toggle>
+                              <ExpandableListItem__HeaderWrap
+                                className="header"
+                              >
+                                <StyledComponent
+                                  className="header"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "ExpandableListItem__HeaderWrap-sc-10hsq3a-4",
+                                        "isStatic": false,
+                                        "lastClassName": "daviui",
+                                        "rules": Array [
+                                          "font-size:14px;",
+                                        ],
+                                      },
+                                      "displayName": "ExpandableListItem__HeaderWrap",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "ExpandableListItem__HeaderWrap-sc-10hsq3a-4",
+                                      "target": "span",
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                >
+                                  <span
+                                    className="ExpandableListItem__HeaderWrap-sc-10hsq3a-4 daviui header"
+                                  >
+                                    <ExpandableListItem__Header
+                                      onClick={[Function]}
+                                      tabIndex={0}
+                                      type="button"
+                                    >
+                                      <StyledComponent
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "ExpandableListItem__Header-sc-10hsq3a-5",
+                                              "isStatic": false,
+                                              "lastClassName": "clUCXq",
+                                              "rules": Array [
+                                                "border:0;padding:0;text-align:left;background:transparent;",
+                                              ],
+                                            },
+                                            "displayName": "ExpandableListItem__Header",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "ExpandableListItem__Header-sc-10hsq3a-5",
+                                            "target": "button",
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
+                                        onClick={[Function]}
+                                        tabIndex={0}
+                                        type="button"
+                                      >
+                                        <button
+                                          className="ExpandableListItem__Header-sc-10hsq3a-5 clUCXq"
+                                          onClick={[Function]}
+                                          tabIndex={0}
+                                          type="button"
+                                        >
+                                          Spaceship
+                                        </button>
+                                      </StyledComponent>
+                                    </ExpandableListItem__Header>
+                                  </span>
+                                </StyledComponent>
+                              </ExpandableListItem__HeaderWrap>
+                            </div>
+                          </StyledComponent>
+                        </ExpandableListItem__Container>
+                        <ExpandableListItem__ExpandableContent>
+                          <StyledComponent
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "ExpandableListItem__ExpandableContent-sc-10hsq3a-7",
+                                  "isStatic": false,
+                                  "lastClassName": "hOvAjD",
+                                  "rules": Array [
+                                    "border-left:1px #eee solid;margin-left:35px;margin-top:10px;padding-left:5px;",
+                                  ],
+                                },
+                                "displayName": "ExpandableListItem__ExpandableContent",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "ExpandableListItem__ExpandableContent-sc-10hsq3a-7",
+                                "target": "div",
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                          >
+                            <div
+                              className="ExpandableListItem__ExpandableContent-sc-10hsq3a-7 hOvAjD"
+                            />
+                          </StyledComponent>
+                        </ExpandableListItem__ExpandableContent>
+                      </li>
+                    </StyledComponent>
+                  </ExpandableListItem__ItemWrap>
                 </ExpandableListItem>
               </ul>
             </ExpandableList>
