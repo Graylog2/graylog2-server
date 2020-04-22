@@ -17,15 +17,19 @@ WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
 WidthProvidedGridLayout.defaultProps = { width: undefined };
 
 const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(({ theme }) => `
-  &.unlocked .react-draggable {
-    cursor: move;
+  &.locked {
+    .widget-drag-handle {
+      display: none;
+    }
   }
 
-  &.locked .react-resizable-handle {
-    display: none;
+  &.unlocked {
+    .react-draggable {
+      cursor: move;
+    }
   }
 
-  .react-grid-placeholder {
+  .react-grid-item.react-grid-placeholder {
     background: ${theme.color.variant.info};
   }
 
@@ -243,7 +247,7 @@ class ReactGridContainer extends React.Component {
                                      onDragStop={this._onLayoutChange}
                                      onResizeStop={this._onLayoutChange}
                                      useCSSTransforms={animate}
-                                     draggableHandle={locked ? '.no-handle' : useDragHandle}>
+                                     draggableHandle={locked ? '' : useDragHandle}>
         {children}
       </StyledWidthProvidedGridLayout>
     );
