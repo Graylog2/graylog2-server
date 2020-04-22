@@ -2,7 +2,6 @@
 import React, { useRef, useMemo } from 'react';
 import type { Node, ComponentType } from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
 import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
 
 import { Overlay } from 'react-overlays';
