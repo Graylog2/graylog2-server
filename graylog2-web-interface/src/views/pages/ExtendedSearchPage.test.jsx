@@ -41,13 +41,13 @@ jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     ['listen', () => jest.fn()],
     'get',
-    ['getInitialState', jest.fn(() => ({
+    ['getInitialState', () => ({
       result: {
         forId: jest.fn(() => {
           return {};
         }),
       },
-    }))],
+    })],
   ),
 }));
 jest.mock('views/stores/FieldTypesStore', () => ({
