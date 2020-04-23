@@ -4,16 +4,16 @@ import { useState, useEffect } from 'react';
 import { withRouter } from 'react-router';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { type ReportedError as ReportedErrorType, ReactErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
+import { type ReportedError, ReactErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
 
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
 import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
 
-const ReportedError = ({ children, router }) => {
-  const [reportedError, setReportedError] = useState<?ReportedErrorType>();
+const ReportedErrorBoundary = ({ children, router }) => {
+  const [reportedError, setReportedError] = useState<?ReportedError>();
 
-  const report = (newError: ReportedErrorType) => setReportedError(newError);
+  const report = (newError: ReportedError) => setReportedError(newError);
 
   useEffect(() => {
     const unlistenErrorsReport = ErrorsActions.report.listen(report);
@@ -45,4 +45,4 @@ const ReportedError = ({ children, router }) => {
 };
 
 
-export default withRouter(ReportedError);
+export default withRouter(ReportedErrorBoundary);
