@@ -19,5 +19,5 @@ package org.graylog.plugins.views.search.export;
 import java.util.function.Consumer;
 
 public interface ExportBackend {
-    void run(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector);
+    void run(ExportMessagesCommand request, Consumer<SimpleMessageChunk> chunkCollector);
 }

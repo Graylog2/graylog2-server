@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.OptionalInt;
 
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
 @AutoValue
@@ -83,7 +84,7 @@ public abstract class ResultFormat {
         @JsonCreator
         public static ResultFormat.Builder create() {
             return new AutoValue_ResultFormat.Builder()
-                    .fieldsInOrder(MessagesRequest.DEFAULT_FIELDS)
+                    .fieldsInOrder(DEFAULT_FIELDS)
                     .executionState(Collections.emptyMap())
                     .sort();
         }

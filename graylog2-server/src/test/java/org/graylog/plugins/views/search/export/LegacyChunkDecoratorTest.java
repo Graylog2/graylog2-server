@@ -20,7 +20,6 @@ import org.assertj.core.groups.Tuple;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
@@ -55,7 +54,7 @@ class LegacyChunkDecoratorTest {
                 new Object[]{"index-1", "1", "a"},
                 new Object[]{"index-2", "2", "b"});
 
-        SearchResponse builtLegacyResponse = captureLegacyResponse(undecoratedChunk, validRequest());
+        SearchResponse builtLegacyResponse = captureLegacyResponse(undecoratedChunk, validCommand());
 
         assertThat(builtLegacyResponse.messages())
                 .extracting(ResultMessageSummary::index, m -> m.message().get("field-1"), m -> m.message().get("field-2"))
@@ -70,12 +69,12 @@ class LegacyChunkDecoratorTest {
     void setsPlausibleAdditionalValuesOnLegacySearchResponse() {
         SimpleMessageChunk undecoratedChunk = SimpleMessageChunk.from(linkedHashSetOf("field-1", "field-2"));
 
-        MessagesRequest request = validRequest(ElasticsearchQueryString.builder().queryString("hase").build());
+        ExportMessagesCommand command = validCommand(ElasticsearchQueryString.builder().queryString("hase").build());
 
-        SearchResponse builtLegacyResponse = captureLegacyResponse(undecoratedChunk, request);
+        SearchResponse builtLegacyResponse = captureLegacyResponse(undecoratedChunk, command);
 
-        assertThat(builtLegacyResponse.from()).isEqualTo(request.timeRange().getFrom());
-        assertThat(builtLegacyResponse.to()).isEqualTo(request.timeRange().getTo());
+        assertThat(builtLegacyResponse.from()).isEqualTo(command.timeRange().getFrom());
+        assertThat(builtLegacyResponse.to()).isEqualTo(command.timeRange().getTo());
         assertThat(builtLegacyResponse.query()).isEqualTo("hase");
         assertThat(builtLegacyResponse.builtQuery()).isEqualTo("hase");
         assertThat(builtLegacyResponse.fields()).containsExactlyElementsOf(undecoratedChunk.fieldsInOrder());
@@ -85,9 +84,9 @@ class LegacyChunkDecoratorTest {
     void setsClearDefaultsForValuesThatCantBeProperlyDetermined() {
         SimpleMessageChunk undecoratedChunk = SimpleMessageChunk.from(linkedHashSetOf());
 
-        MessagesRequest request = validRequest();
+        ExportMessagesCommand command = validCommand();
 
-        SearchResponse builtLegacyResponse = captureLegacyResponse(undecoratedChunk, request);
+        SearchResponse builtLegacyResponse = captureLegacyResponse(undecoratedChunk, command);
 
         assertThat(builtLegacyResponse.totalResults())
                 .as("total results can't be determined from a single chunk").isEqualTo(-1);
@@ -97,28 +96,28 @@ class LegacyChunkDecoratorTest {
                 .as("index data is omitted to save the overhead of loading it").isEmpty();
     }
 
-    private MessagesRequest validRequest() {
-        return validRequest(ElasticsearchQueryString.empty());
+    private ExportMessagesCommand validCommand() {
+        return validCommand(ElasticsearchQueryString.empty());
     }
 
-    private MessagesRequest validRequest(ElasticsearchQueryString queryString) {
-        return MessagesRequest.builder()
+    private ExportMessagesCommand validCommand(ElasticsearchQueryString queryString) {
+        return ExportMessagesCommand.builder()
                 .timeRange(someTimeRange())
                 .queryString(queryString)
                 .build();
     }
 
-    private SearchResponse captureLegacyResponse(SimpleMessageChunk undecoratedChunk, MessagesRequest request) {
+    private SearchResponse captureLegacyResponse(SimpleMessageChunk undecoratedChunk, ExportMessagesCommand command) {
         ArgumentCaptor<SearchResponse> captor = ArgumentCaptor.forClass(SearchResponse.class);
         when(decoratorProcessor.decorateSearchResponse(captor.capture(), any())).thenReturn(mock(SearchResponse.class));
 
 
-        sut.decorate(undecoratedChunk, new ArrayList<>(), request);
+        sut.decorate(undecoratedChunk, new ArrayList<>(), command);
 
         return captor.getValue();
     }
 
-    private TimeRange someTimeRange() {
+    private AbsoluteRange someTimeRange() {
         return AbsoluteRange.create(DateTime.now(DateTimeZone.UTC), DateTime.now(DateTimeZone.UTC).plus(300));
     }
 }

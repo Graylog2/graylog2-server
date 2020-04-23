@@ -19,12 +19,12 @@ package org.graylog.plugins.views.search.export;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_CHUNK_SIZE;
-import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_FIELDS;
-import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_QUERY;
-import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_SORT;
-import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_STREAMS;
-import static org.graylog.plugins.views.search.export.MessagesRequest.DEFAULT_TIME_RANGE;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_CHUNK_SIZE;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_QUERY;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_SORT;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_STREAMS;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_TIME_RANGE;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MessagesRequestTest {

@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.export;
 
 import com.google.common.collect.ImmutableMultimap;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -41,9 +40,9 @@ public class LegacyChunkDecorator implements ChunkDecorator {
     }
 
     @Override
-    public SimpleMessageChunk decorate(SimpleMessageChunk undecoratedChunk, List<Decorator> decorators, MessagesRequest request) {
+    public SimpleMessageChunk decorate(SimpleMessageChunk undecoratedChunk, List<Decorator> decorators, ExportMessagesCommand command) {
 
-        SearchResponse undecoratedLegacyResponse = legacySearchResponseFrom(undecoratedChunk, request);
+        SearchResponse undecoratedLegacyResponse = legacySearchResponseFrom(undecoratedChunk, command);
 
         SearchResponse decoratedLegacyResponse = decoratorProcessor.decorateSearchResponse(undecoratedLegacyResponse, decorators);
 
@@ -61,11 +60,11 @@ public class LegacyChunkDecorator implements ChunkDecorator {
         return SimpleMessageChunk.from(fieldsInOrder, messages);
     }
 
-    private SearchResponse legacySearchResponseFrom(SimpleMessageChunk chunk, MessagesRequest request) {
+    private SearchResponse legacySearchResponseFrom(SimpleMessageChunk chunk, ExportMessagesCommand command) {
         final List<ResultMessageSummary> legacyMessages = legacyMessagesFrom(chunk);
 
-        String queryString = ((ElasticsearchQueryString) request.queryString()).queryString();
-        TimeRange timeRange = request.timeRange();
+        String queryString = command.queryString().queryString();
+        TimeRange timeRange = command.timeRange();
         return SearchResponse.create(
                 queryString,
                 queryString,

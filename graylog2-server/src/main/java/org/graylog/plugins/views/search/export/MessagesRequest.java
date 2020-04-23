@@ -20,12 +20,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
-import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.validation.constraints.NotEmpty;
@@ -34,26 +30,17 @@ import java.util.LinkedHashSet;
 import java.util.OptionalInt;
 import java.util.Set;
 
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_CHUNK_SIZE;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_QUERY;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_SORT;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_STREAMS;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_TIME_RANGE;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
 @AutoValue
 @JsonDeserialize(builder = MessagesRequest.Builder.class)
 public abstract class MessagesRequest {
-
-    public static final TimeRange DEFAULT_TIME_RANGE = lastFiveMinutes();
-    public static final ElasticsearchQueryString DEFAULT_QUERY = ElasticsearchQueryString.empty();
-    public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
-    public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
-    public static final LinkedHashSet<Sort> DEFAULT_SORT = linkedHashSetOf(Sort.create("timestamp", SortOrder.DESC));
-    public static final int DEFAULT_CHUNK_SIZE = 1000;
-
-    private static RelativeRange lastFiveMinutes() {
-        try {
-            return RelativeRange.create(300);
-        } catch (InvalidRangeParametersException e) {
-            throw new RuntimeException("Error creating default time range", e);
-        }
-    }
 
     public abstract TimeRange timeRange();
 

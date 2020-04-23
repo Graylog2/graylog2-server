@@ -27,7 +27,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
-import org.graylog.plugins.views.search.export.MessagesRequest;
+import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.searchtypes.Sort;
@@ -72,7 +72,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     @Override
-    public void run(MessagesRequest request, Consumer<SimpleMessageChunk> chunkCollector) {
+    public void run(ExportMessagesCommand request, Consumer<SimpleMessageChunk> chunkCollector) {
         Object[] searchAfterValues = null;
         boolean isFirstChunk = true;
         int totalCount = 0;
@@ -101,7 +101,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
         }
     }
 
-    private List<SearchResult.Hit<Map, Void>> search(MessagesRequest request, Object[] searchAfterValues) {
+    private List<SearchResult.Hit<Map, Void>> search(ExportMessagesCommand request, Object[] searchAfterValues) {
         Search search = buildSearchRequest(request, searchAfterValues);
 
         SearchResult result = jestWrapper.execute(search, () -> "Failed to execute Search After request");
@@ -109,7 +109,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return result.getHits(Map.class, false);
     }
 
-    private Search buildSearchRequest(MessagesRequest request, Object[] searchAfterValues) {
+    private Search buildSearchRequest(ExportMessagesCommand request, Object[] searchAfterValues) {
         SearchSourceBuilder ssb = searchSourceBuilderFrom(request, searchAfterValues);
 
         Set<String> indices = indicesFor(request);
@@ -122,7 +122,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .build();
     }
 
-    private SearchSourceBuilder searchSourceBuilderFrom(MessagesRequest request, Object[] searchAfterValues) {
+    private SearchSourceBuilder searchSourceBuilderFrom(ExportMessagesCommand request, Object[] searchAfterValues) {
         QueryBuilder query = queryFrom(request);
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
@@ -137,25 +137,25 @@ public class ElasticsearchExportBackend implements ExportBackend {
         return ssb;
     }
 
-    private QueryBuilder queryFrom(MessagesRequest request) {
+    private QueryBuilder queryFrom(ExportMessagesCommand request) {
         return boolQuery()
                 .filter(queryStringFilter(request))
                 .filter(timestampFilter(request))
                 .filter(streamsFilter(request));
     }
 
-    private QueryBuilder queryStringFilter(MessagesRequest request) {
+    private QueryBuilder queryStringFilter(ExportMessagesCommand request) {
         ElasticsearchQueryString backendQuery = request.queryString();
         return backendQuery.isEmpty() ?
                 matchAllQuery() :
                 queryStringQuery(backendQuery.queryString()).allowLeadingWildcard(allowLeadingWildcard);
     }
 
-    private QueryBuilder timestampFilter(MessagesRequest request) {
+    private QueryBuilder timestampFilter(ExportMessagesCommand request) {
         return requireNonNull(IndexHelper.getTimestampRangeFilter(request.timeRange()));
     }
 
-    private TermsQueryBuilder streamsFilter(MessagesRequest request) {
+    private TermsQueryBuilder streamsFilter(ExportMessagesCommand request) {
         return termsQuery(Message.FIELD_STREAMS, request.streams());
     }
 
@@ -167,7 +167,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
         ssb.sort(SortBuilders.fieldSort(TIEBREAKER_FIELD).order(SortOrder.ASC).unmappedType("string"));
     }
 
-    private Set<String> indicesFor(MessagesRequest request) {
+    private Set<String> indicesFor(ExportMessagesCommand request) {
         return indexLookup.indexNamesForStreamsInTimeRange(request.streams(), request.timeRange());
     }
 

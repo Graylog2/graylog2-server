@@ -19,14 +19,18 @@ package org.graylog.plugins.views.search.export;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
-import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.lastFiveMinutes;
 
 public class TestData {
 
@@ -34,6 +38,11 @@ public class TestData {
         return validQueryBuilder().searchTypes(ImmutableSet.of(searchType));
     }
 
+    public static Query.Builder validQueryBuilder() {
+        return Query.builder().id(UUID.randomUUID().toString())
+                .timerange(lastFiveMinutes())
+                .query(new BackendQuery.Fallback());
+    }
 
     public static SimpleMessageChunk simpleMessageChunk(String fieldNames, Object[]... messageValues) {
         LinkedHashSet<SimpleMessage> messages = Arrays.stream(messageValues)
@@ -73,5 +82,13 @@ public class TestData {
 
     public static SimpleMessage simpleMessage(String fieldNames, Object[] values) {
         return simpleMessage("some-index", fieldNames, values);
+    }
+
+    public static RelativeRange relativeRange(int range) {
+        try {
+            return RelativeRange.create(range);
+        } catch (InvalidRangeParametersException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

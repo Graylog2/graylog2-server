@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
-import org.graylog.plugins.views.search.export.MessagesRequest;
+import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,7 +47,7 @@ class ElasticsearchExportBackendTest {
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any()))
                 .thenReturn(ImmutableSet.of("hasi", "mausi"));
 
-        MessagesRequest request = defaultMessagesRequestWithDummyStream();
+        ExportMessagesCommand command = defaultCommandWithDummyStream();
 
         ArgumentCaptor<Search> captor = ArgumentCaptor.forClass(Search.class);
 
@@ -55,13 +55,12 @@ class ElasticsearchExportBackendTest {
         when(searchResult.isSucceeded()).thenReturn(true);
         when(client.execute(captor.capture(), any())).thenReturn(searchResult);
 
-        sut.run(request, x -> {
-        });
+        sut.run(command, x -> {});
 
         assertThat(captor.getValue().getIndex()).isEqualTo("hasi,mausi");
     }
 
-    private MessagesRequest defaultMessagesRequestWithDummyStream() {
-        return MessagesRequest.withDefaults().toBuilder().streams(ImmutableSet.of("dummy")).build();
+    private ExportMessagesCommand defaultCommandWithDummyStream() {
+        return ExportMessagesCommand.withDefaults().toBuilder().streams(ImmutableSet.of("dummy")).build();
     }
 }

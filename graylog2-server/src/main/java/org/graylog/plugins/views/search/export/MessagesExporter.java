@@ -37,15 +37,21 @@ public class MessagesExporter {
     }
 
     public void export(MessagesRequest request, Consumer<SimpleMessageChunk> chunkForwarder) {
-        backend.run(request, chunkForwarder);
+        ExportMessagesCommand command = commandFactory.buildFromRequest(request);
+
+        export(command, chunkForwarder);
+    }
+
+    private void export(ExportMessagesCommand command, Consumer<SimpleMessageChunk> chunkForwarder) {
+        backend.run(command, chunkForwarder);
     }
 
     public void export(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
         Query query = queryFrom(search);
 
-        MessagesRequest request = commandFactory.buildWithSearchOnly(search, query, resultFormat);
+        ExportMessagesCommand command = commandFactory.buildWithSearchOnly(search, query, resultFormat);
 
-        export(request, chunkForwarder);
+        export(command, chunkForwarder);
     }
 
     public void export(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
@@ -53,11 +59,11 @@ public class MessagesExporter {
 
         MessageList messageList = messageListFrom(query, searchTypeId);
 
-        MessagesRequest request = commandFactory.buildWithMessageList(search, query, messageList, resultFormat);
+        ExportMessagesCommand command = commandFactory.buildWithMessageList(search, query, messageList, resultFormat);
 
-        Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, messageList, chunk, request);
+        Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, messageList, chunk, command);
 
-        export(request, decoratedForwarder);
+        export(command, decoratedForwarder);
     }
 
     private MessageList messageListFrom(Query query, String searchTypeId) {
@@ -81,7 +87,7 @@ public class MessagesExporter {
                 .orElseThrow(() -> new ExportException("Invalid Search object with empty Query"));
     }
 
-    private void decorate(Consumer<SimpleMessageChunk> chunkForwarder, MessageList messageList, SimpleMessageChunk chunk, MessagesRequest request) {
+    private void decorate(Consumer<SimpleMessageChunk> chunkForwarder, MessageList messageList, SimpleMessageChunk chunk, ExportMessagesCommand request) {
         SimpleMessageChunk decoratedChunk = chunkDecorator.decorate(chunk, messageList.decorators(), request);
 
         chunkForwarder.accept(decoratedChunk);

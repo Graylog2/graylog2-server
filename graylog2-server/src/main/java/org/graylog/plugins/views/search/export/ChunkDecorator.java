@@ -21,5 +21,5 @@ import org.graylog2.decorators.Decorator;
 import java.util.List;
 
 public interface ChunkDecorator {
-    SimpleMessageChunk decorate(SimpleMessageChunk chunk, List<Decorator> decorators, MessagesRequest request);
+    SimpleMessageChunk decorate(SimpleMessageChunk chunk, List<Decorator> decorators, ExportMessagesCommand request);
 }
