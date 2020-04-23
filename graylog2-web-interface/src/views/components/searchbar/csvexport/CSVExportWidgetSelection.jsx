@@ -1,5 +1,5 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import { Map } from 'immutable';
 
 import Widget from 'views/logic/widgets/Widget';

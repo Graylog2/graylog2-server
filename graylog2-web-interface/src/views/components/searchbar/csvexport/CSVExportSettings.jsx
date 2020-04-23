@@ -1,5 +1,5 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import { List } from 'immutable';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
