@@ -8,7 +8,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import CurrentUserContext from './CurrentUserContext';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-const CurrentUserPreferencesProvider = ({ children }: { children: React.Node }) => {
+const CurrentUserProvider = ({ children }: { children: React.Node }) => {
   const currentUser = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
   return currentUser
     ? (
@@ -19,8 +19,8 @@ const CurrentUserPreferencesProvider = ({ children }: { children: React.Node }) 
     : children;
 };
 
-CurrentUserPreferencesProvider.propTypes = {
+CurrentUserProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default CurrentUserPreferencesProvider;
+export default CurrentUserProvider;
