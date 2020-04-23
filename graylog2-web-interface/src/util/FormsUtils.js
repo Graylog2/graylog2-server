@@ -16,13 +16,24 @@ const FormUtils = {
   triggerInput(urlInput) {
     const { input } = urlInput;
     const tracker = input._valueTracker;
-    const event = new Event('change', { bubbles: true });
+    const event = this.createEvent('change');
     event.simulated = true;
     if (tracker) {
       tracker.setValue('');
     }
     input.dispatchEvent(event);
   },
+  // Workaround for IE11, see #7670
+  createEvent(type) {
+    if (typeof (Event) === 'function') {
+      return new Event(type);
+    }
+
+    const event = document.createEvent('Event');
+    event.initEvent(type, true, true);
+    return event;
+  },
 };
+
 
 export default FormUtils;

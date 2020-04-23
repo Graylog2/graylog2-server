@@ -5,6 +5,7 @@ import { CircleMarker, Map, Popup, TileLayer } from 'react-leaflet';
 import chroma from 'chroma-js';
 import { flatten } from 'lodash';
 
+import FormsUtils from 'util/FormsUtils';
 import style from './MapVisualization.css';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -72,7 +73,7 @@ class MapVisualization extends React.Component {
   // Workaround to avoid wrong placed markers or empty tiles if the map container size changed.
   _forceMapUpdate = () => {
     if (this._map) {
-      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(FormsUtils.createEvent('resize'));
       const { interactive } = this.props;
       this._map.leafletElement.invalidateSize(interactive);
     }
