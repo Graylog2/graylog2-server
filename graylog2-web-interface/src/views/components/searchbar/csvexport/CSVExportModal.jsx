@@ -50,9 +50,9 @@ const _onFieldSelect = (newFields, setSelectedFields) => {
   setSelectedFields(newFields.map((field) => ({ field: field.value })));
 };
 
-const _onStartDownload = (view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading) => {
+const _onStartDownload = (view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal) => {
   setLoading(true);
-  startDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit).then(() => setLoading(false));
+  startDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit).then(closeModal);
 };
 
 const _getInitialFields = (selectedWidget) => {
@@ -110,7 +110,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
       <Modal.Footer>
         {allowWidgetSelection && <Button bsStyle="link" onClick={() => setSelectedWidget(null)} className="pull-left">Select different message table</Button>}
         <Button type="button" onClick={closeModal}>Close</Button>
-        <Button type="button" onClick={() => _onStartDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
+        <Button type="button" onClick={() => _onStartDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
           {loading
             ? <Spinner text="Downloading..." delay={0} />
             : <><Icon name="cloud-download" />&nbsp;Start Download</>}

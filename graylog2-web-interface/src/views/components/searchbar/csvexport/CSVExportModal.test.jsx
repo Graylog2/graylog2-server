@@ -168,6 +168,16 @@ describe('CSVExportModal', () => {
     await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
   });
 
+  it('should be closed after finishing download', async () => {
+    const closeModalStub = jest.fn();
+    const { getByTestId } = render(<SimpleCSVExportModal closeModal={closeModalStub} />);
+
+    const submitButton = getByTestId('csv-download-button');
+    fireEvent.click(submitButton);
+
+    await wait(() => expect(closeModalStub).toHaveBeenCalledTimes(1));
+  });
+
   describe('on search page', () => {
     const SearchCSVExportModal = (props) => (
       <SimpleCSVExportModal viewType={View.Type.Search} {...props} />
