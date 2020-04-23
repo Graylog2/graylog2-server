@@ -22,7 +22,7 @@ import CSVExportSettings from 'views/components/searchbar/csvexport/CSVExportSet
 import CSVExportWidgetSelection from 'views/components/searchbar/csvexport/CSVExportWidgetSelection';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 
-import ExportStategy from './ExportStrategy';
+import ExportStrategy from './ExportStrategy';
 import startDownload from './startDownload';
 
 const DEFAULT_FIELDS = ['timestamp', 'source', 'message'];
@@ -66,7 +66,7 @@ const _getInitialFields = (selectedWidget) => {
 
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
-  const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection } = ExportStategy.createExportStrategy(view.type);
+  const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection } = ExportStrategy.createExportStrategy(view.type);
   const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type)).flatten(true);
 
   const [loading, setLoading] = useState(false);
