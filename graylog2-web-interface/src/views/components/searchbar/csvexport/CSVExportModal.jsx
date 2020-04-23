@@ -50,9 +50,9 @@ const _onFieldSelect = (newFields, setSelectedFields) => {
   setSelectedFields(newFields.map((field) => ({ field: field.value })));
 };
 
-const _onStartDownload = (view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal) => {
+const _onStartDownload = (downloadFile, view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal) => {
   setLoading(true);
-  startDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit).then(closeModal);
+  startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, selectedSort, limit).then(closeModal);
 };
 
 const _getInitialFields = (selectedWidget) => {
@@ -66,7 +66,7 @@ const _getInitialFields = (selectedWidget) => {
 
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
-  const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection } = ExportStrategy.createExportStrategy(view.type);
+  const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
   const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type)).flatten(true);
 
   const [loading, setLoading] = useState(false);
@@ -80,6 +80,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
   const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, messagesWidgets);
   const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, messagesWidgets);
   const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields, loading);
+  const _startDownload = () => _onStartDownload(downloadFile, view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal);
 
   return (
     <BootstrapModalWrapper showModal onHide={closeModal}>
@@ -110,7 +111,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
       <Modal.Footer>
         {allowWidgetSelection && <Button bsStyle="link" onClick={() => setSelectedWidget(null)} className="pull-left">Select different message table</Button>}
         <Button type="button" onClick={closeModal}>Close</Button>
-        <Button type="button" onClick={() => _onStartDownload(view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal)} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
+        <Button type="button" onClick={_startDownload} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
           {loading
             ? <Spinner text="Downloading..." delay={0} />
             : <><Icon name="cloud-download" />&nbsp;Start Download</>}

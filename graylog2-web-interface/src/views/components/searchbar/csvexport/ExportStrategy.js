@@ -1,8 +1,10 @@
 // @flow strict
-import { Map } from 'immutable';
+import { Map, Set } from 'immutable';
 
 import View, { type ViewType } from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
+import { exportSearchMessages, exportSearchTypeMessages, type ExportPayload } from 'util/MessagesExportUtils';
+import Query from 'views/logic/queries/Query';
 
 type ExportStrategy = {
   title: string,
@@ -10,6 +12,7 @@ type ExportStrategy = {
   shouldEnableDownload: (showWidgetSelection: boolean, selectedWidget: ?Widget, selectedFields: { field: string }[], loading: boolean) => boolean,
   shouldShowWidgetSelection: (singleWidgetDownload: boolean, selectedWidget: ?Widget, widgets: Map<string, Widget>) => boolean,
   initialWidget: (widgets: Map<string, Widget>, directExportWidgetId: ?string) => ?Widget,
+  downloadFile: (payload: ExportPayload, searchQueries: Set<Query>, searchType: ?any, searchId: string, filename: string) => Promise<void>,
 };
 
 const _getWidgetById = (widgets, id) => widgets.find((item) => item.id === id);
@@ -24,12 +27,30 @@ const _initialSearchWidget = (widgets, directExportWidgetId) => {
   return null;
 };
 
+const _exportOnDashboard = (payload: ExportPayload, searchType: any, searchId: string, filename: string) => {
+  if (!searchType) {
+    throw new Error('CSV exports on a dashboard require a selected widget!');
+  }
+  return exportSearchTypeMessages(payload, searchId, searchType.id, filename);
+};
+
+const _exportOnSearchPage = (payload: ExportPayload, searchQueries: Set<Query>, searchType: ?any, searchId: string, filename: string) => {
+  if (searchQueries.size !== 1) {
+    throw new Error('Searches must only have a single query!');
+  }
+  if (searchType) {
+    return exportSearchTypeMessages(payload, searchId, searchType.id, filename);
+  }
+  return exportSearchMessages(payload, searchId, filename);
+};
+
 const SearchExportStrategy: ExportStrategy = {
   title: 'Export all search results to CSV',
   shouldEnableDownload: (showWidgetSelection, selectedWidget, selectedFields, loading) => !loading && !showWidgetSelection && !!selectedFields && selectedFields.length > 0,
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection, widgets) => !singleWidgetDownload && !showWidgetSelection && widgets.size > 1,
   shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget, widgets) => !singleWidgetDownload && !selectedWidget && widgets.size > 1,
   initialWidget: _initialSearchWidget,
+  downloadFile: (payload, searchQueries, searchType, searchId, filename) => _exportOnSearchPage(payload, searchQueries, searchType, searchId, filename),
 };
 
 const DashboardExportStrategy: ExportStrategy = {
@@ -38,6 +59,7 @@ const DashboardExportStrategy: ExportStrategy = {
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection) => !singleWidgetDownload && !showWidgetSelection,
   shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget) => !singleWidgetDownload && !selectedWidget,
   initialWidget: (widget, directExportWidgetId) => (directExportWidgetId ? _getWidgetById(widget, directExportWidgetId) : null),
+  downloadFile: (payload, searchQueries, searchType, searchId, filename) => _exportOnDashboard(payload, searchType, searchId, filename),
 };
 
 const createExportStrategy = (viewType: ViewType) => {
