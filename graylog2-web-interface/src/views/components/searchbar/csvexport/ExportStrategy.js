@@ -7,7 +7,7 @@ import Widget from 'views/logic/widgets/Widget';
 type ExportStrategy = {
   title: string,
   shouldAllowWidgetSelection: (singleWidgetDownload: boolean, showWidgetSelection: boolean, widgets: Map<string, Widget>) => boolean,
-  shouldEnableDownload: (showWidgetSelection: boolean, selectedWidget: ?Widget, selectedFields: { field: string }[]) => boolean,
+  shouldEnableDownload: (showWidgetSelection: boolean, selectedWidget: ?Widget, selectedFields: { field: string }[], loading: boolean) => boolean,
   shouldShowWidgetSelection: (singleWidgetDownload: boolean, selectedWidget: ?Widget, widgets: Map<string, Widget>) => boolean,
   initialWidget: (widgets: Map<string, Widget>, directExportWidgetId: ?string) => ?Widget,
 };
@@ -26,7 +26,7 @@ const _initialSearchWidget = (widgets, directExportWidgetId) => {
 
 const SearchExportStrategy: ExportStrategy = {
   title: 'Export all search results to CSV',
-  shouldEnableDownload: (showWidgetSelection, selectedWidget, selectedFields) => !showWidgetSelection && !!selectedFields && selectedFields.length > 0,
+  shouldEnableDownload: (showWidgetSelection, selectedWidget, selectedFields, loading) => !loading && !showWidgetSelection && !!selectedFields && selectedFields.length > 0,
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection, widgets) => !singleWidgetDownload && !showWidgetSelection && widgets.size > 1,
   shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget, widgets) => !singleWidgetDownload && !selectedWidget && widgets.size > 1,
   initialWidget: _initialSearchWidget,
@@ -34,7 +34,7 @@ const SearchExportStrategy: ExportStrategy = {
 
 const DashboardExportStrategy: ExportStrategy = {
   title: 'Export message table search results to CSV',
-  shouldEnableDownload: (showWidgetSelection, selectedWidget, selectedFields) => !!selectedWidget && !!selectedFields && selectedFields.length > 0,
+  shouldEnableDownload: (showWidgetSelection, selectedWidget, selectedFields, loading) => !loading && !!selectedWidget && !!selectedFields && selectedFields.length > 0,
   shouldAllowWidgetSelection: (singleWidgetDownload, showWidgetSelection) => !singleWidgetDownload && !showWidgetSelection,
   shouldShowWidgetSelection: (singleWidgetDownload, selectedWidget) => !singleWidgetDownload && !selectedWidget,
   initialWidget: (widget, directExportWidgetId) => (directExportWidgetId ? _getWidgetById(widget, directExportWidgetId) : null),

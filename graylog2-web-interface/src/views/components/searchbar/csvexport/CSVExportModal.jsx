@@ -79,7 +79,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
   const singleWidgetDownload = !!directExportWidgetId;
   const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, messagesWidgets);
   const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, messagesWidgets);
-  const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields);
+  const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields, loading);
 
   return (
     <BootstrapModalWrapper showModal onHide={closeModal}>
