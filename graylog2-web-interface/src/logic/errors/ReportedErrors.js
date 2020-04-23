@@ -3,7 +3,6 @@
 import { FetchError } from 'logic/rest/FetchProvider';
 
 export const ReactErrorType = 'ReactError';
-export const NotFoundErrorType = 'NotFoundError';
 export const UnauthorizedErrorType = 'UnauthorizedError';
 export const StreamPermissionErrorType = 'StreamPermissionError';
 
