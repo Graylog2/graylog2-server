@@ -7,7 +7,7 @@ import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createReactError, createUnauthorizedError } from 'logic/errors/ReportedErrors';
 import { FetchError } from 'logic/rest/FetchProvider';
-import ReportedError from './ReportedError';
+import ReportedErrorBoundary from './ReportedErrorBoundary';
 
 jest.unmock('logic/rest/FetchProvider');
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
@@ -16,7 +16,7 @@ const router = {
   listen: () => jest.fn(),
 };
 
-describe('ReportedError', () => {
+describe('ReportedErrorBoundary', () => {
   afterEach(() => {
     cleanup();
   });
@@ -25,7 +25,7 @@ describe('ReportedError', () => {
     const mockRouter = {
       listen: jest.fn(() => jest.fn()),
     };
-    render(<ReportedError router={mockRouter}>Hello World!</ReportedError>);
+    render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
 
     expect(mockRouter.listen).toHaveBeenCalledTimes(1);
   });
@@ -35,7 +35,7 @@ describe('ReportedError', () => {
     const mockRouter = {
       listen: () => unlisten,
     };
-    const { unmount } = render(<ReportedError router={mockRouter}>Hello World!</ReportedError>);
+    const { unmount } = render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
 
     unmount();
 
@@ -44,13 +44,13 @@ describe('ReportedError', () => {
 
 
   it('displays child component if there is no error', () => {
-    const { getByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
+    const { getByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
 
     expect(getByText('Hello World!')).not.toBeNull();
   });
 
   it('displays runtime error page when react error got reported', async () => {
-    const { getByText, queryByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
+    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
 
     suppressConsole(() => {
       ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
@@ -61,7 +61,7 @@ describe('ReportedError', () => {
   });
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
-    const { getByText, queryByText } = render(<ReportedError router={router}>Hello World!</ReportedError>);
+    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
 
     suppressConsole(() => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
@@ -77,7 +77,7 @@ describe('ReportedError', () => {
       listen: jest.fn(() => jest.fn()),
     };
 
-    const { getByText } = render(<ReportedError router={mockRouter}>Hello World!</ReportedError>);
+    const { getByText } = render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
 
     expect(getByText('Hello World!')).not.toBeNull();
 

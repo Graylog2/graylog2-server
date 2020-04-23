@@ -26,6 +26,10 @@ const ErrorMessage = styled.div`
     font-weight: normal;
     overflow: auto;
   }
+
+  p {
+    font-size: inherit;
+  }
 `;
 
 type Props = {

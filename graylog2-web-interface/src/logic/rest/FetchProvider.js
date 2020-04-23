@@ -5,7 +5,7 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 // eslint-disable-next-line import/no-cycle
-import { createUnauthorizedError } from 'logic/errors/ReportedErrors';
+import { createFromFetchError } from 'logic/errors/ReportedErrors';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -70,6 +70,8 @@ export class Builder {
 
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
+        const fetchError = new FetchError(error.statusText, error);
+
         const SessionStore = StoreProvider.getStore('Session');
         if (SessionStore.isLoggedIn() && error.status === 401) {
           const SessionActions = ActionsProvider.getActions('Session');
@@ -78,7 +80,7 @@ export class Builder {
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
         if (SessionStore.isLoggedIn() && error.status === 403) {
-          ErrorsActions.report(createUnauthorizedError(error));
+          ErrorsActions.report(createFromFetchError(fetchError));
         }
 
         if (error.originalError && !error.originalError.status) {
@@ -86,7 +88,7 @@ export class Builder {
           ServerAvailabilityActions.reportError(error);
         }
 
-        throw new FetchError(error.statusText, error);
+        throw fetchError;
       });
 
     return this;
