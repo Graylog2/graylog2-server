@@ -96,6 +96,8 @@ const CSVExportSettings = ({
         <Input type="number"
                id="export-message-limit"
                onChange={({ target: { value } }) => setLimit(Number(value))}
+               min={1}
+               step={1}
                value={limit} />
       </Row>
       <Row>
