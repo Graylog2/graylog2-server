@@ -7,7 +7,7 @@ import { Badge } from 'components/graylog';
 
 type Props = {
   smallScreen: boolean,
-}
+};
 
 const HeaderBadge = ({ smallScreen = false }: Props) => {
   const smallScreenClass = smallScreen ? 'small-scrn-badge' : '';
