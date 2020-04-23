@@ -32,6 +32,7 @@ const CustomizationStore = singletonStore('customization.store', () => Reflux.cr
 
     promise.then((response) => {
       this.customization = { ...this.customization, [type]: response };
+
       this.propagateChanges();
 
       return response;
@@ -46,6 +47,7 @@ const CustomizationStore = singletonStore('customization.store', () => Reflux.cr
     promise.then(
       (response) => {
         this.customization = { ...this.customization, [type]: response };
+
         this.propagateChanges();
 
         return response;
