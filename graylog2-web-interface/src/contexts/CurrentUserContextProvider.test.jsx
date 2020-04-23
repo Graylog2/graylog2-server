@@ -34,7 +34,6 @@ describe('CurrentUserProvider', () => {
     expect(consume).toHaveBeenCalledWith(undefined);
   });
 
-
   it('provides current user', () => {
     asMock(CurrentUserStore.getInitialState).mockReturnValue({ currentUser: viewsManager });
 
