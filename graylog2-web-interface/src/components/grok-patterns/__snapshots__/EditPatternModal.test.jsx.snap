@@ -131,7 +131,7 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "DnwXA",
+                  "lastClassName": "UjHmV",
                   "rules": Array [
                     [Function],
                   ],
@@ -156,7 +156,7 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
               backdrop="static"
               bsClass="modal"
               bsSize="large"
-              className="Modal-nuree8-0 DnwXA"
+              className="Modal-nuree8-0 UjHmV"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}
@@ -352,7 +352,7 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "DnwXA",
+                  "lastClassName": "UjHmV",
                   "rules": Array [
                     [Function],
                   ],
@@ -377,7 +377,7 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
               backdrop="static"
               bsClass="modal"
               bsSize="large"
-              className="Modal-nuree8-0 DnwXA"
+              className="Modal-nuree8-0 UjHmV"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}
