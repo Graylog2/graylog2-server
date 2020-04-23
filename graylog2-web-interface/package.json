@@ -19,7 +19,7 @@
     "build:analyze": "yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode=\"static\" --report=\"./webpack/analysis-$(git rev-parse --abbrev-ref HEAD).html\"",
     "lint": "eslint --ext js,jsx src",
     "lint:path": "eslint --ext js,jsx",
-    "lint:styles": "stylelint './src/**/*.{js,jsx,tsx}'",
+    "lint:styles": "stylelint './src/**/*.{js,jsx}'",
     "lint:styles:path": "stylelint --",
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest",
@@ -27,7 +27,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}"
+      "src/**/*.{js,jsx}"
     ],
     "setupFiles": [
       "jest-localstorage-mock",
@@ -46,8 +46,7 @@
     ],
     "moduleFileExtensions": [
       "js",
-      "jsx",
-      "ts"
+      "jsx"
     ],
     "moduleNameMapper": {
       "^file-loader(\\?esModule=false)?!(.+)$": "$2",
@@ -60,8 +59,7 @@
       ".fixtures.js$"
     ],
     "transform": {
-      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest"
+      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest"
     }
   },
   "dependencies": {
@@ -138,12 +136,6 @@
     "@testing-library/dom": "^6.12.2",
     "@testing-library/jest-dom": "^5.1.1",
     "@testing-library/react": "^9.4.1",
-    "@types/bluebird": "^3.5.8",
-    "@types/jquery": "^3.3.30",
-    "@types/node": "^11.11.0",
-    "@types/sockjs-client": "^1.0.31",
-    "@types/toastr": "^2.1.34",
-    "@types/typeahead": "^0.11.29",
     "assets-webpack-plugin": "^3.5.1",
     "babel-core": "^7.0.0-0",
     "babel-jest": "^25.1.0",
@@ -188,9 +180,6 @@
     "stylelint-config-standard": "^19.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.9.0",
-    "ts-jest": "^25.2.1",
-    "ts-loader": "^5.3.3",
-    "typescript": "^2.7.2",
     "url-loader": "^4.0.0",
     "webpack": "^4.39.3",
     "webpack-bundle-analyzer": "^3.5.2",
@@ -202,7 +191,6 @@
     "yargs": "^10.0.3"
   },
   "resolutions": {
-    "@types/jquery": "3.3.0",
     "jquery": "3.4.1",
     "jsdom": "15.2.1",
     "upath": "1.0.5",
