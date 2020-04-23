@@ -43,7 +43,9 @@ public class MessagesExporter {
     }
 
     private void export(ExportMessagesCommand command, Consumer<SimpleMessageChunk> chunkForwarder) {
-        backend.run(command, chunkForwarder);
+        Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, chunk, command);
+
+        backend.run(command, decoratedForwarder);
     }
 
     public void export(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
@@ -61,9 +63,7 @@ public class MessagesExporter {
 
         ExportMessagesCommand command = commandFactory.buildWithMessageList(search, query, messageList, resultFormat);
 
-        Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, messageList, chunk, command);
-
-        export(command, decoratedForwarder);
+        export(command, chunkForwarder);
     }
 
     private MessageList messageListFrom(Query query, String searchTypeId) {
@@ -87,8 +87,8 @@ public class MessagesExporter {
                 .orElseThrow(() -> new ExportException("Invalid Search object with empty Query"));
     }
 
-    private void decorate(Consumer<SimpleMessageChunk> chunkForwarder, MessageList messageList, SimpleMessageChunk chunk, ExportMessagesCommand request) {
-        SimpleMessageChunk decoratedChunk = chunkDecorator.decorate(chunk, messageList.decorators(), request);
+    private void decorate(Consumer<SimpleMessageChunk> chunkForwarder, SimpleMessageChunk chunk, ExportMessagesCommand command) {
+        SimpleMessageChunk decoratedChunk = chunkDecorator.decorate(chunk, command);
 
         chunkForwarder.accept(decoratedChunk);
     }

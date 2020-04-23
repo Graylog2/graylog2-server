@@ -59,16 +59,17 @@ public class CommandFactory {
     }
 
     public ExportMessagesCommand buildWithMessageList(Search search, Query query, MessageList messageList, ResultFormat resultFormat) {
-        ExportMessagesCommand.Builder requestBuilder = builderFrom(resultFormat)
+        ExportMessagesCommand.Builder commandBuilder = builderFrom(resultFormat)
                 .timeRange(toAbsolute(timeRangeFrom(query, messageList)))
                 .queryString(queryStringFrom(search, query, messageList))
-                .streams(streamsFrom(query, messageList));
+                .streams(streamsFrom(query, messageList))
+                .decorators(messageList.decorators());
 
         if (messageList.sort() != null && resultFormat.sort().isEmpty()) {
-            requestBuilder.sort(new LinkedHashSet<>(messageList.sort()));
+            commandBuilder.sort(new LinkedHashSet<>(messageList.sort()));
         }
 
-        return requestBuilder.build();
+        return commandBuilder.build();
     }
 
     private AbsoluteRange toAbsolute(TimeRange timeRange) {

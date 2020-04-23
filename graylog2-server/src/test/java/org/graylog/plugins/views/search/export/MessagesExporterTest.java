@@ -99,14 +99,14 @@ class MessagesExporterTest {
     }
 
     @Test
-    void appliesMessageListDecorators() {
+    void appliesDecorators() {
         MessageList messageList = MessageList.builder().id("ml-id").build();
         Search search = searchWithQueries(validQueryBuilderWith(messageList).build());
 
         SimpleMessageChunk undecoratedChunk = SimpleMessageChunk.from(linkedHashSetOf("field-1"), linkedHashSetOf());
         SimpleMessageChunk decoratedChunk = SimpleMessageChunk.from(linkedHashSetOf("field-1", "field-2"), linkedHashSetOf());
 
-        when(chunkDecorator.decorate(eq(undecoratedChunk), eq(messageList.decorators()), any())).thenReturn(decoratedChunk);
+        when(chunkDecorator.decorate(eq(undecoratedChunk), any())).thenReturn(decoratedChunk);
 
         ArrayList<SimpleMessageChunk> results = exportSearchTypeWithStubbedSingleChunkFromBackend(search, messageList.id(), undecoratedChunk);
 

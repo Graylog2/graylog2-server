@@ -28,8 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.util.ArrayList;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 import static org.graylog.plugins.views.search.export.TestData.simpleMessageChunkWithIndexNames;
@@ -111,8 +109,7 @@ class LegacyChunkDecoratorTest {
         ArgumentCaptor<SearchResponse> captor = ArgumentCaptor.forClass(SearchResponse.class);
         when(decoratorProcessor.decorateSearchResponse(captor.capture(), any())).thenReturn(mock(SearchResponse.class));
 
-
-        sut.decorate(undecoratedChunk, new ArrayList<>(), command);
+        sut.decorate(undecoratedChunk, command);
 
         return captor.getValue();
     }

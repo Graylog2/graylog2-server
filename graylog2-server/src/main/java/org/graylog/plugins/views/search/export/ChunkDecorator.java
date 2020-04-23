@@ -16,10 +16,6 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import org.graylog2.decorators.Decorator;
-
-import java.util.List;
-
 public interface ChunkDecorator {
-    SimpleMessageChunk decorate(SimpleMessageChunk chunk, List<Decorator> decorators, ExportMessagesCommand request);
+    SimpleMessageChunk decorate(SimpleMessageChunk chunk, ExportMessagesCommand request);
 }

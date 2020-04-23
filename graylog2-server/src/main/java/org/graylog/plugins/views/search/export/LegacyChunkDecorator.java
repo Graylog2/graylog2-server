@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.export;
 
 import com.google.common.collect.ImmutableMultimap;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
-import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
@@ -40,11 +39,11 @@ public class LegacyChunkDecorator implements ChunkDecorator {
     }
 
     @Override
-    public SimpleMessageChunk decorate(SimpleMessageChunk undecoratedChunk, List<Decorator> decorators, ExportMessagesCommand command) {
+    public SimpleMessageChunk decorate(SimpleMessageChunk undecoratedChunk, ExportMessagesCommand command) {
 
         SearchResponse undecoratedLegacyResponse = legacySearchResponseFrom(undecoratedChunk, command);
 
-        SearchResponse decoratedLegacyResponse = decoratorProcessor.decorateSearchResponse(undecoratedLegacyResponse, decorators);
+        SearchResponse decoratedLegacyResponse = decoratorProcessor.decorateSearchResponse(undecoratedLegacyResponse, command.decorators());
 
         SimpleMessageChunk decoratedChunk = simpleMessageChunkFrom(decoratedLegacyResponse, undecoratedChunk.fieldsInOrder());
 

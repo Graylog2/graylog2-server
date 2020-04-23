@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
+import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -235,6 +236,21 @@ class CommandFactoryTest {
         ExportMessagesCommand command = buildFrom(s, q, ml);
 
         assertThat(command.timeRange()).isEqualTo(q.timerange());
+    }
+
+    @Test
+    void takesDecoratorsFromMessageList() {
+        Decorator decorator = mock(Decorator.class);
+        MessageList ml = MessageList.builder().id("ml-id")
+                .decorators(newArrayList(decorator))
+                .build();
+        Query q = validQueryBuilderWith(ml).build();
+
+        Search s = searchWithQueries(q);
+
+        ExportMessagesCommand command = buildFrom(s, q, ml);
+
+        assertThat(command.decorators()).containsExactly(decorator);
     }
 
     @Test
