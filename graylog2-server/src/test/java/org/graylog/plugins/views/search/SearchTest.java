@@ -75,7 +75,8 @@ public class SearchTest {
         Search search = searchWithQueriesWithStreams("a,b,c", "");
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
-                .isThrownBy(() -> search.addStreamsToQueriesWithoutStreams(ImmutableSet::of));
+                .isThrownBy(() -> search.addStreamsToQueriesWithoutStreams(ImmutableSet::of))
+                .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).isEmpty());
     }
 
     @Test

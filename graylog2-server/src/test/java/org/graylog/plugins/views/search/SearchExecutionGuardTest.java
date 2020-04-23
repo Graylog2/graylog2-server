@@ -62,7 +62,8 @@ public class SearchExecutionGuardTest {
         final Search search = searchWithStreamIds("ok", "not-ok");
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
-                .isThrownBy(() -> sut.check(search, id -> id.equals("ok")));
+                .isThrownBy(() -> sut.check(search, id -> id.equals("ok")))
+                .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).contains("not-ok"));
     }
 
     @Test
