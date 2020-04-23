@@ -1,10 +1,15 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import AppConfig from 'util/AppConfig';
 import { Badge } from 'components/graylog';
 
-const HeaderBadge = ({ smallScreen = false }) => {
+type Props = {
+  smallScreen: boolean,
+}
+
+const HeaderBadge = ({ smallScreen = false }: Props) => {
   const smallScreenClass = smallScreen ? 'small-scrn-badge' : '';
   const devBadge = AppConfig.gl2DevMode() ? <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">DEV</Badge> : null;
   return (
