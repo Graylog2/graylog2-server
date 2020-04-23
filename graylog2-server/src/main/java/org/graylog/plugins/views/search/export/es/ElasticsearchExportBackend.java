@@ -145,7 +145,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     private QueryBuilder queryStringFilter(MessagesRequest request) {
-        ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) request.queryString();
+        ElasticsearchQueryString backendQuery = request.queryString();
         return backendQuery.isEmpty() ?
                 matchAllQuery() :
                 queryStringQuery(backendQuery.queryString()).allowLeadingWildcard(allowLeadingWildcard);
