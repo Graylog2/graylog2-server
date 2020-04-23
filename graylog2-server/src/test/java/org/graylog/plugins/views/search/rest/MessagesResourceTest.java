@@ -23,11 +23,13 @@ import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +44,7 @@ import static org.mockito.Mockito.when;
 public class MessagesResourceTest {
 
     private MessagesResource sut;
+    private User currentUser;
     private MessagesExporter exporter;
     private PermittedStreams permittedStreams;
     private SearchExecutionGuard executionGuard;
@@ -49,17 +52,31 @@ public class MessagesResourceTest {
     @BeforeEach
     void setUp() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
+        currentUser = mock(User.class);
+        when(currentUser.getName()).thenReturn("peterchen");
         exporter = mock(MessagesExporter.class);
         permittedStreams = mock(PermittedStreams.class);
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
-        sut = new MessagesResource(exporter, mock(SearchDomain.class), executionGuard, permittedStreams, mock(ObjectMapper.class));
+        sut = new MessagesTestResource(exporter, mock(SearchDomain.class), executionGuard, permittedStreams, mock(ObjectMapper.class));
 
         sut.asyncRunner = c -> {
             c.accept(x -> {
             });
             return null;
         };
+    }
+
+    class MessagesTestResource extends MessagesResource {
+        public MessagesTestResource(MessagesExporter exporter, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper) {
+            super(exporter, searchDomain, executionGuard, permittedStreams, objectMapper);
+        }
+
+        @Nullable
+        @Override
+        protected User getCurrentUser() {
+            return currentUser;
+        }
     }
 
     @Test
