@@ -31,9 +31,9 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 public abstract class MessagesExportEvent {
-    public static MessagesExportEvent from(DateTime dateTime, ExportMessagesCommand command) {
+    public static MessagesExportEvent from(DateTime dateTime, String userName, ExportMessagesCommand command) {
         return Builder.create()
-                .userName("TODO")
+                .userName(userName)
                 .executionStart(dateTime)
                 .timeRange(command.timeRange())
                 .queryString(command.queryString().queryString())

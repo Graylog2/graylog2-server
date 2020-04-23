@@ -52,41 +52,41 @@ public class MessagesExporter {
         this.eventBus = eventBus;
     }
 
-    public void export(MessagesRequest request, Consumer<SimpleMessageChunk> chunkForwarder) {
+    public void export(MessagesRequest request, String userName, Consumer<SimpleMessageChunk> chunkForwarder) {
         ExportMessagesCommand command = commandFactory.buildFromRequest(request);
 
-        export(command, chunkForwarder);
+        export(command, userName, chunkForwarder);
     }
 
-    private void export(ExportMessagesCommand command, Consumer<SimpleMessageChunk> chunkForwarder) {
+    private void export(ExportMessagesCommand command, String userName, Consumer<SimpleMessageChunk> chunkForwarder) {
         Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, chunk, command);
 
         backend.run(command, decoratedForwarder);
 
-        postAuditEvent(command);
+        postAuditEvent(command, userName);
     }
 
-    private void postAuditEvent(ExportMessagesCommand command) {
+    private void postAuditEvent(ExportMessagesCommand command, String userName) {
         //noinspection UnstableApiUsage
-        eventBus.post(requireNonNull(MessagesExportEvent.from(now.get(), command)));
+        eventBus.post(requireNonNull(MessagesExportEvent.from(now.get(), userName, command)));
     }
 
-    public void export(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
+    public void export(Search search, ResultFormat resultFormat, String userName, Consumer<SimpleMessageChunk> chunkForwarder) {
         Query query = queryFrom(search);
 
         ExportMessagesCommand command = commandFactory.buildWithSearchOnly(search, query, resultFormat);
 
-        export(command, chunkForwarder);
+        export(command, userName, chunkForwarder);
     }
 
-    public void export(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
+    public void export(Search search, String searchTypeId, ResultFormat resultFormat, String userName, Consumer<SimpleMessageChunk> chunkForwarder) {
         Query query = search.queryForSearchType(searchTypeId);
 
         MessageList messageList = messageListFrom(query, searchTypeId);
 
         ExportMessagesCommand command = commandFactory.buildWithMessageList(search, query, messageList, resultFormat);
 
-        export(command, chunkForwarder);
+        export(command, userName, chunkForwarder);
     }
 
     private MessageList messageListFrom(Query query, String searchTypeId) {

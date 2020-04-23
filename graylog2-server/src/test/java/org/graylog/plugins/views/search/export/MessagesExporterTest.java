@@ -134,7 +134,7 @@ class MessagesExporterTest {
         DateTime now = DateTime.now(DateTimeZone.UTC);
         sut.now = () -> now;
 
-        sut.export(MessagesRequest.withDefaults(), chunk -> {});
+        sut.export(MessagesRequest.withDefaults(), "peterchen", chunk -> {});
 
         ArgumentCaptor<MessagesExportEvent> eventCaptor = ArgumentCaptor.forClass(MessagesExportEvent.class);
 
@@ -144,6 +144,7 @@ class MessagesExporterTest {
         MessagesExportEvent event = eventCaptor.getValue();
 
         assertAll("should send event",
+                () -> assertThat(event.userName()).isEqualTo("peterchen"),
                 () -> assertThat(event.timeRange()).isEqualTo(command.timeRange()),
                 () -> assertThat(event.executionStart()).isEqualTo(now),
                 () -> assertThat(event.queryString()).isEqualTo(command.queryString().queryString()),
@@ -170,12 +171,11 @@ class MessagesExporterTest {
     }
 
     private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat) {
-        exportSearchType(search, searchTypeId, resultFormat, x -> {
-        });
+        exportSearchType(search, searchTypeId, resultFormat, x -> {});
     }
 
     private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> forwarder) {
-        sut.export(search, searchTypeId, resultFormat, forwarder);
+        sut.export(search, searchTypeId, resultFormat, "peterchen", forwarder);
     }
 
     private void exportSearch(Search search, ResultFormat resultFormat) {
@@ -183,7 +183,7 @@ class MessagesExporterTest {
     }
 
     private void exportSearch(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> forwarder) {
-        sut.export(search, resultFormat, forwarder);
+        sut.export(search, resultFormat, "peterchen", forwarder);
     }
 
     private Search searchWithQueries(Query... queries) {

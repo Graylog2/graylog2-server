@@ -46,6 +46,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -85,7 +86,11 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         executionGuard.checkUserIsPermittedToSeeStreams(req.streams(), this::hasStreamReadPermission);
 
-        return asyncRunner.apply(chunkConsumer -> exporter.export(req, chunkConsumer));
+        return asyncRunner.apply(chunkConsumer -> exporter.export(req, userName(), chunkConsumer));
+    }
+
+    private String userName() {
+        return Objects.requireNonNull(getCurrentUser()).getName();
     }
 
     private MessagesRequest fillInIfNecessary(MessagesRequest requestFromClient) {
@@ -108,7 +113,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         Search search = loadSearch(searchId, format.executionState());
 
-        return asyncRunner.apply(chunkConsumer -> exporter.export(search, format, chunkConsumer));
+        return asyncRunner.apply(chunkConsumer -> exporter.export(search, format, userName(), chunkConsumer));
     }
 
     @POST
@@ -123,7 +128,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         Search search = loadSearch(searchId, format.executionState());
 
-        return asyncRunner.apply(chunkConsumer -> exporter.export(search, searchTypeId, format, chunkConsumer));
+        return asyncRunner.apply(chunkConsumer -> exporter.export(search, searchTypeId, format, userName(), chunkConsumer));
     }
 
     private ResultFormat emptyIfNull(ResultFormat format) {

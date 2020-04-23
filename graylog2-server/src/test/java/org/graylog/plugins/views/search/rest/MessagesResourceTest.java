@@ -70,7 +70,7 @@ public class MessagesResourceTest {
 
         ArgumentCaptor<MessagesRequest> captor = ArgumentCaptor.forClass(MessagesRequest.class);
 
-        doNothing().when(exporter).export(captor.capture(), any());
+        doNothing().when(exporter).export(captor.capture(), any(), any());
 
         sut.retrieve(request);
 
