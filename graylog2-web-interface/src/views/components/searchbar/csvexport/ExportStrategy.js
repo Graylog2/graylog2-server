@@ -5,12 +5,12 @@ import View, { type ViewType } from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
 
 type ExportStrategy = {
-    title: string,
-    shouldAllowWidgetSelection: (singleWidgetDownload: boolean, showWidgetSelection: boolean, widgets: Map<string, Widget>) => boolean,
-    shouldEnableDownload: (showWidgetSelection: boolean, selectedWidget: ?Widget, selectedFields: { field: string }[]) => boolean,
-    shouldShowWidgetSelection: (singleWidgetDownload: boolean, selectedWidget: ?Widget, widgets: Map<string, Widget>) => boolean,
-    initialWidget: (widgets: Map<string, Widget>, directExportWidgetId: ?string) => ?Widget,
-  };
+  title: string,
+  shouldAllowWidgetSelection: (singleWidgetDownload: boolean, showWidgetSelection: boolean, widgets: Map<string, Widget>) => boolean,
+  shouldEnableDownload: (showWidgetSelection: boolean, selectedWidget: ?Widget, selectedFields: { field: string }[]) => boolean,
+  shouldShowWidgetSelection: (singleWidgetDownload: boolean, selectedWidget: ?Widget, widgets: Map<string, Widget>) => boolean,
+  initialWidget: (widgets: Map<string, Widget>, directExportWidgetId: ?string) => ?Widget,
+};
 
 const _getWidgetById = (widgets, id) => widgets.find((item) => item.id === id);
 
