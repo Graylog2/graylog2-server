@@ -87,7 +87,8 @@ const CSVExportSettings = ({
       </Row>
       <Row>
         <span>Sort direction:</span>
-        <SortDirectionSelect direction={selectedSortDirection ? selectedSortDirection.direction : null}
+        <SortDirectionSelect disabled={!selectedSort || selectedSort.length === 0}
+                             direction={selectedSortDirection ? selectedSortDirection.direction : null}
                              onChange={onSortDirectionChange} />
       </Row>
       <Row>
