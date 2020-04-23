@@ -103,6 +103,7 @@ const MenuOverlay = (selectRef) => (props) => {
 
 const Select = ({ components, styles, ignoreCase = true, ignoreAccents = false, allowOptionCreation = false, ...rest }: Props) => {
   const selectRef = useRef(null);
+  const Component = allowOptionCreation ? CreatableSelect : ReactSelect;
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
   const menuStyle = useMemo(() => menu(selectRef, allowOptionCreation), [selectRef, allowOptionCreation]);
   const _components = {
@@ -121,21 +122,14 @@ const Select = ({ components, styles, ignoreCase = true, ignoreAccents = false, 
     valueContainer,
   };
   const filterOption = createFilter({ ignoreCase, ignoreAccents });
-  const selectProps = {
-    ...rest,
-    components: _components,
-    filterOption,
-    styles: _styles,
-    tabSelectsValue: false,
-    ref: selectRef,
-  };
-
-  if (allowOptionCreation) {
-    return <CreatableSelect {...selectProps} />;
-  }
 
   return (
-    <ReactSelect {...selectProps} />
+    <Component {...rest}
+               components={_components}
+               filterOption={filterOption}
+               styles={_styles}
+               tabSelectsValue={false}
+               ref={selectRef} />
   );
 };
 
