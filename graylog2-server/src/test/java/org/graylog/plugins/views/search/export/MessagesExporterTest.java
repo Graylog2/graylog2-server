@@ -17,13 +17,17 @@
 package org.graylog.plugins.views.search.export;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.events.MessagesExportEvent;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 import static org.graylog.plugins.views.search.export.TestData.validQueryBuilderWith;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -50,13 +55,20 @@ class MessagesExporterTest {
     private MessagesExporter sut;
     private ChunkDecorator chunkDecorator;
     private CommandFactory commandFactory;
+    @SuppressWarnings("UnstableApiUsage")
+    private EventBus eventBus;
 
     @BeforeEach
     void setUp() {
         backend = mock(ExportBackend.class);
         chunkDecorator = mock(ChunkDecorator.class);
         commandFactory = mock(CommandFactory.class);
-        sut = new MessagesExporter(backend, chunkDecorator, commandFactory);
+        when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
+        when(commandFactory.buildWithSearchOnly(any(), any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
+        when(commandFactory.buildWithMessageList(any(), any(), any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
+        //noinspection UnstableApiUsage
+        eventBus = mock(EventBus.class);
+        sut = new MessagesExporter(backend, chunkDecorator, commandFactory, eventBus);
     }
 
     @Test
@@ -111,6 +123,33 @@ class MessagesExporterTest {
         ArrayList<SimpleMessageChunk> results = exportSearchTypeWithStubbedSingleChunkFromBackend(search, messageList.id(), undecoratedChunk);
 
         assertThat(results).containsExactly(decoratedChunk);
+    }
+
+    @Test
+    void sendsAuditEvent() {
+        ExportMessagesCommand command = ExportMessagesCommand.withDefaults();
+        when(commandFactory.buildFromRequest(any())).
+                thenReturn(command);
+
+        DateTime now = DateTime.now(DateTimeZone.UTC);
+        sut.now = () -> now;
+
+        sut.export(MessagesRequest.withDefaults(), chunk -> {});
+
+        ArgumentCaptor<MessagesExportEvent> eventCaptor = ArgumentCaptor.forClass(MessagesExportEvent.class);
+
+        //noinspection UnstableApiUsage
+        verify(eventBus).post(eventCaptor.capture());
+
+        MessagesExportEvent event = eventCaptor.getValue();
+
+        assertAll("should send event",
+                () -> assertThat(event.timeRange()).isEqualTo(command.timeRange()),
+                () -> assertThat(event.executionStart()).isEqualTo(now),
+                () -> assertThat(event.queryString()).isEqualTo(command.queryString().queryString()),
+                () -> assertThat(event.streams()).isEqualTo(command.streams()),
+                () -> assertThat(event.fieldsInOrder()).isEqualTo(command.fieldsInOrder())
+        );
     }
 
     private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {

@@ -16,24 +16,40 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.events.MessagesExportEvent;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import static java.util.Objects.requireNonNull;
 
 public class MessagesExporter {
     private final ExportBackend backend;
     private final ChunkDecorator chunkDecorator;
     private final CommandFactory commandFactory;
+    @SuppressWarnings("UnstableApiUsage")
+    private final EventBus eventBus;
+
+    public Supplier<DateTime> now = () -> DateTime.now(DateTimeZone.UTC);
 
     @Inject
-    public MessagesExporter(ExportBackend backend, ChunkDecorator chunkDecorator, CommandFactory commandFactory) {
+    public MessagesExporter(
+            ExportBackend backend,
+            ChunkDecorator chunkDecorator,
+            CommandFactory commandFactory,
+            @SuppressWarnings("UnstableApiUsage") EventBus eventBus) {
         this.backend = backend;
         this.chunkDecorator = chunkDecorator;
         this.commandFactory = commandFactory;
+        this.eventBus = eventBus;
     }
 
     public void export(MessagesRequest request, Consumer<SimpleMessageChunk> chunkForwarder) {
@@ -46,6 +62,13 @@ public class MessagesExporter {
         Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, chunk, command);
 
         backend.run(command, decoratedForwarder);
+
+        postAuditEvent(command);
+    }
+
+    private void postAuditEvent(ExportMessagesCommand command) {
+        //noinspection UnstableApiUsage
+        eventBus.post(requireNonNull(MessagesExportEvent.from(now.get(), command)));
     }
 
     public void export(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {

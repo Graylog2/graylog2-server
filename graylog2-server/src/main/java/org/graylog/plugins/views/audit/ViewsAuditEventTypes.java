@@ -40,10 +40,12 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
     private static final String SEARCH = "search";
     public static final String SEARCH_CREATE = PREFIX + SEARCH + ":create";
     public static final String SEARCH_EXECUTE = PREFIX + SEARCH + ":execute";
-    public static final String MESSAGES_EXPORT = PREFIX + SEARCH + ":export";
 
     private static final String SEARCH_JOB = "search_job";
     public static final String SEARCH_JOB_CREATE = PREFIX + SEARCH_JOB + ":create";
+
+    public static final String MESSAGES = "messages";
+    public static final String MESSAGES_EXPORT = PREFIX + MESSAGES + ":export";
 
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
