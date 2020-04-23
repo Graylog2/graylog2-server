@@ -17,6 +17,7 @@ import CustomPropTypes from 'views/components/CustomPropTypes';
 import { RefreshActions } from 'views/stores/RefreshStore';
 
 import { MessageTableEntry } from 'views/components/messagelist';
+import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 
@@ -153,7 +154,7 @@ type Props = {
   config: MessagesWidgetConfig,
   editing?: boolean,
   fields: Immutable.List<FieldTypeMapping>,
-  messages: Array<{[string]: mixed}>,
+  messages: Array<BackendMessage>,
   onSortChange: (SortConfig[]) => Promise<void>,
   selectedFields?: Immutable.Set<string>,
   setLoadingState: (loading: boolean) => void,
@@ -201,7 +202,7 @@ class MessageTable extends React.Component<Props, State> {
     return ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
   };
 
-  _getFormattedMessages = (): Array<{[string]: mixed}> => {
+  _getFormattedMessages = (): Array<Message> => {
     const { messages } = this.props;
     return messages.map((m) => ({
       fields: m.message,

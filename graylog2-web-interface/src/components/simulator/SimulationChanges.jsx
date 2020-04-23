@@ -13,16 +13,6 @@ const SimulationChanges = createReactClass({
     simulationResults: PropTypes.object.isRequired,
   },
 
-  componentDidMount() {
-    this.style.use();
-  },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!./SimulationChanges.css'),
-
   _isOriginalMessageRemoved(originalMessage, processedMessages) {
     return !processedMessages.find((message) => message.id === originalMessage.id);
   },
