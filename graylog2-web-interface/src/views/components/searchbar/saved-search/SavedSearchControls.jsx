@@ -48,7 +48,13 @@ const _isAllowedToEdit = (view: View, currentUser = {}) => (
 );
 
 class SavedSearchControls extends React.Component<Props, State> {
-  // eslint-disable-next-line react/static-property-placement
+  static propTypes = {
+    viewStoreState: PropTypes.object.isRequired,
+    currentUser: PropTypes.shape({
+      username: PropTypes.string.isRequired,
+    }).isRequired,
+  };
+
   static contextType = ViewLoaderContext;
 
   formTarget: any;
@@ -256,13 +262,6 @@ class SavedSearchControls extends React.Component<Props, State> {
     );
   }
 }
-
-SavedSearchControls.propTypes = {
-  viewStoreState: PropTypes.object.isRequired,
-  currentUser: PropTypes.shape({
-    username: PropTypes.string.isRequired,
-  }).isRequired,
-};
 
 export default connect(
   SavedSearchControls,
