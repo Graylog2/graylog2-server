@@ -17,15 +17,9 @@
 package org.graylog.plugins.views.search.export;
 
 import com.google.common.collect.ImmutableSet;
-import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.filter.AndFilter;
-import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -35,21 +29,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.graylog.plugins.views.search.export.TestData.validQueryBuilderWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class MessagesExporterTest {
@@ -57,248 +49,27 @@ class MessagesExporterTest {
     private ExportBackend backend;
     private MessagesExporter sut;
     private ChunkDecorator chunkDecorator;
-    private QueryStringDecorator queryStringDecorator;
+    private CommandFactory commandFactory;
 
     @BeforeEach
     void setUp() {
         backend = mock(ExportBackend.class);
         chunkDecorator = mock(ChunkDecorator.class);
-        queryStringDecorator = mock(QueryStringDecorator.class);
-        when(queryStringDecorator.decorateQueryString(any(), any(), any()))
-                .then(returnsFirstArg());
-        sut = new MessagesExporter(backend, chunkDecorator, queryStringDecorator);
-    }
-
-    @Test
-    void takesRequestParamsFromSearch() {
-        Query query = validQueryBuilder()
-                .filter(streamFilter("stream-1", "stream-2"))
-                .query(ElasticsearchQueryString.builder().queryString("huhu").build())
-                .build();
-        Search s = searchWithQueries(query);
-
-        MessagesRequest request = captureRequest(s);
-
-        assertThat(request.timeRange()).isEqualTo(query.timerange());
-        assertThat(request.queryString()).isEqualTo(query.query());
-        assertThat(request.streams()).isEqualTo(query.usedStreamIds());
-    }
-
-    @Test
-    void takesRequestParamsFromResultFormat() {
-        Search s = searchWithQueries(validQueryBuilder().build());
-
-        ResultFormat resultFormat = ResultFormat.builder()
-                .fieldsInOrder("field-1", "field-2")
-                .sort(Sort.create("field-1", SortOrder.ASC))
-                .limit(100)
-                .build();
-
-        MessagesRequest request = captureRequest(s, resultFormat);
-
-        assertThat(request.sort()).isEqualTo(resultFormat.sort());
-        assertThat(request.fieldsInOrder()).isEqualTo(resultFormat.fieldsInOrder());
-        assertThat(request.limit()).isEqualTo(resultFormat.limit());
-    }
-
-    @Test
-    void takesDefaultsIfNoResultsFormatSpecified() {
-        Search s = searchWithQueries(validQueryBuilder().build());
-
-        ResultFormat resultFormat = ResultFormat.builder()
-                .build();
-
-        MessagesRequest request = captureRequest(s, resultFormat);
-
-        assertThat(request.sort()).isEqualTo(MessagesRequest.DEFAULT_SORT);
-        assertThat(request.fieldsInOrder()).isEqualTo(MessagesRequest.DEFAULT_FIELDS);
-    }
-
-    @Test
-    void takesStreamsFromSearchTypeIfNotEmpty() {
-        MessageList ml = MessageList.builder().id("ml-id")
-                .streams(ImmutableSet.of("stream-1", "stream-2"))
-                .build();
-        Query q = validQueryBuilderWith(ml).filter(streamFilter("stream-3")).build();
-
-        Search s = searchWithQueries(q);
-
-        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
-
-        assertThat(request.streams()).isEqualTo(ml.effectiveStreams());
-    }
-
-    @Test
-    void takesStreamsFromQueryIfEmptyOnSearchType() {
-        MessageList ml = MessageList.builder().id("ml-id").build();
-
-        Query q = validQueryBuilderWith(ml).filter(streamFilter("stream-3")).build();
-
-        Search s = searchWithQueries(q);
-
-        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
-
-        assertThat(request.streams()).isEqualTo(q.usedStreamIds());
-    }
-
-    @Test
-    void takesQueryStringFromMessageListIfOnlySpecifiedThere() {
-        MessageList ml = MessageList.builder().id("ml-id")
-                .query(ElasticsearchQueryString.builder().queryString("nacken").build())
-                .build();
-        Query q = validQueryBuilderWith(ml).build();
-
-        Search s = searchWithQueries(q);
-
-        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
-
-        //noinspection OptionalGetWithoutIsPresent
-        assertThat(request.queryString()).isEqualTo(ml.query().get());
-    }
-
-    @Test
-    void takesQueryStringFromQueryIfOnlySpecifiedThere() {
-        MessageList ml = MessageList.builder().id("ml-id")
-                .build();
-        Query q = validQueryBuilderWith(ml)
-                .query(ElasticsearchQueryString.builder().queryString("nacken").build())
-                .build();
-
-        Search s = searchWithQueries(q);
-
-        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
-
-        assertThat(request.queryString()).isEqualTo(q.query());
-    }
-
-    @Test
-    void combinesQueryStringIfSpecifiedOnMessageListAndQuery() {
-        MessageList ml = MessageList.builder().id("ml-id")
-                .query(ElasticsearchQueryString.builder().queryString("from-messagelist").build())
-                .build();
-        Query q = validQueryBuilderWith(ml)
-                .query(ElasticsearchQueryString.builder().queryString("from-query").build())
-                .build();
-
-        Search s = searchWithQueries(q);
-
-        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
-
-        ElasticsearchQueryString combined = ElasticsearchQueryString.builder()
-                .queryString("from-query AND from-messagelist").build();
-
-        assertThat(request.queryString())
-                .isEqualTo(combined);
-    }
-
-    @Test
-    void takesTimeRangeFromMessageListIfSpecified() {
-        MessageList ml = MessageList.builder().id("ml-id").timerange(timeRange(111)).build();
-
-        Query q = validQueryBuilderWith(ml).timerange(timeRange(222)).build();
-
-        Search s = searchWithQueries(q);
-
-        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
-
-        assertThat(request.timeRange()).isEqualTo(timeRange(111));
-    }
-
-    @Test
-    void takesTimeRangeFromQueryIfNotSpecifiedOnMessageList() {
-        MessageList ml = MessageList.builder().id("ml-id").build();
-
-        Query q = validQueryBuilderWith(ml).timerange(timeRange(222)).build();
-
-        Search s = searchWithQueries(q);
-
-        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
-
-        assertThat(request.timeRange()).isEqualTo(timeRange(222));
-    }
-
-    @Test
-    void takesFieldsFromResultFormatIfSpecified() {
-        MessageList ml = MessageList.builder().id("ml-id").build();
-        Query q = validQueryBuilderWith(ml).build();
-
-        Search s = searchWithQueries(q);
-
-        ResultFormat resultFormat = ResultFormat.builder().fieldsInOrder("field-1", "field-2").build();
-
-        MessagesRequest request = captureRequest(s, ml.id(), resultFormat);
-
-        assertThat(request.fieldsInOrder()).isEqualTo(resultFormat.fieldsInOrder());
-    }
-
-    @Test
-    void takesDefaultFieldsIfNotSpecifiedInResultFormat() {
-        MessageList ml = MessageList.builder().id("ml-id").build();
-
-        Query q = validQueryBuilderWith(ml).build();
-
-        Search s = searchWithQueries(q);
-
-        ResultFormat resultFormat = ResultFormat.builder().build();
-
-        MessagesRequest request = captureRequest(s, ml.id(), resultFormat);
-
-        assertThat(request.fieldsInOrder()).isEqualTo(MessagesRequest.DEFAULT_FIELDS);
-    }
-
-    @Test
-    void takesSortFromMessageListIfNotSpecifiedInResultFormat() {
-        MessageList ml = MessageList.builder().id("ml-id")
-                .sort(newArrayList(
-                        Sort.create("field-1", SortOrder.ASC),
-                        Sort.create("field-2", SortOrder.DESC)))
-                .build();
-
-        Query q = validQueryBuilderWith(ml).build();
-
-        Search s = searchWithQueries(q);
-
-        ResultFormat resultFormat = ResultFormat.builder().build();
-
-        MessagesRequest request = captureRequest(s, ml.id(), resultFormat);
-
-        assertThat(request.sort()).isEqualTo(new LinkedHashSet<>(requireNonNull(ml.sort())));
-    }
-
-    @Test
-    void takesSortFromResultFormatIfSpecified() {
-        MessageList ml = MessageList.builder().id("ml-id")
-                .sort(newArrayList(
-                        Sort.create("field-1", SortOrder.ASC),
-                        Sort.create("field-2", SortOrder.DESC)))
-                .build();
-
-        Query q = validQueryBuilderWith(ml).build();
-
-        Search s = searchWithQueries(q);
-
-        ResultFormat resultFormat = ResultFormat.builder().sort(Sort.create("field-3", SortOrder.ASC)).build();
-
-        MessagesRequest request = captureRequest(s, ml.id(), resultFormat);
-
-        assertThat(request.sort()).isEqualTo(resultFormat.sort());
+        commandFactory = mock(CommandFactory.class);
+        sut = new MessagesExporter(backend, chunkDecorator, commandFactory);
     }
 
     @Test
     void throwsIfSearchTypeIsNotMessageList() {
         Pivot p = Pivot.builder().id("pivot-id").series(newArrayList()).rollup(false).build();
 
-        Query q = validQueryBuilderWith(p).build();
+        Query q = validQueryBuilder().searchTypes(ImmutableSet.of(p)).build();
 
         Search s = searchWithQueries(q);
 
         assertThatExceptionOfType(ExportException.class)
                 .isThrownBy(() -> exportSearchType(s, p.id(), ResultFormat.builder().build()))
                 .withMessageContaining("supported");
-    }
-
-    private Query.Builder validQueryBuilderWith(SearchType searchType) {
-        return validQueryBuilder().searchTypes(ImmutableSet.of(searchType));
     }
 
     @Test
@@ -318,9 +89,13 @@ class MessagesExporterTest {
 
         Search s = searchWithQueries(correctQuery, otherQuery);
 
-        MessagesRequest request = captureRequest(s, ml.id(), ResultFormat.builder().build());
+        ResultFormat resultFormat = ResultFormat.builder().build();
+        exportSearchType(s, ml.id(), resultFormat);
 
-        assertThat(request.timeRange()).isEqualTo(timeRange(222));
+        ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
+        verify(commandFactory).buildWithMessageList(eq(s), captor.capture(), eq(ml), eq(resultFormat));
+
+        assertThat(captor.getValue()).isEqualTo(correctQuery);
     }
 
     @Test
@@ -338,18 +113,6 @@ class MessagesExporterTest {
         assertThat(results).containsExactly(decoratedChunk);
     }
 
-    @Test
-    void appliesQueryDecorators() {
-        Query q = validQueryBuilder().query(ElasticsearchQueryString.builder().queryString("undecorated").build()).build();
-        Search s = searchWithQueries(q);
-
-        when(queryStringDecorator.decorateQueryString("undecorated", s, q)).thenReturn("decorated");
-
-        MessagesRequest request = captureRequest(s, ResultFormat.builder().build());
-
-        assertThat(request.queryString()).isEqualTo(ElasticsearchQueryString.builder().queryString("decorated").build());
-    }
-
     private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Consumer<SimpleMessageChunk>> captor = ArgumentCaptor.forClass(Consumer.class);
@@ -365,35 +128,6 @@ class MessagesExporterTest {
         forwarderFromBackend.accept(chunkFromBackend);
 
         return results;
-    }
-
-    private AndFilter streamFilter(String... streamIds) {
-        StreamFilter[] filters = Arrays.stream(streamIds)
-                .map(StreamFilter::ofId)
-                .toArray(StreamFilter[]::new);
-        return AndFilter.and(filters);
-    }
-
-    private MessagesRequest captureRequest(Search search) {
-        return captureRequest(search, ResultFormat.builder().build());
-    }
-
-    private MessagesRequest captureRequest(Search search, ResultFormat resultFormat) {
-        return capture(() -> exportSearch(search, resultFormat));
-    }
-
-    private MessagesRequest captureRequest(Search search, String searchTypeId, ResultFormat resultFormat) {
-        return capture(() -> exportSearchType(search, searchTypeId, resultFormat));
-    }
-
-    private MessagesRequest capture(Runnable call) {
-        ArgumentCaptor<MessagesRequest> captor = ArgumentCaptor.forClass(MessagesRequest.class);
-
-        doNothing().when(backend).run(captor.capture(), any());
-
-        call.run();
-
-        return captor.getValue();
     }
 
     private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat) {
@@ -418,7 +152,7 @@ class MessagesExporterTest {
                 .queries(ImmutableSet.copyOf(queries)).build();
     }
 
-    private TimeRange timeRange(int range) {
+    private TimeRange timeRange(@SuppressWarnings("SameParameterValue") int range) {
         try {
             return RelativeRange.create(range);
         } catch (InvalidRangeParametersException e) {

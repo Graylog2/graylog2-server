@@ -16,14 +16,24 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.SearchType;
+
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
+import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
 
 public class TestData {
+
+    public static Query.Builder validQueryBuilderWith(SearchType searchType) {
+        return validQueryBuilder().searchTypes(ImmutableSet.of(searchType));
+    }
+
 
     public static SimpleMessageChunk simpleMessageChunk(String fieldNames, Object[]... messageValues) {
         LinkedHashSet<SimpleMessage> messages = Arrays.stream(messageValues)
