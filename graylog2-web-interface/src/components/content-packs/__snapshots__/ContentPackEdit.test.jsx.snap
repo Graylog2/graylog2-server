@@ -4461,9 +4461,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "ExpandableListItem__IconStack-sc-10hsq3a-3",
                                                             "isStatic": false,
-                                                            "lastClassName": "ilxhxM",
+                                                            "lastClassName": "kNaqZg",
                                                             "rules": Array [
-                                                              "&.fa-stack{cursor:pointer;font-size:1.4em;line-height:20px;width:1em;height:1em;vertical-align:text-top;&:hover [class*=\\"fa-\\"]{color:#731748;opacity:1;}}[class*=\\"fa-\\"]:first-child{opacity:0;~ [class*=\\"fa-\\"]:hover{color:#fff;}}",
+                                                              [Function],
                                                             ],
                                                           },
                                                           "displayName": "ExpandableListItem__IconStack",
@@ -4481,7 +4481,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       tabIndex={0}
                                                     >
                                                       <div
-                                                        className="ExpandableListItem__IconStack-sc-10hsq3a-3 ilxhxM fa-stack"
+                                                        className="ExpandableListItem__IconStack-sc-10hsq3a-3 kNaqZg fa-stack"
                                                         onClick={[Function]}
                                                         tabIndex={0}
                                                       >
@@ -4617,9 +4617,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "ExpandableListItem__ExpandableContent-sc-10hsq3a-7",
                                                 "isStatic": false,
-                                                "lastClassName": "hOvAjD",
+                                                "lastClassName": "gVrSEu",
                                                 "rules": Array [
-                                                  "border-left:1px #eee solid;margin-left:35px;margin-top:10px;padding-left:5px;",
+                                                  [Function],
                                                 ],
                                               },
                                               "displayName": "ExpandableListItem__ExpandableContent",
@@ -4635,7 +4635,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           forwardedRef={null}
                                         >
                                           <div
-                                            className="ExpandableListItem__ExpandableContent-sc-10hsq3a-7 hOvAjD"
+                                            className="ExpandableListItem__ExpandableContent-sc-10hsq3a-7 gVrSEu"
                                           />
                                         </StyledComponent>
                                       </ExpandableListItem__ExpandableContent>
