@@ -102,6 +102,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
+import org.graylog.plugins.pipelineprocessor.functions.strings.FirstNonNull;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
@@ -193,6 +194,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(StartsWith.NAME, StartsWith.class);
         addMessageProcessorFunction(Replace.NAME, Replace.class);
         addMessageProcessorFunction(Length.NAME, Length.class);
+        addMessageProcessorFunction(FirstNonNull.NAME, FirstNonNull.class);
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
