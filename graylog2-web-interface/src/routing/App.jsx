@@ -42,12 +42,12 @@ const App = ({ children, location }) => (
                       fullName={currentUser.full_name}
                       loginName={currentUser.username}
                       permissions={currentUser.permissions} />
-          <ScrollToHint id="scroll-to-hint">
-            <Icon name="arrow-up" />
-          </ScrollToHint>
-          <Scratchpad />
           <ReportedErrorBoundary>
             <RuntimeErrorBoundary>
+              <ScrollToHint id="scroll-to-hint">
+                <Icon name="arrow-up" />
+              </ScrollToHint>
+              <Scratchpad />
               {children}
             </RuntimeErrorBoundary>
           </ReportedErrorBoundary>
