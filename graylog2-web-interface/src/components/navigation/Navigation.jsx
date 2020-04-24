@@ -27,11 +27,11 @@ import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
 
 const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(appPrefixed(prefix)) === 0;
+  return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
-  const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
+  const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} topLevel={topLevel} />;
 
   if (permissions) {
     return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
