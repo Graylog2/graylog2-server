@@ -1,17 +1,71 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
+import styled from 'styled-components';
+
+import { Button, ButtonToolbar, Col, Nav, Row } from 'components/graylog';
+import { Wizard } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Wizard } from 'components/common';
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
 import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
-import styles from './EventDefinitionForm.css';
+const NavStyles = styled(Nav)(({ theme }) => `
+  &.nav {
+    > li {
+      border: 1px solid ${theme.color.gray[80]};
+      border-left: 0;
+
+      &:first-child {
+        border-left: 1px solid ${theme.color.gray[80]};
+        border-radius: 4px 0 0 4px;
+
+        > a {
+          border-radius: 4px 0 0 4px;
+        }
+      }
+
+      &:last-child {
+        border-radius: 0 4px 4px 0;
+
+        > a {
+          border-radius: 0 4px 4px 0;
+        }
+      }
+
+      &:not(:last-child)::after {
+        background-color: ${theme.color.gray[100]};
+        border-color: ${theme.color.gray[80]};
+        border-style: solid;
+        border-width: 0 1px 1px 0;
+        content: '';
+        display: block;
+        height: 15px;
+        position: absolute;
+        right: -1px;
+        top: 50%;
+        transform: translateY(-50%) translateX(50%) rotate(-45deg);
+        width: 15px;
+        z-index: 2;
+      }
+
+      &:hover::after {
+        background-color: ${theme.color.gray[90]};
+      }
+
+      &.active::after {
+        background-color: ${theme.color.global.link};
+      }
+
+      > a {
+        border-radius: 0;
+      }
+    }
+  }
+`);
 
 const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
 
@@ -33,9 +87,13 @@ class EventDefinitionForm extends React.Component {
     action: 'edit',
   };
 
-  state = {
-    activeStep: STEP_KEYS[0],
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      activeStep: STEP_KEYS[0],
+    };
+  }
 
   // TODO: Add validation when step changes
   handleStepChange = (nextStep) => {
@@ -163,7 +221,7 @@ class EventDefinitionForm extends React.Component {
                   onStepChange={this.handleStepChange}
                   horizontal
                   justified
-                  navigationClassName={styles.steps}
+                  NavigationComponent={NavStyles}
                   containerClassName=""
                   hidePreviousNextButtons />
           {this.renderButtons(activeStep)}
