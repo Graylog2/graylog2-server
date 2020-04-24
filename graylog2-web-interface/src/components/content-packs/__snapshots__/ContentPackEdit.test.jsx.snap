@@ -27,6 +27,32 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
 >
   <div>
     <Wizard
+      NavigationComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "STYLES": Array [
+            "tabs",
+            "pills",
+          ],
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "Nav-dzawzr-0",
+            "isStatic": false,
+            "lastClassName": "htUNCU",
+            "rules": Array [
+              [Function],
+            ],
+          },
+          "displayName": "Nav",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "Nav-dzawzr-0",
+          "target": [Function],
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
       affixed={true}
       containerClassName="content"
       hidePreviousNextButtons={false}
@@ -2244,6 +2270,32 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
 >
   <div>
     <Wizard
+      NavigationComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "STYLES": Array [
+            "tabs",
+            "pills",
+          ],
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "Nav-dzawzr-0",
+            "isStatic": false,
+            "lastClassName": "htUNCU",
+            "rules": Array [
+              [Function],
+            ],
+          },
+          "displayName": "Nav",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "Nav-dzawzr-0",
+          "target": [Function],
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
       affixed={true}
       containerClassName="content"
       hidePreviousNextButtons={false}
