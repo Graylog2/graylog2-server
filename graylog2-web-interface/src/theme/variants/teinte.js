@@ -36,8 +36,8 @@ const variantLight = {};
 const variantDark = {};
 
 Object.keys(variant).forEach((name) => {
-  variantLight[name] = chroma.mix(variant[name], gray[100], 0.5).hex();
-  variantDark[name] = chroma.mix(variant[name], gray[10], 0.75).hex();
+  variantLight[name] = chroma(variant[name]).brighten(1).hex();
+  variantDark[name] = chroma(variant[name]).darken(1.5).hex();
 });
 
 /* eslint-disable prefer-destructuring */
