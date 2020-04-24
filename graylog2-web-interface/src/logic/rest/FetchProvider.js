@@ -47,7 +47,7 @@ const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
 
   // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
   if (SessionStore.isLoggedIn() && error.status === 403) {
-    onUnauthorized(error);
+    onUnauthorized(fetchError);
   }
 
   if (error.originalError && !error.originalError.status) {
