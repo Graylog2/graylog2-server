@@ -42,6 +42,8 @@ class Wizard extends React.Component {
     containerClassName: PropTypes.string,
     /** Customize the navigation CSS class used by this component */
     navigationClassName: PropTypes.string,
+    /** Customize the navigation componment used by Wizard */
+    NavigationComponent: PropTypes.elementType,
     /** Indicates if wizard should render next/previous buttons or not */
     hidePreviousNextButtons: PropTypes.bool,
   };
@@ -54,6 +56,7 @@ class Wizard extends React.Component {
     justified: false,
     containerClassName: 'content',
     navigationClassName: '',
+    NavigationComponent: Nav,
     hidePreviousNextButtons: false,
   };
 
@@ -131,22 +134,22 @@ class Wizard extends React.Component {
   };
 
   _renderVerticalStepNav = () => {
-    const { justified, navigationClassName, steps, hidePreviousNextButtons } = this.props;
+    const { justified, navigationClassName, NavigationComponent, steps, hidePreviousNextButtons } = this.props;
     const selectedStep = this._getSelectedStep();
     return (
       <Col md={2} className={WizardStyle.subnavigation}>
-        <Nav stacked
-             bsStyle="pills"
-             className={navigationClassName}
-             activeKey={selectedStep}
-             onSelect={this._wizardChanged}
-             justified={justified}>
+        <NavigationComponent stacked
+                             bsStyle="pills"
+                             className={navigationClassName}
+                             activeKey={selectedStep}
+                             onSelect={this._wizardChanged}
+                             justified={justified}>
           {steps.map((navItem) => {
             return (
               <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
             );
           })}
-        </Nav>
+        </NavigationComponent>
         {!hidePreviousNextButtons && (
           <>
             <br />
@@ -174,7 +177,7 @@ class Wizard extends React.Component {
 
   _renderHorizontalStepNav = () => {
     const selectedStep = this._getSelectedStep();
-    const { justified, navigationClassName, steps, hidePreviousNextButtons } = this.props;
+    const { justified, navigationClassName, NavigationComponent, steps, hidePreviousNextButtons } = this.props;
     return (
       <Col sm={12} className={WizardStyle.horizontal}>
         {!hidePreviousNextButtons && (
@@ -195,16 +198,16 @@ class Wizard extends React.Component {
             </ButtonToolbar>
           </div>
         )}
-        <Nav bsStyle="pills"
-             className={navigationClassName}
-             activeKey={selectedStep}
-             onSelect={this._wizardChanged}
-             justified={justified}>
+        <NavigationComponent bsStyle="pills"
+                             className={navigationClassName}
+                             activeKey={selectedStep}
+                             onSelect={this._wizardChanged}
+                             justified={justified}>
           {steps.map((navItem) => {
             return (
               <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
-        </Nav>
+        </NavigationComponent>
       </Col>
     );
   };
