@@ -1,9 +1,73 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled, { css } from 'styled-components';
 import createReactClass from 'create-react-class';
 import { Col, Row } from 'components/graylog';
 
+import { util } from 'theme';
 import { Pluralize } from 'components/common';
+
+const SimulationChangesWrap = styled.div`
+  padding-top: 15px;
+
+  dl {
+    margin-bottom: 10px;
+    margin-top: 5px;
+  }
+
+  dd {
+    padding: 1px 9px 3px;
+  }
+
+  dt {
+    margin-top: 1px;
+    padding: 3px 9px 1px;
+
+    &::after {
+      content: ": ";
+    }
+
+    &:first-child {
+      border-radius: 4px 4px 0 0;
+    }
+
+    ~ dd:last-child {
+      border-radius: 0 0 4px 4px;
+    }
+  }
+`;
+
+const OriginalChanges = styled.div`
+  margin-top: 10px;
+`;
+
+const FieldResultWrap = styled.div(({ resultType, theme }) => {
+  const { success, danger, info } = theme.color.variant.light;
+  const types = {
+    added: success,
+    removed: danger,
+    mutated: info,
+  };
+
+  return `
+    dt,
+    dd {
+      background-color: ${types[resultType]};
+      color: ${util.contrastingColor(types[resultType])};
+
+      ${resultType === 'mutated' && css`
+        &.removed-field {
+          text-decoration: line-through;
+          font-style: italic;
+        }
+      `}
+    }
+  `;
+});
+
+const FieldValue = styled.dd`
+  font-family: monospace;
+`;
 
 const SimulationChanges = createReactClass({
   displayName: 'SimulationChanges',
@@ -12,16 +76,6 @@ const SimulationChanges = createReactClass({
     originalMessage: PropTypes.object.isRequired,
     simulationResults: PropTypes.object.isRequired,
   },
-
-  componentDidMount() {
-    this.style.use();
-  },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!./SimulationChanges.css'),
 
   _isOriginalMessageRemoved(originalMessage, processedMessages) {
     return !processedMessages.find((message) => message.id === originalMessage.id);
@@ -33,7 +87,7 @@ const SimulationChanges = createReactClass({
 
   _formatFieldValue(field, value, isAdded, isRemoved) {
     const className = (isAdded ? 'added-field' : (isRemoved ? 'removed-field' : ''));
-    return <dd key={`${field}-value`} className={`field-value ${className}`}>{String(value)}</dd>;
+    return <FieldValue key={`${field}-value`} className={className}>{String(value)}</FieldValue>;
   },
 
   _formatAddedFields(originalMessage, processedMessage) {
@@ -54,12 +108,12 @@ const SimulationChanges = createReactClass({
     });
 
     return (
-      <div className="added-fields">
+      <FieldResultWrap resultType="added">
         <h4>Added fields</h4>
         <dl>
           {formattedFields}
         </dl>
-      </div>
+      </FieldResultWrap>
     );
   },
 
@@ -81,12 +135,12 @@ const SimulationChanges = createReactClass({
     });
 
     return (
-      <div className="removed-fields">
+      <FieldResultWrap resultType="removed">
         <h4>Removed fields</h4>
         <dl>
           {formattedFields}
         </dl>
-      </div>
+      </FieldResultWrap>
     );
   },
 
@@ -127,12 +181,12 @@ const SimulationChanges = createReactClass({
     });
 
     return (
-      <div className="mutated-fields">
+      <FieldResultWrap resultType="mutated">
         <h4>Mutated fields</h4>
         <dl>
           {formattedFields}
         </dl>
-      </div>
+      </FieldResultWrap>
     );
   },
 
@@ -155,11 +209,11 @@ const SimulationChanges = createReactClass({
     }
 
     return (
-      <div className="original-message-changes">
+      <OriginalChanges>
         {formattedAddedFields}
         {formattedRemovedFields}
         {formattedMutatedFields}
-      </div>
+      </OriginalChanges>
     );
   },
 
@@ -204,10 +258,10 @@ const SimulationChanges = createReactClass({
 
   render() {
     return (
-      <div className="simulation-changes">
+      <SimulationChangesWrap>
         {this._formatOriginalMessageChanges()}
         {this._formatOtherChanges()}
-      </div>
+      </SimulationChangesWrap>
     );
   },
 });
