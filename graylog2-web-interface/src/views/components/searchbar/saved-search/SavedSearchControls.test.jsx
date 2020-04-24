@@ -36,7 +36,7 @@ describe('SavedSearchControls', () => {
     onLoadView?: ViewLoaderContextType,
     currentUser?: User,
     viewStoreState?: ViewStoreState,
-  }
+  };
 
   const SimpleSavedSearchControls = ({ loadNewView = () => Promise.resolve(), onLoadView, currentUser, ...props }: SimpleSavedSearchControlsProps) => (
     <ViewLoaderContext.Provider value={onLoadView}>

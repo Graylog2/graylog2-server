@@ -48,7 +48,7 @@ describe('XYPlot', () => {
     setChartColor?: $PropertyType<XYPlotProps, 'setChartColor'>,
     plotLayout?: $PropertyType<XYPlotProps, 'plotLayout'>,
     onZoom?: $PropertyType<XYPlotProps, 'onZoom'>,
-  }
+  };
 
   const SimpleXYPlot = ({ currentUser, ...props }: SimpleXYPlotProps) => (
     <CurrentUserContext.Provider value={currentUser}>

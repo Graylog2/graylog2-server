@@ -131,11 +131,11 @@ describe('ShareViewModal', () => {
   });
   it('displays correct description if view is a search', () => {
     const wrapper = mount(<ShareViewModal show view={view} currentUser={viewsManager} onClose={onClose} />);
-    expect(wrapper.contains(/'Who is supposed to access the search My fabulous view?'/)).toBe(true);
+    expect(wrapper.text()).toMatch(/Who is supposed to access the search My fabulous view?/);
   });
   it('displays correct description if view is a dashboard', () => {
     const dashboardView = view.toBuilder().type(View.Type.Dashboard).build();
     const wrapper = mount(<ShareViewModal show view={dashboardView} currentUser={viewsManager} onClose={onClose} />);
-    expect(wrapper.contains(/'Who is supposed to access the dashboard My fabulous view?'/)).toBe(true);
+    expect(wrapper.text()).toMatch(/Who is supposed to access the dashboard My fabulous view?/);
   });
 });

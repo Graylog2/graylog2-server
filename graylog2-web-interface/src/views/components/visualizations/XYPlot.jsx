@@ -58,7 +58,10 @@ const XYPlot = ({
   const currentUser = useContext(CurrentUserContext);
   const timezone = currentUser?.timezone || AppConfig.rootTimeZone();
   const yaxis = { fixedrange: true, rangemode: 'tozero' };
-  const defaultLayout: {yaxis: Object, legend?: Object} = { yaxis };
+  const defaultLayout: {
+    yaxis: { fixedrange?: boolean},
+    legend?: {y?: number},
+  } = { yaxis };
   if (height) {
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
