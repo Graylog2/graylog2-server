@@ -27,6 +27,7 @@ const MockFetchProvider = Object.assign(
     default: jest.fn(() => Promise.resolve(mockResponse)),
     fetchPlainText: jest.fn(() => Promise.resolve(mockResponse)),
     fetchPeriodically: jest.fn(() => Promise.resolve(mockResponse)),
+    fetchFile: jest.fn(() => Promise.resolve(mockResponse)),
   },
 );
 

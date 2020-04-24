@@ -32,7 +32,7 @@ export type MessagesWidgetConfigJSON = {
 };
 
 export const defaultSortDirection = Direction.Descending;
-const defaultSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', defaultSortDirection)];
+export const defaultSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', defaultSortDirection)];
 
 export default class MessagesWidgetConfig extends WidgetConfig {
   _value: InternalState;

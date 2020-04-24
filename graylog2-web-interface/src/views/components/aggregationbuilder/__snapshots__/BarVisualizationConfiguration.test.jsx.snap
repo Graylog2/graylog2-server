@@ -39,6 +39,7 @@ exports[`BarVisualizationConfiguration should render with props 1`] = `
     </span>
   </HoverForHelp>
   <Select
+    allowOptionCreation={false}
     components={Object {}}
     ignoreAccents={false}
     ignoreCase={true}
@@ -1521,6 +1522,7 @@ exports[`BarVisualizationConfiguration should render without props 1`] = `
     </span>
   </HoverForHelp>
   <Select
+    allowOptionCreation={false}
     components={Object {}}
     ignoreAccents={false}
     ignoreCase={true}

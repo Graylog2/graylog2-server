@@ -1,9 +1,83 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+
 import { Checkbox } from 'components/graylog';
 import Icon from './Icon';
 
-import style from './ExpandableListItem.css';
+const ItemWrap = styled.li(({ padded }) => `
+  padding: ${padded ? '10px 5px' : ''};
+`);
+
+const Container = styled.div`
+  font-size: 14px;
+  line-height: 20px;
+
+  label {
+    min-height: 20px;
+    margin-bottom: 2px;
+    margin-right: 5px;
+
+    * {
+      cursor: pointer;
+    }
+  }
+`;
+
+const Toggle = styled.div`
+  display: inline-block;
+  width: 20px;
+  margin-right: 5px;
+`;
+
+const IconStack = styled.div(({ theme }) => `
+  &.fa-stack {
+    cursor: pointer;
+    font-size: 1.4em;
+    line-height: 20px;
+    width: 1em;
+    height: 1em;
+    vertical-align: text-top;
+
+    &:hover [class*="fa-"] {
+      color: ${theme.color.variant.primary};
+      opacity: 1;
+    }
+  }
+
+  [class*="fa-"]:first-child {
+    opacity: 0;
+
+    ~ [class*="fa-"]:hover {
+      color: ${theme.color.global.contentBackground};
+    }
+  }
+`);
+
+const HeaderWrap = styled.span`
+  font-size: 14px;
+`;
+
+const Header = styled.button`
+  border: 0;
+  padding: 0;
+  text-align: left;
+  background: transparent;
+`;
+
+const Subheader = styled.span(({ theme }) => `
+  font-size: 0.95em;
+  margin-left: 0.5em;
+  color: ${theme.color.gray[70]};
+`);
+
+const ExpandableContent = styled.div(({ theme }) => `
+  border-left: 1px ${theme.color.gray[90]} solid;
+  margin-left: 35px;
+  margin-top: 10px;
+  padding-left: 5px;
+`);
+
 
 /**
  * The ExpandableListItem is needed to render a ExpandableList.
@@ -52,35 +126,45 @@ class ExpandableListItem extends React.Component {
     padded: true,
   };
 
-  state = {
-    expanded: this.props.expanded,
-    selectable: false,
-    subheader: '',
-  };
+  constructor(props) {
+    super(props);
+
+    this._checkbox = undefined;
+
+    this.state = {
+      expanded: props.expanded,
+    };
+  }
+
 
   componentDidMount() {
-    if (this.props.indetermined && this._checkbox) {
-      this._checkbox.indeterminate = this.props.indetermined;
+    const { indetermined } = this.props;
+
+    if (indetermined && this._checkbox) {
+      this._checkbox.indeterminate = indetermined;
     }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.expanded !== this.props.expanded) {
+    const { expanded, indetermined } = this.props;
+
+    if (prevProps.expanded !== expanded) {
       this._toggleExpand();
     }
 
     if (this._checkbox) {
-      this._checkbox.indeterminate = this.props.indetermined;
+      this._checkbox.indeterminate = indetermined;
     }
   }
 
-  _checkbox = undefined;
-
   _toggleExpand = () => {
-    if (this.props.stayExpanded) {
+    const { stayExpanded } = this.props;
+    const { expanded } = this.state;
+
+    if (stayExpanded) {
       this.setState({ expanded: true });
     } else {
-      this.setState({ expanded: !this.state.expanded });
+      this.setState({ expanded: !expanded });
     }
   };
 
@@ -97,30 +181,34 @@ class ExpandableListItem extends React.Component {
 
   render() {
     const { expanded } = this.state;
+    const { padded } = this.props;
     const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
-    const headerToRender = selectable ? (<span role="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</span>) : header;
+    const headerToRender = selectable ? (<Header type="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</Header>) : header;
     const inputProps = this._filterInputProps(otherProps);
-    const liClassName = this.props.padded ? style.listItemPadding : '';
 
     return (
-      <li className={liClassName}>
-        <div className={style.listItemContainer}>
+      <ItemWrap padded={padded}>
+        <Container>
           {selectable && <Checkbox inputRef={(c) => { this._checkbox = c; }} inline checked={checked} {...inputProps} />}
           {expandable
           && (
-          <div className={style.expandBoxContainer}>
-            <div className={`fa-stack ${style.expandBox}`} role="button" tabIndex={0} onClick={this._toggleExpand}>
-              <Icon name="circle" className={`fa-stack-1x ${style.iconBackground}`} />
-              <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
-            </div>
-          </div>
+            <Toggle>
+              <IconStack className="fa-stack" tabIndex={0} onClick={this._toggleExpand}>
+                <Icon name="circle" className="fa-stack-1x" />
+                <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
+              </IconStack>
+            </Toggle>
           )}
-          <span className={style.header}>{headerToRender}{subheader && <span className={style.subheader}>{subheader}</span>}</span>
-        </div>
-        <div className={style.expandableContent}>
+          <HeaderWrap className="header">
+            {headerToRender}
+            {subheader && <Subheader>{subheader}</Subheader>}
+          </HeaderWrap>
+        </Container>
+
+        <ExpandableContent>
           {expanded && children}
-        </div>
-      </li>
+        </ExpandableContent>
+      </ItemWrap>
     );
   }
 }

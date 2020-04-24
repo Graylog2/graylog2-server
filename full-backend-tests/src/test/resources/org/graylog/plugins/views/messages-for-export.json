@@ -1,0 +1,92 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "gl2_message_id": "0",
+            "source": "source-1",
+            "message": "Ha",
+            "timestamp": "2015-01-01 01:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "1"
+          }
+        },
+        {
+          "data": {
+            "gl2_message_id": "1",
+            "source": "source-2",
+            "message": "He",
+            "timestamp": "2015-01-01 02:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "2"
+          }
+        },
+        {
+          "data": {
+            "gl2_message_id": "2",
+            "source": "source-1",
+            "message": "Hi",
+            "timestamp": "2015-01-01 03:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "3"
+          }
+        },
+        {
+          "data": {
+            "gl2_message_id": "3",
+            "source": "source-2",
+            "message": "Ho",
+            "timestamp": "2015-01-01 04:00:00.000",
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

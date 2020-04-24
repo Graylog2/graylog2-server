@@ -444,7 +444,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         <div
                           className="popover-content"
                         >
-                          <form>
+                          <form
+                            onSubmit={[Function]}
+                          >
                             <Component
                               validationState={null}
                             >
@@ -1207,7 +1209,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                         <div
                           className="popover-content"
                         >
-                          <form>
+                          <form
+                            onSubmit={[Function]}
+                          >
                             <Component
                               validationState={null}
                             >
@@ -2047,7 +2051,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                         <div
                           className="popover-content"
                         >
-                          <form>
+                          <form
+                            onSubmit={[Function]}
+                          >
                             <Component
                               validationState={null}
                             >

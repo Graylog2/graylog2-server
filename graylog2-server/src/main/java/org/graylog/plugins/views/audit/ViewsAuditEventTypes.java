@@ -33,16 +33,18 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
     private static final String VIEW_SHARING = "view_sharing";
     public static final String VIEW_SHARING_CREATE = PREFIX + VIEW_SHARING + ":create";
     public static final String VIEW_SHARING_DELETE = PREFIX + VIEW_SHARING + ":delete";
-    
+
     private static final String DEFAULT_VIEW = "default_view";
     public static final String DEFAULT_VIEW_SET = PREFIX + DEFAULT_VIEW + ":set";
 
     private static final String SEARCH = "search";
     public static final String SEARCH_CREATE = PREFIX + SEARCH + ":create";
     public static final String SEARCH_EXECUTE = PREFIX + SEARCH + ":execute";
+    public static final String MESSAGES_EXPORT = PREFIX + SEARCH + ":export";
 
     private static final String SEARCH_JOB = "search_job";
     public static final String SEARCH_JOB_CREATE = PREFIX + SEARCH_JOB + ":create";
+
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(VIEW_CREATE)
@@ -53,6 +55,8 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
 
             .add(SEARCH_CREATE)
             .add(SEARCH_EXECUTE)
+
+            .add(MESSAGES_EXPORT)
 
             .add(SEARCH_JOB_CREATE)
 

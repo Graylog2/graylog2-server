@@ -17,6 +17,11 @@ type Props = {
   target: any,
 };
 
+const stopEvent = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+};
+
 const SavedSearchForm = (props: Props) => {
   const {
     isCreateNew,
@@ -37,7 +42,7 @@ const SavedSearchForm = (props: Props) => {
                 placement="left"
                 target={target}>
         <Popover title="Name of search" id="saved-search-popover">
-          <form>
+          <form onSubmit={stopEvent}>
             <FormGroup>
               <ControlLabel>Title</ControlLabel>
               <FormControl type="text"

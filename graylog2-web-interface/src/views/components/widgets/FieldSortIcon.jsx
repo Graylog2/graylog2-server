@@ -3,6 +3,7 @@ import React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
 import PropTypes from 'prop-types';
 
+import { type ThemeInterface } from 'theme';
 import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -24,8 +25,8 @@ type DirectionStrategy = {
   tooltip: (fieldName: string) => string,
 };
 
-const SortIcon: StyledComponent<{sortActive: boolean}, {}, HTMLButtonElement> = styled.button(({ sortActive }) => {
-  const color = sortActive ? '#333' : '#bdbdbd';
+const SortIcon: StyledComponent<{sortActive: boolean}, ThemeInterface, HTMLButtonElement> = styled.button(({ sortActive, theme }) => {
+  const color = sortActive ? theme.color.gray[20] : theme.color.gray[70];
 
   return css`
     border: 0;

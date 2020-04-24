@@ -13,6 +13,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
   }
 >
   <Select
+    allowOptionCreation={false}
     closeMenuOnSelect={false}
     components={
       Object {
