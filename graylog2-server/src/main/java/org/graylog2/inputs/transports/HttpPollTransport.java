@@ -26,6 +26,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -33,6 +34,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.RadioField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -52,6 +54,7 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -63,9 +66,11 @@ public class HttpPollTransport extends ThrottleableTransport {
     private static final Logger LOG = LoggerFactory.getLogger(HttpPollTransport.class);
 
     private static final String CK_URL = "target_url";
+    private static final String CK_METHOD = "http_method";
     private static final String CK_HEADERS = "headers";
     private static final String CK_TIMEUNIT = "timeunit";
     private static final String CK_INTERVAL = "interval";
+    private static final String CK_BODY = "http_body";
 
     private final Configuration configuration;
     private final EventBus serverEventBus;
@@ -75,6 +80,10 @@ public class HttpPollTransport extends ThrottleableTransport {
 
     private volatile boolean paused = true;
     private ScheduledFuture<?> scheduledFuture;
+
+    enum HttpMethod {
+        GET, POST
+    }
 
     @AssistedInject
     public HttpPollTransport(@Assisted Configuration configuration,
@@ -131,20 +140,12 @@ public class HttpPollTransport extends ThrottleableTransport {
         // listen for lifecycle changes
         serverEventBus.register(this);
 
-        final Map<String, String> headers = parseHeaders(configuration.getString(CK_HEADERS));
-
-        // figure out a reasonable remote address
         final String url = configuration.getString(CK_URL);
-        final InetSocketAddress remoteAddress;
-        InetSocketAddress remoteAddress1;
-        try {
-            final URL url1 = new URL(url);
-            final int port = url1.getPort();
-            remoteAddress1 = new InetSocketAddress(url1.getHost(), port != -1 ? port : 80);
-        } catch (MalformedURLException e) {
-            remoteAddress1 = null;
-        }
-        remoteAddress = remoteAddress1;
+        final String headers = configuration.getString(CK_HEADERS);
+        final String method = configuration.getString(CK_METHOD);
+        final String body = configuration.getString(CK_BODY);
+
+        final InetSocketAddress remoteAddress = resolveRemoteAddress(url);
 
         final Runnable task = () -> {
             if (paused) {
@@ -156,11 +157,9 @@ public class HttpPollTransport extends ThrottleableTransport {
                 LOG.debug("Not polling HTTP resource {} because we are throttled.", url);
             }
 
-            final Request.Builder requestBuilder = new Request.Builder().get()
-                    .url(url)
-                    .headers(Headers.of(headers));
+            final Request request = buildRequest(url, headers, method, body);
 
-            try (final Response r = httpClient.newCall(requestBuilder.build()).execute()) {
+            try (final Response r = httpClient.newCall(request).execute()) {
                 if (!r.isSuccessful()) {
                     throw new RuntimeException("Expected successful HTTP status code [2xx], got " + r.code());
                 }
@@ -174,6 +173,30 @@ public class HttpPollTransport extends ThrottleableTransport {
         scheduledFuture = scheduler.scheduleAtFixedRate(task, 0,
                 configuration.getInt(CK_INTERVAL),
                 TimeUnit.valueOf(configuration.getString(CK_TIMEUNIT)));
+    }
+
+    private InetSocketAddress resolveRemoteAddress(String url) {
+        // figure out a reasonable remote address
+        InetSocketAddress remoteAddress;
+        try {
+            final URL url1 = new URL(url);
+            final int port = url1.getPort();
+            remoteAddress = new InetSocketAddress(url1.getHost(), port != -1 ? port : 80);
+        } catch (MalformedURLException e) {
+            remoteAddress = null;
+        }
+        return remoteAddress;
+    }
+
+    private Request buildRequest(String url, String headers, String method, String body) {
+        final Map<String, String> headersMap = parseHeaders(headers);
+        final Request.Builder requestBuilder = new Request.Builder().get()
+                .url(url)
+                .headers(Headers.of(headersMap));
+        if (method.toUpperCase().equals(HttpMethod.POST.name().toUpperCase())) {
+            requestBuilder.post(RequestBody.create(null, body));
+        }
+        return requestBuilder.build();
     }
 
     @Override
@@ -209,7 +232,16 @@ public class HttpPollTransport extends ThrottleableTransport {
                     CK_URL,
                     "URI of JSON resource",
                     "http://example.org/api",
-                    "HTTP resource returning JSON on GET",
+                    "HTTP resource returning JSON",
+                    ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+            r.addField(new RadioField(
+                    CK_METHOD,
+                    "HTTP method",
+                    HttpMethod.GET.name().toUpperCase(Locale.ENGLISH),
+                    DropdownField.ValueTemplates.valueMapFromEnum(HttpMethod.class, httpMethod -> httpMethod.name().toUpperCase(Locale.ENGLISH)),
+                    "HTTP method used to poll the endpoint",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
@@ -235,6 +267,15 @@ public class HttpPollTransport extends ThrottleableTransport {
                     TimeUnit.MINUTES.toString(),
                     DropdownField.ValueTemplates.timeUnits(),
                     ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+            r.addField(new TextField(
+                    CK_BODY,
+                    "HTTP Body",
+                    "",
+                    "Body required to send with the request",
+                    ConfigurationField.Optional.OPTIONAL,
+                    TextField.Attribute.TEXTAREA
             ));
 
             return r;

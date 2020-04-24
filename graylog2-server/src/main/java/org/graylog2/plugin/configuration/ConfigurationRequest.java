@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.configuration.fields.RadioField;
 import org.graylog2.plugin.configuration.fields.ListField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -122,6 +123,7 @@ public class ConfigurationRequest {
                         break;
                     case TextField.FIELD_TYPE:
                     case DropdownField.FIELD_TYPE:
+                    case RadioField.FIELD_TYPE:
                         if (!configuration.stringIsSet(fieldName)) {
                             throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
                         }
@@ -166,6 +168,7 @@ public class ConfigurationRequest {
                     break;
                 case TextField.FIELD_TYPE:
                 case DropdownField.FIELD_TYPE:
+                case RadioField.FIELD_TYPE:
                     if (config.stringIsSet(name)) {
                         values.put(name, config.getString(name));
                     }
