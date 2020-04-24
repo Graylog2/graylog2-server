@@ -40,7 +40,7 @@ export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((Rows) =>
       return result;
     }
     const currentUser = CurrentUserStore.get();
-    const timezone = currentUser?.timezone || AppConfig.rootTimeZone();
+    const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
     return result.map((row) => {
       if (row.source !== 'leaf') {
         return row;
