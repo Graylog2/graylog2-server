@@ -111,11 +111,11 @@ describe('TransformKeys', () => {
 
     expect(result).toEqual([
       {
-        key: ['2018-10-01T17:10:55.323+02:00'],
+        key: ['2018-10-01T10:10:55.323-05:00'],
         source: 'leaf',
         values: [],
       }, {
-        key: ['2017-03-12T18:32:21.283+01:00'],
+        key: ['2017-03-12T12:32:21.283-05:00'],
         source: 'leaf',
         values: [],
       },
