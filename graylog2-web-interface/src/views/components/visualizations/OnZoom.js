@@ -15,7 +15,7 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const onZoom = (currentQuery: Query, from: string, to: string, viewType: ?ViewType) => {
   const currentUser = CurrentUserStore.get();
-  const timezone = currentUser?.timezone || AppConfig.rootTimeZone();
+  const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
 
   const newTimerange = {
     type: 'absolute',

@@ -56,7 +56,7 @@ const XYPlot = ({
   onZoom = OnZoom,
 }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const timezone = currentUser?.timezone || AppConfig.rootTimeZone();
+  const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
   const yaxis = { fixedrange: true, rangemode: 'tozero' };
   const defaultLayout: {
     yaxis: { fixedrange?: boolean},
