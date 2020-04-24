@@ -26,35 +26,31 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import java.util.List;
 import java.util.Objects;
 
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
+public class FirstNonNull extends AbstractFunction<Object> {
+    public static final String NAME = "first_non_null";
 
-public class FirstNonNull extends AbstractFunction<String> {
-    public static final String NAME = "firstNonNull";
-
-    private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<List, List> valueParam;
 
     public FirstNonNull() {
-        valueParam = object("value").description("The list of fields to find first non null value").build();
+        valueParam = ParameterDescriptor.type("value", List.class, List.class)
+                .description("The list of fields to find first non null value")
+                .build();
     }
 
     @Override
-    public String evaluate(FunctionArgs args, EvaluationContext context) {
-        Object elements = valueParam.required(args, context);
-        if (elements instanceof List) {
-            List elementsList = (List) elements;
-            return elementsList.stream().filter(Objects::nonNull).findFirst().orElse("").toString();
-        }
-        return "";
+    public Object evaluate(FunctionArgs args, EvaluationContext context) {
+        List elements = valueParam.required(args, context);
+        return elements.stream().filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     @Override
-    public FunctionDescriptor<String> descriptor() {
-        return FunctionDescriptor.<String>builder()
+    public FunctionDescriptor<Object> descriptor() {
+        return FunctionDescriptor.builder()
                 .name(NAME)
                 .pure(false)
-                .returnType(String.class)
+                .returnType(Object.class)
                 .params(ImmutableList.of(valueParam))
-                .description("Returns first non null element found in elements")
+                .description("Returns first non null element found in value")
                 .build();
     }
 }

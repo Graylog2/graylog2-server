@@ -156,6 +156,7 @@ import org.mockito.junit.MockitoRule;
 import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -1138,5 +1139,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("first_found")).isEqualTo("first");
         assertThat(message.getField("middle_found")).isEqualTo("middle");
         assertThat(message.getField("last_found")).isEqualTo("last");
+
+        assertThat(message.getField("list_found")).isInstanceOf(List.class);
+        assertThat(message.getField("int_found")).isInstanceOf(Long.class);
     }
 }
