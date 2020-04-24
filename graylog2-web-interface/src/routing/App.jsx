@@ -5,7 +5,6 @@ import chroma from 'chroma-js';
 
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 import CurrentUserContext from 'components/contexts/CurrentUserContext';
-import CurrentUserProvider from 'contexts/CurrentUserProvider';
 
 import { Scratchpad, Icon, Spinner } from 'components/common';
 import Navigation from 'components/navigation/Navigation';
@@ -32,32 +31,30 @@ const ScrollToHint = styled.div(({ theme }) => css`
 `);
 
 const App = ({ children, location }) => (
-  <CurrentUserProvider>
-    <CurrentUserContext.Consumer>
-      {(currentUser) => {
-        if (!currentUser) {
-          return <Spinner />;
-        }
-        return (
-          <ScratchpadProvider loginName={currentUser.username}>
-            <Navigation requestPath={location.pathname}
-                        fullName={currentUser.full_name}
-                        loginName={currentUser.username}
-                        permissions={currentUser.permissions} />
-            <ScrollToHint id="scroll-to-hint">
-              <Icon name="arrow-up" />
-            </ScrollToHint>
-            <Scratchpad />
-            <ReportedErrorBoundary>
-              <RuntimeErrorBoundary>
-                {children}
-              </RuntimeErrorBoundary>
-            </ReportedErrorBoundary>
-          </ScratchpadProvider>
-        );
-      }}
-    </CurrentUserContext.Consumer>
-  </CurrentUserProvider>
+  <CurrentUserContext.Consumer>
+    {(currentUser) => {
+      if (!currentUser) {
+        return <Spinner />;
+      }
+      return (
+        <ScratchpadProvider loginName={currentUser.username}>
+          <Navigation requestPath={location.pathname}
+                      fullName={currentUser.full_name}
+                      loginName={currentUser.username}
+                      permissions={currentUser.permissions} />
+          <ScrollToHint id="scroll-to-hint">
+            <Icon name="arrow-up" />
+          </ScrollToHint>
+          <Scratchpad />
+          <ReportedErrorBoundary>
+            <RuntimeErrorBoundary>
+              {children}
+            </RuntimeErrorBoundary>
+          </ReportedErrorBoundary>
+        </ScratchpadProvider>
+      );
+    }}
+  </CurrentUserContext.Consumer>
 );
 
 App.propTypes = {

@@ -4,6 +4,7 @@ import { mount } from 'wrappedEnzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
+import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import AppRouter from './AppRouter';
 
 jest.mock('pages', () => ({
@@ -30,7 +31,11 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 
 describe('AppRouter', () => {
   it('routes to Getting Started Page for `/` or empty location', () => {
-    const wrapper = mount(<AppRouter />);
+    const wrapper = mount(
+      <CurrentUserProvider>
+        <AppRouter />
+      </CurrentUserProvider>,
+    );
     expect(wrapper.find('StartPage')).toExist();
   });
 });

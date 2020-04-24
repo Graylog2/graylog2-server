@@ -7,6 +7,7 @@ import { MockCombinedProvider, MockStore } from 'helpers/mocking';
 import CombinedProvider from 'injection/CombinedProvider';
 import UserPreferencesContext, { defaultUserPreferences } from './UserPreferencesContext';
 import type { UserPreferences } from './UserPreferencesContext';
+import CurrentUserProvider from './CurrentUserProvider';
 
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 
@@ -20,11 +21,13 @@ describe('CurrentUserPreferencesProvider', () => {
   const renderSUT = (): ((UserPreferences) => null) => {
     const consume = jest.fn();
     render(
-      <CurrentUserPreferencesProvider>
-        <UserPreferencesContext.Consumer>
-          {consume}
-        </UserPreferencesContext.Consumer>
-      </CurrentUserPreferencesProvider>,
+      <CurrentUserProvider>
+        <CurrentUserPreferencesProvider>
+          <UserPreferencesContext.Consumer>
+            {consume}
+          </UserPreferencesContext.Consumer>
+        </CurrentUserPreferencesProvider>
+      </CurrentUserProvider>,
     );
     return consume;
   };

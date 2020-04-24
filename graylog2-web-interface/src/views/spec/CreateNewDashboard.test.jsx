@@ -10,6 +10,7 @@ import { StoreMock as MockStore } from 'helpers/mocking';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
+import CurrentUserProvider from 'contexts/CurrentUserProvider';
 
 import viewsBindings from 'views/bindings';
 
@@ -66,8 +67,14 @@ describe('Create a new dashboard', () => {
 
   afterEach(cleanup);
 
+  const SimpleAppRouter = () => (
+    <CurrentUserProvider>
+      <AppRouter />
+    </CurrentUserProvider>
+  );
+
   it('using Dashboards Page', async () => {
-    const { getByText, getAllByText } = render(<AppRouter />);
+    const { getByText, getAllByText } = render(<SimpleAppRouter />);
     history.push(Routes.DASHBOARDS);
 
     const button = await waitForElement(() => getAllByText('Create new dashboard')[0], { timeout: 15000 });
@@ -76,7 +83,7 @@ describe('Create a new dashboard', () => {
   });
 
   it('by going to the new dashboards endpoint', async () => {
-    const { getByText } = render(<AppRouter />);
+    const { getByText } = render(<SimpleAppRouter />);
 
     history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
 
