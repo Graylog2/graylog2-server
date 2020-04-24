@@ -17,7 +17,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import CSVExportModal from 'views/components/searchbar/CSVExportModal';
+import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import ShareViewModal from 'views/components/views/ShareViewModal';
 import * as Permissions from 'views/Permissions';
 
@@ -48,14 +48,16 @@ const _isAllowedToEdit = (view: View, currentUser = {}) => (
 );
 
 class SavedSearchControls extends React.Component<Props, State> {
-  formTarget: any;
-
   static propTypes = {
     viewStoreState: PropTypes.object.isRequired,
     currentUser: PropTypes.shape({
       username: PropTypes.string.isRequired,
     }).isRequired,
   };
+
+  static contextType = ViewLoaderContext;
+
+  formTarget: any;
 
   constructor(props: Props) {
     super(props);
@@ -180,15 +182,12 @@ class SavedSearchControls extends React.Component<Props, State> {
     });
   };
 
-  static contextType = ViewLoaderContext;
-
   render() {
     const { showForm, showList, newTitle, showCSVExport, showShareSearch } = this.state;
     const { currentUser, viewStoreState } = this.props;
     const { view, dirty } = viewStoreState;
-
     const csvExport = showCSVExport && (
-      <CSVExportModal closeModal={this.toggleCSVExport} />
+      <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
     );
 
     const shareSearch = showShareSearch && (

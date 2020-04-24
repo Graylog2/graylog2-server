@@ -21,6 +21,7 @@ import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.http.JestHttpClient;
+import io.searchbox.core.SearchResult;
 import org.apache.http.client.config.RequestConfig;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -31,8 +32,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 public class JestUtils {
@@ -130,5 +133,32 @@ public class JestUtils {
 
     private static IndexNotFoundException buildIndexNotFoundException(Supplier<String> errorMessage, String index) {
         return new IndexNotFoundException(errorMessage.get(), Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
+    }
+
+    public static Optional<ElasticsearchException> checkForFailedShards(SearchResult result) {
+        // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets
+        // if at least one of the index sets comes back with a result, the overall result will have the aggregation
+        // but not considered failed entirely. however, if one shard has the error, we will refuse to respond
+        // otherwise we would be showing empty graphs for non-numeric fields.
+        final JsonNode shards = result.getJsonObject().path("_shards");
+        final double failedShards = shards.path("failed").asDouble();
+
+        if (failedShards > 0) {
+            final List<String> errors = StreamSupport.stream(shards.path("failures").spliterator(), false)
+                    .map(failure -> failure.path("reason").path("reason").asText())
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+
+            final List<String> nonNumericFieldErrors = errors.stream()
+                    .filter(error -> error.startsWith("Expected numeric type on field"))
+                    .collect(Collectors.toList());
+            if (!nonNumericFieldErrors.isEmpty()) {
+                return Optional.of(new FieldTypeException("Unable to perform search query: ", deduplicateErrors(nonNumericFieldErrors)));
+            }
+
+            return Optional.of(new ElasticsearchException("Unable to perform search query: ", deduplicateErrors(errors)));
+        }
+
+        return Optional.empty();
     }
 }

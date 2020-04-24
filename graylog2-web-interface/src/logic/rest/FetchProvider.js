@@ -30,6 +30,34 @@ export class FetchError extends Error {
   }
 }
 
+const reportServerSuccess = () => {
+  const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
+  ServerAvailabilityActions.reportSuccess();
+};
+
+const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFetchError(error));
+
+const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
+  const SessionStore = StoreProvider.getStore('Session');
+  const fetchError = FetchError(error.statusText, error);
+  if (SessionStore.isLoggedIn() && error.status === 401) {
+    const SessionActions = ActionsProvider.getActions('Session');
+    SessionActions.logout(SessionStore.getSessionId());
+  }
+
+  // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
+  if (SessionStore.isLoggedIn() && error.status === 403) {
+    onUnauthorized(error);
+  }
+
+  if (error.originalError && !error.originalError.status) {
+    const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
+    ServerAvailabilityActions.reportError(fetchError);
+  }
+
+  throw new FetchError();
+};
+
 export class Builder {
   constructor(method, url) {
     this.request = request(method, url.replace(/([^:])\/\//, '$1/'))
@@ -63,69 +91,43 @@ export class Builder {
       .accept('json')
       .then((resp) => {
         if (resp.ok) {
-          const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-          ServerAvailabilityActions.reportSuccess();
+          reportServerSuccess();
           return resp.body;
         }
-
         throw new FetchError(resp.statusText, resp);
-      }, (error) => {
-        const fetchError = new FetchError(error.statusText, error);
+      }, (error) => onServerError(error));
+    return this;
+  }
 
-        const SessionStore = StoreProvider.getStore('Session');
-        if (SessionStore.isLoggedIn() && error.status === 401) {
-          const SessionActions = ActionsProvider.getActions('Session');
-          SessionActions.logout(SessionStore.getSessionId());
+  file(body, mimeType) {
+    this.request = this.request
+      .send(body)
+      .type('json')
+      .accept(mimeType)
+      .then((resp) => {
+        if (resp.ok) {
+          reportServerSuccess();
+          return resp.text;
         }
-
-        // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-        if (SessionStore.isLoggedIn() && error.status === 403) {
-          ErrorsActions.report(createFromFetchError(fetchError));
-        }
-
-        if (error.originalError && !error.originalError.status) {
-          const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-          ServerAvailabilityActions.reportError(error);
-        }
-
-        throw fetchError;
-      });
-
+        throw new FetchError(resp.statusText, resp);
+      }, (error) => onServerError(error));
     return this;
   }
 
   plaintext(body) {
+    const onUnauthorized = () => history.replace(Routes.STARTPAGE);
     this.request = this.request
       .send(body)
       .type('text/plain')
       .accept('json')
       .then((resp) => {
         if (resp.ok) {
-          const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-          ServerAvailabilityActions.reportSuccess();
+          reportServerSuccess();
           return resp.body;
         }
 
         throw new FetchError(resp.statusText, resp);
-      }, (error) => {
-        const SessionStore = StoreProvider.getStore('Session');
-        if (SessionStore.isLoggedIn() && error.status === 401) {
-          const SessionActions = ActionsProvider.getActions('Session');
-          SessionActions.logout(SessionStore.getSessionId());
-        }
-
-        // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-        if (SessionStore.isLoggedIn() && error.status === 403) {
-          history.replace(Routes.STARTPAGE);
-        }
-
-        if (error.originalError && !error.originalError.status) {
-          const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
-          ServerAvailabilityActions.reportError(error);
-        }
-
-        throw new FetchError(error.statusText, error);
-      });
+      }, (error) => onServerError(error, onUnauthorized));
 
     return this;
   }
@@ -179,6 +181,15 @@ export function fetchPeriodically(method, url, body) {
     .authenticated()
     .noSessionExtension()
     .json(body)
+    .build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchFile(method, url, body, mimeType = 'text/csv') {
+  const promise = () => new Builder(method, url)
+    .authenticated()
+    .file(body, mimeType)
     .build();
 
   return queuePromiseIfNotLoggedin(promise)();

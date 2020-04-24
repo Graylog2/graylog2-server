@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -25,7 +24,6 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -47,7 +45,6 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
@@ -71,7 +68,7 @@ import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.graylog2.indexer.cluster.jest.JestUtils.deduplicateErrors;
+import static org.graylog2.indexer.cluster.jest.JestUtils.checkForFailedShards;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
@@ -278,33 +275,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
-    }
-
-    private Optional<ElasticsearchException> checkForFailedShards(SearchResult result) {
-        // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets
-        // if at least one of the index sets comes back with a result, the overall result will have the aggregation
-        // but not considered failed entirely. however, if one shard has the error, we will refuse to respond
-        // otherwise we would be showing empty graphs for non-numeric fields.
-        final JsonNode shards = result.getJsonObject().path("_shards");
-        final double failedShards = shards.path("failed").asDouble();
-
-        if (failedShards > 0) {
-            final List<String> errors = StreamSupport.stream(shards.path("failures").spliterator(), false)
-                    .map(failure -> failure.path("reason").path("reason").asText())
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
-
-            final List<String> nonNumericFieldErrors = errors.stream()
-                    .filter(error -> error.startsWith("Expected numeric type on field"))
-                    .collect(Collectors.toList());
-            if (!nonNumericFieldErrors.isEmpty()) {
-                return Optional.of(new FieldTypeException("Unable to perform search query: ", deduplicateErrors(nonNumericFieldErrors)));
-            }
-
-            return Optional.of(new ElasticsearchException("Unable to perform search query: ", deduplicateErrors(errors)));
-        }
-
-        return Optional.empty();
     }
 
     private Set<String> queryStringsFromFilter(Filter entry) {

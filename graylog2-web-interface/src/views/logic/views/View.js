@@ -1,7 +1,11 @@
 // @flow strict
 import * as Immutable from 'immutable';
+import { flatten } from 'lodash';
 import ObjectID from 'bson-objectid';
 
+import Widget from 'views/logic/widgets/Widget';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import ViewState from './ViewState';
 import Search from '../search/Search';
 import type { QueryId } from '../queries/Query';
@@ -134,6 +138,22 @@ export default class View {
 
   get requires(): Requirements {
     return this._value.requires || {};
+  }
+
+  getSearchTypeByWidgetId(widgetId: string) {
+    const widgetMapping = this.state.map((state) => state.widgetMapping).flatten(true);
+    const searchTypeId = widgetMapping.get(widgetId).first();
+    if (!searchTypeId) {
+      throw new Error(`Search type for widget with id ${widgetId} does not exist`);
+    }
+    const searchTypes = flatten(this.search.queries.map((query) => query.searchTypes).toArray());
+    return searchTypes.find((entry) => entry && entry.id && entry.id === searchTypeId);
+  }
+
+  getWidgetTitleByWidget(widget: Widget) {
+    const widgetTitles = this.state.flatMap((state) => state.titles.get('widget'));
+    const defaultTitle = widget.type === MessagesWidget.type ? MessagesWidget.defaultTitle : AggregationWidget.defaultTitle;
+    return widgetTitles.get(widget.id) || defaultTitle;
   }
 
   // eslint-disable-next-line no-use-before-define
