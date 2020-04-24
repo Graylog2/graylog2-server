@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import { Col, Row } from 'components/graylog';
 
@@ -54,20 +55,18 @@ const FieldResultWrap = styled.div(({ resultType, theme }) => {
     dd {
       background-color: ${types[resultType]};
       color: ${util.contrastingColor(types[resultType])};
-
-      ${resultType === 'mutated' && css`
-        &.removed-field {
-          text-decoration: line-through;
-          font-style: italic;
-        }
-      `}
     }
   `;
 });
 
-const FieldValue = styled.dd`
+const FieldValue = styled.dd(({ removed }) => `
   font-family: monospace;
-`;
+
+  ${removed && css`
+    text-decoration: line-through;
+    font-style: italic;
+  `}
+`);
 
 const SimulationChanges = createReactClass({
   displayName: 'SimulationChanges',
@@ -85,9 +84,8 @@ const SimulationChanges = createReactClass({
     return <dt key={`${field}-key`}>{field}</dt>;
   },
 
-  _formatFieldValue(field, value, isAdded, isRemoved) {
-    const className = (isAdded ? 'added-field' : (isRemoved ? 'removed-field' : ''));
-    return <FieldValue key={`${field}-value`} className={className}>{String(value)}</FieldValue>;
+  _formatFieldValue(field, value, isRemoved = false) {
+    return <FieldValue key={`${field}-value`} removed={isRemoved}>{String(value)}</FieldValue>;
   },
 
   _formatAddedFields(originalMessage, processedMessage) {
@@ -104,7 +102,7 @@ const SimulationChanges = createReactClass({
 
     addedFields.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field], true, false));
+      formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field]));
     });
 
     return (
@@ -131,7 +129,7 @@ const SimulationChanges = createReactClass({
 
     removedFields.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(field, originalMessage.fields[field], false, true));
+      formattedFields.push(this._formatFieldValue(field, originalMessage.fields[field]));
     });
 
     return (
@@ -176,8 +174,8 @@ const SimulationChanges = createReactClass({
 
     mutatedFields.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
-      formattedFields.push(this._formatFieldValue(`${field}-original`, originalMessage.fields[field], false, true));
-      formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field], true, false));
+      formattedFields.push(this._formatFieldValue(`${field}-original`, originalMessage.fields[field], true));
+      formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field]));
     });
 
     return (
@@ -191,8 +189,8 @@ const SimulationChanges = createReactClass({
   },
 
   _getOriginalMessageChanges() {
-    const { originalMessage } = this.props;
-    const processedMessages = this.props.simulationResults.messages;
+    const { originalMessage, simulationResults } = this.props;
+    const processedMessages = simulationResults.messages;
 
     if (this._isOriginalMessageRemoved(originalMessage, processedMessages)) {
       return <p>Original message would be dropped during processing.</p>;
@@ -218,12 +216,14 @@ const SimulationChanges = createReactClass({
   },
 
   _formatOriginalMessageChanges() {
+    const { originalMessage } = this.props;
+
     return (
       <Row className="row-sm">
         <Col md={12}>
           <h3>
             Changes in original message{' '}
-            <small><em>{this.props.originalMessage.id}</em></small>
+            <small><em>{originalMessage.id}</em></small>
           </h3>
           {this._getOriginalMessageChanges()}
         </Col>
@@ -232,10 +232,9 @@ const SimulationChanges = createReactClass({
   },
 
   _formatOtherChanges() {
-    const originalMessageId = this.props.originalMessage.id;
-    const simulatedMessages = this.props.simulationResults.messages;
+    const { originalMessage, simulationResults } = this.props;
 
-    const createdMessages = simulatedMessages.filter((message) => message.id !== originalMessageId);
+    const createdMessages = simulationResults.messages.filter((message) => message.id !== originalMessage.id);
 
     if (createdMessages.length === 0) {
       return null;
