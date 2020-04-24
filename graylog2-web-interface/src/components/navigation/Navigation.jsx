@@ -5,12 +5,12 @@ import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
+import { Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-import { appPrefixed } from 'util/URLUtils';
+import URLUtils from 'util/URLUtils';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import { IfPermitted } from 'components/common';
 
@@ -28,11 +28,11 @@ import StyledNavbar from './Navigation.styles';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(appPrefixed(prefix)) === 0;
+  return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
-  const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
+  const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} topLevel={topLevel} />;
 
   if (permissions) {
     return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
@@ -84,7 +84,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
         </Navbar.Brand>
         <Navbar.Toggle />
         <HeaderBadge smallScreen />
-        {pluginItems.map(({ key, compontent: Item }) => <Item key={key} smallScreen />)}
+        {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
       </Navbar.Header>
 
       <Navbar.Collapse>

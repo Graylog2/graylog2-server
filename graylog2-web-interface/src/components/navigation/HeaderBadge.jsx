@@ -9,14 +9,9 @@ type Props = {
   smallScreen: boolean,
 };
 
-const HeaderBadge = ({ smallScreen = false }: Props) => {
+const HeaderBadge = ({ smallScreen }: Props) => {
   const smallScreenClass = smallScreen ? 'small-scrn-badge' : '';
-  const devBadge = AppConfig.gl2DevMode() ? <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">DEV</Badge> : null;
-  return (
-    <>
-      {devBadge}
-    </>
-  );
+  return AppConfig.gl2DevMode() ? <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">DEV</Badge> : null;
 };
 
 HeaderBadge.propTypes = {
