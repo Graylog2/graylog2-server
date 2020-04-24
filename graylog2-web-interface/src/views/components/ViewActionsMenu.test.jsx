@@ -42,7 +42,12 @@ jest.mock('views/stores/SearchStore', () => ({
     }),
   },
 }));
-
+jest.mock('views/stores/SearchExecutionStateStore', () => ({
+  SearchExecutionStateStore: {
+    getInitialState: jest.fn(),
+    listen: () => jest.fn(),
+  },
+}));
 jest.mock('views/stores/ViewSharingStore', () => ({
   ViewSharingActions: {
     create: jest.fn(() => Promise.resolve()),
