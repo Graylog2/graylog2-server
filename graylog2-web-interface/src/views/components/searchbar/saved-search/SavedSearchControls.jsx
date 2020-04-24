@@ -1,5 +1,5 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
 import { browserHistory } from 'react-router';
@@ -58,10 +58,12 @@ class SavedSearchControls extends React.Component<Props, State> {
 
   static contextType = ViewLoaderContext;
 
-  formTarget: any;
+  formTarget: { current: null | Button };
 
   constructor(props: Props) {
     super(props);
+
+    this.formTarget = React.createRef();
 
     const { viewStoreState } = props;
     const { view } = viewStoreState;
@@ -211,7 +213,7 @@ class SavedSearchControls extends React.Component<Props, State> {
 
     const savedSearchForm = showForm && (
       <SavedSearchForm onChangeTitle={this.onChangeTitle}
-                       target={this.formTarget}
+                       target={this.formTarget.current}
                        saveSearch={this.saveSearch}
                        saveAsSearch={this.saveAsSearch}
                        disableCreateNew={newTitle === view.title}
