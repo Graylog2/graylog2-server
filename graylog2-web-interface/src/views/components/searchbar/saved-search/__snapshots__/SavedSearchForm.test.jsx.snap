@@ -60,22 +60,22 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#5e0000",
-                          "default": "#000000",
-                          "info": "#002775",
-                          "primary": "#2b0042",
-                          "success": "#006600",
-                          "warning": "#ac8a00",
+                          "danger": "#5b1b1b",
+                          "default": "#1f1f1f",
+                          "info": "#1b3863",
+                          "primary": "#3e2148",
+                          "success": "#1b5b2b",
+                          "warning": "#826c1b",
                         },
                         "default": "#1f1f1f",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#e74a32",
-                          "default": "#464646",
-                          "info": "#5890f1",
-                          "primary": "#a155b5",
-                          "success": "#57e170",
-                          "warning": "#ffff52",
+                          "danger": "#dab4b4",
+                          "default": "#b6b6b6",
+                          "info": "#b4c1e1",
+                          "primary": "#c5b6cb",
+                          "success": "#b4daba",
+                          "warning": "#ffeab4",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -551,7 +551,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "fcGLmv",
+                                                "lastClassName": "ibEGYG",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -574,7 +574,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 fcGLmv"
+                                            className="FormControl-sc-1amoaox-0 ibEGYG"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -582,7 +582,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                              className="FormControl-sc-1amoaox-0 ibEGYG form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
@@ -825,22 +825,22 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#5e0000",
-                          "default": "#000000",
-                          "info": "#002775",
-                          "primary": "#2b0042",
-                          "success": "#006600",
-                          "warning": "#ac8a00",
+                          "danger": "#5b1b1b",
+                          "default": "#1f1f1f",
+                          "info": "#1b3863",
+                          "primary": "#3e2148",
+                          "success": "#1b5b2b",
+                          "warning": "#826c1b",
                         },
                         "default": "#1f1f1f",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#e74a32",
-                          "default": "#464646",
-                          "info": "#5890f1",
-                          "primary": "#a155b5",
-                          "success": "#57e170",
-                          "warning": "#ffff52",
+                          "danger": "#dab4b4",
+                          "default": "#b6b6b6",
+                          "info": "#b4c1e1",
+                          "primary": "#c5b6cb",
+                          "success": "#b4daba",
+                          "warning": "#ffeab4",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -1316,7 +1316,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "fcGLmv",
+                                                "lastClassName": "ibEGYG",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -1339,7 +1339,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 fcGLmv"
+                                            className="FormControl-sc-1amoaox-0 ibEGYG"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -1347,7 +1347,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                              className="FormControl-sc-1amoaox-0 ibEGYG form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
@@ -1667,22 +1667,22 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#5e0000",
-                          "default": "#000000",
-                          "info": "#002775",
-                          "primary": "#2b0042",
-                          "success": "#006600",
-                          "warning": "#ac8a00",
+                          "danger": "#5b1b1b",
+                          "default": "#1f1f1f",
+                          "info": "#1b3863",
+                          "primary": "#3e2148",
+                          "success": "#1b5b2b",
+                          "warning": "#826c1b",
                         },
                         "default": "#1f1f1f",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#e74a32",
-                          "default": "#464646",
-                          "info": "#5890f1",
-                          "primary": "#a155b5",
-                          "success": "#57e170",
-                          "warning": "#ffff52",
+                          "danger": "#dab4b4",
+                          "default": "#b6b6b6",
+                          "info": "#b4c1e1",
+                          "primary": "#c5b6cb",
+                          "success": "#b4daba",
+                          "warning": "#ffeab4",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -2158,7 +2158,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "fcGLmv",
+                                                "lastClassName": "ibEGYG",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -2181,7 +2181,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 fcGLmv"
+                                            className="FormControl-sc-1amoaox-0 ibEGYG"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -2189,7 +2189,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                              className="FormControl-sc-1amoaox-0 ibEGYG form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
