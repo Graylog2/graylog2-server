@@ -24,6 +24,7 @@ import {
   ListField,
   NumberField,
   TextField,
+  RadioField,
 } from 'components/configurationforms';
 import type { ConfigurationField } from 'components/configurationforms/types';
 
@@ -91,6 +92,16 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    onChange={onChange}
                    autoFocus={autoFocus} />
       );
+    case 'radio':
+      return (
+        <RadioField key={elementKey}
+                    typeName={typeName}
+                    title={configKey}
+                    field={configField}
+                    value={configValue}
+                    onChange={onChange}
+                    autoFocus={autoFocus} />
+            )
     default:
       return null;
   }

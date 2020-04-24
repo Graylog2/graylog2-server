@@ -22,5 +22,6 @@ export { default as DropdownField } from './DropdownField';
 export { default as FieldHelpers } from './FieldHelpers';
 export { default as ListField } from './ListField';
 export { default as NumberField } from './NumberField';
+export { default as RadioField } from './RadioField';
 export { default as TextField } from './TextField';
 export { default as TitleField } from './TitleField';
