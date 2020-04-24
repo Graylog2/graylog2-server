@@ -13,7 +13,7 @@ import history from 'util/History';
 export class FetchError extends Error {
   constructor(message, additional) {
     super(message);
-    this.message = message || (additional.message || 'Undefined error.');
+    this.message = message ?? additional?.message ?? 'Undefined error.';
     /* eslint-disable no-console */
     try {
       this.responseMessage = additional.body ? additional.body.message : undefined;
@@ -26,7 +26,7 @@ export class FetchError extends Error {
     /* eslint-enable no-console */
 
     this.additional = additional;
-    this.status = additional.status; // Shortcut, as this is often used
+    this.status = additional?.status; // Shortcut, as this is often used
   }
 }
 
@@ -39,7 +39,7 @@ const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFet
 
 const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
   const SessionStore = StoreProvider.getStore('Session');
-  const fetchError = FetchError(error.statusText, error);
+  const fetchError = new FetchError(error.statusText, error);
   if (SessionStore.isLoggedIn() && error.status === 401) {
     const SessionActions = ActionsProvider.getActions('Session');
     SessionActions.logout(SessionStore.getSessionId());
@@ -55,7 +55,7 @@ const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
     ServerAvailabilityActions.reportError(fetchError);
   }
 
-  throw new FetchError();
+  throw fetchError;
 };
 
 export class Builder {
