@@ -21,7 +21,7 @@ const KeywordTimeRangeSelector = ({ value, ...props }: { value: string }) => (
   </Formik>
 );
 
-jest.mock('logic/datetimes/DateTime', () => ({ fromUTCDateTime: (date) => date }));
+jest.mock('logic/datetimes/DateTime', () => ({ parseFromString: (date) => date }));
 
 describe('KeywordTimeRangeSelector', () => {
   beforeEach(() => {
@@ -71,7 +71,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
 
-    expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour');
+    expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour', 'UTC');
   });
 
   it('sets validation state to error if initial value is empty', async () => {

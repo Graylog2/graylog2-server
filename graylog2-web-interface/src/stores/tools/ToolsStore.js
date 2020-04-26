@@ -7,8 +7,8 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
 const ToolsStore = Reflux.createStore({
-  testNaturalDate(text: string): Promise<string[]> {
-    const { url } = ApiRoutes.ToolsApiController.naturalDateTest(text);
+  testNaturalDate(text: string, timezone: string): Promise<string[]> {
+    const { url } = ApiRoutes.ToolsApiController.naturalDateTest(text, timezone);
     const promise = fetch('GET', qualifyUrl(url));
 
     promise.catch((errorThrown) => {

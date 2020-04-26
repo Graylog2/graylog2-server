@@ -12,6 +12,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
 
 const ToolsStore = StoreProvider.getStore('Tools');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   display: flex;
@@ -28,8 +29,8 @@ const KeywordInput: StyledComponent<{}, void, *> = styled(FormControl)`
 `;
 
 const _parseKeywordPreview = (data) => {
-  const from = DateTime.fromUTCDateTime(data.from).toString();
-  const to = DateTime.fromUTCDateTime(data.to).toString();
+  const from = DateTime.parseFromString(data.from).toString();
+  const to = DateTime.parseFromString(data.to).toString();
   return Immutable.Map({ from, to });
 };
 
@@ -39,6 +40,7 @@ type Props = {
 
 const _validateKeyword = (
   keyword: string,
+  timezone: string,
   _setSuccessfullPreview: ({ from: string, to: string }) => void,
   _setFailedPreview: () => string,
 ): ?Promise<string> => {
@@ -47,11 +49,12 @@ const _validateKeyword = (
   }
   return trim(keyword) === ''
     ? Promise.resolve('Keyword must not be empty!')
-    : ToolsStore.testNaturalDate(keyword)
+    : ToolsStore.testNaturalDate(keyword, timezone)
       .then(_setSuccessfullPreview, _setFailedPreview);
 };
 
 const KeywordTimeRangeSelector = ({ disabled }: Props) => {
+  const timezone = CurrentUserStore.currentUser.timezone;
   const [keywordPreview, setKeywordPreview] = useState(Immutable.Map());
   const _setSuccessfullPreview = useCallback(
     (response: { from: string, to: string }) => setKeywordPreview(_parseKeywordPreview(response)),
@@ -65,13 +68,13 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
   const formik = useFormikContext();
 
   const _validate = useCallback(
-    (newKeyword) => _validateKeyword(newKeyword, _setSuccessfullPreview, _setFailedPreview),
+    (newKeyword) => _validateKeyword(newKeyword, timezone, _setSuccessfullPreview, _setFailedPreview),
     [_setSuccessfullPreview, _setFailedPreview],
   );
 
   useEffect(() => {
     const { values: { timerange: { keyword } } } = formik;
-    ToolsStore.testNaturalDate(keyword)
+    ToolsStore.testNaturalDate(keyword, timezone)
       .then(_setSuccessfullPreview, _setFailedPreview);
 
     return () => formik.unregisterField('timerange.keyword');
