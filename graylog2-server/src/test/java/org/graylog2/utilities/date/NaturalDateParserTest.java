@@ -18,10 +18,10 @@ package org.graylog2.utilities.date;
 
 import org.graylog2.plugin.utilities.date.NaturalDateParser;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.jodatime.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -55,14 +55,12 @@ public class NaturalDateParserTest {
     }
 
     @Test
-    @Ignore
     public void testTemporalOrder() throws Exception {
-        NaturalDateParser p = new NaturalDateParser();
 
-        NaturalDateParser.Result result1 = p.parse("last hour");
+        NaturalDateParser.Result result1 = naturalDateParser.parse("last hour");
         assertTrue(result1.getFrom().compareTo(result1.getTo()) < 0);
 
-        NaturalDateParser.Result result2 = p.parse("last one hour");
+        NaturalDateParser.Result result2 = naturalDateParser.parse("last one hour");
         assertTrue(result2.getFrom().compareTo(result2.getTo()) < 0);
     }
 
@@ -77,5 +75,13 @@ public class NaturalDateParserTest {
 
         NaturalDateParser.Result result101days = naturalDateParser.parse("last 101 days");
         assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(101));
+    }
+
+    @Test
+    public void testParseWithDifferentTimeZone() throws Exception {
+        NaturalDateParser parser = new NaturalDateParser();
+        NaturalDateParser.Result yesterdayFromMidnight = parser.parse("yesterday 00:00:00", "CET");
+
+        assertEquals(0, yesterdayFromMidnight.getFrom().getHourOfDay());
     }
 }

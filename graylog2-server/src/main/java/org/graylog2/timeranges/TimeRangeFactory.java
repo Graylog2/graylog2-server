@@ -37,7 +37,7 @@ public class TimeRangeFactory {
             case "relative":
                 return RelativeRange.create(Integer.parseInt(String.valueOf(timerangeConfig.get("range"))));
             case "keyword":
-                return KeywordRange.create((String) timerangeConfig.get("keyword"));
+                return KeywordRange.create((String) timerangeConfig.get("keyword"), (String) timerangeConfig.get("timezone"));
             case "absolute":
                 final String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString();
                 final String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString();

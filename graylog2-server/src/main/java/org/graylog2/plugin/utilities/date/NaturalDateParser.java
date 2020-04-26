@@ -31,13 +31,18 @@ import java.util.Map;
 import java.util.TimeZone;
 
 public class NaturalDateParser {
-    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+    public static final String DEFAULT_TIMEZONE = "UTC";
 
     public Result parse(final String string) throws DateNotParsableException {
+        return parse(string, DEFAULT_TIMEZONE);
+    }
+
+    public Result parse(final String string, final String timezone) throws DateNotParsableException {
         Date from = null;
         Date to = null;
+        TimeZone tz = getTimezoneFromString(timezone);
 
-        final Parser parser = new Parser(UTC);
+        final Parser parser = new Parser(tz);
         final List<DateGroup> groups = parser.parse(string);
         if (!groups.isEmpty()) {
             final List<Date> dates = groups.get(0).getDates();
@@ -54,24 +59,34 @@ public class NaturalDateParser {
             throw new DateNotParsableException("Unparsable date: " + string);
         }
 
-        return new Result(from, to);
+        return new Result(from, to, tz);
+    }
+
+    private TimeZone getTimezoneFromString(String timezone) {
+        String timezoneString = timezone;
+        if (timezoneString.isEmpty()) {
+            timezoneString = DEFAULT_TIMEZONE;
+        }
+        return TimeZone.getTimeZone(timezoneString);
     }
 
     public static class Result {
         private final DateTime from;
         private final DateTime to;
+        private final DateTimeZone timezone;
 
-        public Result(final Date from, final Date to) {
+        public Result(final Date from, final Date to, final TimeZone timezone) {
+            this.timezone = DateTimeZone.forTimeZone(timezone);
             if (from != null) {
-                this.from = new DateTime(from, DateTimeZone.UTC);
+                this.from = new DateTime(from, this.timezone);
             } else {
-                this.from = Tools.nowUTC();
+                this.from = new DateTime(this.timezone);
             }
 
             if (to != null) {
-                this.to = new DateTime(to, DateTimeZone.UTC);
+                this.to = new DateTime(to, this.timezone);
             } else {
-                this.to = Tools.nowUTC();
+                this.to = new DateTime(this.timezone);
             }
         }
 
@@ -93,7 +108,7 @@ public class NaturalDateParser {
         }
 
         private String dateFormat(final DateTime x) {
-            return x.toString(DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZoneUTC());
+            return x.toString(DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZone(this.timezone));
         }
     }
 

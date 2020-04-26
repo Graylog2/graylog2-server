@@ -600,7 +600,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange keywordRange = KeywordRange.create("1 day ago", "UTC");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(searches.determineAffectedIndicesWithRanges(absoluteRange, null))
@@ -624,7 +624,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange keywordRange = KeywordRange.create("1 day ago", "UTC");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(searches.determineAffectedIndicesWithRanges(absoluteRange, null))
@@ -676,7 +676,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange keywordRange = KeywordRange.create("1 day ago", "UTC");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(searches.determineAffectedIndices(absoluteRange, null))
@@ -700,7 +700,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange keywordRange = KeywordRange.create("1 day ago", "UTC");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(searches.determineAffectedIndices(absoluteRange, null))

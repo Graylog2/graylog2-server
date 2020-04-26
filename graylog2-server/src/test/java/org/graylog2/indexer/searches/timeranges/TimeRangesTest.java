@@ -83,6 +83,6 @@ public class TimeRangesTest {
 
         assertThat(TimeRanges.toSeconds(AbsoluteRange.create(from, to))).isEqualTo(300);
         assertThat(TimeRanges.toSeconds(RelativeRange.create(300))).isEqualTo(300);
-        assertThat(TimeRanges.toSeconds(KeywordRange.create("last 5 minutes"))).isEqualTo(300);
+        assertThat(TimeRanges.toSeconds(KeywordRange.create("last 5 minutes", "UTC"))).isEqualTo(300);
     }
 }

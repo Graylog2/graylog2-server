@@ -89,6 +89,8 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
@@ -99,7 +101,7 @@ public class KeywordSearchResource extends SearchResource {
 
         final List<String> fieldList = parseOptionalFields(fields);
         final Sorting sorting = buildSorting(sort);
-        final TimeRange timeRange = buildKeywordTimeRange(keyword);
+        final TimeRange timeRange = buildKeywordTimeRange(keyword, timezone);
         final SearchesConfig searchesConfig = SearchesConfig.builder()
                 .query(query)
                 .filter(filter)
@@ -128,6 +130,8 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "batch_size", value = "Batch size for the backend storage export request.", required = false) @QueryParam("batch_size") @DefaultValue(DEFAULT_SCROLL_BATCH_SIZE) int batchSize,
@@ -137,7 +141,7 @@ public class KeywordSearchResource extends SearchResource {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         final List<String> fieldList = parseFields(fields);
-        final TimeRange timeRange = buildKeywordTimeRange(keyword);
+        final TimeRange timeRange = buildKeywordTimeRange(keyword, timezone);
 
         final ScrollResult scroll = searches
                 .scroll(query, timeRange, batchSize, offset, fieldList, filter);
@@ -158,6 +162,8 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "batch_size", value = "Batch size for the backend storage export request.", required = false) @QueryParam("batch_size") @DefaultValue(DEFAULT_SCROLL_BATCH_SIZE) int batchSize,
@@ -167,7 +173,7 @@ public class KeywordSearchResource extends SearchResource {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
         final String filename = "graylog-search-result-keyword-" + keyword + ".csv";
         return Response
-            .ok(searchKeywordChunked(query, keyword, limit, offset, batchSize, filter, fields))
+            .ok(searchKeywordChunked(query, keyword, timezone, limit, offset, batchSize, filter, fields))
             .header("Content-Disposition", "attachment; filename=" + filename)
             .build();
     }
@@ -188,6 +194,8 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("interval") @NotEmpty String interval,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
@@ -199,7 +207,7 @@ public class KeywordSearchResource extends SearchResource {
                         query,
                         Searches.DateHistogramInterval.valueOf(interval),
                         filter,
-                        buildKeywordTimeRange(keyword)
+                        buildKeywordTimeRange(keyword, timezone)
                 )
         );
     }
@@ -221,13 +229,15 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
         final Sorting sortOrder = buildSorting(order);
-        return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildKeywordTimeRange(keyword), sortOrder.getDirection()));
+        return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildKeywordTimeRange(keyword, timezone), sortOrder.getDirection()));
     }
 
     @GET
@@ -248,6 +258,8 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("size") @Min(1) int size,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
             @QueryParam("interval") String interval,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
@@ -256,7 +268,7 @@ public class KeywordSearchResource extends SearchResource {
 
         final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
         final Sorting sortOrder = buildSorting(order);
-        final TimeRange timeRange = buildKeywordTimeRange(keyword);
+        final TimeRange timeRange = buildKeywordTimeRange(keyword, timezone);
 
         return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, SearchUtils.buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
@@ -281,11 +293,13 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(name = "keyword", value = "Keyword timeframe", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         return buildTermsStatsResult(
-                searches.termsStats(keyField, valueField, Searches.TermsStatsOrder.valueOf(order.toUpperCase(Locale.ENGLISH)), size, query, filter, buildKeywordTimeRange(keyword))
+                searches.termsStats(keyField, valueField, Searches.TermsStatsOrder.valueOf(order.toUpperCase(Locale.ENGLISH)), size, query, filter, buildKeywordTimeRange(keyword, timezone))
         );
     }
 
@@ -307,10 +321,12 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
-        return buildFieldStatsResult(fieldStats(field, query, filter, buildKeywordTimeRange(keyword)));
+        return buildFieldStatsResult(fieldStats(field, query, filter, buildKeywordTimeRange(keyword, timezone)));
     }
 
     @GET
@@ -332,6 +348,8 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("interval") @NotEmpty String interval,
             @ApiParam(name = "keyword", value = "Range keyword", required = true)
             @QueryParam("keyword") @NotEmpty String keyword,
+            @ApiParam(name = "timezone", value = "Timezone to apply to the search", required = true)
+            @QueryParam("timezone") @NotEmpty String timezone,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "cardinality", value = "Calculate the cardinality of the field as well", required = false) @QueryParam("cardinality") boolean includeCardinality
     ) {
@@ -340,13 +358,13 @@ public class KeywordSearchResource extends SearchResource {
         interval = interval.toUpperCase(Locale.ENGLISH);
         validateInterval(interval);
 
-        return buildHistogramResult(fieldHistogram(field, query, interval, filter, buildKeywordTimeRange(keyword),
+        return buildHistogramResult(fieldHistogram(field, query, interval, filter, buildKeywordTimeRange(keyword, timezone),
                                                    includeCardinality));
     }
 
-    private TimeRange buildKeywordTimeRange(String keyword) {
+    private TimeRange buildKeywordTimeRange(String keyword, String timezone) {
         try {
-            return restrictTimeRange(KeywordRange.create(keyword));
+            return restrictTimeRange(KeywordRange.create(keyword, timezone));
         } catch (InvalidRangeParametersException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
             throw new BadRequestException("Invalid timerange parameters provided", e);

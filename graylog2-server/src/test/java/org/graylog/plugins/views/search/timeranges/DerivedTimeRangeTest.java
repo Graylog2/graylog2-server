@@ -48,7 +48,7 @@ public class DerivedTimeRangeTest {
 
     @Test
     public void returnsInitialRangeForKeywordRange() throws Exception {
-        final KeywordRange range = KeywordRange.create("yesterday");
+        final KeywordRange range = KeywordRange.create("yesterday", "UTC");
         final DerivedTimeRange derivedTimeRange = DerivedTimeRange.of(range);
 
         assertThat(derivedTimeRange.effectiveTimeRange(emptyRootQuery, null)).isEqualTo(range);
