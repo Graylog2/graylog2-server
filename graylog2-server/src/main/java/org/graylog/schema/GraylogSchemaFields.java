@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs;
+package org.graylog.schema;
 
 /**
  * Field names used in the standard Graylog Schema.
