@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
@@ -11,10 +13,15 @@ import StoreProvider from 'injection/StoreProvider';
 import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
 import { DataTable, Spinner, Timestamp, Icon } from 'components/common';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import UserListStyle from '!style!css!./UserList.css';
 
 const UsersStore = StoreProvider.getStore('Users');
 const RolesStore = StoreProvider.getStore('Roles');
+
+const ActiveIcon = styled(Icon)(({ theme }) => `
+  color: ${theme.color.variant.success};
+`);
 
 const UserList = createReactClass({
   displayName: 'UserList',
@@ -106,7 +113,9 @@ const UserList = createReactClass({
   },
 
   _userInfoFormatter(user) {
-    const rowClass = user.username === this.props.currentUsername ? 'active' : null;
+    const { currentUser, currentUsername } = this.props;
+    const rowClass = user.username === currentUsername ? 'active' : null;
+
     let userBadge = null;
     if (user.session_active) {
       const popover = (
@@ -117,7 +126,7 @@ const UserList = createReactClass({
       );
       userBadge = (
         <OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-          <Icon name="circle" className={UserListStyle.activeSession} />
+          <ActiveIcon name="circle" />
         </OverlayTrigger>
       );
     }
@@ -183,7 +192,7 @@ const UserList = createReactClass({
 
       actions = (
         <div>
-          {this.isPermitted(this.props.currentUser.permissions, [`users:edit:${user.username}`]) ? editAction : null}
+          {this.isPermitted(currentUser.permissions, [`users:edit:${user.username}`]) ? editAction : null}
           &nbsp;
           {actionDropDown}
         </div>
@@ -204,10 +213,11 @@ const UserList = createReactClass({
   },
 
   render() {
+    const { roles, users } = this.state;
     const filterKeys = ['username', 'full_name', 'email', 'client_address'];
     const headers = ['', 'Name', 'Username', 'Email Address', 'Client Address', 'Role', 'Actions'];
 
-    if (this.state.users && this.state.roles) {
+    if (users && roles) {
       return (
         <div>
           <DataTable id="user-list"
@@ -215,9 +225,9 @@ const UserList = createReactClass({
                      headers={headers}
                      headerCellFormatter={this._headerCellFormatter}
                      sortByKey="full_name"
-                     rows={this.state.users}
+                     rows={users}
                      filterBy="role"
-                     filterSuggestions={this.state.roles}
+                     filterSuggestions={roles}
                      dataRowFormatter={this._userInfoFormatter}
                      filterLabel="Filter Users"
                      filterKeys={filterKeys} />
