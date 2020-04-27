@@ -90,7 +90,7 @@ const Table = styled(BootstrapTable)(({ theme }) => {
     }
 
     &.table-bordered {
-      border-color: ${util.colorLevel(theme.color.gray[80], -2)};
+      border-color: ${theme.color.gray[80]};
     }
 
     &.table-bordered > thead > tr > th,
@@ -99,15 +99,15 @@ const Table = styled(BootstrapTable)(({ theme }) => {
     &.table-bordered > thead > tr > td,
     &.table-bordered > tbody > tr > td,
     &.table-bordered > tfoot > tr > td {
-      border-color: ${util.colorLevel(theme.color.gray[80], -2)};
+      border-color: ${theme.color.gray[80]};
     }
 
     &.table-striped > tbody > tr:nth-of-type(odd) {
-      background-color: ${util.colorLevel(theme.color.gray[80], -10)};
+      background-color: ${theme.color.gray[90]};
     }
 
     &.table-hover > tbody > tr:hover {
-      background-color: ${util.colorLevel(theme.color.gray[80], -9)};
+      background-color: ${theme.color.gray[80]};
     }
 
     ${variantRowStyles};
