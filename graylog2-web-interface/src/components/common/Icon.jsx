@@ -49,7 +49,13 @@ Icon.propTypes = {
       prefix: PropTypes.string,
       iconName: PropTypes.string,
     }),
-    PropTypes.arrayOf(PropTypes.string)]).isRequired,
+    PropTypes.arrayOf(PropTypes.string),
+  ]).isRequired,
+  className: PropTypes.string,
+};
+
+Icon.defaultProps = {
+  className: undefined,
 };
 
 export default Icon;
