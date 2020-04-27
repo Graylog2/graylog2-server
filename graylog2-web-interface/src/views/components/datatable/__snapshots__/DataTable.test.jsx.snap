@@ -438,11 +438,12 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                       placement="right"
                                       show={false}
                                       toggle={
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
                                           count()
-                                        </span>
+                                        </FieldActions__FieldElement>
                                       }
                                     >
                                       <span
@@ -450,11 +451,49 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                         onClick={[Function]}
                                         role="presentation"
                                       >
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
-                                          count()
-                                        </span>
+                                          <StyledComponent
+                                            active={false}
+                                            disabled={false}
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "attrs": Array [
+                                                  Object {
+                                                    "className": "field-element",
+                                                  },
+                                                ],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "bgKTLs",
+                                                  "rules": Array [
+                                                    [Function],
+                                                  ],
+                                                },
+                                                "displayName": "FieldActions__FieldElement",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                "target": "span",
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                          >
+                                            <span
+                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              disabled={false}
+                                            >
+                                              count()
+                                            </span>
+                                          </StyledComponent>
+                                        </FieldActions__FieldElement>
                                         <span
                                           className="caret"
                                         />
@@ -511,11 +550,12 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                       placement="right"
                                       show={false}
                                       toggle={
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
                                           count()
-                                        </span>
+                                        </FieldActions__FieldElement>
                                       }
                                     >
                                       <span
@@ -523,11 +563,49 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                         onClick={[Function]}
                                         role="presentation"
                                       >
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
-                                          count()
-                                        </span>
+                                          <StyledComponent
+                                            active={false}
+                                            disabled={false}
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "attrs": Array [
+                                                  Object {
+                                                    "className": "field-element",
+                                                  },
+                                                ],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "bgKTLs",
+                                                  "rules": Array [
+                                                    [Function],
+                                                  ],
+                                                },
+                                                "displayName": "FieldActions__FieldElement",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                "target": "span",
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                          >
+                                            <span
+                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              disabled={false}
+                                            >
+                                              count()
+                                            </span>
+                                          </StyledComponent>
+                                        </FieldActions__FieldElement>
                                         <span
                                           className="caret"
                                         />
@@ -1613,11 +1691,12 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       placement="right"
                                       show={false}
                                       toggle={
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
                                           timestamp
-                                        </span>
+                                        </FieldActions__FieldElement>
                                       }
                                     >
                                       <span
@@ -1625,11 +1704,49 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                         onClick={[Function]}
                                         role="presentation"
                                       >
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
-                                          timestamp
-                                        </span>
+                                          <StyledComponent
+                                            active={false}
+                                            disabled={false}
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "attrs": Array [
+                                                  Object {
+                                                    "className": "field-element",
+                                                  },
+                                                ],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "bgKTLs",
+                                                  "rules": Array [
+                                                    [Function],
+                                                  ],
+                                                },
+                                                "displayName": "FieldActions__FieldElement",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                "target": "span",
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                          >
+                                            <span
+                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              disabled={false}
+                                            >
+                                              timestamp
+                                            </span>
+                                          </StyledComponent>
+                                        </FieldActions__FieldElement>
                                         <span
                                           className="caret"
                                         />
@@ -1686,11 +1803,12 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       placement="right"
                                       show={false}
                                       toggle={
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
                                           count()
-                                        </span>
+                                        </FieldActions__FieldElement>
                                       }
                                     >
                                       <span
@@ -1698,11 +1816,49 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                         onClick={[Function]}
                                         role="presentation"
                                       >
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
-                                          count()
-                                        </span>
+                                          <StyledComponent
+                                            active={false}
+                                            disabled={false}
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "attrs": Array [
+                                                  Object {
+                                                    "className": "field-element",
+                                                  },
+                                                ],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "bgKTLs",
+                                                  "rules": Array [
+                                                    [Function],
+                                                  ],
+                                                },
+                                                "displayName": "FieldActions__FieldElement",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                "target": "span",
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                          >
+                                            <span
+                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              disabled={false}
+                                            >
+                                              count()
+                                            </span>
+                                          </StyledComponent>
+                                        </FieldActions__FieldElement>
                                         <span
                                           className="caret"
                                         />
@@ -1759,11 +1915,12 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       placement="right"
                                       show={false}
                                       toggle={
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
                                           count()
-                                        </span>
+                                        </FieldActions__FieldElement>
                                       }
                                     >
                                       <span
@@ -1771,11 +1928,49 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                         onClick={[Function]}
                                         role="presentation"
                                       >
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
-                                          count()
-                                        </span>
+                                          <StyledComponent
+                                            active={false}
+                                            disabled={false}
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "attrs": Array [
+                                                  Object {
+                                                    "className": "field-element",
+                                                  },
+                                                ],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "bgKTLs",
+                                                  "rules": Array [
+                                                    [Function],
+                                                  ],
+                                                },
+                                                "displayName": "FieldActions__FieldElement",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                "target": "span",
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                          >
+                                            <span
+                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              disabled={false}
+                                            >
+                                              count()
+                                            </span>
+                                          </StyledComponent>
+                                        </FieldActions__FieldElement>
                                         <span
                                           className="caret"
                                         />
@@ -2885,11 +3080,12 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                       placement="right"
                                       show={false}
                                       toggle={
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
                                           timestamp
-                                        </span>
+                                        </FieldActions__FieldElement>
                                       }
                                     >
                                       <span
@@ -2897,11 +3093,49 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                         onClick={[Function]}
                                         role="presentation"
                                       >
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
-                                          timestamp
-                                        </span>
+                                          <StyledComponent
+                                            active={false}
+                                            disabled={false}
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "attrs": Array [
+                                                  Object {
+                                                    "className": "field-element",
+                                                  },
+                                                ],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "bgKTLs",
+                                                  "rules": Array [
+                                                    [Function],
+                                                  ],
+                                                },
+                                                "displayName": "FieldActions__FieldElement",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                "target": "span",
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                          >
+                                            <span
+                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              disabled={false}
+                                            >
+                                              timestamp
+                                            </span>
+                                          </StyledComponent>
+                                        </FieldActions__FieldElement>
                                         <span
                                           className="caret"
                                         />
@@ -2958,11 +3192,12 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                       placement="right"
                                       show={false}
                                       toggle={
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
                                           count()
-                                        </span>
+                                        </FieldActions__FieldElement>
                                       }
                                     >
                                       <span
@@ -2970,11 +3205,49 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                         onClick={[Function]}
                                         role="presentation"
                                       >
-                                        <span
-                                          className="field-element  "
+                                        <FieldActions__FieldElement
+                                          active={false}
+                                          disabled={false}
                                         >
-                                          count()
-                                        </span>
+                                          <StyledComponent
+                                            active={false}
+                                            disabled={false}
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "attrs": Array [
+                                                  Object {
+                                                    "className": "field-element",
+                                                  },
+                                                ],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "bgKTLs",
+                                                  "rules": Array [
+                                                    [Function],
+                                                  ],
+                                                },
+                                                "displayName": "FieldActions__FieldElement",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "FieldActions__FieldElement-vd9gu3-0",
+                                                "target": "span",
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                          >
+                                            <span
+                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              disabled={false}
+                                            >
+                                              count()
+                                            </span>
+                                          </StyledComponent>
+                                        </FieldActions__FieldElement>
                                         <span
                                           className="caret"
                                         />
