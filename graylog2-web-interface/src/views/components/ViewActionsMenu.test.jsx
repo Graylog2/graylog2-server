@@ -27,6 +27,12 @@ jest.mock('views/stores/SearchMetadataStore', () => ({
     listen: () => jest.fn(),
   },
 }));
+jest.mock('views/stores/SearchExecutionStateStore', () => ({
+  SearchExecutionStateStore: {
+    getInitialState: () => jest.fn(),
+    listen: () => jest.fn(),
+  },
+}));
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
   ['listen', () => jest.fn()],
   'get',

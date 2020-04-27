@@ -34,6 +34,7 @@ import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -96,7 +97,6 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         return Optional.ofNullable(parameterIndex.get(parameterName));
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     public Search applyExecutionState(ObjectMapper objectMapper, Map<String, Object> executionState) {
         final Builder builder = toBuilder();
 
@@ -131,8 +131,10 @@ public abstract class Search implements ContentPackable<SearchEntity> {
 
         final ImmutableSet<String> defaultStreams = defaultStreamsSupplier.get();
 
-        if (defaultStreams.isEmpty())
-            throw new PermissionException("User doesn't have access to any streams");
+        if (defaultStreams.isEmpty()) {
+            throw new MissingStreamPermissionException("User doesn't have access to any streams",
+                    Collections.emptySet());
+        }
 
         final Set<Query> withDefaultStreams = withoutStreams.stream()
                 .map(q -> q.addStreamsToFilter(defaultStreams))
@@ -163,6 +165,13 @@ public abstract class Search implements ContentPackable<SearchEntity> {
                 .reduce(Collections.emptySet(), Sets::union);
 
         return Sets.union(queryStreamIds, searchTypeStreamIds);
+    }
+
+    public Query queryForSearchType(String searchTypeId) {
+        return queries().stream()
+                .filter(q -> q.hasSearchType(searchTypeId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Search " + id() + " doesn't have a query for search type " + searchTypeId));
     }
 
     @AutoValue.Builder

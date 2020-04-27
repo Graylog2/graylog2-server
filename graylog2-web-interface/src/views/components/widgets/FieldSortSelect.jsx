@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 import * as Immutable from 'immutable';
 
 import CustomPropTypes from 'views/components/CustomPropTypes';
@@ -10,6 +9,7 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import Select from 'views/components/Select';
 
 type Props = {
   fields: Immutable.List<FieldTypeMapping>,

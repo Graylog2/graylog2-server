@@ -2,8 +2,8 @@
 import React, { useRef, useMemo } from 'react';
 import type { Node, ComponentType } from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
-import ReactSelect, { components as Components } from 'react-select';
+import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
+
 import { Overlay } from 'react-overlays';
 import { createFilter } from 'react-select/lib/filters';
 
@@ -15,12 +15,18 @@ const MultiValueRemove = (props) => {
   );
 };
 
-const OverlayInner = ({ children, style }: {children: Node, style?: Object}) => React.Children.map(children,
+const OverlayInner = ({ children, style }: {children: Node, style?: { left: number, top: number }}) => React.Children.map(children,
   (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }));
 
-const menu = (selectRef) => (base) => {
+const getRefContainerWidth = (selectRef, allowOptionCreation) => {
+  const currentRef = selectRef?.current;
+  const containerRef = allowOptionCreation ? currentRef?.select?.select : currentRef?.select;
+  return containerRef?.controlRef?.offsetWidth || 0;
+};
+
+const menu = (selectRef, allowOptionCreation: boolean) => (base) => {
   const defaultMinWidth = 200;
-  const containerWidth = get(selectRef, 'current.select.controlRef.offsetWidth') || 0;
+  const containerWidth = getRefContainerWidth(selectRef, allowOptionCreation);
   const width = containerWidth > defaultMinWidth ? containerWidth : defaultMinWidth;
   return {
     ...base,
@@ -28,7 +34,6 @@ const menu = (selectRef) => (base) => {
     width: `${width}px`,
   };
 };
-
 
 const multiValue = (base) => ({
   ...base,
@@ -65,6 +70,7 @@ const valueContainer = (base) => ({
 });
 
 type Props = {
+  allowOptionCreation?: boolean,
   components: { [string]: ComponentType<any> },
   styles: { [string]: any },
   ignoreAccents: boolean,
@@ -95,10 +101,11 @@ const MenuOverlay = (selectRef) => (props) => {
   );
 };
 
-const Select = ({ components, styles, ignoreCase = true, ignoreAccents = false, ...rest }: Props) => {
+const Select = ({ components, styles, ignoreCase = true, ignoreAccents = false, allowOptionCreation = false, ...rest }: Props) => {
   const selectRef = useRef(null);
+  const Component = allowOptionCreation ? CreatableSelect : ReactSelect;
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
-  const menuStyle = useMemo(() => menu(selectRef), [selectRef]);
+  const menuStyle = useMemo(() => menu(selectRef, allowOptionCreation), [selectRef, allowOptionCreation]);
   const _components = {
     ...components,
     Menu,
@@ -115,17 +122,19 @@ const Select = ({ components, styles, ignoreCase = true, ignoreAccents = false, 
     valueContainer,
   };
   const filterOption = createFilter({ ignoreCase, ignoreAccents });
+
   return (
-    <ReactSelect {...rest}
-                 components={_components}
-                 filterOption={filterOption}
-                 styles={_styles}
-                 tabSelectsValue={false}
-                 ref={selectRef} />
+    <Component {...rest}
+               components={_components}
+               filterOption={filterOption}
+               styles={_styles}
+               tabSelectsValue={false}
+               ref={selectRef} />
   );
 };
 
 Select.propTypes = {
+  allowOptionCreation: PropTypes.bool,
   components: PropTypes.object,
   styles: PropTypes.object,
   ignoreAccents: PropTypes.bool,
@@ -133,6 +142,7 @@ Select.propTypes = {
 };
 
 Select.defaultProps = {
+  allowOptionCreation: false,
   components: {},
   styles: {},
   ignoreAccents: false,

@@ -19,12 +19,11 @@ package org.graylog.plugins.views.search;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -73,8 +73,9 @@ public class SearchTest {
     public void throwsExceptionIfQueryHasNoStreamsAndThereAreNoDefaultStreams() {
         Search search = searchWithQueriesWithStreams("a,b,c", "");
 
-        assertThatExceptionOfType(PermissionException.class)
-                .isThrownBy(() -> search.addStreamsToQueriesWithoutStreams(ImmutableSet::of));
+        assertThatExceptionOfType(MissingStreamPermissionException.class)
+                .isThrownBy(() -> search.addStreamsToQueriesWithoutStreams(ImmutableSet::of))
+                .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).isEmpty());
     }
 
     @Test
@@ -194,10 +195,6 @@ public class SearchTest {
             builder = builder.filter(StreamFilter.anyIdOf(streamIds));
 
         return builder.build();
-    }
-
-    private Query.Builder validQueryBuilder() {
-        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback());
     }
 
     private SearchType searchTypeWithStreams(String streamIds) {

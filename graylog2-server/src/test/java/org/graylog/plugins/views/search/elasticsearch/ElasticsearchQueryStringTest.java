@@ -17,10 +17,12 @@
 package org.graylog.plugins.views.search.elasticsearch;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ElasticsearchQueryStringTest {
+class ElasticsearchQueryStringTest {
     private ElasticsearchQueryString create(String queryString) {
         return ElasticsearchQueryString.builder().queryString(queryString).build();
     }
@@ -43,5 +45,19 @@ public class ElasticsearchQueryStringTest {
     @Test
     void concatenatingTwoNonEmptyStringsReturnsAppendedQueryString() {
         assertThat(create("nf_bytes>200").concatenate(create("_exists_:nf_version")).queryString()).isEqualTo("nf_bytes>200 AND _exists_:nf_version");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "",
+            " ",
+            "\n",
+            "*",
+            " *"
+    })
+    void detectsIfItsEmpty(String queryString) {
+        ElasticsearchQueryString sut = ElasticsearchQueryString.builder().queryString(queryString).build();
+
+        assertThat(sut.isEmpty()).isTrue();
     }
 }

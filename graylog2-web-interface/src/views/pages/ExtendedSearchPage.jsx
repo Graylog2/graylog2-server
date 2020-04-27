@@ -1,9 +1,8 @@
 // @flow strict
 import React, { useEffect } from 'react';
-import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { css } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
@@ -18,6 +17,7 @@ import type {
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
 
+import { type ThemeInterface } from 'theme';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -44,11 +44,29 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import style from '!style/useable!css!./ExtendedSearchPage.css';
 import HighlightMessageInQuery from '../components/messagelist/HighlightMessageInQuery';
 
-const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
+const ExtendedSearchPageGlobalStyles: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+  .extended-search-timerange-chooser .btn {
+    padding: 6px 7px;
+    margin-right: 5px;
+  }
+
+  .extended-search-query-metadata {
+    margin-bottom: 10px !important;
+  }
+
+  .search-button-execute {
+    margin-right: 7px;
+  }
+
+  .xtick text,
+  .ytick text {
+    fill: ${theme.color.gray[50]} !important;
+  }
+`);
+
+const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElement> = styled.div`
   ${({ interactive }) => (interactive ? css`
     height: calc(100vh - 50px);
     display: -ms-grid;
@@ -60,7 +78,7 @@ const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ` : '')}
 `;
 
-const SearchArea = styled(AppContentGrid)`
+const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
   height: 100%;
   grid-column: 2;
   -ms-grid-column: 2;
@@ -123,13 +141,6 @@ const ViewAdditionalContextProvider = connect(
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
-const useStyle = () => {
-  useEffect(() => {
-    style.use();
-    return () => style.unuse();
-  }, []);
-};
-
 const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
@@ -140,8 +151,6 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
 
     bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
   }, [query]);
-
-  useStyle();
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -163,47 +172,49 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   useSyncWithQueryParameters(query);
 
   return (
-    <CurrentViewTypeProvider>
-      <IfInteractive>
-        <IfDashboard>
-          <WindowLeaveMessage route={route} />
-        </IfDashboard>
-      </IfInteractive>
-      <InteractiveContext.Consumer>
-        {(interactive) => (
-          <ViewAdditionalContextProvider>
-            <GridContainer id="main-row" interactive={interactive}>
-              <IfInteractive>
-                <ConnectedSideBar>
-                  <ConnectedFieldList />
-                </ConnectedSideBar>
-              </IfInteractive>
-              <SearchArea>
+    <ExtendedSearchPageGlobalStyles>
+      <CurrentViewTypeProvider>
+        <IfInteractive>
+          <IfDashboard>
+            <WindowLeaveMessage route={route} />
+          </IfDashboard>
+        </IfInteractive>
+        <InteractiveContext.Consumer>
+          {(interactive) => (
+            <ViewAdditionalContextProvider>
+              <GridContainer id="main-row" interactive={interactive}>
                 <IfInteractive>
-                  <HeaderElements />
-                  <IfDashboard>
-                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfDashboard>
-                  <IfSearch>
-                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfSearch>
-
-                  <QueryBarElements />
-
-                  <IfDashboard>
-                    <QueryBar />
-                  </IfDashboard>
+                  <ConnectedSideBar>
+                    <ConnectedFieldList />
+                  </ConnectedSideBar>
                 </IfInteractive>
-                <HighlightMessageInQuery query={location.query}>
-                  <SearchResult />
-                </HighlightMessageInQuery>
-                <Footer />
-              </SearchArea>
-            </GridContainer>
-          </ViewAdditionalContextProvider>
-        )}
-      </InteractiveContext.Consumer>
-    </CurrentViewTypeProvider>
+                <SearchArea>
+                  <IfInteractive>
+                    <HeaderElements />
+                    <IfDashboard>
+                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfDashboard>
+                    <IfSearch>
+                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfSearch>
+
+                    <QueryBarElements />
+
+                    <IfDashboard>
+                      <QueryBar />
+                    </IfDashboard>
+                  </IfInteractive>
+                  <HighlightMessageInQuery query={location.query}>
+                    <SearchResult />
+                  </HighlightMessageInQuery>
+                  <Footer />
+                </SearchArea>
+              </GridContainer>
+            </ViewAdditionalContextProvider>
+          )}
+        </InteractiveContext.Consumer>
+      </CurrentViewTypeProvider>
+    </ExtendedSearchPageGlobalStyles>
   );
 };
 

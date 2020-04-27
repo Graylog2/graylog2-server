@@ -428,13 +428,21 @@ public class Message implements Messages {
 
     @Override
     public String toString() {
+        return toString(true);
+    }
+
+    public String toDumpString() {
+        return toString(false);
+    }
+
+    private String toString(boolean truncate) {
         final StringBuilder sb = new StringBuilder();
         sb.append("source: ").append(getField(FIELD_SOURCE)).append(" | ");
 
         final String message = getField(FIELD_MESSAGE).toString().replaceAll("\\n", "").replaceAll("\\t", "");
         sb.append("message: ");
 
-        if (message.length() > 225) {
+        if (truncate && message.length() > 225) {
             sb.append(message.substring(0, 225)).append(" (...)");
         } else {
             sb.append(message);
