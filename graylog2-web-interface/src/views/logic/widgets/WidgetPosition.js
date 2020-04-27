@@ -6,7 +6,7 @@ type State = {
   row: number,
   height: number,
   width: number,
-}
+};
 
 export type WidgetPositionJSON = {
   col: number | 'Infinity',

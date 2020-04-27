@@ -223,6 +223,8 @@ class SourceCodeEditor extends React.Component {
             <AceEditor ref={(c) => { this.reactAce = c; }}
                        annotations={annotations}
                        editorProps={{ $blockScrolling: 'Infinity' }}
+                       // Convert Windows line breaks to Unix. See issue #7889
+                       setOptions={{ newLineMode: 'unix' }}
                        focus={focus}
                        fontSize={fontSize}
                        mode={mode}

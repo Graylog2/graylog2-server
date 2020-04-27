@@ -13,7 +13,7 @@ type InternalState = {
   dataType: string,
   defaultValue: any,
   optional: boolean,
-  binding: ?ParameterBinding
+  binding: ?ParameterBinding,
 };
 
 export type ParameterJson = {

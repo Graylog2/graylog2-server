@@ -18,21 +18,21 @@ type MultiValue = {|
 |};
 
 export type Leaf = {|
-...{| source: 'leaf' |}, ...Keyed, ...MultiValue
+...{| source: 'leaf' |}, ...Keyed, ...MultiValue,
 |};
 
 export type NonLeaf = {|
-...{| source: 'non-leaf' |}, ...Keyed, ...MultiValue
+...{| source: 'non-leaf' |}, ...Keyed, ...MultiValue,
 |};
 
 export type ColLeaf = {|
-...{| source: 'col-leaf' |}, ...Keyed, ...SingleValue
+...{| source: 'col-leaf' |}, ...Keyed, ...SingleValue,
 |};
 export type RowLeaf = {|
-...{| source: 'row-leaf' |}, ...Keyed, ...SingleValue
+...{| source: 'row-leaf' |}, ...Keyed, ...SingleValue,
 |};
 export type RowInner = {|
-...{| source: 'row-inner' |}, ...Keyed, ...SingleValue
+...{| source: 'row-inner' |}, ...Keyed, ...SingleValue,
 |};
 
 export type Row = Leaf | NonLeaf | ColLeaf | RowLeaf | RowInner;

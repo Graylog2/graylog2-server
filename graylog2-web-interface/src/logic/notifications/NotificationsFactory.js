@@ -221,6 +221,45 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'es_node_disk_watermark_low':
+        return {
+          title: 'Elasticsearch nodes disk usage above low watermark',
+          description: (
+            <span>
+              There are Elasticsearch nodes in the cluster running out of disk space, their disk usage is above the low watermark.{' '}
+              For this reason Elasticsearch will not allocate new shards to the affected nodes.{' '}
+              The affected nodes are: [{notification.details.nodes}]{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              for more details.
+            </span>
+          ),
+        };
+      case 'es_node_disk_watermark_high':
+        return {
+          title: 'Elasticsearch nodes disk usage above high watermark',
+          description: (
+            <span>
+              There are Elasticsearch nodes in the cluster with almost no free disk, their disk usage is above the high watermark.{' '}
+              For this reason Elasticsearch will attempt to relocate shards away from the affected nodes.{' '}
+              The affected nodes are: [{notification.details.nodes}]{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              for more details.
+            </span>
+          ),
+        };
+      case 'es_node_disk_watermark_flood_stage':
+        return {
+          title: 'Elasticsearch nodes disk usage above flood stage watermark',
+          description: (
+            <span>
+              There are Elasticsearch nodes in the cluster without free disk, their disk usage is above the flood stage watermark.{' '}
+              For this reason Elasticsearch enforces a read-only index block on all indexes having any of their shards in any of the{' '}
+              affected nodes. The affected nodes are: [{notification.details.nodes}]{' '}
+              Check <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html" target="_blank">https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html</a>{' '}
+              for more details.
+            </span>
+          ),
+        };
       default:
         return { title: `unknown (${notification.type})`, description: 'unknown' };
     }

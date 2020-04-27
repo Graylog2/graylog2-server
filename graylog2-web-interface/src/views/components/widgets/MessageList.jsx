@@ -53,7 +53,7 @@ const Wrapper = styled.div`
 type State = {
   errors: Array<{ description: string }>,
   currentPage: number,
-}
+};
 
 type Props = {
   config: MessagesWidgetConfig,

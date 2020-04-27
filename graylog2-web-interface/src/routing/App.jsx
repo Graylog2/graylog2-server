@@ -1,14 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import chroma from 'chroma-js';
 
+import { util } from 'theme';
 import Navigation from 'components/navigation/Navigation';
 import { Scratchpad, Icon, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 
-import AppErrorBoundary from './AppErrorBoundary';
+import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
+import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 
 import 'stylesheets/typeahead.less';
 
@@ -19,7 +22,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   left: 50%;
   margin-left: -125px;
   top: 50px;
-  color: ${theme.color.global.textAlt};
+  color: ${util.readableColor(chroma(theme.color.brand.tertiary).alpha(0.8).css())};
   font-size: 80px;
   padding: 25px;
   z-index: 2000;
@@ -28,8 +31,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   cursor: pointer;
   border-radius: 10px;
   display: none;
-  background: rgba(0, 0, 0, 0.8);
-  filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+  background: ${chroma(theme.color.brand.tertiary).alpha(0.8).css()};
 `);
 
 const App = ({ children, currentUser, location }) => {
@@ -43,13 +45,15 @@ const App = ({ children, currentUser, location }) => {
                   fullName={currentUser.full_name}
                   loginName={currentUser.username}
                   permissions={currentUser.permissions} />
-      <ScrollToHint id="scroll-to-hint">
-        <Icon name="arrow-up" />
-      </ScrollToHint>
-      <Scratchpad />
-      <AppErrorBoundary>
-        {children}
-      </AppErrorBoundary>
+      <ReportedErrorBoundary>
+        <RuntimeErrorBoundary>
+          <ScrollToHint id="scroll-to-hint">
+            <Icon name="arrow-up" />
+          </ScrollToHint>
+          <Scratchpad />
+          {children}
+        </RuntimeErrorBoundary>
+      </ReportedErrorBoundary>
     </ScratchpadProvider>
   );
 };

@@ -8,7 +8,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 
 import SortableListItem from './SortableListItem';
 
-const SortableListGroup = styled(ListGroup)(({ disableDragging }) => css`
+const SortableListGroup = styled(ListGroup)(({ disableDragging, theme }) => css`
   cursor: ${disableDragging ? 'default' : 'move'};
   margin: 0 0 15px;
 
@@ -17,7 +17,7 @@ const SortableListGroup = styled(ListGroup)(({ disableDragging }) => css`
   }
 
   .over {
-    border: 1px dashed #8c8e86;
+    border: 1px dashed ${theme.color.gray[50]};
   }
 
   .list-group-item {
@@ -64,32 +64,43 @@ class SortableList extends React.Component {
 
   static defaultProps = {
     disableDragging: false,
+    onMoveItem: () => {},
   };
 
-  state = {
-    items: this.props.items,
-  };
+  constructor(props) {
+    super(props);
 
-  componentWillReceiveProps(nextProps) {
+    this.state = {
+      items: props.items,
+    };
+  }
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ items: nextProps.items });
   }
 
   _moveItem = (dragIndex, hoverIndex) => {
-    const sortedItems = this.state.items;
-    const tempItem = sortedItems[dragIndex];
-    sortedItems[dragIndex] = sortedItems[hoverIndex];
-    sortedItems[hoverIndex] = tempItem;
-    this.setState({ items: sortedItems });
-    if (typeof this.props.onMoveItem === 'function') {
-      this.props.onMoveItem(sortedItems);
+    const { onMoveItem } = this.props;
+    const { items } = this.state;
+    const tempItem = items[dragIndex];
+    items[dragIndex] = items[hoverIndex];
+    items[hoverIndex] = tempItem;
+    this.setState({ items });
+
+    if (typeof onMoveItem === 'function') {
+      onMoveItem(items);
     }
   };
 
   render() {
-    const formattedItems = this.state.items.map((item, idx) => {
+    const { items } = this.state;
+    const { disableDragging } = this.props;
+
+    const formattedItems = items.map((item, idx) => {
       return (
         <SortableListItem key={`sortable-list-item-${item.id}`}
-                          disableDragging={this.props.disableDragging}
+                          disableDragging={disableDragging}
                           index={idx}
                           id={item.id}
                           content={item.title}
@@ -98,7 +109,7 @@ class SortableList extends React.Component {
     });
 
     return (
-      <SortableListGroup disableDragging={this.props.disableDragging}>
+      <SortableListGroup disableDragging={disableDragging}>
         {formattedItems}
       </SortableListGroup>
     );

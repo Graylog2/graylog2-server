@@ -12,7 +12,7 @@ import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewSta
 
 type WidgetId = string;
 
-type Widgets = Immutable.OrderedMap<Widget>;
+type Widgets = Immutable.OrderedMap<string, Widget>;
 
 type WidgetActionsType = RefluxActions<{
   create: (Widget) => Promise<Widget>,

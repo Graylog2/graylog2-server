@@ -18,21 +18,21 @@ export type Stream = {
   isDefaultStream: boolean,
   creatorUser: string,
   createdAt: number,
-}
+};
 
 type TestMatchResponse = {
   matches: boolean,
   rules: any,
-}
+};
 
 type Callback = {
   (): void,
-}
+};
 
 type StreamSummaryResponse = {
   total: number,
   streams: Array<Stream>,
-}
+};
 
 const StreamsStore = Reflux.createStore({
   callbacks: [],

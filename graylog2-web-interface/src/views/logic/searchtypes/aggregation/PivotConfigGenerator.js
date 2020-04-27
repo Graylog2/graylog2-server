@@ -26,7 +26,7 @@ type FormattedPivot = {
   interval: {
     timeunit: string,
     type: string,
-  }
+  },
 };
 
 type TimeConfig = {|

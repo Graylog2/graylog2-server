@@ -1,4 +1,5 @@
 import NumberUtils from 'util/NumberUtils';
+import createEvent from './CreateEvent';
 
 const FormUtils = {
   getValueFromInput(input) {
@@ -16,7 +17,7 @@ const FormUtils = {
   triggerInput(urlInput) {
     const { input } = urlInput;
     const tracker = input._valueTracker;
-    const event = new Event('change', { bubbles: true });
+    const event = createEvent('change');
     event.simulated = true;
     if (tracker) {
       tracker.setValue('');
@@ -24,5 +25,6 @@ const FormUtils = {
     input.dispatchEvent(event);
   },
 };
+
 
 export default FormUtils;

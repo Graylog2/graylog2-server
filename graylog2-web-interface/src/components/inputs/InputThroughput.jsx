@@ -1,5 +1,7 @@
+/* eslint-disable no-restricted-globals */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
@@ -13,9 +15,9 @@ import ActionsProvider from 'injection/ActionsProvider';
 import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
 
-const InputIO = styled.span`
+const InputIO = styled.span(({ theme }) => `
   .total {
-    color: #b8b8b8;
+    color: ${theme.color.gray[70]};
   }
 
   .value {
@@ -40,7 +42,7 @@ const InputIO = styled.span`
     position: relative;
     top: -1px;
   }
-`;
+`);
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
@@ -60,7 +62,7 @@ const InputThroughput = createReactClass({
     };
   },
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this._metricNames().forEach((metricName) => MetricsActions.addGlobal(metricName));
   },
 
@@ -173,6 +175,7 @@ const InputThroughput = createReactClass({
   },
 
   _formatNodeDetails(nodeId, metrics) {
+    const { input } = this.props;
     const openConnections = this._getValueFromMetric(metrics[this._prefix('open_connections')]);
     const totalConnections = this._getValueFromMetric(metrics[this._prefix('total_connections')]);
     const emptyMessages = this._getValueFromMetric(metrics[this._prefix('emptyMessages')]);
@@ -181,9 +184,8 @@ const InputThroughput = createReactClass({
     const readBytes1Sec = this._getValueFromMetric(metrics[this._prefix('read_bytes_1sec')]);
     const readBytesTotal = this._getValueFromMetric(metrics[this._prefix('read_bytes_total')]);
 
-
     return (
-      <span key={this.props.input.id + nodeId}>
+      <span key={input.id + nodeId}>
         <LinkToNode nodeId={nodeId} />
         <br />
         {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
@@ -197,22 +199,27 @@ const InputThroughput = createReactClass({
 
   _toggleShowDetails(evt) {
     evt.preventDefault();
-    this.setState({ showDetails: !this.state.showDetails });
+    const { showDetails } = this.state;
+
+    this.setState({ showDetails: !showDetails });
   },
 
   render() {
-    if (!this.state.metrics) {
+    const { metrics, showDetails } = this.state;
+    const { input } = this.props;
+
+    if (!metrics) {
       return <Spinner />;
     }
-    const metrics = this._calculateMetrics(this.state.metrics);
-    const incomingMessages = metrics[this._prefix('incomingMessages')];
-    const emptyMessages = metrics[this._prefix('emptyMessages')];
-    const openConnections = metrics[this._prefix('open_connections')];
-    const totalConnections = metrics[this._prefix('total_connections')];
-    const writtenBytes1Sec = metrics[this._prefix('written_bytes_1sec')];
-    const writtenBytesTotal = metrics[this._prefix('written_bytes_total')];
-    const readBytes1Sec = metrics[this._prefix('read_bytes_1sec')];
-    const readBytesTotal = metrics[this._prefix('read_bytes_total')];
+    const calculatedMetrics = this._calculateMetrics(metrics);
+    const incomingMessages = calculatedMetrics[this._prefix('incomingMessages')];
+    const emptyMessages = calculatedMetrics[this._prefix('emptyMessages')];
+    const openConnections = calculatedMetrics[this._prefix('open_connections')];
+    const totalConnections = calculatedMetrics[this._prefix('total_connections')];
+    const writtenBytes1Sec = calculatedMetrics[this._prefix('written_bytes_1sec')];
+    const writtenBytesTotal = calculatedMetrics[this._prefix('written_bytes_total')];
+    const readBytes1Sec = calculatedMetrics[this._prefix('read_bytes_1sec')];
+    const readBytesTotal = calculatedMetrics[this._prefix('read_bytes_total')];
     return (
       <div className="graylog-input-metrics">
         <h3>Throughput / Metrics</h3>
@@ -222,8 +229,9 @@ const InputThroughput = createReactClass({
           {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
           {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
           {!isNaN(emptyMessages) && <span>Empty messages discarded: {this._formatCount(emptyMessages)}<br /></span>}
-          {!isNaN(writtenBytes1Sec) && this.props.input.global && <a href="" onClick={this._toggleShowDetails}>{this.state.showDetails ? 'Hide' : 'Show'} details</a>}
-          {!isNaN(writtenBytes1Sec) && this.state.showDetails && this._formatAllNodeDetails(this.state.metrics)}
+          { /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+          {!isNaN(writtenBytes1Sec) && input.global && <a href="" onClick={this._toggleShowDetails}>{showDetails ? 'Hide' : 'Show'} details</a>}
+          {!isNaN(writtenBytes1Sec) && showDetails && this._formatAllNodeDetails(metrics)}
         </span>
       </div>
     );

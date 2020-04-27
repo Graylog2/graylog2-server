@@ -4,6 +4,8 @@ import 'opensans-npm-webfont/open_sans.css';
 import 'opensans-npm-webfont/open_sans_italic.css';
 import 'opensans-npm-webfont/open_sans_bold.css';
 
+import { util } from 'theme';
+
 const fontFamily = '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
 
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
@@ -112,11 +114,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.color.global.contentBackground};
     border: 1px solid ${theme.color.gray[80]};
     margin-bottom: 10px;
-  }
 
-  .content p.description {
-    margin-top: 3px;
-    color: ${theme.color.gray[50]};
+    p.description {
+      margin-top: 3px;
+      color: ${theme.color.gray[50]};
+    }
   }
 
   .actions-lg .actions-container {
@@ -177,7 +179,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .master-node {
-    color: #f89406;
+    color: ${theme.color.variant.dark.warning};
   }
 
   .loglevel-metrics-row {
@@ -365,8 +367,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .sources th {
-    background-color: #333;
-    color: ${theme.color.global.textAlt};
+    background-color: ${theme.color.gray[20]};
+    color: ${util.readableColor(theme.color.gray[20])};
     font-weight: normal;
   }
 
@@ -376,8 +378,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .parse-error {
-    background-color: #f2dede;
-    color: #a94442;
+    background-color: ${theme.color.variant.light.danger};
+    color: ${util.contrastingColor(theme.color.variant.light.danger)};
     padding-left: 2px;
     padding-right: 2px;
   }

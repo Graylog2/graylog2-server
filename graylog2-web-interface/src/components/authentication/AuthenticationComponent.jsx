@@ -1,27 +1,37 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
 import { Alert, Nav, NavItem, Row, Col } from 'components/graylog';
-import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
+import Routes from 'routing/Routes';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
-import AuthProvidersConfig from './AuthProvidersConfig';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.css';
+import AuthProvidersConfig from './AuthProvidersConfig';
 
 const AuthenticationActions = ActionsProvider.getActions('Authentication');
 const AuthenticationStore = StoreProvider.getStore('Authentication');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+
+const SubNavigationCol = styled(Col)(({ theme }) => `
+  border-right: ${theme.color.gray[80]} solid 1px;
+`);
+
+const ContentPaneCol = styled(Col)(({ theme }) => `
+  border-left: ${theme.color.gray[80]} solid 1px;
+  margin-left: -1px;
+`);
+
+const NavItemDivider = styled(NavItem)(({ theme }) => `
+  border-bottom: ${theme.color.gray[80]} solid 1px;
+`);
 
 const AuthenticationComponent = createReactClass({
   displayName: 'AuthenticationComponent',
@@ -104,7 +114,7 @@ const AuthenticationComponent = createReactClass({
         });
 
         authenticators.unshift(
-          <NavItem key="divider" disabled title="Provider Settings" className={AuthenticationComponentStyle.divider}>Provider Settings</NavItem>,
+          <NavItemDivider key="divider" disabled title="Provider Settings">Provider Settings</NavItemDivider>,
         );
         authenticators.unshift(
           <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
@@ -153,8 +163,8 @@ const AuthenticationComponent = createReactClass({
 
     return (
       <Row>
-        <Col md={2} className={AuthenticationComponentStyle.subnavigation}>{subnavigation}</Col>
-        <Col md={10} className={AuthenticationComponentStyle.contentpane}>{contentComponent}</Col>
+        <SubNavigationCol md={2}>{subnavigation}</SubNavigationCol>
+        <ContentPaneCol md={10}>{contentComponent}</ContentPaneCol>
       </Row>
     );
   },

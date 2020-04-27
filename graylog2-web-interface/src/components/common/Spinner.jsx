@@ -9,7 +9,7 @@ type Props = {
   delay: number,
   name?: string,
   text?: string,
-}
+};
 
 /**
  * Simple spinner to use while waiting for something to load.

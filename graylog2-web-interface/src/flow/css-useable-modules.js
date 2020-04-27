@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 type CSSModule = {
   [key: string]: string,
   use: () => void,
