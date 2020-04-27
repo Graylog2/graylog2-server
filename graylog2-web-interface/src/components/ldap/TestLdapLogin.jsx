@@ -1,14 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import createReactClass from 'create-react-class';
 
 import { Row, Col, Panel, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LdapActions = ActionsProvider.getActions('Ldap');
@@ -33,35 +30,35 @@ const StatusIcon = styled(Icon)(({ status, theme }) => `
   color: ${theme.color.varant[status]};
 `);
 
-const TestLdapLogin = createReactClass({
-  displayName: 'TestLdapLogin',
 
-  propTypes: {
+class TestLdapLogin extends React.Component {
+  static propTypes = {
     ldapSettings: PropTypes.object.isRequired,
     disabled: PropTypes.bool,
-  },
+  }
 
-  getDefaultProps() {
-    return {
-      disabled: false,
-    };
-  },
+  static defaultProps = {
+    disabled: false,
+  }
 
-  getInitialState() {
-    return {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       loginUser: '',
       loginPassword: '',
       loginStatus: {},
     };
-  },
+  }
 
+  // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { ldapSettings } = this.props;
     // Reset login status if ldapSettings changed
     if (JSON.stringify(ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
       this.setState({ loginStatus: {} });
     }
-  },
+  }
 
   _changeLoginForm(event) {
     const newState = {};
@@ -69,13 +66,7 @@ const TestLdapLogin = createReactClass({
     newState[key] = event.target.value;
     newState.loginStatus = {};
     this.setState(newState);
-  },
-
-  _disableSubmitOnEnter(event) {
-    if (event.key && event.key === 'Enter') {
-      event.preventDefault();
-    }
-  },
+  }
 
   _testLogin() {
     const { loginUser, loginPassword } = this.state;
@@ -104,14 +95,14 @@ const TestLdapLogin = createReactClass({
       );
 
     this.setState({ loginStatus: { loading: true } });
-  },
+  }
 
   _loginTestButtonStyle() {
     const { loginStatus } = this.state;
     const successStyle = loginStatus.success ? 'success' : 'info';
 
     return loginStatus.error ? 'danger' : successStyle;
-  },
+  }
 
   _formatLoginStatus(loginStatus) {
     // Don't show any status if login didn't complete
@@ -175,12 +166,18 @@ const TestLdapLogin = createReactClass({
         </Col>
       </Row>
     );
-  },
+  }
 
   render() {
     const { loginStatus, loginUser, testLoginPassword } = this.state;
     const { disabled } = this.props;
     const loginDisabled = disabled || !loginUser || loginStatus.loading;
+
+    const _disableSubmitOnEnter = (event) => {
+      if (event.key && event.key === 'Enter') {
+        event.preventDefault();
+      }
+    };
 
     return (
       <div>
@@ -197,7 +194,7 @@ const TestLdapLogin = createReactClass({
                      className="form-control"
                      value={loginUser}
                      onChange={this._changeLoginForm}
-                     onKeyPress={this._disableSubmitOnEnter}
+                     onKeyPress={_disableSubmitOnEnter}
                      placeholder="Username for login test"
                      disabled={disabled} />
             </Col>
@@ -208,7 +205,7 @@ const TestLdapLogin = createReactClass({
                      className="form-control"
                      value={testLoginPassword}
                      onChange={this._changeLoginForm}
-                     onKeyPress={this._disableSubmitOnEnter}
+                     onKeyPress={_disableSubmitOnEnter}
                      placeholder="Password"
                      disabled={disabled} />
             </Col>
@@ -224,7 +221,8 @@ const TestLdapLogin = createReactClass({
         {this._formatLoginStatus(loginStatus)}
       </div>
     );
-  },
-});
+  }
+}
+
 
 export default TestLdapLogin;
