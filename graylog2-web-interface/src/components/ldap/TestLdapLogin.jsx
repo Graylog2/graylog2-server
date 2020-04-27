@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Row, Col, Panel, Button } from 'components/graylog';
@@ -40,6 +41,12 @@ const TestLdapLogin = createReactClass({
     disabled: PropTypes.bool,
   },
 
+  getDefaultProps() {
+    return {
+      disabled: false,
+    };
+  },
+
   getInitialState() {
     return {
       loginUser: '',
@@ -48,9 +55,10 @@ const TestLdapLogin = createReactClass({
     };
   },
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { ldapSettings } = this.props;
     // Reset login status if ldapSettings changed
-    if (JSON.stringify(this.props.ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
+    if (JSON.stringify(ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
       this.setState({ loginStatus: {} });
     }
   },
@@ -70,7 +78,10 @@ const TestLdapLogin = createReactClass({
   },
 
   _testLogin() {
-    LdapActions.testLogin.triggerPromise(this.props.ldapSettings, this.state.loginUser, this.state.loginPassword)
+    const { loginUser, loginPassword } = this.state;
+    const { ldapSettings } = this.props;
+
+    LdapActions.testLogin.triggerPromise(ldapSettings, loginUser, loginPassword)
       .then(
         (result) => {
           if (result.connected && (result.login_authenticated || !ObjectUtils.isEmpty(result.entry))) {
@@ -96,14 +107,10 @@ const TestLdapLogin = createReactClass({
   },
 
   _loginTestButtonStyle() {
-    if (this.state.loginStatus.success) {
-      return 'success';
-    }
-    if (this.state.loginStatus.error) {
-      return 'danger';
-    }
+    const { loginStatus } = this.state;
+    const successStyle = loginStatus.success ? 'success' : 'info';
 
-    return 'info';
+    return loginStatus.error ? 'danger' : successStyle;
   },
 
   _formatLoginStatus(loginStatus) {
@@ -112,6 +119,7 @@ const TestLdapLogin = createReactClass({
       return null;
     }
 
+    const { loginPassword } = this.state;
     const title = `Connection ${loginStatus.error ? 'failed' : 'successful'}`;
     const style = loginStatus.error ? 'danger' : 'success';
 
@@ -125,7 +133,7 @@ const TestLdapLogin = createReactClass({
     let loginCheck;
     if (loginStatus.result.login_authenticated) {
       loginCheck = <StatusIcon status="success" name="check" />;
-    } else if (this.state.loginPassword === '') {
+    } else if (loginPassword === '') {
       loginCheck = <StatusIcon status="info" name="question" />;
     } else {
       loginCheck = <StatusIcon status="danger" name="times" />;
@@ -170,8 +178,9 @@ const TestLdapLogin = createReactClass({
   },
 
   render() {
-    const { loginStatus } = this.state;
-    const loginDisabled = this.props.disabled || !this.state.loginUser || loginStatus.loading;
+    const { loginStatus, loginUser, testLoginPassword } = this.state;
+    const { disabled } = this.props;
+    const loginDisabled = disabled || !loginUser || loginStatus.loading;
 
     return (
       <div>
@@ -186,22 +195,22 @@ const TestLdapLogin = createReactClass({
                      id="test_login_username"
                      name="test_login_username"
                      className="form-control"
-                     value={this.state.loginUser}
+                     value={loginUser}
                      onChange={this._changeLoginForm}
                      onKeyPress={this._disableSubmitOnEnter}
                      placeholder="Username for login test"
-                     disabled={this.props.disabled} />
+                     disabled={disabled} />
             </Col>
             <Col sm={5}>
               <input type="password"
                      id="test_login_password"
                      name="test_login_password"
                      className="form-control"
-                     value={this.state.testLoginPassword}
+                     value={testLoginPassword}
                      onChange={this._changeLoginForm}
                      onKeyPress={this._disableSubmitOnEnter}
                      placeholder="Password"
-                     disabled={this.props.disabled} />
+                     disabled={disabled} />
             </Col>
             <Col sm={2}>
               <Button bsStyle={this._loginTestButtonStyle()}
