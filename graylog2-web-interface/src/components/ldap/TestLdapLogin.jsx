@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 import createReactClass from 'create-react-class';
 
 import { Row, Col, Panel, Button } from 'components/graylog';
@@ -10,6 +11,26 @@ import ObjectUtils from 'util/ObjectUtils';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LdapActions = ActionsProvider.getActions('Ldap');
+
+const LoginResultPanel = styled(Panel)`
+  h4 {
+    margin-bottom: 10px;
+  }
+
+  .login-status {
+    padding: 0;
+    margin-bottom: 10px;
+  }
+
+  .login-status li {
+    display: inline-block;
+    margin-right: 20px;
+  }
+`;
+
+const StatusIcon = styled(Icon)(({ status, theme }) => `
+  color: ${theme.color.varant[status]};
+`);
 
 const TestLdapLogin = createReactClass({
   displayName: 'TestLdapLogin',
@@ -27,22 +48,12 @@ const TestLdapLogin = createReactClass({
     };
   },
 
-  componentDidMount() {
-    this.style.use();
-  },
-
   componentWillReceiveProps(nextProps) {
     // Reset login status if ldapSettings changed
     if (JSON.stringify(this.props.ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
       this.setState({ loginStatus: {} });
     }
   },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!./TestLdapLogin.css'),
 
   _changeLoginForm(event) {
     const newState = {};
@@ -106,18 +117,18 @@ const TestLdapLogin = createReactClass({
 
     let userFound;
     if (ObjectUtils.isEmpty(loginStatus.result.entry)) {
-      userFound = <Icon name="times" className="ldap-failure" />;
+      userFound = <StatusIcon status="danger" name="times" />;
     } else {
-      userFound = <Icon name="check" className="ldap-success" />;
+      userFound = <StatusIcon status="success" name="check" />;
     }
 
     let loginCheck;
     if (loginStatus.result.login_authenticated) {
-      loginCheck = <Icon name="check" className="ldap-success" />;
+      loginCheck = <StatusIcon status="success" name="check" />;
     } else if (this.state.loginPassword === '') {
-      loginCheck = <Icon name="question" className="ldap-info" />;
+      loginCheck = <StatusIcon status="info" name="question" />;
     } else {
-      loginCheck = <Icon name="times" className="ldap-failure" />;
+      loginCheck = <StatusIcon status="danger" name="times" />;
     }
 
     let serverResponse;
@@ -141,18 +152,18 @@ const TestLdapLogin = createReactClass({
     return (
       <Row>
         <Col sm={9} smOffset={3}>
-          <Panel header={title} bsStyle={style} className="ldap-test-login-result">
+          <LoginResultPanel header={title} bsStyle={style}>
             <ul className="login-status">
               <li><h4>User found {userFound}</h4></li>
               <li><h4>Login attempt {loginCheck}</h4></li>
             </ul>
             {serverResponse && <h4>Server response</h4>}
             {serverResponse}
-            <h4>User's LDAP attributes</h4>
+            <h4>User&apos;s LDAP attributes</h4>
             {formattedEntry}
-            <h4>User's LDAP groups</h4>
+            <h4>User&apos;s LDAP groups</h4>
             {formattedGroups}
-          </Panel>
+          </LoginResultPanel>
         </Col>
       </Row>
     );
