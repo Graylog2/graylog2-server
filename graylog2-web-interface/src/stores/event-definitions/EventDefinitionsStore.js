@@ -105,7 +105,7 @@ const EventDefinitionsStore = Reflux.createStore({
   },
 
   get(eventDefinitionId) {
-    const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId] }));
+    const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
     promise.catch((error) => {
       if (error.status === 404) {
         UserNotification.error(`Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
@@ -120,8 +120,20 @@ const EventDefinitionsStore = Reflux.createStore({
     return { ...eventDefinition, alert: isAlert };
   },
 
-  create(eventDefinition) {
-    const promise = fetch('POST', this.eventDefinitionsUrl({}), this.setAlertFlag(eventDefinition));
+  extractSchedulerInfo(eventDefinition) {
+    // Removes the internal "_is_scheduled" field from the event definition data. We only use this to pass-through
+    // the flag from the form.
+    const clonedEventDefinition = lodash.cloneDeep(eventDefinition);
+    // eslint-disable-next-line camelcase
+    const { _is_scheduled } = lodash.pick(clonedEventDefinition.config, ['_is_scheduled']);
+    clonedEventDefinition.config = lodash.omit(clonedEventDefinition.config, ['_is_scheduled']);
+
+    return { eventDefinition: clonedEventDefinition, isScheduled: lodash.defaultTo(_is_scheduled, true) };
+  },
+
+  create(newEventDefinition) {
+    const { eventDefinition, isScheduled } = this.extractSchedulerInfo(newEventDefinition);
+    const promise = fetch('POST', this.eventDefinitionsUrl({ query: { schedule: isScheduled } }), this.setAlertFlag(eventDefinition));
     promise.then(
       (response) => {
         UserNotification.success('Event Definition created successfully',
@@ -139,8 +151,9 @@ const EventDefinitionsStore = Reflux.createStore({
     EventDefinitionsActions.create.promise(promise);
   },
 
-  update(eventDefinitionId, eventDefinition) {
-    const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId] }),
+  update(eventDefinitionId, updatedEventDefinition) {
+    const { eventDefinition, isScheduled } = this.extractSchedulerInfo(updatedEventDefinition);
+    const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId], query: { schedule: isScheduled } }),
       this.setAlertFlag(eventDefinition));
     promise.then(
       (response) => {

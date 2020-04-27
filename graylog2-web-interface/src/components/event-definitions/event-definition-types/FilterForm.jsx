@@ -295,6 +295,13 @@ class FilterForm extends React.Component {
             <HelpBlock>{lodash.get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
           )}
         </FormGroup>
+        <Input id="schedule-checkbox"
+               type="checkbox"
+               name="_is_scheduled"
+               label="Enable scheduling"
+               help="Whether scheduling for this event definition should be enabled?"
+               checked={lodash.defaultTo(eventDefinition.config._is_scheduled, true)}
+               onChange={this.handleConfigChange} />
       </fieldset>
     );
   }
