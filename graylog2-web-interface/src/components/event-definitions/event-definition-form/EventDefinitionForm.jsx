@@ -13,7 +13,7 @@ import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
-const NavStyles = styled(Nav)(({ theme }) => `
+const StyledNav = styled(Nav)(({ theme }) => `
   &.nav {
     > li {
       border: 1px solid ${theme.color.gray[80]};
@@ -221,7 +221,7 @@ class EventDefinitionForm extends React.Component {
                   onStepChange={this.handleStepChange}
                   horizontal
                   justified
-                  NavigationComponent={NavStyles}
+                  NavigationComponent={StyledNav}
                   containerClassName=""
                   hidePreviousNextButtons />
           {this.renderButtons(activeStep)}
