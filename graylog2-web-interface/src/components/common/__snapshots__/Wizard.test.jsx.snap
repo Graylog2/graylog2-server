@@ -392,7 +392,6 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   hidePreviousNextButtons={false}
   horizontal={true}
   justified={false}
-  navigationClassName=""
   onStepChange={[Function]}
   steps={
     Array [
@@ -635,14 +634,12 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
           <Nav
             activeKey="Key1"
             bsStyle="pills"
-            className=""
             justified={false}
             onSelect={[Function]}
           >
             <StyledComponent
               activeKey="Key1"
               bsStyle="pills"
-              className=""
               forwardedComponent={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -1188,7 +1185,6 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   hidePreviousNextButtons={false}
   horizontal={true}
   justified={false}
-  navigationClassName=""
   onStepChange={[Function]}
   steps={
     Array [
@@ -1431,14 +1427,12 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
           <Nav
             activeKey="Key1"
             bsStyle="pills"
-            className=""
             justified={false}
             onSelect={[Function]}
           >
             <StyledComponent
               activeKey="Key1"
               bsStyle="pills"
-              className=""
               forwardedComponent={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -1997,7 +1991,6 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   hidePreviousNextButtons={false}
   horizontal={false}
   justified={false}
-  navigationClassName=""
   onStepChange={[Function]}
   steps={
     Array [
@@ -2045,7 +2038,6 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
           <Nav
             activeKey="Key1"
             bsStyle="pills"
-            className=""
             justified={false}
             onSelect={[Function]}
             stacked={true}
@@ -2053,7 +2045,6 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
             <StyledComponent
               activeKey="Key1"
               bsStyle="pills"
-              className=""
               forwardedComponent={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),
@@ -2782,7 +2773,6 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   hidePreviousNextButtons={false}
   horizontal={false}
   justified={false}
-  navigationClassName=""
   onStepChange={[Function]}
   steps={
     Array [
@@ -2830,7 +2820,6 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
           <Nav
             activeKey="Key1"
             bsStyle="pills"
-            className=""
             justified={false}
             onSelect={[Function]}
             stacked={true}
@@ -2838,7 +2827,6 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
             <StyledComponent
               activeKey="Key1"
               bsStyle="pills"
-              className=""
               forwardedComponent={
                 Object {
                   "$$typeof": Symbol(react.forward_ref),

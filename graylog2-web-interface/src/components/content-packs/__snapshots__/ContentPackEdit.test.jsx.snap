@@ -58,7 +58,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
       hidePreviousNextButtons={false}
       horizontal={false}
       justified={false}
-      navigationClassName=""
       onStepChange={[Function]}
       steps={
         Array [
@@ -154,7 +153,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
               <Nav
                 activeKey="selection"
                 bsStyle="pills"
-                className=""
                 justified={false}
                 onSelect={[Function]}
                 stacked={true}
@@ -162,7 +160,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                 <StyledComponent
                   activeKey="selection"
                   bsStyle="pills"
-                  className=""
                   forwardedComponent={
                     Object {
                       "$$typeof": Symbol(react.forward_ref),
@@ -2301,7 +2298,6 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
       hidePreviousNextButtons={false}
       horizontal={false}
       justified={false}
-      navigationClassName=""
       onStepChange={[Function]}
       steps={
         Array [
@@ -2491,7 +2487,6 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
               <Nav
                 activeKey="selection"
                 bsStyle="pills"
-                className=""
                 justified={false}
                 onSelect={[Function]}
                 stacked={true}
@@ -2499,7 +2494,6 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                 <StyledComponent
                   activeKey="selection"
                   bsStyle="pills"
-                  className=""
                   forwardedComponent={
                     Object {
                       "$$typeof": Symbol(react.forward_ref),
