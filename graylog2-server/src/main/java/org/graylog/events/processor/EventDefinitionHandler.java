@@ -67,7 +67,7 @@ public class EventDefinitionHandler {
         final EventDefinitionDto eventDefinition = createEventDefinition(unsavedEventDefinition);
 
         try {
-            createJobDefinitionAndTriggerIfScheduled(eventDefinition);
+            createJobDefinitionAndTriggerIfScheduledType(eventDefinition);
         } catch (Exception e) {
             // Cleanup if anything goes wrong
             LOG.error("Removing event definition <{}/{}> because of an error creating the job definition",
@@ -97,14 +97,22 @@ public class EventDefinitionHandler {
      * @param updatedEventDefinition the event definition to update
      * @return the updated event definition
      */
-    public EventDefinitionDto update(EventDefinitionDto updatedEventDefinition) {
+    public EventDefinitionDto update(EventDefinitionDto updatedEventDefinition, boolean schedule) {
         // Grab the old record so we can revert to it if something goes wrong
         final Optional<EventDefinitionDto> oldEventDefinition = eventDefinitionService.get(updatedEventDefinition.id());
 
         final EventDefinitionDto eventDefinition = updateEventDefinition(updatedEventDefinition);
 
         try {
-            updateJobDefinitionAndTriggerIfScheduled(eventDefinition);
+            if (schedule) {
+                if (getJobDefinition(eventDefinition).isPresent()) {
+                    updateJobDefinitionAndTriggerIfScheduledType(eventDefinition);
+                } else {
+                    createJobDefinitionAndTriggerIfScheduledType(eventDefinition);
+                }
+            } else {
+                unschedule(eventDefinition.id());
+            }
         } catch (Exception e) {
             // Cleanup if anything goes wrong
             LOG.error("Reverting to old event definition <{}/{}> because of an error updating the job definition",
@@ -145,7 +153,7 @@ public class EventDefinitionHandler {
     public void schedule(String eventDefinitionId) {
         final EventDefinitionDto eventDefinition = getEventDefinitionOrThrowIAE(eventDefinitionId);
 
-        createJobDefinitionAndTriggerIfScheduled(eventDefinition);
+        createJobDefinitionAndTriggerIfScheduledType(eventDefinition);
     }
 
     /**
@@ -208,7 +216,7 @@ public class EventDefinitionHandler {
         }
     }
 
-    private void createJobDefinitionAndTriggerIfScheduled(EventDefinitionDto eventDefinition) {
+    private void createJobDefinitionAndTriggerIfScheduledType(EventDefinitionDto eventDefinition) {
         getJobSchedulerConfig(eventDefinition)
                 .ifPresent(schedulerConfig -> createJobDefinitionAndTrigger(eventDefinition, schedulerConfig));
     }
@@ -258,7 +266,7 @@ public class EventDefinitionHandler {
         }
     }
 
-    private void updateJobDefinitionAndTriggerIfScheduled(EventDefinitionDto eventDefinition) {
+    private void updateJobDefinitionAndTriggerIfScheduledType(EventDefinitionDto eventDefinition) {
         getJobSchedulerConfig(eventDefinition)
                 .ifPresent(schedulerConfig -> updateJobDefinitionAndTrigger(eventDefinition, schedulerConfig));
     }

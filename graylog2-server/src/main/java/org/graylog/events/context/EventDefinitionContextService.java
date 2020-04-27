@@ -31,6 +31,7 @@ import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,6 +50,11 @@ public class EventDefinitionContextService {
 
     public ImmutableMap<String, Object> contextFor(List<EventDefinitionDto> eventDefinitions) {
         return ImmutableMap.of("scheduler", schedulerContext(eventDefinitions));
+    }
+
+    public ImmutableMap<String, Object> contextFor(EventDefinitionDto eventDefinition) {
+        final ImmutableMap<String, SchedulerCtx> schedulerContext = schedulerContext(Collections.singletonList(eventDefinition));
+        return ImmutableMap.of("scheduler", schedulerContext.get(eventDefinition.id()));
     }
 
     private Map<String, List<JobDefinitionDto>> getJobDefinitions(List<EventDefinitionDto> eventDefinitions) {
