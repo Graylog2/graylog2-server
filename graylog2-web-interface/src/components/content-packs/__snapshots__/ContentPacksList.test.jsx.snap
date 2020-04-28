@@ -963,7 +963,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
                           "isStatic": false,
-                          "lastClassName": "hwtGMv",
+                          "lastClassName": "cNtVlO",
                           "rules": Array [
                             [Function],
                           ],
@@ -993,13 +993,13 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     forwardedRef={null}
                   >
                     <ForwardRef
-                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv"
+                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                     >
                       <ListGroupItem__StyledListGroupItem
-                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv"
+                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                       >
                         <StyledComponent
-                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv"
+                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                           forwardedComponent={
                             Object {
                               "$$typeof": Symbol(react.forward_ref),
@@ -1032,11 +1032,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
                             >
                               <ControlledTableListHeader__HeaderWrapper>
                                 <StyledComponent
@@ -1183,7 +1183,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eSaHWj",
+                                                        "lastClassName": "bvWguH",
                                                         "rules": Array [
                                                           [Function],
                                                           [Function],
@@ -1206,12 +1206,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge"
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eSaHWj"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bvWguH"
                                                     pullRight={false}
                                                     status="installed"
                                                   >
                                                     <span
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eSaHWj badge"
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bvWguH badge"
                                                       status="installed"
                                                     >
                                                       installed
@@ -2015,7 +2015,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eSaHWj",
+                                                        "lastClassName": "bvWguH",
                                                         "rules": Array [
                                                           [Function],
                                                           [Function],
@@ -2038,12 +2038,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge"
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eSaHWj"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bvWguH"
                                                     pullRight={false}
                                                     status="installed"
                                                   >
                                                     <span
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eSaHWj badge"
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bvWguH badge"
                                                       status="installed"
                                                     >
                                                       installed
