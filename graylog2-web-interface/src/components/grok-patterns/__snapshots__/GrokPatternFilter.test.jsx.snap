@@ -157,7 +157,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
                             "isStatic": false,
-                            "lastClassName": "fcGLmv",
+                            "lastClassName": "ibEGYG",
                             "rules": Array [
                               [Function],
                             ],
@@ -185,7 +185,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                       <FormControl
                         autoComplete="off"
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 fcGLmv"
+                        className="FormControl-sc-1amoaox-0 ibEGYG"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Filter pattern"
@@ -198,7 +198,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                       >
                         <input
                           autoComplete="off"
-                          className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                          className="FormControl-sc-1amoaox-0 ibEGYG form-control"
                           id="pattern-selector"
                           label="Filter pattern"
                           name="pattern-selector"
@@ -253,7 +253,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   "componentStyle": ComponentStyle {
                     "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                     "isStatic": false,
-                    "lastClassName": "kRfOAP",
+                    "lastClassName": "bgAGM",
                     "rules": Array [
                       [Function],
                     ],
@@ -275,14 +275,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
             >
               <ListGroupItem
                 bsClass="list-group-item"
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
                 header="COMMONMAC"
                 id="list-item-0"
                 listItem={false}
                 onKeyDown={[Function]}
               >
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
                   id="list-item-0"
                   onKeyDown={[Function]}
                 >
@@ -408,7 +408,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   "componentStyle": ComponentStyle {
                     "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                     "isStatic": false,
-                    "lastClassName": "kRfOAP",
+                    "lastClassName": "bgAGM",
                     "rules": Array [
                       [Function],
                     ],
@@ -430,14 +430,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
             >
               <ListGroupItem
                 bsClass="list-group-item"
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
                 header="DATA"
                 id="list-item-1"
                 listItem={false}
                 onKeyDown={[Function]}
               >
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
                   id="list-item-1"
                   onKeyDown={[Function]}
                 >
@@ -563,7 +563,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   "componentStyle": ComponentStyle {
                     "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                     "isStatic": false,
-                    "lastClassName": "kRfOAP",
+                    "lastClassName": "bgAGM",
                     "rules": Array [
                       [Function],
                     ],
@@ -585,14 +585,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
             >
               <ListGroupItem
                 bsClass="list-group-item"
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
                 header="DATE"
                 id="list-item-2"
                 listItem={false}
                 onKeyDown={[Function]}
               >
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
                   id="list-item-2"
                   onKeyDown={[Function]}
                 >
@@ -841,7 +841,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
                             "isStatic": false,
-                            "lastClassName": "fcGLmv",
+                            "lastClassName": "ibEGYG",
                             "rules": Array [
                               [Function],
                             ],
@@ -869,7 +869,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                       <FormControl
                         autoComplete="off"
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 fcGLmv"
+                        className="FormControl-sc-1amoaox-0 ibEGYG"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Filter pattern"
@@ -882,7 +882,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                       >
                         <input
                           autoComplete="off"
-                          className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                          className="FormControl-sc-1amoaox-0 ibEGYG form-control"
                           id="pattern-selector"
                           label="Filter pattern"
                           name="pattern-selector"

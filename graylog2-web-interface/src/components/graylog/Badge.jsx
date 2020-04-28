@@ -26,3 +26,4 @@ const Badge = forwardRef(({ ...props }, ref) => {
 });
 
 export default Badge;
+export { StyledBadge };

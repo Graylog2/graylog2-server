@@ -7,11 +7,11 @@ const brand = {
 };
 
 const global = {
-  textDefault: '#1f1f1f',
-  textAlt: '#fff',
   background: '#e8e8e8',
   contentBackground: '#fff',
   link: '#702785',
+  textAlt: '#fff',
+  textDefault: '#1f1f1f',
 };
 
 global.linkHover = chroma(global.link).darken(1).hex();
@@ -36,9 +36,14 @@ const variantLight = {};
 const variantDark = {};
 
 Object.keys(variant).forEach((name) => {
-  variantLight[name] = chroma(variant[name]).brighten(1).hex();
-  variantDark[name] = chroma(variant[name]).darken(1.5).hex();
+  variantLight[name] = chroma.mix(variant[name], gray[100], 0.5).hex();
+  variantDark[name] = chroma.mix(variant[name], gray[10], 0.75).hex();
 });
+
+/* eslint-disable prefer-destructuring */
+global.tableBackground = gray[100];
+global.tableBackgroundAlt = gray[80];
+/* eslint-enable prefer-destructuring */
 
 const teinte = {
   brand,
