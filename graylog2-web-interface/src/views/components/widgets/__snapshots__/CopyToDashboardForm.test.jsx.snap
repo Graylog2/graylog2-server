@@ -91,7 +91,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fcGLmv form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 ibEGYG form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -309,7 +309,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fcGLmv form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 ibEGYG form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -340,7 +340,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               class="list-group"
             >
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
                 type="button"
               >
                 <h4
@@ -353,7 +353,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 />
               </button>
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
                 type="button"
               >
                 <h4
