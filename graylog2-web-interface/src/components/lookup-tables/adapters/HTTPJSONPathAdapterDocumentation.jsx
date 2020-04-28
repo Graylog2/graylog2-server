@@ -108,6 +108,18 @@ end`;
         contact details so owners of the services you query know whom to contact if issues arise.
         (like excessive API requests from your Graylog cluster)
       </p>
+      <h5 style={{ marginBottom: 10}}>HTTP Method</h5>
+      <p style={{ marginBottom: 10, padding: 0 }}>
+        This is the <em>HTTP Method</em> used to send the HTTP requests. When using <em>POST</em> you can optionally
+        send a body.
+      </p>
+
+      <h5 style={{ marginBottom: 10}}>HTTP Body</h5>
+      <p style={{ marginBottom: 10, padding: 0 }}>
+        When using <em>POST</em> HTTP Method, this will be the body in the HTTP requests. Like in the <em>URL</em>
+        you can use <code>{'${key}'}</code> to replace it with by the actual key that is passed to a
+        lookup function.
+      </p>
 
       <hr />
 

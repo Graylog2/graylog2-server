@@ -40,6 +40,7 @@ import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.dto.DataAdapterDto;
@@ -65,6 +66,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,6 +90,10 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     private JsonPath singleJsonPath = null;
     private JsonPath multiJsonPath = null;
     private Headers headers;
+
+    enum HttpMethod {
+        GET, POST
+    }
 
     @Inject
     protected HTTPJSONPathDataAdapter(@Assisted("dto") DataAdapterDto dto, Engine templateEngine, OkHttpClient httpClient, UrlWhitelistService urlWhitelistService,
@@ -178,11 +184,20 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
             return getErrorResult();
         }
 
-        final Request request = new Request.Builder()
+        Request.Builder requestBuilder = new Request.Builder()
                 .get()
                 .url(url)
-                .headers(headers)
-                .build();
+                .headers(headers);
+
+        if (config.method().toUpperCase(Locale.ENGLISH).equals(HttpMethod.POST.name().toUpperCase(Locale.ENGLISH))) {
+            String bodyString = "";
+            if (config.body() != null) {
+                bodyString = templateEngine.transform(config.body(), ImmutableMap.of("key", String.valueOf(key)));
+            }
+            requestBuilder.post(RequestBody.create(null, bodyString));
+        }
+
+        final Request request = requestBuilder.build();
 
         final Timer.Context time = httpRequestTimer.time();
         try (final Response response = httpClient.newCall(request).execute()) {
@@ -288,6 +303,8 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                     .singleValueJSONPath("$.value")
                     .userAgent("Graylog Lookup - https://www.graylog.org/")
                     .headers(Collections.emptyMap())
+                    .method(HttpMethod.GET.name().toUpperCase(Locale.ENGLISH))
+                    .body("")
                     .build();
         }
     }
@@ -321,6 +338,13 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         @JsonProperty("headers")
         @Nullable
         public abstract Map<String, String> headers();
+
+        @JsonProperty("method")
+        public abstract String method();
+
+        @JsonProperty("body")
+        @Nullable
+        public abstract String body();
 
         public static Builder builder() {
             return new AutoValue_HTTPJSONPathDataAdapter_Config.Builder();
@@ -374,6 +398,12 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
 
             @JsonProperty("headers")
             public abstract Builder headers(Map<String, String> headers);
+
+            @JsonProperty("method")
+            public abstract Builder method(String method);
+
+            @JsonProperty("body")
+            public abstract Builder body(String body);
 
             public abstract Config build();
         }

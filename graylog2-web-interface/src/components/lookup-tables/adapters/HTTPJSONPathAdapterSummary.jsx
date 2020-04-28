@@ -34,6 +34,10 @@ const HTTPJSONPathAdapterSummary = ({ dataAdapter }) => {
       <dd>{config.user_agent}</dd>
       <dt>HTTP Headers</dt>
       <dd><KeyValueTable pairs={config.headers || {}} /></dd>
+      <dt>HTTP Method</dt>
+      <dd>{config.method}</dd>
+      <dt>HTTP Request body</dt>
+      <dd>{config.body}</dd>
     </dl>
   );
 };

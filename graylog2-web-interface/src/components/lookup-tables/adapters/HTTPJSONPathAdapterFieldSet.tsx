@@ -51,7 +51,6 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
   onHTTPHeaderUpdate = (headers: Headers) => {
     const { config, updateConfig } = this.props;
     const configChange = ObjectUtils.clone(config);
-
     configChange.headers = headers;
     updateConfig(configChange);
   };
@@ -107,7 +106,36 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
                wrapperClassName="col-sm-9">
           <KeyValueTable pairs={config.headers || {}} editable onChange={this.onHTTPHeaderUpdate} />
         </Input>
-
+        <div className="form-group">
+          <label className="col-sm-3 control-label">HTTP Method</label>
+          <div className="col-sm9">
+            <label className="radio-inline">
+              <input type="radio"
+                     id="method"
+                     name="method"
+                     value="GET"
+                     checked={!config.method || config.method === "GET"}
+                     onChange={handleFormEvent} />
+              GET</label>
+            <label className="radio-inline">
+              <input type="radio"
+                   id="method"
+                   name="method"
+                   value="POST"
+                   checked={config.method === "POST"}
+                   onChange={handleFormEvent} />
+              POST</label>
+           </div>
+        </div>
+        <Input type="textarea"
+               id="body"
+               name="body"
+               label="HTTP Body"
+               onChange={handleFormEvent}
+               help="The HTTP body to send in the request (only when using POST method)."
+               value={config.body}
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9" />
       </fieldset>
     );
   }
