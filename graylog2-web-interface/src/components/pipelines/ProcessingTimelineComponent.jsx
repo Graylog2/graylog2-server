@@ -100,7 +100,7 @@ const ProcessingTimelineComponent = createReactClass({
         );
       } else {
         formattedStages.push(
-          <PipelineStage key={`${pipeline.id}-stage${usedStage}`} idle>Stage {usedStage}</PipelineStage>,
+          <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>Stage {usedStage}</PipelineStage>,
         );
       }
     }, this);
