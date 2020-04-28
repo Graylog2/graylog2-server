@@ -16,8 +16,8 @@ const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
 `);
 
 const panelVariantStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], 10);
-  const borderColor = util.colorLevel(theme.color.variant.light[variant], -10);
+  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], -10);
+  const borderColor = util.colorLevel(theme.color.variant.light[variant], 10);
 
   return css`
     border-color: ${borderColor};
@@ -46,6 +46,8 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
 });
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
+  background-color: ${util.colorLevel(theme.color.global.background, -4)};
+
   > ${PanelHeading} {
     .panel-title,
     .panel-title h3 {
