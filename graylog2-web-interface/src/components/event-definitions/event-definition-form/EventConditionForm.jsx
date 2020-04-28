@@ -107,7 +107,8 @@ class EventConditionForm extends React.Component {
 
         <Col md={5} lg={4} lgOffset={1}>
           <HelpPanel className={styles.conditionTypesInfo}
-                     title="Available Conditions">
+                     title="Available Conditions"
+                     bsStyle="default">
             {this.renderConditionTypeDescriptions()}
           </HelpPanel>
         </Col>

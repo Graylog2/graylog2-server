@@ -6,6 +6,8 @@ import { Icon } from 'components/common';
 
 import styles from './HelpPanel.css';
 
+const ConditionalWrapper = ({ condition, wrapper, children }) => (condition ? wrapper(children) : children);
+
 class HelpPanel extends React.Component {
   static propTypes = {
     bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary']),
@@ -32,13 +34,21 @@ class HelpPanel extends React.Component {
     const defaultHeader = (<h3><Icon name="info-circle" />&emsp;{title}</h3>);
 
     return (
-      <Panel bsStyle={bsStyle}
+      <Panel defaultExpanded={defaultExpanded}
              className={`${styles.helpPanel} ${className}`}
-             collapsible={collapsible}
-             defaultExpanded={defaultExpanded}
-             header={header || defaultHeader}>
-        {children}
+             bsStyle={bsStyle}>
+        <Panel.Heading>
+          <Panel.Title toggle={collapsible}>
+            {header || defaultHeader}
+          </Panel.Title>
+        </Panel.Heading>
+        <ConditionalWrapper condition={collapsible} wrapper={(wrapChild) => <Panel.Collapse>{wrapChild}</Panel.Collapse>}>
+          <Panel.Body>
+            {children}
+          </Panel.Body>
+        </ConditionalWrapper>
       </Panel>
+
     );
   }
 }

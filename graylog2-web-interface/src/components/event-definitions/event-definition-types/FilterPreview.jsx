@@ -60,6 +60,7 @@ class FilterPreview extends React.Component {
       <>
         <HelpPanel collapsible
                    defaultExpanded={!displayPreview}
+                   bsStyle="default"
                    title="How many Events will Filter & Aggregation create?">
           <p>
             The Filter & Aggregation Condition will generate different number of Events, depending on how it is
@@ -79,7 +80,7 @@ class FilterPreview extends React.Component {
         </HelpPanel>
 
         {displayPreview && (
-          <Panel className={styles.filterPreview} header={<h3>Filter Preview</h3>}>
+          <Panel className={styles.filterPreview} title="Filter Preview">
             {errors.length > 0 ? (
               <p className="text-danger">{errors[0].description}</p>
             ) : (

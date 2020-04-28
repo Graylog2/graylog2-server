@@ -16,21 +16,16 @@ const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
 `);
 
 const panelVariantStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], -9);
-  const borderColor = util.colorLevel(theme.color.variant.dark[variant], -10);
+  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], 10);
+  const borderColor = util.colorLevel(theme.color.variant.light[variant], -10);
 
   return css`
     border-color: ${borderColor};
 
-    & > ${PanelHeading} {
+    > ${PanelHeading} {
       color: ${util.readableColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
-
-      > .panel-title,
-      > .panel-title > * {
-        font-size: 16px;
-      }
 
       + .panel-collapse > .panel-body {
         border-top-color: ${borderColor};
@@ -42,7 +37,7 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
       }
     }
 
-    & > ${PanelFooter} {
+    > ${PanelFooter} {
       + .panel-collapse > .panel-body {
         border-bottom-color: ${borderColor};
       }
@@ -51,15 +46,22 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
 });
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
+  > ${PanelHeading} {
+    .panel-title,
+    .panel-title h3 {
+      font-size: 16px;
+    }
+  }
+
   .panel-group {
-    ${PanelHeading} {
+    > ${PanelHeading} {
       + .panel-collapse > .panel-body,
       + .panel-collapse > .list-group {
         border-top-color: ${theme.color.gray[90]};
       }
     }
 
-    ${PanelFooter} {
+    > ${PanelFooter} {
       + .panel-collapse .panel-body {
         border-bottom-color: ${theme.color.gray[90]};
       }
