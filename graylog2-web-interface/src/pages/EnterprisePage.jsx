@@ -69,13 +69,13 @@ const EnterprisePage = createReactClass({
     } else if (licenseStatus === 'installed') {
       licenseFormContent = (
         <Alert bsStyle="success">
-          You already have a Graylog Enterprise license installed.
+          You have a Graylog Enterprise license installed.
         </Alert>
       );
     } else if (licenseStatus === 'staged') {
       licenseFormContent = (
         <Alert bsStyle="warning">
-          You already requested a free Graylog Enterprise license. It will be activated once you restart the Graylog
+          You requested a free Graylog Enterprise license. It will be activated once you restart the Graylog
           server with the Graylog Enterprise plugins installed.
         </Alert>
       );
