@@ -1,8 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import { withTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
+import { type ThemeInterface } from 'theme';
+
 import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
@@ -42,10 +45,11 @@ export type ChartColor = {
 
 type Props = {
   chartData: Array<*>,
+  getChartColor?: (Array<ChartConfig>, string) => ?string,
   layout: {},
   onZoom: (string, string) => boolean,
-  getChartColor?: (Array<ChartConfig>, string) => ?string,
   setChartColor?: (ChartConfig, ColorMap) => ChartColor,
+  theme: ThemeInterface,
 };
 
 type State = {
@@ -119,7 +123,7 @@ class GenericPlot extends React.Component<Props, State> {
   _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
 
   render() {
-    const { chartData, layout, setChartColor } = this.props;
+    const { chartData, layout, setChartColor, theme } = this.props;
     const defaultLayout = {
       autosize: true,
       showlegend: true,
@@ -138,9 +142,15 @@ class GenericPlot extends React.Component<Props, State> {
       },
       yaxis: {
         automargin: true,
+        tickfont: {
+          color: theme.color.gray[50],
+        },
       },
       xaxis: {
         automargin: true,
+        tickfont: {
+          color: theme.color.gray[50],
+        },
       },
     };
     const plotLayout = merge({}, defaultLayout, layout);
@@ -207,4 +217,4 @@ class GenericPlot extends React.Component<Props, State> {
   }
 }
 
-export default GenericPlot;
+export default withTheme(GenericPlot);

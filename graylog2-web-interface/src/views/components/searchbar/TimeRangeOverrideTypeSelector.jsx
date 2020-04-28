@@ -3,8 +3,8 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useField } from 'formik';
 
-import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
-import { Icon } from 'components/common';
+import { MenuItem, ButtonToolbar } from 'components/graylog';
+import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
 import { migrateTimeRangeToNewType } from '../TimerangeForForm';
 import timeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
 
@@ -18,17 +18,14 @@ const TimeRangeOverrideTypeSelector = () => {
     },
   }), [onChange, value]);
   return (
-    <ButtonToolbar className="extended-search-timerange-chooser pull-left">
-      <DropdownButton bsStyle="info"
-                      title={<Icon name="clock" />}
-                      onSelect={onSelect}
-                      id="dropdown-timerange-selector">
+    <ButtonToolbar className="pull-left">
+      <TimeRangeDropdownButton onSelect={onSelect}>
         <MenuItem eventKey="disabled"
                   active={type === undefined}>
           No Override
         </MenuItem>
         {timeRangeTypeMenuItems(type)}
-      </DropdownButton>
+      </TimeRangeDropdownButton>
     </ButtonToolbar>
   );
 };

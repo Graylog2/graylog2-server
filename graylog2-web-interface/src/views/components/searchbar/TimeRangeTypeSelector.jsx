@@ -3,8 +3,8 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useField } from 'formik';
 
-import { ButtonToolbar, DropdownButton } from 'components/graylog';
-import { Icon } from 'components/common';
+import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
+import { ButtonToolbar } from 'components/graylog';
 
 import PropTypes from 'views/components/CustomPropTypes';
 import { migrateTimeRangeToNewType } from '../TimerangeForForm';
@@ -24,14 +24,10 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
     },
   }), [onChange, value]);
   return (
-    <ButtonToolbar className="extended-search-timerange-chooser pull-left">
-      <DropdownButton bsStyle="info"
-                      id="timerange-type"
-                      disabled={disabled}
-                      title={<Icon name="clock" />}
-                      onSelect={onSelect}>
+    <ButtonToolbar className="pull-left">
+      <TimeRangeDropdownButton disabled={disabled} onSelect={onSelect}>
         {timeRangeTypeMenuItems(currentType)}
-      </DropdownButton>
+      </TimeRangeDropdownButton>
     </ButtonToolbar>
   );
 }
