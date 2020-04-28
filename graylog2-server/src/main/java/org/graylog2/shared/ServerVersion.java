@@ -20,5 +20,5 @@ import org.graylog2.plugin.Version;
 
 public class ServerVersion {
     public static final Version VERSION = Version.CURRENT_CLASSPATH;
-    public static final String CODENAME = "Ethereal Elk";
+    public static final String CODENAME = "Sloth Rocket";
 }

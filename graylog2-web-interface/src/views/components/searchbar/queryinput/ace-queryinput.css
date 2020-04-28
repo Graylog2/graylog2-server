@@ -101,6 +101,12 @@
     color: #8E908C
 }
 
+.ace_placeholder {
+    font-size: 16px;
+    padding: 0 !important;
+    font-family: inherit !important;
+}
+
 .ace-queryinput .ace_indent-guide {
     background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bdu3f/BwAlfgctduB85QAAAABJRU5ErkJggg==) right repeat-y
 }

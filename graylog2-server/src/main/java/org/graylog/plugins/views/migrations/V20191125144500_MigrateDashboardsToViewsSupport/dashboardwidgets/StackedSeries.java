@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -33,7 +35,7 @@ public abstract class StackedSeries {
 
     @JsonCreator
     public static StackedSeries create(
-            @JsonProperty("query") String query,
+            @JsonProperty("query") @Nullable String query,
             @JsonProperty("field") String field,
             @JsonProperty("statistical_function") String statisticalFunction
     ) {

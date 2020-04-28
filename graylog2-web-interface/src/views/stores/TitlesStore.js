@@ -9,7 +9,7 @@ import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewSta
 import type { TitlesMap, TitleType } from './TitleTypes';
 
 type TitlesActionsTypes = RefluxActions<{
-  set: (string, string, string) => Promise<TitlesMap>
+  set: (string, string, string) => Promise<TitlesMap>,
 }>;
 
 export const TitlesActions: TitlesActionsTypes = singletonActions(

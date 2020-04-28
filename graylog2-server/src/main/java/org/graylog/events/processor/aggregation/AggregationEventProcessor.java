@@ -50,6 +50,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -280,7 +281,9 @@ public class AggregationEventProcessor implements EventProcessor {
             final String keyString = Strings.join(keyResult.key(), '|');
             final String eventMessage = createEventMessageString(keyString, keyResult);
 
-            final Event event = eventFactory.createEvent(eventDefinition, result.effectiveTimerange().to(), eventMessage);
+            // Extract eventTime from the key result or use query time range as fallback
+            final DateTime eventTime = keyResult.timestamp().orElse(result.effectiveTimerange().to());
+            final Event event = eventFactory.createEvent(eventDefinition, eventTime, eventMessage);
 
             // TODO: Do we have to set any other event fields here?
             event.setTimerangeStart(parameters.timerange().getFrom());

@@ -1,45 +1,14 @@
 import { createGlobalStyle, css } from 'styled-components';
 
-import openSansRegular from './fonts/OpenSans-Regular.woff';
-import openSansRegular2 from './fonts/OpenSans-Regular.woff2';
-import openSansItalic from './fonts/OpenSans-Italic.woff';
-import openSansItalic2 from './fonts/OpenSans-Italic.woff2';
-import openSansBold from './fonts/OpenSans-Bold.woff';
-import openSansBold2 from './fonts/OpenSans-Bold.woff2';
+import 'opensans-npm-webfont/open_sans.css';
+import 'opensans-npm-webfont/open_sans_italic.css';
+import 'opensans-npm-webfont/open_sans_bold.css';
+
+import { util } from 'theme';
 
 const fontFamily = '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
 
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
-  @font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Open Sans'),
-      local('OpenSans'),
-      url(${openSansRegular2}) format('woff2'),
-      url(${openSansRegular}) format('woff');
-  }
-
-  @font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 700;
-    src: local('Open Sans'),
-      local('OpenSans'),
-      url(${openSansBold2}) format('woff2'),
-      url(${openSansBold}) format('woff');
-  }
-
-  @font-face {
-    font-family: 'Open Sans';
-    font-style: italic;
-    font-weight: 400;
-    src: local('Open Sans'),
-      local('OpenSans'),
-      url(${openSansItalic2}) format('woff2'),
-      url(${openSansItalic}) format('woff');
-  }
-
   #editor {
     height: 256px;
   }
@@ -145,11 +114,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.color.global.contentBackground};
     border: 1px solid ${theme.color.gray[80]};
     margin-bottom: 10px;
-  }
 
-  .content p.description {
-    margin-top: 3px;
-    color: ${theme.color.gray[50]};
+    p.description {
+      margin-top: 3px;
+      color: ${theme.color.gray[50]};
+    }
   }
 
   .actions-lg .actions-container {
@@ -210,7 +179,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .master-node {
-    color: #f89406;
+    color: ${theme.color.variant.dark.warning};
   }
 
   .loglevel-metrics-row {
@@ -283,132 +252,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  .dashboard {
-    color: ${theme.color.global.textDefault};
-    margin: 0;
-    width: 100%;
-  }
-
-  .dashboard .widget {
-    height: inherit;
-    margin: 0;
-    padding: 20px;
-    display: grid;
-    display: -ms-grid;
-    grid-template-rows: auto minmax(10px, 1fr);
-    -ms-grid-rows: auto minmax(10px, 1fr);
-    -ms-grid-columns: 1fr;
-  }
-
-  .dashboard .widget .widget-top {
-    position: relative;
-    margin-bottom: -15px;
-    top: -5px;
-    font-size: 11px;
-    line-height: 11px;
-  }
-
-  .dashboard .widget .controls {
-    display: none;
-    position: relative;
-    left: -3px;
-  }
-
-  .dashboard .widget .reloading {
-    margin-right: 2px;
-    font-weight: bold;
-    color: ${theme.color.variant.dark.info};
-    display: none;
-  }
-
-  .dashboard .widget .loading-failed {
-    color: ${theme.color.variant.danger} !important;
-  }
-
-  .tooltip .tooltip-inner {
-    max-width: 300px;
-  }
-
-  .tooltip .tooltip-inner .datapoint-info {
-    text-align: left;
-  }
-
-  .tooltip .tooltip-inner .datapoint-info .date {
-    color: ${theme.color.gray[90]};
-  }
-
-  .dashboard .widget .dc-chart {
-    float: none;
-  }
-
-  .dashboard .widget .widget-title {
-    font-size: 18px;
-    height: 25px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .dashboard .widget .load-error {
-    color: ${theme.color.variant.danger};
-    margin-right: 5px;
-  }
-
-  .dashboard .widget .widget-update-info {
-    text-align: left;
-    float: left;
-    font-size: 11px;
-    position: absolute;
-    bottom: 10px;
-    width: 130px;
-  }
-
-  .dashboard .widget .configuration dt {
-    text-transform: capitalize;
-  }
-
-  .dashboard .widget svg {
-    overflow: hidden;
-  }
-
-  .dashboard .widget .quickvalues-graph {
-    text-align: center;
-  }
-
-  .dashboard .widget .graph.scatterplot path.line {
-    display: none;
-  }
-
-  .dashboard .widget .actions {
-    position: absolute;
-    right: 15px;
-    bottom: 10px;
-  }
-
-  .dashboard .widget .actions div {
-    display: inline-block;
-    margin-left: 5px;
-  }
-
-  .dashboard .widget .actions button {
-    padding: 0 5px 0 5px;
-  }
-
-  .dashboard .widget .not-available {
-    font-size: 70px;
-  }
-
-  .dashboard .widget .loading,
-  .dashboard .widget .not-available {
-    line-height: 100px;
-    text-align: center;
-  }
-
-  .dashboard .widget .loading .spinner,
-  .dashboard .widget .not-available .spinner {
-    vertical-align: middle;
   }
 
   .configuration-field-optional {
@@ -524,8 +367,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .sources th {
-    background-color: #333;
-    color: ${theme.color.global.textAlt};
+    background-color: ${theme.color.gray[20]};
+    color: ${util.readableColor(theme.color.gray[20])};
     font-weight: normal;
   }
 
@@ -535,8 +378,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .parse-error {
-    background-color: #f2dede;
-    color: #a94442;
+    background-color: ${theme.color.variant.light.danger};
+    color: ${util.contrastingColor(theme.color.variant.light.danger)};
     padding-left: 2px;
     padding-right: 2px;
   }
@@ -665,86 +508,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .message-loader-form input {
     margin-right: 5px;
-  }
-
-  ul.entity-list {
-    padding: 0;
-    margin: 0;
-
-    li.entity-list-item {
-      display: block;
-      padding: 15px 0;
-
-      h2 .label {
-        margin-left: 5px;
-        line-height: 2;
-        vertical-align: bottom;
-      }
-
-      .item-description {
-        min-height: 17px;
-        margin: 5px 0;
-      }
-
-      .item-actions > .btn,
-      .item-actions > .btn-group,
-      .item-actions > span > .btn {
-        margin-left: 5px;
-        margin-bottom: 5px;
-      }
-    }
-
-    li.entity-list-item:not(:last-child) {
-      border-bottom: 1px solid ${theme.color.variant.light.info};
-    }
-  }
-
-  dl.message-details {
-    margin-top: 10px;
-    margin-bottom: 0;
-  }
-
-  dl.message-details dt {
-    font-weight: bold;
-    margin-left: 1px;
-  }
-
-  dl.message-details dd {
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-    margin-left: 1px; /* Ensures that italic text is not cut */
-  }
-
-  dl.message-details-fields span:not(:last-child) dd {
-    border-bottom: 1px solid ${theme.color.gray[90]};
-  }
-
-  dl.message-details-fields dd {
-    white-space: pre-wrap;
-  }
-
-  dl.message-details-fields .field-value {
-    font-family: monospace;
-  }
-
-  dl.message-details-fields dd.message-field .field-value {
-    max-height: 500px;
-    overflow: auto;
-  }
-
-  dl.message-details dd.stream-list ul {
-    list-style-type: disc;
-    padding-left: 25px;
-  }
-
-  dl.message-details dd.stream-list ul li {
-    margin-top: 3px;
-  }
-
-  dl.message-details dd div.message-field-actions {
-    padding-left: 10px;
-    position: relative;
-    top: -10px;
   }
 
   nav.navbar-fixed-top ul.dropdown-menu li a {

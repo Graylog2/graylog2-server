@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { isFunction } from 'lodash';
 import isDeepEqual from './isDeepEqual';
 
@@ -12,6 +13,25 @@ type ExtractStoreState = <V, Store: StoreType<V>>(Store) => V;
 type ExtractComponentProps = <Props>(React.ComponentType<Props>) => Props;
 
 type ResultType<Stores> = $ObjMap<Stores, ExtractStoreState>;
+
+type PropsMapper<V, R> = (V) => R;
+
+const id = <V, R>(x: V) => {
+  // $FlowFixMe: Casting by force
+  return (x: R);
+};
+
+export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: PropsMapper<V, R> = id): R {
+  const [storeState, setStoreState] = useState(() => propsMapper(store.getInitialState()));
+  const storeStateRef = useRef(storeState);
+  useEffect(() => store.listen((newState) => {
+    if (!isDeepEqual(newState, storeStateRef.current)) {
+      setStoreState(propsMapper(newState));
+      storeStateRef.current = newState;
+    }
+  }), [store]);
+  return storeState;
+}
 
 /**
  * Generating a higher order component wrapping an ES6 React component class, connecting it to the supplied stores.
@@ -46,6 +66,7 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
 ): React.ComponentType<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
   class ConnectStoresWrapper extends React.Component<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
+    // eslint-disable-next-line react/state-in-constructor
     state: ResultType<Stores>;
 
     unsubscribes: Array<() => void>;

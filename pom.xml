@@ -27,7 +27,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.3.0-beta.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -102,13 +102,14 @@
         <gelfclient.version>1.5.0</gelfclient.version>
         <geoip2.version>2.12.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
+        <grpc.version>1.29.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>28.2-jre</guava.version>
         <guice.version>4.2.2</guice.version>
         <HdrHistogram.version>2.1.12</HdrHistogram.version>
         <hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
         <hk2.version>2.5.0-b32</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.9.10.20200103</jackson.version>
+        <jackson.version>2.9.10.20200411</jackson.version>
         <jadconfig.version>0.13.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javapoet.version>1.12.1</javapoet.version>
@@ -131,18 +132,18 @@
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
         <mongojack.version>2.10.1</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.48.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.29.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.1.49.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.30.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.6</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.5</pkts.version>
-        <protobuf.version>3.6.1</protobuf.version>
+        <protobuf.version>3.11.4</protobuf.version>
         <reflections.version>0.9.12</reflections.version>
-        <retrofit.version>2.7.2</retrofit.version>
+        <retrofit.version>2.8.1</retrofit.version>
         <scala.version>2.11.8</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>1.5.1</shiro.version>
+        <shiro.version>1.5.2</shiro.version>
         <sigar.version>1.6.4</sigar.version>
         <siv-mode.version>1.3.2</siv-mode.version>
         <slf4j.version>1.7.30</slf4j.version>
@@ -303,7 +304,7 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.8.0</version>
+                    <version>1.9.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>

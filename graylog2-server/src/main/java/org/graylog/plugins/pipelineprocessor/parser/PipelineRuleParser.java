@@ -774,12 +774,20 @@ public class PipelineRuleParser {
             final boolean rightDate = DateTime.class.equals(rightType);
             final boolean leftPeriod = Period.class.equals(leftType);
             final boolean rightPeriod = Period.class.equals(rightType);
+            final boolean leftString = String.class.equals(leftType);
+            final boolean rightString = String.class.equals(rightType);
+
             if (leftDate && rightDate) {
                 if (addExpression.isPlus()) {
                     parseContext.addError(new InvalidOperation(ctx, addExpression, "Unable to add two dates"));
                 }
                 return;
             } else if (leftDate && rightPeriod || leftPeriod && rightDate || leftPeriod && rightPeriod) {
+                return;
+            } else if (leftString && rightString) {
+                if (!addExpression.isPlus()) {
+                    parseContext.addError(new InvalidOperation(ctx, addExpression, "Unable to subtract two strings"));
+                }
                 return;
             }
             // otherwise check generic binary expression

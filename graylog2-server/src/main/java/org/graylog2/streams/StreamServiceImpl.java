@@ -52,6 +52,7 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.streams.events.StreamDeletedEvent;
 import org.graylog2.streams.events.StreamsChangedEvent;
+import org.mongojack.DBProjection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -194,21 +196,55 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         final Map<String, List<StreamRule>> allStreamRules = streamRuleService.loadForStreamIds(streamIds);
 
         final ImmutableList.Builder<Stream> streams = ImmutableList.builder();
+
+        final Map<String, IndexSet> indexSets = indexSetsForStreams(results);
+
+        final Set<String> outputIds = results.stream()
+                .map(this::outputIdsForRawStream)
+                .flatMap(outputs -> outputs.stream().map(ObjectId::toHexString))
+                .collect(Collectors.toSet());
+
+        final Map<String, Output> outputsById = outputService.loadByIds(outputIds)
+                .stream()
+                .collect(Collectors.toMap(Output::getId, Function.identity()));
+
+
         for (DBObject o : results) {
             final ObjectId objectId = (ObjectId) o.get("_id");
             final String id = objectId.toHexString();
             final List<StreamRule> streamRules = allStreamRules.getOrDefault(id, Collections.emptyList());
             LOG.debug("Found {} rules for stream <{}>", streamRules.size(), id);
 
-            final Set<Output> outputs = loadOutputsForRawStream(o);
+            final Set<Output> outputs = outputIdsForRawStream(o)
+                    .stream()
+                    .map(ObjectId::toHexString)
+                    .map(outputsById::get)
+                    .collect(Collectors.toSet());
 
             @SuppressWarnings("unchecked")
             final Map<String, Object> fields = o.toMap();
 
-            streams.add(new StreamImpl(objectId, fields, streamRules, outputs, getIndexSet(o)));
+            final String indexSetId = (String)fields.get(StreamImpl.FIELD_INDEX_SET_ID);
+
+            streams.add(new StreamImpl(objectId, fields, streamRules, outputs, indexSets.get(indexSetId)));
         }
 
         return streams.build();
+    }
+
+    private List<ObjectId> outputIdsForRawStream(DBObject o) {
+        final List<ObjectId> objectIds = (List<ObjectId>) o.get(StreamImpl.FIELD_OUTPUTS);
+        return objectIds == null ? Collections.emptyList() : objectIds;
+    }
+
+    private Map<String, IndexSet> indexSetsForStreams(List<DBObject> streams) {
+        final Set<String> indexSetIds = streams.stream()
+                .map(stream -> (String)stream.get(StreamImpl.FIELD_INDEX_SET_ID))
+                .filter(s -> !isNullOrEmpty(s))
+                .collect(Collectors.toSet());
+        return indexSetService.findByIds(indexSetIds)
+                .stream()
+                .collect(Collectors.toMap(IndexSetConfig::id, indexSetFactory::create));
     }
 
     @Override
@@ -222,6 +258,18 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
+    public Set<String> indexSetIdsByIds(Collection<String> streamIds) {
+        final Set<ObjectId> objectIds = streamIds.stream()
+                .map(ObjectId::new)
+                .collect(Collectors.toSet());
+        final DBObject query = QueryBuilder.start("_id").in(objectIds).get();
+        final DBObject onlyIndexSetIdField = DBProjection.include(StreamImpl.FIELD_INDEX_SET_ID);
+        return StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
+                .map(s -> s.get(StreamImpl.FIELD_INDEX_SET_ID).toString())
+                .collect(Collectors.toSet());
+    }
+
+    @Override
     public List<Stream> loadAllWithConfiguredAlertConditions() {
         final DBObject query = QueryBuilder.start().and(
             QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).exists(true).get(),
@@ -232,8 +280,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
-        @SuppressWarnings("unchecked")
-        List<ObjectId> outputIds = (List<ObjectId>) stream.get(StreamImpl.FIELD_OUTPUTS);
+        List<ObjectId> outputIds = outputIdsForRawStream(stream);
 
         Set<Output> result = new HashSet<>();
         if (outputIds != null)

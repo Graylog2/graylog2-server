@@ -1,5 +1,6 @@
+// @flow strict
 import Reflux from 'reflux';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 
 import ApiRoutes from 'routing/ApiRoutes';
@@ -7,6 +8,22 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { NodesActions } = CombinedProvider.get('Nodes');
 const { SessionStore } = CombinedProvider.get('Session');
+
+type NodeInfo = {
+  cluster_id: string,
+  hostname: string,
+  is_master: boolean,
+  last_seen: string,
+  node_id: string,
+  short_node_id: string,
+  transport_address: string,
+  type: 'server',
+};
+
+type NodesListResponse = {
+  nodes: ?Array<NodeInfo>,
+  total: number,
+};
 
 const NodesStore = Reflux.createStore({
   listenables: [NodesActions],
@@ -38,13 +55,13 @@ const NodesStore = Reflux.createStore({
   },
 
   list() {
-    const promise = this.promises.list || fetchPeriodically('GET', URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
-      .then((response) => {
+    const promise = this.promises.list || fetchPeriodically('GET', qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
+      .then((response: NodesListResponse) => {
         this.nodes = {};
         if (response.nodes) {
-          response.nodes.forEach((node) => {
-            this.nodes[node.node_id] = node;
-          });
+          this.nodes = response.nodes
+            .map((node) => [node.node_id, node])
+            .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
           this.clusterId = this._clusterId();
           this.nodeCount = this._nodeCount();
           this._propagateState();

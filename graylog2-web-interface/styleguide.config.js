@@ -20,10 +20,15 @@ module.exports = {
       content: 'docs/styleguide.md',
     },
     {
+      name: 'Documentation',
+      content: 'docs/documentation.md',
+    },
+    {
       name: 'Theming Details',
+      content: 'src/theme/docs/Details.md',
       sections: [
         {
-          name: 'ThemeProvider',
+          name: 'ThemeProvider & Usage',
           content: 'src/theme/docs/ThemeProvider.md',
         },
         {
@@ -35,10 +40,6 @@ module.exports = {
           content: 'src/theme/docs/Utilities.md',
         },
       ],
-    },
-    {
-      name: 'Documentation',
-      content: 'docs/documentation.md',
     },
     {
       name: 'Tests',

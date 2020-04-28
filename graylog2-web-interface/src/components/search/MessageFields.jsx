@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { MessageField } from 'components/search';
+import { MessageDetailsDefinitionList } from 'components/graylog';
 
 class MessageFields extends React.Component {
   static propTypes = {
@@ -33,9 +34,9 @@ class MessageFields extends React.Component {
     const fields = this._formatFields(formattedFields);
 
     return (
-      <dl className="message-details message-details-fields">
+      <MessageDetailsDefinitionList className="message-details-fields">
         {fields}
-      </dl>
+      </MessageDetailsDefinitionList>
     );
   }
 }

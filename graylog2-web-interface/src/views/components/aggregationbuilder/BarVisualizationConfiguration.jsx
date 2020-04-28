@@ -15,7 +15,7 @@ type Props = {
 type BarModeOption = {
   label: string,
   value: BarMode,
-}
+};
 
 class BarVisualizationConfiguration extends React.Component<Props> {
   static propTypes = {

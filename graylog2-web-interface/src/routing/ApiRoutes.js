@@ -353,6 +353,8 @@ const ApiRoutes = {
     analyze: (index, string) => { return { url: `/messages/${index}/analyze?string=${string}` }; },
     parse: () => { return { url: '/messages/parse' }; },
     single: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
+    exportSearch: ((searchId) => { return { url: `/views/search/messages/${searchId}` }; }),
+    exportSearchType: ((searchId, searchTypeId) => { return { url: `/views/search/messages/${searchId}/${searchTypeId}` }; }),
   },
   MapDataController: {
     search: () => { return { url: '/search/mapdata' }; },

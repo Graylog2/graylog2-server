@@ -11,6 +11,7 @@ import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { ViewJson } from 'views/logic/views/View';
 import { ExtendedSearchPage } from 'views/pages';
+import { IfPermitted } from 'components/common';
 
 type Props = {
   route: {},
@@ -18,7 +19,7 @@ type Props = {
     state?: {
       view?: View | ViewJson,
     },
-    query: { [string]: any }
+    query: { [string]: any },
   };
   loadingViewHooks: Array<ViewHook>,
   executingViewHooks: Array<ViewHook>,
@@ -57,7 +58,7 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
   }
 
   return loaded
-    ? <ExtendedSearchPage route={route} />
+    ? <IfPermitted permissions="dashboards:create"><ExtendedSearchPage route={route} /></IfPermitted>
     : <Spinner />;
 };
 

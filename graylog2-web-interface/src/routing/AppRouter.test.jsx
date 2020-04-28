@@ -20,12 +20,12 @@ jest.mock('injection/CombinedProvider', () => {
   })]);
   return new MockCombinedProvider({
     CurrentUser: { CurrentUserStore: mockCurrentUserStoretore },
-    Notifications: { NotificationsActions: { list: jest.fn() } },
+    Notifications: { NotificationsActions: { list: jest.fn() }, NotificationsStore: MockStore() },
   });
 });
 
 // To prevent exceptions from getting swallwoed
-jest.mock('./AppErrorBoundary', () => mockComponent('AppErrorBoundary'));
+jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterErrorBoundary'));
 
 describe('AppRouter', () => {
   it('routes to Getting Started Page for `/` or empty location', () => {

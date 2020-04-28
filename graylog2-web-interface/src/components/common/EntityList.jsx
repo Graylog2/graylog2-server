@@ -1,8 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Alert } from 'components/graylog';
 import Icon from './Icon';
+
+const StyledList = styled.ul`
+  padding: 0;
+  margin: 0;
+`;
 
 /**
  * Component used to represent list of entities in Graylog, where each entity will have a title, description,
@@ -28,19 +34,21 @@ class EntityList extends React.Component {
   };
 
   render() {
-    if (this.props.items.length === 0) {
+    const { bsNoItemsStyle, items, noItemsText } = this.props;
+
+    if (items.length === 0) {
       return (
-        <Alert bsStyle={this.props.bsNoItemsStyle}>
+        <Alert bsStyle={bsNoItemsStyle}>
           <Icon name="info-circle" />&nbsp;
-          {this.props.noItemsText}
+          {noItemsText}
         </Alert>
       );
     }
 
     return (
-      <ul className="entity-list">
-        {this.props.items}
-      </ul>
+      <StyledList>
+        {items}
+      </StyledList>
     );
   }
 }

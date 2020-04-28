@@ -1,6 +1,8 @@
+All colors are available via the ThemeProvider `theme.color` prop
+
 _Click any color block below to copy the color path._
 
-```js noeditor
+```jsx noeditor
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
@@ -10,6 +12,7 @@ import ColorSwatch from './Colors';
 const Modes = styled.div`
   margin: 0 0 60px;
 `;
+
 const Mode = styled.h3`
   margin: 0 0 6px;
 `;
@@ -39,13 +42,17 @@ const SectionWrap = (mode, section) => {
   return (
     <>
       <Swatches>
-        {getValues(mode, (name) =>
-          typeof mode[name] === 'string' && (
-            <StyledColorSwatch name={name}
-                                  color={mode[name]}
-                                  copyText={`theme.color.${section}.${name}`} />
-          )
-        )}
+        {getValues(mode, (name) => {
+          if (typeof mode[name] === 'string') {
+            const copyTextName = section === 'gray' ? `${section}[${name}]` : `${section}.${name}`;
+
+            return (
+              <StyledColorSwatch name={name}
+                                    color={mode[name]}
+                                    copyText={`theme.color.${copyTextName}`} />
+            )
+          }
+        })}
       </Swatches>
 
       <div>

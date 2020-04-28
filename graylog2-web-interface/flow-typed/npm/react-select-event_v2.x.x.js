@@ -17,5 +17,6 @@ declare module 'react-select-event' {
     ) => Promise<void>,
     clearFirst: (input: HTMLElement) => Promise<void>,
     clearAll: (input: HTMLElement) => Promise<void>,
+    openMenu: (input: HTMLElement) => Promise<void>,
   }
 }

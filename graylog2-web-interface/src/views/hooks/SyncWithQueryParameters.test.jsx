@@ -7,15 +7,16 @@ import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
-import { syncWithQueryParameters, useSyncWithQueryParameters } from './SyncWithQueryParameters';
-import Query, { createElasticsearchQueryString, filtersForQuery } from '../logic/queries/Query';
-import Search from '../logic/search/Search';
-import { QueryFiltersActions } from '../stores/QueryFiltersStore';
-import type { TimeRange } from '../logic/queries/Query';
+import { QueriesActions } from 'views/actions/QueriesActions';
+import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
+import Search from 'views/logic/search/Search';
+import type { TimeRange } from 'views/logic/queries/Query';
 
-jest.mock('views/stores/QueryFiltersStore', () => ({
-  QueryFiltersActions: {
-    streams: {
+import { syncWithQueryParameters, useSyncWithQueryParameters } from './SyncWithQueryParameters';
+
+jest.mock('views/actions/QueriesActions', () => ({
+  QueriesActions: {
+    update: {
       completed: {
         listen: jest.fn(() => () => {}),
       },
@@ -132,10 +133,10 @@ describe('SyncWithQueryParameters', () => {
       useSyncWithQueryParameters('');
       return <span>Hi!</span>;
     };
-    it('listens on action used for adding streams', () => {
+    it('listens on action used for updating a Query', () => {
       render(<TestComponent />);
 
-      expect(QueryFiltersActions.streams.completed.listen).toHaveBeenCalled();
+      expect(QueriesActions.update.completed.listen).toHaveBeenCalled();
     });
   });
 });

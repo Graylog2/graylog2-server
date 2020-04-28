@@ -6,9 +6,9 @@ import { Alert } from 'components/graylog';
 import { Icon } from 'components/common';
 import { SystemJob } from 'components/systemjobs';
 
-const SystemJobWrap = styled.div`
+const SystemJobWrap = styled.div(({ theme }) => `
   margin-top: 10px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid ${theme.color.gray[80]};
 
   .progress {
     margin-top: 2px;
@@ -23,7 +23,7 @@ const SystemJobWrap = styled.div`
     font-family: "Arial", sans-serif;
     font-size: 11px;
   }
-`;
+`);
 
 const StyledAlert = styled(Alert)`
   margin-top: 10px;
@@ -43,8 +43,10 @@ class SystemJobsList extends React.Component {
   };
 
   render() {
-    const jobs = this.props.jobs.map(this._formatSystemJob);
-    if (jobs.length === 0) {
+    const { jobs } = this.props;
+    const formattedJobs = jobs.map(this._formatSystemJob);
+
+    if (formattedJobs.length === 0) {
       return (
         <StyledAlert bsStyle="info">
           <Icon name="info-circle" />{' '}
@@ -52,9 +54,10 @@ class SystemJobsList extends React.Component {
         </StyledAlert>
       );
     }
+
     return (
       <span>
-        {jobs}
+        {formattedJobs}
       </span>
     );
   }

@@ -17,6 +17,9 @@ const StringUtils = {
   stringify(text) {
     return (typeof text === 'object' ? JSON.stringify(text) : String(text)) || '';
   },
+  replaceSpaces(text, newCharacter = '-') {
+    return text.replace(/\s/g, newCharacter);
+  },
 };
 
 export default StringUtils;

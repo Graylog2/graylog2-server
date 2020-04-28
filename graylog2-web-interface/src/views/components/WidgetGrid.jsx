@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
-import { SizeMe } from 'react-sizeme';
+import styled, { css } from 'styled-components';
 
 import connect from 'stores/connect';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
@@ -17,6 +16,18 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
+
+const DashboardWrap = styled.div(({ theme }) => css`
+  color: ${theme.color.global.textDefault};
+  margin: 0;
+  width: 100%;
+`);
+
+const WidgetContainer = styled.div(({ theme }) => css`
+  background-color: ${theme.color.global.contentBackground};
+  border: 1px solid ${theme.color.gray[80]};
+  z-index: auto;
+`);
 
 const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
@@ -50,9 +61,12 @@ class WidgetGrid extends React.Component {
     positions: {},
   };
 
-  state = {
-    widgetDimensions: {},
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      widgetDimensions: {},
+    };
+  }
 
   _onWidgetSizeChange = (widgetId, dimensions) => {
     this.setState(({ widgetDimensions }) => ({ widgetDimensions: { ...widgetDimensions, [widgetId]: dimensions } }));
@@ -91,7 +105,7 @@ class WidgetGrid extends React.Component {
       const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], WidgetGrid._defaultTitle(widget));
 
       returnedWidgets.widgets.push(
-        <div key={widget.id} className={style.widgetContainer}>
+        <WidgetContainer key={widget.id}>
           <DrilldownContextProvider widget={widget}>
             <WidgetContext.Provider value={widget}>
               <AdditionalContext.Provider value={{ widget }}>
@@ -111,7 +125,7 @@ class WidgetGrid extends React.Component {
               </AdditionalContext.Provider>
             </WidgetContext.Provider>
           </DrilldownContextProvider>
-        </div>,
+        </WidgetContainer>,
       );
     });
 
@@ -141,16 +155,10 @@ class WidgetGrid extends React.Component {
       </ReactGridContainer>
     ) : <span />;
     return (
-      <SizeMe monitorWidth refreshRate={100}>
-        {({ size }) => {
-          return (
-            <div className="dashboard">
-              {React.cloneElement(grid, { width: size.width })}
-              {staticWidgets}
-            </div>
-          );
-        }}
-      </SizeMe>
+      <DashboardWrap>
+        {grid}
+        {staticWidgets}
+      </DashboardWrap>
     );
   }
 }

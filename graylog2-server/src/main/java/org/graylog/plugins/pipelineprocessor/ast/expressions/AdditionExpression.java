@@ -61,7 +61,6 @@ public class AdditionExpression extends BinaryExpression implements NumericExpre
         final boolean leftPeriod = Period.class.equals(leftValue.getClass());
         final boolean rightDate = DateTime.class.equals(rightValue.getClass());
         final boolean rightPeriod = Period.class.equals(rightValue.getClass());
-
         if (leftDate && rightPeriod) {
             final DateTime date = (DateTime) leftValue;
             final Period period = (Period) rightValue;
@@ -92,6 +91,14 @@ public class AdditionExpression extends BinaryExpression implements NumericExpre
             } else {
                 return new Duration(right, left);
             }
+        } else if(String.class.equals(type)) {
+            if (!isPlus) {
+                return null;
+            }
+
+            final String left = String.valueOf(leftValue);
+            final String right = String.valueOf(rightValue);
+            return left + right;
         }
         if (isIntegral()) {
             final long l = (long) leftValue;

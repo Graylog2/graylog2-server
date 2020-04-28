@@ -7,8 +7,19 @@ import styled from 'styled-components';
 import { Popover } from 'components/graylog';
 import { Icon } from 'components/common';
 
-import styles from './DescriptionBox.css';
 import HoverForHelp from './HoverForHelp';
+
+const StyledDescriptionBox = styled.div(({ theme }) => `
+  background-color: ${theme.color.gray[90]};
+  padding: 10px;
+  margin: 5px;
+  border-radius: 6px;
+
+  .description {
+    padding-bottom: 5px;
+    text-transform: uppercase;
+  }
+`);
 
 const ConfigButton = styled.button`
   border: 0;
@@ -71,15 +82,15 @@ class DescriptionBox extends React.Component {
   render() {
     const { description, children, help, style: inlineStyle } = this.props;
     return (
-      <div className={styles.descriptionBox} style={inlineStyle}>
-        <div className={styles.description}>
+      <StyledDescriptionBox style={inlineStyle}>
+        <div className="description">
           {description}
           {this.configCaret()}
           {help && <HoverForHelp title={description}>{help}</HoverForHelp>}
         </div>
         {children}
         {this.configPopover()}
-      </div>
+      </StyledDescriptionBox>
     );
   }
 }

@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
+import { asElement, render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
@@ -10,11 +10,9 @@ import WrappingContainer from 'WrappingContainer';
 import WidgetQueryControls from './WidgetQueryControls';
 import { WidgetActions } from '../stores/WidgetStore';
 
-
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
-    timerange: jest.fn(),
-    streams: jest.fn(),
+    update: jest.fn(),
   },
 }));
 jest.mock('views/stores/GlobalOverrideStore', () => ({
@@ -32,11 +30,14 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
+jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Input</span>);
+
 describe('WidgetQueryControls', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
   afterEach(cleanup);
 
   const config = {
-    relative_timerange_options: { PT1D: 'Search in last day', PT0S: 'Search in all messages' },
+    relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
     query_time_range_limit: 'PT0S',
   };
 
@@ -110,42 +111,45 @@ describe('WidgetQueryControls', () => {
     });
   });
 
-  it('changes the widget\'s timerange when time range input is used', () => {
-    const { getByDisplayValue, getByText } = renderSUT();
+  it('changes the widget\'s timerange when time range input is used', async () => {
+    const { getByDisplayValue, getByText, getByTitle } = renderSUT();
     const timeRangeSelect = getByDisplayValue('Search in last day');
     expect(timeRangeSelect).not.toBeNull();
 
-    // $FlowFixMe: We know it is an input, not a plain HTML element
-    const optionForAllMessages: HTMLInputElement = getByText('Search in all messages');
+    const optionForAllMessages = asElement(getByText('Search in all messages'), HTMLOptionElement);
 
     fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
 
-    expect(WidgetActions.timerange).toHaveBeenCalledWith('deadbeef', { type: 'relative', range: '0' });
-    expect(getByDisplayValue('Search in all messages')).not.toBeNull();
+    const searchButton = getByTitle(/Perform search/);
+    fireEvent.click(searchButton);
+
+    await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
+      timerange: { type: 'relative', range: 0 },
+    })));
   });
 
-  it('changes the widget\'s timerange type when switching to absolute time range', () => {
-    const { getByText } = renderSUT();
+  it('changes the widget\'s timerange type when switching to absolute time range', async () => {
+    const { getByText, getByTitle } = renderSUT();
     const absoluteTimeRangeSelect = getByText('Absolute');
     expect(absoluteTimeRangeSelect).not.toBeNull();
 
     fireEvent.click(absoluteTimeRangeSelect);
 
-    expect(WidgetActions.timerange).toHaveBeenLastCalledWith('deadbeef', { type: 'absolute', from: '2019-10-10T12:21:31.146Z', to: '2019-10-10T12:26:31.146Z' });
-  });
+    const searchButton = getByTitle(/Perform search/);
+    fireEvent.click(searchButton);
 
-  it('changes the widget\'s timerange type when switching to absolute time range', () => {
-    const { getByText } = renderSUT();
-    const absoluteTimeRangeSelect = getByText('Absolute');
-    expect(absoluteTimeRangeSelect).not.toBeNull();
-
-    fireEvent.click(absoluteTimeRangeSelect);
-
-    expect(WidgetActions.timerange).toHaveBeenLastCalledWith('deadbeef', { type: 'absolute', from: '2019-10-10T12:21:31.146Z', to: '2019-10-10T12:26:31.146Z' });
+    await wait(() => expect(WidgetActions.update)
+      .toHaveBeenLastCalledWith('deadbeef', expect.objectContaining({
+        timerange: {
+          type: 'absolute',
+          from: '2019-10-10T12:21:31.146Z',
+          to: '2019-10-10T12:26:31.146Z',
+        },
+      })));
   });
 
   it('changes the widget\'s streams when using stream filter', async () => {
-    const { container } = renderSUT({
+    const { container, getByTitle } = renderSUT({
       availableStreams: [
         { key: 'PFLog', value: '5c2e27d6ba33a9681ad62775' },
         { key: 'DNS Logs', value: '5d2d9649e117dc4df84cf83c' },
@@ -154,9 +158,16 @@ describe('WidgetQueryControls', () => {
     const streamFilter = container.querySelector('div[data-testid="streams-filter"] > div');
     expect(streamFilter).not.toBeNull();
 
-    // $FlowFixMe: `streamFilter` cannot be `null` at this point
-    await selectEvent.select(streamFilter, 'PFLog');
+    // Flow is not parsing the jest assertion before
+    if (streamFilter) {
+      await selectEvent.select(streamFilter, 'PFLog');
+    }
 
-    expect(WidgetActions.streams).toHaveBeenCalledWith('deadbeef', ['5c2e27d6ba33a9681ad62775']);
+    const searchButton = getByTitle(/Perform search/);
+    fireEvent.click(searchButton);
+
+    await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
+      streams: ['5c2e27d6ba33a9681ad62775'],
+    })));
   });
 });

@@ -30,9 +30,9 @@ import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorator;
 import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
@@ -185,8 +185,7 @@ public class ESMessageListTest {
                                                                     ESGeneratedQueryContext context) {
         ESMessageList sut = new ESMessageList(
                 new ESQueryDecorators(decorators),
-                new DecoratorProcessor.Fake(),
-                Collections.emptyMap(),
+                new LegacyDecoratorProcessor.Fake(),
                 allowHighlighting);
 
         sut.doGenerateQueryPart(mock(SearchJob.class), someQuery(), messageList, context);

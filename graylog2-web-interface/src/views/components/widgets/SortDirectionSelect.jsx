@@ -6,7 +6,7 @@ import Select from 'react-select';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type Props = {
-  direction: string,
+  direction: ?string,
   disabled: boolean,
   onChange: (Direction) => any,
 };

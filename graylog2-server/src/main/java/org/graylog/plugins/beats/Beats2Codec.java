@@ -88,8 +88,12 @@ public class Beats2Codec extends AbstractCodec {
         final String timestampField = event.path("@timestamp").asText();
         final DateTime timestamp = Tools.dateTimeFromString(timestampField);
 
-        final JsonNode beat = event.path("beat");
-        final String hostname = beat.path("hostname").asText(BEATS_UNKNOWN);
+        JsonNode agentOrBeat = event.path("agent");
+        // backwards compatibility for beats < 7.0
+        if (agentOrBeat.isMissingNode()) {
+            agentOrBeat = event.path("beat");
+        }
+        final String hostname = agentOrBeat.path("hostname").asText(BEATS_UNKNOWN);
 
         final Message gelfMessage = new Message(message, hostname, timestamp);
         gelfMessage.addField("beats_type", beatsType);

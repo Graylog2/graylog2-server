@@ -120,7 +120,7 @@ public class ProcessBuffer extends Buffer {
         final ImmutableMap.Builder<String, String> processBufferDump = ImmutableMap.builder();
         for (int i = 0, processorsLength = processors.length; i < processorsLength; i++) {
             final ProcessBufferProcessor proc = processors[i];
-            processBufferDump.put("ProcessBufferProcessor #" + i, proc.getCurrentMessage().map(Message::toString).orElse("idle"));
+            processBufferDump.put("ProcessBufferProcessor #" + i, proc.getCurrentMessage().map(Message::toDumpString).orElse("idle"));
         }
         return processBufferDump.build();
     }

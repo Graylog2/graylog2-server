@@ -1,111 +1,93 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
-import * as Immutable from 'immutable';
+import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
-import { QueriesActions } from 'views/stores/QueriesStore';
 import mockAction from 'helpers/mocking/MockAction';
+
+import { QueriesActions } from 'views/stores/QueriesStore';
+// eslint-disable-next-line import/no-named-default
+import { default as MockQuery } from 'views/logic/queries/Query';
 import SearchBar from './SearchBar';
 
-jest.mock('stores/sessions/SessionStore', () => MockStore(['isLoggedIn', () => { return true; }], 'getSessionId'));
-jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
-jest.mock('actions/sessions/SessionActions', () => ({
-  logout: {
-    completed: {
-      listen: jest.fn(),
-    },
-  },
-}));
+const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
+jest.mock('stores/users/CurrentUserStore', () => MockStore(
+  ['get', () => mockCurrentUser],
+  ['getInitialState', () => mockCurrentUser],
+));
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   'listen',
   ['listStreams', () => ({ then: jest.fn() })],
   'availableStreams',
 ));
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    update: {
-      completed: {
-        listen: jest.fn(),
-      },
-    },
-    create: {
-      completed: {
-        listen: jest.fn(),
-      },
-    },
-  },
-}));
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
+jest.mock('views/stores/CurrentQueryStore', () => ({
+  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
+    .timerange({ type: 'relative', range: 300 })
+    .query({ type: 'elasticsearch', query_string: '*' })
+    .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
+    .build()]),
+}));
 
 describe('SearchBar', () => {
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
   const config = {
     analysis_disabled_fields: ['full_message', 'message'],
     query_time_range_limit: 'PT0S',
-    relative_timerange_options: { PT0S: 'Search in all messages', PT1D: 'Search in last day' },
+    relative_timerange_options: { PT0S: 'Search in all messages', P1D: 'Search in last day' },
     surrounding_filter_fields: ['file', 'source', 'gl2_source_input', 'source_file'],
     surrounding_timerange_options: { PT1S: 'One second', PT2S: 'Two seconds' },
   };
-  const currentQuery = {
-    timerange: { type: 'relative', range: 300 },
-    query: { type: 'elasticsearch', query_string: '*' },
-    id: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-  };
+
+  beforeEach(() => {
+    QueriesActions.update = mockAction(jest.fn());
+  });
+
+  afterEach(cleanup);
 
   it('should render the SearchBar', () => {
-    // Empty currentQuery
-    const wrapper = mount(<SearchBar config={config} onExecute={() => {}} />);
+    const { getByText } = render(<SearchBar config={config} onExecute={() => {}} />);
 
-    act(() => jest.advanceTimersByTime(200));
-    wrapper.update();
-
-    expect(wrapper).toHaveText(' Loading...');
-    expect(wrapper.find('option')).not.toExist();
-
-    // Set new currentQuery
-    wrapper.setState({ currentQuery });
-    expect(wrapper.find('option')).toHaveLength(2);
-    expect(wrapper.find('option[children="Search in last day"]')).toExist();
-    expect(wrapper.find('option[children="Search in all messages"]')).toExist();
+    expect(getByText('Search in last day')).not.toBeNull();
+    expect(getByText('Search in all messages')).not.toBeNull();
   });
 
-  it('should execute a search', () => {
-    const executeFn = jest.fn();
-    const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
-    wrapper.setState({ currentQuery });
-    wrapper.find('form').simulate('submit');
-    expect(executeFn).toHaveBeenCalledTimes(1);
+  it('should update query when search is performed', async () => {
+    const { getByTitle } = render(<SearchBar config={config} />);
+
+    const searchButton = getByTitle('Perform search');
+    fireEvent.click(searchButton);
+
+    const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
+
+    await wait(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
   });
 
-  it('changing the time range type executes a new search', () => {
-    const executeFn = jest.fn();
-    const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
-    wrapper.setState({ currentQuery });
+  it('changing the time range type does not execute a new search', async () => {
+    const onSubmit = jest.fn(() => Promise.resolve());
+    const { getByText } = render(<SearchBar config={config} onSubmit={onSubmit} />);
+    const absoluteTimeRange = getByText('Absolute');
 
-    const timeRangeTypeSelector = wrapper.find('TimeRangeTypeSelector');
-    const { onSelect } = timeRangeTypeSelector.at(0).props();
-    QueriesActions.rangeType = mockAction(() => Promise.resolve(new Immutable.OrderedMap()));
+    fireEvent.click(absoluteTimeRange);
 
-    return onSelect('absolute').then(() => {
-      expect(executeFn).toHaveBeenCalled();
-    });
+    await wait(() => expect(onSubmit).not.toHaveBeenCalled());
   });
 
-  it('changing the time range value executes a new search', () => {
-    const executeFn = jest.fn();
-    const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
-    wrapper.setState({ currentQuery });
+  const selectOption = (option) => {
+    const { parentNode, value } = asElement(option, HTMLOptionElement);
+    const input = asElement(parentNode, HTMLSelectElement);
+    const { name } = input;
+    fireEvent.change(input, { target: { name, value: String(value) } });
+  };
 
-    const timeRangeInput = wrapper.find('TimeRangeInput');
-    const { onChange } = timeRangeInput.at(0).props();
-    QueriesActions.rangeParams = mockAction(jest.fn(() => Promise.resolve(new Immutable.OrderedMap())));
+  it('changing the relative time range value does not execute a new search', async () => {
+    const onSubmit = jest.fn();
+    const { getByText } = render(<SearchBar config={config} onSubmit={onSubmit} />);
 
-    return onChange({ range: 300 }).then(() => {
-      expect(executeFn).toHaveBeenCalled();
-    });
+    const lastDay = getByText('Search in last day');
+
+    await act(async () => selectOption(lastDay));
+
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

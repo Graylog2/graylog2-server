@@ -1,0 +1,1967 @@
+{
+  "views": [
+    {
+      "_id": {
+        "$oid": "5c2f391f8d954c3396df8f30"
+      },
+      "search_id": "5c2f390f8d954c3396df8f29",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c2f3bcb2d786112113e9246"
+      },
+      "search_id": "5c2f3bb92d786112113e923f",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c2f7f6c433ced25af4f2d56"
+      },
+      "search_id": "5c2f7e0d433ced25af4f2cf4",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c3364c4b3b06de4716289ae"
+      },
+      "search_id": "5c4ecb1b0072413c3e5d6382",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c3603b8f81a640cee33fd89"
+      },
+      "search_id": "5c360298f81a640cee33fd6e",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c3df978831b6a4029a00763"
+      },
+      "search_id": "5c3df955831b6a4029a00754",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c3f2e41827b10a915c1f59e"
+      },
+      "search_id": "5c3f2e3c827b10a915c1f59b",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c41b4e98fcd87b8f4b91c2f"
+      },
+      "search_id": "5c41b4e68fcd87b8f4b91c2b",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c41e9d501ea836c2d4844f5"
+      },
+      "search_id": "5c4991761b004928f26d8e18",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c5056f1ab3ed1a15b46b244"
+      },
+      "search_id": "5c5056eeab3ed1a15b46b241",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c5057a5719f0cf6d42acd92"
+      },
+      "search_id": "5c5057a3719f0cf6d42acd8f",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c505940b3fe06d32ecedd09"
+      },
+      "search_id": "5c50593eb3fe06d32ecedd06",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c531d8451296195e14cf1fa"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5dbbf604799412036075d78f"
+    },
+    {
+      "_id": {
+        "$oid": "5c5c222a38606330e3a8c8d7"
+      },
+      "search_id": "5c5c222838606330e3a8c8d2",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c7d346d66a1027c77a289cc"
+      },
+      "search_id": "5cb496c416a60764cb69f43b",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c7e54f1134960951f153e2d"
+      },
+      "search_id": "5c7e5772134960951f153f20",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c7fc3f9f38ed741ac154697"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e4be7fe032c1ef3b9ee248e"
+    },
+    {
+      "_id": {
+        "$oid": "5c8a613a844d02001a1fd2f4"
+      },
+      "search_id": "5c90baa29f9eba845f5df821",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c9503b544e66722912923b2"
+      },
+      "search_id": "5c9503ac44e66722912923ad",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c9b7de4b256bb1e59394d37"
+      },
+      "search_id": "5c9b7dddb256bb1e59394d32",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5c9ceef1a17b661361d5cd5d"
+      },
+      "search_id": "5c9ceee5a17b661361d5cd58",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5ca72c4095c9feb417bf69dd"
+      },
+      "search_id": "5ca72c3c95c9feb417bf69d8",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cac52d277ffbc667a0ae291"
+      },
+      "search_id": "5d1b411be0af32c59d9964ff",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cb47381b979f8c01f12a85b"
+      },
+      "search_id": "5cb48ccd454b6701cadbe38c",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cb7061e615fc416e905b78a"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5ccaf06b15385b3868f89f8e"
+    },
+    {
+      "_id": {
+        "$oid": "5cc039f7307b49637035cfb1"
+      },
+      "search_id": "5cc05d737ddc58d23636011e",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cc1c68f7f99192655e31bb5"
+      },
+      "search_id": "5cc1c6887f99192655e31bb0",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cc317cc4d64c82a0ba80288"
+      },
+      "search_id": "5cc317964d64c82a0ba80282",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5ccaadcc3e0993788695e7ae"
+      },
+      "search_id": "5ccaadc03e0993788695e7a9",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5ccafa0370bb7aa56583cf4d"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5d7fa2aa643aa02187655ce2"
+    },
+    {
+      "_id": {
+        "$oid": "5cd964f201e90f675ca44379"
+      },
+      "search_id": "5cde9a38ca6e571acc9edad2",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cdaad130d19ee67bf6a78a9"
+      },
+      "search_id": "5cde9efc51caff6bb054bcef",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cdd5af9a13631611ae8a8e1"
+      },
+      "search_id": "5cdd5af0a13631611ae8a8de",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cdea3587e058cd496c0df98"
+      },
+      "search_id": "5cdea34b7e058cd496c0df8d",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5ce3e0ec49c8741c4b19d49e"
+      },
+      "search_id": "5ce3e0e749c8741c4b19d499",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5cecfa5b11c3ee6d594ec54b"
+      },
+      "search_id": "5cecfa8011c3ee6d594ec555",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5ced4a05615dc026834b80e8"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5d8209f7de3ef244f93b4506"
+    },
+    {
+      "_id": {
+        "$oid": "5ced4a4485b52a86b96a0a63"
+      },
+      "search_id": "5ced4a3e85b52a86b96a0a59",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5ced4df1d6e8104c16f50e00"
+      },
+      "search_id": "5ced4deed6e8104c16f50df9",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d12088679c23411883f1ed1"
+      },
+      "search_id": "5d1212599af2d361850e9ab5",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d2329a6bad958c1bd146da9"
+      },
+      "search_id": "5d2328e2bad958c1bd146da3",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d2b1f80104305df38c95bb4"
+      },
+      "search_id": "5d2b219b903a8e06e63849f5",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d2c277d104305df38c95cf9"
+      },
+      "search_id": "5d2c2774104305df38c95cf4",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d2c5b89607b9ab5865ec3ef"
+      },
+      "search_id": "5d2c5a05607b9ab5865ec3e6",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d2ee5d1f61285f0f65ea1d8"
+      },
+      "search_id": "5d2ee6a4f61285f0f65ea1e9",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d302989dcfd4aa4ffc61268"
+      },
+      "search_id": "5d3045489af6a91a3fa7279e",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d63ad1c659227e8fcf875ea"
+      },
+      "search_id": "5d63ad19659227e8fcf875e6",
+      "type": "DASHBOARD"
+    },
+    {
+      "_id": {
+        "$oid": "5d6d03909889ecf444527f98"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5d6ce7bd5d1eb45af534399e"
+    },
+    {
+      "_id": {
+        "$oid": "5d72526ff7dd4c1fbf46370d"
+      },
+      "type": "SEARCH",
+      "search_id": "5d725260f7dd4c1fbf46370c"
+    },
+    {
+      "_id": {
+        "$oid": "5d9ca33b54b78fd4b789051e"
+      },
+      "type": "SEARCH",
+      "search_id": "5d9ca30754b78fd4b789051d"
+    },
+    {
+      "_id": {
+        "$oid": "5d9ca67f54b78fd4b7890523"
+      },
+      "type": "SEARCH",
+      "search_id": "5d9ca67754b78fd4b7890522"
+    },
+    {
+      "_id": {
+        "$oid": "5d9db00d6678ada4bd78c841"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5d9dafee6678ada4bd78c83b"
+    },
+    {
+      "_id": {
+        "$oid": "5da079cd3ee200fbfc19070d"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5da079a63ee200fbfc190707"
+    },
+    {
+      "_id": {
+        "$oid": "5da0818f6e302e7dbcb72652"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5da8282e1f8e93de4d85674b"
+    },
+    {
+      "_id": {
+        "$oid": "5da87a08e1ab06711d1380c2"
+      },
+      "type": "SEARCH",
+      "search_id": "5da879ece1ab06711d1380c1"
+    },
+    {
+      "_id": {
+        "$oid": "5da9bbd929d0de64ba8a5f08"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5da9bc1b3a6a1d0d2f07faf2"
+    },
+    {
+      "_id": {
+        "$oid": "5dad67460c0d0db9698cd5ac"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5dad673d6131be4f08ceea77"
+    },
+    {
+      "_id": {
+        "$oid": "5db2fdf8b2d67462a79bc0bf"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5db2fdf2b2d67462a79bc0ba"
+    },
+    {
+      "_id": {
+        "$oid": "5db6cd8ee9e3429a4a96a6ce"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5db6cd6ee9e3429a4a96a6c8"
+    },
+    {
+      "_id": {
+        "$oid": "5dc3e75d16232c3dd56375e2"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5dc3e74016232c3dd56375d2"
+    },
+    {
+      "_id": {
+        "$oid": "5dc56c8a0fa72f7785950534"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5ddba2fc62b3269e200a0564"
+    },
+    {
+      "_id": {
+        "$oid": "5dd7beb865879b268c937518"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5dd7bf6755dea7c9601ac24f"
+    },
+    {
+      "_id": {
+        "$oid": "5dd961110a518ce0bd3b3df7"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5dda6f9a0a518ce0bd3b3e08"
+    },
+    {
+      "_id": {
+        "$oid": "5ddbe33e1acc6d44a81e272b"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5ddbe34e713a9ae4ef32127b"
+    },
+    {
+      "_id": {
+        "$oid": "5ddf8b1926aca77c85f10740"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5ddf8b1226aca77c85f10739"
+    },
+    {
+      "_id": {
+        "$oid": "5ddf8b6fb2d44b2e044725e5"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5ddf8b6fb2d44b2e044725e4"
+    },
+    {
+      "_id": {
+        "$oid": "5ddf8ed5b2d44b2e04472992"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e4be7fe032c1ef3b9ee248f"
+    },
+    {
+      "_id": {
+        "$oid": "5ddf8ed6b2d44b2e044729a2"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e4be7fe032c1ef3b9ee2490"
+    },
+    {
+      "_id": {
+        "$oid": "5ddf8ed7b2d44b2e044729b1"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e4be7fe032c1ef3b9ee2491"
+    },
+    {
+      "_id": {
+        "$oid": "5ddf8ed8b2d44b2e044729d2"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e4be7fe032c1ef3b9ee2492"
+    },
+    {
+      "_id": {
+        "$oid": "5ddf8ed8b2d44b2e044729d8"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e4be7fe032c1ef3b9ee2493"
+    },
+    {
+      "_id": {
+        "$oid": "5ddfe3d7ad72521ba85b83f6"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5ddfe3b6ad72521ba85b83ee"
+    },
+    {
+      "_id": {
+        "$oid": "5de11dd8cbcf86011a1f939a"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5de120a3c6bc9f166cd8827f"
+    },
+    {
+      "_id": {
+        "$oid": "5df275ac5a05bfd131452c17"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5df275a05a05bfd131452c12"
+    },
+    {
+      "_id": {
+        "$oid": "5df2760dddf1b98430a75b27"
+      },
+      "type": "SEARCH",
+      "search_id": "5df275f2ddf1b98430a75b26"
+    },
+    {
+      "_id": {
+        "$oid": "5df7624ee5b722b53d47f7cb"
+      },
+      "type": "SEARCH",
+      "search_id": "5df76226e5b722b53d47f7ca"
+    },
+    {
+      "_id": {
+        "$oid": "5df8ea6daf77908dac0865b2"
+      },
+      "type": "SEARCH",
+      "search_id": "5df8ea67af77908dac0865b1"
+    },
+    {
+      "_id": {
+        "$oid": "5df9e92944490ccaa1cbf9da"
+      },
+      "type": "SEARCH",
+      "search_id": "5df9e90f44490ccaa1cbf9d9"
+    },
+    {
+      "_id": {
+        "$oid": "5df9e9565b6b26f14388f684"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e6223b1c9df1d052947a14f"
+    },
+    {
+      "_id": {
+        "$oid": "5dfa3569fa0cde1272baaf42"
+      },
+      "type": "SEARCH",
+      "search_id": "5dfa355bfa0cde1272baaf41"
+    },
+    {
+      "_id": {
+        "$oid": "5dfa7b14138f32b681cfdbd1"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5dfb40cb10c50852acbceb71"
+    },
+    {
+      "_id": {
+        "$oid": "5dfb763c947c5352bc5c144b"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5dfb7639947c5352bc5c1446"
+    },
+    {
+      "_id": {
+        "$oid": "5dfb768a947c5352bc5c145b"
+      },
+      "type": "SEARCH",
+      "search_id": "5dfb7683947c5352bc5c145a"
+    },
+    {
+      "_id": {
+        "$oid": "5dfb989a6c915f79765d1301"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e4be7fe032c1ef3b9ee2494"
+    },
+    {
+      "_id": {
+        "$oid": "5dfca8dd691fef70e6f80fe5"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5dfcc5489d79fd62bf7382af"
+    },
+    {
+      "_id": {
+        "$oid": "5e00887581f14009b4edf579"
+      },
+      "type": "SEARCH",
+      "search_id": "5e00854c81f14009b4edf578"
+    },
+    {
+      "_id": {
+        "$oid": "5e0091b94fb06d4139e5aa2f"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e0091b94fb06d4139e5aa2e"
+    },
+    {
+      "_id": {
+        "$oid": "5e134402bff18cc8f70387cf"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e14516bc9d5c61e9d77c290"
+    },
+    {
+      "_id": {
+        "$oid": "5e146a1157080e5ee7c7805d"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e146a0c57080e5ee7c78057"
+    },
+    {
+      "_id": {
+        "$oid": "5e159941d82a411dd218ed57"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e159928d82a411dd218ed50"
+    },
+    {
+      "_id": {
+        "$oid": "5e159e78032582816bac02f9"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e159e703322bb41a0c0e331"
+    },
+    {
+      "_id": {
+        "$oid": "5e15f7c971206ed98e8a9a7d"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e16076a1a71e3ad1b7abab3"
+    },
+    {
+      "_id": {
+        "$oid": "5e184f7dc01ab70080428c2a"
+      },
+      "type": "SEARCH",
+      "search_id": "5e184f69c01ab70080428c29"
+    },
+    {
+      "_id": {
+        "$oid": "5e187b9b5158b512d3c9f492"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e187b985158b512d3c9f48d"
+    },
+    {
+      "_id": {
+        "$oid": "5e1edef18e08406537520ee0"
+      },
+      "type": "SEARCH",
+      "search_id": "5e1ededb8e08406537520edf"
+    },
+    {
+      "_id": {
+        "$oid": "5e20360dfd1ed0f128aa7007"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e20360bfd1ed0f128aa7003"
+    },
+    {
+      "_id": {
+        "$oid": "5e2ef9b0b27811cc729e96c8"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e2ef9aeb27811cc729e96c7"
+    },
+    {
+      "_id": {
+        "$oid": "5e2f0bc563d3f8c61196dd0f"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5da8282e1f8e93de4d85674b"
+    },
+    {
+      "_id": {
+        "$oid": "5e2f0bd863d3f8c61196dd11"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e2f0bd663d3f8c61196dd10"
+    },
+    {
+      "_id": {
+        "$oid": "5e2ffb649117904f8052629e"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e2ffb549117904f8052629d"
+    },
+    {
+      "_id": {
+        "$oid": "5e3044e49c0594cd0f32edf7"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e3044e29c0594cd0f32edf6"
+    },
+    {
+      "_id": {
+        "$oid": "5e319ebbb9586b27b2430335"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e319eb8b9586b27b2430334"
+    },
+    {
+      "_id": {
+        "$oid": "5e394968032c1e564d0c7952"
+      },
+      "search_id": "5e394968032c1e564d0c7951",
+      "type": "SEARCH"
+    },
+    {
+      "_id": {
+        "$oid": "5e394968032c1e564d0c7954"
+      },
+      "search_id": "5e394968032c1e564d0c7953",
+      "type": "SEARCH"
+    },
+    {
+      "_id": {
+        "$oid": "5e394968032c1e564d0c7956"
+      },
+      "search_id": "5e394968032c1e564d0c7955",
+      "type": "SEARCH"
+    },
+    {
+      "_id": {
+        "$oid": "5e394968032c1e564d0c7958"
+      },
+      "search_id": "5e394968032c1e564d0c7957",
+      "type": "SEARCH"
+    },
+    {
+      "_id": {
+        "$oid": "5e394968032c1e564d0c795a"
+      },
+      "search_id": "5e394968032c1e564d0c7959",
+      "type": "SEARCH"
+    },
+    {
+      "_id": {
+        "$oid": "5e3a9a2448dd632425af586c"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e3a9a1148dd632425af586b"
+    },
+    {
+      "_id": {
+        "$oid": "5e4a91ded4b9bd0ce58d452b"
+      },
+      "type": "SEARCH",
+      "search_id": "5e4a91d2d4b9bd0ce58d452a"
+    },
+    {
+      "_id": {
+        "$oid": "5e4fb112458c72323416d21d"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e4fb10e458c72323416d21c"
+    },
+    {
+      "_id": {
+        "$oid": "5e53cdb27cb7949e940af516"
+      },
+      "type": "SEARCH",
+      "search_id": "5e53ce10b8d8b24e6b3b4ee4"
+    },
+    {
+      "_id": {
+        "$oid": "5e551ce9c42c347e03521f83"
+      },
+      "type": "SEARCH",
+      "search_id": "5e551cbdc42c347e03521f82"
+    },
+    {
+      "_id": {
+        "$oid": "5e68e95b11dabbba4736ae03"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e68e91b11dabbba4736ae02"
+    },
+    {
+      "_id": {
+        "$oid": "5e6902de7c7e91aa13e82605"
+      },
+      "type": "SEARCH",
+      "search_id": "5e6902d77c7e91aa13e82604"
+    },
+    {
+      "_id": {
+        "$oid": "5e6903077c7e91aa13e8260a"
+      },
+      "type": "SEARCH",
+      "search_id": "5e6902ff7c7e91aa13e82609"
+    },
+    {
+      "_id": {
+        "$oid": "5e690690095ea54566a7df82"
+      },
+      "type": "SEARCH",
+      "search_id": "5e690687095ea54566a7df81"
+    },
+    {
+      "_id": {
+        "$oid": "5e7b647dc32c9925134589ed"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e7b647ac32c9925134589ec"
+    },
+    {
+      "_id": {
+        "$oid": "5e7c7e925f26f85811bf4de3"
+      },
+      "type": "SEARCH",
+      "search_id": "5e7c871142cc9b533dc22391"
+    },
+    {
+      "_id": {
+        "$oid": "5e85d8c8cafee2bbee5900d8"
+      },
+      "type": "DASHBOARD",
+      "search_id": "5e6223b1c9df1d052947a14f"
+    }
+  ],
+  "searches": [
+  {
+    "_id": {
+      "$oid": "5d6ce7bd5d1eb45af534399e"
+    },
+    "queries": [
+      {
+        "id": "f678e6c5-43b1-4200-b5c3-d33eae164dea",
+        "timerange": {
+          "type": "relative",
+          "range": 0
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\" AND project:\"graylog2-server\""
+        },
+        "search_types": [
+          {
+            "id": "7949e87a-4a82-4e09-b939-f4c803ae12c6",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "hour",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "hour",
+                "limit": 24
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "id": "81e69d89-4160-431f-9b90-95d29ca4cea6",
+            "limit": 150,
+            "offset": 0,
+            "type": "messages"
+          },
+          {
+            "id": "3d6c9e26-9090-4aaf-bed8-313e75d9c477",
+            "series": [
+              {
+                "type": "min",
+                "id": "min(timestamp)",
+                "field": "timestamp"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          },
+          {
+            "id": "122d2764-160d-4acc-a2a7-c1ec8fdad28d",
+            "series": [
+              {
+                "type": "count",
+                "id": "Message Count"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          },
+          {
+            "id": "28c87846-a8b6-4b21-9aac-62a8ce886e8e",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "dayOfTheWeek",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "dayOfTheWeek",
+                "limit": 15
+              },
+              {
+                "type": "values",
+                "field": "weekday",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "id": "8dc4dc5c-1845-4c53-8519-8d02559ad8d7",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "count()",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "project",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "id": "02d6b549-6e56-451e-a2ab-6e4b257605ef",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "id": "fd32330f-f487-4bf3-a518-1f1bcef89aec",
+            "series": [
+              {
+                "type": "max",
+                "id": "max(timestamp)",
+                "field": "timestamp"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          }
+        ]
+      },
+      {
+        "id": "770a516d-3bfd-4a91-89c8-c21cb192fdf1",
+        "timerange": {
+          "type": "relative",
+          "range": 2592000
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\""
+        },
+        "search_types": [
+          {
+            "id": "fcea8d22-4794-418c-ae62-bf7786826a34",
+            "limit": 150,
+            "offset": 0,
+            "type": "messages"
+          }
+        ]
+      },
+      {
+        "id": "85782551-ec81-42ed-b9f7-020a8de93653",
+        "timerange": {
+          "type": "relative",
+          "range": 0
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\""
+        },
+        "search_types": [
+          {
+            "id": "16d5562f-933a-468a-aa34-aaa93f443c88",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(lines_add)",
+                "field": "lines_add"
+              },
+              {
+                "type": "sum",
+                "id": "sum(lines_removed)",
+                "field": "lines_removed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "project",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "id": "52ad4390-16ee-4ad5-b098-5febce6d15d5",
+            "series": [
+              {
+                "type": "percentile",
+                "id": "percentile(files_changed,95)",
+                "field": "files_changed",
+                "percentile": 95
+              },
+              {
+                "type": "avg",
+                "id": "avg(files_changed)",
+                "field": "files_changed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "id": "168311be-eb67-4f33-a255-91a4267eb935",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(lines_add)",
+                "field": "lines_add"
+              },
+              {
+                "type": "sum",
+                "id": "sum(lines_removed)",
+                "field": "lines_removed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "5da9bbb944300ca38bc5da3e"
+    },
+    "queries": [
+      {
+        "id": "f678e6c5-43b1-4200-b5c3-d33eae164dea",
+        "timerange": {
+          "type": "relative",
+          "range": 0
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\" AND project:\"graylog2-server\""
+        },
+        "search_types": [
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "81e69d89-4160-431f-9b90-95d29ca4cea6",
+            "limit": 150,
+            "offset": 0,
+            "type": "messages"
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "7949e87a-4a82-4e09-b939-f4c803ae12c6",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "hour",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "hour",
+                "limit": 24
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "fd32330f-f487-4bf3-a518-1f1bcef89aec",
+            "series": [
+              {
+                "type": "max",
+                "id": "max(timestamp)",
+                "field": "timestamp"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "28c87846-a8b6-4b21-9aac-62a8ce886e8e",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "dayOfTheWeek",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "dayOfTheWeek",
+                "limit": 15
+              },
+              {
+                "type": "values",
+                "field": "weekday",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "3d6c9e26-9090-4aaf-bed8-313e75d9c477",
+            "series": [
+              {
+                "type": "min",
+                "id": "min(timestamp)",
+                "field": "timestamp"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "122d2764-160d-4acc-a2a7-c1ec8fdad28d",
+            "series": [
+              {
+                "type": "count",
+                "id": "Message Count"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "8dc4dc5c-1845-4c53-8519-8d02559ad8d7",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "count()",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "project",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "02d6b549-6e56-451e-a2ab-6e4b257605ef",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          }
+        ]
+      },
+      {
+        "id": "85782551-ec81-42ed-b9f7-020a8de93653",
+        "timerange": {
+          "type": "relative",
+          "range": 0
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\""
+        },
+        "search_types": [
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "52ad4390-16ee-4ad5-b098-5febce6d15d5",
+            "series": [
+              {
+                "type": "percentile",
+                "id": "percentile(files_changed,95)",
+                "field": "files_changed",
+                "percentile": 95
+              },
+              {
+                "type": "avg",
+                "id": "avg(files_changed)",
+                "field": "files_changed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "168311be-eb67-4f33-a255-91a4267eb935",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(lines_add)",
+                "field": "lines_add"
+              },
+              {
+                "type": "sum",
+                "id": "sum(lines_removed)",
+                "field": "lines_removed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "16d5562f-933a-468a-aa34-aaa93f443c88",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(lines_add)",
+                "field": "lines_add"
+              },
+              {
+                "type": "sum",
+                "id": "sum(lines_removed)",
+                "field": "lines_removed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "project",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "5da9bbba12993f3904b41217"
+    },
+    "queries": [
+      {
+        "id": "f678e6c5-43b1-4200-b5c3-d33eae164dea",
+        "timerange": {
+          "type": "relative",
+          "range": 0
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\" AND project:\"graylog2-server\""
+        },
+        "search_types": [
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "cfe972d1-3f49-4c5b-9574-7d41eaad6a5d",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "count()",
+                "direction": "Descending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "project",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "81cbfca4-7544-4995-8e2e-ea4b6170188a",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "90e74b5c-3363-43f4-8c19-6fe4f38019b4",
+            "series": [
+              {
+                "type": "max",
+                "id": "max(timestamp)",
+                "field": "timestamp"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "98ce1897-5a60-4596-94be-629a82b027f6",
+            "series": [
+              {
+                "type": "count",
+                "id": "Message Count"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "358729a5-d49d-4efe-8120-bdc4aa744492",
+            "limit": 150,
+            "offset": 0,
+            "type": "messages"
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "56e96d6b-a988-4432-8cc5-085bb601765b",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "dayOfTheWeek",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "dayOfTheWeek",
+                "limit": 15
+              },
+              {
+                "type": "values",
+                "field": "weekday",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "c52b195a-1387-4755-93c4-6857a942e310",
+            "series": [
+              {
+                "type": "min",
+                "id": "min(timestamp)",
+                "field": "timestamp"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "5b437395-205b-4fd8-80dc-fd97ef2f2a09",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "hour",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "hour",
+                "limit": 24
+              }
+            ],
+            "column_groups": []
+          }
+        ]
+      },
+      {
+        "id": "85782551-ec81-42ed-b9f7-020a8de93653",
+        "timerange": {
+          "type": "relative",
+          "range": 0
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\""
+        },
+        "search_types": [
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "13116470-7bd7-49ac-a523-9f634a4d00a0",
+            "series": [
+              {
+                "type": "percentile",
+                "id": "percentile(files_changed,95)",
+                "field": "files_changed",
+                "percentile": 95
+              },
+              {
+                "type": "avg",
+                "id": "avg(files_changed)",
+                "field": "files_changed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "058389cc-9760-44e1-a4ac-b3d1ff6d7192",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(lines_add)",
+                "field": "lines_add"
+              },
+              {
+                "type": "sum",
+                "id": "sum(lines_removed)",
+                "field": "lines_removed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "8c9a6eff-243d-4a8c-b795-28e3ac01422d",
+            "series": [
+              {
+                "type": "sum",
+                "id": "sum(lines_add)",
+                "field": "lines_add"
+              },
+              {
+                "type": "sum",
+                "id": "sum(lines_removed)",
+                "field": "lines_removed"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "project",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "5da9bc1b3a6a1d0d2f07faf2"
+    },
+    "queries": [
+      {
+        "id": "f678e6c5-43b1-4200-b5c3-d33eae164dea",
+        "timerange": {
+          "type": "relative",
+          "range": 0
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\" AND project:\"graylog2-server\""
+        },
+        "search_types": [
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "858e5916-b88b-48a0-b1b4-d3d3f9207cf7",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "5dad673d6131be4f08ceea77"
+    },
+    "queries": [
+      {
+        "id": "f678e6c5-43b1-4200-b5c3-d33eae164dea",
+        "timerange": {
+          "type": "relative",
+          "range": 0
+        },
+        "filter": {
+          "type": "or",
+          "filters": []
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "author:\"$author$\" AND project:\"graylog2-server\""
+        },
+        "search_types": [
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "051cb04b-a65b-47c5-88bf-0ab4d705f56f",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "dayOfTheWeek",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "dayOfTheWeek",
+                "limit": 15
+              },
+              {
+                "type": "values",
+                "field": "weekday",
+                "limit": 15
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "d7874719-769f-45cc-81fc-5ec5d03b6bb0",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "hour",
+                "direction": "Ascending"
+              }
+            ],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "values",
+                "field": "hour",
+                "limit": 24
+              }
+            ],
+            "column_groups": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "5dbbf604799412036075d78f"
+    },
+    "queries": [
+      {
+        "id": "1f4314f5-86ae-4156-adbb-3d0b960dacd9",
+        "timerange": {
+          "type": "relative",
+          "range": 300
+        },
+        "query": {
+          "type": "elasticsearch",
+          "query_string": "source:$source$"
+        },
+        "search_types": [
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "983c9ada-87a4-4cda-a7da-73c414910588",
+            "series": [
+              {
+                "type": "count",
+                "id": "count()"
+              }
+            ],
+            "sort": [],
+            "rollup": true,
+            "type": "pivot",
+            "row_groups": [
+              {
+                "type": "time",
+                "field": "timestamp",
+                "interval": {
+                  "type": "auto",
+                  "scaling": 1
+                }
+              }
+            ],
+            "column_groups": []
+          },
+          {
+            "timerange": null,
+            "query": null,
+            "streams": [],
+            "id": "7987b4b4-5d63-4842-a6c8-1eb26d223a72",
+            "limit": 150,
+            "offset": 0,
+            "type": "messages"
+          }
+        ]
+      }
+    ]
+  }
+]
+}
+

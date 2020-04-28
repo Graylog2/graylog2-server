@@ -27,7 +27,9 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { TimeRange } from 'views/logic/queries/Query';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -68,6 +70,7 @@ type State = {
   loading: boolean;
   oldWidget?: WidgetModel,
   showCopyToDashboard: boolean,
+  showCsvExport: boolean,
 };
 
 export type Result = {
@@ -134,6 +137,7 @@ class Widget extends React.Component<Props, State> {
       editing,
       loading: false,
       showCopyToDashboard: false,
+      showCsvExport: false,
     };
     if (editing) {
       this.state = { ...this.state, oldWidget: props.widget };
@@ -206,6 +210,13 @@ class Widget extends React.Component<Props, State> {
     });
   };
 
+  _onToggleCSVExport = () => {
+    const { showCsvExport } = this.state;
+    this.setState({
+      showCsvExport: !showCsvExport,
+    });
+  }
+
   _onCancelEdit = () => {
     const { oldWidget } = this.state;
     if (oldWidget) {
@@ -250,9 +261,9 @@ class Widget extends React.Component<Props, State> {
 
   // TODO: Clean up different code paths for normal/edit modes
   render() {
-    const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
-    const { editing, loading, showCopyToDashboard } = this.state;
-    const { config } = widget;
+    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
+    const { editing, loading, showCopyToDashboard, showCsvExport } = this.state;
+    const { config, type } = widget;
     const visualization = this.visualize();
     if (editing) {
       const EditComponent = _editComponentForType(widget.type);
@@ -304,18 +315,19 @@ class Widget extends React.Component<Props, State> {
                   <WidgetActionDropdown>
                     <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                     <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                    <MenuItem onSelect={() => this._onToggleCSVExport()} disabled={type !== MessagesWidget.type}>Export to CSV</MenuItem>
                     <IfSearch>
                       <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                     </IfSearch>
                     <MenuItem divider />
                     <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                   </WidgetActionDropdown>
-                  {showCopyToDashboard
-                    && (
-                      <CopyToDashboard widgetId={id}
-                                       onSubmit={this._onCopyToDashboard}
-                                       onCancel={this._onToggleCopyToDashboard} />
-                    )}
+                  {showCopyToDashboard && (
+                    <CopyToDashboard widgetId={id}
+                                     onSubmit={this._onCopyToDashboard}
+                                     onCancel={this._onToggleCopyToDashboard} />
+                  )}
+                  {showCsvExport && <CSVExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
                 </IfInteractive>
               </WidgetHeader>
             )}

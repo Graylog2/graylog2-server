@@ -23,6 +23,10 @@ import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
+import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,6 +70,24 @@ public class ClusterIT extends ElasticsearchBaseTest {
     public void getFileDescriptorStats() {
         final Set<NodeFileDescriptorStats> fileDescriptorStats = cluster.getFileDescriptorStats();
         assertThat(fileDescriptorStats).isNotEmpty();
+    }
+
+    @Test
+    public void getDiskUsageStats() {
+        final Set<NodeDiskUsageStats> diskUsageStats = cluster.getDiskUsageStats();
+        assertThat(diskUsageStats).isNotEmpty();
+    }
+
+    @Test
+    public void getClusterAllocationDiskSettings() throws Exception{
+        final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
+
+        //Default Elasticsearch settings in Elasticsearch 5.6
+        assertThat(clusterAllocationDiskSettings.ThresholdEnabled()).isTrue();
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().type()).isEqualTo(WatermarkSettings.SettingsType.PERCENTAGE);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().low()).isEqualTo(85D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().high()).isEqualTo(90D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().floodStage()).isNull();
     }
 
     @Test

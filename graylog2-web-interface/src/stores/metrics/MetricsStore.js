@@ -57,7 +57,7 @@ export type NodeMetric = {
     | BaseMetric<GaugeMetric>
     | BaseMetric<MeterMetric>
     | BaseMetric<TimerMetric>,
-}
+};
 
 export type ClusterMetric = {
   [nodeId: string]: NodeMetric,

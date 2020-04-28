@@ -44,13 +44,19 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -61,6 +67,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toSet;
 
 public class PivotAggregationSearch implements AggregationSearch {
@@ -110,7 +117,7 @@ public class PivotAggregationSearch implements AggregationSearch {
 
     @Override
     public AggregationResult doSearch() throws EventProcessorException {
-        final SearchJob searchJob = getSearchJob(parameters, searchOwner);
+        final SearchJob searchJob = getSearchJob(parameters, searchOwner, config.searchWithinMs(), config.executeEveryMs());
         final QueryResult queryResult = searchJob.results().get(QUERY_ID);
         final QueryResult streamQueryResult = searchJob.results().get(STREAMS_QUERY_ID);
 
@@ -168,16 +175,17 @@ public class PivotAggregationSearch implements AggregationSearch {
     }
 
     @VisibleForTesting
-    ImmutableList<AggregationKeyResult> extractValues(PivotResult pivotResult) {
+    ImmutableList<AggregationKeyResult> extractValues(PivotResult pivotResult) throws EventProcessorException {
         final ImmutableList.Builder<AggregationKeyResult> results = ImmutableList.builder();
 
-        // Example PivotResult structures. The "key" value is composed of: "metric/<function>/<field>/<series-id>"
+        // Example PivotResult structures. The row value "key" is composed of: "metric/<function>/<field>/<series-id>"
+        // The row "key" always contains the date range bucket value as first element.
         //
         // With group-by:
         // {
         //  "rows": [
         //    {
-        //      "key": ["php", "box2"],
+        //      "key": ["2020-03-27T16:23:12Z", "php", "box2"],
         //      "values": [
         //        {
         //          "key": ["metric/count/source/abc123"],
@@ -195,7 +203,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         //      "source": "leaf"
         //    },
         //    {
-        //      "key": ["php"],
+        //      "key": ["2020-03-27T16:23:12Z", "php"],
         //      "values": [
         //        {
         //          "key": ["metric/count/source/abc123"],
@@ -213,7 +221,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         //      "source": "non-leaf"
         //    },
         //    {
-        //      "key": ["sshd","box2"],
+        //      "key": ["2020-03-27T16:23:12Z", "sshd","box2"],
         //      "values": [
         //        {
         //          "key": ["metric/count/source/abc123"],
@@ -237,7 +245,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // {
         //  "rows": [
         //    {
-        //      "key": [],
+        //      "key": ["2020-03-27T16:23:12Z"],
         //      "values": [
         //        {
         //          "key": ["metric/count/source/abc123"],
@@ -262,6 +270,24 @@ public class PivotAggregationSearch implements AggregationSearch {
                 continue;
             }
 
+            // Safety guard against programming errors
+            if (row.key().size() == 0 || isNullOrEmpty(row.key().get(0))) {
+                throw new EventProcessorException("Invalid row key! Expected at least the date range timestamp value: " + row.key().toString(), true, eventDefinition);
+            }
+
+            // We always wrap aggregations in date range buckets so we can run aggregations for multiple ranges at once.
+            // The timestamp value of the date range bucket will be part of the result.
+            final String timeKey = row.key().get(0);
+            final ImmutableList<String> groupKey;
+
+            if (row.key().size() > 1) {
+                // The date range bucket value must not be exposed to consumers as part of the key so they
+                // don't have to unwrap the key all the time.
+                groupKey = row.key().subList(1, row.key().size());
+            } else {
+                groupKey = ImmutableList.of();
+            }
+
             final ImmutableList.Builder<AggregationSeriesValue> values = ImmutableList.builder();
 
             for (final PivotResult.Value value : row.values()) {
@@ -279,7 +305,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                         if (maybeNumberValue instanceof Number) {
                             final double numberValue = ((Number) maybeNumberValue).doubleValue();
                             final AggregationSeriesValue seriesValue = AggregationSeriesValue.builder()
-                                    .key(row.key())
+                                    .key(groupKey)
                                     .value(numberValue)
                                     .series(series)
                                     .build();
@@ -294,7 +320,8 @@ public class PivotAggregationSearch implements AggregationSearch {
             }
 
             results.add(AggregationKeyResult.builder()
-                    .key(row.key())
+                    .key(groupKey)
+                    .timestamp(DateTime.parse(timeKey).withZone(DateTimeZone.UTC))
                     .seriesValues(values.build())
                     .build());
         }
@@ -302,9 +329,10 @@ public class PivotAggregationSearch implements AggregationSearch {
         return results.build();
     }
 
-    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, String username) throws EventProcessorException {
+    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, String username,
+                                   long searchWithinMs, long executeEveryMs) throws EventProcessorException {
         Search search = Search.builder()
-                .queries(ImmutableSet.of(getAggregationQuery(parameters), getSourceStreamsQuery(parameters)))
+                .queries(ImmutableSet.of(getAggregationQuery(parameters, searchWithinMs, executeEveryMs), getSourceStreamsQuery(parameters)))
                 .parameters(config.queryParameters())
                 .build();
         // This adds all streams if none were provided
@@ -358,11 +386,14 @@ public class PivotAggregationSearch implements AggregationSearch {
     }
 
     /**
-     * Returns the
-     * @param parameters
-     * @return
+     * Returns the query to compute the aggregation.
+     *
+     * @param parameters processor parameters
+     * @param searchWithinMs processor search within period. Used to build the date range buckets
+     * @param executeEveryMs
+     * @return aggregation query
      */
-    private Query getAggregationQuery(AggregationEventProcessorParameters parameters) {
+    private Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(true);
@@ -375,8 +406,20 @@ public class PivotAggregationSearch implements AggregationSearch {
             pivotBuilder.series(series);
         }
 
+        // Wrap every aggregation with date range buckets of the searchWithin time range.
+        // If the aggregation is configured to be using a sliding window (searchWithin > executeEveryMs)
+        // the time ranges will overlap.
+        // This allows us to run aggregations over larger time ranges than the searchWithin time.
+        // The results will be received in time buckets of the searchWithin time size.
+        final DateRangeBucket dateRangeBucket = buildDateRangeBuckets(parameters.timerange(), searchWithinMs, executeEveryMs);
+        final List<BucketSpec> groupBy = new ArrayList<>();
+
+        // The first bucket must be the date range!
+        groupBy.add(dateRangeBucket);
+
         if (!config.groupBy().isEmpty()) {
-            final List<BucketSpec> groupBy = config.groupBy().stream()
+            // Then we add the configured groups
+            groupBy.addAll(config.groupBy().stream()
                     .map(field -> Values.builder()
                             // The pivot search type (as of Graylog 3.1.0) is using the "terms" aggregation under
                             // the hood. The "terms" aggregation is meant to return the "top" terms and does not allow
@@ -396,9 +439,11 @@ public class PivotAggregationSearch implements AggregationSearch {
                             .limit(Integer.MAX_VALUE)
                             .field(field)
                             .build())
-                    .collect(Collectors.toList());
-            pivotBuilder.rowGroups(groupBy);
+                    .collect(Collectors.toList()));
         }
+
+        // We always have row groups because of the date range buckets
+        pivotBuilder.rowGroups(groupBy);
 
         final Set<SearchType> searchTypes = Collections.singleton(pivotBuilder.build());
 
@@ -441,5 +486,21 @@ public class PivotAggregationSearch implements AggregationSearch {
                     eventDefinition.title());
         }
         return existingStreams;
+    }
+
+    @VisibleForTesting
+    static DateRangeBucket buildDateRangeBuckets(TimeRange timeRange, long searchWithinMs, long executeEveryMs) {
+        final ImmutableList.Builder<DateRange> ranges = ImmutableList.builder();
+        DateTime from = timeRange.getFrom();
+        DateTime to;
+        do {
+            // The smallest configurable unit is 1 sec.
+            // By dividing it before casting we avoid a potential int overflow
+            to = from.plusSeconds((int) (searchWithinMs / 1000));
+            ranges.add(DateRange.builder().from(from).to(to).build());
+            from = from.plusSeconds((int) executeEveryMs/ 1000);
+        } while (to.isBefore(timeRange.getTo()));
+
+        return DateRangeBucket.builder().field("timestamp").ranges(ranges.build()).build();
     }
 }

@@ -3,14 +3,14 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { QueryFiltersStore } from './QueryFiltersStore';
 
-const fieldTypesUrl = URLUtils.qualifyUrl('/views/fields');
+const fieldTypesUrl = qualifyUrl('/views/fields');
 
 type FieldTypesActionsType = RefluxActions<{
   all: () => Promise<void>,
@@ -29,7 +29,9 @@ export type FieldTypesStoreState = {
   queryFields: Immutable.Map<string, FieldTypeMappingsList>,
 };
 
-export const FieldTypesStore = singletonStore(
+export type FieldTypesStoreType = Store<FieldTypesStoreState>;
+
+export const FieldTypesStore: FieldTypesStoreType = singletonStore(
   'views.FieldTypes',
   () => Reflux.createStore({
     listenables: [FieldTypesActions],
