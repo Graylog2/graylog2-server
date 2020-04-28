@@ -15,6 +15,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   body {
     background-color: ${theme.color.global.background};
+    color: ${theme.color.global.textDefault};
     font-family: ${fontFamily};
     font-size: 12px;
     overflow-x: hidden;
