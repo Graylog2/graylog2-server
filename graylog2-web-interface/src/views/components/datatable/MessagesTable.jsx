@@ -67,7 +67,7 @@ const StyledTable = styled(Table)(({ theme }) => `
     padding-top: 0;
     padding-bottom: 5px;
     font-family: monospace;
-    color: ${theme.color.variant.light.info};
+    color: ${theme.color.variant.dark.info};
   }
 
   tr.message-row {
