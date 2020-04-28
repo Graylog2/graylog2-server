@@ -76,7 +76,6 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
       <form onSubmit={this.submitForm}>
         <Row>
           <Col md={5}>
-            <h3 style={{ marginBottom: 10 }}>Get your free Graylog Enterprise license:</h3>
             <Input type="text"
                    id="firstName"
                    label="First Name"
@@ -112,7 +111,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
                       type="submit"
                       bsSize="small"
                       bsStyle="primary">
-                Get your free license
+                UPGRADE NOW
               </Button>
               <Button id="clear-entry"
                       onClick={this.resetForm}
