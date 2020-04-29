@@ -35,7 +35,7 @@ import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFA
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_QUERY;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_SORT;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_STREAMS;
-import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_TIME_RANGE;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.defaultTimeRange;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
 @AutoValue
@@ -105,7 +105,7 @@ public abstract class MessagesRequest {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_MessagesRequest.Builder()
-                    .timeRange(DEFAULT_TIME_RANGE)
+                    .timeRange(defaultTimeRange())
                     .streams(DEFAULT_STREAMS)
                     .queryString(DEFAULT_QUERY)
                     .fieldsInOrder(DEFAULT_FIELDS)
