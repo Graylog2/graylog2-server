@@ -11,8 +11,8 @@ import bsStyleThemeVariant from './variants/bsStyle';
 const PanelHeading = styled(BootstrapPanel.Heading)``;
 
 const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
-  background-color: ${theme.color.gray[80]};
-  border-top-color: ${theme.color.gray[90]};
+  background-color: ${theme.color.gray[90]};
+  border-top-color: ${theme.color.gray[80]};
 `);
 
 const panelVariantStyles = (hex, variant) => css(({ theme }) => {
@@ -23,7 +23,7 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
     border-color: ${borderColor};
 
     > ${PanelHeading} {
-      color: ${util.readableColor(backgroundColor)};
+      color: ${util.contrastingColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
@@ -73,16 +73,16 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   ${bsStyleThemeVariant(panelVariantStyles)};
 `);
 
-const deprecatedVariantStyles = (hex) => css(({ theme }) => {
-  const backgroundColor = theme.color.global.background;
-  const borderColor = theme.color.gray[80];
+const deprecatedVariantStyles = (hex, variant) => css(({ theme }) => {
+  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], -10);
+  const borderColor = util.colorLevel(theme.color.variant.light[variant], 10);
 
   return css`
     /** NOTE: Deprecated & should be removed in 4.0 */
     border-color: ${borderColor};
 
     & > .panel-heading {
-      color: ${util.colorLevel(backgroundColor, 9)};
+      color: ${util.contrastingColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
@@ -111,11 +111,11 @@ const deprecatedVariantStyles = (hex) => css(({ theme }) => {
 
 const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   /** NOTE: Deprecated & should be removed in 4.0 */
-  background-color: ${theme.color.global.background};
+  background-color: ${util.colorLevel(theme.color.global.background, -4)};
 
   .panel-footer {
-    background-color: ${theme.color.gray[80]};
-    border-top-color: ${theme.color.gray[90]};
+    background-color: ${theme.color.gray[90]};
+    border-top-color: ${theme.color.gray[80]};
   }
 
   .panel-group {
@@ -149,7 +149,8 @@ const Panel = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    console.log('setIsExpanded', defaultExpanded && expanded, !defaultExpanded && expanded, (defaultExpanded && isExpanded === expanded));
     setIsExpanded((defaultExpanded && expanded)
       || (!defaultExpanded && expanded)
       || (defaultExpanded && isExpanded === expanded));
