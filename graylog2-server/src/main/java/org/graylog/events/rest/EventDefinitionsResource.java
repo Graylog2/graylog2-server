@@ -188,7 +188,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @PUT
     @Path("{definitionId}/schedule")
-    @ApiOperation("Delete event definition")
+    @ApiOperation("Enable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public void schedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
