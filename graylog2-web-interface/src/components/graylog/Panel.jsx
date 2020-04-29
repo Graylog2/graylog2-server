@@ -150,7 +150,6 @@ const Panel = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    console.log('setIsExpanded', defaultExpanded && expanded, !defaultExpanded && expanded, (defaultExpanded && isExpanded === expanded));
     setIsExpanded((defaultExpanded && expanded)
       || (!defaultExpanded && expanded)
       || (defaultExpanded && isExpanded === expanded));
