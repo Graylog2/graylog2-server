@@ -39,7 +39,7 @@ const PipelineStage = styled.div(({ idle, theme }) => `
   background-color: ${idle ? util.colorLevel(theme.color.global.contentBackground, 10) : theme.color.global.contentBackground};
 `);
 
-const PipelineName = styled.td`
+const PipelineNameTD = styled.td`
   max-width: 300px;
   overflow-x: hidden;
   text-overflow: ellipsis;
@@ -47,7 +47,7 @@ const PipelineName = styled.td`
   width: 300px;
 `;
 
-const StreamList = styled.td`
+const StreamListTD = styled.td`
   max-width: 150px;
   width: 150px;
   word-wrap: break-word;
@@ -113,21 +113,21 @@ const ProcessingTimelineComponent = createReactClass({
 
     return (
       <tr key={pipeline.id}>
-        <PipelineName>
+        <PipelineNameTD>
           <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>{pipeline.title}</Link><br />
           {pipeline.description}
           <br />
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
             <CounterRate prefix="Throughput:" suffix="msg/s" />
           </MetricContainer>
-        </PipelineName>
-        <StreamList>
+        </PipelineNameTD>
+        <StreamListTD>
           <PipelineConnectionsList pipeline={pipeline}
                                    connections={connections}
                                    streams={streams}
                                    streamsFormatter={this._formatConnectedStreams}
                                    noConnectionsMessage={<em>Not connected</em>} />
-        </StreamList>
+        </StreamListTD>
         <td>{this._formatStages(pipeline, pipeline.stages)}</td>
         <td>
           <Button bsStyle="primary" bsSize="xsmall" onClick={this._deletePipeline(pipeline)}>Delete</Button>
