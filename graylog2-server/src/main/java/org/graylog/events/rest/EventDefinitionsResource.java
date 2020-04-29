@@ -197,7 +197,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @PUT
     @Path("{definitionId}/unschedule")
-    @ApiOperation("Delete event definition")
+    @ApiOperation("Disable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public void unschedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
