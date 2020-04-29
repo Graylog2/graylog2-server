@@ -40,9 +40,19 @@ export type Props = {
   view: View,
 };
 
+const _getInitialFields = (selectedWidget) => {
+  let initialFields = DEFAULT_FIELDS;
+  if (selectedWidget) {
+    // Because the message table always displays the message, we need to add it as an initial field.
+    initialFields = [...new Set([...selectedWidget.config.fields, 'message'])];
+  }
+  return initialFields.map((field) => ({ field }));
+};
+
+
 const _onSelectWidget = ({ value: newWidget }, setSelectedWidget, setSelectedFields, setSelectedSort) => {
   setSelectedWidget(newWidget);
-  setSelectedFields(newWidget.config.fields.map((fieldName) => ({ field: fieldName })));
+  setSelectedFields(_getInitialFields(newWidget));
   setSelectedSort(newWidget.config.sort);
 };
 
@@ -53,15 +63,6 @@ const _onFieldSelect = (newFields, setSelectedFields) => {
 const _onStartDownload = (downloadFile, view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal) => {
   setLoading(true);
   startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, selectedSort, limit).then(closeModal);
-};
-
-const _getInitialFields = (selectedWidget) => {
-  let initialFields = DEFAULT_FIELDS;
-  if (selectedWidget) {
-    // Because the message table always displays the message, we need to add it as an initial field.
-    initialFields = [...new Set([...selectedWidget.config.fields, 'message'])];
-  }
-  return initialFields.map((field) => ({ field }));
 };
 
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
