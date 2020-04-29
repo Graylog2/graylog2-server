@@ -34,8 +34,8 @@ const _isActive = (requestPath, prefix) => {
   return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
 };
 
-const formatSinglePluginRoute = ({ description, path, permissions }) => {
-  const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} />;
+const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
+  const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} topLevel={topLevel} />;
 
   if (permissions) {
     return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
@@ -55,12 +55,12 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 
     return (
       <NavDropdown key={title} title={title} id="enterprise-dropdown">
-        {pluginRoute.children.map(formatSinglePluginRoute)}
+        {pluginRoute.children.map((child) => formatSinglePluginRoute(child, false))}
       </NavDropdown>
     );
   }
 
-  return formatSinglePluginRoute(pluginRoute);
+  return formatSinglePluginRoute(pluginRoute, true);
 };
 
 const Navigation = ({ permissions, fullName, location, loginName }) => {
@@ -70,7 +70,6 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
     pluginExports.push({
       path: Routes.SYSTEM.ENTERPRISE,
       description: 'Enterprise',
-      enterprise: undefined,
     });
   }
   const pluginNavigations = pluginExports
