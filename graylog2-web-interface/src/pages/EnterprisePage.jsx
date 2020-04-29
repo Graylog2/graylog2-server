@@ -8,8 +8,6 @@ import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/comm
 import { Alert, Col, Row } from 'components/graylog';
 import { GraylogClusterOverview } from 'components/cluster';
 import DocumentationLink from 'components/support/DocumentationLink';
-import { Link } from 'react-router';
-import Routes from 'routing/Routes';
 import EnterpriseFreeLicenseForm from 'components/enterprise/EnterpriseFreeLicenseForm';
 import PluginList from 'components/enterprise/PluginList';
 
@@ -108,20 +106,17 @@ const EnterprisePage = createReactClass({
             <Row className="content">
               <Col md={6}>
                 <BiggerFontSize>
-                  <p>Extend Graylog’s Open Source capabilities with a free trial of Graylog Enterprise (up to 5 GB/Day).
+                  <p><strong>Extend Graylog’s Open Source capabilities with a free trial of Graylog Enterprise (up to 5 GB/Day).</strong></p>
+                  <p>
                     Graylog Enterprise introduces productivity and compliance features designed to help organizations
-                    reduce risk while encouraging collaboration across a large number of users.</p>
+                    reduce risk while encouraging collaboration across a large number of users.
+                  </p>
 
                   <p>Graylog Enterprise includes:</p>
 
                   <EnterpriseFeatureList>
-                    <li>Automated <Link to={Routes.pluginRoute('SYSTEM_ARCHIVES')}><strong>archiving</strong></Link> and
-                      retention
-                    </li>
-                    <li><Link to={Routes.pluginRoute('SYSTEM_AUDITLOG')}><strong>Audit logs</strong></Link> of Graylog
-                      user activity
-                    </li>
-
+                    <li>Automated <DocumentationLink page="archiving.html" text={<strong>archiving</strong>} /> and retention</li>
+                    <li><DocumentationLink page="auditlog.html" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
                     <li>
                       Alerts with <DocumentationLink page="alerts.html#filter-with-dynamic-lists-enterprise-feature"
                                                      text={<strong>dynamic lists</strong>} />
@@ -129,7 +124,7 @@ const EnterprisePage = createReactClass({
                       to minimize the number of alerts that you need to create and maintain
                     </li>
                     <li>
-                      Customizable <Link to={Routes.pluginRoute('REPORTS')}><strong>scheduled reporting</strong></Link> using dashboard widgets for sharing analysis outside Graylog
+                      Customizable <DocumentationLink page="reporting.html" text={<strong>scheduled reporting</strong>} /> using dashboard widgets for sharing analysis outside Graylog
                     </li>
                     <li><DocumentationLink page="searching/parameters.html"
                                            text={<strong>Parameterized search templates</strong>} /> enable you to

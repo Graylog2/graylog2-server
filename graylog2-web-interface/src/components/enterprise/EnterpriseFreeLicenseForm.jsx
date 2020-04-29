@@ -75,7 +75,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
     return (
       <form onSubmit={this.submitForm}>
         <Row>
-          <Col md={5}>
+          <Col md={12}>
             <Input type="text"
                    id="firstName"
                    label="First Name"
