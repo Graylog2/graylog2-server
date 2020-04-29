@@ -38,6 +38,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Collects additional information for {@link org.graylog.events.processor.EventDefinition event definitions} like
+ * scheduler information. This allows us to return additional information for event definitions without modifying
+ * their DTOs.
+ */
 public class EventDefinitionContextService {
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
