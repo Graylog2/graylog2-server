@@ -298,8 +298,8 @@ class FilterForm extends React.Component {
         <Input id="schedule-checkbox"
                type="checkbox"
                name="_is_scheduled"
-               label="Enable scheduling"
-               help="Whether scheduling for this event definition should be enabled?"
+               label="Enable"
+               help="Should this event definition be executed automatically?"
                checked={lodash.defaultTo(eventDefinition.config._is_scheduled, true)}
                onChange={this.handleConfigChange} />
       </fieldset>
