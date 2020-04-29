@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -67,6 +68,7 @@ public class FreeEnterpriseResource extends RestResource {
     @ApiOperation(value = "Request free Graylog Enterprise license")
     @Path("/license")
     @RequiresPermissions(RestPermissions.FREELICENSES_CREATE)
+    @NoAuditEvent("This will be used to get a license. Without license triggering an audit event doesn't make sense.")
     public Response requestFreeLicense(@NotNull @Valid FreeLicenseRequest request) {
         if (freeEnterpriseService.canRequestFreeLicense()) {
             try {
