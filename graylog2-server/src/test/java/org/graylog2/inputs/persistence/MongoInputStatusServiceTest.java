@@ -188,7 +188,7 @@ public class MongoInputStatusServiceTest {
 
     @Test
     @MongoDBFixtures("input-status.json")
-    public void handleDeleteEvent_DoesNothing() throws Exception {
+    public void handleDeleteEvent_WhenStoppingInputDoesNothing() throws Exception {
         final String deletedInput = "54e3deadbeefdeadbeef0001";
         final InputDeleted inputDeletedEvent = new InputDeleted() {
             @Override
@@ -200,6 +200,18 @@ public class MongoInputStatusServiceTest {
         cut.handleInputDeleted(inputDeletedEvent);
         // The record should not be removed from the DB
         assertThat(cut.get(deletedInput).isPresent(), is(true));
+    }
+
+    @Test
+    @MongoDBFixtures("input-status.json")
+    public void handleDeleteEvent_WhenDeletingInputRemovesState() throws Exception {
+        final String deletedInput = "54e3deadbeefdeadbeef0001";
+        final InputDeleted inputDeletedEvent = new InputDeleted() {
+            @Override
+            public String id() {
+                return deletedInput;
+            }
+        };
 
         // Simulate that the input has actually been deleted
         // TODO: This will change once we fix https://github.com/Graylog2/graylog2-server/issues/7812
