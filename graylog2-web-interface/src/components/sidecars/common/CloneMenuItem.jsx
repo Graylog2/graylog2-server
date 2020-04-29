@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -29,11 +29,11 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => `
   }
 `);
 
-const CloneMenuItem = forwardRef(({ onSelect, onSave, id, onChange, error, name }, ref) => {
+const CloneMenuItem = ({ error, id, modalRef, name, onChange, onSave, onSelect }) => {
   return (
     <span>
       <StyledMenuItem onSelect={onSelect}>Clone</StyledMenuItem>
-      <BootstrapModalForm ref={ref}
+      <BootstrapModalForm ref={modalRef}
                           title="Clone"
                           onSubmitForm={onSave}
                           submitButtonDisabled={!!error}
@@ -52,15 +52,16 @@ const CloneMenuItem = forwardRef(({ onSelect, onSave, id, onChange, error, name 
       </BootstrapModalForm>
     </span>
   );
-});
+};
 
 CloneMenuItem.propTypes = {
-  onSelect: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  id: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
   error: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  modalRef: PropTypes.shape({ current: PropTypes.any }).isRequired,
   name: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
 };
 
 export default CloneMenuItem;

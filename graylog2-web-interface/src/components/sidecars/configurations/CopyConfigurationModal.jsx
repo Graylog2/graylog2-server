@@ -72,7 +72,7 @@ class CopyConfigurationModal extends React.Component {
                      onChange={this._changeName}
                      error={errorMessage}
                      name={name}
-                     ref={this.modalRef} />
+                     modalRef={this.modalRef} />
     );
   }
 }
