@@ -40,6 +40,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                       "global": Object {
                         "background": "#e8e8e8",
                         "contentBackground": "#fff",
+                        "inputBackground": "#fff",
                         "link": "#702785",
                         "linkHover": "#410057",
                         "tableBackground": "#ffffff",
@@ -807,6 +808,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                       "global": Object {
                         "background": "#e8e8e8",
                         "contentBackground": "#fff",
+                        "inputBackground": "#fff",
                         "link": "#702785",
                         "linkHover": "#410057",
                         "tableBackground": "#ffffff",
@@ -1651,6 +1653,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                       "global": Object {
                         "background": "#e8e8e8",
                         "contentBackground": "#fff",
+                        "inputBackground": "#fff",
                         "link": "#702785",
                         "linkHover": "#410057",
                         "tableBackground": "#ffffff",
