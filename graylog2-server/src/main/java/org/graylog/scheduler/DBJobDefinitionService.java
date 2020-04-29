@@ -16,14 +16,13 @@
  */
 package org.graylog.scheduler;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import one.util.streamex.StreamEx;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
-import org.mongojack.Aggregation;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
@@ -33,14 +32,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto> {
     private static final String COLLECTION_NAME = "scheduler_job_definitions";
 
+    private final ObjectMapper objectMapper;
+
     @Inject
     public DBJobDefinitionService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, JobDefinitionDto.class, COLLECTION_NAME);
+        this.objectMapper = mapper.get();
     }
 
     public PaginatedList<JobDefinitionDto> getAllPaginated(String sortByField, int page, int perPage) {
@@ -69,41 +71,12 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
     public Map<String, List<JobDefinitionDto>> getAllByConfigField(String configField, Collection<? extends Object> values) {
         final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
 
-        // Use aggregation to group job definitions by each config field value
-        // Example aggregation output:
-        //   {
-        //     "config-field-value-1": [
-        //       {JobDefinitionDto}, {JobDefinitionDto}
-        //      ],
-        //     "config-field-value-2": [
-        //       {JobDefinitionDto}, {JobDefinitionDto}
-        //      ]
-        //   }
-        final Aggregation.Pipeline<Void> pipeline = Aggregation.match(DBQuery.in(field, values))
-                .group(field)
-                .set(GroupAggregationResult.FIELD_VALUES, Aggregation.Group.list("$ROOT"))
-                .sort(DBSort.asc("_id"));
-
-        return db.aggregate(pipeline, GroupAggregationResult.class)
-                .results()
-                .stream()
-                .collect(Collectors.toMap(GroupAggregationResult::id, GroupAggregationResult::values));
+        return StreamEx.of(db.find(DBQuery.in(field, values))).groupingBy(configFieldGroup(configField));
     }
 
-    @AutoValue
-    static abstract class GroupAggregationResult {
-        static final String FIELD_VALUES = "values";
-
-        @JsonProperty("_id")
-        public abstract String id();
-
-        @JsonProperty(FIELD_VALUES)
-        public abstract List<JobDefinitionDto> values();
-
-        @JsonCreator
-        public static GroupAggregationResult create(@JsonProperty("_id") String id,
-                                                    @JsonProperty(FIELD_VALUES) List<JobDefinitionDto> values) {
-            return new AutoValue_DBJobDefinitionService_GroupAggregationResult(id, values);
-        }
+    private Function<JobDefinitionDto, String> configFieldGroup(final String key) {
+        // Since JobDefinitionDto#config() is a pluggable interface type and we don't have methods we can access,
+        // convert the value to a JsonNode and access the group key with that.
+        return jobDefinition -> objectMapper.convertValue(jobDefinition.config(), JsonNode.class).path(key).asText();
     }
 }
