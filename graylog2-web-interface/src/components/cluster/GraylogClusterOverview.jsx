@@ -25,7 +25,7 @@ const GraylogClusterOverview = createReactClass({
 
   propTypes: {
     layout: PropTypes.oneOf(['default', 'compact']),
-    children: PropTypes.array,
+    children: PropTypes.node,
   },
 
   mixins: [Reflux.connect(NodesStore, 'nodes'), Reflux.connect(ClusterTrafficStore, 'traffic')],

@@ -26,7 +26,7 @@ const EnterpriseProductLink = ({ children }) => {
 };
 
 EnterpriseProductLink.propTypes = {
-  children: PropTypes.array,
+  children: PropTypes.node,
 };
 EnterpriseProductLink.defaultProps = {
   children: null,
