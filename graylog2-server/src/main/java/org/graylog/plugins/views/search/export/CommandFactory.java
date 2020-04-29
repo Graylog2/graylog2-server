@@ -41,7 +41,8 @@ public class CommandFactory {
                 .queryString(request.queryString())
                 .streams(request.streams())
                 .fieldsInOrder(request.fieldsInOrder())
-                .sort(request.sort());
+                .sort(request.sort())
+                .chunkSize(request.chunkSize());
 
         if (request.limit().isPresent()) {
             builder.limit(request.limit().getAsInt());

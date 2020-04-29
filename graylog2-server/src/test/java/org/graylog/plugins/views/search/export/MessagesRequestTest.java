@@ -24,7 +24,6 @@ import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFA
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_QUERY;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_SORT;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_STREAMS;
-import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_TIME_RANGE;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MessagesRequestTest {
@@ -33,7 +32,7 @@ class MessagesRequestTest {
         MessagesRequest defaultRequest = MessagesRequest.builder().build();
 
         assertAll("Should fill every empty field with default",
-                () -> assertThat(defaultRequest.timeRange()).isEqualTo(DEFAULT_TIME_RANGE),
+                () -> assertThat(defaultRequest.timeRange()).isNotNull(),
                 () -> assertThat(defaultRequest.queryString()).isEqualTo(DEFAULT_QUERY),
                 () -> assertThat(defaultRequest.streams()).isEqualTo(DEFAULT_STREAMS),
                 () -> assertThat(defaultRequest.fieldsInOrder()).isEqualTo(DEFAULT_FIELDS),

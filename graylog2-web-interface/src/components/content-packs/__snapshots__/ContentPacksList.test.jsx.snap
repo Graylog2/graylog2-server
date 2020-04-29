@@ -963,7 +963,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
                           "isStatic": false,
-                          "lastClassName": "hwtGMv",
+                          "lastClassName": "cNtVlO",
                           "rules": Array [
                             [Function],
                           ],
@@ -993,13 +993,13 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     forwardedRef={null}
                   >
                     <ForwardRef
-                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv"
+                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                     >
                       <ListGroupItem__StyledListGroupItem
-                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv"
+                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                       >
                         <StyledComponent
-                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv"
+                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                           forwardedComponent={
                             Object {
                               "$$typeof": Symbol(react.forward_ref),
@@ -1032,11 +1032,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 hwtGMv list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
                             >
                               <ControlledTableListHeader__HeaderWrapper>
                                 <StyledComponent
@@ -1172,53 +1172,53 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               onClick={[Function]}
                                               style={Object {}}
                                             >
-                                              <ForwardRef
-                                                bsClass="badge installed"
-                                                key="installed"
+                                              <ContentPackStatus__StatusBadge
+                                                status="installed"
                                               >
-                                                <Badge__StyledBadge
-                                                  bsClass="badge installed"
-                                                >
-                                                  <StyledComponent
-                                                    bsClass="badge installed"
-                                                    forwardedComponent={
-                                                      Object {
-                                                        "$$typeof": Symbol(react.forward_ref),
-                                                        "attrs": Array [],
-                                                        "componentStyle": ComponentStyle {
-                                                          "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                                          "isStatic": false,
-                                                          "lastClassName": "gDhrrS",
-                                                          "rules": Array [
-                                                            [Function],
-                                                          ],
-                                                        },
-                                                        "displayName": "Badge__StyledBadge",
-                                                        "foldedComponentIds": Array [],
-                                                        "render": [Function],
-                                                        "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                                        "target": [Function],
-                                                        "toString": [Function],
-                                                        "warnTooManyClasses": [Function],
-                                                        "withComponent": [Function],
-                                                      }
+                                                <StyledComponent
+                                                  forwardedComponent={
+                                                    Object {
+                                                      "$$typeof": Symbol(react.forward_ref),
+                                                      "attrs": Array [],
+                                                      "componentStyle": ComponentStyle {
+                                                        "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
+                                                        "isStatic": false,
+                                                        "lastClassName": "bvWguH",
+                                                        "rules": Array [
+                                                          [Function],
+                                                          [Function],
+                                                        ],
+                                                      },
+                                                      "displayName": "ContentPackStatus__StatusBadge",
+                                                      "foldedComponentIds": Array [
+                                                        "Badge__StyledBadge-sc-4gzqz0-0",
+                                                      ],
+                                                      "render": [Function],
+                                                      "styledComponentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
+                                                      "target": [Function],
+                                                      "toString": [Function],
+                                                      "warnTooManyClasses": [Function],
+                                                      "withComponent": [Function],
                                                     }
-                                                    forwardedRef={null}
+                                                  }
+                                                  forwardedRef={null}
+                                                  status="installed"
+                                                >
+                                                  <Badge
+                                                    bsClass="badge"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bvWguH"
+                                                    pullRight={false}
+                                                    status="installed"
                                                   >
-                                                    <Badge
-                                                      bsClass="badge installed"
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
-                                                      pullRight={false}
+                                                    <span
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bvWguH badge"
+                                                      status="installed"
                                                     >
-                                                      <span
-                                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed"
-                                                      >
-                                                        installed
-                                                      </span>
-                                                    </Badge>
-                                                  </StyledComponent>
-                                                </Badge__StyledBadge>
-                                              </ForwardRef>
+                                                      installed
+                                                    </span>
+                                                  </Badge>
+                                                </StyledComponent>
+                                              </ContentPackStatus__StatusBadge>
                                             </a>
                                           </Link>
                                         </span>
@@ -2004,53 +2004,53 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               onClick={[Function]}
                                               style={Object {}}
                                             >
-                                              <ForwardRef
-                                                bsClass="badge installed"
-                                                key="installed"
+                                              <ContentPackStatus__StatusBadge
+                                                status="installed"
                                               >
-                                                <Badge__StyledBadge
-                                                  bsClass="badge installed"
-                                                >
-                                                  <StyledComponent
-                                                    bsClass="badge installed"
-                                                    forwardedComponent={
-                                                      Object {
-                                                        "$$typeof": Symbol(react.forward_ref),
-                                                        "attrs": Array [],
-                                                        "componentStyle": ComponentStyle {
-                                                          "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                                          "isStatic": false,
-                                                          "lastClassName": "gDhrrS",
-                                                          "rules": Array [
-                                                            [Function],
-                                                          ],
-                                                        },
-                                                        "displayName": "Badge__StyledBadge",
-                                                        "foldedComponentIds": Array [],
-                                                        "render": [Function],
-                                                        "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                                        "target": [Function],
-                                                        "toString": [Function],
-                                                        "warnTooManyClasses": [Function],
-                                                        "withComponent": [Function],
-                                                      }
+                                                <StyledComponent
+                                                  forwardedComponent={
+                                                    Object {
+                                                      "$$typeof": Symbol(react.forward_ref),
+                                                      "attrs": Array [],
+                                                      "componentStyle": ComponentStyle {
+                                                        "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
+                                                        "isStatic": false,
+                                                        "lastClassName": "bvWguH",
+                                                        "rules": Array [
+                                                          [Function],
+                                                          [Function],
+                                                        ],
+                                                      },
+                                                      "displayName": "ContentPackStatus__StatusBadge",
+                                                      "foldedComponentIds": Array [
+                                                        "Badge__StyledBadge-sc-4gzqz0-0",
+                                                      ],
+                                                      "render": [Function],
+                                                      "styledComponentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
+                                                      "target": [Function],
+                                                      "toString": [Function],
+                                                      "warnTooManyClasses": [Function],
+                                                      "withComponent": [Function],
                                                     }
-                                                    forwardedRef={null}
+                                                  }
+                                                  forwardedRef={null}
+                                                  status="installed"
+                                                >
+                                                  <Badge
+                                                    bsClass="badge"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bvWguH"
+                                                    pullRight={false}
+                                                    status="installed"
                                                   >
-                                                    <Badge
-                                                      bsClass="badge installed"
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
-                                                      pullRight={false}
+                                                    <span
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bvWguH badge"
+                                                      status="installed"
                                                     >
-                                                      <span
-                                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed"
-                                                      >
-                                                        installed
-                                                      </span>
-                                                    </Badge>
-                                                  </StyledComponent>
-                                                </Badge__StyledBadge>
-                                              </ForwardRef>
+                                                      installed
+                                                    </span>
+                                                  </Badge>
+                                                </StyledComponent>
+                                              </ContentPackStatus__StatusBadge>
                                             </a>
                                           </Link>
                                         </span>
