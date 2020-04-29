@@ -186,6 +186,7 @@ public class AWSService {
                                              "elasticloadbalancing:DescribeLoadBalancers",
                                              "iam:CreateRole",
                                              "iam:GetRole",
+                                             "iam:PassRole",
                                              "iam:PutRolePolicy",
                                              "kinesis:CreateStream",
                                              "kinesis:DescribeStream",

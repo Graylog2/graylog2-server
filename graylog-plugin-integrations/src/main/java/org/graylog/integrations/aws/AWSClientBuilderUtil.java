@@ -88,10 +88,14 @@ public class AWSClientBuilderUtil {
      * @return A fully built {@link IamClient}
      */
     public static IamClient buildClient(IamClientBuilder clientBuilder, AWSRequest request) {
+        Region iamRegion = Region.AWS_GLOBAL;
+        if (request.region().contains("gov")) {
+            iamRegion = Region.AWS_US_GOV_GLOBAL;
+        }
 
         AWSClientBuilderUtil.initializeBuilder(clientBuilder,
                                                request.iamEndpoint(),
-                                               Region.AWS_GLOBAL, // Always specify the global region for the IAM client.
+                                               iamRegion, // Always specify the appropriate global region for the IAM client.
                                                AWSAuthFactory.create(request.region(), // The AWSAuthProvider must still use the user-specified region, since a role might need to be assumed in that region.
                                                                      request.awsAccessKeyId(),
                                                                      request.awsSecretAccessKey(), request.assumeRoleArn()));
