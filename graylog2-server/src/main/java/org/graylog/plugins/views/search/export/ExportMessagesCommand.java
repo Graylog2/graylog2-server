@@ -36,17 +36,16 @@ import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHa
 
 @AutoValue
 public abstract class ExportMessagesCommand {
-    public static final AbsoluteRange DEFAULT_TIME_RANGE = lastFiveMinutes();
     public static final ElasticsearchQueryString DEFAULT_QUERY = ElasticsearchQueryString.empty();
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
     public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
     public static final LinkedHashSet<Sort> DEFAULT_SORT = linkedHashSetOf(Sort.create("timestamp", SortOrder.DESC));
     public static final int DEFAULT_CHUNK_SIZE = 1000;
 
-    public static AbsoluteRange lastFiveMinutes() {
+    public static AbsoluteRange defaultTimeRange() {
         try {
-            RelativeRange relativeRange = RelativeRange.create(300);
-            return AbsoluteRange.create(relativeRange.getFrom(), relativeRange.getTo());
+            RelativeRange lastFiveMinutes = RelativeRange.create(300);
+            return AbsoluteRange.create(lastFiveMinutes.getFrom(), lastFiveMinutes.getTo());
         } catch (InvalidRangeParametersException e) {
             throw new RuntimeException("Error creating default time range", e);
         }
@@ -108,7 +107,7 @@ public abstract class ExportMessagesCommand {
 
         public static Builder create() {
             return new AutoValue_ExportMessagesCommand.Builder()
-                    .timeRange(DEFAULT_TIME_RANGE)
+                    .timeRange(defaultTimeRange())
                     .streams(DEFAULT_STREAMS)
                     .queryString(DEFAULT_QUERY)
                     .fieldsInOrder(DEFAULT_FIELDS)

@@ -30,7 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
-import static org.graylog.plugins.views.search.export.ExportMessagesCommand.lastFiveMinutes;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.defaultTimeRange;
 
 public class TestData {
 
@@ -40,7 +40,7 @@ public class TestData {
 
     public static Query.Builder validQueryBuilder() {
         return Query.builder().id(UUID.randomUUID().toString())
-                .timerange(lastFiveMinutes())
+                .timerange(defaultTimeRange())
                 .query(new BackendQuery.Fallback());
     }
 
