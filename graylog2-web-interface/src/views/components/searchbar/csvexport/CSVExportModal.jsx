@@ -40,15 +40,20 @@ export type Props = {
   view: View,
 };
 
+const _getInitialWidgetFields = (selectedWidget) => {
+  if (selectedWidget.config.showMessageRow) {
+    return [...new Set([...selectedWidget.config.fields, 'message'])];
+  }
+  return selectedWidget.config.fields;
+};
+
 const _getInitialFields = (selectedWidget) => {
   let initialFields = DEFAULT_FIELDS;
   if (selectedWidget) {
-    // Because the message table always displays the message, we need to add it as an initial field.
-    initialFields = [...new Set([...selectedWidget.config.fields, 'message'])];
+    initialFields = _getInitialWidgetFields(selectedWidget);
   }
   return initialFields.map((field) => ({ field }));
 };
-
 
 const _onSelectWidget = ({ value: newWidget }, setSelectedWidget, setSelectedFields, setSelectedSort) => {
   setSelectedWidget(newWidget);
