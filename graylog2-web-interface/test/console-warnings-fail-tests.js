@@ -14,15 +14,15 @@ const ignoredWarnings = [
 const ignoreWarning = (args) => (!args[0] || ignoredWarnings.filter((warning) => args[0].includes(warning)).length > 0);
 
 console.warn = jest.fn((...args) => {
+  console.origWarn(...args);
   if (!ignoreWarning(args)) {
     throw new Error(format(...args));
   }
-  console.origWarn(...args);
 });
 
 console.error = jest.fn((...args) => {
+  console.origError(...args);
   if (!ignoreWarning(args)) {
     throw new Error(format(...args));
   }
-  console.origError(...args);
 });
