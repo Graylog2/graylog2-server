@@ -73,7 +73,8 @@ class CommandFactoryTest {
                 () -> assertThat(command.streams()).isEqualTo(request.streams()),
                 () -> assertThat(command.fieldsInOrder()).isEqualTo(request.fieldsInOrder()),
                 () -> assertThat(command.sort()).isEqualTo(request.sort()),
-                () -> assertThat(command.limit()).isEqualTo(request.limit())
+                () -> assertThat(command.limit()).isEqualTo(request.limit()),
+                () -> assertThat(command.chunkSize()).isEqualTo(request.chunkSize())
         );
     }
 
