@@ -7,7 +7,7 @@ import QueryTitleEditModal from './QueryTitleEditModal';
 
 describe('QueryTitleEditModal', () => {
   afterEach(cleanup);
-  const modalHeadline = 'Editing query title';
+  const modalHeadline = 'Editing dashboard page title';
   const openModal = (modalRef, currentTitle = 'CurrentTitle') => {
     if (modalRef) {
       modalRef.open(currentTitle);
