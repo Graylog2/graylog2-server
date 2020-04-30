@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { util } from 'theme';
 import AceEditor from './ace';
@@ -7,7 +7,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   // NOTE: After setting the prop we need to swap them back so AceEditor uses the proper styles
   theme: aceTheme,
   scTheme: theme,
-}))(({ scTheme }) => `
+}))(({ scTheme }) => css`
   margin-top: 9px;
   height: 34px !important;
   width: 100% !important;
@@ -45,7 +45,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
 
   &.ace-queryinput .ace_marker-layer .ace_bracket {
     margin: -1px 0 0 -1px;
-    border: 1px solid ${scTheme.color.variant.light.default};
+    border: none;
   }
 
   &.ace-queryinput .ace_marker-layer .ace_active-line {
@@ -106,7 +106,8 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
 
   &.ace-queryinput .ace_entity.ace_name.ace_function,
   &.ace-queryinput .ace_support.ace_function,
-  &.ace-queryinput .ace_variable {
+  &.ace-queryinput .ace_variable,
+  &.ace-queryinput .ace_term {
     color: ${scTheme.color.variant.info};
   }
 
@@ -130,7 +131,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   }
 
   &.ace-queryinput .ace_comment {
-    color: ${scTheme.color.gray[50]};
+    color: ${scTheme.color.gray[60]};
   }
 
   .ace_placeholder {
