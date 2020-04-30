@@ -1,0 +1,158 @@
+{
+  "event_definitions": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "title": "Test",
+      "description": "A test event definition",
+      "priority": 2,
+      "alert": true,
+      "notification_settings": {
+        "grace_period_ms": 60000
+      },
+      "config": {
+        "type": "__test_event_processor_config__",
+        "message": "This is a test event processor",
+        "search_within_ms": 300000,
+        "execute_every_ms": 60000
+      },
+      "field_spec": {},
+      "key_spec": [
+        "username"
+      ],
+      "notifications": [],
+      "storage": []
+    }
+  ],
+  "scheduler_job_definitions": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "title": "Test 1",
+      "description": "A test event definition",
+      "config": {
+        "type": "event-processor-execution-v1",
+        "event_definition_id": "54e3deadbeefdeadbeef0000",
+        "processing_window_size": 300000,
+        "processing_hop_size": 60000,
+        "parameters": {
+          "type": "__test_event_processor_parameters__",
+          "timerange": {
+            "type": "absolute",
+            "from": {
+              "$date": "2019-01-01T00:00:00.000Z"
+            },
+            "to": {
+              "$date": "2019-01-01T00:05:00.000Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "title": "Test 2",
+      "description": "A second test event definition",
+      "config": {
+        "type": "event-processor-execution-v1",
+        "event_definition_id": "54e3deadbeefdeadbeef0000",
+        "processing_window_size": 300000,
+        "processing_hop_size": 60000,
+        "parameters": {
+          "type": "__test_event_processor_parameters__",
+          "timerange": {
+            "type": "absolute",
+            "from": {
+              "$date": "2019-01-01T00:00:00.000Z"
+            },
+            "to": {
+              "$date": "2019-01-01T00:05:00.000Z"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "scheduler_triggers": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "job_definition_id": "54e3deadbeefdeadbeef0000",
+      "start_time": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "next_time": {
+        "$date": "2019-01-01T02:00:00.000Z"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "updated_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "status": "runnable",
+      "lock": {
+        "owner": null,
+        "clock": 0,
+        "progress": 0
+      },
+      "schedule": {
+        "type": "interval",
+        "interval": 60000,
+        "unit": "MILLISECONDS"
+      },
+      "data": {
+        "type": "event-processor-execution-v1",
+        "timerange_from": {
+          "$date": "2019-01-01T00:00:00.000Z"
+        },
+        "timerange_to": {
+          "$date": "2019-01-01T03:00:00.000Z"
+        }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "job_definition_id": "54e3deadbeefdeadbeef0001",
+      "start_time": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "next_time": {
+        "$date": "2019-01-01T02:00:00.000Z"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "updated_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "status": "runnable",
+      "lock": {
+        "owner": null,
+        "clock": 0,
+        "progress": 0
+      },
+      "schedule": {
+        "type": "interval",
+        "interval": 60000,
+        "unit": "MILLISECONDS"
+      },
+      "data": {
+        "type": "event-processor-execution-v1",
+        "timerange_from": {
+          "$date": "2019-01-01T00:00:00.000Z"
+        },
+        "timerange_to": {
+          "$date": "2019-01-01T03:00:00.000Z"
+        }
+      }
+    }
+  ]
+}

@@ -19,6 +19,9 @@ package org.graylog2.shared.bindings;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.security.ShiroSecurityBinding;
+import org.graylog2.web.DevelopmentIndexHtmlGenerator;
+import org.graylog2.web.IndexHtmlGenerator;
+import org.graylog2.web.ProductionIndexHtmlGenerator;
 
 import javax.ws.rs.container.DynamicFeature;
 
@@ -31,6 +34,15 @@ public class RestApiBindings extends Graylog2Module {
         // we don't actually have global REST API bindings for these
         jerseyExceptionMapperBinder();
         jerseyAdditionalComponentsBinder();
+
+        // In development mode we use an external process to provide the web interface.
+        // To avoid errors because of missing production web assets, we use a different implementation for
+        // generating the "index.html" page.
+        if (System.getenv("DEVELOPMENT") == null) {
+            bind(IndexHtmlGenerator.class).to(ProductionIndexHtmlGenerator.class).asEagerSingleton();
+        } else {
+            bind(IndexHtmlGenerator.class).to(DevelopmentIndexHtmlGenerator.class).asEagerSingleton();
+        }
     }
 
     private void bindDynamicFeatures() {

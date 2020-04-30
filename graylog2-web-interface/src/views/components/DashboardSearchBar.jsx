@@ -17,6 +17,7 @@ import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import TopRow from 'views/components/searchbar/TopRow';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 
@@ -45,7 +46,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
           <DashboardSearchForm initialValues={{ timerange, queryString }} onSubmit={submitForm}>
             {({ dirty, isSubmitting, isValid, handleSubmit }) => (
               <>
-                <Row className="no-bm extended-search-query-metadata">
+                <TopRow>
                   <Col lg={4} md={6} xs={8}>
                     <TimeRangeOverrideTypeSelector />
                     <TimeRangeInput config={config} />
@@ -53,7 +54,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                   <Col lg={8} md={6} xs={4}>
                     <RefreshControls />
                   </Col>
-                </Row>
+                </TopRow>
 
                 <Row className="no-bm">
                   <Col md={9} xs={8}>

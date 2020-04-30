@@ -25,6 +25,8 @@ import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.graylog.events.EventsModule;
+import org.graylog.freeenterprise.FreeEnterpriseConfiguration;
+import org.graylog.freeenterprise.FreeEnterpriseModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -113,6 +115,7 @@ public class Server extends ServerBootstrap {
     private final ViewsConfig viewsConfiguration = new ViewsConfig();
     private final ProcessingStatusConfig processingStatusConfig = new ProcessingStatusConfig();
     private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
+    private final FreeEnterpriseConfiguration freeEnterpriseConfiguration = new FreeEnterpriseConfiguration();
 
     public Server() {
         super("server", configuration);
@@ -129,38 +132,39 @@ public class Server extends ServerBootstrap {
     protected List<Module> getCommandBindings() {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
-            new ConfigurationModule(configuration),
-            new ServerBindings(configuration),
-            new ElasticsearchModule(),
-            new PersistenceServicesBindings(),
-            new MessageFilterBindings(),
-            new MessageProcessorModule(),
-            new AlarmCallbackBindings(),
-            new InitializerBindings(),
-            new MessageInputBindings(),
-            new MessageOutputBindings(configuration, chainingClassLoader),
-            new RotationStrategyBindings(),
-            new RetentionStrategyBindings(),
-            new PeriodicalBindings(),
-            new ObjectMapperModule(chainingClassLoader),
-            new RestApiBindings(),
-            new PasswordAlgorithmBindings(),
-            new WidgetStrategyBindings(),
-            new DashboardBindings(),
-            new DecoratorBindings(),
-            new AuditBindings(),
-            new AlertConditionBindings(),
-            new IndexerBindings(),
-            new MigrationsModule(),
-            new NetFlowPluginModule(),
-            new CEFInputModule(),
-            new MapWidgetModule(),
-            new SidecarModule(),
-            new ContentPacksModule(),
-            new ViewsBindings(),
-            new ESBackendModule(),
-            new JobSchedulerModule(),
-            new EventsModule()
+                new ConfigurationModule(configuration),
+                new ServerBindings(configuration),
+                new ElasticsearchModule(),
+                new PersistenceServicesBindings(),
+                new MessageFilterBindings(),
+                new MessageProcessorModule(),
+                new AlarmCallbackBindings(),
+                new InitializerBindings(),
+                new MessageInputBindings(),
+                new MessageOutputBindings(configuration, chainingClassLoader),
+                new RotationStrategyBindings(),
+                new RetentionStrategyBindings(),
+                new PeriodicalBindings(),
+                new ObjectMapperModule(chainingClassLoader),
+                new RestApiBindings(),
+                new PasswordAlgorithmBindings(),
+                new WidgetStrategyBindings(),
+                new DashboardBindings(),
+                new DecoratorBindings(),
+                new AuditBindings(),
+                new AlertConditionBindings(),
+                new IndexerBindings(),
+                new MigrationsModule(),
+                new NetFlowPluginModule(),
+                new CEFInputModule(),
+                new MapWidgetModule(),
+                new SidecarModule(),
+                new ContentPacksModule(),
+                new ViewsBindings(),
+                new ESBackendModule(),
+                new JobSchedulerModule(),
+                new EventsModule(),
+                new FreeEnterpriseModule()
         );
 
         return modules.build();
@@ -180,7 +184,8 @@ public class Server extends ServerBootstrap {
                 pipelineConfiguration,
                 viewsConfiguration,
                 processingStatusConfig,
-                jobSchedulerConfiguration);
+                jobSchedulerConfiguration,
+                freeEnterpriseConfiguration);
     }
 
     @Override

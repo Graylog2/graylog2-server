@@ -52,6 +52,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String DECORATORS_READ = "decorators:read";
     public static final String DEFLECTOR_CYCLE = "deflector:cycle";
     public static final String DEFLECTOR_READ = "deflector:read";
+    public static final String FREELICENSES_CREATE = "freelicenses:create";
+    public static final String LICENSEINFOS_READ = "licenseinfos:read";
     public static final String EVENT_DEFINITIONS_CREATE = "eventdefinitions:create";
     public static final String EVENT_DEFINITIONS_DELETE = "eventdefinitions:delete";
     public static final String EVENT_DEFINITIONS_EDIT = "eventdefinitions:edit";
@@ -148,146 +150,148 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
-        .add(create(AUTHENTICATION_EDIT, ""))
-        .add(create(AUTHENTICATION_READ, ""))
-        .add(create(BUFFERS_READ, ""))
-        .add(create(CONTENT_PACK_CREATE, ""))
-        .add(create(CONTENT_PACK_DELETE, ""))
-        .add(create(CONTENT_PACK_READ, ""))
-        .add(create(CATALOG_LIST, ""))
-        .add(create(CATALOG_RESOLVE, ""))
-        .add(create(CLUSTER_CONFIG_ENTRY_CREATE, ""))
-        .add(create(CLUSTER_CONFIG_ENTRY_DELETE, ""))
-        .add(create(CLUSTER_CONFIG_ENTRY_EDIT, ""))
-        .add(create(CLUSTER_CONFIG_ENTRY_READ, ""))
-        .add(create(DASHBOARDS_CREATE, ""))
-        .add(create(DASHBOARDS_EDIT, ""))
-        .add(create(DASHBOARDS_READ, ""))
-        .add(create(DECORATORS_CREATE, ""))
-        .add(create(DECORATORS_EDIT, ""))
-        .add(create(DECORATORS_READ, ""))
-        .add(create(DEFLECTOR_CYCLE, ""))
-        .add(create(DEFLECTOR_READ, ""))
-        .add(create(EVENT_DEFINITIONS_CREATE, ""))
-        .add(create(EVENT_DEFINITIONS_DELETE, ""))
-        .add(create(EVENT_DEFINITIONS_EDIT, ""))
-        .add(create(EVENT_DEFINITIONS_EXECUTE, ""))
-        .add(create(EVENT_DEFINITIONS_READ, ""))
-        .add(create(EVENT_NOTIFICATIONS_CREATE, ""))
-        .add(create(EVENT_NOTIFICATIONS_DELETE, ""))
-        .add(create(EVENT_NOTIFICATIONS_EDIT, ""))
-        .add(create(EVENT_NOTIFICATIONS_READ, ""))
-        .add(create(FIELDNAMES_READ, ""))
-        .add(create(INDEXERCLUSTER_READ, ""))
-        .add(create(INDEXRANGES_READ, ""))
-        .add(create(INDEXRANGES_REBUILD, ""))
-        .add(create(INDEXSETS_CREATE, ""))
-        .add(create(INDEXSETS_DELETE, ""))
-        .add(create(INDEXSETS_EDIT, ""))
-        .add(create(INDEXSETS_READ, ""))
-        .add(create(INDICES_CHANGESTATE, ""))
-        .add(create(INDICES_DELETE, ""))
-        .add(create(INDICES_FAILURES, ""))
-        .add(create(INDICES_READ, ""))
-        .add(create(INPUTS_CHANGESTATE, ""))
-        .add(create(INPUTS_CREATE, ""))
-        .add(create(INPUTS_EDIT, ""))
-        .add(create(INPUTS_READ, ""))
-        .add(create(INPUTS_TERMINATE, ""))
-        .add(create(JOURNAL_EDIT, ""))
-        .add(create(JOURNAL_READ, ""))
-        .add(create(JVMSTATS_READ, ""))
-        .add(create(LBSTATUS_CHANGE, ""))
-        .add(create(LDAP_EDIT, ""))
-        .add(create(LDAPGROUPS_EDIT, ""))
-        .add(create(LDAPGROUPS_READ, ""))
-        .add(create(LOOKUP_TABLES_CREATE, ""))
-        .add(create(LOOKUP_TABLES_DELETE, ""))
-        .add(create(LOOKUP_TABLES_EDIT, ""))
-        .add(create(LOOKUP_TABLES_READ, ""))
-        .add(create(LOGGERS_EDIT, ""))
-        .add(create(LOGGERS_EDITSUBSYSTEM, ""))
-        .add(create(LOGGERS_READ, ""))
-        .add(create(LOGGERS_READSUBSYSTEM, ""))
-        .add(create(LOGGERSMESSAGES_READ, ""))
-        .add(create(MESSAGECOUNT_READ, ""))
-        .add(create(MESSAGES_ANALYZE, ""))
-        .add(create(MESSAGES_READ, ""))
-        .add(create(METRICS_ALLKEYS, ""))
-        .add(create(METRICS_READ, ""))
-        .add(create(METRICS_READALL, ""))
-        .add(create(METRICS_READHISTORY, ""))
-        .add(create(NODE_SHUTDOWN, ""))
-        .add(create(NOTIFICATIONS_DELETE, ""))
-        .add(create(NOTIFICATIONS_READ, ""))
-        .add(create(OUTPUTS_CREATE, ""))
-        .add(create(OUTPUTS_EDIT, ""))
-        .add(create(OUTPUTS_READ, ""))
-        .add(create(OUTPUTS_TERMINATE, ""))
-        .add(create(PROCESSING_CHANGESTATE, ""))
-        .add(create(ROLES_CREATE, ""))
-        .add(create(ROLES_DELETE, ""))
-        .add(create(ROLES_EDIT, ""))
-        .add(create(ROLES_READ, ""))
-        .add(create(SAVEDSEARCHES_CREATE, ""))
-        .add(create(SAVEDSEARCHES_EDIT, ""))
-        .add(create(SAVEDSEARCHES_READ, ""))
-        .add(create(SEARCHES_ABSOLUTE, ""))
-        .add(create(SEARCHES_KEYWORD, ""))
-        .add(create(SEARCHES_RELATIVE, ""))
-        .add(create(SOURCES_READ, ""))
-        .add(create(STREAM_OUTPUTS_CREATE, ""))
-        .add(create(STREAM_OUTPUTS_DELETE, ""))
-        .add(create(STREAM_OUTPUTS_READ, ""))
-        .add(create(STREAMS_CHANGESTATE, ""))
-        .add(create(STREAMS_CREATE, ""))
-        .add(create(STREAMS_EDIT, ""))
-        .add(create(STREAMS_READ, ""))
-        .add(create(SYSTEM_READ, ""))
-        .add(create(SYSTEMJOBS_CREATE, ""))
-        .add(create(SYSTEMJOBS_DELETE, ""))
-        .add(create(SYSTEMJOBS_READ, ""))
-        .add(create(SYSTEMMESSAGES_READ, ""))
-        .add(create(THREADS_DUMP, ""))
-        .add(create(PROCESSBUFFER_DUMP, ""))
-        .add(create(THROUGHPUT_READ, ""))
-        .add(create(URL_WHITELIST_READ, ""))
-        .add(create(URL_WHITELIST_WRITE, ""))
-        .add(create(USERS_CREATE, ""))
-        .add(create(USERS_EDIT, ""))
-        .add(create(USERS_LIST, ""))
-        .add(create(USERS_PASSWORDCHANGE, ""))
-        .add(create(USERS_PERMISSIONSEDIT, ""))
-        .add(create(USERS_ROLESEDIT, ""))
-        .add(create(USERS_TOKENCREATE, ""))
-        .add(create(USERS_TOKENLIST, ""))
-        .add(create(USERS_TOKENREMOVE, ""))
-        .build();
+            .add(create(AUTHENTICATION_EDIT, ""))
+            .add(create(AUTHENTICATION_READ, ""))
+            .add(create(BUFFERS_READ, ""))
+            .add(create(CONTENT_PACK_CREATE, ""))
+            .add(create(CONTENT_PACK_DELETE, ""))
+            .add(create(CONTENT_PACK_READ, ""))
+            .add(create(CATALOG_LIST, ""))
+            .add(create(CATALOG_RESOLVE, ""))
+            .add(create(CLUSTER_CONFIG_ENTRY_CREATE, ""))
+            .add(create(CLUSTER_CONFIG_ENTRY_DELETE, ""))
+            .add(create(CLUSTER_CONFIG_ENTRY_EDIT, ""))
+            .add(create(CLUSTER_CONFIG_ENTRY_READ, ""))
+            .add(create(DASHBOARDS_CREATE, ""))
+            .add(create(DASHBOARDS_EDIT, ""))
+            .add(create(DASHBOARDS_READ, ""))
+            .add(create(DECORATORS_CREATE, ""))
+            .add(create(DECORATORS_EDIT, ""))
+            .add(create(DECORATORS_READ, ""))
+            .add(create(DEFLECTOR_CYCLE, ""))
+            .add(create(DEFLECTOR_READ, ""))
+            .add(create(FREELICENSES_CREATE, ""))
+            .add(create(LICENSEINFOS_READ, ""))
+            .add(create(EVENT_DEFINITIONS_CREATE, ""))
+            .add(create(EVENT_DEFINITIONS_DELETE, ""))
+            .add(create(EVENT_DEFINITIONS_EDIT, ""))
+            .add(create(EVENT_DEFINITIONS_EXECUTE, ""))
+            .add(create(EVENT_DEFINITIONS_READ, ""))
+            .add(create(EVENT_NOTIFICATIONS_CREATE, ""))
+            .add(create(EVENT_NOTIFICATIONS_DELETE, ""))
+            .add(create(EVENT_NOTIFICATIONS_EDIT, ""))
+            .add(create(EVENT_NOTIFICATIONS_READ, ""))
+            .add(create(FIELDNAMES_READ, ""))
+            .add(create(INDEXERCLUSTER_READ, ""))
+            .add(create(INDEXRANGES_READ, ""))
+            .add(create(INDEXRANGES_REBUILD, ""))
+            .add(create(INDEXSETS_CREATE, ""))
+            .add(create(INDEXSETS_DELETE, ""))
+            .add(create(INDEXSETS_EDIT, ""))
+            .add(create(INDEXSETS_READ, ""))
+            .add(create(INDICES_CHANGESTATE, ""))
+            .add(create(INDICES_DELETE, ""))
+            .add(create(INDICES_FAILURES, ""))
+            .add(create(INDICES_READ, ""))
+            .add(create(INPUTS_CHANGESTATE, ""))
+            .add(create(INPUTS_CREATE, ""))
+            .add(create(INPUTS_EDIT, ""))
+            .add(create(INPUTS_READ, ""))
+            .add(create(INPUTS_TERMINATE, ""))
+            .add(create(JOURNAL_EDIT, ""))
+            .add(create(JOURNAL_READ, ""))
+            .add(create(JVMSTATS_READ, ""))
+            .add(create(LBSTATUS_CHANGE, ""))
+            .add(create(LDAP_EDIT, ""))
+            .add(create(LDAPGROUPS_EDIT, ""))
+            .add(create(LDAPGROUPS_READ, ""))
+            .add(create(LOOKUP_TABLES_CREATE, ""))
+            .add(create(LOOKUP_TABLES_DELETE, ""))
+            .add(create(LOOKUP_TABLES_EDIT, ""))
+            .add(create(LOOKUP_TABLES_READ, ""))
+            .add(create(LOGGERS_EDIT, ""))
+            .add(create(LOGGERS_EDITSUBSYSTEM, ""))
+            .add(create(LOGGERS_READ, ""))
+            .add(create(LOGGERS_READSUBSYSTEM, ""))
+            .add(create(LOGGERSMESSAGES_READ, ""))
+            .add(create(MESSAGECOUNT_READ, ""))
+            .add(create(MESSAGES_ANALYZE, ""))
+            .add(create(MESSAGES_READ, ""))
+            .add(create(METRICS_ALLKEYS, ""))
+            .add(create(METRICS_READ, ""))
+            .add(create(METRICS_READALL, ""))
+            .add(create(METRICS_READHISTORY, ""))
+            .add(create(NODE_SHUTDOWN, ""))
+            .add(create(NOTIFICATIONS_DELETE, ""))
+            .add(create(NOTIFICATIONS_READ, ""))
+            .add(create(OUTPUTS_CREATE, ""))
+            .add(create(OUTPUTS_EDIT, ""))
+            .add(create(OUTPUTS_READ, ""))
+            .add(create(OUTPUTS_TERMINATE, ""))
+            .add(create(PROCESSING_CHANGESTATE, ""))
+            .add(create(ROLES_CREATE, ""))
+            .add(create(ROLES_DELETE, ""))
+            .add(create(ROLES_EDIT, ""))
+            .add(create(ROLES_READ, ""))
+            .add(create(SAVEDSEARCHES_CREATE, ""))
+            .add(create(SAVEDSEARCHES_EDIT, ""))
+            .add(create(SAVEDSEARCHES_READ, ""))
+            .add(create(SEARCHES_ABSOLUTE, ""))
+            .add(create(SEARCHES_KEYWORD, ""))
+            .add(create(SEARCHES_RELATIVE, ""))
+            .add(create(SOURCES_READ, ""))
+            .add(create(STREAM_OUTPUTS_CREATE, ""))
+            .add(create(STREAM_OUTPUTS_DELETE, ""))
+            .add(create(STREAM_OUTPUTS_READ, ""))
+            .add(create(STREAMS_CHANGESTATE, ""))
+            .add(create(STREAMS_CREATE, ""))
+            .add(create(STREAMS_EDIT, ""))
+            .add(create(STREAMS_READ, ""))
+            .add(create(SYSTEM_READ, ""))
+            .add(create(SYSTEMJOBS_CREATE, ""))
+            .add(create(SYSTEMJOBS_DELETE, ""))
+            .add(create(SYSTEMJOBS_READ, ""))
+            .add(create(SYSTEMMESSAGES_READ, ""))
+            .add(create(THREADS_DUMP, ""))
+            .add(create(PROCESSBUFFER_DUMP, ""))
+            .add(create(THROUGHPUT_READ, ""))
+            .add(create(URL_WHITELIST_READ, ""))
+            .add(create(URL_WHITELIST_WRITE, ""))
+            .add(create(USERS_CREATE, ""))
+            .add(create(USERS_EDIT, ""))
+            .add(create(USERS_LIST, ""))
+            .add(create(USERS_PASSWORDCHANGE, ""))
+            .add(create(USERS_PERMISSIONSEDIT, ""))
+            .add(create(USERS_ROLESEDIT, ""))
+            .add(create(USERS_TOKENCREATE, ""))
+            .add(create(USERS_TOKENLIST, ""))
+            .add(create(USERS_TOKENREMOVE, ""))
+            .build();
 
     // Standard set of PERMISSIONS of readers.
     protected static final ImmutableSet<String> READER_BASE_PERMISSION_SELECTION = ImmutableSet.<String>builder().add(
-        BUFFERS_READ,
-        CLUSTER_CONFIG_ENTRY_READ,
-        DECORATORS_READ,
-        FIELDNAMES_READ,
-        INDEXERCLUSTER_READ,
-        INPUTS_READ,
-        JOURNAL_READ,
-        JVMSTATS_READ,
-        MESSAGECOUNT_READ,
-        MESSAGES_ANALYZE,
-        MESSAGES_READ,
-        METRICS_READ,
-        SAVEDSEARCHES_CREATE,
-        SAVEDSEARCHES_EDIT,
-        SAVEDSEARCHES_READ,
-        SYSTEM_READ,
-        THROUGHPUT_READ
+            BUFFERS_READ,
+            CLUSTER_CONFIG_ENTRY_READ,
+            DECORATORS_READ,
+            FIELDNAMES_READ,
+            INDEXERCLUSTER_READ,
+            INPUTS_READ,
+            JOURNAL_READ,
+            JVMSTATS_READ,
+            MESSAGECOUNT_READ,
+            MESSAGES_ANALYZE,
+            MESSAGES_READ,
+            METRICS_READ,
+            SAVEDSEARCHES_CREATE,
+            SAVEDSEARCHES_EDIT,
+            SAVEDSEARCHES_READ,
+            SYSTEM_READ,
+            THROUGHPUT_READ
     ).build();
 
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
-        .filter(permission -> READER_BASE_PERMISSION_SELECTION.contains(permission.permission()))
-        .collect(Collectors.toSet());
+            .filter(permission -> READER_BASE_PERMISSION_SELECTION.contains(permission.permission()))
+            .collect(Collectors.toSet());
 
     @Override
     public Set<Permission> readerBasePermissions() {
