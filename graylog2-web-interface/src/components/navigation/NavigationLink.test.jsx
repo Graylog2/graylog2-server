@@ -22,4 +22,9 @@ describe('NavigationLink', () => {
     expect(linkContainer.props().to).not.toContain('/someprefix');
     expect(URLUtils.appPrefixed).not.toHaveBeenCalled();
   });
+  it('renders with NavItem if toplevel', () => {
+    const wrapper = mount(<NavigationLink description="Hello there!" path="/hello" topLevel />);
+    expect(wrapper.find('LinkContainer')).toHaveProp('to', '/hello');
+    expect(wrapper.find('NavItem')).toHaveText('Hello there!');
+  });
 });
