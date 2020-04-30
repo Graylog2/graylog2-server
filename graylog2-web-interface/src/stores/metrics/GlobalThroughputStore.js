@@ -1,7 +1,6 @@
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
@@ -40,10 +39,10 @@ const GlobalThroughputStore = Reflux.createStore({
       const inputMetric = update.metrics[nodeId][this.metrics.input];
       const outputMetric = update.metrics[nodeId][this.metrics.output];
       if (inputMetric) {
-        this.throughput.input += inputMetric.metric.value;
+        this.throughput = { ...this.throughput, input: inputMetric.metric.value };
       }
       if (outputMetric) {
-        this.throughput.output += outputMetric.metric.value;
+        this.throughput = { ...this.throughput, output: outputMetric.metric.value };
       }
     });
 
