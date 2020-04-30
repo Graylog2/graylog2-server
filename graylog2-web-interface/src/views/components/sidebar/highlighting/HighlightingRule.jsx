@@ -22,10 +22,12 @@ export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = s
     grid-column: 1;
     -ms-grid-column: 1;
   }
+
   > *:nth-child(2) {
     grid-column: 2;
     -ms-grid-column: 2;
   }
+
   > *:nth-child(3) {
     grid-column: 3;
     -ms-grid-column: 3;
