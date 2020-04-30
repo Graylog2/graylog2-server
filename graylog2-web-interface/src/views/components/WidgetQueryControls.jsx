@@ -10,6 +10,7 @@ import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import Button from 'components/graylog/Button';
+import TopRow from 'views/components/searchbar/TopRow';
 
 import Widget from 'views/logic/widgets/Widget';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -98,7 +99,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                        onSubmit={_onSubmit}>
           {({ dirty, isSubmitting, isValid, handleSubmit }) => (
             <>
-              <Row className="no-bm extended-search-query-metadata">
+              <TopRow>
                 <Col md={4}>
                   <TimeRangeTypeSelector disabled={isGloballyOverridden} />
                   <TimeRangeInput disabled={isGloballyOverridden} config={config} />
@@ -114,7 +115,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                     )}
                   </Field>
                 </Col>
-              </Row>
+              </TopRow>
 
               <Row className="no-bm">
                 <Col md={12}>
