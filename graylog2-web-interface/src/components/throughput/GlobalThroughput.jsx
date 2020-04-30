@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useStore } from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import NumberUtils from 'util/NumberUtils';
