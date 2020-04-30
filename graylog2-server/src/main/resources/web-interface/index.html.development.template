@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow">
+    <meta charset="UTF-8">
+    <title>${title}</title>
+    <link rel="shortcut icon" href="${appPrefix}assets/favicon.png">
+  </head>
+  <body>
+  <h1>${title}</h1>
+  <p>The server is running in development mode and doesn't provide web interface assets.</p>
+  <p>Please use yarn to start the web development server via: <pre>cd /path/to/graylog2-server/graylog2-web-interface && yarn start</pre></p>
+  </body>
+</html>
