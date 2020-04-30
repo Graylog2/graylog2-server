@@ -28,9 +28,12 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     onTitleChange: PropTypes.func.isRequired,
   };
 
-  state = {
-    titleDraft: '',
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      titleDraft: '',
+    };
+  }
 
   open = (activeQueryTitle: string) => {
     this.setState({
@@ -54,12 +57,12 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     const { titleDraft } = this.state;
     return (
       <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
-                          title="Editing query title"
+                          title="Editing dashboard page title"
                           onSubmitForm={this._onDraftSave}
                           submitButtonText="Save"
                           bsSize="large">
         <Input autoFocus
-               help="The title of the query tab. It has a maximum length of 40 characters."
+               help="Enter a helpful dashboard page title. It has a maximum length of 40 characters."
                id="title"
                label="Title"
                name="title"

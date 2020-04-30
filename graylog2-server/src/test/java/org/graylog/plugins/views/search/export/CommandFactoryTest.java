@@ -41,7 +41,7 @@ import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_SORT;
-import static org.graylog.plugins.views.search.export.ExportMessagesCommand.lastFiveMinutes;
+import static org.graylog.plugins.views.search.export.ExportMessagesCommand.defaultTimeRange;
 import static org.graylog.plugins.views.search.export.TestData.relativeRange;
 import static org.graylog.plugins.views.search.export.TestData.validQueryBuilder;
 import static org.graylog.plugins.views.search.export.TestData.validQueryBuilderWith;
@@ -73,7 +73,8 @@ class CommandFactoryTest {
                 () -> assertThat(command.streams()).isEqualTo(request.streams()),
                 () -> assertThat(command.fieldsInOrder()).isEqualTo(request.fieldsInOrder()),
                 () -> assertThat(command.sort()).isEqualTo(request.sort()),
-                () -> assertThat(command.limit()).isEqualTo(request.limit())
+                () -> assertThat(command.limit()).isEqualTo(request.limit()),
+                () -> assertThat(command.chunkSize()).isEqualTo(request.chunkSize())
         );
     }
 
@@ -213,7 +214,7 @@ class CommandFactoryTest {
 
     @Test
     void takesTimeRangeFromMessageListIfSpecified() {
-        AbsoluteRange messageListTimeRange = lastFiveMinutes();
+        AbsoluteRange messageListTimeRange = defaultTimeRange();
         MessageList ml = MessageList.builder().id("ml-id").timerange(messageListTimeRange).build();
 
         Query q = validQueryBuilderWith(ml).timerange(timeRange(222)).build();

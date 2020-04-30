@@ -15,36 +15,3 @@
 :local(.inactiveSidecarsButton) {
     margin-left: 5px;
 }
-
-th.sortable, th.sort-asc, th.sort-desc {
-    cursor: pointer;
-}
-
-/* Dirty hack to avoid column widths to change */
-th.sortable:after {
-    content: ' ';
-    display: inline-block;
-    margin-left: 5px;
-    width: 12px;
-}
-
-th.sortable:hover:after {
-    content: "\f0dc";
-    font-family: FontAwesome;
-    line-height: 1;
-    margin-left: 5px;
-}
-
-th.sort-asc:after {
-    content: "\f160";
-    font-family: FontAwesome;
-    line-height: 1;
-    margin-left: 5px;
-}
-
-th.sort-desc:after {
-    content: "\f161";
-    font-family: FontAwesome;
-    line-height: 1;
-    margin-left: 5px;
-}

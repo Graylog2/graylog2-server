@@ -68,7 +68,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
         padding-top: 0;
         padding-bottom: 5px;
         font-family: monospace;
-        color: ${theme.color.variant.light.info};
+        color: ${theme.color.variant.dark.info};
       }
 
       .message-wrapper {

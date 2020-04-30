@@ -22,6 +22,8 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.inputs.InputService;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -38,6 +40,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.when;
 
 
 public class MongoInputStatusServiceTest {
@@ -52,6 +55,8 @@ public class MongoInputStatusServiceTest {
 
     @Mock
     EventBus mockEventBus;
+    @Mock
+    private InputService inputService;
 
     private JacksonDBCollection<InputStatusRecord, ObjectId> db;
 
@@ -60,7 +65,7 @@ public class MongoInputStatusServiceTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
-        cut = new MongoInputStatusService(mongodb.mongoConnection(), mapperProvider, mockEventBus);
+        cut = new MongoInputStatusService(mongodb.mongoConnection(), mapperProvider, inputService, mockEventBus);
 
         db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection(MongoInputStatusService.COLLECTION_NAME),
                 InputStatusRecord.class,
@@ -128,6 +133,7 @@ public class MongoInputStatusServiceTest {
         InputStatusRecord savedRecord = cut.save(InputStatusRecord.builder()
                 .inputId("54e3deadbeefdeadbeef8888")
                 .inputStateData(new InputStateData() {
+                    @Override
                     public String type() {
                         return "test_type_8888";
                     }
@@ -182,24 +188,37 @@ public class MongoInputStatusServiceTest {
 
     @Test
     @MongoDBFixtures("input-status.json")
-    public void handleDeleteEvent_DoesNothing() {
-        /*
-        Currently, the InputDeleted event is propagated both when an input is stopped and when an input is deleted. We
-        would like to clean up the DB when an input is deleted, but not when it is stopped.  This method is in place to
-        be used once there are separate events for input deleted and input stopped.  For now, it should do nothing.
-         */
-
-        cut.handleInputDeleted(new InputDeleted(){
+    public void handleDeleteEvent_WhenStoppingInputDoesNothing() throws Exception {
+        final String deletedInput = "54e3deadbeefdeadbeef0001";
+        final InputDeleted inputDeletedEvent = new InputDeleted() {
             @Override
             public String id() {
-                return "54e3deadbeefdeadbeef0001";
+                return deletedInput;
             }
-        });
+        };
 
+        cut.handleInputDeleted(inputDeletedEvent);
         // The record should not be removed from the DB
-        Optional<InputStatusRecord> optDbRecord = cut.get("54e3deadbeefdeadbeef0001");
+        assertThat(cut.get(deletedInput).isPresent(), is(true));
+    }
 
-        assertThat(optDbRecord, notNullValue());
-        assertThat(optDbRecord.isPresent(), is(true));
+    @Test
+    @MongoDBFixtures("input-status.json")
+    public void handleDeleteEvent_WhenDeletingInputRemovesState() throws Exception {
+        final String deletedInput = "54e3deadbeefdeadbeef0001";
+        final InputDeleted inputDeletedEvent = new InputDeleted() {
+            @Override
+            public String id() {
+                return deletedInput;
+            }
+        };
+
+        // Simulate that the input has actually been deleted
+        // TODO: This will change once we fix https://github.com/Graylog2/graylog2-server/issues/7812
+        when(inputService.find(deletedInput)).thenThrow(new NotFoundException());
+
+        cut.handleInputDeleted(inputDeletedEvent);
+        // The record should be removed from the DB
+        assertThat(cut.get(deletedInput).isPresent(), is(false));
     }
 }

@@ -1,6 +1,7 @@
 /* eslint-disable react/no-find-dom-node */
 /* global window */
 import React from 'react';
+import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
@@ -21,7 +22,20 @@ const NodesStore = StoreProvider.getStore('Nodes');
 
 const GraylogClusterOverview = createReactClass({
   displayName: 'GraylogClusterOverview',
+
+  propTypes: {
+    layout: PropTypes.oneOf(['default', 'compact']),
+    children: PropTypes.node,
+  },
+
   mixins: [Reflux.connect(NodesStore, 'nodes'), Reflux.connect(ClusterTrafficStore, 'traffic')],
+
+  getDefaultProps() {
+    return {
+      layout: 'default',
+      children: null,
+    };
+  },
 
   getInitialState() {
     return {
@@ -50,48 +64,104 @@ const GraylogClusterOverview = createReactClass({
     this.setState({ graphWidth: domNode.clientWidth });
   },
 
-  _isClusterLoading() {
-    return !this.state.nodes;
-  },
+  renderClusterInfo() {
+    const { nodes } = this.state;
 
-  render() {
     let content = <Spinner />;
-
-    if (!this._isClusterLoading()) {
+    if (nodes) {
       content = (
         <dl className="system-dl" style={{ marginBottom: 0 }}>
           <dt>Cluster ID:</dt>
-          <dd>{this.state.nodes.clusterId || 'Not available'}</dd>
+          <dd>{nodes.clusterId || 'Not available'}</dd>
           <dt>Number of nodes:</dt>
-          <dd>{this.state.nodes.nodeCount}</dd>
+          <dd>{nodes.nodeCount}</dd>
         </dl>
       );
     }
+
+    return content;
+  },
+
+  renderTrafficGraph() {
+    const { traffic, graphWidth } = this.state;
+
     let sumOutput = null;
-    if (this.state.traffic) {
-      const bytesOut = _.reduce(this.state.traffic.output, (result, value) => result + value);
+    let trafficGraph = <Spinner />;
+    if (traffic) {
+      const bytesOut = _.reduce(traffic.output, (result, value) => result + value);
       sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
+
+      trafficGraph = (
+        <TrafficGraph traffic={traffic.output}
+                      from={traffic.from}
+                      to={traffic.to}
+                      width={graphWidth} />
+      );
     }
+
+    return (
+      <>
+        <h3 ref={(container) => { this._container = container; }} style={{ marginBottom: 10 }}>Outgoing traffic {sumOutput}</h3>
+        {trafficGraph}
+      </>
+    );
+  },
+
+  renderHeader() {
+    return <h2 style={{ marginBottom: 10 }}>Graylog cluster</h2>;
+  },
+
+  renderDefaultLayout() {
+    const { children } = this.props;
+
     return (
       <Row className="content">
         <Col md={12}>
-          <h2 style={{ marginBottom: 10 }}>Graylog cluster</h2>
-          {content}
+          {this.renderHeader()}
+          {this.renderClusterInfo()}
           <hr />
+          {children}
           <Row>
             <Col md={12}>
-              <h3 ref={(container) => { this._container = container; }} style={{ marginBottom: 10 }}>Outgoing traffic {sumOutput}</h3>
-              {!this.state.traffic ? <Spinner /> : (
-                <TrafficGraph traffic={this.state.traffic.output}
-                              from={this.state.traffic.from}
-                              to={this.state.traffic.to}
-                              width={this.state.graphWidth} />
-              )}
+              {this.renderTrafficGraph()}
             </Col>
           </Row>
         </Col>
       </Row>
     );
+  },
+
+  renderCompactLayout() {
+    const { children } = this.props;
+
+    return (
+      <Row className="content">
+        <Col md={12}>
+          {this.renderHeader()}
+          <Row>
+            <Col md={6}>
+              {this.renderClusterInfo()}
+              <hr />
+              {children}
+            </Col>
+            <Col md={6}>
+              {this.renderTrafficGraph()}
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    );
+  },
+
+  render() {
+    const { layout } = this.props;
+
+    switch (layout) {
+      case 'compact':
+        return this.renderCompactLayout();
+      default:
+        return this.renderDefaultLayout();
+    }
   },
 });
 
