@@ -11,6 +11,7 @@ jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
+jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -150,8 +151,8 @@ describe('Navigation', () => {
     };
     it.each`
     permissions                    | count | links
-    ${[]}                          | ${4}  | ${['Streams', 'Alerts', 'Dashboards']}
-    ${['searches:absolute', 'searches:relative', 'searches:keyword']} | ${5}  | ${['Search']}
+    ${[]}                          | ${3}  | ${['Streams', 'Alerts', 'Dashboards']}
+    ${['searches:absolute', 'searches:relative', 'searches:keyword']} | ${4}  | ${['Search']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
 });
