@@ -83,7 +83,10 @@ class GenericPlot extends React.Component<Props, State> {
     setChartColor: undefined,
   };
 
-  state = {};
+  constructor(props: Props) {
+    super(props);
+    this.state = {};
+  }
 
   componentDidMount() {
     styles.use();
