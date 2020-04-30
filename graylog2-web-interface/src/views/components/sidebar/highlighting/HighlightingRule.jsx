@@ -37,8 +37,9 @@ const HighlightingRule = ({ rule }: Props) => {
                           colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
                           triggerNode={<div className={styles.colorElement} style={{ backgroundColor: color }} />}
                           onChange={(newColor, _, hidePopover) => updateColor(rule, newColor, hidePopover)} />
-      {' '}
-      for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
+      <span>
+        for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
+      </span>
       <span role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
         <Icon name="trash-o" />
       </span>

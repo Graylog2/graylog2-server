@@ -11,7 +11,8 @@
 
 :local(.highlightingRuleBlock) {
     margin-top: 5px;
-    display: flex;
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
 }
 
 :local(.highlightingRuleBlock) * {

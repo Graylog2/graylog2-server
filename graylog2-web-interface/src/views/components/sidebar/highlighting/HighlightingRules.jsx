@@ -22,7 +22,7 @@ const HighlightingRules = ({ rules = [] }: Props) => {
       <h4 className={styles.headline}>Highlighting</h4>
       <div id="search-term-color" className={styles.highlightingRuleBlock}>
         <ColorBox color={DEFAULT_HIGHLIGHT_COLOR} />
-        Search terms
+        <span>Search terms</span>
       </div>
 
       {rules.map((rule) => <HighlightingRule key={`${rule.field}-${rule.value}-${rule.color}`} rule={rule} />)}
