@@ -24,7 +24,7 @@ class ExternalLink extends React.Component {
   static defaultProps = {
     href: '',
     target: '_blank',
-    iconClass: 'external-link',
+    iconClass: 'external-link-alt',
     className: '',
   };
 
