@@ -172,16 +172,12 @@ public class JobExecutionEngine {
             executionSuccessful.inc();
 
             LOG.trace("Update trigger: trigger={} update={}", trigger.id(), triggerUpdate);
-            if (!jobTriggerService.releaseTrigger(trigger, triggerUpdate)) {
-                LOG.error("Couldn't release trigger {}", trigger.id());
-            }
+            jobTriggerService.releaseTrigger(trigger, triggerUpdate);
         } catch (JobExecutionException e) {
             LOG.error("Job execution error - trigger={} job={}", trigger.id(), jobDefinition.id(), e);
             executionFailed.inc();
 
-            if (!jobTriggerService.releaseTrigger(e.getTrigger(), e.getUpdate())) {
-                LOG.error("Couldn't release trigger {}", trigger.id());
-            }
+            jobTriggerService.releaseTrigger(e.getTrigger(), e.getUpdate());
         } catch (Exception e) {
             executionFailed.inc();
             // This is an unhandled job execution error so we mark the trigger as defective
@@ -191,9 +187,7 @@ public class JobExecutionEngine {
             // don't know what happened and we also got no instructions from the job. (no JobExecutionException)
             final DateTime nextFutureTime = scheduleStrategies.nextFutureTime(trigger).orElse(null);
 
-            if (!jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextFutureTime))) {
-                LOG.error("Couldn't release trigger {}", trigger.id());
-            }
+            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextFutureTime));
         }
     }
 }
