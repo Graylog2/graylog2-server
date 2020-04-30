@@ -83,7 +83,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
         final EventDefinitionEntity entity = eventDefinition.toContentPackEntity(entityDescriptorIds)
                 .toBuilder()
-                .isScheduled(jobDefinition.isPresent())
+                .isScheduled(ValueReference.of(jobDefinition.isPresent()))
                 .build();
 
         final JsonNode data = objectMapper.convertValue(entity, JsonNode.class);
@@ -133,7 +133,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                 EventDefinitionEntity.class);
         final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
         final EventDefinitionDto savedDto;
-        if (eventDefinitionEntity.isScheduled()) {
+        if (eventDefinitionEntity.isScheduled().asBoolean(parameters)) {
             savedDto = eventDefinitionHandler.create(eventDefinition);
         } else {
             savedDto = eventDefinitionHandler.createWithoutSchedule(eventDefinition);

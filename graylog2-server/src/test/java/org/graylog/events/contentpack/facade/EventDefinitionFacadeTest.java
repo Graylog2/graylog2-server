@@ -147,7 +147,7 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionEntity.title().asString()).isEqualTo("title");
         assertThat(eventDefinitionEntity.description().asString()).isEqualTo("description");
         assertThat(eventDefinitionEntity.config().type()).isEqualTo(AggregationEventProcessorConfigEntity.TYPE_NAME);
-        assertThat(eventDefinitionEntity.isScheduled()).isTrue();
+        assertThat(eventDefinitionEntity.isScheduled().asBoolean(ImmutableMap.of())).isTrue();
     }
 
     @Test
@@ -168,7 +168,7 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionEntity.title().asString()).isEqualTo("title");
         assertThat(eventDefinitionEntity.description().asString()).isEqualTo("description");
         assertThat(eventDefinitionEntity.config().type()).isEqualTo(AggregationEventProcessorConfigEntity.TYPE_NAME);
-        assertThat(eventDefinitionEntity.isScheduled()).isFalse();
+        assertThat(eventDefinitionEntity.isScheduled().asBoolean(ImmutableMap.of())).isFalse();
     }
 
     private EntityV1 createTestEntity() {

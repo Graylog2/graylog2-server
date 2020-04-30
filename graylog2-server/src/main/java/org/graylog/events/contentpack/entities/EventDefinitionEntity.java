@@ -86,7 +86,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     public abstract ImmutableList<EventStorageHandler.Config> storage();
 
     @JsonProperty(FIELD_IS_SCHEDULED)
-    public abstract boolean isScheduled();
+    public abstract ValueReference isScheduled();
 
     public static Builder builder() {
         return Builder.create();
@@ -98,7 +98,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDefinitionEntity.Builder().isScheduled(true);
+            return new AutoValue_EventDefinitionEntity.Builder().isScheduled(ValueReference.of(true));
         }
 
         @JsonProperty(FIELD_TITLE)
@@ -132,7 +132,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storage);
 
         @JsonProperty(FIELD_IS_SCHEDULED)
-        public abstract Builder isScheduled(boolean isScheduled);
+        public abstract Builder isScheduled(ValueReference isScheduled);
 
         public abstract EventDefinitionEntity build();
     }
