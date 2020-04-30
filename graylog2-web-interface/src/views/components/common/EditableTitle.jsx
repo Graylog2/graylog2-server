@@ -1,9 +1,21 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import styles from './EditableTitle.css';
 
-export default class EditableTitle extends React.Component {
+type Props = {
+  disabled?: boolean,
+  onChange: (newTitle: string) => void,
+  value: string,
+};
+
+type State = {
+  editing: boolean,
+  value: string,
+};
+
+export default class EditableTitle extends React.Component<Props, State> {
   static propTypes = {
     disabled: PropTypes.bool,
     onChange: PropTypes.func,
@@ -15,7 +27,7 @@ export default class EditableTitle extends React.Component {
     onChange: () => {},
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     const { value } = props;
     this.state = {
@@ -36,13 +48,15 @@ export default class EditableTitle extends React.Component {
     this._onSubmit();
   };
 
-  _onChange = (evt) => {
+  _onChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
     evt.preventDefault();
     this.setState({ value: evt.target.value });
   };
 
-  _onSubmit = (e) => {
-    e.preventDefault();
+  _onSubmit = (e?: SyntheticInputEvent<HTMLInputElement>) => {
+    if (e) {
+      e.preventDefault();
+    }
     const { value } = this.state;
     const { onChange, value: propsValue } = this.props;
     if (value !== '') {
