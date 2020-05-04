@@ -7,11 +7,11 @@ import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import { type ThemeInterface } from 'theme';
 
-const StyledButton: StyledComponent<{}, void, HTMLButtonElement> = styled(Button)`
+const StyledButton: StyledComponent<{}, void, Button> = styled(Button)`
   margin-right: 7px;
 `;
 
-const DirtyButton: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled(StyledButton)(({ theme }) => `
+const DirtyButton: StyledComponent<{}, ThemeInterface, Button> = styled(StyledButton)(({ theme }) => `
   position: relative;
 
   &::after {
