@@ -45,7 +45,7 @@ export default class EditableTitle extends React.Component<Props, State> {
 
   _onBlur = () => {
     this._toggleEditing();
-    this._onSubmit();
+    this._submitValue();
   };
 
   _onChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
@@ -53,10 +53,7 @@ export default class EditableTitle extends React.Component<Props, State> {
     this.setState({ value: evt.target.value });
   };
 
-  _onSubmit = (e?: SyntheticInputEvent<HTMLInputElement>) => {
-    if (e) {
-      e.preventDefault();
-    }
+  _submitValue = () => {
     const { value } = this.state;
     const { onChange, value: propsValue } = this.props;
     if (value !== '') {
@@ -64,7 +61,12 @@ export default class EditableTitle extends React.Component<Props, State> {
     } else {
       this.setState({ value: propsValue });
     }
-    this.setState({ editing: false });
+  }
+
+  _onSubmit = (e: SyntheticInputEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    this._toggleEditing();
+    this._submitValue();
   };
 
   render() {
