@@ -147,7 +147,7 @@ class MapVisualization extends React.Component {
         <Map animate={interactive}
              className={style.map}
              fadeAnimation={interactive}
-             key={`map-${width}-${height}`}
+             key={`visualization-${id}-${width}-${height}`}
              id={`visualization-${id}`}
              markerZoomAnimation={interactive}
              onViewportChanged={onChange}
