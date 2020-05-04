@@ -37,8 +37,8 @@ public class JestWrapper {
         this.jestClient = jestClient;
     }
 
-    public <T extends JestResult> T execute(Action<T> clearScroll, Supplier<String> errorMessageSupplier) {
-        final T result = JestUtils.execute(jestClient, clearScroll, errorMessageSupplier);
+    public <T extends JestResult> T execute(Action<T> action, Supplier<String> errorMessageSupplier) {
+        final T result = JestUtils.execute(jestClient, action, errorMessageSupplier);
         Optional<ElasticsearchException> elasticsearchException = checkForFailedShards(result);
         if (elasticsearchException.isPresent()) {
             throw new ExportException(errorMessageSupplier.get(), elasticsearchException.get());
