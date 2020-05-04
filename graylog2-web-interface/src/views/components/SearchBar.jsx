@@ -11,6 +11,7 @@ import DocsHelper from 'util/DocsHelper';
 import { Spinner, Icon } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
+import TopRow from 'views/components/searchbar/TopRow';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
@@ -72,7 +73,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
                          onSubmit={_onSubmit}>
             {({ dirty, isSubmitting, isValid, handleSubmit }) => (
               <>
-                <Row className="no-bm extended-search-query-metadata">
+                <TopRow>
                   <Col md={4}>
                     <TimeRangeTypeSelector />
                     <TimeRangeInput config={config} />
@@ -95,7 +96,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
                   <Col md={3} xs={4}>
                     <RefreshControls />
                   </Col>
-                </Row>
+                </TopRow>
 
                 <Row className="no-bm">
                   <Col md={9} xs={8}>

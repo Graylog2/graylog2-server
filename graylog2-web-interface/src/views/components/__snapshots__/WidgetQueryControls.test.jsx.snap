@@ -6,13 +6,13 @@ exports[`WidgetQueryControls should do something 1`] = `
     action="#"
   >
     <div
-      class="no-bm extended-search-query-metadata row"
+      class="TopRow-sc-1ysyhyx-0 dDogjc row"
     >
       <div
         class="col-md-4"
       >
         <div
-          class="extended-search-timerange-chooser pull-left btn-toolbar"
+          class="pull-left btn-toolbar"
           role="toolbar"
         >
           <div
@@ -21,7 +21,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             <button
               aria-expanded="false"
               aria-haspopup="true"
-              class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 cbvLeL dropdown-toggle btn btn-info"
+              class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 cbvLeL TimeRangeDropdownButton__StyledDropdownButton-sc-1rmks06-0 goSdAM dropdown-toggle btn btn-info"
               id="timerange-type"
               role="button"
               type="button"
@@ -196,7 +196,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           </a>
         </div>
         <button
-          class="Button__StyledButton-c9cbmb-0 jVYrA pull-left search-button-execute btn btn-success"
+          class="Button__StyledButton-c9cbmb-0 jVYrA SearchButton__StyledButton-mm3q5z-0 gkhrPg pull-left btn btn-success"
           title="Perform search"
           type="submit"
         >

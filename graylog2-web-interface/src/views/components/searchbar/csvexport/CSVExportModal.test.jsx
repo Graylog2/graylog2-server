@@ -178,6 +178,44 @@ describe('CSVExportModal', () => {
     await wait(() => expect(closeModalStub).toHaveBeenCalledTimes(1));
   });
 
+
+  it('initial fields should not contain the message field if message list config showMessageRow is false', async () => {
+    const exportSearchTypeMessagesAction = asMock(exportSearchTypeMessages);
+    const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, [], []);
+    const widgetWithoutMessageRow = widget1.toBuilder().config(widgetConfig).build();
+    const viewStateMap: ViewStateMap = Immutable.Map({
+      'query-id-1': ViewState.builder()
+        .widgets(Immutable.List([widgetWithoutMessageRow]))
+        .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
+        .titles(Immutable.Map())
+        .build(),
+    });
+    const view = viewWithoutWidget(View.Type.Search)
+      .toBuilder()
+      .state(viewStateMap)
+      .build();
+    const { getByTestId } = render(<SimpleCSVExportModal view={view} />);
+
+    const submitButton = getByTestId('csv-download-button');
+    fireEvent.click(submitButton);
+
+    await wait(() => expect(exportSearchTypeMessagesAction).toHaveBeenCalledTimes(1));
+    expect(exportSearchTypeMessagesAction).toHaveBeenCalledWith(
+      {
+        ...payload,
+        sort: [defaultSort],
+        fields_in_order: [
+          'level',
+          'http_method',
+        ],
+      },
+      'search-id',
+      'search-type-id-1',
+      'Untitled-Message-Table-search-result',
+    );
+  });
+
+
   describe('on search page', () => {
     const SearchCSVExportModal = (props) => (
       <SimpleCSVExportModal viewType={View.Type.Search} {...props} />

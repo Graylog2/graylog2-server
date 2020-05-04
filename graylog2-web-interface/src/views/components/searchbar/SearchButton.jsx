@@ -6,7 +6,11 @@ import styled, { type StyledComponent } from 'styled-components';
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
 
-const DirtyButton: StyledComponent<{}, void, HTMLButtonElement> = styled(Button)`
+const StyledButton: StyledComponent<{}, void, Button> = styled(Button)`
+  margin-right: 7px;
+`;
+
+const DirtyButton: StyledComponent<{}, void, Button> = styled(StyledButton)`
   position: relative;
 
   ::after {
@@ -28,14 +32,14 @@ type Props = {
 };
 
 const SearchButton = ({ disabled, glyph, dirty }: Props) => {
-  const ButtonComponent = dirty ? DirtyButton : Button;
+  const ButtonComponent = dirty ? DirtyButton : StyledButton;
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform search';
   return (
     <ButtonComponent type="submit"
                      bsStyle="success"
                      disabled={disabled}
                      title={title}
-                     className="pull-left search-button-execute">
+                     className="pull-left">
       <Icon name={glyph} />
     </ButtonComponent>
   );

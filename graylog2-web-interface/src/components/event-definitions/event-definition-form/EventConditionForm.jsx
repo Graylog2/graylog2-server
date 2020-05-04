@@ -105,7 +105,7 @@ class EventConditionForm extends React.Component {
           </FormGroup>
         </Col>
 
-        <Col md={5} lg={4} lgOffset={1}>
+        <Col md={5} lg={5} lgOffset={1}>
           <HelpPanel className={styles.conditionTypesInfo}
                      title="Available Conditions">
             {this.renderConditionTypeDescriptions()}
