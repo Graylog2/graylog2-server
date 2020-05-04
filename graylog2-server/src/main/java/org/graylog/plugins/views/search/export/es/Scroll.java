@@ -79,7 +79,7 @@ public class Scroll implements RequestStrategy {
                 .setParameter(Parameters.SCROLL, "1m")
                 .addSort(unsorted());
 
-        return jestWrapper.execute(modified.build(), () -> "Failed to execute Scroll request");
+        return jestWrapper.execute(modified.build(), () -> "Failed to execute initial Scroll request");
     }
 
     private Sort unsorted() {
@@ -89,7 +89,7 @@ public class Scroll implements RequestStrategy {
     private JestResult continueScroll(String scrollId) {
         SearchScroll scroll = new SearchScroll.Builder(scrollId, SCROLL_TIME).build();
 
-        return jestWrapper.execute(scroll, () -> "Failed to execute Scroll request");
+        return jestWrapper.execute(scroll, () -> "Failed to execute Scroll request with scroll id " + currentScrollId);
     }
 
     private String scrollIdFrom(JestResult result) {

@@ -55,7 +55,7 @@ public class SearchAfter implements RequestStrategy {
     private SearchResult search(Search.Builder search) {
         Search.Builder modified = search.addSort(timestampDescending());
 
-        return jestWrapper.execute(modified.build(), () -> "Failed to execute Scroll request");
+        return jestWrapper.execute(modified.build(), () -> "Failed to execute Search After request");
     }
 
     private ArrayList<Sort> timestampDescending() {
