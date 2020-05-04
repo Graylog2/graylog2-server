@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.export.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.emory.mathcs.backport.java.util.Collections;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.ClearScroll;
 import io.searchbox.core.Search;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
