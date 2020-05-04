@@ -4,7 +4,6 @@ import React from 'react';
 import { CircleMarker, Map, Popup, TileLayer } from 'react-leaflet';
 import chroma from 'chroma-js';
 import { flatten } from 'lodash';
-import createEvent from 'util/CreateEvent';
 
 import style from './MapVisualization.css';
 
