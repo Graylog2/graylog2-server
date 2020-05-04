@@ -20,12 +20,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.emory.mathcs.backport.java.util.Collections;
 import io.searchbox.client.JestResult;
+import io.searchbox.core.ClearScroll;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.SearchScroll;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -36,6 +39,8 @@ import java.util.stream.StreamSupport;
 import static com.google.common.collect.Lists.newArrayList;
 
 public class Scroll implements RequestStrategy {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Scroll.class);
 
     private static final String SCROLL_TIME = "1m";
 
@@ -52,6 +57,17 @@ public class Scroll implements RequestStrategy {
     @SuppressWarnings("rawtypes")
     @Override
     public List<SearchResult.Hit<Map, Void>> nextChunk(Search.Builder search, ExportMessagesCommand command) {
+        List<SearchResult.Hit<Map, Void>> hits = retrieveHits(search);
+
+        if (hits.isEmpty()) {
+            cancelScroll();
+        }
+
+        return hits;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private List<SearchResult.Hit<Map, Void>> retrieveHits(Search.Builder search) {
         if (isFirstRequest()) {
             SearchResult result = search(search);
             currentScrollId = scrollIdFrom(result);
@@ -72,6 +88,14 @@ public class Scroll implements RequestStrategy {
 
     private boolean isFirstRequest() {
         return currentScrollId == null;
+    }
+
+    private void cancelScroll() {
+        ClearScroll.Builder clearScrollBuilder = new ClearScroll.Builder().addScrollId(currentScrollId);
+        JestResult result = jestWrapper.execute(clearScrollBuilder.build(), () -> "Failed to cancel scroll " + currentScrollId);
+        if (!result.isSucceeded()) {
+            LOG.error("Failed to cancel scroll with id " + currentScrollId);
+        }
     }
 
     private SearchResult search(Search.Builder search) {
