@@ -45,7 +45,7 @@ class CopyConfigurationModal extends React.Component {
     const { copyConfiguration } = this.props;
     const { errorMessage, id, name } = this.state;
 
-    if (errorMessage) {
+    if (!errorMessage) {
       copyConfiguration(id, name, this._saved);
     }
   };
@@ -56,9 +56,9 @@ class CopyConfigurationModal extends React.Component {
     this.setState({ name, errorMessage: undefined });
 
     validateConfiguration({ name }).then((validation) => {
-      const [errorMessage] = validation.errors.name;
-
-      this.setState({ errorMessage });
+      if (validation.errors.name) {
+        this.setState({ errorMessage: validation.errors.name[0] });
+      }
     });
   };
 

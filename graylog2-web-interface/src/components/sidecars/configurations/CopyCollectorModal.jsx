@@ -61,8 +61,9 @@ class CopyCollectorModal extends React.Component {
     nextCollector.id = '';
 
     validateCollector(nextCollector).then((validation) => {
-      const [errorMessage] = validation.errors.name;
-      this.setState({ errorMessage });
+      if (validation.errors.name) {
+        this.setState({ errorMessage: validation.errors.name[0] });
+      }
     });
   };
 
@@ -74,7 +75,7 @@ class CopyCollectorModal extends React.Component {
                      onSave={this._save}
                      id={this._getId('collector-name')}
                      onChange={this._changeName}
-                     error={errorMessage}
+                     error={errorMessage || ''}
                      name={name}
                      modalRef={this.modalRef} />
     );
