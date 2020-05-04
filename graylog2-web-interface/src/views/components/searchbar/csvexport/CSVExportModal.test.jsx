@@ -8,7 +8,6 @@ import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExp
 
 import type { ViewStateMap } from 'views/logic/views/View';
 import Direction from 'views/logic/aggregationbuilder/Direction';
-import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import Query from 'views/logic/queries/Query';
@@ -91,12 +90,8 @@ describe('CSVExportModal', () => {
     .state(statesWithMultipleWidgets)
     .build();
   // Prepare expected payload
-  const defaultDirection = Direction.Descending;
-  const messageSortConfig = new MessageSortConfig('level', defaultDirection);
-  const defaultSort = new MessageSortConfig('timestamp', defaultDirection);
   const payload = {
     fields_in_order: ['level', 'http_method', 'message'],
-    sort: [messageSortConfig],
     limit: undefined,
     execution_state: new SearchExecutionState(),
   };
@@ -144,7 +139,6 @@ describe('CSVExportModal', () => {
         'source',
         'message',
       ],
-      sort: [defaultSort],
       execution_state: executionState,
     };
     const { getByTestId } = render(<SimpleCSVExportModal />);
@@ -203,7 +197,6 @@ describe('CSVExportModal', () => {
     expect(exportSearchTypeMessagesAction).toHaveBeenCalledWith(
       {
         ...payload,
-        sort: [defaultSort],
         fields_in_order: [
           'level',
           'http_method',
@@ -224,7 +217,7 @@ describe('CSVExportModal', () => {
     it('should not show widget selection when no widget exists', () => {
       const { queryByText } = render(<SearchCSVExportModal />);
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields and sorting for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
       // should not show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).toBeNull();
       // should not allow widget selection
@@ -242,7 +235,6 @@ describe('CSVExportModal', () => {
       expect(exportSearchMessagesAction).toHaveBeenCalledWith(
         {
           ...payload,
-          sort: [defaultSort],
           fields_in_order: [
             'timestamp',
             'source',
@@ -257,7 +249,7 @@ describe('CSVExportModal', () => {
     it('preselect messages widget when only one exists', () => {
       const { queryByText } = render(<SearchCSVExportModal view={viewWithOneWidget(View.Type.Search)} />);
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields and sorting for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).not.toBeNull();
       // should not allow widget selection
@@ -281,7 +273,7 @@ describe('CSVExportModal', () => {
     it('preselect widget on direct export', () => {
       const { queryByText } = render(<SearchCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields and sorting for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/The following settings are based on the message table:/)).not.toBeNull();
       // should not allow widget selection
@@ -321,7 +313,7 @@ describe('CSVExportModal', () => {
     it('preselect widget on direct widget export', () => {
       const { queryByText } = render(<DashboardCSVExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} directExportWidgetId="widget-id-1" />);
       // should not show widget selection but settings form
-      expect(queryByText(/Define the fields and sorting for your CSV file./)).not.toBeNull();
+      expect(queryByText(/Define the fields for your CSV file./)).not.toBeNull();
       // should show info about selected widget
       expect(queryByText(/You are currently exporting the search results for the message table:/)).not.toBeNull();
       // should not allow widget selection
