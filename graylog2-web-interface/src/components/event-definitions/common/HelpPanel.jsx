@@ -1,46 +1,56 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import styled from 'styled-components';
 import { Panel } from 'components/graylog';
 import { Icon } from 'components/common';
 
 import styles from './HelpPanel.css';
 
-class HelpPanel extends React.Component {
-  static propTypes = {
-    bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary']),
-    children: PropTypes.node,
-    className: PropTypes.string,
-    collapsible: PropTypes.bool,
-    header: PropTypes.node,
-    title: PropTypes.string,
-    defaultExpanded: PropTypes.bool,
-  };
+const IconHeader = styled(Icon)`
+  margin-right: 9px;
+`;
 
-  static defaultProps = {
-    bsStyle: 'info',
-    children: undefined,
-    className: '',
-    collapsible: false,
-    header: undefined,
-    title: '',
-    defaultExpanded: false,
-  };
+const ConditionalCollapse = ({ condition, wrapper, children }) => (condition ? wrapper(children) : children);
 
-  render() {
-    const { bsStyle, children, className, collapsible, header, title, defaultExpanded } = this.props;
-    const defaultHeader = (<h3><Icon name="info-circle" />&emsp;{title}</h3>);
+export const HelpPanel = ({ bsStyle, children, className, collapsible, header, title, defaultExpanded }) => {
+  const defaultHeader = <h3><IconHeader name="info-circle" />{title}</h3>;
 
-    return (
-      <Panel bsStyle={bsStyle}
-             className={`${styles.helpPanel} ${className}`}
-             collapsible={collapsible}
-             defaultExpanded={defaultExpanded}
-             header={header || defaultHeader}>
-        {children}
-      </Panel>
-    );
-  }
-}
+  return (
+    <Panel defaultExpanded={defaultExpanded}
+           className={`${styles.helpPanel} ${className}`}
+           bsStyle={bsStyle}>
+      <Panel.Heading>
+        <Panel.Title toggle={collapsible}>
+          {header || defaultHeader}
+        </Panel.Title>
+      </Panel.Heading>
+      <ConditionalCollapse condition={collapsible} wrapper={(wrapChild) => <Panel.Collapse>{wrapChild}</Panel.Collapse>}>
+        <Panel.Body>
+          {children}
+        </Panel.Body>
+      </ConditionalCollapse>
+    </Panel>
+  );
+};
+
+HelpPanel.propTypes = {
+  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary']),
+  children: PropTypes.node,
+  className: PropTypes.string,
+  collapsible: PropTypes.bool,
+  header: PropTypes.node,
+  title: PropTypes.string,
+  defaultExpanded: PropTypes.bool,
+};
+
+HelpPanel.defaultProps = {
+  bsStyle: 'info',
+  children: undefined,
+  className: '',
+  collapsible: false,
+  header: undefined,
+  title: '',
+  defaultExpanded: false,
+};
 
 export default HelpPanel;
