@@ -22,6 +22,8 @@ import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
@@ -50,8 +52,13 @@ class MessagesResourceIT {
                 .when()
                 .post("/views/search/messages");
 
-        assertThat(r.asString().split("\n")).containsExactly(
-                "\"timestamp\",\"source\",\"message\"",
+        String[] resultLines = r.asString().split("\n");
+
+        assertThat(resultLines)
+                .startsWith("\"timestamp\",\"source\",\"message\"")
+                .as("should contain header");
+
+        assertThat(Arrays.copyOfRange(resultLines, 1, 5)).containsExactlyInAnyOrder(
                 "\"2015-01-01T04:00:00.000Z\",\"source-2\",\"Ho\"",
                 "\"2015-01-01T03:00:00.000Z\",\"source-1\",\"Hi\"",
                 "\"2015-01-01T02:00:00.000Z\",\"source-2\",\"He\"",
