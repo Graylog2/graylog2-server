@@ -267,7 +267,7 @@ describe('CSVExportModal', () => {
 
     it('show widget selection if more than one exists', () => {
       const { queryByText } = render(<SearchCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} />);
-      expect(queryByText(/Please select a message table to adopt its fields and sort./)).not.toBeNull();
+      expect(queryByText(/Please select a message table to adopt its fields./)).not.toBeNull();
     });
 
     it('preselect widget on direct export', () => {

@@ -24,10 +24,10 @@ const WidgetSelection = ({ selectWidget, widgets, view }: WidgetSelectionProps) 
       <Row>
         <IfSearch>
           The CSV file will contain all messages for your current search.<br />
-          Please select a message table to adopt its fields and sort. You can adjust all settings in the next step.
+          Please select a message table to adopt its fields. You can adjust all settings in the next step.
         </IfSearch>
         <IfDashboard>
-          Please select the message table you want to export the search results for. You can adjust its fields and sort in the next step.<br />
+          Please select the message table you want to export the search results for. You can adjust its fields in the next step.<br />
           Selecting a message table equals using the option &quot;Export to CSV&quot; in a message table action menu.
         </IfDashboard>
       </Row>
