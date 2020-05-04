@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.system.inputs;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import org.graylog2.inputs.Input;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -52,40 +51,39 @@ public class AbstractInputsResource extends RestResource {
         final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) ?
                 input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
         return InputSummary.create(input.getTitle(),
-                                   input.isGlobal(),
-                                   name,
-                                   input.getContentPack(),
-                                   input.getId(),
-                                   input.getCreatedAt(),
-                                   input.getType(),
-                                   input.getCreatorUserId(),
-                                   configuration,
-                                   input.getStaticFields(),
-                                   input.getNodeId());
+                input.isGlobal(),
+                name,
+                input.getContentPack(),
+                input.getId(),
+                input.getCreatedAt(),
+                input.getType(),
+                input.getCreatorUserId(),
+                configuration,
+                input.getStaticFields(),
+                input.getNodeId());
     }
 
-    @VisibleForTesting
-    Map<String, Object> maskPasswordsInConfiguration(Map<String, Object> configuration, ConfigurationRequest configurationRequest) {
+    protected Map<String, Object> maskPasswordsInConfiguration(Map<String, Object> configuration, ConfigurationRequest configurationRequest) {
         if (configuration == null || configurationRequest == null) {
             return configuration;
         }
         return configuration.entrySet()
-                            .stream()
-                            .collect(
-                                    HashMap::new,
-                                    (map, entry) -> {
-                                        final ConfigurationField field = configurationRequest.getField(entry.getKey());
-                                        if (field instanceof TextField) {
-                                            final TextField textField = (TextField) field;
-                                            if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH))
-                                                && !Strings.isNullOrEmpty((String) entry.getValue())) {
-                                                map.put(entry.getKey(), "<password set>");
-                                                return;
-                                            }
-                                        }
-                                        map.put(entry.getKey(), entry.getValue());
-                                    },
-                                    HashMap::putAll
-                            );
+                .stream()
+                .collect(
+                        HashMap::new,
+                        (map, entry) -> {
+                            final ConfigurationField field = configurationRequest.getField(entry.getKey());
+                            if (field instanceof TextField) {
+                                final TextField textField = (TextField) field;
+                                if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH))
+                                        && !Strings.isNullOrEmpty((String) entry.getValue())) {
+                                    map.put(entry.getKey(), "<password set>");
+                                    return;
+                                }
+                            }
+                            map.put(entry.getKey(), entry.getValue());
+                        },
+                        HashMap::putAll
+                );
     }
 }
