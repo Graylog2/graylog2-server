@@ -5,8 +5,6 @@ import { type ExportPayload } from 'util/MessagesExportUtils';
 import StringUtils from 'util/StringUtils';
 
 import Query from 'views/logic/queries/Query';
-import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
-import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -30,13 +28,11 @@ const startDownload = (
   executionState: SearchExecutionState,
   selectedWidget: ?Widget,
   selectedFields: { field: string }[],
-  selectedSort: SortConfig[],
   limit: ?number,
 ) => {
   const payload: ExportPayload = {
     execution_state: executionState,
     fields_in_order: selectedFields.map((field) => field.field),
-    sort: selectedSort.map((sortConfig) => new MessageSortConfig(sortConfig.field, sortConfig.direction)),
     limit,
   };
   const searchType = selectedWidget ? view.getSearchTypeByWidgetId(selectedWidget.id) : undefined;
