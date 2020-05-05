@@ -49,6 +49,13 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     padding: 0;
     margin: 0;
     color: ${theme.color.global.textDefault};
+
+    small {
+      font-family: ${sansSerifFamily};
+      text-transform: none;
+      font-weight: 600;
+      font-size: 0.75em;
+    }
   }
 
   h1 {
