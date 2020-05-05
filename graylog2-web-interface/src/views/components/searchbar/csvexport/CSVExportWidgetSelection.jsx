@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { Map } from 'immutable';
+import { List } from 'immutable';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
@@ -12,7 +12,7 @@ import Select from 'views/components/Select';
 
 type WidgetSelectionProps = {
   selectWidget: {label: string, value: Widget} => void,
-  widgets: Map<string, Widget>,
+  widgets: List<Widget>,
   view: View,
 };
 
