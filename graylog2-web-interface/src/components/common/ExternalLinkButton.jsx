@@ -41,7 +41,7 @@ ExternalLinkButton.defaultProps = {
   bsStyle: 'default',
   bsSize: undefined,
   target: '_blank',
-  iconClass: 'external-link',
+  iconClass: 'external-link-alt',
   className: '',
   disabled: false,
 };
