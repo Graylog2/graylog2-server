@@ -48,7 +48,7 @@ const ContentWrap = styled.strong`
 `;
 
 const ThroughputData = styled.span(({ dataIn, theme }) => `
-  font-size: 11px;
+  font-size: 12px;
   line-height: 13px;
   grid-area: ${dataIn ? '1 / 1 / 2 / 2' : '2 / 1 / 3 / 2'};
   display: grid;
