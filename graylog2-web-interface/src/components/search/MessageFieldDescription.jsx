@@ -23,9 +23,13 @@ class MessageFieldDescription extends React.Component {
     customFieldActions: undefined,
   };
 
-  state = {
-    messageTerms: Immutable.List(),
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      messageTerms: Immutable.List(),
+    };
+  }
 
   _shouldShowTerms = () => {
     const { messageTerms } = this.state;

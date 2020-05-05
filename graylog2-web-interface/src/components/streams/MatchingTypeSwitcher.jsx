@@ -47,9 +47,11 @@ class MatchingTypeSwitcher extends React.Component {
   }
 
   handleTypeChange = (newValue) => {
+    const { onChange, stream } = this.props;
+
     if (window.confirm('You are about to change how rules are applied to this stream, do you want to continue? Changes will take effect immediately.')) {
-      StreamsStore.update(this.props.stream.id, { matching_type: newValue }, (response) => {
-        this.props.onChange();
+      StreamsStore.update(stream.id, { matching_type: newValue }, (response) => {
+        onChange();
         UserNotification.success(`Messages will now be routed into the stream when ${newValue === 'AND' ? 'all' : 'any'} rules are matched`,
           'Success');
         return response;
@@ -58,18 +60,20 @@ class MatchingTypeSwitcher extends React.Component {
   }
 
   render() {
+    const { stream } = this.props;
+
     return (
       <StreamRuleConnector>
         <div>
           <Input id="streamrule-and-connector"
                  type="radio"
                  label="A message must match all of the following rules"
-                 checked={this.props.stream.matching_type === 'AND'}
+                 checked={stream.matching_type === 'AND'}
                  onChange={this.handleTypeChangeToAnd} />
           <Input id="streamrule-or-connector"
                  type="radio"
                  label="A message must match at least one of the following rules"
-                 checked={this.props.stream.matching_type === 'OR'}
+                 checked={stream.matching_type === 'OR'}
                  onChange={this.handleTypeChangeToOr} />
         </div>
       </StreamRuleConnector>
