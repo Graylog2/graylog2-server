@@ -1,8 +1,8 @@
 import { createGlobalStyle, css } from 'styled-components';
 
-import '@openfonts/oswald_latin';
-import '@openfonts/roboto-mono_latin';
-import '@openfonts/source-sans-pro_latin';
+import '@openfonts/oswald_latin/index.css';
+import '@openfonts/roboto-mono_latin/index.css';
+import '@openfonts/source-sans-pro_latin/index.css';
 
 import { util } from 'theme';
 
