@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
+import { Alert } from 'components/graylog';
+
 const MessageTerms = styled.span`
   margin-right: 8px;
-  font-family: monospace;
+  font-family: ${monospaceFamily};
 `;
 
 class MessageFieldDescription extends React.Component {

@@ -16,7 +16,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
     position: relative;
     margin-bottom: -15px;
     top: -5px;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 11px;
   }
 
@@ -57,7 +57,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   .widget-update-info {
     text-align: left;
     float: left;
-    font-size: 11px;
+    font-size: 12px;
     position: absolute;
     bottom: 10px;
     width: 130px;

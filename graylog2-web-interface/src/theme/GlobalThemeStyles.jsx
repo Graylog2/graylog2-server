@@ -1,12 +1,14 @@
 import { createGlobalStyle, css } from 'styled-components';
 
-import 'opensans-npm-webfont/open_sans.css';
-import 'opensans-npm-webfont/open_sans_italic.css';
-import 'opensans-npm-webfont/open_sans_bold.css';
+import '@openfonts/oswald_latin';
+import '@openfonts/roboto-mono_latin';
+import '@openfonts/source-sans-pro_latin';
 
 import { util } from 'theme';
 
-const fontFamily = '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
+export const sansSerifFamily = '"Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif';
+export const headerFamily = `Oswald, ${sansSerifFamily}`;
+export const monospaceFamily = '"Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace';
 
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   #editor {
@@ -16,8 +18,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   body {
     background-color: ${theme.color.global.background};
     color: ${theme.color.global.textDefault};
-    font-family: ${fontFamily};
-    font-size: 12px;
+    font-family: ${sansSerifFamily};
+    font-size: 14px;
     overflow-x: hidden;
     margin-top: 50px;
     min-height: calc(100vh - 50px);
@@ -42,7 +44,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   h4,
   h5,
   h6 {
-    font-weight: normal;
+    font-family: ${headerFamily};
+    text-transform: uppercase;
     padding: 0;
     margin: 0;
     color: ${theme.color.global.textDefault};
@@ -62,7 +65,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   h4 {
     font-size: 14px;
-    font-weight: normal;
   }
 
   a {
@@ -71,6 +73,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   a:hover {
     color: ${theme.color.global.linkHover};
+  }
+
+  pre,
+  code,
+  .ace_editor {
+    font-family: ${monospaceFamily};
   }
 
   /* Remove boostrap outline */
@@ -88,7 +96,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   select.form-control,
   textarea.form-control {
     color: ${theme.color.gray[30]};
-    font-family: ${fontFamily};
+    font-family: ${sansSerifFamily};
 
     &:hover {
       border-color: hsl(0, 0%, 70%);
@@ -257,7 +265,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .configuration-field-optional {
     margin-left: 5px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .index-description {
@@ -429,7 +437,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
     margin-bottom: 0;
     padding: 9px;
-    font-family: monospace;
+    font-family: ${monospaceFamily};
     word-wrap: break-word;
   }
 
@@ -501,7 +509,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .btn-text {
-    font-family: ${fontFamily};
+    font-family: ${sansSerifFamily};
     font-size: 12px;
     padding: 0;
     vertical-align: baseline;
@@ -512,7 +520,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   nav.navbar-fixed-top ul.dropdown-menu li a {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   nav.navbar-fixed-top ul.dropdown-menu {
@@ -576,7 +584,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .threaddump {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   h2.extractor-title {

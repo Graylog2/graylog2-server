@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 
 const MessageDetailsDefinitionList = styled.dl(({ theme }) => `
   margin-top: 10px;
@@ -39,7 +40,7 @@ const MessageDetailsDefinitionList = styled.dl(({ theme }) => `
   }
 
   &.message-details-fields .field-value {
-    font-family: monospace;
+    font-family: ${monospaceFamily};
   }
 
   &.message-details-fields dd.message-field .field-value {

@@ -36,7 +36,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => `
 
       #scratchpad-toggle,
       .dropdown-toggle {
-        font-size: 12px;
+        font-size: 14px;
         font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
         &::before {

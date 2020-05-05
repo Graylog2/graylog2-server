@@ -68,7 +68,7 @@ const Bar: StyledComponent<BarProps, ThemeInterface, HTMLDivElement> = styled.di
 
   return css`
     height: 100%;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
     text-align: center;
     ${boxShadow('inset 0 -1px 0')};

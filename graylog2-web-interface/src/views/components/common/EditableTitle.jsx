@@ -1,6 +1,7 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import styles from './EditableTitle.css';
 
@@ -14,6 +15,10 @@ type State = {
   editing: boolean,
   value: string,
 };
+
+const TitleH4 = styled.h4`
+  display: inline-block;
+`;
 
 export default class EditableTitle extends React.Component<Props, State> {
   static propTypes = {
@@ -82,6 +87,6 @@ export default class EditableTitle extends React.Component<Props, State> {
                  onChange={this._onChange} />
         </form>
       </span>
-    ) : <span onDoubleClick={this._toggleEditing} title="Double click the title to edit it.">{value}</span>;
+    ) : <TitleH4 onDoubleClick={this._toggleEditing} title="Double click the title to edit it.">{value}</TitleH4>;
   }
 }

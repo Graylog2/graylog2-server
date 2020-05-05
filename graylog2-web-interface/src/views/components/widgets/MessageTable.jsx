@@ -5,6 +5,7 @@ import * as Immutable from 'immutable';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { util, type ThemeInterface } from 'theme';
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -32,7 +33,7 @@ const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
 
 const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.table(({ theme }) => `
   position: relative;
-  font-size: 11px;
+  font-size: 14px;
   margin-top: 0;
   margin-bottom: 60px;
   border-collapse: collapse;
@@ -67,7 +68,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
         border-top: 0;
         padding-top: 0;
         padding-bottom: 5px;
-        font-family: monospace;
+        font-family: ${monospaceFamily};
         color: ${theme.color.variant.dark.info};
       }
 
@@ -76,6 +77,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
         white-space: pre-line;
         max-height: 6em; /* show 4 lines: line-height * 4 */
         overflow: hidden;
+        font-size: 12px;
       }
     }
 
@@ -137,7 +139,7 @@ const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = 
 
   th {
     border: 0;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: normal;
     white-space: nowrap;
     background-color: ${theme.color.gray[90]};

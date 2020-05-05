@@ -6,6 +6,7 @@ import { Alert, Col, Row, Button } from 'components/graylog';
 import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import { IfPermitted, Spinner, Icon } from 'components/common';
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 
 const NodeRow = styled.div(({ theme }) => `
   border-bottom: 1px solid ${theme.color.gray[80]};
@@ -14,14 +15,14 @@ const NodeRow = styled.div(({ theme }) => `
   margin-top: 0;
 
   .hostname {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .well {
     margin-bottom: 0;
     margin-top: 3px;
-    font-family: monospace;
-    font-size: 11px;
+    font-family: ${monospaceFamily};
+    font-size: 12px;
   }
 
   .xtrc-converters {

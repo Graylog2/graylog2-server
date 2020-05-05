@@ -6,7 +6,7 @@ import { Table } from 'components/graylog';
 import { SystemMessage } from 'components/systemmessages';
 
 const SystemMessagesTable = styled(Table)(({ theme }) => `
-  font-size: 12px;
+  font-size: 14px;
 
   a {
     color: ${theme.color.global.textDefault};

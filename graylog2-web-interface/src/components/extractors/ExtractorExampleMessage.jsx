@@ -4,11 +4,12 @@ import styled from 'styled-components';
 
 import { Well } from 'components/graylog';
 
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 import MessageLoader from './MessageLoader';
 
 const NewExampleWell = styled(Well)`
   margin-bottom: 5px;
-  font-family: monospace;
+  font-family: ${monospaceFamily};
   font-size: 14px;
   white-space: pre-wrap;
   word-wrap: break-word;

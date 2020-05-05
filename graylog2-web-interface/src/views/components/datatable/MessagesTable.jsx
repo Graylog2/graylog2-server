@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import chroma from 'chroma-js';
 
 import { Table } from 'components/graylog';
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 
 const MessagesContainer = styled.div`
   padding-right: 13px;
@@ -12,7 +13,7 @@ const MessagesContainer = styled.div`
 
 const StyledTable = styled(Table)(({ theme }) => `
   position: relative;
-  font-size: 11px;
+  font-size: 14px;
   margin-top: 15px;
   margin-bottom: 60px;
   border-collapse: collapse;
@@ -32,7 +33,7 @@ const StyledTable = styled(Table)(({ theme }) => `
 
   > thead th {
     border: 0;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: normal;
     background-color: ${theme.color.gray[10]};
     white-space: nowrap;
@@ -66,7 +67,8 @@ const StyledTable = styled(Table)(({ theme }) => `
     border-top: 0;
     padding-top: 0;
     padding-bottom: 5px;
-    font-family: monospace;
+    font-family: ${monospaceFamily};
+    font-size: 12px;
     color: ${theme.color.variant.dark.info};
   }
 
@@ -79,6 +81,7 @@ const StyledTable = styled(Table)(({ theme }) => `
       white-space: pre-line;
       max-height: 6em; /* show 4 lines: line-height * 4 */
       overflow: hidden;
+      font-size: 12px;
 
       &::after {
         content: "";

@@ -12,7 +12,7 @@ const TimerangeWrap = styled.div(({ theme }) => `
   }
 
   .absolute {
-    font-size: 12px;
+    font-size: 14px;
   }
 `);
 

@@ -14,7 +14,7 @@ const StreamRuleConnector = styled.div`
   margin-bottom: 13px;
 
   label {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .form-group {

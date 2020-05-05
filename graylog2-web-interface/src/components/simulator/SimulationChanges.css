@@ -31,7 +31,7 @@
 }
 
 .field-value {
-    font-family: monospace;
+    font-family: "Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 .mutated-fields .removed-field {

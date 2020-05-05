@@ -7,13 +7,12 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 import styled from 'styled-components';
 
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 
 const InputIO = styled.span(({ theme }) => `
   .total {
@@ -21,7 +20,7 @@ const InputIO = styled.span(({ theme }) => `
   }
 
   .value {
-    font-family: monospace;
+    font-family: ${monospaceFamily};
   }
 
   .persec {

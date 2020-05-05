@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Metric } from 'components/metrics';
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 
 const MetricListWrap = styled.ul(({ theme }) => `
   padding: 0;
@@ -16,7 +17,7 @@ const MetricListWrap = styled.ul(({ theme }) => `
 
     .name {
       font-size: 13px;
-      font-family: monospace;
+      font-family: ${monospaceFamily};
       word-break: break-all;
 
       .open:hover {

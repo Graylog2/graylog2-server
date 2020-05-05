@@ -5,6 +5,7 @@ import ClipboardJS from 'clipboard';
 
 import { Alert, Button, MenuItem, SplitButton } from 'components/graylog';
 import { BootstrapModalConfirm } from 'components/bootstrap';
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 import { ScratchpadContext } from 'providers/ScratchpadProvider';
 /* NOTE: common components are cyclical dependencies, so they need to be directly imported */
 import InteractableModal from 'components/common/InteractableModal';
@@ -35,7 +36,7 @@ const Textarea = styled.textarea(({ copied, theme }) => css`
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
     0 0 8px ${chroma(copied ? theme.color.variant.success : theme.color.gray[80]).alpha(0.4).css()};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
-  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: ${monospaceFamily};
   font-size: 14px;
 
   :focus {

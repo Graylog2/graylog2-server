@@ -4,6 +4,7 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { MessageDetailsDefinitionList } from 'components/graylog';
 import { type ThemeInterface } from 'theme';
+import { monospaceFamily } from 'theme/GlobalThemeStyles';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
@@ -22,7 +23,7 @@ const MessageDetailsDL: StyledComponent<{}, ThemeInterface, HTMLDListElement> = 
   color: ${theme.color.gray[40]};
 
   dd {
-    font-family: monospace;
+    font-family: ${monospaceFamily};
 
     &:not(:last-child) {
       border-bottom: 1px solid  ${theme.color.gray[90]};
