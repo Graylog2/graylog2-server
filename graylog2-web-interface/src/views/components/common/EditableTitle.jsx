@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import styles from './EditableTitle.css';
 
@@ -16,7 +16,7 @@ type State = {
   value: string,
 };
 
-const TitleH4 = styled.h4`
+const TitleH4: StyledComponent<{}, void, HTMLHeadingElement> = styled.h4`
   display: inline-block;
 `;
 
