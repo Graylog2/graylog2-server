@@ -80,7 +80,8 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 jestClient,
                 indexLookup,
                 new ESQueryDecorators(Collections.emptySet()),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup)
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                false
         );
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 

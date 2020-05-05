@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.graph.Traverser;
+import com.google.inject.name.Named;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
@@ -79,6 +80,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final IndexLookup indexLookup;
     private final ESQueryDecorators esQueryDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
+    private final boolean allowLeadingWildcard;
 
     @Inject
     public ElasticsearchBackend(Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -86,7 +88,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 JestClient jestClient,
                                 IndexLookup indexLookup,
                                 ESQueryDecorators esQueryDecorators,
-                                ESGeneratedQueryContext.Factory queryContextFactory) {
+                                ESGeneratedQueryContext.Factory queryContextFactory,
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.queryStringParser = queryStringParser;
         this.jestClient = jestClient;
@@ -94,12 +97,13 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         this.esQueryDecorators = esQueryDecorators;
         this.queryContextFactory = queryContextFactory;
+        this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
     private QueryBuilder normalizeQueryString(String queryString) {
         return (queryString.isEmpty() || queryString.trim().equals("*"))
                 ? QueryBuilders.matchAllQuery()
-                : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(true);
+                : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
     }
 
     @Override
