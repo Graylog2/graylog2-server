@@ -17,7 +17,7 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
-    'jsx-a11y/label-has-associated-control': [2, { assert: 'either' }],
+    'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
     'max-classes-per-file': 'off',
     'max-len': 'off',
     'new-cap': 'off',
