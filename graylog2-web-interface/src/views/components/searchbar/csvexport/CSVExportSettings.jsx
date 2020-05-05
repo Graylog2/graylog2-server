@@ -26,14 +26,14 @@ const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, v
   const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);
   return (
     <Row>
-      <b>
+      <i>
         <IfSearch>
           {selectedWidget && `The following settings are based on the message table: ${selectedWidgetTitle}`}<br />
         </IfSearch>
         <IfDashboard>
           {selectedWidget && `You are currently exporting the search results for the message table: ${selectedWidgetTitle}`}<br />
         </IfDashboard>
-      </b>
+      </i>
     </Row>
   );
 };
@@ -60,17 +60,17 @@ const CSVExportSettings = ({
           </p>
         )}
         <p>
-          When you&apos;ve finished the configuration, click on <i>Start Download</i>.
+          When you&apos;ve finished the configuration, click on <q>Start Download</q>.
         </p>
       </Row>
       <Row>
-        <span>Fields to export:</span>
-        <FieldSelect fields={fields} onChange={selectField} value={selectedFields} allowOptionCreation={!!selectedWidget} />
+        <label htmlFor="export-fields">Fields to export:</label>
+        <FieldSelect fields={fields} onChange={selectField} value={selectedFields} allowOptionCreation={!!selectedWidget} inputId="export-fields" />
       </Row>
       <Row>
-        <span>Messages limit:</span>
+        <label htmlFor="export-limit">Messages limit:</label>
         <Input type="number"
-               id="export-message-limit"
+               id="export-limit"
                onChange={({ target: { value } }) => setLimit(Number(value))}
                min={1}
                step={1}

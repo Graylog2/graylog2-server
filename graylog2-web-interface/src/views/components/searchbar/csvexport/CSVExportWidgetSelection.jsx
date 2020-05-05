@@ -33,7 +33,6 @@ const WidgetSelection = ({ selectWidget, widgets, view }: WidgetSelectionProps) 
       </Row>
       {widgets.size !== 0 ? (
         <Row>
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label htmlFor="widget-selection">Select message table:</label>
           <Select placeholder="Select message table"
                   onChange={selectWidget}
