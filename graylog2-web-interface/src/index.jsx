@@ -6,11 +6,11 @@ import ReactDOM from 'react-dom';
 import Promise from 'bluebird';
 import Reflux from 'reflux';
 
-// eslint-disable-next-line import/no-named-as-default
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-
 import AppFacade from 'routing/AppFacade';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import CustomizationProvider from 'contexts/CustomizationProvider';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
 import ViewsBindings from 'views/bindings';
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
@@ -20,9 +20,11 @@ Reflux.setPromiseFactory((handlers) => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
-    <GraylogThemeProvider>
-      <AppFacade />
-    </GraylogThemeProvider>,
+    <CustomizationProvider>
+      <GraylogThemeProvider>
+        <AppFacade />
+      </GraylogThemeProvider>
+    </CustomizationProvider>,
     appContainer,
   );
 }
