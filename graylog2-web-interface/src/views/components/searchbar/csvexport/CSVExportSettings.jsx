@@ -64,11 +64,11 @@ const CSVExportSettings = ({
         </p>
       </Row>
       <Row>
-        <label htmlFor="export-fields">Fields to export:</label>
+        <label htmlFor="export-fields">Fields to export</label>
         <FieldSelect fields={fields} onChange={selectField} value={selectedFields} allowOptionCreation={!!selectedWidget} inputId="export-fields" />
       </Row>
       <Row>
-        <label htmlFor="export-limit">Messages limit:</label>
+        <label htmlFor="export-limit">Messages limit</label>
         <Input type="number"
                id="export-limit"
                onChange={({ target: { value } }) => setLimit(Number(value))}

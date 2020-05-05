@@ -263,7 +263,7 @@ describe('CSVExportModal', () => {
     it('show widget selection if more than one exists', async () => {
       const { getByLabelText, queryByText } = render(<SearchCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} />);
 
-      const select = getByLabelText('Select message table:');
+      const select = getByLabelText('Select message table');
 
       expect(queryByText(/Please select a message table to adopt its fields./)).not.toBeNull();
 
@@ -310,7 +310,7 @@ describe('CSVExportModal', () => {
 
     it('show widget selection if more than one exists', async () => {
       const { queryByText, getByLabelText } = render(<DashboardCSVExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />);
-      const select = getByLabelText('Select message table:');
+      const select = getByLabelText('Select message table');
 
       expect(queryByText(/Please select the message table you want to export the search results for./)).not.toBeNull();
 
@@ -333,7 +333,7 @@ describe('CSVExportModal', () => {
         .build();
 
       const { queryByText, getByLabelText } = render(<DashboardCSVExportModal view={complexView} />);
-      const select = getByLabelText('Select message table:');
+      const select = getByLabelText('Select message table');
 
       await selectEvent.openMenu(select);
 

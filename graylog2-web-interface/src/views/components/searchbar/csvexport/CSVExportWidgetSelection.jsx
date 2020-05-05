@@ -33,7 +33,7 @@ const WidgetSelection = ({ selectWidget, widgets, view }: WidgetSelectionProps) 
       </Row>
       {widgets.size !== 0 ? (
         <Row>
-          <label htmlFor="widget-selection">Select message table:</label>
+          <label htmlFor="widget-selection">Select message table</label>
           <Select placeholder="Select message table"
                   onChange={selectWidget}
                   options={widgetOptions}
