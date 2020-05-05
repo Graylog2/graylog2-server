@@ -4,7 +4,6 @@ import React from 'react';
 import { CircleMarker, Map, Popup, TileLayer } from 'react-leaflet';
 import chroma from 'chroma-js';
 import { flatten } from 'lodash';
-import createEvent from 'util/CreateEvent';
 
 import style from './MapVisualization.css';
 
@@ -55,28 +54,11 @@ class MapVisualization extends React.Component {
   }
 
   componentDidMount() {
-    this._forceMapUpdate();
     leafletStyles.use();
-  }
-
-  componentDidUpdate(prevProps) {
-    const { height, width } = this.props;
-    if (height !== prevProps.height || width !== prevProps.width) {
-      this._forceMapUpdate();
-    }
   }
 
   componentWillUnmount() {
     leafletStyles.unuse();
-  }
-
-  // Workaround to avoid wrong placed markers or empty tiles if the map container size changed.
-  _forceMapUpdate = () => {
-    if (this._map) {
-      window.dispatchEvent(createEvent('resize'));
-      const { interactive } = this.props;
-      this._map.leafletElement.invalidateSize(interactive);
-    }
   }
 
   // Coordinates are given as "lat,long"
@@ -161,18 +143,19 @@ class MapVisualization extends React.Component {
     return (
       <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
         {locked && <div className={style.overlay} style={{ height, width }} />}
-        <Map ref={(c) => { this._map = c; }}
-             id={`visualization-${id}`}
-             viewport={viewport}
-             onViewportChanged={onChange}
+        <Map animate={interactive}
              className={style.map}
-             style={{ height, width }}
-             scrollWheelZoom
-             animate={interactive}
-             zoomAnimation={interactive}
              fadeAnimation={interactive}
+             key={`visualization-${id}-${width}-${height}`}
+             id={`visualization-${id}`}
              markerZoomAnimation={interactive}
-             whenReady={this._handleMapReady}>
+             onViewportChanged={onChange}
+             scrollWheelZoom
+             style={{ height, width }}
+             viewport={viewport}
+             whenReady={this._handleMapReady}
+             zoomAnimation={interactive}
+             ref={(c) => { this._map = c; }}>
           <TileLayer url={url} maxZoom={19} attribution={attribution} onLoad={this._handleTilesReady} />
           {markers}
         </Map>

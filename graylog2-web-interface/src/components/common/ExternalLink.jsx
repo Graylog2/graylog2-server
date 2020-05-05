@@ -24,26 +24,27 @@ class ExternalLink extends React.Component {
   static defaultProps = {
     href: '',
     target: '_blank',
-    iconClass: 'external-link',
+    iconClass: 'external-link-alt',
     className: '',
   };
 
   render() {
+    const { children, className, href, iconClass, target } = this.props;
     const content = (
       <span>
-        {this.props.children}
+        {children}
         &nbsp;
-        <Icon name={this.props.iconClass} />
+        <Icon name={iconClass} />
       </span>
     );
 
     // This makes the component usable as child element of a component that already renders a link (e.g. MenuItem)
-    if (_.trim(this.props.href) === '') {
+    if (_.trim(href) === '') {
       return content;
     }
 
     return (
-      <a href={this.props.href} target={this.props.target} className={this.props.className}>
+      <a href={href} target={target} className={className}>
         {content}
       </a>
     );

@@ -7,14 +7,12 @@ import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 
 import { type QueryString, type TimeRange } from 'views/logic/queries/Query';
-import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 
 export type ExportPayload = {
   timerange?: ?TimeRange,
   query_string?: QueryString,
   streams?: string[],
   fields_in_order: ?string[],
-  sort: MessageSortConfig[],
 };
 
 const downloadCSV = (fileContent: string, filename: string = 'search-result') => {

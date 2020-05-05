@@ -9,6 +9,7 @@ import AppRouter from './AppRouter';
 jest.mock('pages', () => ({
   StartPage: mockComponent('StartPage'),
 }));
+jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 
 jest.mock('injection/CombinedProvider', () => {
   const mockCurrentUserStoretore = MockStore('get', 'listen', ['getInitialState', () => ({

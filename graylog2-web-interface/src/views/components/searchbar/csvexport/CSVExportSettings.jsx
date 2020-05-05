@@ -2,19 +2,15 @@
 import * as React from 'react';
 import { List } from 'immutable';
 
-import Direction from 'views/logic/aggregationbuilder/Direction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 
 import { Input } from 'components/bootstrap';
 import { Row } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
-import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
-import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 
 type CSVExportSettingsType = {
   fields: List<FieldTypeMapping>,
@@ -23,9 +19,6 @@ type CSVExportSettingsType = {
   selectedWidget: ?Widget,
   selectField: ({ label: string, value: string }[]) => void,
   selectedFields: ?{field: string}[],
-  setSelectedSort: (Array<*>) => any,
-  selectedSortDirection: Direction,
-  selectedSort: SortConfig[],
   view: View,
 };
 
@@ -50,23 +43,16 @@ const CSVExportSettings = ({
   selectedWidget,
   selectField,
   selectedFields,
-  selectedSort,
-  setSelectedSort,
-  selectedSortDirection,
   setLimit,
   limit,
   view,
 }: CSVExportSettingsType) => {
-  const onSortDirectionChange = (newDirection) => {
-    const newSort = selectedSort.map((sort) => sort.toBuilder().direction(newDirection).build());
-    setSelectedSort(newSort);
-  };
   return (
     <>
       {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
       <Row>
         <p>
-          Define the fields and sorting for your CSV file. You can change the field order with drag and drop.<br />
+          Define the fields for your CSV file. You can change the field order with drag and drop.<br />
         </p>
         {selectedWidget && (
           <p>
@@ -80,16 +66,6 @@ const CSVExportSettings = ({
       <Row>
         <span>Fields to export:</span>
         <FieldSelect fields={fields} onChange={selectField} value={selectedFields} allowOptionCreation={!!selectedWidget} />
-      </Row>
-      <Row>
-        <span>Sort:</span>
-        <FieldSortSelect fields={fields} sort={selectedSort} onChange={setSelectedSort} />
-      </Row>
-      <Row>
-        <span>Sort direction:</span>
-        <SortDirectionSelect disabled={!selectedSort || selectedSort.length === 0}
-                             direction={selectedSortDirection ? selectedSortDirection.direction : null}
-                             onChange={onSortDirectionChange} />
       </Row>
       <Row>
         <span>Messages limit:</span>

@@ -86,7 +86,8 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                 jestClient,
                 indexLookup,
                 new ESQueryDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup));
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                false);
     }
 
     @Before

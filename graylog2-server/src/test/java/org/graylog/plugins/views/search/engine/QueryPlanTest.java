@@ -62,7 +62,8 @@ public class QueryPlanTest {
                 null,
                 mock(IndexLookup.class),
                 new ESQueryDecorators.Fake(),
-                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup));
+                (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
+                false);
         queryEngine = new QueryEngine(ImmutableMap.of("elasticsearch", backend), Collections.emptySet());
     }
 

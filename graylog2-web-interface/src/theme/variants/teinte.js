@@ -43,6 +43,7 @@ Object.keys(variant).forEach((name) => {
 /* eslint-disable prefer-destructuring */
 global.tableBackground = gray[100];
 global.tableBackgroundAlt = gray[80];
+global.inputBackground = global.contentBackground;
 /* eslint-enable prefer-destructuring */
 
 const teinte = {

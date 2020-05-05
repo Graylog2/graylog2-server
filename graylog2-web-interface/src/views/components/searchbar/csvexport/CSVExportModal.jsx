@@ -8,9 +8,7 @@ import connect from 'stores/connect';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
-import { defaultSort } from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
@@ -55,19 +53,18 @@ const _getInitialFields = (selectedWidget) => {
   return initialFields.map((field) => ({ field }));
 };
 
-const _onSelectWidget = ({ value: newWidget }, setSelectedWidget, setSelectedFields, setSelectedSort) => {
+const _onSelectWidget = ({ value: newWidget }, setSelectedWidget, setSelectedFields) => {
   setSelectedWidget(newWidget);
   setSelectedFields(_getInitialFields(newWidget));
-  setSelectedSort(newWidget.config.sort);
 };
 
 const _onFieldSelect = (newFields, setSelectedFields) => {
   setSelectedFields(newFields.map((field) => ({ field: field.value })));
 };
 
-const _onStartDownload = (downloadFile, view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal) => {
+const _onStartDownload = (downloadFile, view, executionState, selectedWidget, selectedFields, limit, setLoading, closeModal) => {
   setLoading(true);
-  startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, selectedSort, limit).then(closeModal);
+  startDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit).then(closeModal);
 };
 
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
@@ -78,15 +75,13 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
   const [loading, setLoading] = useState(false);
   const [selectedWidget, setSelectedWidget] = useState<?Widget>(initialWidget(messagesWidgets, directExportWidgetId));
   const [selectedFields, setSelectedFields] = useState<{ field: string }[]>(_getInitialFields(selectedWidget));
-  const [selectedSort, setSelectedSort] = useState<SortConfig[]>(selectedWidget ? selectedWidget.config.sort : defaultSort);
-  const [selectedSortDirection] = selectedSort.map((s) => s.direction);
   const [limit, setLimit] = useState<?number>();
 
   const singleWidgetDownload = !!directExportWidgetId;
   const showWidgetSelection = shouldShowWidgetSelection(singleWidgetDownload, selectedWidget, messagesWidgets);
   const allowWidgetSelection = shouldAllowWidgetSelection(singleWidgetDownload, showWidgetSelection, messagesWidgets);
   const enableDownload = shouldEnableDownload(showWidgetSelection, selectedWidget, selectedFields, loading);
-  const _startDownload = () => _onStartDownload(downloadFile, view, executionState, selectedWidget, selectedFields, selectedSort, limit, setLoading, closeModal);
+  const _startDownload = () => _onStartDownload(downloadFile, view, executionState, selectedWidget, selectedFields, limit, setLoading, closeModal);
 
   return (
     <BootstrapModalWrapper showModal onHide={closeModal}>
@@ -96,17 +91,14 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
       <Modal.Body>
         <Content>
           {showWidgetSelection && (
-            <CSVExportWidgetSelection selectWidget={(selection) => _onSelectWidget(selection, setSelectedWidget, setSelectedFields, setSelectedSort)}
+            <CSVExportWidgetSelection selectWidget={(selection) => _onSelectWidget(selection, setSelectedWidget, setSelectedFields)}
                                       view={view}
                                       widgets={messagesWidgets} />
           )}
           {!showWidgetSelection && (
             <CSVExportSettings fields={fields}
                                selectedFields={selectedFields}
-                               selectedSort={selectedSort}
-                               selectedSortDirection={selectedSortDirection}
                                selectField={(newFields) => _onFieldSelect(newFields, setSelectedFields)}
-                               setSelectedSort={setSelectedSort}
                                selectedWidget={selectedWidget}
                                setLimit={setLimit}
                                limit={limit}
