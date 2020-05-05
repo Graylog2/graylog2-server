@@ -1,12 +1,13 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import withPluginEntities from 'views/logic/withPluginEntities';
 import PropTypes from 'prop-types';
 
+import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
+
 import type { AutoCompleter, Editor } from './ace-types';
-import AceEditor from './queryinput/ace';
+import StyledAceEditor from './queryinput/StyledAceEditor';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
 import type { Completer } from './SearchBarAutocompletions';
 
@@ -53,33 +54,28 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
     <div className="query" style={{ display: 'flex' }} data-testid="query-input">
       <UserPreferencesContext.Consumer>
         {({ enableSmartSearch = true }) => (
-          <AceEditor mode="lucene"
-                     disabled={disabled}
-                     ref={editorRef}
-                     readOnly={disabled}
-                     theme="ace-queryinput"
-                     onBlur={onBlur}
-                     onChange={onChange}
-                     value={value}
-                     name="QueryEditor"
-                     showGutter={false}
-                     showPrintMargin={false}
-                     highlightActiveLine={false}
-                     minLines={1}
-                     maxLines={1}
-                     enableBasicAutocompletion={enableSmartSearch}
-                     enableLiveAutocompletion={enableSmartSearch}
-                     editorProps={{
-                       $blockScrolling: Infinity,
-                       selectionStyle: 'line',
-                     }}
-                     fontSize={13}
-                     style={{
-                       marginTop: '9px',
-                       height: '34px',
-                       width: '100%',
-                     }}
-                     placeholder={placeholder} />
+          <StyledAceEditor mode="lucene"
+                           disabled={disabled}
+                           aceTheme="ace-queryinput" // NOTE: is usually just `theme` but we need that prop for styled-components
+                           ref={editorRef}
+                           readOnly={disabled}
+                           onBlur={onBlur}
+                           onChange={onChange}
+                           value={value}
+                           name="QueryEditor"
+                           showGutter={false}
+                           showPrintMargin={false}
+                           highlightActiveLine={false}
+                           minLines={1}
+                           maxLines={1}
+                           enableBasicAutocompletion={enableSmartSearch}
+                           enableLiveAutocompletion={enableSmartSearch}
+                           editorProps={{
+                             $blockScrolling: Infinity,
+                             selectionStyle: 'line',
+                           }}
+                           fontSize={13}
+                           placeholder={placeholder} />
         )}
       </UserPreferencesContext.Consumer>
     </div>
