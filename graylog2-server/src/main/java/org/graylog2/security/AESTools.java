@@ -114,7 +114,7 @@ public class AESTools {
     /**
      * Generates a new random salt
      *
-     * @return the generated random salt as a
+     * @return the generated random salt as a string of hexadecimal digits.
      */
 
     public static String generateNewSalt() {
