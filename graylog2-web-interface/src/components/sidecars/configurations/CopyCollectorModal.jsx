@@ -75,7 +75,7 @@ class CopyCollectorModal extends React.Component {
                      onSave={this._save}
                      id={this._getId('collector-name')}
                      onChange={this._changeName}
-                     error={errorMessage || ''}
+                     error={errorMessage}
                      name={name}
                      modalRef={this.modalRef} />
     );

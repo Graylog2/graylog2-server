@@ -55,13 +55,17 @@ const CloneMenuItem = ({ error, id, modalRef, name, onChange, onSave, onSelect }
 };
 
 CloneMenuItem.propTypes = {
-  error: PropTypes.string.isRequired,
+  error: PropTypes.string,
   id: PropTypes.string.isRequired,
   modalRef: PropTypes.shape({ current: PropTypes.any }).isRequired,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
+};
+
+CloneMenuItem.defaultProps = {
+  error: undefined,
 };
 
 export default CloneMenuItem;
