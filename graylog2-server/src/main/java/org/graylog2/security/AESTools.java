@@ -116,7 +116,6 @@ public class AESTools {
      *
      * @return the generated random salt as a string of hexadecimal digits.
      */
-
     public static String generateNewSalt() {
         final SecureRandom random = new SecureRandom();
         byte[] saltBytes = new byte[8];
