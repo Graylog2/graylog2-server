@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 import Promise from 'bluebird';
 
 import { Button } from 'components/graylog';
@@ -74,6 +74,7 @@ class SearchForm extends React.Component {
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]),
+    focusAfterMount: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -93,12 +94,20 @@ class SearchForm extends React.Component {
     loadingLabel: 'Loading...',
     queryHelpComponent: null,
     children: null,
+    focusAfterMount: false,
   };
 
   state = {
     query: this.props.query,
     isLoading: false,
   };
+
+  componentDidMount(): void {
+    const { focusAfterMount } = this.props;
+    if (focusAfterMount && this.searchInput) {
+      this.searchInput.focus();
+    }
+  }
 
   componentWillReceiveProps(nextProps) {
     // The query might get reset outside of this component so we have to adjust the internal state
@@ -162,6 +171,7 @@ class SearchForm extends React.Component {
           <div className="form-group has-feedback">
             {this.props.label && <label htmlFor="common-search-form-query-input" className="control-label">{this.props.label}</label>}
             <input id="common-search-form-query-input"
+                   ref={(ref) => { this.searchInput = ref; }}
                    onChange={this.handleQueryChange}
                    value={this.state.query}
                    placeholder={this.props.placeholder}

@@ -145,7 +145,8 @@ class SavedSearchList extends React.Component<Props, State> {
     return (
       <Modal show>
         <Modal.Body>
-          <SearchForm onSearch={this.handleSearch}
+          <SearchForm focusAfterMount
+                      onSearch={this.handleSearch}
                       onReset={this.handleSearchReset} />
           {renderResult}
         </Modal.Body>
