@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.searchtypes.Sort;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -38,9 +37,7 @@ public abstract class ResultFormat {
     @NotEmpty
     public abstract LinkedHashSet<String> fieldsInOrder();
 
-    public abstract LinkedHashSet<Sort> sort();
-
-    @Positive
+   @Positive
     public abstract OptionalInt limit();
 
     public abstract Map<String, Object> executionState();
@@ -63,13 +60,6 @@ public abstract class ResultFormat {
         }
 
         @JsonProperty
-        public abstract Builder sort(LinkedHashSet<Sort> sort);
-
-        public Builder sort(Sort... sorts) {
-            return sort(linkedHashSetOf(sorts));
-        }
-
-        @JsonProperty
         public abstract Builder limit(Integer limit);
 
         @JsonProperty
@@ -85,8 +75,7 @@ public abstract class ResultFormat {
         public static ResultFormat.Builder create() {
             return new AutoValue_ResultFormat.Builder()
                     .fieldsInOrder(DEFAULT_FIELDS)
-                    .executionState(Collections.emptyMap())
-                    .sort();
+                    .executionState(Collections.emptyMap());
         }
     }
 }

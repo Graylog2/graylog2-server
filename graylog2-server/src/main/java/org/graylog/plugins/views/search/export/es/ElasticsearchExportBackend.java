@@ -22,15 +22,12 @@ import io.searchbox.core.SearchResult;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
@@ -58,28 +55,24 @@ import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 public class ElasticsearchExportBackend implements ExportBackend {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchExportBackend.class);
 
-    private static final String TIEBREAKER_FIELD = Message.FIELD_GL2_MESSAGE_ID;
-
-    private final JestWrapper jestWrapper;
     private final IndexLookup indexLookup;
+    private final RequestStrategy requestStrategy;
     private final boolean allowLeadingWildcard;
 
     @Inject
-    public ElasticsearchExportBackend(JestWrapper jestWrapper, IndexLookup indexLookup, @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
-        this.jestWrapper = jestWrapper;
+    public ElasticsearchExportBackend(IndexLookup indexLookup, RequestStrategy requestStrategy, @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.indexLookup = indexLookup;
+        this.requestStrategy = requestStrategy;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
     @Override
     public void run(ExportMessagesCommand request, Consumer<SimpleMessageChunk> chunkCollector) {
-        Object[] searchAfterValues = null;
         boolean isFirstChunk = true;
         int totalCount = 0;
 
-
         while (true) {
-            List<SearchResult.Hit<Map, Void>> hits = search(request, searchAfterValues);
+            List<SearchResult.Hit<Map, Void>> hits = search(request);
 
             if (hits.isEmpty()) {
                 return;
@@ -96,45 +89,35 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 return;
             }
 
-            searchAfterValues = lastHitSortFrom(hits);
             isFirstChunk = false;
         }
     }
 
-    private List<SearchResult.Hit<Map, Void>> search(ExportMessagesCommand request, Object[] searchAfterValues) {
-        Search search = buildSearchRequest(request, searchAfterValues);
+    private List<SearchResult.Hit<Map, Void>> search(ExportMessagesCommand request) {
+        Search.Builder search = prepareSearchRequest(request);
 
-        SearchResult result = jestWrapper.execute(search, () -> "Failed to execute Search After request");
-
-        return result.getHits(Map.class, false);
+        return requestStrategy.nextChunk(search, request);
     }
 
-    private Search buildSearchRequest(ExportMessagesCommand request, Object[] searchAfterValues) {
-        SearchSourceBuilder ssb = searchSourceBuilderFrom(request, searchAfterValues);
+    private Search.Builder prepareSearchRequest(ExportMessagesCommand request) {
+        SearchSourceBuilder ssb = searchSourceBuilderFrom(request);
 
         Set<String> indices = indicesFor(request);
-
         return new Search.Builder(ssb.toString())
                 .addType(IndexMapping.TYPE_MESSAGE)
                 .allowNoIndices(false)
                 .ignoreUnavailable(false)
-                .addIndex(indices)
-                .build();
+                .addIndex(indices);
     }
 
-    private SearchSourceBuilder searchSourceBuilderFrom(ExportMessagesCommand request, Object[] searchAfterValues) {
+    private SearchSourceBuilder searchSourceBuilderFrom(ExportMessagesCommand request) {
         QueryBuilder query = queryFrom(request);
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
                 .size(request.chunkSize());
 
-        addSort(ssb, request.sort());
-
-        if (searchAfterValues != null) {
-            ssb.searchAfter(searchAfterValues);
-        }
-        return ssb;
+        return requestStrategy.configure(ssb);
     }
 
     private QueryBuilder queryFrom(ExportMessagesCommand request) {
@@ -157,14 +140,6 @@ public class ElasticsearchExportBackend implements ExportBackend {
 
     private TermsQueryBuilder streamsFilter(ExportMessagesCommand request) {
         return termsQuery(Message.FIELD_STREAMS, request.streams());
-    }
-
-    private void addSort(SearchSourceBuilder ssb, LinkedHashSet<Sort> sorts) {
-        for (Sort sort : sorts) {
-            ssb.sort(SortBuilders.fieldSort(sort.field()).order(sort.order()));
-        }
-
-        ssb.sort(SortBuilders.fieldSort(TIEBREAKER_FIELD).order(SortOrder.ASC).unmappedType("string"));
     }
 
     private Set<String> indicesFor(ExportMessagesCommand request) {
@@ -223,11 +198,5 @@ public class ElasticsearchExportBackend implements ExportBackend {
             LOG.warn("Could not parse timestamp {}", rawTimestamp, e);
             return rawTimestamp;
         }
-    }
-
-    private Object[] lastHitSortFrom(List<SearchResult.Hit<Map, Void>> hits) {
-        SearchResult.Hit<Map, Void> lastHit = hits.get(hits.size() - 1);
-
-        return lastHit.sort.toArray(new Object[0]);
     }
 }
