@@ -263,6 +263,24 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
+    public void writeWithCustomKeyPersistsClusterConfig() throws Exception {
+        CustomConfig customConfig = new CustomConfig();
+        customConfig.text = "TEST";
+
+        @SuppressWarnings("deprecation")
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        assertThat(collection.count()).isEqualTo(0L);
+
+        clusterConfigService.write("foobar", customConfig);
+
+        assertThat(collection.count()).isEqualTo(1L);
+
+        DBObject dbObject = collection.findOne();
+        assertThat((String) dbObject.get("type")).isEqualTo("foobar");
+        assertThat((String) dbObject.get("last_updated_by")).isEqualTo("ID");
+    }
+
+    @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void writeUpdatesExistingClusterConfig() throws Exception {
         CustomConfig customConfig = new CustomConfig();
