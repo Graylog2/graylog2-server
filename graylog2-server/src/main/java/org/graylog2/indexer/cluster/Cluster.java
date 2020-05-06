@@ -66,7 +66,7 @@ public class Cluster {
     public Cluster(JestClient jestClient,
                    IndexSetRegistry indexSetRegistry,
                    @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                   @Named("elasticsearch_request_timeout") Duration requestTimeout) {
+                   @Named("elasticsearch_socket_timeout") Duration requestTimeout) {
         this.scheduler = scheduler;
         this.jestClient = jestClient;
         this.indexSetRegistry = indexSetRegistry;
