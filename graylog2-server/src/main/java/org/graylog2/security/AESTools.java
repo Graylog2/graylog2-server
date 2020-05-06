@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -108,6 +109,19 @@ public class AESTools {
             LOG.error("Couldn't decrypt value", e);
         }
         return null;
+    }
+
+    /**
+     * Generates a new random salt
+     *
+     * @return the generated random salt as a
+     */
+
+    public static String generateNewSalt() {
+        final SecureRandom random = new SecureRandom();
+        byte[] saltBytes = new byte[8];
+        random.nextBytes(saltBytes);
+        return Hex.encodeToString(saltBytes);
     }
 
     private static void validateTextAndEncryptionKey(String text, byte[] encryptionKey) {
