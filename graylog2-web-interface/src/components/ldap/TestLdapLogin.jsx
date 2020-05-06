@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Row, Col, Panel, Button } from 'components/graylog';
@@ -27,7 +27,7 @@ const LoginResultPanel = styled(Panel)`
 `;
 
 const StatusIcon = styled(Icon)(({ status, theme }) => `
-  color: ${theme.color.varant[status]};
+  color: ${theme.color.variant[status]};
 `);
 
 
@@ -60,15 +60,13 @@ class TestLdapLogin extends React.Component {
     }
   }
 
-  _changeLoginForm(event) {
-    const newState = {};
+  _changeLoginForm = (event) => {
     const key = (event.target.name === 'test_login_username' ? 'loginUser' : 'loginPassword');
-    newState[key] = event.target.value;
-    newState.loginStatus = {};
-    this.setState(newState);
+
+    this.setState({ [key]: event.target.value });
   }
 
-  _testLogin() {
+  _testLogin = () => {
     const { loginUser, loginPassword } = this.state;
     const { ldapSettings } = this.props;
 
@@ -97,14 +95,14 @@ class TestLdapLogin extends React.Component {
     this.setState({ loginStatus: { loading: true } });
   }
 
-  _loginTestButtonStyle() {
+  _loginTestButtonStyle = () => {
     const { loginStatus } = this.state;
     const successStyle = loginStatus.success ? 'success' : 'info';
 
     return loginStatus.error ? 'danger' : successStyle;
   }
 
-  _formatLoginStatus(loginStatus) {
+  _formatLoginStatus = (loginStatus) => {
     // Don't show any status if login didn't complete
     if (!loginStatus.error && !loginStatus.success) {
       return null;
@@ -169,7 +167,7 @@ class TestLdapLogin extends React.Component {
   }
 
   render() {
-    const { loginStatus, loginUser, testLoginPassword } = this.state;
+    const { loginStatus, loginUser, loginPassword } = this.state;
     const { disabled } = this.props;
     const loginDisabled = disabled || !loginUser || loginStatus.loading;
 
@@ -181,7 +179,7 @@ class TestLdapLogin extends React.Component {
 
     return (
       <div>
-        <Input id="test_login_username"
+        <Input id="test_login_input"
                labelClassName="col-sm-3"
                wrapperClassName="col-sm-9"
                label="Login test"
@@ -203,7 +201,7 @@ class TestLdapLogin extends React.Component {
                      id="test_login_password"
                      name="test_login_password"
                      className="form-control"
-                     value={testLoginPassword}
+                     value={loginPassword}
                      onChange={this._changeLoginForm}
                      onKeyPress={_disableSubmitOnEnter}
                      placeholder="Password"
