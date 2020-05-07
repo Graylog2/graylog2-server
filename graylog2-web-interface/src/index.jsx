@@ -13,6 +13,8 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import ViewsBindings from 'views/bindings';
 
+const don_test = 'This is a test!';
+
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 
 Promise.config({ cancellation: true });
