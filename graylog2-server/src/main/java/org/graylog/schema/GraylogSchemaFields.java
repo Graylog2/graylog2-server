@@ -25,7 +25,6 @@ package org.graylog.schema;
 public class GraylogSchemaFields {
 
     public static final String FIELD_USER_ID = "user_id";
-    public static final String FIELD_USER_TYPE = "user_type";
     public static final String FIELD_ASSOCIATED_USER_REFERENCE = "associated_user_reference";
     public static final String FIELD_USER_NAME = "user_name";
     public static final String FIELD_HTTP_USER_AGENT = "http_user_agent";
