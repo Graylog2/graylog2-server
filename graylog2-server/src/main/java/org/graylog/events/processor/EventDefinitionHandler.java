@@ -256,7 +256,7 @@ public class EventDefinitionHandler {
         final JobDefinitionDto jobDefinition = updateJobDefinition(eventDefinition, oldJobDefinition, schedulerConfig);
 
         try {
-            updateJobTrigger(eventDefinition, jobDefinition, schedulerConfig);
+            updateJobTrigger(eventDefinition, jobDefinition, oldJobDefinition, schedulerConfig);
         } catch (Exception e) {
             // Cleanup if anything goes wrong
             LOG.error("Reverting to old job definition <{}/{}> because of an error updating the job trigger",
@@ -312,6 +312,7 @@ public class EventDefinitionHandler {
 
     private void updateJobTrigger(EventDefinitionDto eventDefinition,
                                   JobDefinitionDto jobDefinition,
+                                  JobDefinitionDto oldJobDefinition,
                                   EventProcessorSchedulerConfig schedulerConfig) {
         final Optional<JobTriggerDto> optionalOldJobTrigger = getJobTrigger(jobDefinition);
         if (!optionalOldJobTrigger.isPresent()) {
@@ -327,16 +328,12 @@ public class EventDefinitionHandler {
                 .schedule(schedulerConfig.schedule())
                 .nextTime(clock.nowUTC());
 
-        // Calculate new scheduling times
-        if (oldJobTrigger.data().isPresent()) {
-            final EventProcessorExecutionJob.Config config = (EventProcessorExecutionJob.Config) jobDefinition.config();
-            final EventProcessorExecutionJob.Data oldData = (EventProcessorExecutionJob.Data) oldJobTrigger.data().get();
-            EventProcessorExecutionJob.Data newData = EventProcessorExecutionJob.Data.builder()
-                    .timerangeFrom(oldData.timerangeFrom())
-                    .timerangeTo(oldData.timerangeFrom().plus(config.processingWindowSize()))
-                    .build();
-            unsavedJobTriggerBuilder.data(newData);
-            unsavedJobTriggerBuilder.nextTime(newData.timerangeTo());
+        final EventProcessorExecutionJob.Config oldConfig = (EventProcessorExecutionJob.Config) oldJobDefinition.config();
+        final EventProcessorExecutionJob.Config config = (EventProcessorExecutionJob.Config) jobDefinition.config();
+        // Reset the scheduling times
+        if (!config.hasEqualSchedule(oldConfig)) {
+            unsavedJobTriggerBuilder.data(null);
+            unsavedJobTriggerBuilder.nextTime(config.parameters().timerange().getTo());
         }
 
         final JobTriggerDto jobTrigger = unsavedJobTriggerBuilder.build();
