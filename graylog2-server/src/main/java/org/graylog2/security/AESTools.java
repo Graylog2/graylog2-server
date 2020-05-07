@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.SecureRandom;
 
 public class AESTools {
     private static final Logger LOG = LoggerFactory.getLogger(AESTools.class);
@@ -54,5 +55,17 @@ public class AESTools {
             LOG.error("Could not decrypt value.", e);
         }
         return null;
+    }
+
+    /**
+     * Generates a new random salt
+     *
+     * @return the generated random salt as a string of hexadecimal digits.
+     */
+    public static String generateNewSalt() {
+        final SecureRandom random = new SecureRandom();
+        byte[] saltBytes = new byte[8];
+        random.nextBytes(saltBytes);
+        return Hex.encodeToString(saltBytes);
     }
 }
