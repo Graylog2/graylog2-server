@@ -21,7 +21,6 @@ import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.http.JestHttpClient;
-import io.searchbox.core.SearchResult;
 import org.apache.http.client.config.RequestConfig;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -135,7 +134,7 @@ public class JestUtils {
         return new IndexNotFoundException(errorMessage.get(), Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
     }
 
-    public static Optional<ElasticsearchException> checkForFailedShards(SearchResult result) {
+    public static Optional<ElasticsearchException> checkForFailedShards(JestResult result) {
         // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets
         // if at least one of the index sets comes back with a result, the overall result will have the aggregation
         // but not considered failed entirely. however, if one shard has the error, we will refuse to respond

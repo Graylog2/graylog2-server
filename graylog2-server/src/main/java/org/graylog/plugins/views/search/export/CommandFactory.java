@@ -24,7 +24,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.inject.Inject;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class CommandFactory {
@@ -41,7 +40,6 @@ public class CommandFactory {
                 .queryString(request.queryString())
                 .streams(request.streams())
                 .fieldsInOrder(request.fieldsInOrder())
-                .sort(request.sort())
                 .chunkSize(request.chunkSize());
 
         if (request.limit().isPresent()) {
@@ -66,10 +64,6 @@ public class CommandFactory {
                 .streams(streamsFrom(query, messageList))
                 .decorators(messageList.decorators());
 
-        if (messageList.sort() != null && resultFormat.sort().isEmpty()) {
-            commandBuilder.sort(new LinkedHashSet<>(messageList.sort()));
-        }
-
         return commandBuilder.build();
     }
 
@@ -81,10 +75,6 @@ public class CommandFactory {
         ExportMessagesCommand.Builder requestBuilder = ExportMessagesCommand.builder();
 
         requestBuilder.fieldsInOrder(resultFormat.fieldsInOrder());
-
-        if (!resultFormat.sort().isEmpty()) {
-            requestBuilder.sort(resultFormat.sort());
-        }
 
         if (resultFormat.limit().isPresent()) {
             requestBuilder.limit(resultFormat.limit().getAsInt());

@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.views.search.export.es;
 
+import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
+import io.searchbox.client.JestResult;
 import org.graylog.plugins.views.search.export.ExportException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.jest.JestUtils;
@@ -37,8 +37,8 @@ public class JestWrapper {
         this.jestClient = jestClient;
     }
 
-    public SearchResult execute(Search search, Supplier<String> errorMessageSupplier) {
-        SearchResult result = JestUtils.execute(jestClient, search, errorMessageSupplier);
+    public <T extends JestResult> T execute(Action<T> action, Supplier<String> errorMessageSupplier) {
+        final T result = JestUtils.execute(jestClient, action, errorMessageSupplier);
         Optional<ElasticsearchException> elasticsearchException = checkForFailedShards(result);
         if (elasticsearchException.isPresent()) {
             throw new ExportException(errorMessageSupplier.get(), elasticsearchException.get());
