@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { Map } from 'immutable';
+import { List } from 'immutable';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
@@ -12,7 +12,7 @@ import Select from 'views/components/Select';
 
 type WidgetSelectionProps = {
   selectWidget: {label: string, value: Widget} => void,
-  widgets: Map<string, Widget>,
+  widgets: List<Widget>,
   view: View,
 };
 
@@ -33,10 +33,11 @@ const WidgetSelection = ({ selectWidget, widgets, view }: WidgetSelectionProps) 
       </Row>
       {widgets.size !== 0 ? (
         <Row>
-          <span>Select message table:</span>
+          <label htmlFor="widget-selection">Select message table</label>
           <Select placeholder="Select message table"
                   onChange={selectWidget}
-                  options={widgetOptions} />
+                  options={widgetOptions}
+                  inputId="widget-selection" />
         </Row>
       ) : (
         <Row>

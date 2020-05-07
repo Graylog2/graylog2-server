@@ -70,7 +70,7 @@ const _onStartDownload = (downloadFile, view, executionState, selectedWidget, se
 const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, executionState }: Props) => {
   const { state: viewStates } = view;
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
-  const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type)).flatten(true);
+  const messagesWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.type === MessagesWidget.type)).toList().flatten();
 
   const [loading, setLoading] = useState(false);
   const [selectedWidget, setSelectedWidget] = useState<?Widget>(initialWidget(messagesWidgets, directExportWidgetId));
