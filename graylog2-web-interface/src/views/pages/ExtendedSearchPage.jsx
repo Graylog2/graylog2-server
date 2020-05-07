@@ -58,7 +58,7 @@ const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElem
 `;
 
 const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
-  height: 100%;
+  height: calc(100vh - 50px);
   grid-column: 2;
   -ms-grid-column: 2;
   grid-row: 1;
