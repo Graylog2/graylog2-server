@@ -15,7 +15,7 @@ exports[`<Widget /> should render with empty props 1`] = `
         title="Widget Title"
       >
         <div
-          class="Widget__WidgetActionsWrapper-sc-1k4o2f7-0 jMAZyY"
+          class="Widget__WidgetActionsWBar-sc-1k4o2f7-0 ldtCrq"
         >
           <button
             class="IconButton__Wrapper-sc-1q956yw-0 jAMEoy"
