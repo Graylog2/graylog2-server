@@ -8,9 +8,9 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   theme: aceTheme,
   scTheme: theme,
 }))(({ scTheme }) => css`
-  margin-top: 9px;
-  height: 34px !important;
-  width: 100% !important;
+  height: 34px;
+  line-height: 32px;
+  width: 100%;
 
   &.ace-queryinput .ace_gutter {
     background: ${scTheme.color.global.inputBackground};
@@ -32,7 +32,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   }
 
   &.ace-queryinput .ace_marker-layer .ace_selection {
-    background: ${scTheme.color.variant.light.default};
+    background: ${scTheme.color.variant.lightest.default};
   }
 
   &.ace-queryinput.ace_multiselect .ace_selection.ace_start {
@@ -73,7 +73,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   }
 
   &.ace-queryinput .ace_keyword.ace_operator {
-    color: ${scTheme.color.variant.dark.info};
+    color: ${scTheme.color.variant.darker.info};
   }
 
   &.ace-queryinput .ace_constant.ace_character,
