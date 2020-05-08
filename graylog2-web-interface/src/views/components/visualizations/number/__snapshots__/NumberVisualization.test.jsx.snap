@@ -1,6 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NumberVisualization should render a number visualization 1`] = `
+.c0 {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
 <NumberVisualization
   config={
     Object {
@@ -79,7 +108,7 @@ exports[`NumberVisualization should render a number visualization 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "NumberVisualization__SingleItemGrid-lb6dwm-1",
             "isStatic": false,
-            "lastClassName": "bAvNbr",
+            "lastClassName": "c0",
             "rules": Array [
               "display:grid;grid-template-columns:1fr;grid-template-rows:1fr;grid-column-gap:0;grid-row-gap:0;height:100%;width:100%;",
             ],
@@ -97,7 +126,7 @@ exports[`NumberVisualization should render a number visualization 1`] = `
       forwardedRef={null}
     >
       <div
-        className="NumberVisualization__SingleItemGrid-lb6dwm-1 bAvNbr"
+        className="c0"
       >
         <NumberVisualization__NumberBox>
           <StyledComponent
@@ -108,7 +137,7 @@ exports[`NumberVisualization should render a number visualization 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "NumberVisualization__NumberBox-lb6dwm-2",
                   "isStatic": false,
-                  "lastClassName": "hHukuE",
+                  "lastClassName": "c1",
                   "rules": Array [
                     "display:flex;justify-content:center;align-items:center;height:100%;width:100%;text-align:center;padding-bottom:10px;",
                   ],
@@ -126,7 +155,7 @@ exports[`NumberVisualization should render a number visualization 1`] = `
             forwardedRef={null}
           >
             <div
-              className="NumberVisualization__NumberBox-lb6dwm-2 hHukuE"
+              className="c1"
             >
               <SizeMe
                 monitorHeight={true}

@@ -1,6 +1,201 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should create new instance 1`] = `
+.c1 .modal-content {
+  background-color: #fff;
+  border-color: rgba(31,31,31,0.2);
+}
+
+.c1 .modal-content .modal-header {
+  border-bottom-color: #e6e6e6;
+}
+
+.c1 .modal-content .modal-footer {
+  border-top-color: #e6e6e6;
+}
+
+.c1 .modal-title {
+  font-size: 21px;
+}
+
+.c1 .modal-dialog {
+  margin-top: 55px;
+}
+
+.c1 .modal-backdrop {
+  height: 100000%;
+  z-index: 1030;
+}
+
+.c1 form {
+  margin-bottom: 0;
+}
+
+.c1 .modal-body .form-group {
+  margin-bottom: 5px;
+}
+
+.c0 {
+  background-color: #ffffff;
+}
+
+.c0.table > thead > tr > th,
+.c0.table > tbody > tr > th,
+.c0.table > tfoot > tr > th,
+.c0.table > thead > tr > td,
+.c0.table > tbody > tr > td,
+.c0.table > tfoot > tr > td {
+  border-top-color: #cdcdcd;
+}
+
+.c0.table > thead > tr > th {
+  border-bottom-color: #cdcdcd;
+}
+
+.c0.table > tbody + tbody {
+  border-top-color: #cdcdcd;
+}
+
+.c0 .table .table {
+  background-color: #ffffff;
+}
+
+.c0.table-bordered {
+  border-color: #cdcdcd;
+}
+
+.c0.table-bordered > thead > tr > th,
+.c0.table-bordered > tbody > tr > th,
+.c0.table-bordered > tfoot > tr > th,
+.c0.table-bordered > thead > tr > td,
+.c0.table-bordered > tbody > tr > td,
+.c0.table-bordered > tfoot > tr > td {
+  border-color: #cdcdcd;
+}
+
+.c0.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #e6e6e6;
+}
+
+.c0.table-hover > tbody > tr:hover {
+  background-color: #cdcdcd;
+}
+
+.c0.table > thead > tr > td.active,
+.c0.table > tbody > tr > td.active,
+.c0.table > tfoot > tr > td.active,
+.c0.table > thead > tr > th.active,
+.c0.table > tbody > tr > th.active,
+.c0.table > tfoot > tr > th.active,
+.c0.table > thead > tr.active > td,
+.c0.table > tbody > tr.active > td,
+.c0.table > tfoot > tr.active > td,
+.c0.table > thead > tr.active > th,
+.c0.table > tbody > tr.active > th,
+.c0.table > tfoot > tr.active > th {
+  background-color: rgb(216,216,216);
+}
+
+.c0.table-hover > tbody > tr > td.active:hover,
+.c0.table-hover > tbody > tr > th.active:hover,
+.c0.table-hover > tbody > tr.active:hover > td,
+.c0.table-hover > tbody > tr:hover > .active,
+.c0.table-hover > tbody > tr.active:hover > th {
+  background-color: rgb(220,220,220);
+}
+
+.c0.table > thead > tr > td.success,
+.c0.table > tbody > tr > td.success,
+.c0.table > tfoot > tr > td.success,
+.c0.table > thead > tr > th.success,
+.c0.table > tbody > tr > th.success,
+.c0.table > tfoot > tr > th.success,
+.c0.table > thead > tr.success > td,
+.c0.table > tbody > tr.success > td,
+.c0.table > tfoot > tr.success > td,
+.c0.table > thead > tr.success > th,
+.c0.table > tbody > tr.success > th,
+.c0.table > tfoot > tr.success > th {
+  background-color: rgb(114,193,128);
+}
+
+.c0.table-hover > tbody > tr > td.success:hover,
+.c0.table-hover > tbody > tr > th.success:hover,
+.c0.table-hover > tbody > tr.success:hover > td,
+.c0.table-hover > tbody > tr:hover > .success,
+.c0.table-hover > tbody > tr.success:hover > th {
+  background-color: rgb(135,200,146);
+}
+
+.c0.table > thead > tr > td.info,
+.c0.table > tbody > tr > td.info,
+.c0.table > tfoot > tr > td.info,
+.c0.table > thead > tr > th.info,
+.c0.table > tbody > tr > th.info,
+.c0.table > tfoot > tr > th.info,
+.c0.table > thead > tr.info > td,
+.c0.table > tbody > tr.info > td,
+.c0.table > tfoot > tr.info > td,
+.c0.table > thead > tr.info > th,
+.c0.table > tbody > tr.info > th,
+.c0.table > tfoot > tr.info > th {
+  background-color: rgb(114,144,205);
+}
+
+.c0.table-hover > tbody > tr > td.info:hover,
+.c0.table-hover > tbody > tr > th.info:hover,
+.c0.table-hover > tbody > tr.info:hover > td,
+.c0.table-hover > tbody > tr:hover > .info,
+.c0.table-hover > tbody > tr.info:hover > th {
+  background-color: rgb(135,159,210);
+}
+
+.c0.table > thead > tr > td.warning,
+.c0.table > tbody > tr > td.warning,
+.c0.table > tfoot > tr > td.warning,
+.c0.table > thead > tr > th.warning,
+.c0.table > tbody > tr > th.warning,
+.c0.table > tfoot > tr > th.warning,
+.c0.table > thead > tr.warning > td,
+.c0.table > tbody > tr.warning > td,
+.c0.table > tfoot > tr.warning > td,
+.c0.table > thead > tr.warning > th,
+.c0.table > tbody > tr.warning > th,
+.c0.table > tfoot > tr.warning > th {
+  background-color: rgb(255,220,114);
+}
+
+.c0.table-hover > tbody > tr > td.warning:hover,
+.c0.table-hover > tbody > tr > th.warning:hover,
+.c0.table-hover > tbody > tr.warning:hover > td,
+.c0.table-hover > tbody > tr:hover > .warning,
+.c0.table-hover > tbody > tr.warning:hover > th {
+  background-color: rgb(255,224,135);
+}
+
+.c0.table > thead > tr > td.danger,
+.c0.table > tbody > tr > td.danger,
+.c0.table > tfoot > tr > td.danger,
+.c0.table > thead > tr > th.danger,
+.c0.table > tbody > tr > th.danger,
+.c0.table > tfoot > tr > th.danger,
+.c0.table > thead > tr.danger > td,
+.c0.table > tbody > tr.danger > td,
+.c0.table > tfoot > tr.danger > td,
+.c0.table > thead > tr.danger > th,
+.c0.table > tbody > tr.danger > th,
+.c0.table > tfoot > tr.danger > th {
+  background-color: rgb(192,114,114);
+}
+
+.c0.table-hover > tbody > tr > td.danger:hover,
+.c0.table-hover > tbody > tr > th.danger:hover,
+.c0.table-hover > tbody > tr.danger:hover > td,
+.c0.table-hover > tbody > tr:hover > .danger,
+.c0.table-hover > tbody > tr.danger:hover > th {
+  background-color: rgb(199,135,135);
+}
+
 <UrlWhiteListConfig
   config={
     Object {
@@ -56,7 +251,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
             "componentStyle": ComponentStyle {
               "componentId": "Table-ztr4bi-0",
               "isStatic": false,
-              "lastClassName": "biajjI",
+              "lastClassName": "c0",
               "rules": Array [
                 [Function],
               ],
@@ -77,14 +272,14 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
         <Table
           bordered={true}
           bsClass="table"
-          className="Table-ztr4bi-0 biajjI top-margin"
+          className="c0 top-margin"
           condensed={true}
           hover={false}
           responsive={false}
           striped={true}
         >
           <table
-            className="Table-ztr4bi-0 biajjI top-margin table table-striped table-bordered table-condensed"
+            className="c0 top-margin table table-striped table-bordered table-condensed"
           >
             <thead>
               <tr>
@@ -212,7 +407,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "UjHmV",
+                  "lastClassName": "c1",
                   "rules": Array [
                     [Function],
                   ],
@@ -237,7 +432,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
               backdrop="static"
               bsClass="modal"
               bsSize="lg"
-              className="Modal-nuree8-0 UjHmV"
+              className="c1"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}

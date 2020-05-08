@@ -1,6 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackDetails /> should render with content pack 1`] = `
+.c0 {
+  background-color: #e6e6e6;
+  border-color: #cdcdcd;
+}
+
 <ContentPackDetails
   constraints={Array []}
   contentPack={
@@ -140,7 +145,7 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Well-sc-19gs1oc-0",
                         "isStatic": false,
-                        "lastClassName": "eWEWxV",
+                        "lastClassName": "c0",
                         "rules": Array [
                           [Function],
                         ],
@@ -159,10 +164,10 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                 >
                   <Well
                     bsClass="well"
-                    className="Well-sc-19gs1oc-0 eWEWxV"
+                    className="c0"
                   >
                     <div
-                      className="Well-sc-19gs1oc-0 eWEWxV well"
+                      className="c0 well"
                     >
                       <div
                         dangerouslySetInnerHTML={

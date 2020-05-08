@@ -1,6 +1,356 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
+.c1.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c1.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c1.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c1.btn-danger[disabled],
+.c1.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c1.btn-danger[disabled]:hover,
+.c1.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c1.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c1.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c1.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c1.btn-default[disabled],
+.c1.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c1.btn-default[disabled]:hover,
+.c1.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c1.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c1.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c1.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c1.btn-info[disabled],
+.c1.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c1.btn-info[disabled]:hover,
+.c1.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c1.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c1.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c1.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c1.btn-link[disabled],
+.c1.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c1.btn-link[disabled]:hover,
+.c1.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c1.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c1.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c1.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c1.btn-primary[disabled],
+.c1.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c1.btn-primary[disabled]:hover,
+.c1.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c1.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c1.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c1.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c1.btn-success[disabled],
+.c1.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c1.btn-success[disabled]:hover,
+.c1.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c1.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c1.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c1.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c1.btn-warning[disabled],
+.c1.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c1.btn-warning[disabled]:hover,
+.c1.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c0 .modal-content {
+  background-color: #fff;
+  border-color: rgba(31,31,31,0.2);
+}
+
+.c0 .modal-content .modal-header {
+  border-bottom-color: #e6e6e6;
+}
+
+.c0 .modal-content .modal-footer {
+  border-top-color: #e6e6e6;
+}
+
+.c0 .modal-title {
+  font-size: 21px;
+}
+
+.c0 .modal-dialog {
+  margin-top: 55px;
+}
+
+.c0 .modal-backdrop {
+  height: 100000%;
+  z-index: 1030;
+}
+
+.c0 form {
+  margin-bottom: 0;
+}
+
+.c0 .modal-body .form-group {
+  margin-bottom: 5px;
+}
+
+.c3 {
+  clear: right;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c2 {
+  background-color: rgb(198,207,231);
+  border-color: rgb(169,185,221);
+  color: #1f1f1f;
+}
+
+.c2 a:not(.btn) {
+  color: rgb(77,80,89);
+  font-weight: bold;
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+}
+
+.c2 a:not(.btn):hover,
+.c2 a:not(.btn):focus {
+  color: rgb(44,46,52);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+.c2 a:not(.btn):active {
+  color: rgb(44,46,52);
+}
+
 <body
   class="modal-open"
   style="padding-right: 0px;"
@@ -16,7 +366,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 UjHmV in modal"
+      class="fade c0 in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -57,7 +407,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                    class="c1 submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +418,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                    class="c1 reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -77,7 +427,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
               </form>
             </div>
             <div
-              class="Alert-sc-1yucn9g-0 gTlUyR SavedSearchList__NoSavedSearches-sc-1r3qvm6-1 gmJDqJ alert alert-info"
+              class="c2 c3 alert alert-info"
               role="alert"
             >
               <svg
@@ -92,21 +442,21 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+              class="c1 btn btn-primary"
               disabled=""
               type="button"
             >
               Load
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+              class="c1 btn btn-default"
               disabled=""
               type="button"
             >
               Delete
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+              class="c1 btn btn-default"
               type="button"
             >
               Cancel
@@ -127,7 +477,457 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
   <div
     aria-hidden="true"
   />
-  <div
+  .c1.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c1.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c1.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c1.btn-danger[disabled],
+.c1.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c1.btn-danger[disabled]:hover,
+.c1.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c1.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c1.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c1.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c1.btn-default[disabled],
+.c1.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c1.btn-default[disabled]:hover,
+.c1.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c1.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c1.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c1.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c1.btn-info[disabled],
+.c1.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c1.btn-info[disabled]:hover,
+.c1.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c1.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c1.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c1.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c1.btn-link[disabled],
+.c1.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c1.btn-link[disabled]:hover,
+.c1.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c1.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c1.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c1.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c1.btn-primary[disabled],
+.c1.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c1.btn-primary[disabled]:hover,
+.c1.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c1.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c1.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c1.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c1.btn-success[disabled],
+.c1.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c1.btn-success[disabled]:hover,
+.c1.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c1.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c1.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c1.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c1.btn-warning[disabled],
+.c1.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c1.btn-warning[disabled]:hover,
+.c1.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c2 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c3 {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #cdcdcd;
+}
+
+.c3::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c3::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c3:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c3::placeholder {
+  color: #9b9b9b;
+}
+
+.c3:focus {
+  border-color: #6386c9;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(99,134,201,0.4);
+}
+
+.c3[disabled],
+.c3[readonly],
+fieldset[disabled] .c3 {
+  background-color: #cdcdcd;
+}
+
+.c3 ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c4 {
+  background-color: #fff;
+  border-color: #cdcdcd;
+}
+
+.c4 .list-group-item-heading {
+  font-weight: bold;
+}
+
+.c4.disabled,
+.c4.disabled:hover,
+.c4.disabled:focus {
+  color: #9b9b9b;
+  background-color: #e6e6e6;
+}
+
+.c4.disabled .list-group-item-heading,
+.c4.disabled:hover .list-group-item-heading,
+.c4.disabled:focus .list-group-item-heading {
+  color: inherit;
+  font-weight: bold;
+}
+
+.c4.disabled .list-group-item-text,
+.c4.disabled:hover .list-group-item-text,
+.c4.disabled:focus .list-group-item-text {
+  color: #9b9b9b;
+}
+
+.c4.active,
+.c4.active:hover,
+.c4.active:focus {
+  color: #ffffff;
+  background-color: #8f699d;
+  border-color: #8f699d;
+  z-index: auto;
+}
+
+.c4.active .list-group-item-heading,
+.c4.active:hover .list-group-item-heading,
+.c4.active:focus .list-group-item-heading,
+.c4.active .list-group-item-heading > small,
+.c4.active:hover .list-group-item-heading > small,
+.c4.active:focus .list-group-item-heading > small,
+.c4.active .list-group-item-heading > .small,
+.c4.active:hover .list-group-item-heading > .small,
+.c4.active:focus .list-group-item-heading > .small {
+  color: inherit;
+  font-weight: bold;
+}
+
+.c4.active .list-group-item-text,
+.c4.active:hover .list-group-item-text,
+.c4.active:focus .list-group-item-text {
+  color: #8f699d;
+}
+
+a.c4,
+button.c4 {
+  color: #702785;
+}
+
+a.c4 .list-group-item-heading,
+button.c4 .list-group-item-heading {
+  color: #383838;
+  font-weight: bold;
+}
+
+a.c4:hover:not(.disabled),
+button.c4:hover:not(.disabled),
+a.c4:focus:not(.disabled),
+button.c4:focus:not(.disabled) {
+  background-color: #6a6a6a;
+  color: #fff;
+}
+
+a.c4:hover:not(.disabled).active,
+button.c4:hover:not(.disabled).active,
+a.c4:focus:not(.disabled).active,
+button.c4:focus:not(.disabled).active {
+  color: #fff;
+  border-color: #702785;
+  background-color: #702785;
+}
+
+a.c4:hover:not(.disabled) .list-group-item-heading,
+button.c4:hover:not(.disabled) .list-group-item-heading,
+a.c4:focus:not(.disabled) .list-group-item-heading,
+button.c4:focus:not(.disabled) .list-group-item-heading {
+  color: #fff;
+}
+
+.c0 .modal-content {
+  background-color: #fff;
+  border-color: rgba(31,31,31,0.2);
+}
+
+.c0 .modal-content .modal-header {
+  border-bottom-color: #e6e6e6;
+}
+
+.c0 .modal-content .modal-footer {
+  border-top-color: #e6e6e6;
+}
+
+.c0 .modal-title {
+  font-size: 21px;
+}
+
+.c0 .modal-dialog {
+  margin-top: 55px;
+}
+
+.c0 .modal-backdrop {
+  height: 100000%;
+  z-index: 1030;
+}
+
+.c0 form {
+  margin-bottom: 0;
+}
+
+.c0 .modal-body .form-group {
+  margin-bottom: 5px;
+}
+
+<div
     aria-hidden="true"
     role="dialog"
   >
@@ -135,7 +935,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 UjHmV in modal"
+      class="fade c0 in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -176,7 +976,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                    class="c1 submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -187,7 +987,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                    class="c1 reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -200,17 +1000,17 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
               style="float: right;"
             >
               <div
-                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                class="form-group"
               >
                 <label
-                  class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                  class="c2 control-label"
                   for="page-size"
                 >
                   Show:
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
+                    class="c3 form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -241,7 +1041,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
               class="list-group"
             >
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                class="c4 list-group-item"
                 type="button"
               >
                 test-0
@@ -334,21 +1134,21 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+              class="c1 btn btn-primary"
               disabled=""
               type="button"
             >
               Load
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+              class="c1 btn btn-default"
               disabled=""
               type="button"
             >
               Delete
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+              class="c1 btn btn-default"
               type="button"
             >
               Cancel

@@ -1,6 +1,788 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPacksList /> should render with content packs 1`] = `
+.c2.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c2.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c2.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c2.btn-danger[disabled],
+.c2.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c2.btn-danger[disabled]:hover,
+.c2.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c2.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c2.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c2.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c2.btn-default[disabled],
+.c2.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c2.btn-default[disabled]:hover,
+.c2.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c2.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c2.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c2.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c2.btn-info[disabled],
+.c2.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c2.btn-info[disabled]:hover,
+.c2.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c2.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c2.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c2.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c2.btn-link[disabled],
+.c2.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c2.btn-link[disabled]:hover,
+.c2.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c2.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c2.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c2.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c2.btn-primary[disabled],
+.c2.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c2.btn-primary[disabled]:hover,
+.c2.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c2.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c2.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c2.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c2.btn-success[disabled],
+.c2.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c2.btn-success[disabled]:hover,
+.c2.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c2.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c2.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c2.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c2.btn-warning[disabled],
+.c2.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c2.btn-warning[disabled]:hover,
+.c2.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c0 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c8.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c8.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c8.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c8.btn-danger[disabled],
+.c8.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c8.btn-danger[disabled]:hover,
+.c8.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c8.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c8.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c8.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c8.btn-default[disabled],
+.c8.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c8.btn-default[disabled]:hover,
+.c8.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c8.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c8.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c8.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c8.btn-info[disabled],
+.c8.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c8.btn-info[disabled]:hover,
+.c8.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c8.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c8.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c8.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c8.btn-link[disabled],
+.c8.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c8.btn-link[disabled]:hover,
+.c8.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c8.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c8.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c8.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c8.btn-primary[disabled],
+.c8.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c8.btn-primary[disabled]:hover,
+.c8.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c8.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c8.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c8.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c8.btn-success[disabled],
+.c8.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c8.btn-success[disabled]:hover,
+.c8.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c8.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c8.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c8.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c8.btn-warning[disabled],
+.c8.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c8.btn-warning[disabled]:hover,
+.c8.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c8 ~ .dropdown-menu > li > a {
+  color: #1f1f1f;
+}
+
+.c8 ~ .dropdown-menu > li > a:hover,
+.c8 ~ .dropdown-menu > li > a:focus {
+  color: rgb(73,73,73);
+  background-color: #e6e6e6;
+}
+
+.c8 ~ .dropdown-menu > .active > a {
+  color: rgb(250,250,253);
+  background-color: #6386c9;
+}
+
+.c8 ~ .dropdown-menu > .active > a:hover,
+.c8 ~ .dropdown-menu > .active > a:focus {
+  color: rgb(249,250,252);
+  background-color: #0063be;
+}
+
+.c8 ~ .dropdown-menu > .disabled > a {
+  color: rgb(103,103,103);
+  background-color: #e6e6e6;
+}
+
+.c8 ~ .dropdown-menu > .disabled > a:hover,
+.c8 ~ .dropdown-menu > .disabled > a:focus {
+  color: rgb(103,103,103);
+}
+
+.c1 {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #cdcdcd;
+}
+
+.c1::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c1::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c1:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c1::placeholder {
+  color: #9b9b9b;
+}
+
+.c1:focus {
+  border-color: #6386c9;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(99,134,201,0.4);
+}
+
+.c1[disabled],
+.c1[readonly],
+fieldset[disabled] .c1 {
+  background-color: #cdcdcd;
+}
+
+.c1 ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c4 {
+  background-color: #fff;
+  border-color: #cdcdcd;
+}
+
+.c4 .list-group-item-heading {
+  font-weight: bold;
+}
+
+.c4.disabled,
+.c4.disabled:hover,
+.c4.disabled:focus {
+  color: #9b9b9b;
+  background-color: #e6e6e6;
+}
+
+.c4.disabled .list-group-item-heading,
+.c4.disabled:hover .list-group-item-heading,
+.c4.disabled:focus .list-group-item-heading {
+  color: inherit;
+  font-weight: bold;
+}
+
+.c4.disabled .list-group-item-text,
+.c4.disabled:hover .list-group-item-text,
+.c4.disabled:focus .list-group-item-text {
+  color: #9b9b9b;
+}
+
+.c4.active,
+.c4.active:hover,
+.c4.active:focus {
+  color: #ffffff;
+  background-color: #8f699d;
+  border-color: #8f699d;
+  z-index: auto;
+}
+
+.c4.active .list-group-item-heading,
+.c4.active:hover .list-group-item-heading,
+.c4.active:focus .list-group-item-heading,
+.c4.active .list-group-item-heading > small,
+.c4.active:hover .list-group-item-heading > small,
+.c4.active:focus .list-group-item-heading > small,
+.c4.active .list-group-item-heading > .small,
+.c4.active:hover .list-group-item-heading > .small,
+.c4.active:focus .list-group-item-heading > .small {
+  color: inherit;
+  font-weight: bold;
+}
+
+.c4.active .list-group-item-text,
+.c4.active:hover .list-group-item-text,
+.c4.active:focus .list-group-item-text {
+  color: #8f699d;
+}
+
+a.c4,
+button.c4 {
+  color: #702785;
+}
+
+a.c4 .list-group-item-heading,
+button.c4 .list-group-item-heading {
+  color: #383838;
+  font-weight: bold;
+}
+
+a.c4:hover:not(.disabled),
+button.c4:hover:not(.disabled),
+a.c4:focus:not(.disabled),
+button.c4:focus:not(.disabled) {
+  background-color: #6a6a6a;
+  color: #fff;
+}
+
+a.c4:hover:not(.disabled).active,
+button.c4:hover:not(.disabled).active,
+a.c4:focus:not(.disabled).active,
+button.c4:focus:not(.disabled).active {
+  color: #fff;
+  border-color: #702785;
+  background-color: #702785;
+}
+
+a.c4:hover:not(.disabled) .list-group-item-heading,
+button.c4:hover:not(.disabled) .list-group-item-heading,
+a.c4:focus:not(.disabled) .list-group-item-heading,
+button.c4:focus:not(.disabled) .list-group-item-heading {
+  color: #fff;
+}
+
+.c7 .modal-content {
+  background-color: #fff;
+  border-color: rgba(31,31,31,0.2);
+}
+
+.c7 .modal-content .modal-header {
+  border-bottom-color: #e6e6e6;
+}
+
+.c7 .modal-content .modal-footer {
+  border-top-color: #e6e6e6;
+}
+
+.c7 .modal-title {
+  font-size: 21px;
+}
+
+.c7 .modal-dialog {
+  margin-top: 55px;
+}
+
+.c7 .modal-backdrop {
+  height: 100000%;
+  z-index: 1030;
+}
+
+.c7 form {
+  margin-bottom: 0;
+}
+
+.c7 .modal-body .form-group {
+  margin-bottom: 5px;
+}
+
+.c3 {
+  background-color: #e6e6e6;
+  font-size: 14px;
+  padding: 0 15px;
+}
+
+.c3 .form-group {
+  margin: 0;
+}
+
+.c5 {
+  margin: 10px 0;
+  min-height: 20px;
+}
+
+.c6 {
+  margin-left: 4px;
+  background-color: #00a03d;
+  color: #1f1f1f;
+}
+
 <ContentPacksList
   contentPackMetadata={
     Object {
@@ -348,12 +1130,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              className=""
                               controlId="content-packs-filter"
                               validationState={null}
                             >
                               <div
-                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                className="form-group"
                               >
                                 <ControlLabel>
                                   <StyledComponent
@@ -364,7 +1146,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "ControlLabel-sc-1edmum5-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCskeX",
+                                          "lastClassName": "c0",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -383,11 +1165,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <ControlLabel
                                       bsClass="control-label"
-                                      className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                      className="c0"
                                       srOnly={false}
                                     >
                                       <label
-                                        className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                        className="c0 control-label"
                                         htmlFor="content-packs-filter"
                                       >
                                         Filter
@@ -424,7 +1206,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "fdBWEX",
+                                              "lastClassName": "c1",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -448,7 +1230,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 fdBWEX"
+                                          className="c1"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -457,7 +1239,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                            className="c1 form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
@@ -517,7 +1299,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "c2",
                               "rules": Array [
                                 [Function],
                               ],
@@ -545,7 +1327,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="c2"
                           disabled={false}
                           style={
                             Object {
@@ -555,7 +1337,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           type="submit"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="c2 btn btn-default"
                             disabled={false}
                             style={
                               Object {
@@ -616,7 +1398,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "c2",
                               "rules": Array [
                                 [Function],
                               ],
@@ -645,7 +1427,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="c2"
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -656,7 +1438,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           type="button"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="c2 btn btn-default"
                             disabled={true}
                             onClick={[Function]}
                             style={
@@ -963,7 +1745,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
                           "isStatic": false,
-                          "lastClassName": "cNtVlO",
+                          "lastClassName": "c3",
                           "rules": Array [
                             [Function],
                           ],
@@ -993,13 +1775,13 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     forwardedRef={null}
                   >
                     <ForwardRef
-                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                      className="c3"
                     >
                       <ListGroupItem__StyledListGroupItem
-                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                        className="c3"
                       >
                         <StyledComponent
-                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                          className="c3"
                           forwardedComponent={
                             Object {
                               "$$typeof": Symbol(react.forward_ref),
@@ -1013,7 +1795,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "iEzmJe",
+                                "lastClassName": "c4",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1032,11 +1814,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                            className="c4 c3"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                              className="c4 c3 list-group-item"
                             >
                               <ControlledTableListHeader__HeaderWrapper>
                                 <StyledComponent
@@ -1047,7 +1829,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlledTableListHeader__HeaderWrapper-tr2y34-1",
                                         "isStatic": false,
-                                        "lastClassName": "ekhgZW",
+                                        "lastClassName": "c5",
                                         "rules": Array [
                                           "margin:10px 0;min-height:20px;",
                                         ],
@@ -1065,7 +1847,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   forwardedRef={null}
                                 >
                                   <div
-                                    className="ControlledTableListHeader__HeaderWrapper-tr2y34-1 ekhgZW"
+                                    className="c5"
                                   />
                                 </StyledComponent>
                               </ControlledTableListHeader__HeaderWrapper>
@@ -1096,7 +1878,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -1115,11 +1897,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -1183,7 +1965,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eYvbcA",
+                                                        "lastClassName": "c6",
                                                         "rules": Array [
                                                           [Function],
                                                           [Function],
@@ -1206,12 +1988,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge"
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA"
+                                                    className="c6"
                                                     pullRight={false}
                                                     status="installed"
                                                   >
                                                     <span
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA badge"
+                                                      className="c6 badge"
                                                       status="installed"
                                                     >
                                                       installed
@@ -1272,7 +2054,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1296,12 +2078,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -1347,7 +2129,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1372,7 +2154,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -1451,7 +2233,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1474,7 +2256,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-1"
                                           pullRight={true}
                                           title="More Actions"
@@ -1518,7 +2300,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-1"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -1534,7 +2316,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-1"
                                                         onClick={[Function]}
@@ -1544,7 +2326,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-1"
                                                           onClick={[Function]}
@@ -1797,7 +2579,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -1822,7 +2604,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -1928,7 +2710,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -1947,11 +2729,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -2015,7 +2797,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eYvbcA",
+                                                        "lastClassName": "c6",
                                                         "rules": Array [
                                                           [Function],
                                                           [Function],
@@ -2038,12 +2820,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge"
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA"
+                                                    className="c6"
                                                     pullRight={false}
                                                     status="installed"
                                                   >
                                                     <span
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA badge"
+                                                      className="c6 badge"
                                                       status="installed"
                                                     >
                                                       installed
@@ -2104,7 +2886,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2128,12 +2910,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -2179,7 +2961,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2204,7 +2986,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -2283,7 +3065,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2306,7 +3088,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-2"
                                           pullRight={true}
                                           title="More Actions"
@@ -2350,7 +3132,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-2"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -2366,7 +3148,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-2"
                                                         onClick={[Function]}
@@ -2376,7 +3158,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-2"
                                                           onClick={[Function]}
@@ -2629,7 +3411,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -2654,7 +3436,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -2760,7 +3542,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -2779,11 +3561,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -2872,7 +3654,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2896,12 +3678,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -2947,7 +3729,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2972,7 +3754,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -3051,7 +3833,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3074,7 +3856,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-3"
                                           pullRight={true}
                                           title="More Actions"
@@ -3118,7 +3900,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-3"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -3134,7 +3916,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-3"
                                                         onClick={[Function]}
@@ -3144,7 +3926,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-3"
                                                           onClick={[Function]}
@@ -3397,7 +4179,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -3422,7 +4204,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -3527,7 +4309,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -3546,11 +4328,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -3639,7 +4421,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3663,12 +4445,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -3714,7 +4496,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3739,7 +4521,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -3818,7 +4600,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3841,7 +4623,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-4"
                                           pullRight={true}
                                           title="More Actions"
@@ -3885,7 +4667,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-4"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -3901,7 +4683,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-4"
                                                         onClick={[Function]}
@@ -3911,7 +4693,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-4"
                                                           onClick={[Function]}
@@ -4164,7 +4946,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -4189,7 +4971,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -4295,7 +5077,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -4314,11 +5096,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -4407,7 +5189,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4431,12 +5213,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -4482,7 +5264,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4507,7 +5289,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -4586,7 +5368,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4609,7 +5391,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-5"
                                           pullRight={true}
                                           title="More Actions"
@@ -4653,7 +5435,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-5"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -4669,7 +5451,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-5"
                                                         onClick={[Function]}
@@ -4679,7 +5461,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-5"
                                                           onClick={[Function]}
@@ -4932,7 +5714,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -4957,7 +5739,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -5063,7 +5845,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -5082,11 +5864,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -5175,7 +5957,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5199,12 +5981,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -5250,7 +6032,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5275,7 +6057,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -5354,7 +6136,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5377,7 +6159,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-6"
                                           pullRight={true}
                                           title="More Actions"
@@ -5421,7 +6203,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-6"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -5437,7 +6219,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-6"
                                                         onClick={[Function]}
@@ -5447,7 +6229,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-6"
                                                           onClick={[Function]}
@@ -5700,7 +6482,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -5725,7 +6507,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -5831,7 +6613,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -5850,11 +6632,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -5943,7 +6725,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5967,12 +6749,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -6018,7 +6800,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6043,7 +6825,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -6122,7 +6904,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6145,7 +6927,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-7"
                                           pullRight={true}
                                           title="More Actions"
@@ -6189,7 +6971,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-7"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -6205,7 +6987,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-7"
                                                         onClick={[Function]}
@@ -6215,7 +6997,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-7"
                                                           onClick={[Function]}
@@ -6468,7 +7250,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -6493,7 +7275,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -6599,7 +7381,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -6618,11 +7400,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -6711,7 +7493,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6735,12 +7517,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -6786,7 +7568,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6811,7 +7593,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -6890,7 +7672,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6913,7 +7695,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-8"
                                           pullRight={true}
                                           title="More Actions"
@@ -6957,7 +7739,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-8"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -6973,7 +7755,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-8"
                                                         onClick={[Function]}
@@ -6983,7 +7765,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-8"
                                                           onClick={[Function]}
@@ -7236,7 +8018,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -7261,7 +8043,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -7366,7 +8148,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -7385,11 +8167,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -7478,7 +8260,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -7502,12 +8284,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -7553,7 +8335,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -7578,7 +8360,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -7657,7 +8439,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -7680,7 +8462,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-9"
                                           pullRight={true}
                                           title="More Actions"
@@ -7724,7 +8506,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-9"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -7740,7 +8522,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-9"
                                                         onClick={[Function]}
@@ -7750,7 +8532,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-9"
                                                           onClick={[Function]}
@@ -8003,7 +8785,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -8028,7 +8810,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -8134,7 +8916,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "c4",
                             "rules": Array [
                               [Function],
                             ],
@@ -8153,11 +8935,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="c4"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="c4 list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -8246,7 +9028,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "c2",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -8270,12 +9052,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="c2"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="c2 btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -8321,7 +9103,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
                                               "isStatic": false,
-                                              "lastClassName": "UjHmV",
+                                              "lastClassName": "c7",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -8346,7 +9128,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 UjHmV"
+                                          className="c7"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -8425,7 +9207,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "c8",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -8448,7 +9230,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         <DropdownButton
                                           bsSize="small"
                                           bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="c8"
                                           id="more-actions-10"
                                           pullRight={true}
                                           title="More Actions"
@@ -8492,7 +9274,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsRole="toggle"
                                                       bsSize="small"
                                                       bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="c8"
                                                       id="more-actions-10"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -8508,7 +9290,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="c8 dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-10"
                                                         onClick={[Function]}
@@ -8518,7 +9300,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="c8 dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-10"
                                                           onClick={[Function]}
@@ -8771,7 +9553,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Modal-nuree8-0",
                                                 "isStatic": false,
-                                                "lastClassName": "UjHmV",
+                                                "lastClassName": "c7",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -8796,7 +9578,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 UjHmV"
+                                            className="c7"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -9172,6 +9954,330 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
 `;
 
 exports[`<ContentPacksList /> should render with empty content packs 1`] = `
+.c2.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c2.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c2.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c2.btn-danger[disabled],
+.c2.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c2.btn-danger[disabled]:hover,
+.c2.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c2.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c2.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c2.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c2.btn-default[disabled],
+.c2.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c2.btn-default[disabled]:hover,
+.c2.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c2.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c2.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c2.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c2.btn-info[disabled],
+.c2.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c2.btn-info[disabled]:hover,
+.c2.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c2.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c2.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c2.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c2.btn-link[disabled],
+.c2.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c2.btn-link[disabled]:hover,
+.c2.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c2.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c2.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c2.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c2.btn-primary[disabled],
+.c2.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c2.btn-primary[disabled]:hover,
+.c2.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c2.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c2.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c2.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c2.btn-success[disabled],
+.c2.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c2.btn-success[disabled]:hover,
+.c2.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c2.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c2.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c2.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c2.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c2.btn-warning[disabled],
+.c2.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c2.btn-warning[disabled]:hover,
+.c2.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c0 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c1 {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #cdcdcd;
+}
+
+.c1::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c1::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c1:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c1::placeholder {
+  color: #9b9b9b;
+}
+
+.c1:focus {
+  border-color: #6386c9;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(99,134,201,0.4);
+}
+
+.c1[disabled],
+.c1[readonly],
+fieldset[disabled] .c1 {
+  background-color: #cdcdcd;
+}
+
+.c1 ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
 <ContentPacksList
   contentPackMetadata={Object {}}
   contentPacks={Array []}
@@ -9284,12 +10390,12 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              className=""
                               controlId="content-packs-filter"
                               validationState={null}
                             >
                               <div
-                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                className="form-group"
                               >
                                 <ControlLabel>
                                   <StyledComponent
@@ -9300,7 +10406,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "ControlLabel-sc-1edmum5-0",
                                           "isStatic": false,
-                                          "lastClassName": "hCskeX",
+                                          "lastClassName": "c0",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -9319,11 +10425,11 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   >
                                     <ControlLabel
                                       bsClass="control-label"
-                                      className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                      className="c0"
                                       srOnly={false}
                                     >
                                       <label
-                                        className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                        className="c0 control-label"
                                         htmlFor="content-packs-filter"
                                       >
                                         Filter
@@ -9360,7 +10466,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "fdBWEX",
+                                              "lastClassName": "c1",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -9384,7 +10490,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 fdBWEX"
+                                          className="c1"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -9393,7 +10499,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                            className="c1 form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
@@ -9453,7 +10559,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "c2",
                               "rules": Array [
                                 [Function],
                               ],
@@ -9481,7 +10587,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="c2"
                           disabled={false}
                           style={
                             Object {
@@ -9491,7 +10597,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           type="submit"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="c2 btn btn-default"
                             disabled={false}
                             style={
                               Object {
@@ -9552,7 +10658,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "c2",
                               "rules": Array [
                                 [Function],
                               ],
@@ -9581,7 +10687,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="c2"
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -9592,7 +10698,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           type="button"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="c2 btn btn-default"
                             disabled={true}
                             onClick={[Function]}
                             style={
