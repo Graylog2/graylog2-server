@@ -14,26 +14,37 @@ exports[`<Widget /> should render with empty props 1`] = `
         loading="false"
         title="Widget Title"
       >
-        <span>
-          <svg
-            class="svg-inline--fa fa-arrows-alt-h"
-          />
-        </span>
-         
-        <span
-          role="presentation"
+        <div
+          class="Widget__WidgetActionsWrapper-sc-1k4o2f7-0 jMAZyY"
         >
+          <button
+            class="IconButton__Wrapper-sc-1q956yw-0 jAMEoy"
+            title="Stretch width"
+          >
+            <svg
+              class="svg-inline--fa fa-arrows-alt-h"
+            />
+          </button>
           <span
             role="presentation"
           >
-            <span>
-              <svg
-                class="svg-inline--fa fa-chevron-down"
-                data-testid="widgetActionDropDown"
-              />
+            <span
+              role="presentation"
+            >
+              <span>
+                <button
+                  class="IconButton__Wrapper-sc-1q956yw-0 jAMEoy"
+                  title="Open actions dropdown"
+                >
+                  <svg
+                    class="svg-inline--fa fa-chevron-down"
+                    data-testid="widgetActionDropDown"
+                  />
+                </button>
+              </span>
             </span>
           </span>
-        </span>
+        </div>
       </widget-header>
       <div
         class="spinnerContainer"
