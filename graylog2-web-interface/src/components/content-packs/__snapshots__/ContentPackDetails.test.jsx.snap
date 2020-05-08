@@ -167,7 +167,8 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                       <div
                         dangerouslySetInnerHTML={
                           Object {
-                            "__html": "<p>Grok Patterns to extract informations from UFW logfiles</p>",
+                            "__html": "<p>Grok Patterns to extract informations from UFW logfiles</p>
+",
                           }
                         }
                       />
