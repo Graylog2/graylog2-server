@@ -72,15 +72,14 @@ public class NotificationGracePeriodService {
     }
 
     public boolean inGracePeriod(EventDefinition definition, String notificationId, Event event) {
-        if (definition.notificationSettings().gracePeriodMs() <= 0) {
+        final long gracePeriodMs = definition.notificationSettings().gracePeriodMs();
+        if (gracePeriodMs <= 0) {
             return false;
         }
         final Optional<DateTime> lastEventTime = get(definition.id(), notificationId, event.toDto().key());
-        if (lastEventTime.isPresent()) {
-            return lastEventTime.get().isAfter(event.getEventTimestamp().minus(definition.notificationSettings().gracePeriodMs()));
-        }
+        final boolean isInGracePeriod = lastEventTime.map(dateTime -> dateTime.isAfter(event.getEventTimestamp().minus(gracePeriodMs))).orElse(false);
         put(definition.id(), notificationId, event.toDto().key(), event.getEventTimestamp());
-        return false;
+        return isInGracePeriod;
     }
 
     private Optional<DateTime> get(String eventDefinitionId, String notificationId, String eventKey) {
