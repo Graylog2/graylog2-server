@@ -186,6 +186,7 @@ describe('<ContentPackSelection />', () => {
     it('should validate that URLs only have http or https protocols', () => {
       const contentPack = { name: 'name', summary: 'summary', vendor: 'vendor' };
       const protocols = [
+        // eslint-disable-next-line no-script-url
         { protocol: 'javascript:', errors: 1 },
         { protocol: 'ftp:', errors: 1 },
         { protocol: 'http:', errors: 0 },
