@@ -1,7 +1,7 @@
 // @flow strict
 import PropTypes from 'prop-types';
-import type { ViewType } from 'views/logic/views/View';
 import StringUtils from 'util/StringUtils';
+import type { ViewType } from 'views/logic/views/View';
 
 type Props = {
   type: ViewType,
