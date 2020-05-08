@@ -10,7 +10,7 @@ type SearchTypePivot = {
   field: string,
   limit?: number,
   interval?: Interval,
-  };
+};
 
 type SearchTypeBase = {
   filter: ?string,
