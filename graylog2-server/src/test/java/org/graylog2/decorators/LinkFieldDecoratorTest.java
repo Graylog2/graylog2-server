@@ -32,10 +32,10 @@ public class LinkFieldDecoratorTest {
     public void verifyUnsafeLinksAreRemoved() {
 
         // Verify that real, safe URLs are rendered as links.
-        Assert.assertEquals("http://full-local-should-match", getDecoratorUrl("http://full-local-should-match"));
-        Assert.assertEquals("http://full-url-should-match.com", getDecoratorUrl("http://full-url-should-match.com"));
-        Assert.assertEquals("http://full-url-should-match.com/test", getDecoratorUrl("http://full-url-should-match.com/test"));
-        Assert.assertEquals("http://full-url-should-match.com/test?with=param", getDecoratorUrl("http://full-url-should-match.com/test?with=param"));
+        Assert.assertEquals("http://full-local-allowed", getDecoratorUrl("http://full-local-allowed"));
+        Assert.assertEquals("http://full-url-allowed.com", getDecoratorUrl("http://full-url-allowed.com"));
+        Assert.assertEquals("http://full-url-allowed.com/test", getDecoratorUrl("http://full-url-allowed.com/test"));
+        Assert.assertEquals("http://full-url-allowed.com/test?with=param", getDecoratorUrl("http://full-url-allowed.com/test?with=param"));
         Assert.assertEquals("https://https-is-allowed-too.com", getDecoratorUrl("https://https-is-allowed-too.com"));
         Assert.assertEquals("HTTPS://upper-case-https-all-good.com", getDecoratorUrl("HTTPS://upper-case-https-all-good.com"));
 
@@ -45,11 +45,17 @@ public class LinkFieldDecoratorTest {
         Assert.assertEquals("ntp://other-stuff-is-not-allowed", getDecoratorMessage("ntp://other-stuff-is-not-allowed"));
     }
 
+    /**
+     * @return Dig out and return the message value directly displayed by the UI.
+     */
     private Object getDecoratorMessage(String urlFieldValue) {
 
         return executeDecoratorGetFirstMessage(urlFieldValue).message().get(TEST_FIELD);
     }
 
+    /**
+     * @return Dig out and return the href link property used by the UI.
+     */
     private Object getDecoratorUrl(String urlFieldValue) {
 
         return ((HashMap) executeDecoratorGetFirstMessage(urlFieldValue).message().get(TEST_FIELD)).get("href");
