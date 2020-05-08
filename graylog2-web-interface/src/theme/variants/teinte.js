@@ -30,14 +30,24 @@ const variant = {
   primary: '#702785',
   success: '#00ae42',
   warning: '#ffd200',
+  lightest: {},
+  lighter: {},
+  light: {},
+  dark: {},
+  darker: {},
+  darkest: {},
 };
 
-const variantLight = {};
-const variantDark = {};
-
 Object.keys(variant).forEach((name) => {
-  variantLight[name] = chroma(variant[name]).brighten(1).hex();
-  variantDark[name] = chroma(variant[name]).darken(1.5).hex();
+  if (typeof variant[name] === 'string') {
+    variant.light[name] = chroma.mix(variant[name], '#fff', 0.15).hex();
+    variant.lighter[name] = chroma.mix(variant[name], '#fff', 0.5).hex();
+    variant.lightest[name] = chroma.mix(variant[name], '#fff', 0.85).hex();
+
+    variant.dark[name] = chroma.mix(variant[name], '#000', 0.15).hex();
+    variant.darker[name] = chroma.mix(variant[name], '#000', 0.5).hex();
+    variant.darkest[name] = chroma.mix(variant[name], '#000', 0.85).hex();
+  }
 });
 
 /* eslint-disable prefer-destructuring */
@@ -50,11 +60,7 @@ const teinte = {
   brand,
   global,
   gray,
-  variant: {
-    ...variant,
-    light: { ...variantLight },
-    dark: { ...variantDark },
-  },
+  variant,
 };
 
 export default teinte;
