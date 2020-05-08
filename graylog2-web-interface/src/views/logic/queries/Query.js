@@ -9,29 +9,6 @@ export type QueryId = string;
 
 export type FilterType = Immutable.Map<string, any>;
 
-export type ElasticsearchQueryString = {
-  type: 'elasticsearch',
-  query_string: string,
-};
-
-export type RelativeTimeRange = {|
-  type: 'relative',
-  range: number,
-|};
-
-export type AbsoluteTimeRange = {|
-  type: 'absolute',
-  from: string,
-  to: string,
-|};
-
-export type KeywordTimeRange = {|
-  type: 'keyword',
-  keyword: string,
-|};
-
-export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
-
 type SearchTypeList = Array<SearchType>;
 type InternalBuilderState = Immutable.Map<string, any>;
 
@@ -49,6 +26,11 @@ export type QueryJson = {
   timerange: any,
   filter?: FilterType,
   search_types: any,
+};
+
+export type ElasticsearchQueryString = {
+  type: 'elasticsearch',
+  query_string: string,
 };
 
 export const createElasticsearchQueryString = (query: string = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
@@ -83,6 +65,24 @@ export const filtersToStreamSet = (filter: ?Immutable.Map<string, any>): Immutab
 export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
+
+export type RelativeTimeRange = {|
+  type: 'relative',
+  range: number,
+|};
+
+export type AbsoluteTimeRange = {|
+  type: 'absolute',
+  from: string,
+  to: string,
+|};
+
+export type KeywordTimeRange = {|
+  type: 'keyword',
+  keyword: string,
+|};
+
+export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
 export default class Query {
   _value: InternalState;
