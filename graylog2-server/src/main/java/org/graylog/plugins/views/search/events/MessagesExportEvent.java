@@ -28,13 +28,26 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.graylog.plugins.views.audit.ViewsAuditEventTypes.MESSAGES_EXPORT_REQUESTED;
+import static org.graylog.plugins.views.audit.ViewsAuditEventTypes.MESSAGES_EXPORT_SUCCEEDED;
+
 @AutoValue
 @JsonAutoDetect
-public abstract class MessagesExportSucceededEvent {
-    public static MessagesExportSucceededEvent from(DateTime endTime, String userName, ExportMessagesCommand command) {
+public abstract class MessagesExportEvent {
+
+    public static MessagesExportEvent requested(DateTime startTime, String userName, ExportMessagesCommand command) {
+        return from(startTime, userName, command, MESSAGES_EXPORT_REQUESTED);
+    }
+
+    public static MessagesExportEvent succeeded(DateTime startTime, String userName, ExportMessagesCommand command) {
+        return from(startTime, userName, command, MESSAGES_EXPORT_SUCCEEDED);
+    }
+
+    private static MessagesExportEvent from(DateTime startTime, String userName, ExportMessagesCommand command, String auditType) {
         return Builder.create()
                 .userName(userName)
-                .timestamp(endTime)
+                .auditType(auditType)
+                .timestamp(startTime)
                 .timeRange(command.timeRange())
                 .queryString(command.queryString().queryString())
                 .streams(command.streams())
@@ -43,6 +56,8 @@ public abstract class MessagesExportSucceededEvent {
     }
 
     public abstract String userName();
+
+    public abstract String auditType();
 
     public abstract DateTime timestamp();
 
@@ -71,6 +86,8 @@ public abstract class MessagesExportSucceededEvent {
 
         public abstract Builder userName(String userName);
 
+        public abstract Builder auditType(String auditType);
+
         public abstract Builder timestamp(DateTime executionStart);
 
         public abstract Builder timeRange(AbsoluteRange timeRange);
@@ -81,15 +98,15 @@ public abstract class MessagesExportSucceededEvent {
 
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
 
-        abstract MessagesExportSucceededEvent autoBuild();
+        abstract MessagesExportEvent autoBuild();
 
-        public MessagesExportSucceededEvent build() {
+        public MessagesExportEvent build() {
             return autoBuild();
         }
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_MessagesExportSucceededEvent.Builder();
+            return new AutoValue_MessagesExportEvent.Builder();
         }
     }
 

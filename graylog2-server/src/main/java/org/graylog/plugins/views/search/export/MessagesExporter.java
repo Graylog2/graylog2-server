@@ -20,8 +20,7 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.events.MessagesExportRequestedEvent;
-import org.graylog.plugins.views.search.events.MessagesExportSucceededEvent;
+import org.graylog.plugins.views.search.events.MessagesExportEvent;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -61,13 +60,13 @@ public class MessagesExporter {
     }
 
     private void export(ExportMessagesCommand command, String userName, Consumer<SimpleMessageChunk> chunkForwarder) {
-        post(MessagesExportRequestedEvent.from(startedAt.get(), userName, command));
+        post(MessagesExportEvent.requested(startedAt.get(), userName, command));
 
         Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, chunk, command);
 
         backend.run(command, decoratedForwarder);
 
-        post(MessagesExportSucceededEvent.from(finishedAt.get(), userName, command));
+        post(MessagesExportEvent.succeeded(finishedAt.get(), userName, command));
     }
 
     private void post(Object event) {

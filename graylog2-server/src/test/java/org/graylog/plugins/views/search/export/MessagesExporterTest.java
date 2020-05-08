@@ -20,8 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.events.MessagesExportRequestedEvent;
-import org.graylog.plugins.views.search.events.MessagesExportSucceededEvent;
+import org.graylog.plugins.views.search.events.MessagesExportEvent;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -137,7 +136,7 @@ class MessagesExporterTest {
     void sendsAuditEventWhenStarted() {
         ExportMessagesCommand command = mockDefaultCommand();
 
-        MessagesExportRequestedEvent event = exportWithExpectedAuditEvent(MessagesExportRequestedEvent.class, 0);
+        MessagesExportEvent event = exportWithExpectedAuditEvent(0);
 
         assertAll("should have sent event",
                 () -> assertThat(event.userName()).isEqualTo("peterchen"),
@@ -153,7 +152,7 @@ class MessagesExporterTest {
     void sendsAuditEventWhenFinished() {
         ExportMessagesCommand command = mockDefaultCommand();
 
-        MessagesExportSucceededEvent event = exportWithExpectedAuditEvent(MessagesExportSucceededEvent.class, 1);
+        MessagesExportEvent event = exportWithExpectedAuditEvent(1);
 
         assertAll("should have sent event",
                 () -> assertThat(event.userName()).isEqualTo("peterchen"),
@@ -165,20 +164,16 @@ class MessagesExporterTest {
         );
     }
 
-    private <T> T exportWithExpectedAuditEvent(Class<T> clazz, int eventPosition) {
+    private MessagesExportEvent exportWithExpectedAuditEvent(int eventPosition) {
         sut.export(MessagesRequest.withDefaults(), "peterchen", chunk -> {
         });
 
-        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<MessagesExportEvent> eventCaptor = ArgumentCaptor.forClass(MessagesExportEvent.class);
 
         //noinspection UnstableApiUsage
         verify(eventBus, times(2)).post(eventCaptor.capture());
 
-        Object event = eventCaptor.getAllValues().get(eventPosition);
-        assertThat(event).isInstanceOf(clazz);
-
-        //noinspection unchecked
-        return (T) event;
+        return eventCaptor.getAllValues().get(eventPosition);
     }
 
     private ExportMessagesCommand mockDefaultCommand() {
