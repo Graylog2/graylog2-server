@@ -1190,7 +1190,8 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   <div
                                     dangerouslySetInnerHTML={
                                       Object {
-                                        "__html": "<p>descr</p>",
+                                        "__html": "<p>descr</p>
+",
                                       }
                                     }
                                   />
