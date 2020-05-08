@@ -54,7 +54,7 @@ public class HttpConfiguration {
     private URI httpPublishUri;
 
     @Parameter(value = "http_enable_cors")
-    private boolean httpEnableCors = true;
+    private boolean httpEnableCors = false;
 
     @Parameter(value = "http_enable_gzip")
     private boolean httpEnableGzip = true;
