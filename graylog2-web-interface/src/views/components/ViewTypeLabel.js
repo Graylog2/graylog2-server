@@ -1,17 +1,16 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import type { ViewType } from 'views/logic/views/View';
+import StringUtils from 'util/StringUtils';
 
 type Props = {
   type: ViewType,
   capitalize?: boolean,
 };
 
-const capitalizeLabel = (label) => label[0].toUpperCase() + label.slice(1);
-
 const ViewTypeLabel = ({ type, capitalize }: Props) => {
   const typeLabel = type.toLowerCase();
-  return capitalize ? capitalizeLabel(typeLabel) : typeLabel;
+  return capitalize ? StringUtils.capitalizeFirstLetter(typeLabel) : typeLabel;
 };
 
 ViewTypeLabel.propTypes = {
