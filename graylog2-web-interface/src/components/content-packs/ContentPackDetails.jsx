@@ -9,10 +9,19 @@ import ContentPackConstraints from 'components/content-packs/ContentPackConstrai
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
 import ContentPackParameterList from 'components/content-packs/ContentPackParameterList';
 import 'components/content-packs/ContentPackDetails.css';
+import { hasAcceptedProtocol } from 'util/URLUtils';
 
 const ContentPackDetails = (props) => {
   const { contentPack, offset, verbose, constraints, showConstraints } = props;
   const markdownDescription = markdown.toHTML(contentPack.description || '');
+  let contentPackAnchor = contentPack.url;
+  try {
+    if (hasAcceptedProtocol(contentPack.url)) {
+      contentPackAnchor = <a href={contentPack.url}>{contentPack.url}</a>;
+    }
+  } catch (e) {
+    // Do nothing
+  }
 
   return (
     <Row>
@@ -26,7 +35,7 @@ const ContentPackDetails = (props) => {
               <dt>Name:</dt> <dd>{contentPack.name}&nbsp;</dd>
               <dt>Summary:</dt> <dd>{contentPack.summary}&nbsp;</dd>
               <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
-              <dt>URL:</dt> <dd><a href={contentPack.url}>{contentPack.url}</a>&nbsp;</dd>
+              <dt>URL:</dt> <dd>{contentPackAnchor}&nbsp;</dd>
               { contentPack.id && (<span><dt>ID:</dt> <dd><code>{contentPack.id}</code></dd></span>) }
               { contentPack.parameters && !verbose && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
               { contentPack.entities && !verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }

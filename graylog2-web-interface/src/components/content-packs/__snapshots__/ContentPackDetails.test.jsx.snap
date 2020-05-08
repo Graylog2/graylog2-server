@@ -12,7 +12,7 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
       "parameters": Array [],
       "rev": 1,
       "summary": "This is a summary",
-      "url": "www.graylog.com",
+      "url": "http://www.graylog.com",
       "v": 1,
       "vendor": "graylog.com",
     }
@@ -85,9 +85,9 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                  
                 <dd>
                   <a
-                    href="www.graylog.com"
+                    href="http://www.graylog.com"
                   >
-                    www.graylog.com
+                    http://www.graylog.com
                   </a>
                    
                 </dd>
@@ -201,7 +201,7 @@ exports[`<ContentPackDetails /> should render with content pack without a descri
       ],
       "summary": "This is a summary",
       "title": "UFW Grok Patterns",
-      "url": "www.graylog.com",
+      "url": "http://www.graylog.com",
       "vendor": "graylog.com",
       "version": "1.0",
     }
@@ -271,9 +271,9 @@ exports[`<ContentPackDetails /> should render with content pack without a descri
                  
                 <dd>
                   <a
-                    href="www.graylog.com"
+                    href="http://www.graylog.com"
                   >
-                    www.graylog.com
+                    http://www.graylog.com
                   </a>
                    
                 </dd>

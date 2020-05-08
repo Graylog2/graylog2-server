@@ -2103,9 +2103,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     </dt>
                                      
                                     <dd>
-                                      <a
-                                        href=""
-                                      />
                                        
                                     </dd>
                                     <span>
