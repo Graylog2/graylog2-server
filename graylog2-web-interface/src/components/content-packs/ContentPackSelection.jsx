@@ -8,6 +8,7 @@ import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, Icon, SearchForm } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
+import { hasAcceptedProtocol } from 'util/URLUtils';
 
 import style from './ContentPackSelection.css';
 
@@ -75,6 +76,16 @@ class ContentPackSelection extends React.Component {
       }
       return newErrors;
     }, {});
+
+    if (contentPack.url) {
+      try {
+        if (!hasAcceptedProtocol(contentPack.url)) {
+          errors.url = 'Must use a URL starting with http or https.';
+        }
+      } catch (e) {
+        errors.url = 'Invalid URL';
+      }
+    }
 
     const selectionEmpty = Object.keys(selectedEntities)
       .reduce((acc, entityGroup) => { return acc + selectedEntities[entityGroup].length; }, 0) <= 0;
@@ -269,10 +280,11 @@ class ContentPackSelection extends React.Component {
                        id="url"
                        type="text"
                        maxLength={250}
+                       bsStyle={errors.url ? 'error' : null}
                        value={contentPack.url}
                        onChange={this._bindValue}
                        label="URL"
-                       help="Where can I find the content pack. e.g. github url" />
+                       help={errors.url ? errors.url : 'Where can I find the content pack. e.g. github url'} />
               </fieldset>
             </form>
           </Col>
