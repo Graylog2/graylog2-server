@@ -20,7 +20,8 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.events.MessagesExportEvent;
+import org.graylog.plugins.views.search.events.MessagesExportRequestedEvent;
+import org.graylog.plugins.views.search.events.MessagesExportSucceededEvent;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -38,7 +39,8 @@ public class MessagesExporter {
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus;
 
-    public Supplier<DateTime> now = () -> DateTime.now(DateTimeZone.UTC);
+    public Supplier<DateTime> startedAt = () -> DateTime.now(DateTimeZone.UTC);
+    public Supplier<DateTime> finishedAt = () -> DateTime.now(DateTimeZone.UTC);
 
     @Inject
     public MessagesExporter(
@@ -59,16 +61,18 @@ public class MessagesExporter {
     }
 
     private void export(ExportMessagesCommand command, String userName, Consumer<SimpleMessageChunk> chunkForwarder) {
+        post(MessagesExportRequestedEvent.from(startedAt.get(), userName, command));
+
         Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, chunk, command);
 
         backend.run(command, decoratedForwarder);
 
-        postAuditEvent(command, userName);
+        post(MessagesExportSucceededEvent.from(finishedAt.get(), userName, command));
     }
 
-    private void postAuditEvent(ExportMessagesCommand command, String userName) {
+    private void post(Object event) {
         //noinspection UnstableApiUsage
-        eventBus.post(requireNonNull(MessagesExportEvent.from(now.get(), userName, command)));
+        eventBus.post(requireNonNull(event));
     }
 
     public void export(Search search, ResultFormat resultFormat, String userName, Consumer<SimpleMessageChunk> chunkForwarder) {

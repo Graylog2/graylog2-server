@@ -22,7 +22,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
@@ -32,7 +31,7 @@ import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -80,7 +79,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
-    @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
+    @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest request) {
         final MessagesRequest req = fillInIfNecessary(request);
 
@@ -105,7 +104,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Path("{searchId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
-    @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
+    @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @Valid ResultFormat formatFromClient) {
@@ -119,7 +118,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Path("{searchId}/{searchTypeId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
-    @AuditEvent(type = ViewsAuditEventTypes.MESSAGES_EXPORT)
+    @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @ApiParam @PathParam("searchId") String searchId,
             @ApiParam @PathParam("searchTypeId") String searchTypeId,

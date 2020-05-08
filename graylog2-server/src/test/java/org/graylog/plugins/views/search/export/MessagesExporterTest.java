@@ -20,7 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.events.MessagesExportEvent;
+import org.graylog.plugins.views.search.events.MessagesExportRequestedEvent;
+import org.graylog.plugins.views.search.events.MessagesExportSucceededEvent;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -46,6 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +59,8 @@ class MessagesExporterTest {
     private CommandFactory commandFactory;
     @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
+    private DateTime nowAtStart;
+    private DateTime nowAtEnd;
 
     @BeforeEach
     void setUp() {
@@ -69,6 +73,10 @@ class MessagesExporterTest {
         //noinspection UnstableApiUsage
         eventBus = mock(EventBus.class);
         sut = new MessagesExporter(backend, chunkDecorator, commandFactory, eventBus);
+        nowAtStart = DateTime.now(DateTimeZone.UTC);
+        nowAtEnd = DateTime.now(DateTimeZone.UTC);
+        sut.startedAt = () -> nowAtStart;
+        sut.finishedAt = () -> nowAtEnd;
     }
 
     @Test
@@ -126,31 +134,58 @@ class MessagesExporterTest {
     }
 
     @Test
-    void sendsAuditEvent() {
-        ExportMessagesCommand command = ExportMessagesCommand.withDefaults();
-        when(commandFactory.buildFromRequest(any())).
-                thenReturn(command);
+    void sendsAuditEventWhenStarted() {
+        ExportMessagesCommand command = mockDefaultCommand();
 
-        DateTime now = DateTime.now(DateTimeZone.UTC);
-        sut.now = () -> now;
+        MessagesExportRequestedEvent event = exportWithExpectedAuditEvent(MessagesExportRequestedEvent.class, 0);
 
-        sut.export(MessagesRequest.withDefaults(), "peterchen", chunk -> {});
-
-        ArgumentCaptor<MessagesExportEvent> eventCaptor = ArgumentCaptor.forClass(MessagesExportEvent.class);
-
-        //noinspection UnstableApiUsage
-        verify(eventBus).post(eventCaptor.capture());
-
-        MessagesExportEvent event = eventCaptor.getValue();
-
-        assertAll("should send event",
+        assertAll("should have sent event",
                 () -> assertThat(event.userName()).isEqualTo("peterchen"),
                 () -> assertThat(event.timeRange()).isEqualTo(command.timeRange()),
-                () -> assertThat(event.executionStart()).isEqualTo(now),
+                () -> assertThat(event.timestamp()).isEqualTo(nowAtStart),
                 () -> assertThat(event.queryString()).isEqualTo(command.queryString().queryString()),
                 () -> assertThat(event.streams()).isEqualTo(command.streams()),
                 () -> assertThat(event.fieldsInOrder()).isEqualTo(command.fieldsInOrder())
         );
+    }
+
+    @Test
+    void sendsAuditEventWhenFinished() {
+        ExportMessagesCommand command = mockDefaultCommand();
+
+        MessagesExportSucceededEvent event = exportWithExpectedAuditEvent(MessagesExportSucceededEvent.class, 1);
+
+        assertAll("should have sent event",
+                () -> assertThat(event.userName()).isEqualTo("peterchen"),
+                () -> assertThat(event.timeRange()).isEqualTo(command.timeRange()),
+                () -> assertThat(event.timestamp()).isEqualTo(nowAtEnd),
+                () -> assertThat(event.queryString()).isEqualTo(command.queryString().queryString()),
+                () -> assertThat(event.streams()).isEqualTo(command.streams()),
+                () -> assertThat(event.fieldsInOrder()).isEqualTo(command.fieldsInOrder())
+        );
+    }
+
+    private <T> T exportWithExpectedAuditEvent(Class<T> clazz, int eventPosition) {
+        sut.export(MessagesRequest.withDefaults(), "peterchen", chunk -> {
+        });
+
+        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
+
+        //noinspection UnstableApiUsage
+        verify(eventBus, times(2)).post(eventCaptor.capture());
+
+        Object event = eventCaptor.getAllValues().get(eventPosition);
+        assertThat(event).isInstanceOf(clazz);
+
+        //noinspection unchecked
+        return (T) event;
+    }
+
+    private ExportMessagesCommand mockDefaultCommand() {
+        ExportMessagesCommand command = ExportMessagesCommand.withDefaults();
+        when(commandFactory.buildFromRequest(any())).
+                thenReturn(command);
+        return command;
     }
 
     private ArrayList<SimpleMessageChunk> exportSearchTypeWithStubbedSingleChunkFromBackend(Search s, String searchTypeId, SimpleMessageChunk chunkFromBackend) {

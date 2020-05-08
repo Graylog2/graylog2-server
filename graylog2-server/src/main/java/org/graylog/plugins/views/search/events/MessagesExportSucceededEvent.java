@@ -30,11 +30,11 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class MessagesExportEvent {
-    public static MessagesExportEvent from(DateTime dateTime, String userName, ExportMessagesCommand command) {
+public abstract class MessagesExportSucceededEvent {
+    public static MessagesExportSucceededEvent from(DateTime endTime, String userName, ExportMessagesCommand command) {
         return Builder.create()
                 .userName(userName)
-                .executionStart(dateTime)
+                .timestamp(endTime)
                 .timeRange(command.timeRange())
                 .queryString(command.queryString().queryString())
                 .streams(command.streams())
@@ -44,7 +44,7 @@ public abstract class MessagesExportEvent {
 
     public abstract String userName();
 
-    public abstract DateTime executionStart();
+    public abstract DateTime timestamp();
 
     public abstract AbsoluteRange timeRange();
 
@@ -58,7 +58,7 @@ public abstract class MessagesExportEvent {
 
     public Map<String, Object> toMap() {
         return ImmutableMap.of(
-                "execution_start", executionStart(),
+                "timestamp", timestamp(),
                 "time_range", timeRange(),
                 "query_string", queryString(),
                 "streams", streams(),
@@ -71,7 +71,7 @@ public abstract class MessagesExportEvent {
 
         public abstract Builder userName(String userName);
 
-        public abstract Builder executionStart(DateTime executionStart);
+        public abstract Builder timestamp(DateTime executionStart);
 
         public abstract Builder timeRange(AbsoluteRange timeRange);
 
@@ -81,15 +81,15 @@ public abstract class MessagesExportEvent {
 
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
 
-        abstract MessagesExportEvent autoBuild();
+        abstract MessagesExportSucceededEvent autoBuild();
 
-        public MessagesExportEvent build() {
+        public MessagesExportSucceededEvent build() {
             return autoBuild();
         }
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_MessagesExportEvent.Builder().userName("TODO");
+            return new AutoValue_MessagesExportSucceededEvent.Builder();
         }
     }
 

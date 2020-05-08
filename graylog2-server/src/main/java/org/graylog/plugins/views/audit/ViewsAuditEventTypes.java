@@ -46,6 +46,8 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
 
     public static final String MESSAGES = "messages";
     public static final String MESSAGES_EXPORT = PREFIX + MESSAGES + ":export";
+    public static final String MESSAGES_EXPORT_REQUESTED = MESSAGES_EXPORT + "_requested";
+    public static final String MESSAGES_EXPORT_SUCCEEDED = MESSAGES_EXPORT + "_succeeded";
 
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
@@ -58,12 +60,13 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
             .add(SEARCH_CREATE)
             .add(SEARCH_EXECUTE)
 
-            .add(MESSAGES_EXPORT)
-
             .add(SEARCH_JOB_CREATE)
 
             .add(VIEW_SHARING_CREATE)
             .add(VIEW_SHARING_DELETE)
+
+            .add(MESSAGES_EXPORT_REQUESTED)
+            .add(MESSAGES_EXPORT_SUCCEEDED)
 
             .build();
 
