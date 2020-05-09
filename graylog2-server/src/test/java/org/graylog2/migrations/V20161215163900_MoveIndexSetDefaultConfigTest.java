@@ -105,7 +105,7 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
         assertThat(clusterConfigService.get(DefaultIndexSetConfig.class).defaultIndexSetId()).isEqualTo("57f3d721a43c2d59cb750001");
 
         assertThat(migrationCompleted).isNotNull();
-        assertThat(migrationCompleted.indexSetIds()).containsExactly("57f3d721a43c2d59cb750001", "57f3d721a43c2d59cb750003");
+        assertThat(migrationCompleted.indexSetIds()).containsExactlyInAnyOrder("57f3d721a43c2d59cb750001", "57f3d721a43c2d59cb750003");
     }
 
     @Test
