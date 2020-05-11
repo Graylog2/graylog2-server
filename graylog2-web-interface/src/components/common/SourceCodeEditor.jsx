@@ -3,6 +3,7 @@ import lodash from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
+import styled from 'styled-components';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -13,8 +14,40 @@ import PipelineRulesMode from 'components/rules/mode-pipeline';
 
 import ClipboardButton from './ClipboardButton';
 import Icon from './Icon';
-import style from './SourceCodeEditor.css';
 import './webpack-resolver';
+
+const SourceCodeContainer = styled.div(({ darkMode, resizable, theme }) => `
+  .ace_editor {
+    border: 1px solid ${theme.color.gray[80]};
+    border-radius: 5px;
+  }
+
+  .react-resizable-handle {
+    /* Ensure resize handle is over text editor */
+    z-index: 100;
+    /* Make resize handle visible on a dark background */
+    filter: ${darkMode ? 'invert(100%) brightness(180%);' : 'none'};
+    display: ${resizable ? 'block' : 'none'};
+  }
+`);
+
+const Toolbar = styled.div(({ theme }) => `
+  background: ${theme.color.global.contentBackground};
+  border: 1px solid ${theme.color.gray[80]};
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+
+  .btn-link {
+    color: #333;
+  }
+
+  & + ${SourceCodeContainer} {
+    /* Do not add border radius if code editor comes after toolbar */
+    .ace_editor {
+      border-radius: 0 0 5px 5px;
+    }
+  }
+`);
 
 /**
  * Component that renders a source code editor input. This is what powers the pipeline rules and collector
@@ -174,13 +207,12 @@ class SourceCodeEditor extends React.Component {
       value,
     } = this.props;
     const validCssWidth = lodash.isFinite(width) ? width : '100%';
-    const containerStyle = `${style.sourceCodeEditor} ${theme !== 'light' && style.darkMode} ${!resizable && style.static}`;
     const overlay = <Tooltip id="paste-button-tooltip">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
     return (
       <div>
         {toolbar
           && (
-          <div className={style.toolbar} style={{ width: validCssWidth }}>
+          <Toolbar style={{ width: validCssWidth }}>
             <ButtonToolbar>
               <ButtonGroup>
                 <ClipboardButton title={<Icon name="copy" fixedWidth />}
@@ -213,13 +245,15 @@ class SourceCodeEditor extends React.Component {
                 </Button>
               </ButtonGroup>
             </ButtonToolbar>
-          </div>
+          </Toolbar>
           )}
         <Resizable height={height}
                    width={width}
                    minConstraints={[200, 200]}
                    onResize={this.handleResize}>
-          <div className={containerStyle} style={{ height: height, width: validCssWidth }}>
+          <SourceCodeContainer style={{ height: height, width: validCssWidth }}
+                               darkMode={theme !== 'light'}
+                               resizable={resizable}>
             <AceEditor ref={(c) => { this.reactAce = c; }}
                        annotations={annotations}
                        editorProps={{ $blockScrolling: 'Infinity' }}
@@ -237,7 +271,7 @@ class SourceCodeEditor extends React.Component {
                        readOnly={readOnly}
                        value={value}
                        width="100%" />
-          </div>
+          </SourceCodeContainer>
         </Resizable>
       </div>
     );
