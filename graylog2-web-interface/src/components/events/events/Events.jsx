@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
+import styled from 'styled-components';
 
 import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
 import { EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
@@ -14,9 +15,57 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import EventsSearchBar from './EventsSearchBar';
 import EventDetails from './EventDetails';
 
-import styles from './Events.css';
-
 const HEADERS = ['Description', 'Key', 'Type', 'Event Definition', 'Timestamp'];
+
+const ExpandedTR = styled.tr(({ theme }) => `
+  > td {
+    border-top: 1px solid ${theme.color.gray[80]} !important;
+    padding: 10px 8px 8px 35px !important;
+  }
+
+  dd {
+    margin-bottom: 0.25em;
+  }
+
+  dl {
+    > dl,
+    > ul {
+      padding-left: 1.5em;
+    }
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+`);
+
+const EventsTbody = styled.tbody(({ expanded, theme }) => `
+    border-left: ${expanded ? `3px solid ${theme.color.variant.light.info}` : ''};
+    border-collapse: ${expanded ? 'separate' : 'collapse'};
+`);
+
+const CollapsibleTr = styled.tr`
+  cursor: pointer;
+`;
+
+const EventsTable = styled(Table)(({ theme }) => `
+  tr {
+    &:hover {
+      background-color: ${theme.color.gray[90]};
+    }
+
+    &${ExpandedTR} {
+      &:hover {
+        background-corlor: ${theme.color.global.contentBackground}
+      }
+    }
+  }
+`);
+
+const EventsIcon = styled(Icon)`
+  font-size: 1.5em;
+  vertical-align: top;
+`;
 
 class Events extends React.Component {
   static propTypes = {
@@ -33,9 +82,13 @@ class Events extends React.Component {
     onSearchReload: PropTypes.func.isRequired,
   };
 
-  state = {
-    expanded: [],
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      expanded: [],
+    };
+  }
 
   handlePageSizeChange = (nextPageSize) => {
     const { onPageChange } = this.props;
@@ -73,7 +126,7 @@ class Events extends React.Component {
     return (
       <>
         <OverlayTrigger placement="top" overlay={tooltip}>
-          <Icon name={icon} fixedWidth className={`${style} ${styles.priority}`} />
+          <EventsIcon name={icon} fixedWidth className={style} />
         </OverlayTrigger>
       </>
     );
@@ -98,13 +151,13 @@ class Events extends React.Component {
     const eventDefinitionContext = context.event_definitions[event.event_definition_id];
 
     const className = [
-      styles.collapsible,
       event.priority === EventDefinitionPriorityEnum.HIGH ? 'bg-danger' : '',
     ].join(' ');
 
     return (
-      <tbody key={event.id} className={expanded.includes(event.id) ? styles.expandedMarker : ''}>
-        <tr className={className} onClick={this.expandRow(event.id)}>
+      <EventsTbody key={event.id} expanded={expanded.includes(event.id)}>
+        <CollapsibleTr className={event.priority === EventDefinitionPriorityEnum.HIGH ? 'bg-danger' : ''}
+                       onClick={this.expandRow(event.id)}>
           <td>
             {this.priorityFormatter(event.id, event.priority)}
             &nbsp;
@@ -116,15 +169,15 @@ class Events extends React.Component {
             {this.renderLinkToEventDefinition(event, eventDefinitionContext)}
           </td>
           <td><Timestamp dateTime={event.timestamp} format={DateTime.Formats.DATETIME} /></td>
-        </tr>
+        </CollapsibleTr>
         {expanded.includes(event.id) && (
-          <tr className={styles.expandedRow}>
+          <ExpandedTR>
             <td colSpan={HEADERS.length + 1}>
               <EventDetails event={event} eventDefinitionContext={eventDefinitionContext} currentUser={currentUser} />
             </td>
-          </tr>
+          </ExpandedTR>
         )}
-      </tbody>
+      </EventsTbody>
     );
   };
 
@@ -191,14 +244,14 @@ class Events extends React.Component {
               {eventList.length === 0 ? (
                 <Alert bsStyle="info">No {entity} found for the current search criteria.</Alert>
               ) : (
-                <Table id="events-table" className={styles.eventsTable}>
+                <EventsTable id="events-table">
                   <thead>
                     <tr>
                       {HEADERS.map((header) => <th key={header}>{header}</th>)}
                     </tr>
                   </thead>
                   {eventList.map(this.renderEvent)}
-                </Table>
+                </EventsTable>
               )}
             </PaginatedList>
           </Col>
