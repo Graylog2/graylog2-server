@@ -187,6 +187,7 @@ type Props = {
   delimiter?: string,
   disabled?: boolean,
   displayKey?: string,
+  ignoreAccents?: boolean,
   inputProps?: { [string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
@@ -292,7 +293,7 @@ class Select extends React.Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps = (nextProps: Props) => {
+  componentWillReceivePropsProps = (nextProps: Props) => {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
@@ -362,7 +363,7 @@ class Select extends React.Component<Props, State> {
     });
   };
 
-  createCustomFilter = (stringify) => {
+  createCustomFilter = (stringify: (any) => string) => {
     const { matchProp, ignoreAccents } = this.props;
     const options = { ignoreAccents };
 
