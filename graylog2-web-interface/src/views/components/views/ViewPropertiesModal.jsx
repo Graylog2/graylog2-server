@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { isEqual } from 'lodash';
 import FormsUtils from 'util/FormsUtils';
 
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 
@@ -23,7 +24,8 @@ export default class ViewPropertiesModal extends React.Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { title } = this.props;
     const { view } = this.state;
     if (title !== nextProps.title || !isEqual(view, nextProps.view)) {
@@ -57,7 +59,8 @@ export default class ViewPropertiesModal extends React.Component {
 
   render() {
     const { view: { title = '', summary = '', description = '' }, title: modalTitle } = this.state;
-    const { onClose, show } = this.props;
+    const { onClose, show, view } = this.props;
+    const viewType = ViewTypeLabel({ type: view.type });
     return (
       <BootstrapModalForm show={show}
                           title={modalTitle}
@@ -69,7 +72,7 @@ export default class ViewPropertiesModal extends React.Component {
                type="text"
                name="title"
                label="Title"
-               help="The title of the dashboard."
+               help={`The title of the ${viewType}.`}
                required
                onChange={this._onChange}
                value={title} />
@@ -77,14 +80,14 @@ export default class ViewPropertiesModal extends React.Component {
                type="text"
                name="summary"
                label="Summary"
-               help="A helpful summary of the dashboard."
+               help={`A helpful summary of the ${viewType}.`}
                onChange={this._onChange}
                value={summary} />
         <Input id="description"
                type="textarea"
                name="description"
                label="Description"
-               help="A longer, helpful description of the dashboard and its functionality."
+               help={`A longer, helpful description of the ${viewType} and its functionality.`}
                onChange={this._onChange}
                value={description} />
       </BootstrapModalForm>

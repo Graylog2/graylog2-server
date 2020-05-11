@@ -63,7 +63,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
       </Button>
       <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
         <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
-          <Icon name="edit" /> Edit
+          <Icon name="edit" /> Edit metadata
         </MenuItem>
         <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="share-alt" /> Share
@@ -88,7 +88,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
                              view={view}
                              title="Editing dashboard"
                              onClose={() => setEditViewOpen(false)}
-                             onSave={(updatedView) => onSaveView(updatedView, router)} />
+                             onSave={onSaveView} />
       )}
       {shareViewOpen && <ShareViewModal show view={view} onClose={() => setShareViewOpen(false)} />}
       {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}

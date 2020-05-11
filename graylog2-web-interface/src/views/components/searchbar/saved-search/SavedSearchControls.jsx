@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
 import { browserHistory } from 'react-router';
 
+import connect from 'stores/connect';
 import { type ThemeInterface } from 'theme';
 import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
@@ -16,13 +17,14 @@ import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-import connect from 'stores/connect';
+import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import ShareViewModal from 'views/components/views/ShareViewModal';
 import * as Permissions from 'views/Permissions';
 
+import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
 
@@ -42,6 +44,7 @@ type State = {
   showList: boolean,
   showCSVExport: boolean,
   showShareSearch: boolean,
+  showMetadataEdit: boolean,
   newTitle: string,
 };
 
@@ -72,6 +75,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const { view } = viewStoreState;
 
     this.state = {
+      showMetadataEdit: false,
       showCSVExport: false,
       showShareSearch: false,
       showForm: false,
@@ -93,6 +97,11 @@ class SavedSearchControls extends React.Component<Props, State> {
   toggleCSVExport = () => {
     const { showCSVExport } = this.state;
     this.setState({ showCSVExport: !showCSVExport });
+  };
+
+  toggleMetadataEdit = () => {
+    const { showMetadataEdit } = this.state;
+    this.setState({ showMetadataEdit: !showMetadataEdit });
   };
 
   toggleShareSearch = () => {
@@ -189,11 +198,21 @@ class SavedSearchControls extends React.Component<Props, State> {
   };
 
   render() {
-    const { showForm, showList, newTitle, showCSVExport, showShareSearch } = this.state;
+    const { showForm, showList, newTitle, showCSVExport, showShareSearch, showMetadataEdit } = this.state;
     const { currentUser, theme, viewStoreState } = this.props;
     const { view, dirty } = viewStoreState;
+    const isAllowedToEdit = view && view.id && _isAllowedToEdit(view, currentUser);
+
     const csvExport = showCSVExport && (
       <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
+    );
+
+    const metadataEdit = showMetadataEdit && (
+      <ViewPropertiesModal show
+                           view={view}
+                           title="Editing saved search"
+                           onClose={this.toggleMetadataEdit}
+                           onSave={onSaveView} />
     );
 
     const shareSearch = showShareSearch && (
@@ -249,17 +268,21 @@ class SavedSearchControls extends React.Component<Props, State> {
               </Button>
               {savedSearchList}
               <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
+                <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
+                  <Icon name="edit" /> Edit metadata
+                </MenuItem>
                 <MenuItem onSelect={this.loadAsDashboard}><Icon name="dashboard" /> Export to dashboard</MenuItem>
                 <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download" /> Export to CSV</MenuItem>
                 <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
                   <Icon name="eraser" /> Reset search
                 </MenuItem>
                 <MenuItem divider />
-                <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!(view && view.id) || !_isAllowedToEdit(view, currentUser)}>
+                <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit}>
                   <Icon name="share-alt" /> Share
                 </MenuItem>
               </DropdownButton>
               {csvExport}
+              {metadataEdit}
               {shareSearch}
             </ButtonGroup>
           </div>
