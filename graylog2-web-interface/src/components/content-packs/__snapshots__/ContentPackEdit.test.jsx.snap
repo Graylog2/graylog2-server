@@ -2189,7 +2189,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
     </Wizard>
     <ScrollButton
       delay={5}
-      possition="middle"
+      position="middle"
       scrollSteps={50}
     >
       <span />
@@ -4990,7 +4990,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
     </Wizard>
     <ScrollButton
       delay={5}
-      possition="middle"
+      position="middle"
       scrollSteps={50}
     >
       <span />
