@@ -1,7 +1,7 @@
 // @flow strict
 import styled, { css, type StyledComponent } from 'styled-components';
 import chroma from 'chroma-js';
-import { util, type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme';
 import { Title as NavItemTitle } from './NavItem.styles';
 
 const sidebarWidth = {
@@ -15,7 +15,7 @@ export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLD
   grid-column: 1;
   -ms-grid-column: 1;
   background: ${theme.color.gray[10]};
-  color: ${util.contrastingColor(theme.color.gray[10], 'AA')};
+  color: ${theme.util.contrastingColor(theme.color.gray[10], 'AA')};
   height: calc(100vh - 50px);
   padding-top: 20px;
   position: ${open ? 'fixed' : 'static'};

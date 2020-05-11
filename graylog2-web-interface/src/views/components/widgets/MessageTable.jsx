@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { util, type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -133,7 +133,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
 
 const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = styled.thead(({ theme }) => `
   background-color: ${theme.color.gray[90]};
-  color: ${util.readableColor(theme.color.gray[90])};
+  color: ${theme.util.readableColor(theme.color.gray[90])};
 
   th {
     border: 0;
@@ -141,7 +141,7 @@ const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = 
     font-weight: normal;
     white-space: nowrap;
     background-color: ${theme.color.gray[90]};
-    color: ${util.readableColor(theme.color.gray[90])};
+    color: ${theme.util.readableColor(theme.color.gray[90])};
   }
 `);
 

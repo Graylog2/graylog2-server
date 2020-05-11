@@ -4,37 +4,36 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const styleVariants = ['danger', 'info', 'success', 'warning'];
 
-const alertStyles = (hex) => {
-  const borderColor = util.colorLevel(hex, -7);
-  const backgroundColor = util.colorLevel(hex, -5);
+const alertStyles = (hex) => css(({ theme }) => {
+  const borderColor = theme.util.colorLevel(hex, -7);
+  const backgroundColor = theme.util.colorLevel(hex, -5);
 
   return css`
     background-color: ${backgroundColor};
     border-color: ${borderColor};
-    color: ${util.readableColor(backgroundColor)};
+    color: ${theme.util.readableColor(backgroundColor)};
 
     a:not(.btn) {
-      color: ${util.contrastingColor(backgroundColor, 'AA')};
+      color: ${theme.util.contrastingColor(backgroundColor, 'AA')};
       font-weight: bold;
       text-decoration: underline;
 
       &:hover,
       &:focus {
-        color: ${util.contrastingColor(backgroundColor, 'AAA')};
+        color: ${theme.util.contrastingColor(backgroundColor, 'AAA')};
         text-decoration: none;
       }
 
       &:active {
-        color: ${util.contrastingColor(backgroundColor, 'AAA')};
+        color: ${theme.util.contrastingColor(backgroundColor, 'AAA')};
       }
     }
   `;
-};
+});
 
 
 const Alert = forwardRef(({ bsStyle, ...props }, ref) => {

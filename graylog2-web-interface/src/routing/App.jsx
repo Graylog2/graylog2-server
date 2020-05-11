@@ -3,7 +3,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { util } from 'theme';
 import Navigation from 'components/navigation/Navigation';
 import { Scratchpad, Icon, Spinner } from 'components/common';
 import connect from 'stores/connect';
@@ -22,7 +21,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   left: 50%;
   margin-left: -125px;
   top: 50px;
-  color: ${util.readableColor(chroma(theme.color.brand.tertiary).alpha(0.8).css())};
+  color: ${theme.util.readableColor(chroma(theme.color.brand.tertiary).alpha(0.8).css())};
   font-size: 80px;
   padding: 25px;
   z-index: 2000;

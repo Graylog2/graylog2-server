@@ -4,12 +4,11 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 
-import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], -5);
-  const textColor = util.readableColor(backgroundColor);
+  const backgroundColor = theme.util.colorLevel(theme.color.variant.light[variant], -5);
+  const textColor = theme.util.readableColor(backgroundColor);
 
   return css`
     &.list-group-item-${variant} {
@@ -34,7 +33,7 @@ const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
         &.active,
         &.active:hover,
         &.active:focus {
-          color: ${util.readableColor(theme.color.variant.light[variant])};
+          color: ${theme.util.readableColor(theme.color.variant.light[variant])};
           background-color: ${theme.color.variant.light[variant]};
           border-color: ${theme.color.variant.light[variant]};
         }
@@ -99,16 +98,16 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     &:hover:not(.disabled),
     &:focus:not(.disabled) {
       background-color: ${theme.color.gray[40]};
-      color: ${util.readableColor(theme.color.gray[40])};
+      color: ${theme.util.readableColor(theme.color.gray[40])};
 
       &.active {
-        color: ${util.readableColor(theme.color.variant.primary)};
+        color: ${theme.util.readableColor(theme.color.variant.primary)};
         border-color: ${theme.color.variant.primary};
         background-color: ${theme.color.variant.primary};
       }
 
       .list-group-item-heading {
-        color: ${util.readableColor(theme.color.gray[40])};
+        color: ${theme.util.readableColor(theme.color.gray[40])};
       }
     }
   }

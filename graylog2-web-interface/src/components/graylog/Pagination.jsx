@@ -6,14 +6,13 @@ import { Pagination as DeprecatedPagination } from '@react-bootstrap/pagination'
 import { css } from 'styled-components';
 
 import deprecationNotice from 'util/deprecationNotice';
-import { util } from 'theme';
 
 export const paginationStyles = css(({ theme }) => css`
   &.pagination {
     > li {
       > a,
       > span {
-        color: ${util.readableColor(theme.color.global.contentBackground)};
+        color: ${theme.util.readableColor(theme.color.global.contentBackground)};
         background-color: ${theme.color.global.contentBackground};
         border-color: ${theme.color.gray[80]};
 
