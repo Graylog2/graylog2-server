@@ -150,10 +150,6 @@ class Events extends React.Component {
     const { expanded } = this.state;
     const eventDefinitionContext = context.event_definitions[event.event_definition_id];
 
-    const className = [
-      event.priority === EventDefinitionPriorityEnum.HIGH ? 'bg-danger' : '',
-    ].join(' ');
-
     return (
       <EventsTbody key={event.id} expanded={expanded.includes(event.id)}>
         <CollapsibleTr className={event.priority === EventDefinitionPriorityEnum.HIGH ? 'bg-danger' : ''}
