@@ -37,56 +37,12 @@ public class AESTools {
 
     private static final SivMode SIV_MODE = new SivMode();
 
-
-    private static int desiredKeyLength(String input) {
-        final int length = input.length();
-
-        if (length == 16 || length == 24 || length == 32) {
-            return length;
-        }
-
-        if (length < 16) {
-            return 16;
-        }
-
-        if (length > 32) {
-            return 32;
-        }
-
-        return (length / 8 + 1) * 8;
-    }
-
-    private static byte[] cutToLength(String input, int length) {
-        checkArgument(input.length() >= length, "Input string must be greater or of desired length");
-        return (input.length() > length ? input.substring(0, length) : input).getBytes(UTF_8);
-    }
-
-    private static byte[] padToLength(String input, int length) {
-        checkArgument(input.length() < length, "Input string must be smaller than desired length");
-        final byte[] result = new byte[length];
-        System.arraycopy(input.getBytes(UTF_8), 0, result, 0, input.length());
-
-        return result;
-    }
-
-    private static byte[] cutOrPadToLength(String input, int length) {
-        checkNotNull(input);
-        if (input.length() == length) {
-            return input.getBytes(UTF_8);
-        }
-
-        return input.length() > length
-                ? cutToLength(input, length)
-                : padToLength(input, length);
-    }
-
     @Nullable
     public static String encrypt(String plainText, String encryptionKey, String salt) {
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
-            final int desiredLength = desiredKeyLength(encryptionKey);
-            SecretKeySpec key = new SecretKeySpec(cutOrPadToLength(encryptionKey, desiredLength), "AES");
+            SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
             return Hex.encodeToString(cipher.doFinal(plainText.getBytes("UTF-8")));
         } catch (Exception e) {
@@ -100,8 +56,7 @@ public class AESTools {
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
-            final int desiredLength = desiredKeyLength(encryptionKey);
-            SecretKeySpec key = new SecretKeySpec(cutOrPadToLength(encryptionKey, desiredLength), "AES");
+            SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
             return new String(cipher.doFinal(Hex.decode(cipherText)), "UTF-8");
         } catch (Exception e) {
@@ -177,5 +132,52 @@ public class AESTools {
         if (encryptionKey == null || encryptionKey.length < 32) {
             throw new IllegalArgumentException("encryptionKey cannot be null and must be at least 32 bytes long");
         }
+    }
+
+    private static int desiredKeyLength(String input) {
+        final int length = input.length();
+
+        if (length == 16 || length == 24 || length == 32) {
+            return length;
+        }
+
+        if (length < 16) {
+            return 16;
+        }
+
+        if (length > 32) {
+            return 32;
+        }
+
+        return (length / 8 + 1) * 8;
+    }
+
+    private static byte[] cutToLength(String input, int length) {
+        checkArgument(input.length() >= length, "Input string must be greater or of desired length");
+        return (input.length() > length ? input.substring(0, length) : input).getBytes(UTF_8);
+    }
+
+    private static byte[] padToLength(String input, int length) {
+        checkArgument(input.length() < length, "Input string must be smaller than desired length");
+        final byte[] result = new byte[length];
+        System.arraycopy(input.getBytes(UTF_8), 0, result, 0, input.length());
+
+        return result;
+    }
+
+    private static byte[] cutOrPadToLength(String input, int length) {
+        if (input.length() == length) {
+            return input.getBytes(UTF_8);
+        }
+
+        return input.length() > length
+                ? cutToLength(input, length)
+                : padToLength(input, length);
+    }
+
+    private static byte[] adjustToIdealKeyLength(String input) {
+        checkNotNull(input);
+        final int desiredLength = desiredKeyLength(input);
+        return cutOrPadToLength(input, desiredLength);
     }
 }
