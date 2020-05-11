@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Checks the grace period of events at an early stage, to prevent creating unnecessary JobTriggers.
- * This is an additional filter to {@link org.graylog.events.notifications.DBNotificationService}
+ * This is an additional filter to {@link org.graylog.events.notifications.DBNotificationGracePeriodService}
  */
 @Singleton
 public class NotificationGracePeriodService {
@@ -72,20 +72,19 @@ public class NotificationGracePeriodService {
     }
 
     public boolean inGracePeriod(EventDefinition definition, String notificationId, Event event) {
-        if (definition.notificationSettings().gracePeriodMs() <= 0) {
+        final long gracePeriodMs = definition.notificationSettings().gracePeriodMs();
+        if (gracePeriodMs <= 0) {
             return false;
         }
         final Optional<DateTime> lastEventTime = get(definition.id(), notificationId, event.toDto().key());
-        if (lastEventTime.isPresent()) {
-            return lastEventTime.get().isAfter(event.getEventTimestamp().minus(definition.notificationSettings().gracePeriodMs()));
-        }
+        final boolean isInGracePeriod = lastEventTime.map(dateTime -> dateTime.isAfter(event.getEventTimestamp().minus(gracePeriodMs))).orElse(false);
         put(definition.id(), notificationId, event.toDto().key(), event.getEventTimestamp());
-        return false;
+        return isInGracePeriod;
     }
 
     private Optional<DateTime> get(String eventDefinitionId, String notificationId, String eventKey) {
         try {
-            return seenEvents.get(new AutoValue_NotificationGracePeriodService_CacheKey(eventDefinitionId, notificationId, eventKey));
+            return seenEvents.get(CacheKey.create(eventDefinitionId, notificationId, eventKey));
         } catch (ExecutionException e) {
             final Throwable rootCause = Throwables.getRootCause(e);
             LOG.error("Unable to get seenEvent {}/{}/{} from cache", eventDefinitionId, notificationId, eventKey, rootCause);
@@ -94,6 +93,6 @@ public class NotificationGracePeriodService {
     }
 
     private void put(String eventDefinitionId, String notificationId, String eventKey, DateTime time) {
-        seenEvents.put(new AutoValue_NotificationGracePeriodService_CacheKey(eventDefinitionId, notificationId, eventKey), Optional.of(time));
+        seenEvents.put(CacheKey.create(eventDefinitionId, notificationId, eventKey), Optional.of(time));
     }
 }
