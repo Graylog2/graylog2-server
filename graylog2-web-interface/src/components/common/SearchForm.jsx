@@ -102,13 +102,6 @@ class SearchForm extends React.Component {
     isLoading: false,
   };
 
-  componentDidMount(): void {
-    const { focusAfterMount } = this.props;
-    if (focusAfterMount && this.searchInput) {
-      this.searchInput.focus();
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     // The query might get reset outside of this component so we have to adjust the internal state
     if (this.props.query !== nextProps.query) {
@@ -171,7 +164,8 @@ class SearchForm extends React.Component {
           <div className="form-group has-feedback">
             {this.props.label && <label htmlFor="common-search-form-query-input" className="control-label">{this.props.label}</label>}
             <input id="common-search-form-query-input"
-                   ref={(ref) => { this.searchInput = ref; }}
+                   /* eslint-disable-next-line jsx-a11y/no-autofocus */
+                   autoFocus={this.props.focusAfterMount}
                    onChange={this.handleQueryChange}
                    value={this.state.query}
                    placeholder={this.props.placeholder}
