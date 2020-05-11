@@ -8,9 +8,9 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   theme: aceTheme,
   scTheme: theme,
 }))(({ scTheme }) => css`
-  height: 34px;
+  height: 34px !important;
   line-height: 32px;
-  width: 100%;
+  width: 100% !important;
 
   &.ace-queryinput .ace_gutter {
     background: ${scTheme.color.global.inputBackground};
