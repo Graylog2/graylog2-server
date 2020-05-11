@@ -37,8 +37,21 @@ public class AESTools {
 
     private static final SivMode SIV_MODE = new SivMode();
 
+    /**
+     * Encrypt the given plain text value with the given encryption key and salt using AES CBC.
+     * If the supplied encryption key is not of 16, 24 or 32 bytes length, it will be truncated or padded to the next
+     * largest key size before encryption.
+     *
+     * @param plainText     the plain text value to encrypt
+     * @param encryptionKey the encryption key
+     * @param salt          the salt
+     * @return the encrypted hexadecimal cipher text or null if encryption failed
+     */
     @Nullable
     public static String encrypt(String plainText, String encryptionKey, String salt) {
+        checkNotNull(plainText, "Plain text must not be null.");
+        checkNotNull(encryptionKey, "Encryption key must not be null.");
+        checkNotNull(salt, "Salt must not be null.");
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
@@ -51,8 +64,22 @@ public class AESTools {
         return null;
     }
 
+    /**
+     * Decrypt the given cipher text value with the given encryption key and the same salt used for encryption using AES
+     * CBC.
+     * If the supplied encryption key is not of 16, 24 or 32 bytes length, it will be truncated or padded to the next
+     * largest key size before encryption.
+     *
+     * @param cipherText    the hexadecimal cipher text value to decrypt
+     * @param encryptionKey the encryption key
+     * @param salt          the salt used for encrypting this cipherText
+     * @return the decrypted cipher text or null if decryption failed
+     */
     @Nullable
     public static String decrypt(String cipherText, String encryptionKey, String salt) {
+        checkNotNull(cipherText, "Cipher text must not be null.");
+        checkNotNull(encryptionKey, "Encryption key must not be null.");
+        checkNotNull(salt, "Salt must not be null.");
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
