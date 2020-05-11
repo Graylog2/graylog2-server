@@ -330,9 +330,13 @@ public class EventDefinitionHandler {
 
         final EventProcessorExecutionJob.Config oldConfig = (EventProcessorExecutionJob.Config) oldJobDefinition.config();
         final EventProcessorExecutionJob.Config config = (EventProcessorExecutionJob.Config) jobDefinition.config();
-        // Reset the scheduling times
+        // If necessary, reset the scheduling times
         if (!config.hasEqualSchedule(oldConfig)) {
+            // jobDefinition has a newly created scheduling timerange.
+            // Wipe the old one so EventProcessorExecutionJob.execute()
+            // will fall back to the new one from the JobDefinition.
             unsavedJobTriggerBuilder.data(null);
+            // schedule the next execution accordingly
             unsavedJobTriggerBuilder.nextTime(config.parameters().timerange().getTo());
         }
 
