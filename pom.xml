@@ -94,6 +94,7 @@
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <commons-codec.version>1.11</commons-codec.version>
         <commons-email.version>1.5</commons-email.version>
+        <commons-validator.version>1.6</commons-validator.version>
         <commons-io.version>2.6</commons-io.version>
         <disruptor.version>3.4.2</disruptor.version>
         <elasticsearch.version>5.6.12</elasticsearch.version>
