@@ -20,7 +20,6 @@ export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExternalLink } from './ExternalLink';
 export { default as ExternalLinkButton } from './ExternalLinkButton';
 export { default as Icon } from './Icon';
-// eslint-disable-next-line import/no-cycle
 export { default as IconButton } from './IconButton';
 export { default as IfPermitted } from './IfPermitted';
 export { default as InteractableModal } from './InteractableModal';
@@ -31,7 +30,6 @@ export { default as LocaleSelect } from './LocaleSelect';
 export { default as KeyValueTable } from './KeyValueTable';
 export { default as MultiSelect } from './MultiSelect';
 export { default as OverlayElement } from './OverlayElement';
-// eslint-disable-next-line import/no-cycle
 export { default as PageErrorOverview } from './PageErrorOverview';
 export { default as PageHeader } from './PageHeader';
 export { default as PaginatedList } from './PaginatedList';

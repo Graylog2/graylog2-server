@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 
 const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.button(({ theme }) => `
   display: inline-flex;
