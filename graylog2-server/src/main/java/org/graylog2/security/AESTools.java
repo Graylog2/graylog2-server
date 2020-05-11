@@ -34,6 +34,46 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class AESTools {
     private static final Logger LOG = LoggerFactory.getLogger(AESTools.class);
 
+    @Nullable
+    public static String encrypt(String plainText, String encryptionKey, String salt) {
+        try {
+            @SuppressWarnings("CIPHER_INTEGRITY")
+            Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
+            SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
+            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
+            return Hex.encodeToString(cipher.doFinal(plainText.getBytes("UTF-8")));
+        } catch (Exception e) {
+            LOG.error("Could not encrypt value.", e);
+        }
+        return null;
+    }
+
+    @Nullable
+    public static String decrypt(String cipherText, String encryptionKey, String salt) {
+        try {
+            @SuppressWarnings("CIPHER_INTEGRITY")
+            Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
+            SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
+            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
+            return new String(cipher.doFinal(Hex.decode(cipherText)), "UTF-8");
+        } catch (Exception e) {
+            LOG.error("Could not decrypt value.", e);
+        }
+        return null;
+    }
+
+    /**
+     * Generates a new random salt
+     *
+     * @return the generated random salt as a string of hexadecimal digits.
+     */
+    public static String generateNewSalt() {
+        final SecureRandom random = new SecureRandom();
+        byte[] saltBytes = new byte[8];
+        random.nextBytes(saltBytes);
+        return Hex.encodeToString(saltBytes);
+    }
+
     private static int desiredKeyLength(String input) {
         final int length = input.length();
 
@@ -66,7 +106,6 @@ public class AESTools {
     }
 
     private static byte[] cutOrPadToLength(String input, int length) {
-        checkNotNull(input);
         if (input.length() == length) {
             return input.getBytes(UTF_8);
         }
@@ -76,45 +115,9 @@ public class AESTools {
                 : padToLength(input, length);
     }
 
-    @Nullable
-    public static String encrypt(String plainText, String encryptionKey, String salt) {
-        try {
-            @SuppressWarnings("CIPHER_INTEGRITY")
-            Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
-            final int desiredLength = desiredKeyLength(encryptionKey);
-            SecretKeySpec key = new SecretKeySpec(cutOrPadToLength(encryptionKey, desiredLength), "AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
-            return Hex.encodeToString(cipher.doFinal(plainText.getBytes("UTF-8")));
-        } catch (Exception e) {
-            LOG.error("Could not encrypt value.", e);
-        }
-        return null;
-    }
-
-    @Nullable
-    public static String decrypt(String cipherText, String encryptionKey, String salt) {
-        try {
-            @SuppressWarnings("CIPHER_INTEGRITY")
-            Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
-            final int desiredLength = desiredKeyLength(encryptionKey);
-            SecretKeySpec key = new SecretKeySpec(cutOrPadToLength(encryptionKey, desiredLength), "AES");
-            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
-            return new String(cipher.doFinal(Hex.decode(cipherText)), "UTF-8");
-        } catch (Exception e) {
-            LOG.error("Could not decrypt value.", e);
-        }
-        return null;
-    }
-
-    /**
-     * Generates a new random salt
-     *
-     * @return the generated random salt as a string of hexadecimal digits.
-     */
-    public static String generateNewSalt() {
-        final SecureRandom random = new SecureRandom();
-        byte[] saltBytes = new byte[8];
-        random.nextBytes(saltBytes);
-        return Hex.encodeToString(saltBytes);
+    private static byte[] adjustToIdealKeyLength(String input) {
+        checkNotNull(input);
+        final int desiredLength = desiredKeyLength(input);
+        return cutOrPadToLength(input, desiredLength);
     }
 }
