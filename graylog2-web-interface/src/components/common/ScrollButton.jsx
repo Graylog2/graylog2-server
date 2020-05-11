@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import { util } from 'theme';
 import Icon from './Icon';
-import ScrollButtonStyle from './ScrollButton.css';
 
 const ScrollBtn = styled.button(({ theme }) => `
   opacity: 0.3;
@@ -97,7 +96,7 @@ class ScrollButton extends React.Component {
     return (
       <ScrollBtn title="Back to top"
                  type="button"
-                 className={`${ScrollButtonStyle.scroll} ${position}`}
+                 className={position}
                  onClick={this.scrollToTop}>
         <ArrowUpIcon name="chevron-up" />
       </ScrollBtn>
