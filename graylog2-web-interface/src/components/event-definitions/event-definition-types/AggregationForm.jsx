@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 
+// TODO: This should be moved to a general place outside of `views`
+import { defaultCompare } from 'views/logic/DefaultCompare';
 import { MultiSelect } from 'components/common';
-
-import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import AggregationConditionsForm from './AggregationConditionsForm';
 
@@ -16,7 +16,7 @@ class AggregationForm extends React.Component {
   formatFields = lodash.memoize(
     (fieldTypes) => {
       return fieldTypes
-        .sort((ftA, ftB) => naturalSortIgnoreCase(ftA.name, ftB.name))
+        .sort((ftA, ftB) => defaultCompare(ftA.name, ftB.name))
         .map((fieldType) => {
           return {
             label: `${fieldType.name} – ${fieldType.value.type.type}`,
