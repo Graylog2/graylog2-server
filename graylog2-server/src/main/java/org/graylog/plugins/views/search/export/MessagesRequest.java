@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.validation.constraints.NotEmpty;
@@ -33,7 +32,6 @@ import java.util.Set;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_CHUNK_SIZE;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_QUERY;
-import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_SORT;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_STREAMS;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.defaultTimeRange;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
@@ -50,9 +48,6 @@ public abstract class MessagesRequest {
 
     @NotEmpty
     public abstract LinkedHashSet<String> fieldsInOrder();
-
-    @NotEmpty
-    public abstract LinkedHashSet<Sort> sort();
 
     public abstract int chunkSize();
 
@@ -87,9 +82,6 @@ public abstract class MessagesRequest {
             return fieldsInOrder(linkedHashSetOf(fieldsInOrder));
         }
 
-        @JsonProperty
-        public abstract Builder sort(LinkedHashSet<Sort> sort);
-
         @JsonProperty("chunk_size")
         public abstract Builder chunkSize(int chunkSize);
 
@@ -109,7 +101,6 @@ public abstract class MessagesRequest {
                     .streams(DEFAULT_STREAMS)
                     .queryString(DEFAULT_QUERY)
                     .fieldsInOrder(DEFAULT_FIELDS)
-                    .sort(DEFAULT_SORT)
                     .chunkSize(DEFAULT_CHUNK_SIZE);
         }
     }

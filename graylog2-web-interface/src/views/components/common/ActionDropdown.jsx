@@ -103,7 +103,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
 
     const mappedChildren = React.Children.map(
       children,
-      (child) => React.cloneElement(child, {
+      (child) => child && React.cloneElement(child, {
         ...child.props,
         ...(child.props.onSelect ? {
           onSelect: (eventKey, event) => {

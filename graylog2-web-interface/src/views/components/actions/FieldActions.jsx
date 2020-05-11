@@ -1,11 +1,13 @@
 // @flow strict
 import * as React from 'react';
+import styled, { type StyledComponent } from 'styled-components';
 import { MenuItem } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
+import { type ThemeInterface } from 'theme';
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Field.css';
 import { createHandlerFor } from './ActionHandler';
@@ -26,6 +28,18 @@ type State = {
   overflowingComponents: ActionComponents,
 };
 
+type FieldElementProps = {
+  active: boolean,
+  disabled: boolean,
+};
+
+const FieldElement: StyledComponent<FieldElementProps, ThemeInterface, HTMLSpanElement> = styled.span.attrs({
+  className: 'field-element',
+})(({ active, disabled, theme }) => `
+  color: ${active ? theme.color.variant.info : 'currentColor'};
+  opacity: ${disabled ? '0.3' : '1'};
+`);
+
 class FieldActions extends React.Component<Props, State> {
   static contextType = ActionContext;
 
@@ -42,9 +56,8 @@ class FieldActions extends React.Component<Props, State> {
   render() {
     const { children, disabled, element, menuContainer, name, type, queryId } = this.props;
     const { open } = this.state;
-    const activeClass = open ? style.active : '';
-    const disabledClass = disabled ? style.disabled : '';
-    const wrappedElement = <span className={`field-element ${activeClass} ${disabledClass}`}>{element}</span>;
+
+    const wrappedElement = <FieldElement active={open} disabled={disabled}>{element}</FieldElement>;
     const handlerArgs = { queryId, field: name, type, contexts: this.context };
     const fieldActions: Array<ActionDefinition> = PluginStore.exports('fieldActions')
       .filter((action: ActionDefinition) => {

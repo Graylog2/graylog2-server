@@ -2,10 +2,6 @@
     font-size: 12px;
 }
 
-:local(.activeSession) {
-    color: #72a230;
-}
-
 :local(.roleBadgeFixes) {
     margin-right: 5px;
     margin-bottom: 5px;

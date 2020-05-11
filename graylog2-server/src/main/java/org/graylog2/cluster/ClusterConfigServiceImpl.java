@@ -132,12 +132,22 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         }
 
         String canonicalClassName = AutoValueUtils.getCanonicalName(payload.getClass());
-        ClusterConfig clusterConfig = ClusterConfig.create(canonicalClassName, payload, nodeId.toString());
+        write(canonicalClassName, payload);
+    }
 
-        dbCollection.update(DBQuery.is("type", canonicalClassName), clusterConfig, true, false, WriteConcern.JOURNALED);
+    @Override
+    public <T> void write(String key, T payload) {
+        if (payload == null) {
+            LOG.debug("Payload was null. Skipping.");
+            return;
+        }
+
+        ClusterConfig clusterConfig = ClusterConfig.create(key, payload, nodeId.toString());
+
+        dbCollection.update(DBQuery.is("type", key), clusterConfig, true, false, WriteConcern.JOURNALED);
 
         ClusterConfigChangedEvent event = ClusterConfigChangedEvent.create(
-                DateTime.now(DateTimeZone.UTC), nodeId.toString(), canonicalClassName);
+                DateTime.now(DateTimeZone.UTC), nodeId.toString(), key);
         clusterEventBus.post(event);
     }
 
