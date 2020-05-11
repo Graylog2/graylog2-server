@@ -1,8 +1,39 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
+import { util } from 'theme';
 import Icon from './Icon';
 import ScrollButtonStyle from './ScrollButton.css';
+
+const ScrollBtn = styled.button(({ theme }) => `
+  opacity: 0.3;
+  background-color: ${theme.color.variant.primary};
+  width: 40px;
+  height: 40px;
+  position: fixed;
+  bottom: 60px;
+  right: 20px;
+  border-radius: 5px;
+  border: none;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.middle {
+    right: 35%;
+  }
+`);
+
+const ArrowUpIcon = styled(Icon)(({ theme }) => `
+  color: ${util.readableColor(theme.color.variant.primary)};
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -9px;
+  margin-left: -5px;
+`);
 
 class ScrollButton extends React.Component {
   static propTypes = {
@@ -39,29 +70,37 @@ class ScrollButton extends React.Component {
   };
 
   scrollStep = () => {
+    const { intervalId } = this.state;
+    const { scrollSteps } = this.props;
+
     if (window.pageYOffset === 0) {
-      clearInterval(this.state.intervalId);
+      clearInterval(intervalId);
     }
-    window.scroll(0, window.pageYOffset - this.props.scrollSteps);
+    window.scroll(0, window.pageYOffset - scrollSteps);
   };
 
   scrollToTop = () => {
-    const intervalId = setInterval(this.scrollStep.bind(this), this.props.delay);
+    const { delay } = this.props;
+    const intervalId = setInterval(this.scrollStep.bind(this), delay);
+
     this.setState({ intervalId: intervalId });
   };
 
   render() {
-    if (this.state.hideButton) {
+    const { position } = this.props;
+    const { hideButton } = this.state;
+
+    if (hideButton) {
       return (<span />);
     }
 
     return (
-      <button title="Back to top"
-              type="button"
-              className={`${ScrollButtonStyle.scroll} ${this.props.position}`}
-              onClick={this.scrollToTop}>
-        <Icon name="chevron-up" className={ScrollButtonStyle.arrowUp} />
-      </button>
+      <ScrollBtn title="Back to top"
+                 type="button"
+                 className={`${ScrollButtonStyle.scroll} ${position}`}
+                 onClick={this.scrollToTop}>
+        <ArrowUpIcon name="chevron-up" />
+      </ScrollBtn>
     );
   }
 }
