@@ -8,13 +8,13 @@ class ScrollButton extends React.Component {
   static propTypes = {
     delay: PropTypes.number,
     scrollSteps: PropTypes.number,
-    possition: PropTypes.string,
+    position: PropTypes.string,
   };
 
   static defaultProps = {
     delay: 5,
     scrollSteps: 50,
-    possition: '',
+    position: '',
   };
 
   constructor() {
@@ -58,7 +58,7 @@ class ScrollButton extends React.Component {
     return (
       <button title="Back to top"
               type="button"
-              className={`${ScrollButtonStyle.scroll} ${this.props.possition}`}
+              className={`${ScrollButtonStyle.scroll} ${this.props.position}`}
               onClick={this.scrollToTop}>
         <Icon name="chevron-up" className={ScrollButtonStyle.arrowUp} />
       </button>
