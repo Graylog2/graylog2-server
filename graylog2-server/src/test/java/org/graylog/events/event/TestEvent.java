@@ -16,6 +16,7 @@
  */
 package org.graylog.events.event;
 
+import com.google.common.collect.ImmutableList;
 import de.huxhorn.sulky.ulid.ULID;
 import org.joda.time.DateTime;
 
@@ -30,5 +31,10 @@ public class TestEvent extends EventImpl {
 
     public TestEvent(DateTime timestamp) {
         super(ULID.nextULID(), timestamp, "test", "1", "Test Event", "test", 1, true);
+    }
+
+    public TestEvent(DateTime timestamp, String key) {
+        super(ULID.nextULID(), timestamp, "test", "1", "Test Event", "test", 1, true);
+        this.setKeyTuple(ImmutableList.of(key));
     }
 }

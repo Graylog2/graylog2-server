@@ -38,7 +38,11 @@ padding-left: 20px;
 `;
 
 const BiggerFontSize = styled.div`
-font-size: 1.5em;
+font-size: 1.2em;
+`;
+
+const GraylogEnterpriseHeader = styled.h2`
+margin-bottom: 10px
 `;
 
 const EnterprisePage = createReactClass({
@@ -105,8 +109,9 @@ const EnterprisePage = createReactClass({
           <IfPermitted permissions="freelicenses:create">
             <Row className="content">
               <Col md={6}>
+                <GraylogEnterpriseHeader>Graylog Enterprise</GraylogEnterpriseHeader>
                 <BiggerFontSize>
-                  <p><strong>Extend Graylog’s Open Source capabilities with a free trial of Graylog Enterprise (up to 5 GB/Day).</strong></p>
+                  <p><strong>Extend Graylog’s Open Source capabilities with a free trial of Graylog Enterprise for 30 days.</strong></p>
                   <p>
                     Graylog Enterprise introduces productivity and compliance features designed to help organizations
                     reduce risk while encouraging collaboration across a large number of users.
@@ -119,8 +124,8 @@ const EnterprisePage = createReactClass({
                     <li><DocumentationLink page="auditlog.html" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
                     <li>
                       Alerts with <DocumentationLink page="alerts.html#filter-with-dynamic-lists-enterprise-feature"
-                                                     text={<strong>dynamic lists</strong>} />
-                      and <DocumentationLink page="alerts.html" text={<strong>correlation engine</strong>} /> for events
+                                                     text={<strong>dynamic lists</strong>} /> and <DocumentationLink
+                      page="alerts.html" text={<strong>correlation engine</strong>} /> for events
                       to minimize the number of alerts that you need to create and maintain
                     </li>
                     <li>

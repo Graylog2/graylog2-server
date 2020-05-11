@@ -53,6 +53,14 @@ public interface ClusterConfigService {
     <T> T getOrDefault(Class<T> type, T defaultValue);
 
     /**
+     * Write a configuration bean to the cluster configuration with the specified key.
+     * @param key     The key that is used to write the cluster config object to the database.
+     * @param payload The object to write to the cluster configuration. Must be serializable by Jackson!
+     * @param <T>     The type of the Java configuration bean.
+     */
+    <T> void write(String key, T payload);
+
+    /**
      * Write a configuration bean to the cluster configuration.
      *
      * @param payload The object to write to the cluster configuration. Must be serializable by Jackson!

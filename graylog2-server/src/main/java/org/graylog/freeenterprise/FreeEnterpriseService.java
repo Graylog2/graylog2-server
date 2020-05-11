@@ -104,8 +104,7 @@ public class FreeEnterpriseService {
             final Response<FreeLicenseAPIResponse> response = apiClient.requestFreeLicense(apiRequest).execute();
 
             if (response.isSuccessful() && response.body() != null) {
-                // TODO: Change to debug
-                LOG.info("Received free Graylog Enterprise license: {}", response.body());
+                LOG.debug("Received free Graylog Enterprise license: {}", response.body());
                 final StagedFreeEnterpriseLicense dto = StagedFreeEnterpriseLicense.builder()
                         .clusterId(clusterId)
                         .license(response.body().licenseString())
@@ -123,6 +122,9 @@ public class FreeEnterpriseService {
                 }
                 throw new FreeLicenseRequestException("Couldn't request free Graylog Enterprise license", request);
             }
+        } catch (FreeLicenseRequestException e) {
+            // no need to log this again
+            throw e;
         } catch (IOException e) {
             LOG.error("Couldn't request free Graylog Enterprise license from remote service", e);
             throw new FreeLicenseRequestException("Couldn't request free Graylog Enterprise license from remote service", request, e);

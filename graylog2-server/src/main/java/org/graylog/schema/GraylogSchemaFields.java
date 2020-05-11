@@ -42,7 +42,6 @@ public class GraylogSchemaFields {
     public static final String FIELD_SOURCE_AS_ORGANIZATION_NAME = "source_as_organization_name";
     public static final String FIELD_SOURCE_AS_IP = "source_as_ip";
     public static final String FIELD_SOURCE_AS_DOMAIN = "source_as_domain";
-    public static final String FIELD_THREAT_DETECTED = "threat_detected";
     public static final String FIELD_SERVICE_VERSION = "service_version";
     public static final String FIELD_TARGET_USER_NAME = "target_user_name";
     public static final String FIELD_TARGET_USER_ID = "target_user_id";

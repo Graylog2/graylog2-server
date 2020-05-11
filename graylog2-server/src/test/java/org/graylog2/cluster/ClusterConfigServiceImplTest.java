@@ -45,7 +45,6 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -244,6 +243,24 @@ public class ClusterConfigServiceImplTest {
 
         DBObject dbObject = collection.findOne();
         assertThat((String) dbObject.get("type")).isEqualTo(CustomConfig.class.getCanonicalName());
+        assertThat((String) dbObject.get("last_updated_by")).isEqualTo("ID");
+    }
+
+    @Test
+    public void writeWithCustomKeyPersistsClusterConfig() throws Exception {
+        CustomConfig customConfig = new CustomConfig();
+        customConfig.text = "TEST";
+
+        @SuppressWarnings("deprecation")
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        assertThat(collection.count()).isEqualTo(0L);
+
+        clusterConfigService.write("foobar", customConfig);
+
+        assertThat(collection.count()).isEqualTo(1L);
+
+        DBObject dbObject = collection.findOne();
+        assertThat((String) dbObject.get("type")).isEqualTo("foobar");
         assertThat((String) dbObject.get("last_updated_by")).isEqualTo("ID");
     }
 
