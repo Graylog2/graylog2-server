@@ -160,8 +160,19 @@ class MessagesExporterTest {
                 () -> assertThat(event.timestamp()).isEqualTo(nowAtEnd),
                 () -> assertThat(event.queryString()).isEqualTo(command.queryString().queryString()),
                 () -> assertThat(event.streams()).isEqualTo(command.streams()),
-                () -> assertThat(event.fieldsInOrder()).isEqualTo(command.fieldsInOrder())
+                () -> assertThat(event.fieldsInOrder()).isEqualTo(command.fieldsInOrder()),
+                () -> assertThat(event.limit()).isEmpty()
         );
+    }
+
+    @Test
+    void auditEventHasLimitIfDefined() {
+        ExportMessagesCommand command = ExportMessagesCommand.withDefaults().toBuilder().limit(5).build();
+        when(commandFactory.buildFromRequest(any())).thenReturn(command);
+
+        MessagesExportEvent event = exportWithExpectedAuditEvent(1);
+
+        assertThat(event.limit().getAsInt()).isEqualTo(5);
     }
 
     private MessagesExportEvent exportWithExpectedAuditEvent(int eventPosition) {
@@ -201,7 +212,8 @@ class MessagesExporterTest {
     }
 
     private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat) {
-        exportSearchType(search, searchTypeId, resultFormat, x -> {});
+        exportSearchType(search, searchTypeId, resultFormat, x -> {
+        });
     }
 
     private void exportSearchType(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> forwarder) {
@@ -209,7 +221,8 @@ class MessagesExporterTest {
     }
 
     private void exportSearch(Search search, ResultFormat resultFormat) {
-        exportSearch(search, resultFormat, x -> {});
+        exportSearch(search, resultFormat, x -> {
+        });
     }
 
     private void exportSearch(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> forwarder) {

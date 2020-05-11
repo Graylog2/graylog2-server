@@ -19,13 +19,14 @@ package org.graylog.plugins.views.search.events;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 
 import static org.graylog.plugins.views.audit.ViewsAuditEventTypes.MESSAGES_EXPORT_REQUESTED;
@@ -44,15 +45,20 @@ public abstract class MessagesExportEvent {
     }
 
     private static MessagesExportEvent from(DateTime startTime, String userName, ExportMessagesCommand command, String auditType) {
-        return Builder.create()
+        Builder builder = Builder.create()
                 .userName(userName)
                 .auditType(auditType)
                 .timestamp(startTime)
                 .timeRange(command.timeRange())
                 .queryString(command.queryString().queryString())
                 .streams(command.streams())
-                .fieldsInOrder(command.fieldsInOrder())
-                .build();
+                .fieldsInOrder(command.fieldsInOrder());
+
+        if (command.limit().isPresent()) {
+            builder.limit(command.limit().getAsInt());
+        }
+
+        return builder.build();
     }
 
     public abstract String userName();
@@ -69,16 +75,22 @@ public abstract class MessagesExportEvent {
 
     public abstract LinkedHashSet<String> fieldsInOrder();
 
+    public abstract OptionalInt limit();
+
     public abstract Builder toBuilder();
 
     public Map<String, Object> toMap() {
-        return ImmutableMap.of(
-                "timestamp", timestamp(),
-                "time_range", timeRange(),
-                "query_string", queryString(),
-                "streams", streams(),
-                "fields", fieldsInOrder()
-        );
+        Map<String, Object> map = new HashMap<>();
+        map.put("timestamp", timestamp());
+        map.put("time_range", timeRange());
+        map.put("query_string", queryString());
+        map.put("streams", streams());
+        map.put("fields", fieldsInOrder());
+
+        if (limit().isPresent()) {
+            map.put("limit", limit());
+        }
+        return map;
     }
 
     @AutoValue.Builder
@@ -97,6 +109,8 @@ public abstract class MessagesExportEvent {
         public abstract Builder streams(Set<String> streams);
 
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
+
+        public abstract Builder limit(Integer limit);
 
         abstract MessagesExportEvent autoBuild();
 
