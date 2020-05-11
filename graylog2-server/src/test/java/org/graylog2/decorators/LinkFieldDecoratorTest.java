@@ -55,6 +55,9 @@ public class LinkFieldDecoratorTest {
         Assert.assertEquals("https://https-is-allowed-too.com", getDecoratorUrl("https://https-is-allowed-too.com"));
         Assert.assertEquals("HTTPS://upper-case-https-all-good.com", getDecoratorUrl("HTTPS://upper-case-https-all-good.com"));
 
+        // Links with double slashes should be allowed.
+        Assert.assertEquals("https://graylog.com//releases", getDecoratorUrl("https://graylog.com//releases"));
+
         // Verify that unsafe URLs are rendered as text.
         Assert.assertEquals("javascript:alert('Javascript is not allowed.')", getDecoratorMessage("javascript:alert('Javascript is not allowed.')"));
         Assert.assertEquals("alert('Javascript this way is still not allowed", getDecoratorMessage("alert('Javascript this way is still not allowed"));

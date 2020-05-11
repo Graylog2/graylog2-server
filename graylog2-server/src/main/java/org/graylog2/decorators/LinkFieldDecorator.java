@@ -118,7 +118,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
         String[] schemes = {"http", "https"};
         // UrlValidator.ALLOW_LOCAL_URLS allows local links to be permitted such as http://my-local-server
         // Some users may reference such local URLs, and there should be no issue with doing so.
-        UrlValidator urlValidator = new UrlValidator(schemes, UrlValidator.ALLOW_LOCAL_URLS);
+        UrlValidator urlValidator = new UrlValidator(schemes, UrlValidator.ALLOW_LOCAL_URLS + UrlValidator.ALLOW_2_SLASHES);
         return urlValidator.isValid(url);
     }
 }
