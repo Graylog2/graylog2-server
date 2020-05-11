@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import QueryResult from 'views/logic/QueryResult';
