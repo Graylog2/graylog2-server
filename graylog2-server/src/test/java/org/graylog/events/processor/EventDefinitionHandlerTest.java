@@ -32,6 +32,7 @@ import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -212,25 +213,23 @@ public class EventDefinitionHandlerTest {
             assertThat(dto.description()).isEqualTo(newDescription);
         });
 
+        // Test that the schedule is updated to the new config
         final JobDefinitionDto newJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElseThrow(AssertionError::new);
         assertThat(newJobDefinition.title()).isEqualTo(newTitle);
         assertThat(newJobDefinition.description()).isEqualTo(newDescription);
         assertThat(((EventProcessorExecutionJob.Config) newJobDefinition.config()).processingHopSize()).isEqualTo(550000);
+        assertThat(((EventProcessorExecutionJob.Config) newJobDefinition.config()).processingWindowSize()).isEqualTo(800000);
+
+        // Test if the EventDefinition update removed the old trigger data
+        // and reset the job definition timerange to the new parameters
+        final EventProcessorExecutionJob.Config newJobConfig = (EventProcessorExecutionJob.Config) newJobDefinition.config();
+        final TimeRange newTimeRange = newJobConfig.parameters().timerange();
+        assertThat(newTimeRange.getFrom()).isEqualTo(clock.nowUTC().minus(newConfig.searchWithinMs()));
+        assertThat(newTimeRange.getTo()).isEqualTo(clock.nowUTC());
 
         assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).isPresent().get().satisfies(trigger -> {
-            final EventProcessorExecutionJob.Data newTriggerData = (EventProcessorExecutionJob.Data) trigger.data().orElseThrow(AssertionError::new);
-            final EventProcessorExecutionJob.Config newJobConfig = (EventProcessorExecutionJob.Config) newJobDefinition.config();
-            final DateTime nextTime = trigger.nextTime();
-
-            final IntervalJobSchedule schedule = (IntervalJobSchedule) trigger.schedule();
-            assertThat(schedule.interval()).isEqualTo(550000);
-
-            // Check if new scheduling times have been calculated and updated accordingly
-            assertThat(existingTriggerData.timerangeFrom()).isEqualTo(newTriggerData.timerangeFrom());
-            assertThat(nextTime).isGreaterThan(existingTriggerData.timerangeFrom());
-            assertThat(nextTime).isEqualTo(newTriggerData.timerangeTo());
-            assertThat(nextTime).isEqualTo(existingTriggerData.timerangeFrom().plus(newJobConfig.processingWindowSize()));
-            assertThat(nextTime).isEqualTo(DateTime.parse("2019-01-01T00:13:20.000Z"));
+            assertThat(trigger.data()).isEmpty();
+            assertThat(trigger.nextTime()).isEqualTo(clock.nowUTC());
         });
     }
 
