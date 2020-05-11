@@ -33,4 +33,21 @@ public class AESToolsTest {
         Assert.assertEquals("I am secret", decrypt);
     }
 
+    @Test
+    public void testEncryptWithKeyBeingLargerThan32() {
+        byte[] iv = new byte[8];
+        new SecureRandom().nextBytes(iv);
+        final String encrypt = AESTools.encrypt("I am secret", "1234567890123456789012345678901234567", Hex.encodeHexString(iv));
+        final String decrypt = AESTools.decrypt(encrypt, "1234567890123456789012345678901234567", Hex.encodeHexString(iv));
+        Assert.assertEquals("I am secret", decrypt);
+    }
+
+    @Test
+    public void testEncryptWithKeyBeingSmallerThan32() {
+        byte[] iv = new byte[8];
+        new SecureRandom().nextBytes(iv);
+        final String encrypt = AESTools.encrypt("I am secret", "123456789012345678", Hex.encodeHexString(iv));
+        final String decrypt = AESTools.decrypt(encrypt, "123456789012345678", Hex.encodeHexString(iv));
+        Assert.assertEquals("I am secret", decrypt);
+    }
 }
