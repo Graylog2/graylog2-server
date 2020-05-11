@@ -1,24 +1,29 @@
 // @flow strict
 import * as React from 'react';
-import { Map } from 'immutable';
+import { List } from 'immutable';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
 import { Row, Alert } from 'components/graylog';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import Select from 'views/components/Select';
 
-type WidgetSelectionProps = {
+const sortOptions = (options) => options.sort(
+  (option1, option2) => defaultCompare(option1.label, option2.label),
+);
+
+type Props = {
   selectWidget: {label: string, value: Widget} => void,
-  widgets: Map<string, Widget>,
+  widgets: List<Widget>,
   view: View,
 };
 
-const WidgetSelection = ({ selectWidget, widgets, view }: WidgetSelectionProps) => {
+const WidgetSelection = ({ selectWidget, widgets, view }: Props) => {
   const widgetOption = (widget) => ({ label: view.getWidgetTitleByWidget(widget), value: widget });
-  const widgetOptions = widgets.map((widget) => (widgetOption(widget))).toArray();
+  const widgetOptions = sortOptions(widgets.map((widget) => (widgetOption(widget))).toArray());
   return (
     <>
       <Row>
@@ -33,10 +38,11 @@ const WidgetSelection = ({ selectWidget, widgets, view }: WidgetSelectionProps) 
       </Row>
       {widgets.size !== 0 ? (
         <Row>
-          <span>Select message table:</span>
+          <label htmlFor="widget-selection">Select message table</label>
           <Select placeholder="Select message table"
                   onChange={selectWidget}
-                  options={widgetOptions} />
+                  options={widgetOptions}
+                  inputId="widget-selection" />
         </Row>
       ) : (
         <Row>

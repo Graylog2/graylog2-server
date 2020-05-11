@@ -3,6 +3,7 @@ import * as React from 'react';
 import { cleanup, render, fireEvent, wait } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
+import selectEvent from 'react-select-event';
 
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 
@@ -66,28 +67,24 @@ describe('CSVExportModal', () => {
     .state(states)
     .build();
   // Prepare view with one widget
-  const statesWithOneWidget: ViewStateMap = Immutable.Map({
-    'query-id-1': ViewState.builder()
-      .widgets(Immutable.List([widget1]))
-      .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-      .titles(Immutable.Map())
-      .build(),
-  });
+  const stateWithOneWidget: ViewState = ViewState.builder()
+    .widgets(Immutable.List([widget1]))
+    .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
+    .titles(Immutable.Map({ widget: Immutable.Map({ 'widget-id-1': 'Widget 1' }) }))
+    .build();
   const viewWithOneWidget = (viewType) => viewWithoutWidget(viewType)
     .toBuilder()
-    .state(statesWithOneWidget)
+    .state(Immutable.Map({ 'query-id-1': stateWithOneWidget }))
     .build();
   // Prepare view with mulitple widgets
-  const statesWithMultipleWidgets: ViewStateMap = Immutable.Map({
-    'query-id-1': ViewState.builder()
-      .widgets(Immutable.List([widget1, widget2]))
-      .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-      .titles(Immutable.Map())
-      .build(),
-  });
+  const stateWithMultipleWidgets: ViewState = ViewState.builder()
+    .widgets(Immutable.List([widget1, widget2]))
+    .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
+    .titles(Immutable.Map({ widget: Immutable.Map({ 'widget-id-1': 'Widget 1', 'widget-id-2': 'Widget 2' }) }))
+    .build();
   const viewWithMultipleWidgets = (viewType) => viewWithoutWidget(viewType)
     .toBuilder()
-    .state(statesWithMultipleWidgets)
+    .state(Immutable.Map({ 'query-id-1': stateWithMultipleWidgets }))
     .build();
   // Prepare expected payload
   const payload = {
@@ -178,10 +175,8 @@ describe('CSVExportModal', () => {
     const widgetConfig = new MessagesWidgetConfig(['level', 'http_method'], false, [], []);
     const widgetWithoutMessageRow = widget1.toBuilder().config(widgetConfig).build();
     const viewStateMap: ViewStateMap = Immutable.Map({
-      'query-id-1': ViewState.builder()
+      'query-id-1': stateWithOneWidget.toBuilder()
         .widgets(Immutable.List([widgetWithoutMessageRow]))
-        .widgetMapping(Immutable.Map({ 'widget-id-1': Immutable.Set(['search-type-id-1']) }))
-        .titles(Immutable.Map())
         .build(),
     });
     const view = viewWithoutWidget(View.Type.Search)
@@ -204,7 +199,7 @@ describe('CSVExportModal', () => {
       },
       'search-id',
       'search-type-id-1',
-      'Untitled-Message-Table-search-result',
+      'Widget-1-search-result',
     );
   });
 
@@ -262,12 +257,20 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
 
-    it('show widget selection if more than one exists', () => {
-      const { queryByText } = render(<SearchCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} />);
+    it('show widget selection if more than one exists', async () => {
+      const { getByLabelText, queryByText } = render(<SearchCSVExportModal view={viewWithMultipleWidgets(View.Type.Search)} />);
+
+      const select = getByLabelText('Select message table');
+
       expect(queryByText(/Please select a message table to adopt its fields./)).not.toBeNull();
+
+      await selectEvent.openMenu(select);
+
+      expect(queryByText('Widget 1')).not.toBeNull();
+      expect(queryByText('Widget 2')).not.toBeNull();
     });
 
     it('preselect widget on direct export', () => {
@@ -286,7 +289,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
   });
 
@@ -305,9 +308,37 @@ describe('CSVExportModal', () => {
       expect(queryByText(/Please select the message table you want to export the search results for./)).not.toBeNull();
     });
 
-    it('show widget selection if more than one exists', () => {
-      const { queryByText } = render(<DashboardCSVExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />);
+    it('show widget selection if more than one exists', async () => {
+      const { queryByText, getByLabelText } = render(<DashboardCSVExportModal view={viewWithMultipleWidgets(View.Type.Dashboard)} />);
+      const select = getByLabelText('Select message table');
+
       expect(queryByText(/Please select the message table you want to export the search results for./)).not.toBeNull();
+
+      await selectEvent.openMenu(select);
+
+      expect(queryByText('Widget 1')).not.toBeNull();
+      expect(queryByText('Widget 2')).not.toBeNull();
+    });
+
+    it('show widget selection with widgets from all dashboard pages', async () => {
+      const secondViewState: ViewState = ViewState.builder()
+        .widgets(Immutable.List([widget2]))
+        .widgetMapping(Immutable.Map({ 'widget-id-2': Immutable.Set(['search-type-id-2']) }))
+        .titles(Immutable.Map({ widget: Immutable.Map({ 'widget-id-2': 'Widget 2' }) }))
+        .build();
+
+      const complexView = viewWithoutWidget(View.Type.Dashboard)
+        .toBuilder()
+        .state(Immutable.Map({ 'query-id-1': stateWithOneWidget, 'query-id-2': secondViewState }))
+        .build();
+
+      const { queryByText, getByLabelText } = render(<DashboardCSVExportModal view={complexView} />);
+      const select = getByLabelText('Select message table');
+
+      await selectEvent.openMenu(select);
+
+      expect(queryByText('Widget 1')).not.toBeNull();
+      expect(queryByText('Widget 2')).not.toBeNull();
     });
 
     it('preselect widget on direct widget export', () => {
@@ -326,7 +357,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
       fireEvent.click(submitButton);
       await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Untitled-Message-Table-search-result');
+      expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
   });
 });

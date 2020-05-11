@@ -117,7 +117,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "FormControl-sc-1amoaox-0",
                         "isStatic": false,
-                        "lastClassName": "ibEGYG",
+                        "lastClassName": "fcGLmv",
                         "rules": Array [
                           [Function],
                         ],
@@ -139,14 +139,14 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <FormControl
                     bsClass="form-control"
-                    className="FormControl-sc-1amoaox-0 ibEGYG"
+                    className="FormControl-sc-1amoaox-0 fcGLmv"
                     componentClass="input"
                     onChange={[Function]}
                     type="text"
                     value="count()"
                   >
                     <input
-                      className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                      className="FormControl-sc-1amoaox-0 fcGLmv form-control"
                       onChange={[Function]}
                       type="text"
                       value="count()"
