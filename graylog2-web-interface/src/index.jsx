@@ -14,6 +14,7 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import ViewsBindings from 'views/bindings';
 
 const don_test = 'This is a test!';
+const don2_test = 'This is a test!';
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
 
