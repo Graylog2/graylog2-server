@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -25,7 +26,10 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
+import org.graylog.plugins.views.search.export.AuditingMessagesExporter;
 import org.graylog.plugins.views.search.export.ChunkedRunner;
+import org.graylog.plugins.views.search.export.CommandFactory;
+import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
@@ -54,7 +58,7 @@ import java.util.function.Function;
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
 
-    private final MessagesExporter exporter;
+    private final CommandFactory commandFactory;
     private final SearchDomain searchDomain;
     private final SearchExecutionGuard executionGuard;
     private final PermittedStreams permittedStreams;
@@ -62,30 +66,40 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
     //allow mocking
     Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsync;
+    Function<String, MessagesExporter> messagesExporterFactory;
 
     @Inject
     public MessagesResource(
             MessagesExporter exporter,
+            CommandFactory commandFactory,
             SearchDomain searchDomain,
             SearchExecutionGuard executionGuard,
             PermittedStreams permittedStreams,
-            ObjectMapper objectMapper) {
-        this.exporter = exporter;
+            ObjectMapper objectMapper,
+            @SuppressWarnings("UnstableApiUsage") EventBus eventBus) {
+        this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;
         this.permittedStreams = permittedStreams;
         this.objectMapper = objectMapper;
+        this.messagesExporterFactory = userName -> new AuditingMessagesExporter(eventBus, userName, exporter);
+    }
+
+    private MessagesExporter exporter() {
+        return messagesExporterFactory.apply(userName());
     }
 
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
-    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest request) {
-        final MessagesRequest req = fillInIfNecessary(request);
+    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest rawrequest) {
+        final MessagesRequest request = fillInIfNecessary(rawrequest);
 
-        executionGuard.checkUserIsPermittedToSeeStreams(req.streams(), this::hasStreamReadPermission);
+        executionGuard.checkUserIsPermittedToSeeStreams(request.streams(), this::hasStreamReadPermission);
 
-        return asyncRunner.apply(chunkConsumer -> exporter.export(req, userName(), chunkConsumer));
+        ExportMessagesCommand command = commandFactory.buildFromRequest(request);
+
+        return asyncRunner.apply(chunkConsumer -> exporter().export(command, chunkConsumer));
     }
 
     private String userName() {
@@ -112,7 +126,9 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         Search search = loadSearch(searchId, format.executionState());
 
-        return asyncRunner.apply(chunkConsumer -> exporter.export(search, format, userName(), chunkConsumer));
+        ExportMessagesCommand command = commandFactory.buildWithSearchOnly(search, format);
+
+        return asyncRunner.apply(chunkConsumer -> exporter().export(command, chunkConsumer));
     }
 
     @POST
@@ -127,7 +143,9 @@ public class MessagesResource extends RestResource implements PluginRestResource
 
         Search search = loadSearch(searchId, format.executionState());
 
-        return asyncRunner.apply(chunkConsumer -> exporter.export(search, searchTypeId, format, userName(), chunkConsumer));
+        ExportMessagesCommand command = commandFactory.buildWithMessageList(search, searchTypeId, format);
+
+        return asyncRunner.apply(chunkConsumer -> exporter().export(command, chunkConsumer));
     }
 
     private ResultFormat emptyIfNull(ResultFormat format) {
