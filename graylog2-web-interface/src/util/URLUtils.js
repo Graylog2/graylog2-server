@@ -3,6 +3,8 @@ import URI from 'urijs';
 import AppConfig from 'util/AppConfig';
 import UAParser from 'ua-parser-js';
 
+const ACCEPTED_PROTOCOLS = ['http:', 'https:'];
+
 const URLUtils = {
   parser: new UAParser(),
   qualifyUrl(url) {
@@ -51,6 +53,10 @@ const URLUtils = {
   areCredentialsInURLSupported() {
     const browser = this.parser.getBrowser();
     return browser.name !== 'IE' && browser.name !== 'Edge';
+  },
+  hasAcceptedProtocol(string, acceptedProtocols = ACCEPTED_PROTOCOLS) {
+    const url = new URL(string);
+    return acceptedProtocols.includes(url.protocol);
   },
 };
 
