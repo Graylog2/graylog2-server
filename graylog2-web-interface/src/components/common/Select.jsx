@@ -293,7 +293,7 @@ class Select extends React.Component<Props, State> {
     };
   }
 
-  componentWillReceivePropsProps = (nextProps: Props) => {
+  componentWillReceiveProps = (nextProps: Props) => {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
