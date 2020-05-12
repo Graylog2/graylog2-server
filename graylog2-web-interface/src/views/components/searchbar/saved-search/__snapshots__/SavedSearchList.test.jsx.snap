@@ -92,20 +92,6 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
-              disabled=""
-              type="button"
-            >
-              Load
-            </button>
-            <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
-              disabled=""
-              type="button"
-            >
-              Delete
-            </button>
-            <button
               class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
               type="button"
             >
@@ -245,6 +231,16 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                 type="button"
               >
                 test-0
+                <span>
+                  <span
+                    class="SavedSearchList__DeleteButton-sc-1r3qvm6-2 hOFiKI"
+                  >
+                    <svg
+                      class="svg-inline--fa fa-trash-alt"
+                      data-testid="delete-foo-bar-0"
+                    />
+                  </span>
+                </span>
               </button>
             </div>
             <div
@@ -333,20 +329,6 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
           <div
             class="modal-footer"
           >
-            <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
-              disabled=""
-              type="button"
-            >
-              Load
-            </button>
-            <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
-              disabled=""
-              type="button"
-            >
-              Delete
-            </button>
             <button
               class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
               type="button"

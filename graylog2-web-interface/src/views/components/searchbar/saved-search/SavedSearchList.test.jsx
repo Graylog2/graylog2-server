@@ -76,13 +76,11 @@ describe('SavedSearchList', () => {
         return new Promise(() => {});
       });
       const views = createViewsResponse(1);
-      const { getByText } = render(<SavedSearchList toggleModal={() => {}}
-                                                    showModal
-                                                    deleteSavedSearch={onDelete}
-                                                    views={views} />);
-      const listItem = getByText('test-0');
-      fireEvent.click(listItem);
-      const deleteBtn = getByText('Delete');
+      const { getByTestId } = render(<SavedSearchList toggleModal={() => {}}
+                                                                 showModal
+                                                                 deleteSavedSearch={onDelete}
+                                                                 views={views} />);
+      const deleteBtn = getByTestId('delete-foo-bar-0');
       fireEvent.click(deleteBtn);
       expect(window.confirm).toBeCalledTimes(1);
       expect(onDelete).toBeCalledTimes(1);
@@ -102,8 +100,6 @@ describe('SavedSearchList', () => {
       );
       const listItem = getByText('test-0');
       fireEvent.click(listItem);
-      const loadBtn = getByText('Load');
-      fireEvent.click(loadBtn);
       expect(onLoad).toBeCalledTimes(1);
     });
   });
@@ -127,8 +123,6 @@ describe('SavedSearchList', () => {
       );
       const listItem = getByText('test-0');
       fireEvent.click(listItem);
-      const loadButton = getByText('Load');
-      fireEvent.click(loadButton);
       await wait(() => {
         expect(browserHistory.push).toBeCalledTimes(1);
         expect(browserHistory.push).toHaveBeenCalledWith('SEARCH_VIEWID:foo-bar-0');
