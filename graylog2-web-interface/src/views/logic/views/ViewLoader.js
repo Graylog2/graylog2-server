@@ -1,9 +1,9 @@
 // @flow strict
-import Routes from 'routing/Routes';
-import history from 'util/History';
-
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
+
 import View from './View';
 import ViewDeserializer from './ViewDeserializer';
 
@@ -49,11 +49,11 @@ const ViewLoader = (viewId: string,
   onSuccess: OnSuccess = () => {},
   onError: OnError = () => {}) => {
   const promise = ViewManagementActions.get(viewId)
-    .then(ViewDeserializer, (e) => {
-      if (e.status === 404) {
-        history.replace(Routes.NOTFOUND);
+    .then(ViewDeserializer, (error) => {
+      if (error.status === 404) {
+        ErrorsActions.report(createFromFetchError(error));
       } else {
-        throw e;
+        throw error;
       }
       return View.create();
     });
