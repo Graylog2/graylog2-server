@@ -57,6 +57,15 @@ public class AESToolsTest {
     }
 
     @Test
+    public void testEncryptDecryptWith16Characters17BytesKey() {
+        byte[] iv = new byte[8];
+        new SecureRandom().nextBytes(iv);
+        final String encrypt = AESTools.encrypt("I am secret", "123456789012345\u00E4", Hex.encodeHexString(iv));
+        final String decrypt = AESTools.decrypt(encrypt, "123456789012345\u00E4", Hex.encodeHexString(iv));
+        Assert.assertEquals("I am secret", decrypt);
+    }
+
+    @Test
     public void sivEncryptAndDecrypt() throws Exception {
         final byte[] encryptionKey = DigestUtils.sha256("encryptionKey");
         final String secret = "secret";

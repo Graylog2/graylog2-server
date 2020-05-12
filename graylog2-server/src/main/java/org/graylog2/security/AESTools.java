@@ -161,8 +161,8 @@ public class AESTools {
         }
     }
 
-    private static int desiredKeyLength(String input) {
-        final int length = input.length();
+    private static int desiredKeyLength(byte[] input) {
+        final int length = input.length;
 
         if (length == 16 || length == 24 || length == 32) {
             return length;
@@ -179,32 +179,33 @@ public class AESTools {
         return (length / 8 + 1) * 8;
     }
 
-    private static byte[] cutToLength(String input, int length) {
-        checkArgument(input.length() >= length, "Input string must be greater or of desired length");
-        return (input.length() > length ? input.substring(0, length) : input).getBytes(UTF_8);
+    private static byte[] cutToLength(byte[] input, int length) {
+        checkArgument(input.length >= length, "Input string must be greater or of desired length");
+        return input.length > length ? Arrays.copyOfRange(input, 0, length) : input;
     }
 
-    private static byte[] padToLength(String input, int length) {
-        checkArgument(input.length() < length, "Input string must be smaller than desired length");
+    private static byte[] padToLength(byte[] input, int length) {
+        checkArgument(input.length < length, "Input string must be smaller than desired length");
         final byte[] result = new byte[length];
-        System.arraycopy(input.getBytes(UTF_8), 0, result, 0, input.length());
+        System.arraycopy(input, 0, result, 0, input.length);
 
         return result;
     }
 
-    private static byte[] cutOrPadToLength(String input, int length) {
-        if (input.length() == length) {
-            return input.getBytes(UTF_8);
+    private static byte[] cutOrPadToLength(byte[] input, int length) {
+        if (input.length == length) {
+            return input;
         }
 
-        return input.length() > length
+        return input.length > length
                 ? cutToLength(input, length)
                 : padToLength(input, length);
     }
 
     private static byte[] adjustToIdealKeyLength(String input) {
         checkNotNull(input);
-        final int desiredLength = desiredKeyLength(input);
-        return cutOrPadToLength(input, desiredLength);
+        final byte[] inputAsBytes = input.getBytes(UTF_8);
+        final int desiredLength = desiredKeyLength(inputAsBytes);
+        return cutOrPadToLength(inputAsBytes, desiredLength);
     }
 }
