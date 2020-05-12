@@ -22,6 +22,7 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.PermissionException;
+import org.graylog.plugins.views.search.export.AuditContext;
 import org.graylog.plugins.views.search.export.CommandFactory;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
@@ -38,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -54,6 +56,7 @@ public class MessagesResourceTest {
     private CommandFactory commandFactory;
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus = mock(EventBus.class);
+    private SearchDomain searchDomain;
 
     @BeforeEach
     void setUp() {
@@ -68,7 +71,8 @@ public class MessagesResourceTest {
         permittedStreams = mock(PermittedStreams.class);
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
-        sut = new MessagesTestResource(exporter, commandFactory, mock(SearchDomain.class), executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus);
+        searchDomain = mock(SearchDomain.class);
+        sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus);
 
         sut.asyncRunner = c -> {
             c.accept(x -> {
@@ -119,16 +123,25 @@ public class MessagesResourceTest {
     }
 
     @Test
-    void passesUserNameToAuditingExporter() {
-        AtomicReference<String> passedUsername = new AtomicReference<>();
-        sut.messagesExporterFactory = userName -> {
-            passedUsername.set(userName);
-            return mock(MessagesExporter.class);
-        };
+    void passesOnlyUserNameToAuditingExporterIfExportBasedOnRequest() {
+        AtomicReference<AuditContext> context = captureAuditContext();
 
         sut.retrieve(validRequest());
 
-        assertThat(passedUsername.toString()).isEqualTo(currentUser.getName());
+        assertAll(
+                () -> assertThat(context.get().getUserName()).isEqualTo(currentUser.getName()),
+                () -> assertThat(context.get().getSearchId()).isEmpty(),
+                () -> assertThat(context.get().getSearchTypeId()).isEmpty()
+        );
+    }
+
+    private AtomicReference<AuditContext> captureAuditContext() {
+        AtomicReference<AuditContext> captured = new AtomicReference<>();
+        sut.messagesExporterFactory = context -> {
+            captured.set(context);
+            return mock(MessagesExporter.class);
+        };
+        return captured;
     }
 
     private MessagesRequest validRequest() {

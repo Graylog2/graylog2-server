@@ -27,27 +27,27 @@ import java.util.function.Supplier;
 import static java.util.Objects.requireNonNull;
 
 public class AuditingMessagesExporter implements MessagesExporter {
+    private final AuditContext context;
     @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus;
-    private final String userName;
     private final MessagesExporter decoratedExporter;
 
     public Supplier<DateTime> startedAt = () -> DateTime.now(DateTimeZone.UTC);
     public Supplier<DateTime> finishedAt = () -> DateTime.now(DateTimeZone.UTC);
 
-    public AuditingMessagesExporter(@SuppressWarnings("UnstableApiUsage") EventBus eventBus, String userName, MessagesExporter decoratedExporter) {
+    public AuditingMessagesExporter(AuditContext context, @SuppressWarnings("UnstableApiUsage") EventBus eventBus, MessagesExporter decoratedExporter) {
+        this.context = context;
         this.eventBus = eventBus;
-        this.userName = userName;
         this.decoratedExporter = decoratedExporter;
     }
 
     @Override
     public void export(ExportMessagesCommand command, Consumer<SimpleMessageChunk> chunkForwarder) {
-        post(MessagesExportEvent.requested(startedAt.get(), userName, command));
+        post(MessagesExportEvent.requested(startedAt.get(), context, command));
 
         decoratedExporter.export(command, chunkForwarder);
 
-        post(MessagesExportEvent.succeeded(finishedAt.get(), userName, command));
+        post(MessagesExportEvent.succeeded(finishedAt.get(), context, command));
     }
 
     private void post(Object event) {

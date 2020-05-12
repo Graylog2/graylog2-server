@@ -42,11 +42,15 @@ public class AuditingMessagesExporterTest {
     void setUp() {
         //noinspection UnstableApiUsage
         eventBus = mock(EventBus.class);
-        sut = new AuditingMessagesExporter(eventBus, userName, mock(MessagesExporter.class));
+        sut = sutWithContext(new AuditContext(userName, null, null));
         nowAtStart = DateTime.now(DateTimeZone.UTC);
         nowAtEnd = DateTime.now(DateTimeZone.UTC);
         sut.startedAt = () -> nowAtStart;
         sut.finishedAt = () -> nowAtEnd;
+    }
+
+    private AuditingMessagesExporter sutWithContext(AuditContext context) {
+        return new AuditingMessagesExporter(context, eventBus, mock(MessagesExporter.class));
     }
 
     @Test
@@ -90,6 +94,26 @@ public class AuditingMessagesExporterTest {
 
         //noinspection OptionalGetWithoutIsPresent
         assertThat(event.limit().getAsInt()).isEqualTo(5);
+    }
+
+    @Test
+    void auditEventHasSearchIdIfDefined() {
+        sut = sutWithContext(new AuditContext(userName, "search-id", null));
+
+        MessagesExportEvent event = exportWithExpectedAuditEvent(ExportMessagesCommand.withDefaults(), 1);
+
+        //noinspection OptionalGetWithoutIsPresent
+        assertThat(event.searchId()).contains("search-id");
+    }
+
+    @Test
+    void auditEventHasSearchTypeIdIfDefined() {
+        sut = sutWithContext(new AuditContext(userName, "search-id", "search-type-id"));
+
+        MessagesExportEvent event = exportWithExpectedAuditEvent(ExportMessagesCommand.withDefaults(), 1);
+
+        //noinspection OptionalGetWithoutIsPresent
+        assertThat(event.searchTypeId()).contains("search-type-id");
     }
 
     private MessagesExportEvent exportWithExpectedAuditEvent(ExportMessagesCommand command, int eventPosition) {
