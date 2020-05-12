@@ -77,9 +77,9 @@ describe('SavedSearchList', () => {
       });
       const views = createViewsResponse(1);
       const { getByTestId } = render(<SavedSearchList toggleModal={() => {}}
-                                                                 showModal
-                                                                 deleteSavedSearch={onDelete}
-                                                                 views={views} />);
+                                                      showModal
+                                                      deleteSavedSearch={onDelete}
+                                                      views={views} />);
       const deleteBtn = getByTestId('delete-foo-bar-0');
       fireEvent.click(deleteBtn);
       expect(window.confirm).toBeCalledTimes(1);
