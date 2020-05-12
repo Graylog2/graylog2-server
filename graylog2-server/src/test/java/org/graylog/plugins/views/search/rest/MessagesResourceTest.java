@@ -18,23 +18,30 @@ package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.PermissionException;
+import org.graylog.plugins.views.search.export.AuditContext;
+import org.graylog.plugins.views.search.export.CommandFactory;
+import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.MessagesRequest;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,24 +49,48 @@ import static org.mockito.Mockito.when;
 public class MessagesResourceTest {
 
     private MessagesResource sut;
+    private User currentUser;
     private MessagesExporter exporter;
     private PermittedStreams permittedStreams;
     private SearchExecutionGuard executionGuard;
+    private CommandFactory commandFactory;
+    @SuppressWarnings("UnstableApiUsage")
+    private final EventBus eventBus = mock(EventBus.class);
+    private SearchDomain searchDomain;
 
     @BeforeEach
     void setUp() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
+        currentUser = mock(User.class);
+        when(currentUser.getName()).thenReturn("peterchen");
         exporter = mock(MessagesExporter.class);
+        commandFactory = mock(CommandFactory.class);
+        when(commandFactory.buildFromRequest(any())).thenReturn(ExportMessagesCommand.withDefaults());
+        when(commandFactory.buildWithSearchOnly(any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
+        when(commandFactory.buildWithMessageList(any(), any(), any())).thenReturn(ExportMessagesCommand.withDefaults());
         permittedStreams = mock(PermittedStreams.class);
         when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("a-default-stream"));
         executionGuard = mock(SearchExecutionGuard.class);
-        sut = new MessagesResource(exporter, mock(SearchDomain.class), executionGuard, permittedStreams, mock(ObjectMapper.class));
+        searchDomain = mock(SearchDomain.class);
+        sut = new MessagesTestResource(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, mock(ObjectMapper.class), eventBus);
 
         sut.asyncRunner = c -> {
             c.accept(x -> {
             });
             return null;
         };
+    }
+
+    class MessagesTestResource extends MessagesResource {
+        public MessagesTestResource(MessagesExporter exporter, CommandFactory commandFactory, SearchDomain searchDomain, SearchExecutionGuard executionGuard, PermittedStreams permittedStreams, ObjectMapper objectMapper, EventBus eventBus) {
+            super(exporter, commandFactory, searchDomain, executionGuard, permittedStreams, objectMapper, eventBus);
+        }
+
+        @Nullable
+        @Override
+        protected User getCurrentUser() {
+            return currentUser;
+        }
     }
 
     @Test
@@ -70,11 +101,12 @@ public class MessagesResourceTest {
 
         ArgumentCaptor<MessagesRequest> captor = ArgumentCaptor.forClass(MessagesRequest.class);
 
-        doNothing().when(exporter).export(captor.capture(), any());
+        when(commandFactory.buildFromRequest(captor.capture())).thenReturn(ExportMessagesCommand.withDefaults());
 
         sut.retrieve(request);
 
-        assertThat(captor.getValue().streams())
+        MessagesRequest value = captor.getValue();
+        assertThat(value.streams())
                 .containsExactly("stream-1", "stream-2");
     }
 
@@ -88,6 +120,28 @@ public class MessagesResourceTest {
 
         assertThatExceptionOfType(PermissionException.class).isThrownBy(() -> sut.retrieve(request))
                 .withMessageContaining(exception.getMessage());
+    }
+
+    @Test
+    void passesOnlyUserNameToAuditingExporterIfExportBasedOnRequest() {
+        AtomicReference<AuditContext> context = captureAuditContext();
+
+        sut.retrieve(validRequest());
+
+        assertAll(
+                () -> assertThat(context.get().userName()).isEqualTo(currentUser.getName()),
+                () -> assertThat(context.get().searchId()).isEmpty(),
+                () -> assertThat(context.get().searchTypeId()).isEmpty()
+        );
+    }
+
+    private AtomicReference<AuditContext> captureAuditContext() {
+        AtomicReference<AuditContext> captured = new AtomicReference<>();
+        sut.messagesExporterFactory = context -> {
+            captured.set(context);
+            return mock(MessagesExporter.class);
+        };
+        return captured;
     }
 
     private MessagesRequest validRequest() {
