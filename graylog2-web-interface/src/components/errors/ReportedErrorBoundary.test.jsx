@@ -56,8 +56,8 @@ describe('ReportedErrorBoundary', () => {
       ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
     });
     await wait(() => expect(queryByText('Hello World!')).toBeNull());
-    await wait(() => expect(getByText('Something went wrong.')).not.toBeNull());
-    await wait(() => expect(getByText('The error message')).not.toBeNull());
+    expect(getByText('Something went wrong.')).not.toBeNull();
+    expect(getByText('The error message')).not.toBeNull();
   });
 
   it('displays not found page when not found error got reported', async () => {
@@ -69,8 +69,8 @@ describe('ReportedErrorBoundary', () => {
     });
 
     await wait(() => expect(queryByText('Hello World!')).toBeNull());
-    await wait(() => expect(getByText('Page not found')).not.toBeNull());
-    await wait(() => expect(getByText('The party gorilla was just here, but had another party to rock.')).not.toBeNull());
+    expect(getByText('Page not found')).not.toBeNull();
+    expect(getByText('The party gorilla was just here, but had another party to rock.')).not.toBeNull();
   });
 
   it('displays reported error with an unkown type', async () => {
@@ -82,8 +82,8 @@ describe('ReportedErrorBoundary', () => {
     });
 
     await wait(() => expect(queryByText('Hello World!')).toBeNull());
-    await wait(() => expect(getByText('Something went wrong')).not.toBeNull());
-    await wait(() => expect(getByText(/The error message/)).not.toBeNull());
+    expect(getByText('Something went wrong')).not.toBeNull();
+    expect(getByText(/The error message/)).not.toBeNull();
   });
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
@@ -95,8 +95,8 @@ describe('ReportedErrorBoundary', () => {
     });
 
     await wait(() => expect(queryByText('Hello World!')).toBeNull());
-    await wait(() => expect(getByText('Missing Permissions')).not.toBeNull());
-    await wait(() => expect(getByText(/The request error message/)).not.toBeNull());
+    expect(getByText('Missing Permissions')).not.toBeNull();
+    expect(getByText(/The request error message/)).not.toBeNull();
   });
 
   it('resets error when navigation changes', async () => {
