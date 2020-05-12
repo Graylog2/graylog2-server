@@ -1,11 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+import styled from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 import Icon from './Icon';
 
-import WizardStyle from './Wizard.css';
+const SubnavigationCol = styled(Col)(({ theme }) => `
+  border-right: ${theme.color.gray[80]} solid 1px;
+`);
+
+const HorizontalCol = styled(Col)`
+  margin-bottom: 15px;
+`;
+
+const HorizontalButtonToolbar = styled(ButtonToolbar)`
+  padding: 7px;
+`;
 
 /**
  * Component that renders a wizard, letting the consumers of the component
@@ -134,7 +145,7 @@ class Wizard extends React.Component {
     const { justified, NavigationComponent, steps, hidePreviousNextButtons } = this.props;
     const selectedStep = this._getSelectedStep();
     return (
-      <Col md={2} className={WizardStyle.subnavigation}>
+      <SubnavigationCol md={2}>
         <NavigationComponent stacked
                              bsStyle="pills"
                              activeKey={selectedStep}
@@ -167,7 +178,7 @@ class Wizard extends React.Component {
             </Row>
           </>
         )}
-      </Col>
+      </SubnavigationCol>
     );
   };
 
@@ -175,10 +186,10 @@ class Wizard extends React.Component {
     const selectedStep = this._getSelectedStep();
     const { justified, NavigationComponent, steps, hidePreviousNextButtons } = this.props;
     return (
-      <Col sm={12} className={WizardStyle.horizontal}>
+      <HorizontalCol sm={12}>
         {!hidePreviousNextButtons && (
           <div className="pull-right">
-            <ButtonToolbar className={WizardStyle.horizontalPreviousNextButtons}>
+            <HorizontalButtonToolbar>
               <Button onClick={this._onPrevious}
                       bsSize="xsmall"
                       bsStyle="info"
@@ -191,7 +202,7 @@ class Wizard extends React.Component {
                       disabled={this._disableButton('next')}>
                 <Icon name="caret-right" />
               </Button>
-            </ButtonToolbar>
+            </HorizontalButtonToolbar>
           </div>
         )}
         <NavigationComponent bsStyle="pills"
@@ -203,7 +214,7 @@ class Wizard extends React.Component {
               <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
         </NavigationComponent>
-      </Col>
+      </HorizontalCol>
     );
   };
 

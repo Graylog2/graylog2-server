@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>3.3.0-beta.3-SNAPSHOT</version>
+        <version>3.3.0-beta.4-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 

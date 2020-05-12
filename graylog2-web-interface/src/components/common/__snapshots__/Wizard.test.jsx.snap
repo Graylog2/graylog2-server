@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
-.c0.btn-danger {
+.c2.btn-danger {
   background-color: #ad0707;
   border-color: #b23939;
   color: rgb(252,249,249);
@@ -9,39 +9,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-danger:hover {
+.c2.btn-danger:hover {
   background-color: #a00e0e;
   border-color: #a53636;
   color: #e9e6e6;
 }
 
-.c0.btn-danger.active {
+.c2.btn-danger.active {
   background-color: #b75151;
   border-color: #bc6363;
   color: rgb(252,249,249);
 }
 
-.c0.btn-danger.active:hover {
+.c2.btn-danger.active:hover {
   background-color: #a94c4c;
   border-color: #ad5c5c;
   color: #e9e6e6;
 }
 
-.c0.btn-danger[disabled],
-.c0.btn-danger.disabled {
+.c2.btn-danger[disabled],
+.c2.btn-danger.disabled {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c0.btn-danger[disabled]:hover,
-.c0.btn-danger.disabled:hover {
+.c2.btn-danger[disabled]:hover,
+.c2.btn-danger.disabled:hover {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c0.btn-default {
+.c2.btn-default {
   background-color: #e6e6e6;
   border-color: #e0e0e0;
   color: rgb(73,73,73);
@@ -49,39 +49,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-default:hover {
+.c2.btn-default:hover {
   background-color: #d4d4d4;
   border-color: #cfcfcf;
   color: #444444;
 }
 
-.c0.btn-default.active {
+.c2.btn-default.active {
   background-color: #dadada;
   border-color: #d4d4d4;
   color: rgb(49,49,49);
 }
 
-.c0.btn-default.active:hover {
+.c2.btn-default.active:hover {
   background-color: #cacaca;
   border-color: #c4c4c4;
   color: #2f2f2f;
 }
 
-.c0.btn-default[disabled],
-.c0.btn-default.disabled {
+.c2.btn-default[disabled],
+.c2.btn-default.disabled {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c0.btn-default[disabled]:hover,
-.c0.btn-default.disabled:hover {
+.c2.btn-default[disabled]:hover,
+.c2.btn-default.disabled:hover {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c0.btn-info {
+.c2.btn-info {
   background-color: #0063be;
   border-color: #3970c2;
   color: rgb(249,250,252);
@@ -89,39 +89,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-info:hover {
+.c2.btn-info:hover {
   background-color: #0c5cb0;
   border-color: #3668b3;
   color: #e6e7e9;
 }
 
-.c0.btn-info.active {
+.c2.btn-info.active {
   background-color: #517cc5;
   border-color: #6386c9;
   color: rgb(249,250,252);
 }
 
-.c0.btn-info.active:hover {
+.c2.btn-info.active:hover {
   background-color: #4b73b6;
   border-color: #5c7dba;
   color: #e6e7e9;
 }
 
-.c0.btn-info[disabled],
-.c0.btn-info.disabled {
+.c2.btn-info[disabled],
+.c2.btn-info.disabled {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c0.btn-info[disabled]:hover,
-.c0.btn-info.disabled:hover {
+.c2.btn-info[disabled]:hover,
+.c2.btn-info.disabled:hover {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c0.btn-link {
+.c2.btn-link {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
@@ -129,39 +129,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-link:hover {
+.c2.btn-link:hover {
   background-color: #ebebeb26;
   border-color: #ebebeb26;
   color: #68267b;
 }
 
-.c0.btn-link.active {
+.c2.btn-link.active {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #410057;
 }
 
-.c0.btn-link.active:hover {
+.c2.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
   border-color: #ebebeb26;
   color: #3d0c51;
 }
 
-.c0.btn-link[disabled],
-.c0.btn-link.disabled {
+.c2.btn-link[disabled],
+.c2.btn-link.disabled {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c0.btn-link[disabled]:hover,
-.c0.btn-link.disabled:hover {
+.c2.btn-link[disabled]:hover,
+.c2.btn-link.disabled:hover {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c0.btn-primary {
+.c2.btn-primary {
   background-color: #702785;
   border-color: #7b458e;
   color: rgb(234,229,236);
@@ -169,39 +169,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-primary:hover {
+.c2.btn-primary:hover {
   background-color: #68267b;
   border-color: #724083;
   color: #d8d3da;
 }
 
-.c0.btn-primary.active {
+.c2.btn-primary.active {
   background-color: #855996;
   border-color: #8f699d;
   color: rgb(250,249,251);
 }
 
-.c0.btn-primary.active:hover {
+.c2.btn-primary.active:hover {
   background-color: #7c538b;
   border-color: #846292;
   color: #e7e6e8;
 }
 
-.c0.btn-primary[disabled],
-.c0.btn-primary.disabled {
+.c2.btn-primary[disabled],
+.c2.btn-primary.disabled {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c0.btn-primary[disabled]:hover,
-.c0.btn-primary.disabled:hover {
+.c2.btn-primary[disabled]:hover,
+.c2.btn-primary.disabled:hover {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c0.btn-success {
+.c2.btn-success {
   background-color: #00ae42;
   border-color: #39b356;
   color: rgb(249,252,249);
@@ -209,39 +209,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-success:hover {
+.c2.btn-success:hover {
   background-color: #0ca13e;
   border-color: #36a550;
   color: #e6e9e6;
 }
 
-.c0.btn-success.active {
+.c2.btn-success.active {
   background-color: #51b866;
   border-color: #63bc74;
   color: rgb(249,252,250);
 }
 
-.c0.btn-success.active:hover {
+.c2.btn-success.active:hover {
   background-color: #4baa5f;
   border-color: #5cae6c;
   color: #e6e9e7;
 }
 
-.c0.btn-success[disabled],
-.c0.btn-success.disabled {
+.c2.btn-success[disabled],
+.c2.btn-success.disabled {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c0.btn-success[disabled]:hover,
-.c0.btn-success.disabled:hover {
+.c2.btn-success[disabled]:hover,
+.c2.btn-success.disabled:hover {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c0.btn-warning {
+.c2.btn-warning {
   background-color: #ffd200;
   border-color: #f9cd07;
   color: rgb(57,47,0);
@@ -249,114 +249,122 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-warning:hover {
+.c2.btn-warning:hover {
   background-color: #ebc20c;
   border-color: #e6bd0e;
   color: #362d0c;
 }
 
-.c0.btn-warning.active {
+.c2.btn-warning.active {
   background-color: #f2c70a;
   border-color: #ebc20c;
   color: rgb(54,45,2);
 }
 
-.c0.btn-warning.active:hover {
+.c2.btn-warning.active:hover {
   background-color: #e0b80f;
   border-color: #d9b310;
   color: #332b0c;
 }
 
-.c0.btn-warning[disabled],
-.c0.btn-warning.disabled {
+.c2.btn-warning[disabled],
+.c2.btn-warning.disabled {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c0.btn-warning[disabled]:hover,
-.c0.btn-warning.disabled:hover {
+.c2.btn-warning[disabled]:hover,
+.c2.btn-warning.disabled:hover {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c1.nav > li > a:hover,
-.c1.nav > li > a:focus {
+.c3.nav > li > a:hover,
+.c3.nav > li > a:focus {
   background-color: #e6e6e6;
 }
 
-.c1.nav > li.disabled > a {
+.c3.nav > li.disabled > a {
   color: #9b9b9b;
 }
 
-.c1.nav > li.disabled > a:hover,
-.c1.nav > li.disabled > a:focus {
+.c3.nav > li.disabled > a:hover,
+.c3.nav > li.disabled > a:focus {
   color: #9b9b9b;
 }
 
-.c1.nav .open > a,
-.c1.nav .open > a:hover,
-.c1.nav .open > a:focus {
+.c3.nav .open > a,
+.c3.nav .open > a:hover,
+.c3.nav .open > a:focus {
   background-color: #e6e6e6;
   border-color: #702785;
 }
 
-.c1.nav.nav-pills > li.active > a,
-.c1.nav.nav-pills > li.active > a:hover,
-.c1.nav.nav-pills > li.active > a:focus {
+.c3.nav.nav-pills > li.active > a,
+.c3.nav.nav-pills > li.active > a:hover,
+.c3.nav.nav-pills > li.active > a:focus {
   color: #fff;
   background-color: #702785;
 }
 
-.c1.nav .nav-tabs {
+.c3.nav .nav-tabs {
   border-bottom-color: rgb(198,207,231);
 }
 
-.c1.nav .nav-tabs > li > a {
+.c3.nav .nav-tabs > li > a {
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
   border-color: #cdcdcd #cdcdcd rgb(198,207,231);
 }
 
-.c1.nav .nav-tabs > li > a:hover {
+.c3.nav .nav-tabs > li > a:hover {
   background-color: #cdcdcd;
   color: rgb(46,46,46);
 }
 
-.c1.nav .nav-tabs > li.active > a,
-.c1.nav .nav-tabs > li.active > a:hover,
-.c1.nav .nav-tabs > li.active > a:focus {
+.c3.nav .nav-tabs > li.active > a,
+.c3.nav .nav-tabs > li.active > a:hover,
+.c3.nav .nav-tabs > li.active > a:focus {
   color: #1f1f1f;
   background-color: #ffffff;
   border-color: rgb(198,207,231);
   border-bottom-color: transparent;
 }
 
-.c1.nav .nav-tabs > li.disabled > a,
-.c1.nav .nav-tabs > li.disabled > a:hover,
-.c1.nav .nav-tabs > li.disabled > a:focus {
+.c3.nav .nav-tabs > li.disabled > a,
+.c3.nav .nav-tabs > li.disabled > a:hover,
+.c3.nav .nav-tabs > li.disabled > a:focus {
   color: #9b9b9b;
   background-color: #ffffff;
   border-color: #ffffff #ffffff rgb(198,207,231);
   cursor: not-allowed;
 }
 
-.c1.nav.nav-justified > .active > a,
-.c1.nav.nav-justified > .active > a:hover,
-.c1.nav.nav-justified > .active > a:focus {
+.c3.nav.nav-justified > .active > a,
+.c3.nav.nav-justified > .active > a:hover,
+.c3.nav.nav-justified > .active > a:focus {
   border-color: rgb(198,207,231);
 }
 
+.c0 {
+  margin-bottom: 15px;
+}
+
+.c1 {
+  padding: 7px;
+}
+
 @media (min-width:768px) {
-  .c1.nav.nav-justified > li > a {
+  .c3.nav.nav-justified > li > a {
     border-bottom-color: rgb(198,207,231);
   }
 
-  .c1.nav.nav-justified > .active > a,
-  .c1.nav.nav-justified > .active > a:hover,
-  .c1.nav.nav-justified > .active > a:focus {
+  .c3.nav.nav-justified > .active > a,
+  .c3.nav.nav-justified > .active > a:hover,
+  .c3.nav.nav-justified > .active > a:focus {
     border-bottom-color: #ffffff;
   }
 }
@@ -373,7 +381,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
       "componentStyle": ComponentStyle {
         "componentId": "Nav-dzawzr-0",
         "isStatic": false,
-        "lastClassName": "c1",
+        "lastClassName": "c3",
         "rules": Array [
           [Function],
         ],
@@ -427,354 +435,413 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
     <div
       className="content row"
     >
-      <Col
-        bsClass="col"
-        className="horizontal"
-        componentClass="div"
+      <Wizard__HorizontalCol
         sm={12}
       >
-        <div
-          className="horizontal col-sm-12"
+        <StyledComponent
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Wizard__HorizontalCol-sc-1jnediy-1",
+                "isStatic": false,
+                "lastClassName": "c0",
+                "rules": Array [
+                  "margin-bottom:15px;",
+                ],
+              },
+              "displayName": "Wizard__HorizontalCol",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Wizard__HorizontalCol-sc-1jnediy-1",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          sm={12}
         >
-          <div
-            className="pull-right"
+          <Col
+            bsClass="col"
+            className="c0"
+            componentClass="div"
+            sm={12}
           >
-            <ButtonToolbar
-              bsClass="btn-toolbar"
-              className="horizontalPreviousNextButtons"
+            <div
+              className="c0 col-sm-12"
             >
               <div
-                className="horizontalPreviousNextButtons btn-toolbar"
-                role="toolbar"
+                className="pull-right"
               >
-                <ForwardRef
-                  bsSize="xsmall"
-                  bsStyle="info"
-                  disabled={true}
-                  onClick={[Function]}
-                >
-                  <Button__StyledButton
-                    bsSize="xsmall"
-                    bsStyle="info"
-                    disabled={true}
-                    onClick={[Function]}
-                  >
-                    <StyledComponent
-                      bsSize="xsmall"
-                      bsStyle="info"
-                      disabled={true}
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                            "xsmall",
+                <Wizard__HorizontalButtonToolbar>
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Wizard__HorizontalButtonToolbar-sc-1jnediy-2",
+                          "isStatic": false,
+                          "lastClassName": "c1",
+                          "rules": Array [
+                            "padding:7px;",
                           ],
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                            "default",
-                            "primary",
-                            "link",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "Button__StyledButton-c9cbmb-0",
-                            "isStatic": false,
-                            "lastClassName": "c0",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "Button__StyledButton",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
+                        },
+                        "displayName": "Wizard__HorizontalButtonToolbar",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Wizard__HorizontalButtonToolbar-sc-1jnediy-2",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
                       }
-                      forwardedRef={null}
-                      onClick={[Function]}
+                    }
+                    forwardedRef={null}
+                  >
+                    <ButtonToolbar
+                      bsClass="btn-toolbar"
+                      className="c1"
                     >
-                      <Button
-                        active={false}
-                        block={false}
-                        bsClass="btn"
-                        bsSize="xsmall"
-                        bsStyle="info"
-                        className="c0"
-                        disabled={true}
-                        onClick={[Function]}
+                      <div
+                        className="c1 btn-toolbar"
+                        role="toolbar"
                       >
-                        <button
-                          className="c0 btn btn-xs btn-info"
+                        <ForwardRef
+                          bsSize="xsmall"
+                          bsStyle="info"
                           disabled={true}
                           onClick={[Function]}
-                          type="button"
                         >
-                          <Icon
-                            name="caret-left"
+                          <Button__StyledButton
+                            bsSize="xsmall"
+                            bsStyle="info"
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            <FontAwesomeIcon
-                              icon={
+                            <StyledComponent
+                              bsSize="xsmall"
+                              bsStyle="info"
+                              disabled={true}
+                              forwardedComponent={
                                 Object {
-                                  "iconName": "caret-left",
-                                  "prefix": "fas",
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "c2",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
                                 }
                               }
+                              forwardedRef={null}
+                              onClick={[Function]}
                             >
-                              <svg
-                                className="svg-inline--fa fa-caret-left"
-                              />
-                            </FontAwesomeIcon>
-                          </Icon>
-                        </button>
-                      </Button>
-                    </StyledComponent>
-                  </Button__StyledButton>
-                </ForwardRef>
-                <ForwardRef
-                  bsSize="xsmall"
-                  bsStyle="info"
-                  onClick={[Function]}
-                >
-                  <Button__StyledButton
-                    bsSize="xsmall"
-                    bsStyle="info"
-                    onClick={[Function]}
-                  >
-                    <StyledComponent
-                      bsSize="xsmall"
-                      bsStyle="info"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                            "xsmall",
-                          ],
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                            "default",
-                            "primary",
-                            "link",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "Button__StyledButton-c9cbmb-0",
-                            "isStatic": false,
-                            "lastClassName": "c0",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "Button__StyledButton",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
-                      onClick={[Function]}
-                    >
-                      <Button
-                        active={false}
-                        block={false}
-                        bsClass="btn"
-                        bsSize="xsmall"
-                        bsStyle="info"
-                        className="c0"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <button
-                          className="c0 btn btn-xs btn-info"
-                          disabled={false}
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsSize="xsmall"
+                                bsStyle="info"
+                                className="c2"
+                                disabled={true}
+                                onClick={[Function]}
+                              >
+                                <button
+                                  className="c2 btn btn-xs btn-info"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                  type="button"
+                                >
+                                  <Icon
+                                    name="caret-left"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "caret-left",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-caret-left"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                        <ForwardRef
+                          bsSize="xsmall"
+                          bsStyle="info"
                           onClick={[Function]}
-                          type="button"
                         >
-                          <Icon
-                            name="caret-right"
+                          <Button__StyledButton
+                            bsSize="xsmall"
+                            bsStyle="info"
+                            onClick={[Function]}
                           >
-                            <FontAwesomeIcon
-                              icon={
+                            <StyledComponent
+                              bsSize="xsmall"
+                              bsStyle="info"
+                              forwardedComponent={
                                 Object {
-                                  "iconName": "caret-right",
-                                  "prefix": "fas",
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "c2",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
                                 }
                               }
+                              forwardedRef={null}
+                              onClick={[Function]}
                             >
-                              <svg
-                                className="svg-inline--fa fa-caret-right"
-                              />
-                            </FontAwesomeIcon>
-                          </Icon>
-                        </button>
-                      </Button>
-                    </StyledComponent>
-                  </Button__StyledButton>
-                </ForwardRef>
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsSize="xsmall"
+                                bsStyle="info"
+                                className="c2"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <button
+                                  className="c2 btn btn-xs btn-info"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                  type="button"
+                                >
+                                  <Icon
+                                    name="caret-right"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "caret-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-caret-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </ButtonToolbar>
+                  </StyledComponent>
+                </Wizard__HorizontalButtonToolbar>
               </div>
-            </ButtonToolbar>
-          </div>
-          <Nav
-            activeKey="Key1"
-            bsStyle="pills"
-            justified={false}
-            onSelect={[Function]}
-          >
-            <StyledComponent
-              activeKey="Key1"
-              bsStyle="pills"
-              forwardedComponent={
-                Object {
-                  "$$typeof": Symbol(react.forward_ref),
-                  "STYLES": Array [
-                    "tabs",
-                    "pills",
-                  ],
-                  "attrs": Array [],
-                  "componentStyle": ComponentStyle {
-                    "componentId": "Nav-dzawzr-0",
-                    "isStatic": false,
-                    "lastClassName": "c1",
-                    "rules": Array [
-                      [Function],
-                    ],
-                  },
-                  "displayName": "Nav",
-                  "foldedComponentIds": Array [],
-                  "render": [Function],
-                  "styledComponentId": "Nav-dzawzr-0",
-                  "target": [Function],
-                  "toString": [Function],
-                  "warnTooManyClasses": [Function],
-                  "withComponent": [Function],
-                }
-              }
-              forwardedRef={null}
-              justified={false}
-              onSelect={[Function]}
-            >
               <Nav
                 activeKey="Key1"
-                bsClass="nav"
                 bsStyle="pills"
-                className="c1"
                 justified={false}
                 onSelect={[Function]}
-                pullLeft={false}
-                pullRight={false}
-                stacked={false}
               >
-                <ul
-                  className="c1 nav nav-pills"
-                  role={null}
+                <StyledComponent
+                  activeKey="Key1"
+                  bsStyle="pills"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "STYLES": Array [
+                        "tabs",
+                        "pills",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Nav-dzawzr-0",
+                        "isStatic": false,
+                        "lastClassName": "c3",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Nav",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Nav-dzawzr-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  justified={false}
+                  onSelect={[Function]}
                 >
-                  <NavItem
-                    active={true}
+                  <Nav
                     activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key1"
-                    key=".$Key1"
+                    bsClass="nav"
+                    bsStyle="pills"
+                    className="c3"
+                    justified={false}
                     onSelect={[Function]}
+                    pullLeft={false}
+                    pullRight={false}
+                    stacked={false}
                   >
-                    <li
-                      className="active"
-                      role="presentation"
+                    <ul
+                      className="c3 nav nav-pills"
+                      role={null}
                     >
-                      <SafeAnchor
-                        componentClass="a"
+                      <NavItem
+                        active={true}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key1"
+                        key=".$Key1"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className="active"
+                          role="presentation"
                         >
-                          Title1
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                  <NavItem
-                    active={false}
-                    activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key2"
-                    key=".$Key2"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title1
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                      <NavItem
+                        active={false}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key2"
+                        key=".$Key2"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className=""
+                          role="presentation"
                         >
-                          Title2
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                  <NavItem
-                    active={false}
-                    activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key3"
-                    key=".$Key3"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title2
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                      <NavItem
+                        active={false}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key3"
+                        key=".$Key3"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className=""
+                          role="presentation"
                         >
-                          Title3
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                </ul>
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title3
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                    </ul>
+                  </Nav>
+                </StyledComponent>
               </Nav>
-            </StyledComponent>
-          </Nav>
-        </div>
-      </Col>
+            </div>
+          </Col>
+        </StyledComponent>
+      </Wizard__HorizontalCol>
       <Col
         bsClass="col"
         componentClass="div"
@@ -794,7 +861,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
 `;
 
 exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1`] = `
-.c0.btn-danger {
+.c2.btn-danger {
   background-color: #ad0707;
   border-color: #b23939;
   color: rgb(252,249,249);
@@ -802,39 +869,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-danger:hover {
+.c2.btn-danger:hover {
   background-color: #a00e0e;
   border-color: #a53636;
   color: #e9e6e6;
 }
 
-.c0.btn-danger.active {
+.c2.btn-danger.active {
   background-color: #b75151;
   border-color: #bc6363;
   color: rgb(252,249,249);
 }
 
-.c0.btn-danger.active:hover {
+.c2.btn-danger.active:hover {
   background-color: #a94c4c;
   border-color: #ad5c5c;
   color: #e9e6e6;
 }
 
-.c0.btn-danger[disabled],
-.c0.btn-danger.disabled {
+.c2.btn-danger[disabled],
+.c2.btn-danger.disabled {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c0.btn-danger[disabled]:hover,
-.c0.btn-danger.disabled:hover {
+.c2.btn-danger[disabled]:hover,
+.c2.btn-danger.disabled:hover {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c0.btn-default {
+.c2.btn-default {
   background-color: #e6e6e6;
   border-color: #e0e0e0;
   color: rgb(73,73,73);
@@ -842,39 +909,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-default:hover {
+.c2.btn-default:hover {
   background-color: #d4d4d4;
   border-color: #cfcfcf;
   color: #444444;
 }
 
-.c0.btn-default.active {
+.c2.btn-default.active {
   background-color: #dadada;
   border-color: #d4d4d4;
   color: rgb(49,49,49);
 }
 
-.c0.btn-default.active:hover {
+.c2.btn-default.active:hover {
   background-color: #cacaca;
   border-color: #c4c4c4;
   color: #2f2f2f;
 }
 
-.c0.btn-default[disabled],
-.c0.btn-default.disabled {
+.c2.btn-default[disabled],
+.c2.btn-default.disabled {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c0.btn-default[disabled]:hover,
-.c0.btn-default.disabled:hover {
+.c2.btn-default[disabled]:hover,
+.c2.btn-default.disabled:hover {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c0.btn-info {
+.c2.btn-info {
   background-color: #0063be;
   border-color: #3970c2;
   color: rgb(249,250,252);
@@ -882,39 +949,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-info:hover {
+.c2.btn-info:hover {
   background-color: #0c5cb0;
   border-color: #3668b3;
   color: #e6e7e9;
 }
 
-.c0.btn-info.active {
+.c2.btn-info.active {
   background-color: #517cc5;
   border-color: #6386c9;
   color: rgb(249,250,252);
 }
 
-.c0.btn-info.active:hover {
+.c2.btn-info.active:hover {
   background-color: #4b73b6;
   border-color: #5c7dba;
   color: #e6e7e9;
 }
 
-.c0.btn-info[disabled],
-.c0.btn-info.disabled {
+.c2.btn-info[disabled],
+.c2.btn-info.disabled {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c0.btn-info[disabled]:hover,
-.c0.btn-info.disabled:hover {
+.c2.btn-info[disabled]:hover,
+.c2.btn-info.disabled:hover {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c0.btn-link {
+.c2.btn-link {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
@@ -922,39 +989,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-link:hover {
+.c2.btn-link:hover {
   background-color: #ebebeb26;
   border-color: #ebebeb26;
   color: #68267b;
 }
 
-.c0.btn-link.active {
+.c2.btn-link.active {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #410057;
 }
 
-.c0.btn-link.active:hover {
+.c2.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
   border-color: #ebebeb26;
   color: #3d0c51;
 }
 
-.c0.btn-link[disabled],
-.c0.btn-link.disabled {
+.c2.btn-link[disabled],
+.c2.btn-link.disabled {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c0.btn-link[disabled]:hover,
-.c0.btn-link.disabled:hover {
+.c2.btn-link[disabled]:hover,
+.c2.btn-link.disabled:hover {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c0.btn-primary {
+.c2.btn-primary {
   background-color: #702785;
   border-color: #7b458e;
   color: rgb(234,229,236);
@@ -962,39 +1029,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-primary:hover {
+.c2.btn-primary:hover {
   background-color: #68267b;
   border-color: #724083;
   color: #d8d3da;
 }
 
-.c0.btn-primary.active {
+.c2.btn-primary.active {
   background-color: #855996;
   border-color: #8f699d;
   color: rgb(250,249,251);
 }
 
-.c0.btn-primary.active:hover {
+.c2.btn-primary.active:hover {
   background-color: #7c538b;
   border-color: #846292;
   color: #e7e6e8;
 }
 
-.c0.btn-primary[disabled],
-.c0.btn-primary.disabled {
+.c2.btn-primary[disabled],
+.c2.btn-primary.disabled {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c0.btn-primary[disabled]:hover,
-.c0.btn-primary.disabled:hover {
+.c2.btn-primary[disabled]:hover,
+.c2.btn-primary.disabled:hover {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c0.btn-success {
+.c2.btn-success {
   background-color: #00ae42;
   border-color: #39b356;
   color: rgb(249,252,249);
@@ -1002,39 +1069,39 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-success:hover {
+.c2.btn-success:hover {
   background-color: #0ca13e;
   border-color: #36a550;
   color: #e6e9e6;
 }
 
-.c0.btn-success.active {
+.c2.btn-success.active {
   background-color: #51b866;
   border-color: #63bc74;
   color: rgb(249,252,250);
 }
 
-.c0.btn-success.active:hover {
+.c2.btn-success.active:hover {
   background-color: #4baa5f;
   border-color: #5cae6c;
   color: #e6e9e7;
 }
 
-.c0.btn-success[disabled],
-.c0.btn-success.disabled {
+.c2.btn-success[disabled],
+.c2.btn-success.disabled {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c0.btn-success[disabled]:hover,
-.c0.btn-success.disabled:hover {
+.c2.btn-success[disabled]:hover,
+.c2.btn-success.disabled:hover {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c0.btn-warning {
+.c2.btn-warning {
   background-color: #ffd200;
   border-color: #f9cd07;
   color: rgb(57,47,0);
@@ -1042,114 +1109,122 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c0.btn-warning:hover {
+.c2.btn-warning:hover {
   background-color: #ebc20c;
   border-color: #e6bd0e;
   color: #362d0c;
 }
 
-.c0.btn-warning.active {
+.c2.btn-warning.active {
   background-color: #f2c70a;
   border-color: #ebc20c;
   color: rgb(54,45,2);
 }
 
-.c0.btn-warning.active:hover {
+.c2.btn-warning.active:hover {
   background-color: #e0b80f;
   border-color: #d9b310;
   color: #332b0c;
 }
 
-.c0.btn-warning[disabled],
-.c0.btn-warning.disabled {
+.c2.btn-warning[disabled],
+.c2.btn-warning.disabled {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c0.btn-warning[disabled]:hover,
-.c0.btn-warning.disabled:hover {
+.c2.btn-warning[disabled]:hover,
+.c2.btn-warning.disabled:hover {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c1.nav > li > a:hover,
-.c1.nav > li > a:focus {
+.c3.nav > li > a:hover,
+.c3.nav > li > a:focus {
   background-color: #e6e6e6;
 }
 
-.c1.nav > li.disabled > a {
+.c3.nav > li.disabled > a {
   color: #9b9b9b;
 }
 
-.c1.nav > li.disabled > a:hover,
-.c1.nav > li.disabled > a:focus {
+.c3.nav > li.disabled > a:hover,
+.c3.nav > li.disabled > a:focus {
   color: #9b9b9b;
 }
 
-.c1.nav .open > a,
-.c1.nav .open > a:hover,
-.c1.nav .open > a:focus {
+.c3.nav .open > a,
+.c3.nav .open > a:hover,
+.c3.nav .open > a:focus {
   background-color: #e6e6e6;
   border-color: #702785;
 }
 
-.c1.nav.nav-pills > li.active > a,
-.c1.nav.nav-pills > li.active > a:hover,
-.c1.nav.nav-pills > li.active > a:focus {
+.c3.nav.nav-pills > li.active > a,
+.c3.nav.nav-pills > li.active > a:hover,
+.c3.nav.nav-pills > li.active > a:focus {
   color: #fff;
   background-color: #702785;
 }
 
-.c1.nav .nav-tabs {
+.c3.nav .nav-tabs {
   border-bottom-color: rgb(198,207,231);
 }
 
-.c1.nav .nav-tabs > li > a {
+.c3.nav .nav-tabs > li > a {
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
   border-color: #cdcdcd #cdcdcd rgb(198,207,231);
 }
 
-.c1.nav .nav-tabs > li > a:hover {
+.c3.nav .nav-tabs > li > a:hover {
   background-color: #cdcdcd;
   color: rgb(46,46,46);
 }
 
-.c1.nav .nav-tabs > li.active > a,
-.c1.nav .nav-tabs > li.active > a:hover,
-.c1.nav .nav-tabs > li.active > a:focus {
+.c3.nav .nav-tabs > li.active > a,
+.c3.nav .nav-tabs > li.active > a:hover,
+.c3.nav .nav-tabs > li.active > a:focus {
   color: #1f1f1f;
   background-color: #ffffff;
   border-color: rgb(198,207,231);
   border-bottom-color: transparent;
 }
 
-.c1.nav .nav-tabs > li.disabled > a,
-.c1.nav .nav-tabs > li.disabled > a:hover,
-.c1.nav .nav-tabs > li.disabled > a:focus {
+.c3.nav .nav-tabs > li.disabled > a,
+.c3.nav .nav-tabs > li.disabled > a:hover,
+.c3.nav .nav-tabs > li.disabled > a:focus {
   color: #9b9b9b;
   background-color: #ffffff;
   border-color: #ffffff #ffffff rgb(198,207,231);
   cursor: not-allowed;
 }
 
-.c1.nav.nav-justified > .active > a,
-.c1.nav.nav-justified > .active > a:hover,
-.c1.nav.nav-justified > .active > a:focus {
+.c3.nav.nav-justified > .active > a,
+.c3.nav.nav-justified > .active > a:hover,
+.c3.nav.nav-justified > .active > a:focus {
   border-color: rgb(198,207,231);
 }
 
+.c0 {
+  margin-bottom: 15px;
+}
+
+.c1 {
+  padding: 7px;
+}
+
 @media (min-width:768px) {
-  .c1.nav.nav-justified > li > a {
+  .c3.nav.nav-justified > li > a {
     border-bottom-color: rgb(198,207,231);
   }
 
-  .c1.nav.nav-justified > .active > a,
-  .c1.nav.nav-justified > .active > a:hover,
-  .c1.nav.nav-justified > .active > a:focus {
+  .c3.nav.nav-justified > .active > a,
+  .c3.nav.nav-justified > .active > a:hover,
+  .c3.nav.nav-justified > .active > a:focus {
     border-bottom-color: #ffffff;
   }
 }
@@ -1166,7 +1241,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
       "componentStyle": ComponentStyle {
         "componentId": "Nav-dzawzr-0",
         "isStatic": false,
-        "lastClassName": "c1",
+        "lastClassName": "c3",
         "rules": Array [
           [Function],
         ],
@@ -1220,354 +1295,413 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
     <div
       className="content row"
     >
-      <Col
-        bsClass="col"
-        className="horizontal"
-        componentClass="div"
+      <Wizard__HorizontalCol
         sm={12}
       >
-        <div
-          className="horizontal col-sm-12"
+        <StyledComponent
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Wizard__HorizontalCol-sc-1jnediy-1",
+                "isStatic": false,
+                "lastClassName": "c0",
+                "rules": Array [
+                  "margin-bottom:15px;",
+                ],
+              },
+              "displayName": "Wizard__HorizontalCol",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Wizard__HorizontalCol-sc-1jnediy-1",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          sm={12}
         >
-          <div
-            className="pull-right"
+          <Col
+            bsClass="col"
+            className="c0"
+            componentClass="div"
+            sm={12}
           >
-            <ButtonToolbar
-              bsClass="btn-toolbar"
-              className="horizontalPreviousNextButtons"
+            <div
+              className="c0 col-sm-12"
             >
               <div
-                className="horizontalPreviousNextButtons btn-toolbar"
-                role="toolbar"
+                className="pull-right"
               >
-                <ForwardRef
-                  bsSize="xsmall"
-                  bsStyle="info"
-                  disabled={true}
-                  onClick={[Function]}
-                >
-                  <Button__StyledButton
-                    bsSize="xsmall"
-                    bsStyle="info"
-                    disabled={true}
-                    onClick={[Function]}
-                  >
-                    <StyledComponent
-                      bsSize="xsmall"
-                      bsStyle="info"
-                      disabled={true}
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                            "xsmall",
+                <Wizard__HorizontalButtonToolbar>
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Wizard__HorizontalButtonToolbar-sc-1jnediy-2",
+                          "isStatic": false,
+                          "lastClassName": "c1",
+                          "rules": Array [
+                            "padding:7px;",
                           ],
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                            "default",
-                            "primary",
-                            "link",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "Button__StyledButton-c9cbmb-0",
-                            "isStatic": false,
-                            "lastClassName": "c0",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "Button__StyledButton",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
+                        },
+                        "displayName": "Wizard__HorizontalButtonToolbar",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Wizard__HorizontalButtonToolbar-sc-1jnediy-2",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
                       }
-                      forwardedRef={null}
-                      onClick={[Function]}
+                    }
+                    forwardedRef={null}
+                  >
+                    <ButtonToolbar
+                      bsClass="btn-toolbar"
+                      className="c1"
                     >
-                      <Button
-                        active={false}
-                        block={false}
-                        bsClass="btn"
-                        bsSize="xsmall"
-                        bsStyle="info"
-                        className="c0"
-                        disabled={true}
-                        onClick={[Function]}
+                      <div
+                        className="c1 btn-toolbar"
+                        role="toolbar"
                       >
-                        <button
-                          className="c0 btn btn-xs btn-info"
+                        <ForwardRef
+                          bsSize="xsmall"
+                          bsStyle="info"
                           disabled={true}
                           onClick={[Function]}
-                          type="button"
                         >
-                          <Icon
-                            name="caret-left"
+                          <Button__StyledButton
+                            bsSize="xsmall"
+                            bsStyle="info"
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            <FontAwesomeIcon
-                              icon={
+                            <StyledComponent
+                              bsSize="xsmall"
+                              bsStyle="info"
+                              disabled={true}
+                              forwardedComponent={
                                 Object {
-                                  "iconName": "caret-left",
-                                  "prefix": "fas",
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "c2",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
                                 }
                               }
+                              forwardedRef={null}
+                              onClick={[Function]}
                             >
-                              <svg
-                                className="svg-inline--fa fa-caret-left"
-                              />
-                            </FontAwesomeIcon>
-                          </Icon>
-                        </button>
-                      </Button>
-                    </StyledComponent>
-                  </Button__StyledButton>
-                </ForwardRef>
-                <ForwardRef
-                  bsSize="xsmall"
-                  bsStyle="info"
-                  onClick={[Function]}
-                >
-                  <Button__StyledButton
-                    bsSize="xsmall"
-                    bsStyle="info"
-                    onClick={[Function]}
-                  >
-                    <StyledComponent
-                      bsSize="xsmall"
-                      bsStyle="info"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                            "xsmall",
-                          ],
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                            "default",
-                            "primary",
-                            "link",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "Button__StyledButton-c9cbmb-0",
-                            "isStatic": false,
-                            "lastClassName": "c0",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "Button__StyledButton",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
-                      onClick={[Function]}
-                    >
-                      <Button
-                        active={false}
-                        block={false}
-                        bsClass="btn"
-                        bsSize="xsmall"
-                        bsStyle="info"
-                        className="c0"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <button
-                          className="c0 btn btn-xs btn-info"
-                          disabled={false}
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsSize="xsmall"
+                                bsStyle="info"
+                                className="c2"
+                                disabled={true}
+                                onClick={[Function]}
+                              >
+                                <button
+                                  className="c2 btn btn-xs btn-info"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                  type="button"
+                                >
+                                  <Icon
+                                    name="caret-left"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "caret-left",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-caret-left"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                        <ForwardRef
+                          bsSize="xsmall"
+                          bsStyle="info"
                           onClick={[Function]}
-                          type="button"
                         >
-                          <Icon
-                            name="caret-right"
+                          <Button__StyledButton
+                            bsSize="xsmall"
+                            bsStyle="info"
+                            onClick={[Function]}
                           >
-                            <FontAwesomeIcon
-                              icon={
+                            <StyledComponent
+                              bsSize="xsmall"
+                              bsStyle="info"
+                              forwardedComponent={
                                 Object {
-                                  "iconName": "caret-right",
-                                  "prefix": "fas",
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "SIZES": Array [
+                                    "large",
+                                    "small",
+                                    "xsmall",
+                                  ],
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                    "default",
+                                    "primary",
+                                    "link",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "Button__StyledButton-c9cbmb-0",
+                                    "isStatic": false,
+                                    "lastClassName": "c2",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "Button__StyledButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
                                 }
                               }
+                              forwardedRef={null}
+                              onClick={[Function]}
                             >
-                              <svg
-                                className="svg-inline--fa fa-caret-right"
-                              />
-                            </FontAwesomeIcon>
-                          </Icon>
-                        </button>
-                      </Button>
-                    </StyledComponent>
-                  </Button__StyledButton>
-                </ForwardRef>
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsSize="xsmall"
+                                bsStyle="info"
+                                className="c2"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <button
+                                  className="c2 btn btn-xs btn-info"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                  type="button"
+                                >
+                                  <Icon
+                                    name="caret-right"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "caret-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-caret-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </button>
+                              </Button>
+                            </StyledComponent>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </ButtonToolbar>
+                  </StyledComponent>
+                </Wizard__HorizontalButtonToolbar>
               </div>
-            </ButtonToolbar>
-          </div>
-          <Nav
-            activeKey="Key1"
-            bsStyle="pills"
-            justified={false}
-            onSelect={[Function]}
-          >
-            <StyledComponent
-              activeKey="Key1"
-              bsStyle="pills"
-              forwardedComponent={
-                Object {
-                  "$$typeof": Symbol(react.forward_ref),
-                  "STYLES": Array [
-                    "tabs",
-                    "pills",
-                  ],
-                  "attrs": Array [],
-                  "componentStyle": ComponentStyle {
-                    "componentId": "Nav-dzawzr-0",
-                    "isStatic": false,
-                    "lastClassName": "c1",
-                    "rules": Array [
-                      [Function],
-                    ],
-                  },
-                  "displayName": "Nav",
-                  "foldedComponentIds": Array [],
-                  "render": [Function],
-                  "styledComponentId": "Nav-dzawzr-0",
-                  "target": [Function],
-                  "toString": [Function],
-                  "warnTooManyClasses": [Function],
-                  "withComponent": [Function],
-                }
-              }
-              forwardedRef={null}
-              justified={false}
-              onSelect={[Function]}
-            >
               <Nav
                 activeKey="Key1"
-                bsClass="nav"
                 bsStyle="pills"
-                className="c1"
                 justified={false}
                 onSelect={[Function]}
-                pullLeft={false}
-                pullRight={false}
-                stacked={false}
               >
-                <ul
-                  className="c1 nav nav-pills"
-                  role={null}
+                <StyledComponent
+                  activeKey="Key1"
+                  bsStyle="pills"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "STYLES": Array [
+                        "tabs",
+                        "pills",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Nav-dzawzr-0",
+                        "isStatic": false,
+                        "lastClassName": "c3",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Nav",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Nav-dzawzr-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  justified={false}
+                  onSelect={[Function]}
                 >
-                  <NavItem
-                    active={true}
+                  <Nav
                     activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key1"
-                    key=".$Key1"
+                    bsClass="nav"
+                    bsStyle="pills"
+                    className="c3"
+                    justified={false}
                     onSelect={[Function]}
+                    pullLeft={false}
+                    pullRight={false}
+                    stacked={false}
                   >
-                    <li
-                      className="active"
-                      role="presentation"
+                    <ul
+                      className="c3 nav nav-pills"
+                      role={null}
                     >
-                      <SafeAnchor
-                        componentClass="a"
+                      <NavItem
+                        active={true}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key1"
+                        key=".$Key1"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className="active"
+                          role="presentation"
                         >
-                          Title1
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                  <NavItem
-                    active={false}
-                    activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key2"
-                    key=".$Key2"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title1
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                      <NavItem
+                        active={false}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key2"
+                        key=".$Key2"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className=""
+                          role="presentation"
                         >
-                          Title2
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                  <NavItem
-                    active={false}
-                    activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key3"
-                    key=".$Key3"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title2
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                      <NavItem
+                        active={false}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key3"
+                        key=".$Key3"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className=""
+                          role="presentation"
                         >
-                          Title3
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                </ul>
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title3
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                    </ul>
+                  </Nav>
+                </StyledComponent>
               </Nav>
-            </StyledComponent>
-          </Nav>
-        </div>
-      </Col>
+            </div>
+          </Col>
+        </StyledComponent>
+      </Wizard__HorizontalCol>
       <Col
         bsClass="col"
         componentClass="div"
@@ -1600,7 +1734,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
 `;
 
 exports[`<Wizard /> should render with 3 steps 1`] = `
-.c1.btn-danger {
+.c2.btn-danger {
   background-color: #ad0707;
   border-color: #b23939;
   color: rgb(252,249,249);
@@ -1608,39 +1742,39 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-danger:hover {
+.c2.btn-danger:hover {
   background-color: #a00e0e;
   border-color: #a53636;
   color: #e9e6e6;
 }
 
-.c1.btn-danger.active {
+.c2.btn-danger.active {
   background-color: #b75151;
   border-color: #bc6363;
   color: rgb(252,249,249);
 }
 
-.c1.btn-danger.active:hover {
+.c2.btn-danger.active:hover {
   background-color: #a94c4c;
   border-color: #ad5c5c;
   color: #e9e6e6;
 }
 
-.c1.btn-danger[disabled],
-.c1.btn-danger.disabled {
+.c2.btn-danger[disabled],
+.c2.btn-danger.disabled {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c1.btn-danger[disabled]:hover,
-.c1.btn-danger.disabled:hover {
+.c2.btn-danger[disabled]:hover,
+.c2.btn-danger.disabled:hover {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c1.btn-default {
+.c2.btn-default {
   background-color: #e6e6e6;
   border-color: #e0e0e0;
   color: rgb(73,73,73);
@@ -1648,39 +1782,39 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-default:hover {
+.c2.btn-default:hover {
   background-color: #d4d4d4;
   border-color: #cfcfcf;
   color: #444444;
 }
 
-.c1.btn-default.active {
+.c2.btn-default.active {
   background-color: #dadada;
   border-color: #d4d4d4;
   color: rgb(49,49,49);
 }
 
-.c1.btn-default.active:hover {
+.c2.btn-default.active:hover {
   background-color: #cacaca;
   border-color: #c4c4c4;
   color: #2f2f2f;
 }
 
-.c1.btn-default[disabled],
-.c1.btn-default.disabled {
+.c2.btn-default[disabled],
+.c2.btn-default.disabled {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c1.btn-default[disabled]:hover,
-.c1.btn-default.disabled:hover {
+.c2.btn-default[disabled]:hover,
+.c2.btn-default.disabled:hover {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c1.btn-info {
+.c2.btn-info {
   background-color: #0063be;
   border-color: #3970c2;
   color: rgb(249,250,252);
@@ -1688,39 +1822,39 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-info:hover {
+.c2.btn-info:hover {
   background-color: #0c5cb0;
   border-color: #3668b3;
   color: #e6e7e9;
 }
 
-.c1.btn-info.active {
+.c2.btn-info.active {
   background-color: #517cc5;
   border-color: #6386c9;
   color: rgb(249,250,252);
 }
 
-.c1.btn-info.active:hover {
+.c2.btn-info.active:hover {
   background-color: #4b73b6;
   border-color: #5c7dba;
   color: #e6e7e9;
 }
 
-.c1.btn-info[disabled],
-.c1.btn-info.disabled {
+.c2.btn-info[disabled],
+.c2.btn-info.disabled {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c1.btn-info[disabled]:hover,
-.c1.btn-info.disabled:hover {
+.c2.btn-info[disabled]:hover,
+.c2.btn-info.disabled:hover {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c1.btn-link {
+.c2.btn-link {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
@@ -1728,39 +1862,39 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-link:hover {
+.c2.btn-link:hover {
   background-color: #ebebeb26;
   border-color: #ebebeb26;
   color: #68267b;
 }
 
-.c1.btn-link.active {
+.c2.btn-link.active {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #410057;
 }
 
-.c1.btn-link.active:hover {
+.c2.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
   border-color: #ebebeb26;
   color: #3d0c51;
 }
 
-.c1.btn-link[disabled],
-.c1.btn-link.disabled {
+.c2.btn-link[disabled],
+.c2.btn-link.disabled {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c1.btn-link[disabled]:hover,
-.c1.btn-link.disabled:hover {
+.c2.btn-link[disabled]:hover,
+.c2.btn-link.disabled:hover {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c1.btn-primary {
+.c2.btn-primary {
   background-color: #702785;
   border-color: #7b458e;
   color: rgb(234,229,236);
@@ -1768,39 +1902,39 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-primary:hover {
+.c2.btn-primary:hover {
   background-color: #68267b;
   border-color: #724083;
   color: #d8d3da;
 }
 
-.c1.btn-primary.active {
+.c2.btn-primary.active {
   background-color: #855996;
   border-color: #8f699d;
   color: rgb(250,249,251);
 }
 
-.c1.btn-primary.active:hover {
+.c2.btn-primary.active:hover {
   background-color: #7c538b;
   border-color: #846292;
   color: #e7e6e8;
 }
 
-.c1.btn-primary[disabled],
-.c1.btn-primary.disabled {
+.c2.btn-primary[disabled],
+.c2.btn-primary.disabled {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c1.btn-primary[disabled]:hover,
-.c1.btn-primary.disabled:hover {
+.c2.btn-primary[disabled]:hover,
+.c2.btn-primary.disabled:hover {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c1.btn-success {
+.c2.btn-success {
   background-color: #00ae42;
   border-color: #39b356;
   color: rgb(249,252,249);
@@ -1808,39 +1942,39 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-success:hover {
+.c2.btn-success:hover {
   background-color: #0ca13e;
   border-color: #36a550;
   color: #e6e9e6;
 }
 
-.c1.btn-success.active {
+.c2.btn-success.active {
   background-color: #51b866;
   border-color: #63bc74;
   color: rgb(249,252,250);
 }
 
-.c1.btn-success.active:hover {
+.c2.btn-success.active:hover {
   background-color: #4baa5f;
   border-color: #5cae6c;
   color: #e6e9e7;
 }
 
-.c1.btn-success[disabled],
-.c1.btn-success.disabled {
+.c2.btn-success[disabled],
+.c2.btn-success.disabled {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c1.btn-success[disabled]:hover,
-.c1.btn-success.disabled:hover {
+.c2.btn-success[disabled]:hover,
+.c2.btn-success.disabled:hover {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c1.btn-warning {
+.c2.btn-warning {
   background-color: #ffd200;
   border-color: #f9cd07;
   color: rgb(57,47,0);
@@ -1848,114 +1982,118 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-warning:hover {
+.c2.btn-warning:hover {
   background-color: #ebc20c;
   border-color: #e6bd0e;
   color: #362d0c;
 }
 
-.c1.btn-warning.active {
+.c2.btn-warning.active {
   background-color: #f2c70a;
   border-color: #ebc20c;
   color: rgb(54,45,2);
 }
 
-.c1.btn-warning.active:hover {
+.c2.btn-warning.active:hover {
   background-color: #e0b80f;
   border-color: #d9b310;
   color: #332b0c;
 }
 
-.c1.btn-warning[disabled],
-.c1.btn-warning.disabled {
+.c2.btn-warning[disabled],
+.c2.btn-warning.disabled {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c1.btn-warning[disabled]:hover,
-.c1.btn-warning.disabled:hover {
+.c2.btn-warning[disabled]:hover,
+.c2.btn-warning.disabled:hover {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c0.nav > li > a:hover,
-.c0.nav > li > a:focus {
+.c1.nav > li > a:hover,
+.c1.nav > li > a:focus {
   background-color: #e6e6e6;
 }
 
-.c0.nav > li.disabled > a {
+.c1.nav > li.disabled > a {
   color: #9b9b9b;
 }
 
-.c0.nav > li.disabled > a:hover,
-.c0.nav > li.disabled > a:focus {
+.c1.nav > li.disabled > a:hover,
+.c1.nav > li.disabled > a:focus {
   color: #9b9b9b;
 }
 
-.c0.nav .open > a,
-.c0.nav .open > a:hover,
-.c0.nav .open > a:focus {
+.c1.nav .open > a,
+.c1.nav .open > a:hover,
+.c1.nav .open > a:focus {
   background-color: #e6e6e6;
   border-color: #702785;
 }
 
-.c0.nav.nav-pills > li.active > a,
-.c0.nav.nav-pills > li.active > a:hover,
-.c0.nav.nav-pills > li.active > a:focus {
+.c1.nav.nav-pills > li.active > a,
+.c1.nav.nav-pills > li.active > a:hover,
+.c1.nav.nav-pills > li.active > a:focus {
   color: #fff;
   background-color: #702785;
 }
 
-.c0.nav .nav-tabs {
+.c1.nav .nav-tabs {
   border-bottom-color: rgb(198,207,231);
 }
 
-.c0.nav .nav-tabs > li > a {
+.c1.nav .nav-tabs > li > a {
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
   border-color: #cdcdcd #cdcdcd rgb(198,207,231);
 }
 
-.c0.nav .nav-tabs > li > a:hover {
+.c1.nav .nav-tabs > li > a:hover {
   background-color: #cdcdcd;
   color: rgb(46,46,46);
 }
 
-.c0.nav .nav-tabs > li.active > a,
-.c0.nav .nav-tabs > li.active > a:hover,
-.c0.nav .nav-tabs > li.active > a:focus {
+.c1.nav .nav-tabs > li.active > a,
+.c1.nav .nav-tabs > li.active > a:hover,
+.c1.nav .nav-tabs > li.active > a:focus {
   color: #1f1f1f;
   background-color: #ffffff;
   border-color: rgb(198,207,231);
   border-bottom-color: transparent;
 }
 
-.c0.nav .nav-tabs > li.disabled > a,
-.c0.nav .nav-tabs > li.disabled > a:hover,
-.c0.nav .nav-tabs > li.disabled > a:focus {
+.c1.nav .nav-tabs > li.disabled > a,
+.c1.nav .nav-tabs > li.disabled > a:hover,
+.c1.nav .nav-tabs > li.disabled > a:focus {
   color: #9b9b9b;
   background-color: #ffffff;
   border-color: #ffffff #ffffff rgb(198,207,231);
   cursor: not-allowed;
 }
 
-.c0.nav.nav-justified > .active > a,
-.c0.nav.nav-justified > .active > a:hover,
-.c0.nav.nav-justified > .active > a:focus {
+.c1.nav.nav-justified > .active > a,
+.c1.nav.nav-justified > .active > a:hover,
+.c1.nav.nav-justified > .active > a:focus {
   border-color: rgb(198,207,231);
 }
 
+.c0 {
+  border-right: #cdcdcd solid 1px;
+}
+
 @media (min-width:768px) {
-  .c0.nav.nav-justified > li > a {
+  .c1.nav.nav-justified > li > a {
     border-bottom-color: rgb(198,207,231);
   }
 
-  .c0.nav.nav-justified > .active > a,
-  .c0.nav.nav-justified > .active > a:hover,
-  .c0.nav.nav-justified > .active > a:focus {
+  .c1.nav.nav-justified > .active > a,
+  .c1.nav.nav-justified > .active > a:hover,
+  .c1.nav.nav-justified > .active > a:focus {
     border-bottom-color: #ffffff;
   }
 }
@@ -1972,7 +2110,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
       "componentStyle": ComponentStyle {
         "componentId": "Nav-dzawzr-0",
         "isStatic": false,
-        "lastClassName": "c0",
+        "lastClassName": "c1",
         "rules": Array [
           [Function],
         ],
@@ -2026,343 +2164,374 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
     <div
       className="content row"
     >
-      <Col
-        bsClass="col"
-        className="subnavigation"
-        componentClass="div"
+      <Wizard__SubnavigationCol
         md={2}
       >
-        <div
-          className="subnavigation col-md-2"
+        <StyledComponent
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                "isStatic": false,
+                "lastClassName": "c0",
+                "rules": Array [
+                  [Function],
+                ],
+              },
+              "displayName": "Wizard__SubnavigationCol",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          md={2}
         >
-          <Nav
-            activeKey="Key1"
-            bsStyle="pills"
-            justified={false}
-            onSelect={[Function]}
-            stacked={true}
+          <Col
+            bsClass="col"
+            className="c0"
+            componentClass="div"
+            md={2}
           >
-            <StyledComponent
-              activeKey="Key1"
-              bsStyle="pills"
-              forwardedComponent={
-                Object {
-                  "$$typeof": Symbol(react.forward_ref),
-                  "STYLES": Array [
-                    "tabs",
-                    "pills",
-                  ],
-                  "attrs": Array [],
-                  "componentStyle": ComponentStyle {
-                    "componentId": "Nav-dzawzr-0",
-                    "isStatic": false,
-                    "lastClassName": "c0",
-                    "rules": Array [
-                      [Function],
-                    ],
-                  },
-                  "displayName": "Nav",
-                  "foldedComponentIds": Array [],
-                  "render": [Function],
-                  "styledComponentId": "Nav-dzawzr-0",
-                  "target": [Function],
-                  "toString": [Function],
-                  "warnTooManyClasses": [Function],
-                  "withComponent": [Function],
-                }
-              }
-              forwardedRef={null}
-              justified={false}
-              onSelect={[Function]}
-              stacked={true}
+            <div
+              className="c0 col-md-2"
             >
               <Nav
                 activeKey="Key1"
-                bsClass="nav"
                 bsStyle="pills"
-                className="c0"
                 justified={false}
                 onSelect={[Function]}
-                pullLeft={false}
-                pullRight={false}
                 stacked={true}
               >
-                <ul
-                  className="c0 nav nav-pills nav-stacked"
-                  role={null}
+                <StyledComponent
+                  activeKey="Key1"
+                  bsStyle="pills"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "STYLES": Array [
+                        "tabs",
+                        "pills",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Nav-dzawzr-0",
+                        "isStatic": false,
+                        "lastClassName": "c1",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Nav",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Nav-dzawzr-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  justified={false}
+                  onSelect={[Function]}
+                  stacked={true}
                 >
-                  <NavItem
-                    active={true}
+                  <Nav
                     activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key1"
-                    key=".$Key1"
+                    bsClass="nav"
+                    bsStyle="pills"
+                    className="c1"
+                    justified={false}
                     onSelect={[Function]}
+                    pullLeft={false}
+                    pullRight={false}
+                    stacked={true}
                   >
-                    <li
-                      className="active"
-                      role="presentation"
+                    <ul
+                      className="c1 nav nav-pills nav-stacked"
+                      role={null}
                     >
-                      <SafeAnchor
-                        componentClass="a"
+                      <NavItem
+                        active={true}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key1"
+                        key=".$Key1"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className="active"
+                          role="presentation"
                         >
-                          Title1
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                  <NavItem
-                    active={false}
-                    activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key2"
-                    key=".$Key2"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title1
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                      <NavItem
+                        active={false}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key2"
+                        key=".$Key2"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className=""
+                          role="presentation"
                         >
-                          Title2
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                  <NavItem
-                    active={false}
-                    activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key3"
-                    key=".$Key3"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title2
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                      <NavItem
+                        active={false}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key3"
+                        key=".$Key3"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className=""
+                          role="presentation"
                         >
-                          Title3
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                </ul>
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title3
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                    </ul>
+                  </Nav>
+                </StyledComponent>
               </Nav>
-            </StyledComponent>
-          </Nav>
-          <br />
-          <Row
-            bsClass="row"
-            componentClass="div"
-          >
-            <div
-              className="row"
-            >
-              <Col
-                bsClass="col"
+              <br />
+              <Row
+                bsClass="row"
                 componentClass="div"
-                xs={6}
               >
                 <div
-                  className="col-xs-6"
+                  className="row"
                 >
-                  <ForwardRef
-                    bsSize="small"
-                    bsStyle="info"
-                    disabled={true}
-                    onClick={[Function]}
+                  <Col
+                    bsClass="col"
+                    componentClass="div"
+                    xs={6}
                   >
-                    <Button__StyledButton
-                      bsSize="small"
-                      bsStyle="info"
-                      disabled={true}
-                      onClick={[Function]}
+                    <div
+                      className="col-xs-6"
                     >
-                      <StyledComponent
+                      <ForwardRef
                         bsSize="small"
                         bsStyle="info"
                         disabled={true}
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "SIZES": Array [
-                              "large",
-                              "small",
-                              "xsmall",
-                            ],
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
-                              "default",
-                              "primary",
-                              "link",
-                            ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "Button__StyledButton-c9cbmb-0",
-                              "isStatic": false,
-                              "lastClassName": "c1",
-                              "rules": Array [
-                                [Function],
-                              ],
-                            },
-                            "displayName": "Button__StyledButton",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
-                        }
-                        forwardedRef={null}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Button__StyledButton
                           bsSize="small"
                           bsStyle="info"
-                          className="c1"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <button
-                            className="c1 btn btn-sm btn-info"
+                          <StyledComponent
+                            bsSize="small"
+                            bsStyle="info"
                             disabled={true}
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                  "xsmall",
+                                ],
+                                "STYLES": Array [
+                                  "success",
+                                  "warning",
+                                  "danger",
+                                  "info",
+                                  "default",
+                                  "primary",
+                                  "link",
+                                ],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
+                                  "isStatic": false,
+                                  "lastClassName": "c2",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "Button__StyledButton",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
                             onClick={[Function]}
-                            type="button"
                           >
-                            Previous
-                          </button>
-                        </Button>
-                      </StyledComponent>
-                    </Button__StyledButton>
-                  </ForwardRef>
-                </div>
-              </Col>
-              <Col
-                bsClass="col"
-                className="text-right"
-                componentClass="div"
-                xs={6}
-              >
-                <div
-                  className="text-right col-xs-6"
-                >
-                  <ForwardRef
-                    bsSize="small"
-                    bsStyle="info"
-                    onClick={[Function]}
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsSize="small"
+                              bsStyle="info"
+                              className="c2"
+                              disabled={true}
+                              onClick={[Function]}
+                            >
+                              <button
+                                className="c2 btn btn-sm btn-info"
+                                disabled={true}
+                                onClick={[Function]}
+                                type="button"
+                              >
+                                Previous
+                              </button>
+                            </Button>
+                          </StyledComponent>
+                        </Button__StyledButton>
+                      </ForwardRef>
+                    </div>
+                  </Col>
+                  <Col
+                    bsClass="col"
+                    className="text-right"
+                    componentClass="div"
+                    xs={6}
                   >
-                    <Button__StyledButton
-                      bsSize="small"
-                      bsStyle="info"
-                      onClick={[Function]}
+                    <div
+                      className="text-right col-xs-6"
                     >
-                      <StyledComponent
+                      <ForwardRef
                         bsSize="small"
                         bsStyle="info"
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "SIZES": Array [
-                              "large",
-                              "small",
-                              "xsmall",
-                            ],
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
-                              "default",
-                              "primary",
-                              "link",
-                            ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "Button__StyledButton-c9cbmb-0",
-                              "isStatic": false,
-                              "lastClassName": "c1",
-                              "rules": Array [
-                                [Function],
-                              ],
-                            },
-                            "displayName": "Button__StyledButton",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
-                        }
-                        forwardedRef={null}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Button__StyledButton
                           bsSize="small"
                           bsStyle="info"
-                          className="c1"
-                          disabled={false}
                           onClick={[Function]}
                         >
-                          <button
-                            className="c1 btn btn-sm btn-info"
-                            disabled={false}
+                          <StyledComponent
+                            bsSize="small"
+                            bsStyle="info"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                  "xsmall",
+                                ],
+                                "STYLES": Array [
+                                  "success",
+                                  "warning",
+                                  "danger",
+                                  "info",
+                                  "default",
+                                  "primary",
+                                  "link",
+                                ],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
+                                  "isStatic": false,
+                                  "lastClassName": "c2",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "Button__StyledButton",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
                             onClick={[Function]}
-                            type="button"
                           >
-                            Next
-                          </button>
-                        </Button>
-                      </StyledComponent>
-                    </Button__StyledButton>
-                  </ForwardRef>
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsSize="small"
+                              bsStyle="info"
+                              className="c2"
+                              disabled={false}
+                              onClick={[Function]}
+                            >
+                              <button
+                                className="c2 btn btn-sm btn-info"
+                                disabled={false}
+                                onClick={[Function]}
+                                type="button"
+                              >
+                                Next
+                              </button>
+                            </Button>
+                          </StyledComponent>
+                        </Button__StyledButton>
+                      </ForwardRef>
+                    </div>
+                  </Col>
                 </div>
-              </Col>
+              </Row>
             </div>
-          </Row>
-        </div>
-      </Col>
+          </Col>
+        </StyledComponent>
+      </Wizard__SubnavigationCol>
       <Col
         bsClass="col"
         componentClass="div"
@@ -2382,7 +2551,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
 `;
 
 exports[`<Wizard /> should render with 3 steps and children 1`] = `
-.c1.btn-danger {
+.c2.btn-danger {
   background-color: #ad0707;
   border-color: #b23939;
   color: rgb(252,249,249);
@@ -2390,39 +2559,39 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-danger:hover {
+.c2.btn-danger:hover {
   background-color: #a00e0e;
   border-color: #a53636;
   color: #e9e6e6;
 }
 
-.c1.btn-danger.active {
+.c2.btn-danger.active {
   background-color: #b75151;
   border-color: #bc6363;
   color: rgb(252,249,249);
 }
 
-.c1.btn-danger.active:hover {
+.c2.btn-danger.active:hover {
   background-color: #a94c4c;
   border-color: #ad5c5c;
   color: #e9e6e6;
 }
 
-.c1.btn-danger[disabled],
-.c1.btn-danger.disabled {
+.c2.btn-danger[disabled],
+.c2.btn-danger.disabled {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c1.btn-danger[disabled]:hover,
-.c1.btn-danger.disabled:hover {
+.c2.btn-danger[disabled]:hover,
+.c2.btn-danger.disabled:hover {
   background-color: #c07272;
   border-color: #bc6363;
   color: rgb(252,250,250);
 }
 
-.c1.btn-default {
+.c2.btn-default {
   background-color: #e6e6e6;
   border-color: #e0e0e0;
   color: rgb(73,73,73);
@@ -2430,39 +2599,39 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-default:hover {
+.c2.btn-default:hover {
   background-color: #d4d4d4;
   border-color: #cfcfcf;
   color: #444444;
 }
 
-.c1.btn-default.active {
+.c2.btn-default.active {
   background-color: #dadada;
   border-color: #d4d4d4;
   color: rgb(49,49,49);
 }
 
-.c1.btn-default.active:hover {
+.c2.btn-default.active:hover {
   background-color: #cacaca;
   border-color: #c4c4c4;
   color: #2f2f2f;
 }
 
-.c1.btn-default[disabled],
-.c1.btn-default.disabled {
+.c2.btn-default[disabled],
+.c2.btn-default.disabled {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c1.btn-default[disabled]:hover,
-.c1.btn-default.disabled:hover {
+.c2.btn-default[disabled]:hover,
+.c2.btn-default.disabled:hover {
   background-color: #cecece;
   border-color: #d4d4d4;
   color: rgb(80,80,80);
 }
 
-.c1.btn-info {
+.c2.btn-info {
   background-color: #0063be;
   border-color: #3970c2;
   color: rgb(249,250,252);
@@ -2470,39 +2639,39 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-info:hover {
+.c2.btn-info:hover {
   background-color: #0c5cb0;
   border-color: #3668b3;
   color: #e6e7e9;
 }
 
-.c1.btn-info.active {
+.c2.btn-info.active {
   background-color: #517cc5;
   border-color: #6386c9;
   color: rgb(249,250,252);
 }
 
-.c1.btn-info.active:hover {
+.c2.btn-info.active:hover {
   background-color: #4b73b6;
   border-color: #5c7dba;
   color: #e6e7e9;
 }
 
-.c1.btn-info[disabled],
-.c1.btn-info.disabled {
+.c2.btn-info[disabled],
+.c2.btn-info.disabled {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c1.btn-info[disabled]:hover,
-.c1.btn-info.disabled:hover {
+.c2.btn-info[disabled]:hover,
+.c2.btn-info.disabled:hover {
   background-color: #7290cd;
   border-color: #6386c9;
   color: rgb(250,251,253);
 }
 
-.c1.btn-link {
+.c2.btn-link {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
@@ -2510,39 +2679,39 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-link:hover {
+.c2.btn-link:hover {
   background-color: #ebebeb26;
   border-color: #ebebeb26;
   color: #68267b;
 }
 
-.c1.btn-link.active {
+.c2.btn-link.active {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #410057;
 }
 
-.c1.btn-link.active:hover {
+.c2.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
   border-color: #ebebeb26;
   color: #3d0c51;
 }
 
-.c1.btn-link[disabled],
-.c1.btn-link.disabled {
+.c2.btn-link[disabled],
+.c2.btn-link.disabled {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c1.btn-link[disabled]:hover,
-.c1.btn-link.disabled:hover {
+.c2.btn-link[disabled]:hover,
+.c2.btn-link.disabled:hover {
   background-color: rgba(255,255,255,0);
   border-color: rgba(255,255,255,0);
   color: #702785;
 }
 
-.c1.btn-primary {
+.c2.btn-primary {
   background-color: #702785;
   border-color: #7b458e;
   color: rgb(234,229,236);
@@ -2550,39 +2719,39 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-primary:hover {
+.c2.btn-primary:hover {
   background-color: #68267b;
   border-color: #724083;
   color: #d8d3da;
 }
 
-.c1.btn-primary.active {
+.c2.btn-primary.active {
   background-color: #855996;
   border-color: #8f699d;
   color: rgb(250,249,251);
 }
 
-.c1.btn-primary.active:hover {
+.c2.btn-primary.active:hover {
   background-color: #7c538b;
   border-color: #846292;
   color: #e7e6e8;
 }
 
-.c1.btn-primary[disabled],
-.c1.btn-primary.disabled {
+.c2.btn-primary[disabled],
+.c2.btn-primary.disabled {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c1.btn-primary[disabled]:hover,
-.c1.btn-primary.disabled:hover {
+.c2.btn-primary[disabled]:hover,
+.c2.btn-primary.disabled:hover {
   background-color: #9877a5;
   border-color: #8f699d;
   color: rgb(251,250,251);
 }
 
-.c1.btn-success {
+.c2.btn-success {
   background-color: #00ae42;
   border-color: #39b356;
   color: rgb(249,252,249);
@@ -2590,39 +2759,39 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-success:hover {
+.c2.btn-success:hover {
   background-color: #0ca13e;
   border-color: #36a550;
   color: #e6e9e6;
 }
 
-.c1.btn-success.active {
+.c2.btn-success.active {
   background-color: #51b866;
   border-color: #63bc74;
   color: rgb(249,252,250);
 }
 
-.c1.btn-success.active:hover {
+.c2.btn-success.active:hover {
   background-color: #4baa5f;
   border-color: #5cae6c;
   color: #e6e9e7;
 }
 
-.c1.btn-success[disabled],
-.c1.btn-success.disabled {
+.c2.btn-success[disabled],
+.c2.btn-success.disabled {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c1.btn-success[disabled]:hover,
-.c1.btn-success.disabled:hover {
+.c2.btn-success[disabled]:hover,
+.c2.btn-success.disabled:hover {
   background-color: #72c180;
   border-color: #63bc74;
   color: rgb(250,252,250);
 }
 
-.c1.btn-warning {
+.c2.btn-warning {
   background-color: #ffd200;
   border-color: #f9cd07;
   color: rgb(57,47,0);
@@ -2630,114 +2799,118 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
 }
 
-.c1.btn-warning:hover {
+.c2.btn-warning:hover {
   background-color: #ebc20c;
   border-color: #e6bd0e;
   color: #362d0c;
 }
 
-.c1.btn-warning.active {
+.c2.btn-warning.active {
   background-color: #f2c70a;
   border-color: #ebc20c;
   color: rgb(54,45,2);
 }
 
-.c1.btn-warning.active:hover {
+.c2.btn-warning.active:hover {
   background-color: #e0b80f;
   border-color: #d9b310;
   color: #332b0c;
 }
 
-.c1.btn-warning[disabled],
-.c1.btn-warning.disabled {
+.c2.btn-warning[disabled],
+.c2.btn-warning.disabled {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c1.btn-warning[disabled]:hover,
-.c1.btn-warning.disabled:hover {
+.c2.btn-warning[disabled]:hover,
+.c2.btn-warning.disabled:hover {
   background-color: #e4bc0e;
   border-color: #ebc20c;
   color: rgb(88,73,5);
 }
 
-.c0.nav > li > a:hover,
-.c0.nav > li > a:focus {
+.c1.nav > li > a:hover,
+.c1.nav > li > a:focus {
   background-color: #e6e6e6;
 }
 
-.c0.nav > li.disabled > a {
+.c1.nav > li.disabled > a {
   color: #9b9b9b;
 }
 
-.c0.nav > li.disabled > a:hover,
-.c0.nav > li.disabled > a:focus {
+.c1.nav > li.disabled > a:hover,
+.c1.nav > li.disabled > a:focus {
   color: #9b9b9b;
 }
 
-.c0.nav .open > a,
-.c0.nav .open > a:hover,
-.c0.nav .open > a:focus {
+.c1.nav .open > a,
+.c1.nav .open > a:hover,
+.c1.nav .open > a:focus {
   background-color: #e6e6e6;
   border-color: #702785;
 }
 
-.c0.nav.nav-pills > li.active > a,
-.c0.nav.nav-pills > li.active > a:hover,
-.c0.nav.nav-pills > li.active > a:focus {
+.c1.nav.nav-pills > li.active > a,
+.c1.nav.nav-pills > li.active > a:hover,
+.c1.nav.nav-pills > li.active > a:focus {
   color: #fff;
   background-color: #702785;
 }
 
-.c0.nav .nav-tabs {
+.c1.nav .nav-tabs {
   border-bottom-color: rgb(198,207,231);
 }
 
-.c0.nav .nav-tabs > li > a {
+.c1.nav .nav-tabs > li > a {
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
   border-color: #cdcdcd #cdcdcd rgb(198,207,231);
 }
 
-.c0.nav .nav-tabs > li > a:hover {
+.c1.nav .nav-tabs > li > a:hover {
   background-color: #cdcdcd;
   color: rgb(46,46,46);
 }
 
-.c0.nav .nav-tabs > li.active > a,
-.c0.nav .nav-tabs > li.active > a:hover,
-.c0.nav .nav-tabs > li.active > a:focus {
+.c1.nav .nav-tabs > li.active > a,
+.c1.nav .nav-tabs > li.active > a:hover,
+.c1.nav .nav-tabs > li.active > a:focus {
   color: #1f1f1f;
   background-color: #ffffff;
   border-color: rgb(198,207,231);
   border-bottom-color: transparent;
 }
 
-.c0.nav .nav-tabs > li.disabled > a,
-.c0.nav .nav-tabs > li.disabled > a:hover,
-.c0.nav .nav-tabs > li.disabled > a:focus {
+.c1.nav .nav-tabs > li.disabled > a,
+.c1.nav .nav-tabs > li.disabled > a:hover,
+.c1.nav .nav-tabs > li.disabled > a:focus {
   color: #9b9b9b;
   background-color: #ffffff;
   border-color: #ffffff #ffffff rgb(198,207,231);
   cursor: not-allowed;
 }
 
-.c0.nav.nav-justified > .active > a,
-.c0.nav.nav-justified > .active > a:hover,
-.c0.nav.nav-justified > .active > a:focus {
+.c1.nav.nav-justified > .active > a,
+.c1.nav.nav-justified > .active > a:hover,
+.c1.nav.nav-justified > .active > a:focus {
   border-color: rgb(198,207,231);
 }
 
+.c0 {
+  border-right: #cdcdcd solid 1px;
+}
+
 @media (min-width:768px) {
-  .c0.nav.nav-justified > li > a {
+  .c1.nav.nav-justified > li > a {
     border-bottom-color: rgb(198,207,231);
   }
 
-  .c0.nav.nav-justified > .active > a,
-  .c0.nav.nav-justified > .active > a:hover,
-  .c0.nav.nav-justified > .active > a:focus {
+  .c1.nav.nav-justified > .active > a,
+  .c1.nav.nav-justified > .active > a:hover,
+  .c1.nav.nav-justified > .active > a:focus {
     border-bottom-color: #ffffff;
   }
 }
@@ -2754,7 +2927,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
       "componentStyle": ComponentStyle {
         "componentId": "Nav-dzawzr-0",
         "isStatic": false,
-        "lastClassName": "c0",
+        "lastClassName": "c1",
         "rules": Array [
           [Function],
         ],
@@ -2808,343 +2981,374 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
     <div
       className="content row"
     >
-      <Col
-        bsClass="col"
-        className="subnavigation"
-        componentClass="div"
+      <Wizard__SubnavigationCol
         md={2}
       >
-        <div
-          className="subnavigation col-md-2"
+        <StyledComponent
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                "isStatic": false,
+                "lastClassName": "c0",
+                "rules": Array [
+                  [Function],
+                ],
+              },
+              "displayName": "Wizard__SubnavigationCol",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          md={2}
         >
-          <Nav
-            activeKey="Key1"
-            bsStyle="pills"
-            justified={false}
-            onSelect={[Function]}
-            stacked={true}
+          <Col
+            bsClass="col"
+            className="c0"
+            componentClass="div"
+            md={2}
           >
-            <StyledComponent
-              activeKey="Key1"
-              bsStyle="pills"
-              forwardedComponent={
-                Object {
-                  "$$typeof": Symbol(react.forward_ref),
-                  "STYLES": Array [
-                    "tabs",
-                    "pills",
-                  ],
-                  "attrs": Array [],
-                  "componentStyle": ComponentStyle {
-                    "componentId": "Nav-dzawzr-0",
-                    "isStatic": false,
-                    "lastClassName": "c0",
-                    "rules": Array [
-                      [Function],
-                    ],
-                  },
-                  "displayName": "Nav",
-                  "foldedComponentIds": Array [],
-                  "render": [Function],
-                  "styledComponentId": "Nav-dzawzr-0",
-                  "target": [Function],
-                  "toString": [Function],
-                  "warnTooManyClasses": [Function],
-                  "withComponent": [Function],
-                }
-              }
-              forwardedRef={null}
-              justified={false}
-              onSelect={[Function]}
-              stacked={true}
+            <div
+              className="c0 col-md-2"
             >
               <Nav
                 activeKey="Key1"
-                bsClass="nav"
                 bsStyle="pills"
-                className="c0"
                 justified={false}
                 onSelect={[Function]}
-                pullLeft={false}
-                pullRight={false}
                 stacked={true}
               >
-                <ul
-                  className="c0 nav nav-pills nav-stacked"
-                  role={null}
+                <StyledComponent
+                  activeKey="Key1"
+                  bsStyle="pills"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "STYLES": Array [
+                        "tabs",
+                        "pills",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Nav-dzawzr-0",
+                        "isStatic": false,
+                        "lastClassName": "c1",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "Nav",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Nav-dzawzr-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  justified={false}
+                  onSelect={[Function]}
+                  stacked={true}
                 >
-                  <NavItem
-                    active={true}
+                  <Nav
                     activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key1"
-                    key=".$Key1"
+                    bsClass="nav"
+                    bsStyle="pills"
+                    className="c1"
+                    justified={false}
                     onSelect={[Function]}
+                    pullLeft={false}
+                    pullRight={false}
+                    stacked={true}
                   >
-                    <li
-                      className="active"
-                      role="presentation"
+                    <ul
+                      className="c1 nav nav-pills nav-stacked"
+                      role={null}
                     >
-                      <SafeAnchor
-                        componentClass="a"
+                      <NavItem
+                        active={true}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key1"
+                        key=".$Key1"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className="active"
+                          role="presentation"
                         >
-                          Title1
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                  <NavItem
-                    active={false}
-                    activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key2"
-                    key=".$Key2"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title1
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                      <NavItem
+                        active={false}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key2"
+                        key=".$Key2"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className=""
+                          role="presentation"
                         >
-                          Title2
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                  <NavItem
-                    active={false}
-                    activeKey="Key1"
-                    disabled={false}
-                    eventKey="Key3"
-                    key=".$Key3"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title2
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                      <NavItem
+                        active={false}
+                        activeKey="Key1"
                         disabled={false}
-                        onClick={[Function]}
+                        eventKey="Key3"
+                        key=".$Key3"
+                        onSelect={[Function]}
                       >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                        <li
+                          className=""
+                          role="presentation"
                         >
-                          Title3
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </NavItem>
-                </ul>
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              Title3
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </NavItem>
+                    </ul>
+                  </Nav>
+                </StyledComponent>
               </Nav>
-            </StyledComponent>
-          </Nav>
-          <br />
-          <Row
-            bsClass="row"
-            componentClass="div"
-          >
-            <div
-              className="row"
-            >
-              <Col
-                bsClass="col"
+              <br />
+              <Row
+                bsClass="row"
                 componentClass="div"
-                xs={6}
               >
                 <div
-                  className="col-xs-6"
+                  className="row"
                 >
-                  <ForwardRef
-                    bsSize="small"
-                    bsStyle="info"
-                    disabled={true}
-                    onClick={[Function]}
+                  <Col
+                    bsClass="col"
+                    componentClass="div"
+                    xs={6}
                   >
-                    <Button__StyledButton
-                      bsSize="small"
-                      bsStyle="info"
-                      disabled={true}
-                      onClick={[Function]}
+                    <div
+                      className="col-xs-6"
                     >
-                      <StyledComponent
+                      <ForwardRef
                         bsSize="small"
                         bsStyle="info"
                         disabled={true}
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "SIZES": Array [
-                              "large",
-                              "small",
-                              "xsmall",
-                            ],
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
-                              "default",
-                              "primary",
-                              "link",
-                            ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "Button__StyledButton-c9cbmb-0",
-                              "isStatic": false,
-                              "lastClassName": "c1",
-                              "rules": Array [
-                                [Function],
-                              ],
-                            },
-                            "displayName": "Button__StyledButton",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
-                        }
-                        forwardedRef={null}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Button__StyledButton
                           bsSize="small"
                           bsStyle="info"
-                          className="c1"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <button
-                            className="c1 btn btn-sm btn-info"
+                          <StyledComponent
+                            bsSize="small"
+                            bsStyle="info"
                             disabled={true}
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                  "xsmall",
+                                ],
+                                "STYLES": Array [
+                                  "success",
+                                  "warning",
+                                  "danger",
+                                  "info",
+                                  "default",
+                                  "primary",
+                                  "link",
+                                ],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
+                                  "isStatic": false,
+                                  "lastClassName": "c2",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "Button__StyledButton",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
                             onClick={[Function]}
-                            type="button"
                           >
-                            Previous
-                          </button>
-                        </Button>
-                      </StyledComponent>
-                    </Button__StyledButton>
-                  </ForwardRef>
-                </div>
-              </Col>
-              <Col
-                bsClass="col"
-                className="text-right"
-                componentClass="div"
-                xs={6}
-              >
-                <div
-                  className="text-right col-xs-6"
-                >
-                  <ForwardRef
-                    bsSize="small"
-                    bsStyle="info"
-                    onClick={[Function]}
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsSize="small"
+                              bsStyle="info"
+                              className="c2"
+                              disabled={true}
+                              onClick={[Function]}
+                            >
+                              <button
+                                className="c2 btn btn-sm btn-info"
+                                disabled={true}
+                                onClick={[Function]}
+                                type="button"
+                              >
+                                Previous
+                              </button>
+                            </Button>
+                          </StyledComponent>
+                        </Button__StyledButton>
+                      </ForwardRef>
+                    </div>
+                  </Col>
+                  <Col
+                    bsClass="col"
+                    className="text-right"
+                    componentClass="div"
+                    xs={6}
                   >
-                    <Button__StyledButton
-                      bsSize="small"
-                      bsStyle="info"
-                      onClick={[Function]}
+                    <div
+                      className="text-right col-xs-6"
                     >
-                      <StyledComponent
+                      <ForwardRef
                         bsSize="small"
                         bsStyle="info"
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "SIZES": Array [
-                              "large",
-                              "small",
-                              "xsmall",
-                            ],
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
-                              "default",
-                              "primary",
-                              "link",
-                            ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "Button__StyledButton-c9cbmb-0",
-                              "isStatic": false,
-                              "lastClassName": "c1",
-                              "rules": Array [
-                                [Function],
-                              ],
-                            },
-                            "displayName": "Button__StyledButton",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
-                        }
-                        forwardedRef={null}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Button__StyledButton
                           bsSize="small"
                           bsStyle="info"
-                          className="c1"
-                          disabled={false}
                           onClick={[Function]}
                         >
-                          <button
-                            className="c1 btn btn-sm btn-info"
-                            disabled={false}
+                          <StyledComponent
+                            bsSize="small"
+                            bsStyle="info"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                  "xsmall",
+                                ],
+                                "STYLES": Array [
+                                  "success",
+                                  "warning",
+                                  "danger",
+                                  "info",
+                                  "default",
+                                  "primary",
+                                  "link",
+                                ],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
+                                  "isStatic": false,
+                                  "lastClassName": "c2",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "Button__StyledButton",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
                             onClick={[Function]}
-                            type="button"
                           >
-                            Next
-                          </button>
-                        </Button>
-                      </StyledComponent>
-                    </Button__StyledButton>
-                  </ForwardRef>
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsSize="small"
+                              bsStyle="info"
+                              className="c2"
+                              disabled={false}
+                              onClick={[Function]}
+                            >
+                              <button
+                                className="c2 btn btn-sm btn-info"
+                                disabled={false}
+                                onClick={[Function]}
+                                type="button"
+                              >
+                                Next
+                              </button>
+                            </Button>
+                          </StyledComponent>
+                        </Button__StyledButton>
+                      </ForwardRef>
+                    </div>
+                  </Col>
                 </div>
-              </Col>
+              </Row>
             </div>
-          </Row>
-        </div>
-      </Col>
+          </Col>
+        </StyledComponent>
+      </Wizard__SubnavigationCol>
       <Col
         bsClass="col"
         componentClass="div"

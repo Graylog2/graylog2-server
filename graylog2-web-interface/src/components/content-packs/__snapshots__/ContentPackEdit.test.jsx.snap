@@ -141,358 +141,389 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
         <div
           className="content row"
         >
-          <Col
-            bsClass="col"
-            className="subnavigation"
-            componentClass="div"
+          <Wizard__SubnavigationCol
             md={2}
           >
-            <div
-              className="subnavigation col-md-2"
+            <StyledComponent
+              forwardedComponent={
+                Object {
+                  "$$typeof": Symbol(react.forward_ref),
+                  "attrs": Array [],
+                  "componentStyle": ComponentStyle {
+                    "componentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                    "isStatic": false,
+                    "lastClassName": "bgQPzB",
+                    "rules": Array [
+                      [Function],
+                    ],
+                  },
+                  "displayName": "Wizard__SubnavigationCol",
+                  "foldedComponentIds": Array [],
+                  "render": [Function],
+                  "styledComponentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                  "target": [Function],
+                  "toString": [Function],
+                  "warnTooManyClasses": [Function],
+                  "withComponent": [Function],
+                }
+              }
+              forwardedRef={null}
+              md={2}
             >
-              <Nav
-                activeKey="selection"
-                bsStyle="pills"
-                justified={false}
-                onSelect={[Function]}
-                stacked={true}
+              <Col
+                bsClass="col"
+                className="Wizard__SubnavigationCol-sc-1jnediy-0 bgQPzB"
+                componentClass="div"
+                md={2}
               >
-                <StyledComponent
-                  activeKey="selection"
-                  bsStyle="pills"
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "STYLES": Array [
-                        "tabs",
-                        "pills",
-                      ],
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "Nav-dzawzr-0",
-                        "isStatic": false,
-                        "lastClassName": "htUNCU",
-                        "rules": Array [
-                          [Function],
-                        ],
-                      },
-                      "displayName": "Nav",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "Nav-dzawzr-0",
-                      "target": [Function],
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
-                  justified={false}
-                  onSelect={[Function]}
-                  stacked={true}
+                <div
+                  className="Wizard__SubnavigationCol-sc-1jnediy-0 bgQPzB col-md-2"
                 >
                   <Nav
                     activeKey="selection"
-                    bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 htUNCU"
                     justified={false}
                     onSelect={[Function]}
-                    pullLeft={false}
-                    pullRight={false}
                     stacked={true}
                   >
-                    <ul
-                      className="Nav-dzawzr-0 htUNCU nav nav-pills nav-stacked"
-                      role={null}
+                    <StyledComponent
+                      activeKey="selection"
+                      bsStyle="pills"
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "tabs",
+                            "pills",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Nav-dzawzr-0",
+                            "isStatic": false,
+                            "lastClassName": "htUNCU",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "Nav",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Nav-dzawzr-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                      justified={false}
+                      onSelect={[Function]}
+                      stacked={true}
                     >
-                      <NavItem
-                        active={true}
+                      <Nav
                         activeKey="selection"
-                        disabled={false}
-                        eventKey="selection"
-                        key=".$selection"
+                        bsClass="nav"
+                        bsStyle="pills"
+                        className="Nav-dzawzr-0 htUNCU"
+                        justified={false}
                         onSelect={[Function]}
+                        pullLeft={false}
+                        pullRight={false}
+                        stacked={true}
                       >
-                        <li
-                          className="active"
-                          role="presentation"
+                        <ul
+                          className="Nav-dzawzr-0 htUNCU nav nav-pills nav-stacked"
+                          role={null}
                         >
-                          <SafeAnchor
-                            componentClass="a"
+                          <NavItem
+                            active={true}
+                            activeKey="selection"
                             disabled={false}
-                            onClick={[Function]}
+                            eventKey="selection"
+                            key=".$selection"
+                            onSelect={[Function]}
                           >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
+                            <li
+                              className="active"
+                              role="presentation"
                             >
-                              Content Selection
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </NavItem>
-                      <NavItem
-                        active={false}
-                        activeKey="selection"
-                        disabled={true}
-                        eventKey="parameters"
-                        key=".$parameters"
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                          role="presentation"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Content Selection
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="selection"
                             disabled={true}
-                            onClick={[Function]}
+                            eventKey="parameters"
+                            key=".$parameters"
+                            onSelect={[Function]}
                           >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
+                            <li
+                              className="disabled"
+                              role="presentation"
                             >
-                              Parameters
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </NavItem>
-                      <NavItem
-                        active={false}
-                        activeKey="selection"
-                        disabled={true}
-                        eventKey="preview"
-                        key=".$preview"
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                          role="presentation"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={true}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                  style={
+                                    Object {
+                                      "pointerEvents": "none",
+                                    }
+                                  }
+                                  tabIndex={-1}
+                                >
+                                  Parameters
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="selection"
                             disabled={true}
-                            onClick={[Function]}
+                            eventKey="preview"
+                            key=".$preview"
+                            onSelect={[Function]}
                           >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
+                            <li
+                              className="disabled"
+                              role="presentation"
                             >
-                              Preview
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </NavItem>
-                    </ul>
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={true}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                  style={
+                                    Object {
+                                      "pointerEvents": "none",
+                                    }
+                                  }
+                                  tabIndex={-1}
+                                >
+                                  Preview
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                        </ul>
+                      </Nav>
+                    </StyledComponent>
                   </Nav>
-                </StyledComponent>
-              </Nav>
-              <br />
-              <Row
-                bsClass="row"
-                componentClass="div"
-              >
-                <div
-                  className="row"
-                >
-                  <Col
-                    bsClass="col"
+                  <br />
+                  <Row
+                    bsClass="row"
                     componentClass="div"
-                    xs={6}
                   >
                     <div
-                      className="col-xs-6"
+                      className="row"
                     >
-                      <ForwardRef
-                        bsSize="small"
-                        bsStyle="info"
-                        disabled={true}
-                        onClick={[Function]}
+                      <Col
+                        bsClass="col"
+                        componentClass="div"
+                        xs={6}
                       >
-                        <Button__StyledButton
-                          bsSize="small"
-                          bsStyle="info"
-                          disabled={true}
-                          onClick={[Function]}
+                        <div
+                          className="col-xs-6"
                         >
-                          <StyledComponent
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             disabled={true}
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "SIZES": Array [
-                                  "large",
-                                  "small",
-                                  "xsmall",
-                                ],
-                                "STYLES": Array [
-                                  "success",
-                                  "warning",
-                                  "danger",
-                                  "info",
-                                  "default",
-                                  "primary",
-                                  "link",
-                                ],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
-                                  "isStatic": false,
-                                  "lastClassName": "jVYrA",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Button__StyledButton",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
+                            <Button__StyledButton
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                               disabled={true}
                               onClick={[Function]}
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                              <StyledComponent
+                                bsSize="small"
+                                bsStyle="info"
                                 disabled={true}
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "jVYrA",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button__StyledButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 onClick={[Function]}
-                                type="button"
                               >
-                                Previous
-                              </button>
-                            </Button>
-                          </StyledComponent>
-                        </Button__StyledButton>
-                      </ForwardRef>
-                    </div>
-                  </Col>
-                  <Col
-                    bsClass="col"
-                    className="text-right"
-                    componentClass="div"
-                    xs={6}
-                  >
-                    <div
-                      className="text-right col-xs-6"
-                    >
-                      <ForwardRef
-                        bsSize="small"
-                        bsStyle="info"
-                        disabled={true}
-                        onClick={[Function]}
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                >
+                                  <button
+                                    className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                    disabled={true}
+                                    onClick={[Function]}
+                                    type="button"
+                                  >
+                                    Previous
+                                  </button>
+                                </Button>
+                              </StyledComponent>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </div>
+                      </Col>
+                      <Col
+                        bsClass="col"
+                        className="text-right"
+                        componentClass="div"
+                        xs={6}
                       >
-                        <Button__StyledButton
-                          bsSize="small"
-                          bsStyle="info"
-                          disabled={true}
-                          onClick={[Function]}
+                        <div
+                          className="text-right col-xs-6"
                         >
-                          <StyledComponent
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             disabled={true}
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "SIZES": Array [
-                                  "large",
-                                  "small",
-                                  "xsmall",
-                                ],
-                                "STYLES": Array [
-                                  "success",
-                                  "warning",
-                                  "danger",
-                                  "info",
-                                  "default",
-                                  "primary",
-                                  "link",
-                                ],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
-                                  "isStatic": false,
-                                  "lastClassName": "jVYrA",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Button__StyledButton",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
+                            <Button__StyledButton
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                               disabled={true}
                               onClick={[Function]}
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                              <StyledComponent
+                                bsSize="small"
+                                bsStyle="info"
                                 disabled={true}
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "jVYrA",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button__StyledButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 onClick={[Function]}
-                                type="button"
                               >
-                                Next
-                              </button>
-                            </Button>
-                          </StyledComponent>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                >
+                                  <button
+                                    className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                    disabled={true}
+                                    onClick={[Function]}
+                                    type="button"
+                                  >
+                                    Next
+                                  </button>
+                                </Button>
+                              </StyledComponent>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </div>
+                      </Col>
                     </div>
-                  </Col>
+                  </Row>
                 </div>
-              </Row>
-            </div>
-          </Col>
+              </Col>
+            </StyledComponent>
+          </Wizard__SubnavigationCol>
           <Col
             bsClass="col"
             componentClass="div"
@@ -2103,9 +2134,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     </dt>
                                      
                                     <dd>
-                                      <a
-                                        href=""
-                                      />
                                        
                                     </dd>
                                     <span>
@@ -2158,7 +2186,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
     </Wizard>
     <ScrollButton
       delay={5}
-      possition="middle"
+      position="middle"
       scrollSteps={50}
     >
       <span />
@@ -2475,352 +2503,383 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
         <div
           className="content row"
         >
-          <Col
-            bsClass="col"
-            className="subnavigation"
-            componentClass="div"
+          <Wizard__SubnavigationCol
             md={2}
           >
-            <div
-              className="subnavigation col-md-2"
+            <StyledComponent
+              forwardedComponent={
+                Object {
+                  "$$typeof": Symbol(react.forward_ref),
+                  "attrs": Array [],
+                  "componentStyle": ComponentStyle {
+                    "componentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                    "isStatic": false,
+                    "lastClassName": "bgQPzB",
+                    "rules": Array [
+                      [Function],
+                    ],
+                  },
+                  "displayName": "Wizard__SubnavigationCol",
+                  "foldedComponentIds": Array [],
+                  "render": [Function],
+                  "styledComponentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                  "target": [Function],
+                  "toString": [Function],
+                  "warnTooManyClasses": [Function],
+                  "withComponent": [Function],
+                }
+              }
+              forwardedRef={null}
+              md={2}
             >
-              <Nav
-                activeKey="selection"
-                bsStyle="pills"
-                justified={false}
-                onSelect={[Function]}
-                stacked={true}
+              <Col
+                bsClass="col"
+                className="Wizard__SubnavigationCol-sc-1jnediy-0 bgQPzB"
+                componentClass="div"
+                md={2}
               >
-                <StyledComponent
-                  activeKey="selection"
-                  bsStyle="pills"
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "STYLES": Array [
-                        "tabs",
-                        "pills",
-                      ],
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "Nav-dzawzr-0",
-                        "isStatic": false,
-                        "lastClassName": "htUNCU",
-                        "rules": Array [
-                          [Function],
-                        ],
-                      },
-                      "displayName": "Nav",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "Nav-dzawzr-0",
-                      "target": [Function],
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
-                  justified={false}
-                  onSelect={[Function]}
-                  stacked={true}
+                <div
+                  className="Wizard__SubnavigationCol-sc-1jnediy-0 bgQPzB col-md-2"
                 >
                   <Nav
                     activeKey="selection"
-                    bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 htUNCU"
                     justified={false}
                     onSelect={[Function]}
-                    pullLeft={false}
-                    pullRight={false}
                     stacked={true}
                   >
-                    <ul
-                      className="Nav-dzawzr-0 htUNCU nav nav-pills nav-stacked"
-                      role={null}
+                    <StyledComponent
+                      activeKey="selection"
+                      bsStyle="pills"
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "tabs",
+                            "pills",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Nav-dzawzr-0",
+                            "isStatic": false,
+                            "lastClassName": "htUNCU",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "Nav",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Nav-dzawzr-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                      justified={false}
+                      onSelect={[Function]}
+                      stacked={true}
                     >
-                      <NavItem
-                        active={true}
+                      <Nav
                         activeKey="selection"
-                        disabled={false}
-                        eventKey="selection"
-                        key=".$selection"
+                        bsClass="nav"
+                        bsStyle="pills"
+                        className="Nav-dzawzr-0 htUNCU"
+                        justified={false}
                         onSelect={[Function]}
+                        pullLeft={false}
+                        pullRight={false}
+                        stacked={true}
                       >
-                        <li
-                          className="active"
-                          role="presentation"
+                        <ul
+                          className="Nav-dzawzr-0 htUNCU nav nav-pills nav-stacked"
+                          role={null}
                         >
-                          <SafeAnchor
-                            componentClass="a"
+                          <NavItem
+                            active={true}
+                            activeKey="selection"
                             disabled={false}
-                            onClick={[Function]}
+                            eventKey="selection"
+                            key=".$selection"
+                            onSelect={[Function]}
                           >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
+                            <li
+                              className="active"
+                              role="presentation"
                             >
-                              Content Selection
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </NavItem>
-                      <NavItem
-                        active={false}
-                        activeKey="selection"
-                        disabled={false}
-                        eventKey="parameters"
-                        key=".$parameters"
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className=""
-                          role="presentation"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Content Selection
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="selection"
                             disabled={false}
-                            onClick={[Function]}
+                            eventKey="parameters"
+                            key=".$parameters"
+                            onSelect={[Function]}
                           >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
+                            <li
+                              className=""
+                              role="presentation"
                             >
-                              Parameters
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </NavItem>
-                      <NavItem
-                        active={false}
-                        activeKey="selection"
-                        disabled={true}
-                        eventKey="preview"
-                        key=".$preview"
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                          role="presentation"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Parameters
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="selection"
                             disabled={true}
-                            onClick={[Function]}
+                            eventKey="preview"
+                            key=".$preview"
+                            onSelect={[Function]}
                           >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
+                            <li
+                              className="disabled"
+                              role="presentation"
                             >
-                              Preview
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </NavItem>
-                    </ul>
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={true}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                  style={
+                                    Object {
+                                      "pointerEvents": "none",
+                                    }
+                                  }
+                                  tabIndex={-1}
+                                >
+                                  Preview
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                        </ul>
+                      </Nav>
+                    </StyledComponent>
                   </Nav>
-                </StyledComponent>
-              </Nav>
-              <br />
-              <Row
-                bsClass="row"
-                componentClass="div"
-              >
-                <div
-                  className="row"
-                >
-                  <Col
-                    bsClass="col"
+                  <br />
+                  <Row
+                    bsClass="row"
                     componentClass="div"
-                    xs={6}
                   >
                     <div
-                      className="col-xs-6"
+                      className="row"
                     >
-                      <ForwardRef
-                        bsSize="small"
-                        bsStyle="info"
-                        disabled={true}
-                        onClick={[Function]}
+                      <Col
+                        bsClass="col"
+                        componentClass="div"
+                        xs={6}
                       >
-                        <Button__StyledButton
-                          bsSize="small"
-                          bsStyle="info"
-                          disabled={true}
-                          onClick={[Function]}
+                        <div
+                          className="col-xs-6"
                         >
-                          <StyledComponent
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             disabled={true}
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "SIZES": Array [
-                                  "large",
-                                  "small",
-                                  "xsmall",
-                                ],
-                                "STYLES": Array [
-                                  "success",
-                                  "warning",
-                                  "danger",
-                                  "info",
-                                  "default",
-                                  "primary",
-                                  "link",
-                                ],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
-                                  "isStatic": false,
-                                  "lastClassName": "jVYrA",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Button__StyledButton",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
+                            <Button__StyledButton
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                               disabled={true}
                               onClick={[Function]}
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                              <StyledComponent
+                                bsSize="small"
+                                bsStyle="info"
                                 disabled={true}
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "jVYrA",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button__StyledButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 onClick={[Function]}
-                                type="button"
                               >
-                                Previous
-                              </button>
-                            </Button>
-                          </StyledComponent>
-                        </Button__StyledButton>
-                      </ForwardRef>
-                    </div>
-                  </Col>
-                  <Col
-                    bsClass="col"
-                    className="text-right"
-                    componentClass="div"
-                    xs={6}
-                  >
-                    <div
-                      className="text-right col-xs-6"
-                    >
-                      <ForwardRef
-                        bsSize="small"
-                        bsStyle="info"
-                        disabled={false}
-                        onClick={[Function]}
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                >
+                                  <button
+                                    className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                    disabled={true}
+                                    onClick={[Function]}
+                                    type="button"
+                                  >
+                                    Previous
+                                  </button>
+                                </Button>
+                              </StyledComponent>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </div>
+                      </Col>
+                      <Col
+                        bsClass="col"
+                        className="text-right"
+                        componentClass="div"
+                        xs={6}
                       >
-                        <Button__StyledButton
-                          bsSize="small"
-                          bsStyle="info"
-                          disabled={false}
-                          onClick={[Function]}
+                        <div
+                          className="text-right col-xs-6"
                         >
-                          <StyledComponent
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             disabled={false}
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "SIZES": Array [
-                                  "large",
-                                  "small",
-                                  "xsmall",
-                                ],
-                                "STYLES": Array [
-                                  "success",
-                                  "warning",
-                                  "danger",
-                                  "info",
-                                  "default",
-                                  "primary",
-                                  "link",
-                                ],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
-                                  "isStatic": false,
-                                  "lastClassName": "jVYrA",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Button__StyledButton",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
+                            <Button__StyledButton
                               bsSize="small"
                               bsStyle="info"
-                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                               disabled={false}
                               onClick={[Function]}
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                              <StyledComponent
+                                bsSize="small"
+                                bsStyle="info"
                                 disabled={false}
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "jVYrA",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button__StyledButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 onClick={[Function]}
-                                type="button"
                               >
-                                Next
-                              </button>
-                            </Button>
-                          </StyledComponent>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                >
+                                  <button
+                                    className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                    type="button"
+                                  >
+                                    Next
+                                  </button>
+                                </Button>
+                              </StyledComponent>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </div>
+                      </Col>
                     </div>
-                  </Col>
+                  </Row>
                 </div>
-              </Row>
-            </div>
-          </Col>
+              </Col>
+            </StyledComponent>
+          </Wizard__SubnavigationCol>
           <Col
             bsClass="col"
             componentClass="div"
@@ -4900,7 +4959,8 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           <div
                                             dangerouslySetInnerHTML={
                                               Object {
-                                                "__html": "<h2>No one dares</h2>",
+                                                "__html": "<h2 id=\\"no-one-dares\\">No one dares</h2>
+",
                                               }
                                             }
                                           />
@@ -4928,7 +4988,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
     </Wizard>
     <ScrollButton
       delay={5}
-      possition="middle"
+      position="middle"
       scrollSteps={50}
     >
       <span />

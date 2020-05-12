@@ -5247,6 +5247,11 @@ domhandler@^2.3.0:
   dependencies:
     domelementtype "1"
 
+dompurify@^2.0.11:
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.11.tgz#cd47935774230c5e478b183a572e726300b3891d"
+  integrity sha512-qVoGPjIW9IqxRij7klDQQ2j6nSe4UNWANBhZNLnsS7ScTtLb+3YdxkRY8brNTpkUiTtcXsCJO+jS0UCDfenLuA==
+
 domutils@1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/domutils/-/domutils-1.5.1.tgz#dcd8488a26f563d61079e48c9f7b7e32373682cf"
@@ -7557,11 +7562,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
-  version "3.3.0-SNAPSHOT"
+  version "3.3.0-beta.3-SNAPSHOT"
   dependencies:
     "@babel/preset-env" "7.9.5"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-3.3.0-SNAPSHOT-d63d5d1e-774c-46d2-8f78-ac1c511744e8-1587730558311/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-3.3.0-beta.3-SNAPSHOT-15d0d85c-540a-44cd-a844-9360946c2ed9-1588950633290/node_modules/eslint-config-graylog"
     html-webpack-plugin "^3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"
@@ -10050,12 +10055,10 @@ markdown-to-jsx@^6.10.3:
     prop-types "^15.6.2"
     unquote "^1.1.0"
 
-markdown@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/markdown/-/markdown-0.5.0.tgz#28205b565a8ae7592de207463d6637dc182722b2"
-  integrity sha1-KCBbVlqK51kt4gdGPWY33BgnIrI=
-  dependencies:
-    nopt "~2.1.1"
+marked@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-1.0.0.tgz#d35784245a04871e5988a491e28867362e941693"
+  integrity sha512-Wo+L1pWTVibfrSr+TTtMuiMfNzmZWiOPeO7rZsQUY5bgsxpHesBEcIWJloWVTFnrMXnf/TL30eTFSGJddmQAng==
 
 mat4-decompose@^1.0.3:
   version "1.0.4"
@@ -10798,13 +10801,6 @@ nopt@~1.0.10:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/nopt/-/nopt-1.0.10.tgz#6ddd21bd2a31417b92727dd585f8a6f37608ebee"
   integrity sha1-bd0hvSoxQXuScn3Vhfim83YI6+4=
-  dependencies:
-    abbrev "1"
-
-nopt@~2.1.1:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/nopt/-/nopt-2.1.2.tgz#6cccd977b80132a07731d6e8ce58c2c8303cf9af"
-  integrity sha1-bMzZd7gBMqB3MdbozljCyDA8+a8=
   dependencies:
     abbrev "1"
 
