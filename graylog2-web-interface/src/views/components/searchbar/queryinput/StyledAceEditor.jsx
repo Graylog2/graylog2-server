@@ -14,6 +14,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     background-color: ${scTheme.color.global.inputBackground};
     color: ${util.contrastingColor(scTheme.color.global.inputBackground, 'AAA')};
 
+
+    &.ace_multiselect .ace_selection.ace_start {
+      box-shadow: 0 0 3px 0 ${scTheme.color.global.inputBackground};
+    }
+
     .ace_gutter {
       background: ${scTheme.color.global.inputBackground};
       color: ${util.contrastingColor(scTheme.color.global.inputBackground, 'AAA')};
@@ -30,10 +35,6 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
 
     .ace_marker-layer .ace_selection {
       background: ${scTheme.color.variant.lightest.default};
-    }
-
-    &.ace_multiselect .ace_selection.ace_start {
-      box-shadow: 0 0 3px 0 ${scTheme.color.global.inputBackground};
     }
 
     .ace_marker-layer .ace_step {
@@ -142,10 +143,6 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
       padding: 0 !important;
       font-family: inherit !important;
     }
-  }
-
-  .ace_editor.ace_autocomplete {
-    width: 600px !important;
   }
 `);
 

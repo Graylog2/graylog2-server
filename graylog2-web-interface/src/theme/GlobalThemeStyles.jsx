@@ -653,6 +653,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   .form-control.message-id-input {
     width: 300px;
   }
+
+  /* additional styles for 'StyledAceEditor' */
+  .ace_editor.ace_autocomplete.ace-queryinput {
+    width: 600px !important;
+    margin-top: 6px;
+  }
 `);
 
 export default GlobalThemeStyles;
