@@ -29,15 +29,15 @@ public class AuditContext {
         this.searchTypeId = searchTypeId;
     }
 
-    public String getUserName() {
+    public String userName() {
         return userName;
     }
 
-    public Optional<String> getSearchId() {
+    public Optional<String> searchId() {
         return Optional.ofNullable(searchId);
     }
 
-    public Optional<String> getSearchTypeId() {
+    public Optional<String> searchTypeId() {
         return Optional.ofNullable(searchTypeId);
     }
 }

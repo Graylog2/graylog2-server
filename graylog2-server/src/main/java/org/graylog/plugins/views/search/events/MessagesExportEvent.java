@@ -48,7 +48,7 @@ public abstract class MessagesExportEvent {
 
     private static MessagesExportEvent from(DateTime startTime, AuditContext context, ExportMessagesCommand command, String auditType) {
         Builder builder = Builder.create()
-                .userName(context.getUserName())
+                .userName(context.userName())
                 .auditType(auditType)
                 .timestamp(startTime)
                 .timeRange(command.timeRange())
@@ -59,11 +59,11 @@ public abstract class MessagesExportEvent {
         if (command.limit().isPresent()) {
             builder.limit(command.limit().getAsInt());
         }
-        if (context.getSearchId().isPresent()) {
-            builder.searchId(context.getSearchId().get());
+        if (context.searchId().isPresent()) {
+            builder.searchId(context.searchId().get());
         }
-        if (context.getSearchTypeId().isPresent()) {
-            builder.searchTypeId(context.getSearchTypeId().get());
+        if (context.searchTypeId().isPresent()) {
+            builder.searchTypeId(context.searchTypeId().get());
         }
 
         return builder.build();

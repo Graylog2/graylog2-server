@@ -129,9 +129,9 @@ public class MessagesResourceTest {
         sut.retrieve(validRequest());
 
         assertAll(
-                () -> assertThat(context.get().getUserName()).isEqualTo(currentUser.getName()),
-                () -> assertThat(context.get().getSearchId()).isEmpty(),
-                () -> assertThat(context.get().getSearchTypeId()).isEmpty()
+                () -> assertThat(context.get().userName()).isEqualTo(currentUser.getName()),
+                () -> assertThat(context.get().searchId()).isEmpty(),
+                () -> assertThat(context.get().searchTypeId()).isEmpty()
         );
     }
 
