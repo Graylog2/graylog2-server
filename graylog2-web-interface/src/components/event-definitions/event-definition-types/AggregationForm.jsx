@@ -64,6 +64,7 @@ class AggregationForm extends React.Component {
                            matchProp="label"
                            onChange={(selected) => this.handleGroupByChange(selected === '' ? [] : selected.split(','))}
                            options={formattedFields}
+                           ignoreAccents={false}
                            value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')}
                            allowCreate />
               <HelpBlock>
