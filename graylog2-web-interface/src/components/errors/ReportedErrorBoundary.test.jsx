@@ -62,9 +62,10 @@ describe('ReportedErrorBoundary', () => {
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
     const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const response = { status: 403, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
-      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
+      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
     });
 
     await wait(() => expect(queryByText('Hello World!')).toBeNull());
@@ -78,11 +79,12 @@ describe('ReportedErrorBoundary', () => {
     };
 
     const { getByText } = render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
+    const response = { status: 403, body: { message: 'The request error message' } };
 
     expect(getByText('Hello World!')).not.toBeNull();
 
     suppressConsole(() => {
-      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
+      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
     });
 
     await wait(() => expect(getByText('Missing Permissions')).not.toBeNull());
