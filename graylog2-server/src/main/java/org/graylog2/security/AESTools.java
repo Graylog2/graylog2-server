@@ -25,6 +25,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -100,8 +101,8 @@ public class AESTools {
         return Hex.encodeToString(saltBytes);
     }
 
-    private static int desiredKeyLength(String input) {
-        final int length = input.length();
+    private static int desiredKeyLength(byte[] input) {
+        final int length = input.length;
 
         if (length == 16 || length == 24 || length == 32) {
             return length;
