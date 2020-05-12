@@ -336,6 +336,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                 </span>
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -369,6 +370,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}
@@ -1286,6 +1288,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                 <br />
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -1319,6 +1322,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}
@@ -2373,6 +2377,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                 </span>
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -2406,6 +2411,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}
@@ -2803,6 +2809,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                 <br />
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -2836,6 +2843,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}

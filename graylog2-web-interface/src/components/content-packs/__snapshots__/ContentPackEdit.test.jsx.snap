@@ -1786,6 +1786,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                         >
                           <SearchForm
                             buttonLeftMargin={5}
+                            focusAfterMount={false}
                             id="filter-input"
                             label={null}
                             loadingLabel="Loading..."
@@ -1820,6 +1821,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 >
                                   <input
                                     autoComplete="off"
+                                    autoFocus={false}
                                     className="query form-control"
                                     id="common-search-form-query-input"
                                     onChange={[Function]}
@@ -4183,6 +4185,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                         >
                           <SearchForm
                             buttonLeftMargin={5}
+                            focusAfterMount={false}
                             id="filter-input"
                             label={null}
                             loadingLabel="Loading..."
@@ -4217,6 +4220,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 >
                                   <input
                                     autoComplete="off"
+                                    autoFocus={false}
                                     className="query form-control"
                                     id="common-search-form-query-input"
                                     onChange={[Function]}

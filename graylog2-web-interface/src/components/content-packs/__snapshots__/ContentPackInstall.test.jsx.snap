@@ -572,6 +572,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                 <br />
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -605,6 +606,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}

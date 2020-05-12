@@ -28,6 +28,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
       onQueryChange={[Function]}
@@ -61,6 +62,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
           >
             <input
               autoComplete="off"
+              autoFocus={false}
               className="query form-control"
               id="common-search-form-query-input"
               onChange={[Function]}
@@ -522,6 +524,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
     </span>
     <SearchForm
       buttonLeftMargin={5}
+      focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
       onQueryChange={[Function]}
@@ -555,6 +558,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
           >
             <input
               autoComplete="off"
+              autoFocus={false}
               className="query form-control"
               id="common-search-form-query-input"
               onChange={[Function]}
@@ -828,6 +832,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
       onQueryChange={[Function]}
@@ -861,6 +866,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
           >
             <input
               autoComplete="off"
+              autoFocus={false}
               className="query form-control"
               id="common-search-form-query-input"
               onChange={[Function]}
@@ -1508,6 +1514,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
     </span>
     <SearchForm
       buttonLeftMargin={5}
+      focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
       onQueryChange={[Function]}
@@ -1541,6 +1548,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
           >
             <input
               autoComplete="off"
+              autoFocus={false}
               className="query form-control"
               id="common-search-form-query-input"
               onChange={[Function]}
