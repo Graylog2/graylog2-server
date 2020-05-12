@@ -99,15 +99,9 @@ public abstract class MessagesExportEvent {
         map.put("streams", streams());
         map.put("fields", fieldsInOrder());
 
-        if (limit().isPresent()) {
-            map.put("limit", limit());
-        }
-        if (searchId().isPresent()) {
-            map.put("search_id", searchId().get());
-        }
-        if (searchTypeId().isPresent()) {
-            map.put("search_type_id", searchId().get());
-        }
+        limit().ifPresent(limit -> map.put("limit", limit));
+        searchId().ifPresent(searchId -> map.put("search_id", searchId));
+        searchTypeId().ifPresent(searchTypeId -> map.put("search_type_id", searchTypeId));
 
         return map;
     }
