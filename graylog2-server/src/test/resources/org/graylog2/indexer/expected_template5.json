@@ -1,0 +1,72 @@
+{
+  "template" : "sampleIndexTemplate",
+  "order" : -1,
+  "settings" : {
+    "analysis" : {
+      "analyzer" : {
+        "analyzer_keyword" : {
+          "tokenizer" : "keyword",
+          "filter" : "lowercase"
+        }
+      }
+    }
+  },
+  "mappings" : {
+    "message" : {
+      "properties" : {
+        "message" : {
+          "type" : "text",
+          "analyzer" : "standard",
+          "fielddata" : false
+        },
+        "full_message" : {
+          "type" : "text",
+          "analyzer" : "standard",
+          "fielddata" : false
+        },
+        "timestamp" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd HH:mm:ss.SSS"
+        },
+        "gl2_accounted_message_size" : {
+          "type" : "long"
+        },
+        "gl2_receive_timestamp" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd HH:mm:ss.SSS"
+        },
+        "gl2_processing_timestamp" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd HH:mm:ss.SSS"
+        },
+        "source" : {
+          "type" : "text",
+          "analyzer" : "analyzer_keyword",
+          "fielddata" : true
+        },
+        "streams" : {
+          "type" : "keyword"
+        }
+      },
+      "dynamic_templates" : [ {
+        "internal_fields" : {
+          "match" : "gl2_*",
+          "match_mapping_type" : "string",
+          "mapping" : {
+            "type" : "keyword"
+          }
+        }
+      }, {
+        "store_generic" : {
+          "match" : "*",
+          "mapping" : {
+            "index" : "not_analyzed"
+          }
+        }
+      } ],
+      "_source" : {
+        "enabled" : true
+      }
+    }
+  }
+}
