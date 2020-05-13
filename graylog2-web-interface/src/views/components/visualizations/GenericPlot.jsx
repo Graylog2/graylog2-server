@@ -19,7 +19,7 @@ import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 type LegendConfig = {
   name: string,
   target: HTMLElement,
-  color?: string,
+  color?: ?string,
 };
 
 type ChartMarker = {
@@ -113,7 +113,6 @@ class GenericPlot extends React.Component<Props, State> {
     const { getChartColor } = this.props;
     if (getChartColor) {
       const color = getChartColor(e.fullData, name);
-      /* $FlowFixMe color is already declared as optional */
       this.setState({ legendConfig: { name, target, color } });
     }
     return false;

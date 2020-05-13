@@ -91,7 +91,7 @@ export const chartData = (
   data: Rows,
   chartType: string,
   generator: Generator = _defaultChartGenerator,
-  customSeriesFormatter?: ({valuesBySeries: Object, xLabels: Array<any>}) => ExtractedSeries = formatSeries,
+  customSeriesFormatter?: ({ valuesBySeries: Object, xLabels: Array<any> }) => ExtractedSeries = formatSeries,
   leafValueMatcher?: Value => boolean,
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;

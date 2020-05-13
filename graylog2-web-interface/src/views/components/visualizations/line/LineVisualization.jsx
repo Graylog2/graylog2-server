@@ -1,6 +1,7 @@
 // @flow strict
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
+import chroma from 'chroma-js';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -22,10 +23,17 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
+const noColors = 40;
+const scale = chroma.scale(['#fafa6e','#2A4858']).colors(40);
+const randomButStaticColorFor = (name) => {
+  const sum = name.split('').map((c) => c.charCodeAt(0)).reduce((prev, cur) => prev + cur, 0);
+  return scale[sum % noColors];
+};
+
+const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] ?? randomButStaticColorFor(chart.name) } });
 
 const LineVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
-// $FlowFixMe: We need to assume it is a LineVisualizationConfig instance
+  // $FlowFixMe: We need to assume it is a LineVisualizationConfig instance
   const visualizationConfig: LineVisualizationConfig = config.visualizationConfig || LineVisualizationConfig.empty();
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
