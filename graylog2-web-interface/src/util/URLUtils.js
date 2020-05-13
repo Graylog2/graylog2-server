@@ -3,6 +3,8 @@ import URI from 'urijs';
 import AppConfig from 'util/AppConfig';
 import UAParser from 'ua-parser-js';
 
+const ACCEPTED_PROTOCOLS = ['http:', 'https:'];
+
 const URLUtils = {
   parser: new UAParser(),
   qualifyUrl(url) {
@@ -64,6 +66,10 @@ const URLUtils = {
     return isValid;
   },
 
+  hasAcceptedProtocol(string, acceptedProtocols = ACCEPTED_PROTOCOLS) {
+    const url = new URL(string);
+    return acceptedProtocols.includes(url.protocol);
+  },
 };
 export default URLUtils;
 
@@ -77,4 +83,5 @@ export const {
   concatURLPath,
   areCredentialsInURLSupported,
   isValidURL,
+  hasAcceptedProtocol,
 } = URLUtils;

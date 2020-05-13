@@ -1,5 +1,8 @@
 import chroma from 'chroma-js';
 
+function lighten(color, ratio) { return chroma.mix(color, '#fff', ratio).hex(); }
+function darken(color, ratio) { return chroma.mix(color, '#000', ratio).hex(); }
+
 const brand = {
   primary: '#ff3633',
   secondary: '#fff',
@@ -30,14 +33,24 @@ const variant = {
   primary: '#702785',
   success: '#00ae42',
   warning: '#ffd200',
+  lightest: {},
+  lighter: {},
+  light: {},
+  dark: {},
+  darker: {},
+  darkest: {},
 };
 
-const variantLight = {};
-const variantDark = {};
-
 Object.keys(variant).forEach((name) => {
-  variantLight[name] = chroma(variant[name]).brighten(1).hex();
-  variantDark[name] = chroma(variant[name]).darken(1.5).hex();
+  if (typeof variant[name] === 'string') {
+    variant.light[name] = lighten(variant[name], 0.15);
+    variant.lighter[name] = lighten(variant[name], 0.5);
+    variant.lightest[name] = lighten(variant[name], 0.85);
+
+    variant.dark[name] = darken(variant[name], 0.15);
+    variant.darker[name] = darken(variant[name], 0.5);
+    variant.darkest[name] = darken(variant[name], 0.85);
+  }
 });
 
 /* eslint-disable prefer-destructuring */
@@ -50,11 +63,7 @@ const teinte = {
   brand,
   global,
   gray,
-  variant: {
-    ...variant,
-    light: { ...variantLight },
-    dark: { ...variantDark },
-  },
+  variant,
 };
 
 export default teinte;

@@ -93,6 +93,7 @@ const NumberRefExpression = ({
           </Col>
           <Col md={6}>
             <Select className="aggregation-function-field"
+                    ignoreAccents={false}
                     matchProp="label"
                     placeholder="Select Field (Optional)"
                     onChange={handleAggregationFieldChange}

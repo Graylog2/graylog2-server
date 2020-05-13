@@ -33,8 +33,8 @@ class FilterPreview extends React.Component {
     });
   };
 
-  renderSearchResult = (searchResult) => {
-    if (searchResult.messages.length === 0) {
+  renderSearchResult = (searchResult = {}) => {
+    if (!searchResult.messages || searchResult.messages.length === 0) {
       return <p>Could not find any messages with the current search criteria.</p>;
     }
 
