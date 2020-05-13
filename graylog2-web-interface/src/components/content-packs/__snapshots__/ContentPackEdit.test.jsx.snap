@@ -2170,9 +2170,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     </dt>
                                      
                                     <dd>
-                                      <a
-                                        href=""
-                                      />
                                        
                                     </dd>
                                     <span>
@@ -4821,7 +4818,8 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           <div
                                             dangerouslySetInnerHTML={
                                               Object {
-                                                "__html": "<h2>No one dares</h2>",
+                                                "__html": "<h2 id=\\"no-one-dares\\">No one dares</h2>
+",
                                               }
                                             }
                                           />
