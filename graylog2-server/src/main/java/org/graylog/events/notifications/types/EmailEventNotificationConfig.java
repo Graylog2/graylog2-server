@@ -58,6 +58,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             "Timestamp Processing: ${event.timestamp}\n" +
             "Timerange Start:      ${event.timerange_start}\n" +
             "Timerange End:        ${event.timerange_end}\n" +
+            "Source Streams:       ${event.source_streams}\n" +
             "Fields:\n" +
             "${foreach event.fields field}  ${field.key}: ${field.value}\n" +
             "${end}\n" +
