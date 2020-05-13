@@ -77,13 +77,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         return ImmutableList.of(templateInternal, templateAll);
     }
 
-    protected Map<String, Object> dynamicStrings() {
-        return ImmutableMap.of(
-                    // Match all
-                    "match", "*",
-                    // Analyze nothing by default
-                    "mapping", ImmutableMap.of("index", "not_analyzed"));
-    }
+    abstract Map<String, Object> dynamicStrings();
 
     private Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.<String, Map<String, Object>>builder()
@@ -101,10 +95,10 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .build();
     }
 
-    protected Map<String, Object> notAnalyzedString() {
+    Map<String, Object> notAnalyzedString() {
         return ImmutableMap.of("type", "keyword");
     }
-    protected Map<String, Object> analyzedString(String analyzer, boolean fieldData) {
+    Map<String, Object> analyzedString(String analyzer, boolean fieldData) {
         return ImmutableMap.of(
                 "type", "text",
                 "analyzer", analyzer,
