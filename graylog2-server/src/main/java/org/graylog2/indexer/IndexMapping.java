@@ -53,14 +53,14 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         );
     }
 
-    protected Map<String, Object> messageMapping(final String analyzer) {
+    private Map<String, Object> messageMapping(final String analyzer) {
         return ImmutableMap.of(
                 "properties", fieldProperties(analyzer),
                 "dynamic_templates", dynamicTemplate(),
                 "_source", enabled());
     }
 
-    protected Map<String, Map<String, Object>> internalFieldsMapping() {
+    private Map<String, Map<String, Object>> internalFieldsMapping() {
         return ImmutableMap.of("internal_fields",
                 ImmutableMap.of(
                         "match", "gl2_*",
@@ -69,7 +69,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         );
     }
 
-    protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
+    private List<Map<String, Map<String, Object>>> dynamicTemplate() {
         final Map<String, Map<String, Object>> templateInternal = internalFieldsMapping();
 
         final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", dynamicStrings());
@@ -85,7 +85,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                     "mapping", ImmutableMap.of("index", "not_analyzed"));
     }
 
-    protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
+    private Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.<String, Map<String, Object>>builder()
                 .put("message", analyzedString(analyzer, false))
                 .put("full_message", analyzedString(analyzer, false))
@@ -111,17 +111,17 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "fielddata", fieldData);
     }
 
-    protected Map<String, Object> typeTimeWithMillis() {
+    private Map<String, Object> typeTimeWithMillis() {
         return ImmutableMap.of(
                 "type", "date",
                 "format", Tools.ES_DATE_FORMAT);
     }
 
-    protected Map<String, Object> typeLong() {
+    private Map<String, Object> typeLong() {
         return ImmutableMap.of("type", "long");
     }
 
-    protected Map<String, Boolean> enabled() {
+    private Map<String, Boolean> enabled() {
         return ImmutableMap.of("enabled", true);
     }
 }

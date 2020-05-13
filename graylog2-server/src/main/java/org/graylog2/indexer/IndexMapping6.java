@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
-public class IndexMapping6 extends IndexMapping {
+class IndexMapping6 extends IndexMapping {
     @Override
     protected Map<String, Object> dynamicStrings() {
         return ImmutableMap.of(
