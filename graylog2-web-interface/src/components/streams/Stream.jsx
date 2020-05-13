@@ -8,7 +8,7 @@ import { Button, Tooltip } from 'components/graylog';
 import { OverlayElement, Icon } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
@@ -146,7 +146,7 @@ class Stream extends React.Component {
     let editRulesLink;
     let manageOutputsLink;
     let manageAlertsLink;
-    if (PermissionsMixin.isPermitted(permissions, [`streams:edit:${stream.id}`])) {
+    if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
           <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
@@ -161,7 +161,7 @@ class Stream extends React.Component {
         </LinkContainer>
       );
 
-      if (PermissionsMixin.isPermitted(permissions, ['stream_outputs:read'])) {
+      if (isPermitted(permissions, ['stream_outputs:read'])) {
         manageOutputsLink = (
           <LinkContainer to={Routes.stream_outputs(stream.id)}>
             <Button bsStyle="info">Manage Outputs</Button>
@@ -171,7 +171,7 @@ class Stream extends React.Component {
     }
 
     let toggleStreamLink;
-    if (PermissionsMixin.isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
+    if (isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
       if (stream.disabled) {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
@@ -213,7 +213,7 @@ class Stream extends React.Component {
     );
 
     const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.is_default);
-    const indexSetDetails = PermissionsMixin.isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
+    const indexSetDetails = isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
 
     return (
       <StreamListItem>

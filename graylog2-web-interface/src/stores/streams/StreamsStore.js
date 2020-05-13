@@ -44,7 +44,7 @@ type PaginatedResponse = {
     query: string,
   },
   streams: Array<any>,
-}
+};
 
 const StreamsStore = Reflux.createStore({
   callbacks: [],

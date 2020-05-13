@@ -19,15 +19,20 @@ class StreamComponent extends React.Component {
     indexSets: PropTypes.array.isRequired,
   };
 
-  state = {
-    pagination: {
-      page: 1,
-      perPage: 10,
-      count: 0,
-      total: 0,
-      query: '',
-    },
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      pagination: {
+        page: 1,
+        perPage: 10,
+        count: 0,
+        total: 0,
+        query: '',
+      },
+    };
+  }
+
 
   componentDidMount() {
     this.loadData();
