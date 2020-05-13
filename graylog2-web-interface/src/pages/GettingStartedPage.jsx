@@ -4,6 +4,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, Spinner } from 'components/common';
+import { Row } from 'components/graylog';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
 
 import Routes from 'routing/Routes';
@@ -38,14 +39,14 @@ const GettingStartedPage = createReactClass({
 
     return (
       <DocumentTitle title="Getting started">
-        <div>
+        <Row>
           <GettingStarted clusterId={this.state.system.cluster_id}
                           masterOs={this.state.system.operating_system}
                           masterVersion={this.state.system.version}
                           gettingStartedUrl={GETTING_STARTED_URL}
                           noDismissButton={Boolean(this.props.location.query.menu)}
                           onDismiss={this._onDismiss} />
-        </div>
+        </Row>
       </DocumentTitle>
     );
   },
