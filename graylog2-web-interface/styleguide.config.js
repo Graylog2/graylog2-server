@@ -5,7 +5,6 @@ const webpackConfig = require('./webpack.config.js');
 module.exports = {
   require: [
     'bootstrap/less/bootstrap.less',
-    'stylesheets/bootstrap-submenus.less',
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
     'injection/builtins.js',

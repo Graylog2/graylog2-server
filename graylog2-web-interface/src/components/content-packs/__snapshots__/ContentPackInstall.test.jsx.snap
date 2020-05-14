@@ -207,7 +207,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                     "componentStyle": ComponentStyle {
                                       "componentId": "FormControl-sc-1amoaox-0",
                                       "isStatic": false,
-                                      "lastClassName": "fcGLmv",
+                                      "lastClassName": "fdBWEX",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -234,7 +234,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 fcGLmv"
+                                  className="FormControl-sc-1amoaox-0 fdBWEX"
                                   componentClass="input"
                                   inputRef={[Function]}
                                   label="Comment"
@@ -246,7 +246,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   value=""
                                 >
                                   <input
-                                    className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                    className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                     id="comment"
                                     label="Comment"
                                     maxLength={512}
@@ -435,7 +435,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                     "componentStyle": ComponentStyle {
                                       "componentId": "FormControl-sc-1amoaox-0",
                                       "isStatic": false,
-                                      "lastClassName": "fcGLmv",
+                                      "lastClassName": "fdBWEX",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -463,7 +463,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 fcGLmv"
+                                  className="FormControl-sc-1amoaox-0 fdBWEX"
                                   componentClass="input"
                                   inputRef={[Function]}
                                   label="A parameter"
@@ -476,7 +476,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   value="parameter"
                                 >
                                   <input
-                                    className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                    className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                     id="PARAM"
                                     label="A parameter"
                                     maxLength={250}

@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { color } from 'theme';
-import ColorSwatch from './Colors';
+import ColorSwatch, {Swatch} from './Colors';
 
 const Modes = styled.div`
   margin: 0 0 60px;
@@ -24,13 +24,19 @@ const Section = styled.h4`
 const Swatches = styled.div`
   display: flex;
   margin: 0 0 15px;
+  flex-wrap: wrap;
 `;
 
 const StyledColorSwatch = styled(ColorSwatch)`
-  margin-right: 6px;
+  flex-basis: ${(props) => props.section === 'global' ? '100px' : '1px'};
+  max-width: ${(props) => props.section === 'global' ? '200px' : 'auto'};
 
-  &:last-of-type {
-    margin: 0;
+  ${Swatch} {
+    margin-right: 6px;
+
+    &:last-of-type {
+      margin: 0;
+    }
   }
 `;
 
@@ -48,8 +54,9 @@ const SectionWrap = (mode, section) => {
 
             return (
               <StyledColorSwatch name={name}
-                                    color={mode[name]}
-                                    copyText={`theme.color.${copyTextName}`} />
+                                 section={section}
+                                 color={mode[name]}
+                                 copyText={`theme.color.${copyTextName}`} />
             )
           }
         })}
@@ -64,8 +71,9 @@ const SectionWrap = (mode, section) => {
               <Swatches>
                 {getValues(mode[name], (subname) => (
                   <StyledColorSwatch name={subname}
-                                      color={mode[name][subname]}
-                                      copyText={`theme.color.${section}.${name}.${subname}`} />
+                                     section={section}
+                                     color={mode[name][subname]}
+                                     copyText={`theme.color.${section}.${name}.${subname}`} />
                 ))}
               </Swatches>
             </>

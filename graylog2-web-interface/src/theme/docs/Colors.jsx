@@ -29,7 +29,7 @@ const Wrapped = styled.div`
   position: relative;
 `;
 
-const Swatch = styled.button(({ color }) => `
+export const Swatch = styled.button(({ color }) => `
   height: 60px;
   background-color: ${color};
   border: 1px solid #222;
@@ -74,7 +74,7 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
   }, []);
 
   return (
-    <Wrapped>
+    <Wrapped className={className}>
       <StyledTooltip placement="top"
                      opened={opened}
                      positionTop={-32}
@@ -83,7 +83,6 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
       </StyledTooltip>
 
       <Swatch color={color}
-              className={className}
               data-clipboard-button
               data-clipboard-text={copyText}
               ref={swatchRef}>
