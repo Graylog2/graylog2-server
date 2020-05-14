@@ -1,9 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import chroma from 'chroma-js';
 import ViewColorContext from './ViewColorContext';
 
-const pickColor = () => '#333';
+const pickColor = (assignedColors: { [string]: string }) => chroma.random().toString();
 
 type Props = {
   children: React.Node,
@@ -18,11 +19,11 @@ const GlobalColorProvider = ({ children }: Props) => {
     if (assignedColors[name]) {
       return assignedColors[name];
     }
-    const color = pickColor();
+    const color = pickColor(assignedColors);
 
     setColor(name, color);
     return color;
-  }
+  };
   return (
     <ViewColorContext.Provider value={{ getColor }}>
       {children}
