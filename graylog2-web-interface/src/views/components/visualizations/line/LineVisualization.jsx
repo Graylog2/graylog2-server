@@ -13,8 +13,9 @@ import { makeVisualization } from 'views/components/aggregationbuilder/Aggregati
 import type { ChartDefinition } from '../ChartData';
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
+import ViewColorContext from '../../contexts/ViewColorContext';
 
-const getChartColor = (fullData, name) => {
+const getCurrentChartColor = (fullData, name) => {
   const data = fullData.find((d) => (d.name === name));
   if (data && data.line && data.line.color) {
     const { line: { color } } = data;
@@ -30,11 +31,11 @@ const randomButStaticColorFor = (name) => {
   return scale[sum % noColors];
 };
 
-const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] ?? randomButStaticColorFor(chart.name) } });
+const getPinnedChartColor = (chart, getColor) => ({ line: { color: getColor(chart.name) } });
 
 const LineVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   // $FlowFixMe: We need to assume it is a LineVisualizationConfig instance
-  const visualizationConfig: LineVisualizationConfig = config.visualizationConfig || LineVisualizationConfig.empty();
+  const visualizationConfig: LineVisualizationConfig = config.visualizationConfig ?? LineVisualizationConfig.empty();
   const { interpolation = 'linear' } = visualizationConfig;
   const chartGenerator = useCallback((type, name, labels, values): ChartDefinition => ({
     type,
@@ -56,9 +57,9 @@ const LineVisualization: VisualizationComponent = makeVisualization(({ config, d
     <XYPlot config={config}
             plotLayout={layout}
             effectiveTimerange={effectiveTimerange}
-            getChartColor={getChartColor}
+            getCurrentChartColor={getCurrentChartColor}
             height={height}
-            setChartColor={setChartColor}
+            getPinnedChartColor={getPinnedChartColor}
             chartData={chartDataResult} />
   );
 }, 'line');

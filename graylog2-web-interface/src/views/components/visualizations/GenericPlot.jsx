@@ -15,6 +15,7 @@ import ChartColorContext from './ChartColorContext';
 import styles from '!style/useable!css!./GenericPlot.css';
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import type { RetrieveColorFunction } from './ChartColorContext';
 
 type LegendConfig = {
   name: string,
@@ -45,10 +46,10 @@ export type ChartColor = {
 
 type Props = {
   chartData: Array<*>,
-  getChartColor?: (Array<ChartConfig>, string) => ?string,
+  getCurrentChartColor?: (Array<ChartConfig>, string) => ?string,
   layout: {},
   onZoom: (string, string) => boolean,
-  setChartColor?: (ChartConfig, ColorMap) => ChartColor,
+  getPinnedChartColor?: (ChartConfig, RetrieveColorFunction) => ChartColor,
   theme: ThemeInterface,
 };
 
@@ -72,15 +73,15 @@ class GenericPlot extends React.Component<Props, State> {
     chartData: PropTypes.array.isRequired,
     layout: PropTypes.object,
     onZoom: PropTypes.func,
-    getChartColor: PropTypes.func,
-    setChartColor: PropTypes.func,
+    getCurrentChartColor: PropTypes.func,
+    getPinnedChartColor: PropTypes.func,
   };
 
   static defaultProps = {
     layout: {},
     onZoom: () => true,
-    getChartColor: undefined,
-    setChartColor: undefined,
+    getCurrentChartColor: undefined,
+    getPinnedChartColor: undefined,
   };
 
   constructor(props: Props) {
@@ -110,9 +111,9 @@ class GenericPlot extends React.Component<Props, State> {
   _onLegendClick = (e: any) => {
     const name = e.node.textContent;
     const target = e.node.querySelector('g.layers');
-    const { getChartColor } = this.props;
-    if (getChartColor) {
-      const color = getChartColor(e.fullData, name);
+    const { getCurrentChartColor } = this.props;
+    if (getCurrentChartColor) {
+      const color = getCurrentChartColor(e.fullData, name);
       this.setState({ legendConfig: { name, target, color } });
     }
     return false;
@@ -125,7 +126,7 @@ class GenericPlot extends React.Component<Props, State> {
   _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
 
   render() {
-    const { chartData, layout, setChartColor, theme } = this.props;
+    const { chartData, layout, getPinnedChartColor, theme } = this.props;
     const defaultLayout = {
       autosize: true,
       showlegend: true,
@@ -165,10 +166,10 @@ class GenericPlot extends React.Component<Props, State> {
 
     return (
       <ChartColorContext.Consumer>
-        {({ colors, setColor }) => {
+        {({ getColor, setColor }) => {
           const newChartData = chartData.map((chart) => {
-            if (setChartColor && colors) {
-              const conf = setChartColor(chart, colors);
+            if (getPinnedChartColor) {
+              const conf = getPinnedChartColor(chart, getColor);
               if (conf.line || conf.marker) {
                 return merge(chart, conf);
               }

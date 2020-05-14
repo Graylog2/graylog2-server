@@ -18,12 +18,12 @@ jest.mock('views/stores/ChartColorRulesStore', () => ({
 jest.mock('stores/connect', () => (x) => x);
 
 type ContainerProps = {
-  colors: ChartColorMap,
+  getColor: ChartColorMap,
   setColor: ChangeColorFunction,
 };
 
 // eslint-disable-next-line no-unused-vars
-const Container = ({ colors, setColor }: ContainerProps) => <div>Hello!</div>;
+const Container = ({ getColor, setColor }: ContainerProps) => <div>Hello!</div>;
 
 describe('WidgetColorContext', () => {
   const colorRules: Array<ColorRule> = [
@@ -36,8 +36,8 @@ describe('WidgetColorContext', () => {
   const wrapper = mount((
     <WidgetColorContext colorRules={colorRules} id="deadbeef">
       <ChartColorContext.Consumer>
-        {({ colors, setColor }) => (
-          <Container colors={colors} setColor={setColor} />
+        {({ getColor, setColor }) => (
+          <Container getColor={getColor} setColor={setColor} />
         )}
       </ChartColorContext.Consumer>
     </WidgetColorContext>
@@ -45,9 +45,9 @@ describe('WidgetColorContext', () => {
   const container = wrapper.find('Container');
 
   it('extracts coloring rules for current widget', () => {
-    const { colors } = container.props();
-    expect(colors).toEqual({ localhost: '#171EFE', 'sum(bytes)': '#affe42' });
-    expect();
+    const { getColor } = container.props();
+    expect(getColor('localhost')).toEqual('#171EFE');
+    expect(getColor('sum(bytes)')).toEqual('#affe42');
   });
   it('supplies setter for color of current widget', () => {
     const { setColor } = container.props();

@@ -1,11 +1,13 @@
 // @flow strict
 import * as React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
 import connect from 'stores/connect';
 import { ChartColorRulesStore, ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
 import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import ChartColorContext from '../visualizations/ChartColorContext';
+import ViewColorContext from '../contexts/ViewColorContext';
 
 type Props = {
   children: React.Node,
@@ -14,13 +16,14 @@ type Props = {
 };
 
 const WidgetColorContext = ({ children, colorRules, id }: Props) => {
+  const viewColorContext = useContext(ViewColorContext);
   const colorRulesForWidget = colorRules.filter(({ widgetId }) => (widgetId === id))
     .reduce((prev, { name, color }) => ({ ...prev, [name]: color }), {});
+  const getColor = (trace) => colorRulesForWidget[trace] ?? viewColorContext.getColor(trace);
   const setColor = (name, color) => ChartColorRulesActions.set(id, name, color);
-  const contextValue = { colors: colorRulesForWidget, setColor };
 
   return (
-    <ChartColorContext.Provider value={contextValue}>
+    <ChartColorContext.Provider value={{ getColor, setColor }}>
       {children}
     </ChartColorContext.Provider>
   );

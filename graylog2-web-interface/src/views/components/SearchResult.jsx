@@ -18,6 +18,7 @@ import TSearchResult from 'views/logic/SearchResult';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/graylog';
 import type { FieldTypesStoreState } from '../stores/FieldTypesStore';
+import GlobalColorProvider from './contexts/GlobalColorProvider';
 
 const SearchLoadingIndicator = connect(
   ({ searchLoadingState }) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
@@ -50,12 +51,14 @@ const SearchResult = React.memo(({ fieldTypes, queryId, searches, viewState }: P
   const positions = viewState.state && viewState.state.widgetPositions;
 
   const content = currentResults ? (
-    <QueryWithWidgets allFields={allFields}
-                      fields={queryFields}
-                      queryId={queryId}
-                      results={currentResults}
-                      positions={positions}
-                      widgetMapping={widgetMapping} />
+    <GlobalColorProvider>
+      <QueryWithWidgets allFields={allFields}
+                        fields={queryFields}
+                        queryId={queryId}
+                        results={currentResults}
+                        positions={positions}
+                        widgetMapping={widgetMapping} />
+    </GlobalColorProvider>
   ) : <Spinner />;
 
   return (

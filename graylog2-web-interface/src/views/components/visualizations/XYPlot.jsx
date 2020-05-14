@@ -29,9 +29,9 @@ type Props = {
     from: string,
     to: string,
   },
-  getChartColor?: (Array<ChartConfig>, string) => ?string,
+  getCurrentChartColor?: (Array<ChartConfig>, string) => ?string,
   height?: number;
-  setChartColor?: (ChartConfig, ColorMap) => ChartColor,
+  getPinnedChartColor?: (ChartConfig, ColorMap) => ChartColor,
   plotLayout?: any,
   onZoom: (Query, string, string, ?ViewType) => boolean,
 };
@@ -52,8 +52,8 @@ const XYPlot = ({
   currentQuery,
   timezone,
   effectiveTimerange,
-  getChartColor,
-  setChartColor,
+  getCurrentChartColor,
+  getPinnedChartColor,
   height,
   plotLayout = {},
   onZoom = OnZoom,
@@ -88,8 +88,8 @@ const XYPlot = ({
     <GenericPlot chartData={chartData}
                  layout={layout}
                  onZoom={_onZoom}
-                 getChartColor={getChartColor}
-                 setChartColor={setChartColor} />
+                 getCurrentChartColor={getCurrentChartColor}
+                 getPinnedChartColor={getPinnedChartColor} />
   );
 };
 
@@ -103,16 +103,16 @@ XYPlot.propTypes = {
     to: PropTypes.string.isRequired,
   }),
   plotLayout: PropTypes.object,
-  getChartColor: PropTypes.func,
-  setChartColor: PropTypes.func,
+  getCurrentChartColor: PropTypes.func,
+  getPinnedChartColor: PropTypes.func,
   onZoom: PropTypes.func,
 };
 
 XYPlot.defaultProps = {
   plotLayout: {},
-  getChartColor: undefined,
+  getCurrentChartColor: undefined,
   height: undefined,
-  setChartColor: undefined,
+  getPinnedChartColor: undefined,
   effectiveTimerange: undefined,
   onZoom: OnZoom,
 };

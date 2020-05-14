@@ -79,15 +79,15 @@ describe('GenericPlot', () => {
   });
   it('extracts series color from context', () => {
     const lens = {
-      colors: {
+      getColor: (name) => ({
         'count()': '#783a8e',
-      },
+      }[name]),
       setColor: jest.fn(),
     };
-    const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
+    const getPinnedChartColor = (chart, getColor) => ({ marker: { color: getColor(chart.name) } });
     const wrapper = mount((
       <ChartColorContext.Provider value={lens}>
-        <GenericPlot chartData={[{ x: 23, name: 'count()' }, { x: 42, name: 'sum(bytes)' }]} setChartColor={setChartColor} />
+        <GenericPlot chartData={[{ x: 23, name: 'count()' }, { x: 42, name: 'sum(bytes)' }]} getPinnedChartColor={getPinnedChartColor} />
       </ChartColorContext.Provider>
     ));
 
@@ -97,7 +97,7 @@ describe('GenericPlot', () => {
     expect(newChartData.find((chart) => chart.name === 'sum(bytes)').marker.color).toBeUndefined();
   });
   describe('has color picker', () => {
-    const getChartColor = (fullData, name) => {
+    const getCurrentChartColor = (fullData, name) => {
       const data = fullData.find((d) => (d.name === name));
       if (data && data.marker && data.marker.color) {
         // $FlowFixMe the check above ensures the presents of marker
@@ -134,7 +134,7 @@ describe('GenericPlot', () => {
       let genericPlot = null;
       const wrapper = mount(<GenericPlot ref={(elem) => { genericPlot = elem; }}
                                          chartData={[{ x: 23 }, { x: 42 }]}
-                                         getChartColor={getChartColor} />);
+                                         getCurrentChartColor={getCurrentChartColor} />);
 
       expect(wrapper.find('color-picker')).not.toExist();
 
@@ -148,7 +148,7 @@ describe('GenericPlot', () => {
     });
     it('calling onChange when new color is selected', () => {
       const lens = {
-        colors: {},
+        getColor: () => undefined,
         setColor: jest.fn(() => Promise.resolve([])),
       };
       let genericPlot = null;
@@ -156,7 +156,7 @@ describe('GenericPlot', () => {
         <ChartColorContext.Provider value={lens}>
           <GenericPlot ref={(elem) => { genericPlot = elem; }}
                        chartData={[{ x: 23 }, { x: 42 }]}
-                       getChartColor={getChartColor} />);
+                       getCurrentChartColor={getCurrentChartColor} />);
         </ChartColorContext.Provider>
       ));
 

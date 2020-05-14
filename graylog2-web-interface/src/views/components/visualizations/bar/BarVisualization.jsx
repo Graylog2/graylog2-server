@@ -9,6 +9,7 @@ import { makeVisualization } from 'views/components/aggregationbuilder/Aggregati
 
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
+import BarVisualizationConfig from '../../../logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
 type ChartDefinition = {
   type: string,
@@ -19,7 +20,7 @@ type ChartDefinition = {
   opacity: number,
 };
 
-const getChartColor = (fullData, name) => {
+const getCurrentChartColor = (fullData, name) => {
   const data = fullData.find((d) => (d.name === name)).marker;
   if (data && data.marker && data.marker.color) {
     const { marker: color } = data;
@@ -28,18 +29,19 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
+const getPinnedChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
 
 const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const { visualizationConfig } = config;
   const layout = {};
 
   /* $FlowFixMe: type inheritance does not work here */
-  if (visualizationConfig && visualizationConfig.barmode) {
-    layout.barmode = visualizationConfig.barmode;
+  const barVisualizationConfig: BarVisualizationConfig = visualizationConfig;
+
+  if (barVisualizationConfig?.barmode) {
+    layout.barmode = barVisualizationConfig.barmode;
   }
-  /* $FlowFixMe: type inheritance does not work here */
-  const opacity = visualizationConfig ? visualizationConfig.opacity : 1.0;
+  const opacity = barVisualizationConfig?.opacity ?? 1.0;
 
   const _seriesGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values, opacity });
 
@@ -55,9 +57,9 @@ const BarVisualization: VisualizationComponent = makeVisualization(({ config, da
     <XYPlot config={config}
             chartData={chartDataResult}
             effectiveTimerange={effectiveTimerange}
-            getChartColor={getChartColor}
+            getCurrentChartColor={getCurrentChartColor}
             height={height}
-            setChartColor={setChartColor}
+            getPinnedChartColor={getPinnedChartColor}
             plotLayout={layout} />
   );
 }, 'bar');

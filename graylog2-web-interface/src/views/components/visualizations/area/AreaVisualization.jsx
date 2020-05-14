@@ -12,7 +12,7 @@ import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
 import { chartData } from '../ChartData';
 
-const getChartColor = (fullData, name) => {
+const getCurrentChartColor = (fullData, name) => {
   const data = fullData.find((d) => (d.name === name));
   if (data && data.line && data.line.color) {
     const { line: { color } } = data;
@@ -21,7 +21,7 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
+const getPinnedChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
 
 const AreaVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   // $FlowFixMe: We need to assume it is a LineVisualizationConfig instance
@@ -48,9 +48,9 @@ const AreaVisualization: VisualizationComponent = makeVisualization(({ config, d
     <XYPlot config={config}
             plotLayout={layout}
             effectiveTimerange={effectiveTimerange}
-            getChartColor={getChartColor}
+            getCurrentChartColor={getCurrentChartColor}
             height={height}
-            setChartColor={setChartColor}
+            getPinnedChartColor={getPinnedChartColor}
             chartData={chartDataResult} />
   );
 }, 'area');

@@ -43,7 +43,7 @@ const _generateSeries = (type, name, x, y, z, idx, total) => ({
   },
 });
 
-const getChartColor = (fullDataArray, name) => {
+const getCurrentChartColor = (fullDataArray, name) => {
   const fullData = fullDataArray.find((d) => d.labels.indexOf(name) >= 0);
   if (fullData && fullData.labels && fullData.marker && fullData.marker.colors) {
     const indexOfName = fullData.labels.indexOf(name);
@@ -56,15 +56,15 @@ const getChartColor = (fullDataArray, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colorMap) => {
+const getPinnedChartColor = (chart, colorMap) => {
   const colors = chart.labels.map((label) => colorMap[label]);
   return { marker: { colors } };
 };
 
 const PieVisualization: VisualizationComponent = makeVisualization(({ config, data }: VisualizationComponentProps) => (
   <GenericPlot chartData={chartData(config, data.chart || Object.values(data)[0], 'pie', _generateSeries)}
-               getChartColor={getChartColor}
-               setChartColor={setChartColor} />
+               getCurrentChartColor={getCurrentChartColor}
+               getPinnedChartColor={getPinnedChartColor} />
 ), 'pie');
 
 PieVisualization.propTypes = {
