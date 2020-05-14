@@ -13,7 +13,7 @@ const NodesStore = StoreProvider.getStore('Nodes');
 type Props = {
   global: boolean,
   node: string,
-  onChange: (string, boolean | string) => void,
+  onChange: ('node' | 'global', boolean | ?string) => void,
 };
 
 const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
