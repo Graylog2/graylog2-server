@@ -31,10 +31,25 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
+/**
+ * WIP. This class illustrates how we could reuse common functionality for integration tests.
+ * It might make sense to configure it with @link io.restassured.specification.RequestSpecification
+ * and whatever else it might need in the future and make it injectable into the test class via
+ *
+ * @link org.graylog.testing.completebackend.GraylogBackendExtension
+ * We should do that later, if we find that implementing more functionality here is useful and feasible.
+ */
 public class SearchDriver {
 
+    /**
+     * @param requestSpec @see io.restassured.specification.RequestSpecification
+     * @return all messages' "message" field as List<String>
+     */
     public static List<String> searchAllMessages(RequestSpecification requestSpec) {
-        String body = allMessagesJson();
+        String queryId = "query-id";
+        String messageListId = "message-list-id";
+
+        String body = allMessagesJson(queryId, messageListId);
 
         return given()
                 .spec(requestSpec)
@@ -44,13 +59,13 @@ public class SearchDriver {
                 .then()
                 .statusCode(200)
                 .extract()
-                .jsonPath().getList(allMessagesJsonPath("query-id", "message-list-id"), String.class);
+                .jsonPath().getList(allMessagesJsonPath(queryId, messageListId), String.class);
     }
 
-    private static String allMessagesJson() {
-        MessageList messageList = MessageList.builder().id("message-list-id").build();
+    private static String allMessagesJson(String queryId, String messageListId) {
+        MessageList messageList = MessageList.builder().id(messageListId).build();
         Query q = Query.builder()
-                .id("query-id")
+                .id(queryId)
                 .query(ElasticsearchQueryString.builder().queryString("").build())
                 .timerange(allMessagesTimeRange())
                 .searchTypes(ImmutableSet.of(messageList))

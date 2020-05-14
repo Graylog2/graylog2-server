@@ -16,15 +16,20 @@
  */
 package org.graylog.elasticsearch.e2e;
 
+import com.google.common.collect.ImmutableMap;
 import io.restassured.specification.RequestSpecification;
+import org.glassfish.jersey.internal.util.Producer;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog2.inputs.gelf.http.GELFHttpInput;
+import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.function.Consumer;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,60 +53,39 @@ public class ElasticsearchE2E {
 
     @Test
     void inputMessageCanBeSearched() {
-        //TODO: dont hardcode port in body
-        // create input
-        String input = "{\"title\":\"KILL ME\",\"type\":\"org.graylog2.inputs.gelf.http.GELFHttpInput\",\"configuration\":{\"bind_address\":\"0.0.0.0\",\"port\":12201,\"recv_buffer_size\":1048576,\"number_worker_threads\":8,\"tls_cert_file\":\"\",\"tls_key_file\":\"\",\"tls_enable\":false,\"tls_key_password\":\"\",\"tls_client_auth\":\"disabled\",\"tls_client_auth_cert_file\":\"\",\"tcp_keepalive\":false,\"enable_cors\":true,\"max_chunk_size\":65536,\"idle_writer_timeout\":60,\"override_source\":null,\"decompress_size_limit\":8388608},\"global\":true}";
-
-        given()
-                .spec(requestSpec)
-                .body(input)
-                .expect().response().statusCode(201)
-                .when()
-                .post("/system/inputs");
-
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
 
-        waitForGelfInputListening(mappedPort);
+        createGelfHttpInput(mappedPort);
 
-        //post message
-        String message = "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}";
+        postMessage(mappedPort, "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}");
 
-        gelfEndpoint(mappedPort)
-                .body(message)
-                .expect().response().statusCode(202)
-                .when()
-                .post();
-
-        //search message
-
-        wait(5000);
-
-        List<String> messages = searchAllMessages(requestSpec);
+        List<String> messages = searchForAllMessages();
 
         assertThat(messages).containsExactly("Hello there");
     }
 
-    private void waitForGelfInputListening(int port) {
-        int timeOutMs = 5000;
-        int msPassed = 0;
-        int waitMs = 500;
-        while (msPassed <= timeOutMs) {
-            if (gelfInputIsListening(port)) {
-                LOG.info("GELF input listening on port {} after {} ms", port, msPassed);
-                return;
-            }
-            msPassed += waitMs;
-            wait(waitMs);
-        }
-        fail(String.format(Locale.ENGLISH, "Timed out waiting for GELF input listening on port %s after %s ms.", port, msPassed));
+    private void createGelfHttpInput(int mappedPort) {
+        InputCreateRequest request = InputCreateRequest.create(
+                "KILL ME",
+                GELFHttpInput.class.getName(),
+                true,
+                ImmutableMap.of("bind_address", "0.0.0.0", "port", GELF_HTTP_PORT),
+                null);
+
+        given()
+                .spec(requestSpec)
+                .body(request)
+                .expect().response().statusCode(201)
+                .when()
+                .post("/system/inputs");
+
+        waitForGelfInputOnPort(mappedPort);
     }
 
-    private void wait(int waitMs) {
-        try {
-            Thread.sleep(waitMs);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    private void waitForGelfInputOnPort(int mappedPort) {
+        waitFor(
+                () -> gelfInputIsListening(mappedPort),
+                "Timed out waiting for GELF input listening on port " + mappedPort);
     }
 
     private boolean gelfInputIsListening(int mappedPort) {
@@ -110,9 +94,57 @@ public class ElasticsearchE2E {
                     .expect().response().statusCode(200)
                     .when()
                     .options();
+            LOG.info("GELF input listening on port {}", mappedPort);
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    private void postMessage(int mappedPort, @SuppressWarnings("SameParameterValue") String messageJson) {
+        gelfEndpoint(mappedPort)
+                .body(messageJson)
+                .expect().response().statusCode(202)
+                .when()
+                .post();
+    }
+
+    private List<String> searchForAllMessages() {
+        List<String> messages = new ArrayList<>();
+
+        waitFor(() -> captureMessages(messages::addAll), "Timed out waiting for messages to be present");
+
+        return messages;
+    }
+
+    private boolean captureMessages(Consumer<List<String>> messagesCaptor) {
+        List<String> messages = searchAllMessages(requestSpec);
+        if (!messages.isEmpty()) {
+            messagesCaptor.accept(messages);
+            return true;
+        }
+        return false;
+    }
+
+    private void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
+        int timeOutMs = 5000;
+        int msPassed = 0;
+        int waitMs = 500;
+        while (msPassed <= timeOutMs) {
+            if (predicate.call()) {
+                return;
+            }
+            msPassed += waitMs;
+            wait(waitMs);
+        }
+        fail(timeoutErrorMessage);
+    }
+
+    private void wait(int waitMs) {
+        try {
+            Thread.sleep(waitMs);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
