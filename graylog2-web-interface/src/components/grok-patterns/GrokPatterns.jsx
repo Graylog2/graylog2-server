@@ -1,9 +1,8 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import styled from 'styled-components';
 
 import { PaginatedList, SearchForm } from 'components/common';
-import { Row, Col, Button } from 'components/graylog';
+import { Button, Col, Row } from 'components/graylog';
 import PageHeader from 'components/common/PageHeader';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
@@ -23,11 +22,10 @@ const GrokPatternsList = styled(DataTable)`
   }
 `;
 
-const GrokPatterns = createReactClass({
-  displayName: 'GrokPatterns',
-
-  getInitialState() {
-    return {
+class GrokPatterns extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       patterns: [],
       pagination: {
         page: 1,
@@ -37,20 +35,21 @@ const GrokPatterns = createReactClass({
         query: '',
       },
     };
-  },
+  }
 
   componentDidMount() {
     this.loadData();
-  },
+  }
 
   componentWillUnmount() {
     if (this.loadPromise) {
       this.loadPromise.cancel();
     }
-  },
+  }
 
-  loadData(callback) {
-    const { page, perPage, query } = this.state.pagination;
+  loadData = (callback) => {
+    const { pagination: pagination1 } = this.state;
+    const { page, perPage, query } = pagination1;
     this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
       .then(({ patterns, pagination }) => {
         if (callback) {
@@ -65,52 +64,54 @@ const GrokPatterns = createReactClass({
           });
         }
       });
-  },
+  };
 
-  validPatternName(name) {
+  validPatternName = (name) => {
     // Check if patterns already contain a pattern with the given name.
-    return !this.state.patterns.some((pattern) => pattern.name === name);
-  },
+    const { patterns } = this.state;
+    return !patterns.some((pattern) => pattern.name === name);
+  };
 
-  savePattern(pattern, callback) {
+  savePattern = (pattern, callback) => {
     GrokPatternsStore.savePattern(pattern, () => {
       callback();
       this.loadData();
     });
-  },
+  };
 
-  testPattern(pattern, callback, errCallback) {
+  testPattern = (pattern, callback, errCallback) => {
     GrokPatternsStore.testPattern(pattern, callback, errCallback);
-  },
+  };
 
-  _onPageChange(newPage, newPerPage) {
-    const pagination = this.state.pagination;
+  _onPageChange = (newPage, newPerPage) => {
+    const { pagination } = this.state;
     const newPagination = Object.assign(pagination, {
       page: newPage,
       perPage: newPerPage,
     });
-    this.setState({ pagination, newPagination }, this.loadData);
-  },
+    this.setState({ pagination: newPagination }, this.loadData);
+  };
 
-  _onSearch(query, resetLoadingCallback) {
-    const pagination = this.state.pagination;
+  _onSearch = (query, resetLoadingCallback) => {
+    const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: query });
-    this.setState({ pagination, newPagination }, () => this.loadData(resetLoadingCallback));
-  },
+    this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
+  };
 
-  _onReset() {
-    const pagination = this.state.pagination;
+  _onReset = () => {
+    const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: '' });
-    this.setState({ pagination, newPagination }, this.loadData);
-  },
+    this.setState({ pagination: newPagination }, this.loadData);
+  };
 
-  confirmedRemove(pattern) {
+  confirmedRemove = (pattern) => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`)) {
       GrokPatternsStore.deletePattern(pattern, this.loadData);
     }
-  },
+  };
 
-  _headerCellFormatter(header) {
+  _headerCellFormatter = (header) => {
     let formattedHeaderCell;
 
     switch (header.toLocaleLowerCase()) {
@@ -125,11 +126,11 @@ const GrokPatterns = createReactClass({
     }
 
     return formattedHeaderCell;
-  },
+  };
 
-  _patternFormatter(pattern) {
-    const patterns = this.state.patterns.filter((p) => p.name !== pattern.name);
-
+  _patternFormatter = (pattern) => {
+    const { patterns: patterns1 } = this.state;
+    const patterns = patterns1.filter((p) => p.name !== pattern.name);
     return (
       <tr key={pattern.id}>
         <td>{pattern.name}</td>
@@ -155,11 +156,11 @@ const GrokPatterns = createReactClass({
         </td>
       </tr>
     );
-  },
+  };
 
   render() {
     const headers = ['Name', 'Pattern', 'Actions'];
-
+    const { pagination, patterns } = this.state;
     return (
       <div>
         <PageHeader title="Grok patterns">
@@ -174,7 +175,7 @@ const GrokPatterns = createReactClass({
               <EditPatternModal id=""
                                 name=""
                                 pattern=""
-                                patterns={this.state.patterns}
+                                patterns={patterns}
                                 create
                                 testPattern={this.testPattern}
                                 reload={this.loadData}
@@ -195,7 +196,7 @@ const GrokPatterns = createReactClass({
               <Row>
                 <Col md={12}>
                   <PaginatedList onChange={this._onPageChange}
-                                 totalItems={this.state.pagination.total}>
+                                 totalItems={pagination.total}>
                     <br />
                     <br />
                     <GrokPatternsList id="grok-pattern-list"
@@ -203,10 +204,8 @@ const GrokPatterns = createReactClass({
                                       headers={headers}
                                       headerCellFormatter={this._headerCellFormatter}
                                       sortByKey="name"
-                                      rows={this.state.patterns}
-                                      dataRowFormatter={this._patternFormatter}
-                                      filterLabel="Filter patterns"
-                                      filterKeys={filterKeys} />
+                                      rows={patterns}
+                                      dataRowFormatter={this._patternFormatter} />
                   </PaginatedList>
                 </Col>
               </Row>
@@ -215,7 +214,7 @@ const GrokPatterns = createReactClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default GrokPatterns;

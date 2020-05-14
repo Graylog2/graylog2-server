@@ -2,6 +2,7 @@
 import Reflux from 'reflux';
 
 import fetch, { fetchPlainText } from 'logic/rest/FetchProvider';
+import PaginationHelper from 'util/PaginationHelper';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -45,6 +46,29 @@ const GrokPatternsStore = Reflux.createStore({
         },
         failCallback,
       );
+  },
+
+  searchPaginated(page, perPage, query) {
+    const url = PaginationHelper.urlGenerator(ApiRoutes.GrokPatternsController.indexPage().url, page, perPage, query);
+    const promise = fetch('GET', URLUtils.qualifyUrl(url))
+      .then((response: any) => {
+        const pagination = {
+          count: response.pagination.count,
+          total: response.pagination.total,
+          page: response.pagination.page,
+          perPage: response.pagination.per_page,
+          query: response.pagination.query,
+        };
+        return {
+          patterns: response.patterns,
+          pagination: pagination,
+        };
+      })
+      .catch((errorThrown) => {
+        UserNotification.error(`Loading patterns failed with status: ${errorThrown}`,
+          'Could not load streams');
+      });
+    return promise;
   },
 
   testPattern(pattern: GrokPatternTest, callback: (request: any) => void, errCallback: (errorMessage: string) => void) {
