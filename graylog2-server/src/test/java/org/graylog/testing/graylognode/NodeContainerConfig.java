@@ -23,17 +23,19 @@ public class NodeContainerConfig {
     public final Network network;
     public final String mongoDbUri;
     public final String elasticsearchUri;
+    public final int[] extraPorts;
     public final boolean enableDebugging;
     public final boolean skipPackaging;
 
-    public static NodeContainerConfig create(Network network, String mongoDbUri, String elasticsearchUri) {
-        return new NodeContainerConfig(network, mongoDbUri, elasticsearchUri);
+    public static NodeContainerConfig create(Network network, String mongoDbUri, String elasticsearchUri, int[] extraPorts) {
+        return new NodeContainerConfig(network, mongoDbUri, elasticsearchUri, extraPorts);
     }
 
-    public NodeContainerConfig(Network network, String mongoDbUri, String elasticsearchUri) {
+    public NodeContainerConfig(Network network, String mongoDbUri, String elasticsearchUri, int[] extraPorts) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.elasticsearchUri = elasticsearchUri;
+        this.extraPorts = extraPorts == null ? new int[0] : extraPorts;
         this.enableDebugging = flagFromEnvVar("GRAYLOG_IT_DEBUG_SERVER");
         this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
     }

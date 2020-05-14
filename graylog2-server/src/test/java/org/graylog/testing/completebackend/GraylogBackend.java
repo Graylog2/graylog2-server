@@ -38,9 +38,9 @@ public class GraylogBackend {
 
     private static GraylogBackend instance;
 
-    public static GraylogBackend createStarted() {
+    public static GraylogBackend createStarted(int[] extraPorts) {
         if (instance == null) {
-            instance = createStartedBackend();
+            instance = createStartedBackend(extraPorts);
         } else {
             instance.fullReset();
             LOG.info("Reusing running backend");
@@ -52,7 +52,7 @@ public class GraylogBackend {
     // Starting ES instance in parallel thread to save time.
     // MongoDB and the node have to be started in sequence however, because the the node might crash,
     // if a MongoDb instance isn't already present while it's starting up.
-    private static GraylogBackend createStartedBackend() {
+    private static GraylogBackend createStartedBackend(int[] extraPorts) {
         Network network = Network.newNetwork();
 
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("build-es-container-for-api-it").build());
@@ -61,7 +61,7 @@ public class GraylogBackend {
 
         MongoDBInstance mongoDB = MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
 
-        NodeInstance node = NodeInstance.createStarted(network, MongoDBInstance.internalUri(), ElasticsearchInstance.internalUri());
+        NodeInstance node = NodeInstance.createStarted(network, MongoDBInstance.internalUri(), ElasticsearchInstance.internalUri(), extraPorts);
 
         try {
             return new GraylogBackend(esFuture.get(), mongoDB, node);
@@ -93,15 +93,19 @@ public class GraylogBackend {
         es.importFixtureResource(resourcePath, testClass);
     }
 
-    public String getUri() {
-        return node.getUri();
+    public String uri() {
+        return node.uri();
     }
 
-    public int getApiPort() {
-        return node.getApiPort();
+    public int apiPort() {
+        return node.apiPort();
     }
 
     public void printServerLog() {
         node.printLog();
+    }
+
+    public int mappedPortFor(int originalPort) {
+        return node.mappedPortFor(originalPort);
     }
 }
