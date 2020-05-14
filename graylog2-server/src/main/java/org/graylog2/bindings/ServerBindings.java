@@ -66,6 +66,7 @@ import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.realm.AuthenticatingRealmModule;
+import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
@@ -112,6 +113,7 @@ public class ServerBindings extends Graylog2Module {
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
         install(new AuthenticatingRealmModule(configuration));
+        install(new AuthorizationOnlyRealmModule());
         bindSearchResponseDecorators();
         install(new GrokModule());
         install(new LookupModule());
