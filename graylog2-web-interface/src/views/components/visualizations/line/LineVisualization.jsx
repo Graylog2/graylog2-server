@@ -1,7 +1,6 @@
 // @flow strict
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import chroma from 'chroma-js';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -13,7 +12,6 @@ import { makeVisualization } from 'views/components/aggregationbuilder/Aggregati
 import type { ChartDefinition } from '../ChartData';
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
-import ViewColorContext from '../../contexts/ViewColorContext';
 
 const getCurrentChartColor = (fullData, name) => {
   const data = fullData.find((d) => (d.name === name));
@@ -22,13 +20,6 @@ const getCurrentChartColor = (fullData, name) => {
     return color;
   }
   return undefined;
-};
-
-const noColors = 40;
-const scale = chroma.scale(['#fafa6e','#2A4858']).colors(40);
-const randomButStaticColorFor = (name) => {
-  const sum = name.split('').map((c) => c.charCodeAt(0)).reduce((prev, cur) => prev + cur, 0);
-  return scale[sum % noColors];
 };
 
 const getPinnedChartColor = (chart, getColor) => ({ line: { color: getColor(chart.name) } });

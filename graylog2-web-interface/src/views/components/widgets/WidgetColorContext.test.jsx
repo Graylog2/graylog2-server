@@ -5,7 +5,7 @@ import { mount } from 'wrappedEnzyme';
 import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import { ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
 import ChartColorContext from '../visualizations/ChartColorContext';
-import type { ChangeColorFunction, ChartColorMap } from '../visualizations/ChartColorContext';
+import type { ChangeColorFunction, RetrieveColorFunction } from '../visualizations/ChartColorContext';
 
 import WidgetColorContext from './WidgetColorContext';
 
@@ -18,7 +18,7 @@ jest.mock('views/stores/ChartColorRulesStore', () => ({
 jest.mock('stores/connect', () => (x) => x);
 
 type ContainerProps = {
-  getColor: ChartColorMap,
+  getColor: RetrieveColorFunction,
   setColor: ChangeColorFunction,
 };
 

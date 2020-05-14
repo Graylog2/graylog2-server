@@ -148,7 +148,7 @@ describe('GenericPlot', () => {
     });
     it('calling onChange when new color is selected', () => {
       const lens = {
-        getColor: () => undefined,
+        getColor: () => '#333',
         setColor: jest.fn(() => Promise.resolve([])),
       };
       let genericPlot = null;

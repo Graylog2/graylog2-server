@@ -15,8 +15,9 @@ import type { ViewType } from 'views/logic/views/View';
 import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
 import CustomPropTypes from '../CustomPropTypes';
-import type { ChartColor, ChartConfig, ColorMap } from './GenericPlot';
+import type { ChartColor, ChartConfig } from './GenericPlot';
 import ViewTypeContext from '../contexts/ViewTypeContext';
+import type { RetrieveColorFunction } from './ChartColorContext';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
@@ -31,7 +32,7 @@ type Props = {
   },
   getCurrentChartColor?: (Array<ChartConfig>, string) => ?string,
   height?: number;
-  getPinnedChartColor?: (ChartConfig, ColorMap) => ChartColor,
+  getPinnedChartColor?: (ChartConfig, RetrieveColorFunction) => ChartColor,
   plotLayout?: any,
   onZoom: (Query, string, string, ?ViewType) => boolean,
 };
