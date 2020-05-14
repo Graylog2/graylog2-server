@@ -56,8 +56,8 @@ const getCurrentChartColor = (fullDataArray, name) => {
   return undefined;
 };
 
-const getPinnedChartColor = (chart, colorMap) => {
-  const colors = chart.labels.map((label) => colorMap[label]);
+const getPinnedChartColor = (chart, getColor) => {
+  const colors = chart.labels.map((label) => getColor(label));
   return { marker: { colors } };
 };
 

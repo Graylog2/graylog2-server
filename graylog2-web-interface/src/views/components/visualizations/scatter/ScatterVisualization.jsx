@@ -12,6 +12,17 @@ import XYPlot from '../XYPlot';
 
 const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels, y: values, mode: 'markers' });
 
+const getCurrentChartColor = (fullData, name) => {
+  const data = fullData.find((d) => (d.name === name));
+  if (data && data.line && data.line.color) {
+    const { line: { color } } = data;
+    return color;
+  }
+  return undefined;
+};
+
+const getPinnedChartColor = (chart, getColor) => ({ line: { color: getColor(chart.name) } });
+
 const ScatterVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', seriesGenerator);
   const layout = {};
@@ -25,7 +36,9 @@ const ScatterVisualization: VisualizationComponent = makeVisualization(({ config
             chartData={chartDataResult}
             plotLayout={layout}
             height={height}
-            effectiveTimerange={effectiveTimerange} />
+            effectiveTimerange={effectiveTimerange}
+            getCurrentChartColor={getCurrentChartColor}
+            getPinnedChartColor={getPinnedChartColor} />
   );
 }, 'scatter');
 

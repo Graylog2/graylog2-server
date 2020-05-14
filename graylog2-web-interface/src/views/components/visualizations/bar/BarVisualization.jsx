@@ -29,7 +29,7 @@ const getCurrentChartColor = (fullData, name) => {
   return undefined;
 };
 
-const getPinnedChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
+const getPinnedChartColor = (chart, getColor) => ({ marker: { color: getColor(chart.name) } });
 
 const BarVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const { visualizationConfig } = config;
