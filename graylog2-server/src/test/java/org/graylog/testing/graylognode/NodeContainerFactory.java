@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.graylognode;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +28,10 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.Arrays;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
+import static org.graylog.testing.graylognode.NodeContainerConfig.DEBUG_PORT;
 import static org.graylog.testing.graylognode.ResourceUtil.resourceToTmpFile;
 
 public class NodeContainerFactory {
@@ -41,8 +41,6 @@ public class NodeContainerFactory {
     private static final int EXECUTABLE_MODE = 0100755;
     // sha2 for password "admin"
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-    static final int API_PORT = 9000;
-    private static final int DEBUG_PORT = 5005;
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
         if (!config.skipPackaging) {
@@ -90,26 +88,15 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
                 .withEnv("GRAYLOG_VERSIONCHECKS", "false")
                 .waitingFor(Wait.forLogMessage(".*Graylog server up and running.*", 1))
-                .withExposedPorts(API_PORT)
+                .withExposedPorts(config.portsToExpose())
                 .withStartupTimeout(Duration.of(120, SECONDS));
 
-        for (int port : config.extraPorts) {
-            container.addExposedPort(port);
-        }
+        container.start();
 
         if (config.enableDebugging) {
-            container.addExposedPort(DEBUG_PORT);
-            container.start();
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
-        } else {
-            container.start();
         }
         return container;
-    }
-
-    private static Integer[] allExposedPorts(int[] extraPorts) {
-        int[] allPorts = ArrayUtils.add(extraPorts, 0, API_PORT);
-        return Arrays.stream(allPorts).boxed().toArray(Integer[]::new);
     }
 
     private static Path pathTo(String propertyName) {

@@ -25,7 +25,7 @@ import org.testcontainers.containers.Network;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static org.graylog.testing.graylognode.NodeContainerFactory.API_PORT;
+import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
 
 public class NodeInstance {
 

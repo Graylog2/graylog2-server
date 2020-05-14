@@ -16,9 +16,15 @@
  */
 package org.graylog.testing.graylognode;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.testcontainers.containers.Network;
 
+import java.util.Arrays;
+
 public class NodeContainerConfig {
+
+    static final int API_PORT = 9000;
+    static final int DEBUG_PORT = 5005;
 
     public final Network network;
     public final String mongoDbUri;
@@ -43,5 +49,15 @@ public class NodeContainerConfig {
     private static boolean flagFromEnvVar(String flagName) {
         String flag = System.getenv(flagName);
         return flag != null && flag.equalsIgnoreCase("true");
+    }
+
+    public Integer[] portsToExpose() {
+        int[] allPorts = ArrayUtils.add(extraPorts, 0, API_PORT);
+
+        if (enableDebugging) {
+            allPorts = ArrayUtils.add(allPorts, 0, DEBUG_PORT);
+        }
+
+        return Arrays.stream(allPorts).boxed().toArray(Integer[]::new);
     }
 }
