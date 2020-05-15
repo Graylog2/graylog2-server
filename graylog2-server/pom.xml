@@ -63,7 +63,7 @@
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
 
-        <it.es.version>5.6.12</it.es.version>
+        <it.es.version>7.7.0</it.es.version>
     </properties>
 
     <dependencies>

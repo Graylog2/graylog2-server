@@ -56,7 +56,7 @@ public class ElasticsearchInstance extends ExternalResource {
 
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
     private static final String DEFAULT_IMAGE = "elasticsearch";
-    private static final String DEFAULT_VERSION = "6.8.4";
+    private static final String DEFAULT_VERSION = "7.7.0";
 
     private static final int ES_PORT = 9200;
     private static final String NETWORK_ALIAS = "elasticsearch";
@@ -120,7 +120,7 @@ public class ElasticsearchInstance extends ExternalResource {
                 .withReuse(true)
                 .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
                 .withEnv("discovery.type", "single-node")
-                .withEnv("action.auto_create_index", "false")
+                .withEnv("action.auto_create_index", ".watches,.triggered_watches,.watcher-history-*")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));

@@ -404,7 +404,7 @@ public class Indices {
         settings.putAll(customSettings);
 
         final CreateIndex request = new CreateIndex.Builder(indexName)
-                .settings(settings)
+                //.settings(settings)
                 .build();
 
         // Make sure our index template exists before creating an index!

@@ -24,6 +24,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Tools;
 
 import java.util.Map;
+import java.util.function.Function;
 
 public class EventsIndexMapping implements IndexMappingTemplate {
     private final Version elasticsearchVersion;
@@ -36,6 +37,7 @@ public class EventsIndexMapping implements IndexMappingTemplate {
     public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
         final String indexPatternsField;
         final Object indexPatternsValue;
+        Function<Map<String, Object>, Map<String, Object>> createMappings = (mappings) -> map().put(IndexMapping.TYPE_MESSAGE, mappings).build();
 
         if (elasticsearchVersion.satisfies("^5.0.0")) {
             indexPatternsField = "template";
@@ -43,6 +45,10 @@ public class EventsIndexMapping implements IndexMappingTemplate {
         } else if (elasticsearchVersion.satisfies("^6.0.0")) {
             indexPatternsField = "index_patterns";
             indexPatternsValue = ImmutableSet.of(indexPattern);
+        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
+            indexPatternsField = "index_patterns";
+            indexPatternsValue = ImmutableSet.of(indexPattern);
+            createMappings = (mappings) -> mappings;
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }
@@ -55,8 +61,8 @@ public class EventsIndexMapping implements IndexMappingTemplate {
                 .put("settings", map()
                         .put("index.refresh_interval", indexRefreshInterval)
                         .build())
-                .put("mappings", map()
-                        .put(IndexMapping.TYPE_MESSAGE, map() // TODO: Type name is "message" because the index field type poller is using that
+                .put("mappings", createMappings.apply(
+                        map() // TODO: Type name is "message" because the index field type poller is using that
                                 .put("_source", map()
                                         .put("enabled", true)
                                         .build())
@@ -214,8 +220,7 @@ public class EventsIndexMapping implements IndexMappingTemplate {
                                                 .put("type", "keyword")
                                                 .build())
                                         .build())
-                                .build())
-                        .build())
+                                .build()))
                 .build();
     }
 

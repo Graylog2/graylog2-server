@@ -47,7 +47,6 @@ import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
@@ -236,7 +235,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .orElse(affectedIndices);
 
                     return new Search.Builder(searchTypeQueries.get(searchTypeId).toString())
-                            .addType(IndexMapping.TYPE_MESSAGE)
+                            //.addType("_doc")
                             .addIndex(affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType)
                             .allowNoIndices(false)
                             .ignoreUnavailable(false)

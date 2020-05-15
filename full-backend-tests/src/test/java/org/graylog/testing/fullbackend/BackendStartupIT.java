@@ -91,7 +91,8 @@ class BackendStartupIT {
                         .then()
                         .statusCode(200)
                         .extract()
-                        .jsonPath().getList(allMessagesJsonPath("query-id", "message-list-id"), String.class);
+                        .jsonPath()
+                        .getList(allMessagesJsonPath("query-id", "message-list-id"), String.class);
 
         assertThat(allMessages).containsExactly("hello from es fixture");
     }

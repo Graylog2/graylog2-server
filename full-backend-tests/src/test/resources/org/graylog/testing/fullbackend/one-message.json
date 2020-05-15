@@ -5,7 +5,6 @@
         {
           "index": {
             "indexName": "graylog_0",
-            "indexType": "message",
             "indexId": "0"
           }
         },
