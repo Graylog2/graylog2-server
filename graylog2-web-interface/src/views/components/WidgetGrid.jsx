@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
 import styled, { css } from 'styled-components';
+import { SizeMe } from 'react-sizeme';
 
 import connect from 'stores/connect';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -154,11 +155,20 @@ class WidgetGrid extends React.Component {
         {widgets}
       </ReactGridContainer>
     ) : <span />;
+
+    // The SizeMe component is required to update the widget grid
+    // when its content height results in a scrollbar
     return (
-      <DashboardWrap>
-        {grid}
-        {staticWidgets}
-      </DashboardWrap>
+      <SizeMe monitorWidth refreshRate={100}>
+        {({ size }) => {
+          return (
+            <DashboardWrap>
+              {React.cloneElement(grid, { width: size.width })}
+              {staticWidgets}
+            </DashboardWrap>
+          );
+        }}
+      </SizeMe>
     );
   }
 }
