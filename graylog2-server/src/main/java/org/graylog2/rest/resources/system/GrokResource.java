@@ -107,7 +107,7 @@ public class GrokResource extends RestResource {
 
     @GET
     @Timed
-    @Path("/page")
+    @Path("/paginated")
     @ApiOperation("Get existing grok patterns paged")
     @Produces(MediaType.APPLICATION_JSON)
     public GrokPatternPageList getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,

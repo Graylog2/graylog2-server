@@ -49,7 +49,7 @@ const GrokPatternsStore = Reflux.createStore({
   },
 
   searchPaginated(page, perPage, query) {
-    const url = PaginationHelper.urlGenerator(ApiRoutes.GrokPatternsController.indexPage().url, page, perPage, query);
+    const url = PaginationHelper.urlGenerator(ApiRoutes.GrokPatternsController.paginated().url, page, perPage, query);
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then((response: any) => {
         const pagination = {
