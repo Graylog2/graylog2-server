@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>3.3.0-beta.4-SNAPSHOT</version>
+        <version>3.3.0-rc.1</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
