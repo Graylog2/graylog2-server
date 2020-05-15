@@ -37,7 +37,7 @@ const defaultColor = '#d3d3d3';
 
 const formatTimestamp = (timestamp, tz = 'UTC'): string => {
   // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
-  return moment(timestamp).tz(tz || 'UTC').toISOString(true);
+  return moment(timestamp).tz(tz ?? 'UTC').toISOString(true);
 };
 
 export default {
