@@ -69,7 +69,7 @@ public class PemReaderTest {
 
     @Test
     public void readPrivateKeyHandlesSecuredPrivateKey() throws Exception {
-        final URL url = Resources.getResource("org/graylog2/shared/security/tls/secure.key");
+        final URL url = Resources.getResource("org/graylog2/shared/security/tls/key-enc-pbe1.p8");
         final byte[] privateKey = PemReader.readPrivateKey(Paths.get(url.toURI()));
         assertThat(privateKey).isNotEmpty();
     }
