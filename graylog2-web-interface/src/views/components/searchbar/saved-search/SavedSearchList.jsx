@@ -40,7 +40,7 @@ const NoSavedSearches: StyledComponent<{}, ThemeInterface, *> = styled(Alert)`
   align-items: center;
 `;
 
-const DeleteButton: StyledComponent<{}, ThemeInterface, *> = styled.span`
+const DeleteButton: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span`
   position: absolute;
   top: 10px;
   right: 10px;
