@@ -34,7 +34,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,7 +50,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Before
     public void setUpFixtures() {
-        final Set<SearchType> searchTypes = new HashSet<SearchType>() {{
+        final Set<SearchType> searchTypes = new LinkedHashSet<SearchType>() {{
             add(
                     Pivot.builder()
                             .id("pivot1")
