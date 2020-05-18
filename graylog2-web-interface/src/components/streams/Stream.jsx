@@ -87,7 +87,7 @@ class Stream extends React.Component {
   },
 
   _openStreamRuleForm() {
-    this.setState( { showStreamRuleForm: true });
+    this.setState({ showStreamRuleForm: true });
   },
 
   _onDelete= (stream) => {

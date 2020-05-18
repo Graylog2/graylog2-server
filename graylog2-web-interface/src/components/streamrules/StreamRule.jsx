@@ -5,14 +5,13 @@ import styled from 'styled-components';
 
 import { Icon } from 'components/common';
 import { Button, ListGroupItem } from 'components/graylog';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
 
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
-const { isPermitted } = PermissionsMixin;
 
 const ActionButtonsWrap = styled.span`
   margin-right: 6px;
