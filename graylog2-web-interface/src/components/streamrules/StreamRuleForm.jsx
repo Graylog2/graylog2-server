@@ -1,3 +1,4 @@
+// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -15,7 +16,33 @@ import FormsUtils from 'util/FormsUtils';
 
 const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
 
-class StreamRuleForm extends React.Component {
+type StreamRule = {
+  type: number,
+  field: string,
+  value: string,
+  id?: string,
+  inverted: boolean,
+  description: string,
+};
+
+type Props = {
+  onSubmit: (?string, StreamRule) => void,
+  streamRule: StreamRule,
+  streamRuleTypes: [],
+  title: string,
+  inputs: [],
+  onClose: () => void,
+};
+
+type State = StreamRule;
+
+class StreamRuleForm extends React.Component<Props, State> {
+  static defaultProps = {
+    streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
+    inputs: [],
+    onClose: () => {},
+  };
+
   FIELD_PRESENCE_RULE_TYPE = 5;
 
   ALWAYS_MATCH_RULE_TYPE = 7;
@@ -159,12 +186,6 @@ StreamRuleForm.propTypes = {
   title: PropTypes.string.isRequired,
   inputs: PropTypes.array,
   onClose: PropTypes.func,
-};
-
-StreamRuleForm.defaultProps = {
-  streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
-  inputs: [],
-  onClose: () => {},
 };
 
 export default connect(StreamRuleForm,
