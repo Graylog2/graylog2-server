@@ -78,10 +78,19 @@ class Stream extends React.Component {
 
     this.state = {
       loading: false,
+      showStreamRuleForm: false,
     };
   }
 
-  _onDelete = (stream) => {
+  _closeStreamRuleForm() {
+    this.setState({ showStreamRuleForm: false });
+  },
+
+  _openStreamRuleForm() {
+    this.setState( { showStreamRuleForm: true });
+  },
+
+  _onDelete= (stream) => {
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
@@ -141,7 +150,7 @@ class Stream extends React.Component {
 
   render() {
     const { indexSets, stream, permissions, streamRuleTypes, user } = this.props;
-    const { loading } = this.state;
+    const { loading, showStreamRuleForm } = this.state;
 
     const isDefaultStream = stream.is_default;
     const defaultStreamTooltip = isDefaultStream
@@ -249,10 +258,12 @@ class Stream extends React.Component {
                           permissions={permissions}
                           isDefaultStream={isDefaultStream} />
         </div>
-        <StreamRuleForm ref={(quickAddStreamRuleForm) => { this.quickAddStreamRuleForm = quickAddStreamRuleForm; }}
-                        title="New Stream Rule"
-                        onSubmit={this._onSaveStreamRule}
-                        streamRuleTypes={streamRuleTypes} />
+        { showStreamRuleForm && (
+          <StreamRuleForm onClose={this._closeStreamRuleForm}
+                          title="New Stream Rule"
+                          onSubmit={this._onSaveStreamRule}
+                          streamRuleTypes={streamRuleTypes} />
+        ) }
       </StreamListItem>
     );
   }

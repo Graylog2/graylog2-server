@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 public class StreamRouterEngine {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouterEngine.class);
 
-    private final EnumSet<StreamRuleType> ruleTypesNotNeedingFieldPresence = EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.EXACT, StreamRuleType.REGEX, StreamRuleType.ALWAYS_MATCH, StreamRuleType.CONTAINS);
+    private final EnumSet<StreamRuleType> ruleTypesNotNeedingFieldPresence = EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.EXACT, StreamRuleType.REGEX, StreamRuleType.ALWAYS_MATCH, StreamRuleType.CONTAINS, StreamRuleType.MATCH_INPUT);
     private final List<Stream> streams;
     private final StreamFaultManager streamFaultManager;
     private final StreamMetrics streamMetrics;
@@ -90,6 +90,7 @@ public class StreamRouterEngine {
         final List<Rule> smallerRules = Lists.newArrayList();
         final List<Rule> regexRules = Lists.newArrayList();
         final List<Rule> containsRules = Lists.newArrayList();
+        final List<Rule> matchInputRules = Lists.newArrayList();
 
         for (Stream stream : streams) {
             for (StreamRule streamRule : stream.getStreamRules()) {
@@ -122,11 +123,14 @@ public class StreamRouterEngine {
                     case CONTAINS:
                         containsRules.add(rule);
                         break;
+                    case MATCH_INPUT:
+                        matchInputRules.add(rule);
+                        break;
                 }
             }
         }
 
-        final int size = alwaysMatchRules.size() + presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + containsRules.size() + regexRules.size();
+        final int size = alwaysMatchRules.size() + presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + containsRules.size() + regexRules.size() + matchInputRules.size();
         this.rulesList = Lists.newArrayListWithCapacity(size);
         this.rulesList.addAll(alwaysMatchRules);
         this.rulesList.addAll(presenceRules);
@@ -135,6 +139,7 @@ public class StreamRouterEngine {
         this.rulesList.addAll(smallerRules);
         this.rulesList.addAll(containsRules);
         this.rulesList.addAll(regexRules);
+        this.rulesList.addAll(matchInputRules);
     }
 
     /**

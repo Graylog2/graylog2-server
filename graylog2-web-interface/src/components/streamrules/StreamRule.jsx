@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import styled from 'styled-components';
@@ -19,11 +19,11 @@ const ActionButtonsWrap = styled.span`
 `;
 
 const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleTypes, onSubmit, onDelete }) => {
-  const streamRuleFormRef = useRef();
+  const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
 
   const _onEdit = (event) => {
     event.preventDefault();
-    streamRuleFormRef.current.open();
+    setShowStreamRuleForm(true);
   };
 
   const _onDelete = (event) => {
@@ -78,11 +78,13 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
     <ListGroupItem bsStyle={listGroupStyle}>
       {actionItems}
       <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} />
-      <StreamRuleForm ref={streamRuleFormRef}
-                      streamRule={streamRule}
-                      streamRuleTypes={streamRuleTypes}
-                      title="Edit Stream Rule"
-                      onSubmit={_onSubmit} />
+      { showStreamRuleForm && (
+        <StreamRuleForm streamRule={streamRule}
+                        onClose={() => setShowStreamRuleForm(false)}
+                        streamRuleTypes={streamRuleTypes}
+                        title="Edit Stream Rule"
+                        onSubmit={_onSubmit} />
+      ) }
       {description}
     </ListGroupItem>
   );
