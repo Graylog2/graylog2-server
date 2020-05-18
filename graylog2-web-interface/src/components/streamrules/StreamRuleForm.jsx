@@ -25,10 +25,16 @@ type StreamRule = {
   description: string,
 };
 
+type StreamRuleType = {
+  id: number,
+  short_desc: string,
+  long_desc: string,
+};
+
 type Props = {
   onSubmit: (?string, StreamRule) => void,
   streamRule: StreamRule,
-  streamRuleTypes: [],
+  streamRuleTypes: [StreamRuleType],
   title: string,
   inputs: [],
   onClose: () => void,
