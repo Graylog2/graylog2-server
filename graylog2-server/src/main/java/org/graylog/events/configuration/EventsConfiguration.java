@@ -17,15 +17,14 @@
 package org.graylog.events.configuration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.joda.time.Duration;
 
-import javax.annotation.Nullable;
-
 @JsonAutoDetect
-@JsonDeserialize(builder = AutoValue_EventsConfiguration.Builder.class)
+@JsonDeserialize(builder = EventsConfiguration.Builder.class)
 @AutoValue
 public abstract class EventsConfiguration {
     private static final String FIELD_SEARCH_TIMEOUT = "events_search_timeout";
@@ -51,17 +50,22 @@ public abstract class EventsConfiguration {
     public abstract long eventCatchupWindow();
 
     public static Builder builder() {
-        return new AutoValue_EventsConfiguration.Builder()
-                .eventsSearchTimeout(DEFAULT_SEARCH_TIMEOUT_MS)
-                .eventNotificationsRetry(DEFAULT_NOTIFICATIONS_RETRY_MS)
-                .eventNotificationsBacklog(DEFAULT_NOTIFICATIONS_BACKLOG)
-                .eventCatchupWindow(DEFAULT_CATCH_UP_WINDOW_MS);
+        return Builder.create();
     }
 
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
     public static abstract class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_EventsConfiguration.Builder()
+                    .eventsSearchTimeout(DEFAULT_SEARCH_TIMEOUT_MS)
+                    .eventNotificationsRetry(DEFAULT_NOTIFICATIONS_RETRY_MS)
+                    .eventNotificationsBacklog(DEFAULT_NOTIFICATIONS_BACKLOG)
+                    .eventCatchupWindow(DEFAULT_CATCH_UP_WINDOW_MS);
+        }
+
         @JsonProperty(FIELD_SEARCH_TIMEOUT)
         public abstract Builder eventsSearchTimeout(long searchTimeout);
 
@@ -72,7 +76,7 @@ public abstract class EventsConfiguration {
         public abstract Builder eventNotificationsBacklog(long defaultBacklog);
 
         @JsonProperty(FIELD_CATCHUP_WINDOW)
-        public abstract Builder eventCatchupWindow(@Nullable long catchupWindow);
+        public abstract Builder eventCatchupWindow(long catchupWindow);
 
         public abstract EventsConfiguration build();
     }
