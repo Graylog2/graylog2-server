@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import PaginationHelper from 'util/PaginationHelper';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -231,7 +231,7 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   _url(path) {
-    return URLUtils.qualifyUrl(`/system/lookup/${path}`);
+    return qualifyUrl(`/system/lookup/${path}`);
   },
 });
 
