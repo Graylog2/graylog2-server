@@ -165,23 +165,25 @@ public class SearchesIT extends ElasticsearchBaseTest {
         when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
         metricRegistry = new MetricRegistry();
         searches = new Searches(
-            new Configuration(),
-            indexRangeService,
-            metricRegistry,
-            streamService,
-            indices,
-            indexSetRegistry,
+                new Configuration(),
+                indexRangeService,
+                metricRegistry,
+                streamService,
+                indices,
+                indexSetRegistry,
                 jestClient(),
-            new ScrollResult.Factory() {
-                @Override
-                public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
-                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
-                }
-                @Override
-                public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
-                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
-                }
-            }
+                new ScrollResult.Factory() {
+                    @Override
+                    public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
+                        return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
+                    }
+
+                    @Override
+                    public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
+                        return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
+                    }
+                },
+                mock(SearchesDriver.class)
         );
     }
 

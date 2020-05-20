@@ -17,11 +17,15 @@
 package org.graylog.events.search;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.MultiSearch;
+import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
@@ -42,6 +46,8 @@ import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -51,7 +57,9 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.searches.SearchFailure;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.SearchesDriver;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -72,6 +80,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -104,8 +113,9 @@ public class MoreSearch extends Searches {
                       ScrollResult.Factory scrollResultFactory,
                       JestClient jestClient,
                       Configuration configuration,
-                      ESQueryDecorators esQueryDecorators) {
-        super(configuration, indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, jestClient, scrollResultFactory);
+                      ESQueryDecorators esQueryDecorators,
+                      SearchesDriver searchesDriver) {
+        super(indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, searchesDriver);
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
         this.scrollResultFactory = scrollResultFactory;
@@ -184,6 +194,54 @@ public class MoreSearch extends Searches {
                 .usedIndexNames(affectedIndices)
                 .executedQuery(searchSourceBuilder.toString())
                 .build();
+    }
+
+    protected long tookMsFromSearchResult(JestResult searchResult) {
+        final JsonNode tookMs = searchResult.getJsonObject().path("took");
+        if (tookMs.isNumber()) {
+            return tookMs.asLong();
+        } else {
+            throw new ElasticsearchException("Unexpected response structure: " + searchResult.getJsonString());
+        }
+    }
+
+    private <T extends JestResult> T checkForFailedShards(T result) throws FieldTypeException {
+        // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets
+        // if at least one of the index sets comes back with a result, the overall result will have the aggregation
+        // but not considered failed entirely. however, if one shard has the error, we will refuse to respond
+        // otherwise we would be showing empty graphs for non-numeric fields.
+        final JsonNode shards = result.getJsonObject().path("_shards");
+        final double failedShards = shards.path("failed").asDouble();
+
+        if (failedShards > 0) {
+            final SearchFailure searchFailure = new SearchFailure(shards);
+            final List<String> nonNumericFieldErrors = searchFailure.getNonNumericFieldErrors();
+
+            if (!nonNumericFieldErrors.isEmpty()) {
+                throw new FieldTypeException("Unable to perform search query", nonNumericFieldErrors);
+            }
+
+            throw new ElasticsearchException("Unable to perform search query", searchFailure.getErrors());
+        }
+
+        return result;
+    }
+
+    protected io.searchbox.core.SearchResult wrapInMultiSearch(Search search, Supplier<String> errorMessage) {
+        final MultiSearch multiSearch = new MultiSearch.Builder(search).build();
+        final MultiSearchResult multiSearchResult = JestUtils.execute(jestClient, multiSearch, errorMessage);
+
+        final List<MultiSearchResult.MultiSearchResponse> responses = multiSearchResult.getResponses();
+        if (responses.size() != 1) {
+            throw new ElasticsearchException("Expected exactly 1 search result, but got " + responses.size());
+        }
+
+        final MultiSearchResult.MultiSearchResponse response = responses.get(0);
+        if (response.isError) {
+            throw JestUtils.specificException(errorMessage, response.error);
+        }
+
+        return checkForFailedShards(response.searchResult);
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
