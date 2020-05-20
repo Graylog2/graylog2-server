@@ -23,6 +23,7 @@
         <module>graylog-project-parent</module>
         <module>graylog-plugin-parent</module>
         <module>graylog-plugin-archetype</module>
+        <module>graylog-storage-elasticsearch6</module>
     </modules>
 
     <groupId>org.graylog</groupId>
