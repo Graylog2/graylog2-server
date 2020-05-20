@@ -70,6 +70,10 @@ public class ElasticsearchInstance extends ExternalResource {
         return create(Network.newNetwork());
     }
 
+    public static ElasticsearchInstance forVersion(String version) {
+        return create(version, Network.newNetwork());
+    }
+
     public static ElasticsearchInstance create(Network network) {
         String version = PropertyLoader
                 .loadProperties(PROPERTIES_RESOURCE_NAME)
