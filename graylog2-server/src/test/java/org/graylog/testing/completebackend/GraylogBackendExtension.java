@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.http.ContentType.JSON;
+import static org.graylog.testing.junit5utils.Annotations.annotationFrom;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
 
@@ -48,6 +49,10 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
     public void beforeAll(ExtensionContext context) {
 
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+
+        ApiIntegrationTest annotation = annotationFrom(context, ApiIntegrationTest.class);
+
+        lifecycle = annotation.serverLifecycle();
 
         Stopwatch sw = Stopwatch.createStarted();
 
