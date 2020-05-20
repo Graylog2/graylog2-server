@@ -16,5 +16,17 @@
     <description>Graylog Storage Module for Elasticsearch 6</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-server</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-server</artifactId>
+            <version>${project.parent.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
