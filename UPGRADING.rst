@@ -29,6 +29,16 @@ Please note that the format has changed. You can see the new format for saved se
 
 We are planning to remove the legacy saved searches API and the `/views/savedSearches` redirect in the next major upgrade of Graylog.
 
+CSV Export API
+==============
+
+For 3.3.0 a new endpoint for creating CSV exports has been added under `/views/search/messages`.
+
+We are planning to remove the older export endpoints in the next major upgrade of Graylog:
+- `/search/universal/absolute/export`
+- `/search/universal/keyword/export`
+- `/search/universal/relative/export`
+
 Notes for plugin authors
 ========================
 
