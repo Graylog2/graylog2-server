@@ -23,6 +23,7 @@
         <module>../graylog2-server</module>
         <module>../integration-tests</module>
         <module>../full-backend-tests</module>
+        <module>../graylog-storage-elasticsearch6</module>
     </modules>
 
     <parent>

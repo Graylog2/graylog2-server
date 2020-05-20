@@ -11,6 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>graylog-storage-elasticsearch6</artifactId>
+    <name>Graylog Storage Module for Elasticsearch 6</name>
 
     <dependencies>
     </dependencies>
