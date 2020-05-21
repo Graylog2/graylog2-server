@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 import { MenuItem } from 'components/graylog';
 import { Overlay } from 'react-overlays';
 import StopPropagation from './StopPropagation';

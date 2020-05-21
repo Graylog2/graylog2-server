@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 import connect from 'stores/connect';
 import Field from 'views/components/Field';
 import Value from 'views/components/Value';

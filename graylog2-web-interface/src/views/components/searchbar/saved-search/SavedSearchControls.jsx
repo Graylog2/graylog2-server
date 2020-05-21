@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
 import { browserHistory } from 'react-router';
 
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';

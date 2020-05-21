@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent, css } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 
 import Version from 'util/Version';
 import connect from 'stores/connect';

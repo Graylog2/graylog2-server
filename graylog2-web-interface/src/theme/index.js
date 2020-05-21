@@ -2,10 +2,11 @@
 import colors from './colors';
 import breakpoints from './breakpoints';
 import utils from './utils';
+import { type ThemeInterface } from './types';
 
-const theme = {
-  colors,
+const theme: ThemeInterface = {
   breakpoints,
+  colors,
   utils,
 };
 

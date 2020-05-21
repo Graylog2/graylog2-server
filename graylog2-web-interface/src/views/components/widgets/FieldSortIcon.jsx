@@ -3,7 +3,7 @@ import React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';

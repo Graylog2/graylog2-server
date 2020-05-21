@@ -5,7 +5,7 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 
 const StyledButton: StyledComponent<{}, void, Button> = styled(Button)`
   margin-right: 7px;

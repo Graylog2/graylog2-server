@@ -14,17 +14,14 @@ Object.keys(sizes).forEach((bp) => {
   max[bp] = `${sizes[bp] - 1}px`;
 });
 
-const breakpoints = {
+export type Breakpoints = {
+  min: { [string]: string },
+  max: { [string]: string },
+};
+
+const breakpoints: Breakpoints = {
   min,
   max,
 };
-
-console.log('breakpoints', breakpoints);
-
-// export type Breakpoints = {
-//   min: {
-
-//   }
-// }
 
 export default breakpoints;

@@ -12,7 +12,7 @@ Or, if you are using Flow, you can type the component with
 
 ```jsx static
 import styled, { type StyledComponent } from 'styled-components';
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 
 const StyledElement: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
   background-color: ${theme.colors.global.contentBackground};

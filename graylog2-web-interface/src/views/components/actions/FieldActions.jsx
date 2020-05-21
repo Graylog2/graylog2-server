@@ -7,7 +7,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Field.css';
 import { createHandlerFor } from './ActionHandler';

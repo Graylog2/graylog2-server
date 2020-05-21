@@ -5,7 +5,7 @@ import styled, { css, keyframes, type StyledComponent } from 'styled-components'
 // $FlowFixMe removing in future iteration
 import chroma from 'chroma-js';
 
-import { util, type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 type ProgressBarProps = {
@@ -47,10 +47,10 @@ const animatedStripes = keyframes`
   }
 `;
 
-const progressBarVariants = (color) => css`
+const progressBarVariants = (color) => css(({ theme }) => `
   background-color: ${color};
-  color: ${util.readableColor(color)};
-`;
+  color: ${theme.utils.readableColor(color)};
+`);
 
 const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   height: 20px;

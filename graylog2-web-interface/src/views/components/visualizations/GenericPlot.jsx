@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 
 import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';

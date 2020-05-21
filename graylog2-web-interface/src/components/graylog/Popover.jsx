@@ -4,7 +4,6 @@ import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { util } from 'theme';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
 const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
@@ -15,7 +14,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     border-color: ${borderColor};
 
     &.top > .arrow {
-      border-top-color: ${util.opacify(borderColor, 0.05)};
+      border-top-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
         border-top-color: ${theme.colors.gray[100]};
@@ -23,7 +22,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.right > .arrow {
-      border-right-color: ${util.opacify(borderColor, 0.05)};
+      border-right-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
         border-right-color: ${theme.colors.gray[100]};
@@ -31,7 +30,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.bottom > .arrow {
-      border-bottom-color: ${util.opacify(borderColor, 0.05)};
+      border-bottom-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
         border-bottom-color: ${theme.colors.gray[100]};
@@ -39,7 +38,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.left > .arrow {
-      border-left-color: ${util.opacify(borderColor, 0.05)};
+      border-left-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
         border-left-color: ${theme.colors.gray[100]};

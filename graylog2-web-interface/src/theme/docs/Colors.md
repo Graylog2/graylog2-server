@@ -6,7 +6,7 @@ _Click any color block below to copy the color path._
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-import { color } from 'theme';
+import { colors } from 'theme';
 import ColorSwatch, {Swatch} from './Colors';
 
 const Modes = styled.div`
@@ -87,14 +87,14 @@ const SectionWrap = (mode, section) => {
 const Colors = () => {
   return (
     <>
-      {getValues(color, (mode) => (
+      {getValues(colors, (mode) => (
           <Modes>
             <Mode>{mode}</Mode>
 
-            {getValues(color[mode], (section) => (
+            {getValues(colors[mode], (section) => (
               <>
                 <Section>{section}</Section>
-                {SectionWrap(color[mode][section], section)}
+                {SectionWrap(colors[mode][section], section)}
               </>
             ))}
           </Modes>

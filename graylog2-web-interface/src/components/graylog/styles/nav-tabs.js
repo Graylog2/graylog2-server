@@ -1,8 +1,7 @@
 import { css } from 'styled-components';
-import { breakpoint, util } from 'theme';
 
 const navTabsStyles = css(({ theme }) => {
-  const borderColor = util.colorLevel(theme.colors.variant.info, -5);
+  const borderColor = theme.utils.colorLevel(theme.colors.variant.info, -5);
 
   return css`
     .nav-tabs {
@@ -16,7 +15,7 @@ const navTabsStyles = css(({ theme }) => {
 
           &:hover {
             background-color: ${theme.colors.gray[80]};
-            color: ${util.contrastingColor(theme.colors.gray[80])};
+            color: ${theme.utils.contrastingColor(theme.colors.gray[80])};
           }
         }
 
@@ -53,7 +52,7 @@ const navTabsStyles = css(({ theme }) => {
         }
       }
 
-      @media (min-width: ${breakpoint.min.sm}) {
+      @media (min-width: ${theme.breakpoints.min.sm}) {
         > li > a {
           border-bottom-color: ${borderColor};
         }

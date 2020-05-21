@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled, { type StyledComponent, css } from 'styled-components';
 import numeral from 'numeral';
 
-import { util, type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -26,7 +26,7 @@ const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivEleme
     text-align: right;
     ${trend && css`
       background-color: ${bgColor};
-      color: ${util.contrastingColor(bgColor)};
+      color: ${theme.utils.contrastingColor(bgColor)};
     `}
   `;
 });

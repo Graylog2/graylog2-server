@@ -3,8 +3,6 @@ import { Navbar as BootstrapNavbar } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
-import { breakpoint, util } from 'theme';
-
 const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   &.navbar-default {
     background-color: ${theme.colors.gray[90]};
@@ -41,7 +39,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         &,
         &:hover,
         &:focus {
-          color: ${util.readableColor(theme.colors.gray[80])};
+          color: ${theme.utils.readableColor(theme.colors.gray[80])};
           background-color: ${theme.colors.gray[80]};
         }
       }
@@ -64,7 +62,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         }
       }
 
-      @media (max-width: ${breakpoint.max.sm}) {
+      @media (max-width: ${theme.breakpoints.max.sm}) {
         .open .dropdown-menu {
           > li > a,
           > li > .btn-link {
@@ -200,7 +198,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         }
       }
 
-      @media (max-width: ${breakpoint.max.sm}) {
+      @media (max-width: ${theme.breakpoints.max.sm}) {
         .open .dropdown-menu {
           > .dropdown-header {
             border-color: ${theme.colors.gray[10]};

@@ -1,6 +1,5 @@
 import styled, { css } from 'styled-components';
 
-import { util } from 'theme';
 import AceEditor from './ace';
 
 const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
@@ -11,34 +10,34 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   &.ace-queryinput {
     height: 34px !important;
     width: 100% !important;
-    background-color: ${sctheme.colors.global.inputBackground};
-    color: ${util.contrastingColor(sctheme.colors.global.inputBackground, 'AAA')};
+    background-color: ${scTheme.colors.global.inputBackground};
+    color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
 
 
     &.ace_multiselect .ace_selection.ace_start {
-      box-shadow: 0 0 3px 0 ${sctheme.colors.global.inputBackground};
+      box-shadow: 0 0 3px 0 ${scTheme.colors.global.inputBackground};
     }
 
     .ace_gutter {
-      background: ${sctheme.colors.global.inputBackground};
-      color: ${util.contrastingColor(sctheme.colors.global.inputBackground, 'AAA')};
+      background: ${scTheme.colors.global.inputBackground};
+      color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
     }
 
     .ace_print-margin {
       width: 1px;
-      background: ${sctheme.colors.global.inputBackground};
+      background: ${scTheme.colors.global.inputBackground};
     }
 
     .ace_cursor {
-      color: ${sctheme.colors.gray[50]};
+      color: ${scTheme.colors.gray[50]};
     }
 
     .ace_marker-layer .ace_selection {
-      background: ${sctheme.colors.variant.lightest.default};
+      background: ${scTheme.colors.variant.lightest.default};
     }
 
     .ace_marker-layer .ace_step {
-      background: ${sctheme.colors.variant.warning};
+      background: ${scTheme.colors.variant.warning};
     }
 
     .ace_marker-layer .ace_bracket {
@@ -47,19 +46,19 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     }
 
     .ace_marker-layer .ace_active-line {
-      background: ${sctheme.colors.global.inputBackground};
+      background: ${scTheme.colors.global.inputBackground};
     }
 
     .ace_gutter-active-line {
-      background-color: ${sctheme.colors.global.inputBackground};
+      background-color: ${scTheme.colors.global.inputBackground};
     }
 
     .ace_marker-layer .ace_selected-word {
-      border: 1px solid ${sctheme.colors.gray[80]};
+      border: 1px solid ${scTheme.colors.gray[80]};
     }
 
     .ace_invisible {
-      color: ${sctheme.colors.global.inputBackground};
+      color: ${scTheme.colors.global.inputBackground};
     }
 
     .ace_keyword,
@@ -67,11 +66,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_storage,
     .ace_storage.ace_type,
     .ace_support.ace_type {
-      color: ${sctheme.colors.variant.primary};
+      color: ${scTheme.colors.variant.primary};
     }
 
     .ace_keyword.ace_operator {
-      color: ${sctheme.colors.variant.darker.info};
+      color: ${scTheme.colors.variant.darker.info};
     }
 
     .ace_constant.ace_character,
@@ -80,44 +79,44 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_keyword.ace_other.ace_unit,
     .ace_support.ace_constant,
     .ace_variable.ace_parameter {
-      color: ${sctheme.colors.variant.dark.danger};
+      color: ${scTheme.colors.variant.dark.danger};
     }
 
     .ace_constant.ace_other {
-      color: ${sctheme.colors.variant.default};
+      color: ${scTheme.colors.variant.default};
     }
 
     .ace_invalid {
-      color: ${util.readableColor(sctheme.colors.brand.primary)};
-      background-color: ${sctheme.colors.brand.primary};
+      color: ${scTheme.utils.readableColor(scTheme.colors.brand.primary)};
+      background-color: ${scTheme.colors.brand.primary};
     }
 
     .ace_invalid.ace_deprecated {
-      color: ${util.readableColor(sctheme.colors.brand.primary)};
-      background-color: ${sctheme.colors.variant.dark.primary};
+      color: ${scTheme.utils.readableColor(scTheme.colors.brand.primary)};
+      background-color: ${scTheme.colors.variant.dark.primary};
     }
 
     .ace_fold {
-      background-color: ${sctheme.colors.variant.info};
-      border-color: ${util.contrastingColor(sctheme.colors.global.inputBackground, 'AAA')};
+      background-color: ${scTheme.colors.variant.info};
+      border-color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
     }
 
     .ace_entity.ace_name.ace_function,
     .ace_support.ace_function,
     .ace_variable,
     .ace_term {
-      color: ${sctheme.colors.variant.info};
+      color: ${scTheme.colors.variant.info};
     }
 
     .ace_support.ace_class,
     .ace_support.ace_type {
-      color: ${sctheme.colors.variant.dark.warning};
+      color: ${scTheme.colors.variant.dark.warning};
     }
 
     .ace_heading,
     .ace_markup.ace_heading,
     .ace_string {
-      color: ${sctheme.colors.variant.dark.success};
+      color: ${scTheme.colors.variant.dark.success};
     }
 
     .ace_entity.ace_name.ace_tag,
@@ -125,11 +124,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_meta.ace_tag,
     .ace_string.ace_regexp,
     .ace_variable {
-      color: ${sctheme.colors.brand.primary};
+      color: ${scTheme.colors.brand.primary};
     }
 
     .ace_comment {
-      color: ${sctheme.colors.gray[60]};
+      color: ${scTheme.colors.gray[60]};
     }
 
     .ace_indent-guide {

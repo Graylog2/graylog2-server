@@ -10,7 +10,6 @@ import naturalSort from 'javascript-natural-sort';
 import { Alert, Button } from 'components/graylog';
 import { DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { util } from 'theme';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -36,7 +35,7 @@ const PipelineStage = styled.div(({ idle, theme }) => `
   padding: 20px;
   text-align: center;
   width: 120px;
-  background-color: ${idle ? util.colorLevel(theme.colors.global.contentBackground, 10) : theme.colors.global.contentBackground};
+  background-color: ${idle ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10) : theme.colors.global.contentBackground};
 `);
 
 const PipelineNameTD = styled.td`

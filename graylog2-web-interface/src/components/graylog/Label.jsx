@@ -4,17 +4,16 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Label as BootstrapLabel } from 'react-bootstrap';
 
-import { util } from 'theme';
 import bsStyleThemeVariant, { bsStyles } from './variants/bsStyle';
 
-const labelStyles = (hex) => {
-  const textColor = util.readableColor(hex);
+const labelStyles = (hex) => css(({ theme }) => {
+  const textColor = theme.utils.readableColor(hex);
 
   return css`
     background-color: ${hex};
     color: ${textColor};
   `;
-};
+});
 
 const Label = forwardRef(({ bsStyle, ...props }, ref) => {
   const StyledLabel = useMemo(

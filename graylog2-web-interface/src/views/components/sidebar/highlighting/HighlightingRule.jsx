@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';

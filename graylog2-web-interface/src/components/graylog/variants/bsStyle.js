@@ -1,14 +1,14 @@
 import theme from 'styled-theming';
-import { color, themeModes } from 'theme';
+import { colors, themeModes } from 'theme';
 
 const variantColors = (mode) => {
   return {
-    danger: color[mode].variant.danger,
-    default: color[mode].variant.default,
-    info: color[mode].variant.info,
-    primary: color[mode].variant.primary,
-    success: color[mode].variant.success,
-    warning: color[mode].variant.warning,
+    danger: colors[mode].variant.danger,
+    default: colors[mode].variant.default,
+    info: colors[mode].variant.info,
+    primary: colors[mode].variant.primary,
+    success: colors[mode].variant.success,
+    warning: colors[mode].variant.warning,
   };
 };
 

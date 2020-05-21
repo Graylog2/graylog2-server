@@ -11,7 +11,7 @@ import connect from 'stores/connect';
 import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
 import { Icon, PaginatedList, SearchForm } from 'components/common';
 import View from 'views/logic/views/View';
-import { type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme/types';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
