@@ -21,7 +21,7 @@ const InputIO = styled.span(({ theme }) => `
   }
 
   .value {
-    font-family: monospace;
+    font-family: ${theme.fonts.family.monospace};
   }
 
   .persec {

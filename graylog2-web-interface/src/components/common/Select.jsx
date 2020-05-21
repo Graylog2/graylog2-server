@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
+import { fonts } from 'theme';
 import Icon from './Icon';
 
 type Option = { [string]: any };
@@ -113,7 +114,7 @@ const menu = (base) => ({
 const singleValueAndPlaceholder = (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: fonts.family.body,
   fontSize: '14px',
   fontWeight: 400,
   color: '#666',
@@ -122,7 +123,7 @@ const singleValueAndPlaceholder = (base) => ({
 const placeholder = (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: fonts.family.body,
   fontSize: '14px',
   fontWeight: 400,
   color: '#999',

@@ -67,7 +67,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
         border-top: 0;
         padding-top: 0;
         padding-bottom: 5px;
-        font-family: monospace;
+        font-family: ${theme.fonts.family.monospace};
         color: ${theme.color.variant.dark.info};
       }
 

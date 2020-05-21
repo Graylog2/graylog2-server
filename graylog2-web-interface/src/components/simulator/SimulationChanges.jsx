@@ -58,8 +58,8 @@ const FieldResultWrap = styled.div(({ resultType, theme }) => {
   `;
 });
 
-const FieldValue = styled.dd(({ removed }) => `
-  font-family: monospace;
+const FieldValue = styled.dd(({ removed, theme }) => `
+  font-family: ${theme.fonts.family.monospace};
 
   ${removed && css`
     text-decoration: line-through;

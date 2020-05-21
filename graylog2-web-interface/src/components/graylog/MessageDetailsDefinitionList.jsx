@@ -39,7 +39,7 @@ const MessageDetailsDefinitionList = styled.dl(({ theme }) => `
   }
 
   &.message-details-fields .field-value {
-    font-family: monospace;
+    font-family: ${theme.fonts.family.monospace};
   }
 
   &.message-details-fields dd.message-field .field-value {

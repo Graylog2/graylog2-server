@@ -1,5 +1,5 @@
 :local(.bodyPreview) {
-    font-family: monospace;
+    font-family: "Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
     font-size: 12px;
     overflow-wrap: break-word;
     white-space: pre-wrap;

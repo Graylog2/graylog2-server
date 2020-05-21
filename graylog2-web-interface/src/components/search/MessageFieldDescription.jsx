@@ -4,10 +4,10 @@ import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
-const MessageTerms = styled.span`
+const MessageTerms = styled.spa(({ theme }) => `
   margin-right: 8px;
-  font-family: monospace;
-`;
+  font-family: ${theme.fonts.family.monospace};
+`);
 
 class MessageFieldDescription extends React.Component {
   static propTypes = {
@@ -21,9 +21,13 @@ class MessageFieldDescription extends React.Component {
     customFieldActions: undefined,
   };
 
-  state = {
-    messageTerms: Immutable.List(),
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      messageTerms: Immutable.List(),
+    };
+  }
 
   _shouldShowTerms = () => {
     const { messageTerms } = this.state;

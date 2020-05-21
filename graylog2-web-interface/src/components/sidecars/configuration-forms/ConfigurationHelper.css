@@ -19,7 +19,7 @@
 }
 
 :local(.monoSpaceFont) {
-    font-family: monospace;
+    font-family: "Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 :local(.ulStyle) {

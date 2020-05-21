@@ -35,7 +35,7 @@ const Textarea = styled.textarea(({ copied, theme }) => css`
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
     0 0 8px ${chroma(copied ? theme.color.variant.success : theme.color.gray[80]).alpha(0.4).css()};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
-  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: ${theme.fonts.family.monospace};
   font-size: 14px;
 
   :focus {

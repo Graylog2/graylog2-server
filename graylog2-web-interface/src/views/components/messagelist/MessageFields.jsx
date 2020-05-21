@@ -22,7 +22,7 @@ const MessageDetailsDL: StyledComponent<{}, ThemeInterface, HTMLDListElement> = 
   color: ${theme.color.gray[40]};
 
   dd {
-    font-family: monospace;
+    font-family: ${theme.fonts.family.monospace};
 
     &:not(:last-child) {
       border-bottom: 1px solid  ${theme.color.gray[90]};
