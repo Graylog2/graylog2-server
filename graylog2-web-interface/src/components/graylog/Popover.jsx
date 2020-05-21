@@ -14,7 +14,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     border-color: ${borderColor};
 
     &.top > .arrow {
-      border-top-color: ${theme.util.opacify(borderColor, 0.05)};
+      border-top-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
         border-top-color: ${theme.color.gray[100]};
@@ -22,7 +22,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.right > .arrow {
-      border-right-color: ${theme.util.opacify(borderColor, 0.05)};
+      border-right-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
         border-right-color: ${theme.color.gray[100]};
@@ -30,7 +30,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.bottom > .arrow {
-      border-bottom-color: ${theme.util.opacify(borderColor, 0.05)};
+      border-bottom-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
         border-bottom-color: ${theme.color.gray[100]};
@@ -38,7 +38,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.left > .arrow {
-      border-left-color: ${theme.util.opacify(borderColor, 0.05)};
+      border-left-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
         border-left-color: ${theme.color.gray[100]};

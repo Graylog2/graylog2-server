@@ -32,7 +32,7 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 
   .tooltip-inner {
-    color: ${theme.util.readableColor(theme.color.gray[10])};
+    color: ${theme.utils.readableColor(theme.color.gray[10])};
     background-color: ${theme.color.gray[10]};
     max-width: 300px;
 

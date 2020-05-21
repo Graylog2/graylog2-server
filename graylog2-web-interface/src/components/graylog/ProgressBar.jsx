@@ -49,7 +49,7 @@ const animatedStripes = keyframes`
 
 const progressBarVariants = (color) => css(({ theme }) => `
   background-color: ${color};
-  color: ${theme.util.readableColor(color)};
+  color: ${theme.utils.readableColor(color)};
 `);
 
 const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`

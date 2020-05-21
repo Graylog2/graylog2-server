@@ -367,7 +367,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .sources th {
     background-color: ${theme.color.gray[20]};
-    color: ${theme.util.readableColor(theme.color.gray[20])};
+    color: ${theme.utils.readableColor(theme.color.gray[20])};
     font-weight: normal;
   }
 
@@ -378,7 +378,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .parse-error {
     background-color: ${theme.color.variant.light.danger};
-    color: ${theme.util.contrastingColor(theme.color.variant.light.danger)};
+    color: ${theme.utils.contrastingColor(theme.color.variant.light.danger)};
     padding-left: 2px;
     padding-right: 2px;
   }

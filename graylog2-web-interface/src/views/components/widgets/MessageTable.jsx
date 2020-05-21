@@ -133,7 +133,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
 
 const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = styled.thead(({ theme }) => `
   background-color: ${theme.color.gray[90]};
-  color: ${theme.util.readableColor(theme.color.gray[90])};
+  color: ${theme.utils.readableColor(theme.color.gray[90])};
 
   th {
     border: 0;
@@ -141,7 +141,7 @@ const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = 
     font-weight: normal;
     white-space: nowrap;
     background-color: ${theme.color.gray[90]};
-    color: ${theme.util.readableColor(theme.color.gray[90])};
+    color: ${theme.utils.readableColor(theme.color.gray[90])};
   }
 `);
 

@@ -9,27 +9,27 @@ import bsStyleThemeVariant from './variants/bsStyle';
 const styleVariants = ['danger', 'info', 'success', 'warning'];
 
 const alertStyles = (hex) => css(({ theme }) => {
-  const borderColor = theme.util.colorLevel(hex, -7);
-  const backgroundColor = theme.util.colorLevel(hex, -5);
+  const borderColor = theme.utils.colorLevel(hex, -7);
+  const backgroundColor = theme.utils.colorLevel(hex, -5);
 
   return css`
     background-color: ${backgroundColor};
     border-color: ${borderColor};
-    color: ${theme.util.readableColor(backgroundColor)};
+    color: ${theme.utils.readableColor(backgroundColor)};
 
     a:not(.btn) {
-      color: ${theme.util.contrastingColor(backgroundColor, 'AA')};
+      color: ${theme.utils.contrastingColor(backgroundColor, 'AA')};
       font-weight: bold;
       text-decoration: underline;
 
       &:hover,
       &:focus {
-        color: ${theme.util.contrastingColor(backgroundColor, 'AAA')};
+        color: ${theme.utils.contrastingColor(backgroundColor, 'AAA')};
         text-decoration: none;
       }
 
       &:active {
-        color: ${theme.util.contrastingColor(backgroundColor, 'AAA')};
+        color: ${theme.utils.contrastingColor(backgroundColor, 'AAA')};
       }
     }
   `;

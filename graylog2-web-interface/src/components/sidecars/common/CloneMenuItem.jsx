@@ -22,7 +22,7 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => `
     &:hover,
     &:focus {
       text-decoration: none;
-      color: ${theme.util.contrastingColor(theme.color.gray[90])};
+      color: ${theme.utils.contrastingColor(theme.color.gray[90])};
       background-color: ${theme.color.gray[90]};
     }
   }

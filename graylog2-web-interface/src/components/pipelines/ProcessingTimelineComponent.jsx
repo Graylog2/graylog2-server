@@ -35,7 +35,7 @@ const PipelineStage = styled.div(({ idle, theme }) => `
   padding: 20px;
   text-align: center;
   width: 120px;
-  background-color: ${idle ? theme.util.colorLevel(theme.color.global.contentBackground, 10) : theme.color.global.contentBackground};
+  background-color: ${idle ? theme.utils.colorLevel(theme.color.global.contentBackground, 10) : theme.color.global.contentBackground};
 `);
 
 const PipelineNameTD = styled.td`

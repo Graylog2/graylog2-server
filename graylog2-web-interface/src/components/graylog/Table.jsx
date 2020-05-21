@@ -7,24 +7,24 @@ const variantRowStyles = css(({ theme }) => {
 
   const variants = {
     active: {
-      background: theme.util.colorLevel(theme.color.global.tableBackgroundAlt, -10),
-      hover: theme.util.colorLevel(theme.color.global.tableBackgroundAlt, -9),
+      background: theme.utils.colorLevel(theme.color.global.tableBackgroundAlt, -10),
+      hover: theme.utils.colorLevel(theme.color.global.tableBackgroundAlt, -9),
     },
     success: {
-      background: theme.util.colorLevel(theme.color.variant.success, -10),
-      hover: theme.util.colorLevel(theme.color.variant.success, -9),
+      background: theme.utils.colorLevel(theme.color.variant.success, -10),
+      hover: theme.utils.colorLevel(theme.color.variant.success, -9),
     },
     info: {
-      background: theme.util.colorLevel(theme.color.variant.info, -10),
-      hover: theme.util.colorLevel(theme.color.variant.info, -9),
+      background: theme.utils.colorLevel(theme.color.variant.info, -10),
+      hover: theme.utils.colorLevel(theme.color.variant.info, -9),
     },
     warning: {
-      background: theme.util.colorLevel(theme.color.variant.warning, -10),
-      hover: theme.util.colorLevel(theme.color.variant.warning, -9),
+      background: theme.utils.colorLevel(theme.color.variant.warning, -10),
+      hover: theme.utils.colorLevel(theme.color.variant.warning, -9),
     },
     danger: {
-      background: theme.util.colorLevel(theme.color.variant.danger, -10),
-      hover: theme.util.colorLevel(theme.color.variant.danger, -9),
+      background: theme.utils.colorLevel(theme.color.variant.danger, -10),
+      hover: theme.utils.colorLevel(theme.color.variant.danger, -9),
     },
   };
 

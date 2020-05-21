@@ -14,11 +14,11 @@ import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import style from './SidecarRow.css';
 
 const SidecarTR = styled.tr(({ inactive, theme }) => `
-  color: ${inactive ? theme.util.contrastingColor(theme.color.global.tableBackground, 'AA') : 'currentColor'};
+  color: ${inactive ? theme.utils.contrastingColor(theme.color.global.tableBackground, 'AA') : 'currentColor'};
   opacity: ${inactive ? 0.9 : 1};
 
   &:nth-of-type(2n+1) {
-    color: ${inactive ? theme.util.contrastingColor(theme.color.global.tableBackgroundAlt, 'AA') : 'currentColor'};
+    color: ${inactive ? theme.utils.contrastingColor(theme.color.global.tableBackgroundAlt, 'AA') : 'currentColor'};
   }
 
   td:not(:last-child) {

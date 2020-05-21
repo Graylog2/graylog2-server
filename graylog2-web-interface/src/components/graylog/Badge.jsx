@@ -6,7 +6,7 @@ import { Badge as BootstrapBadge } from 'react-bootstrap';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const cssBuilder = (backgroundColor) => css(({ theme }) => {
-  const textColor = theme.util.readableColor(backgroundColor);
+  const textColor = theme.utils.readableColor(backgroundColor);
 
   return css`
     background-color: ${backgroundColor};

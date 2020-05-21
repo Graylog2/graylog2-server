@@ -18,7 +18,7 @@ const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
   return `
     margin-left: 4px;
     background-color: ${statuses[status]};
-    color: ${theme.util.readableColor(statuses[status])};
+    color: ${theme.utils.readableColor(statuses[status])};
   `;
 });
 

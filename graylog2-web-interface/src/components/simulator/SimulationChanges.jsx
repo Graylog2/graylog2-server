@@ -53,7 +53,7 @@ const FieldResultWrap = styled.div(({ resultType, theme }) => {
     dt,
     dd {
       background-color: ${types[resultType]};
-      color: ${theme.util.contrastingColor(types[resultType])};
+      color: ${theme.utils.contrastingColor(types[resultType])};
     }
   `;
 });

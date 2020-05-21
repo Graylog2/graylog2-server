@@ -12,7 +12,7 @@ export const paginationStyles = css(({ theme }) => css`
     > li {
       > a,
       > span {
-        color: ${theme.util.readableColor(theme.color.global.contentBackground)};
+        color: ${theme.utils.readableColor(theme.color.global.contentBackground)};
         background-color: ${theme.color.global.contentBackground};
         border-color: ${theme.color.gray[80]};
 

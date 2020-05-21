@@ -32,7 +32,7 @@ const Swatch = styled.button(({ color, theme }) => `
   height: 60px;
   background-color: ${color};
   border: 1px solid #222;
-  color: ${theme.util.readableColor(color)};
+  color: ${theme.utils.readableColor(color)};
   padding: 3px;
   cursor: pointer;
   display: flex;

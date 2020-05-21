@@ -15,7 +15,7 @@ export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLD
   grid-column: 1;
   -ms-grid-column: 1;
   background: ${theme.color.gray[10]};
-  color: ${theme.util.contrastingColor(theme.color.gray[10], 'AA')};
+  color: ${theme.utils.contrastingColor(theme.color.gray[10], 'AA')};
   height: calc(100vh - 50px);
   padding-top: 20px;
   position: ${open ? 'fixed' : 'static'};

@@ -41,7 +41,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         &,
         &:hover,
         &:focus {
-          color: ${theme.util.readableColor(theme.color.gray[80])};
+          color: ${theme.utils.readableColor(theme.color.gray[80])};
           background-color: ${theme.color.gray[80]};
         }
       }

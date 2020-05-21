@@ -7,7 +7,7 @@ import { Label as BootstrapLabel } from 'react-bootstrap';
 import bsStyleThemeVariant, { bsStyles } from './variants/bsStyle';
 
 const labelStyles = (hex) => css(({ theme }) => {
-  const textColor = theme.util.readableColor(hex);
+  const textColor = theme.utils.readableColor(hex);
 
   return css`
     background-color: ${hex};
