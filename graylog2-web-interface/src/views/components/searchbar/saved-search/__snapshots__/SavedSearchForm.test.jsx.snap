@@ -142,6 +142,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         ],
                       ],
                     },
+                    "fonts": Object {
+                      "family": Object {
+                        "body": "\\"Open Sans\\", \\"Helvetica Neue\\", Helvetica, Arial, sans-serif",
+                        "monospace": "\\"Roboto Mono\\", Menlo, Monaco, Consolas, \\"Courier New\\", monospace",
+                      },
+                    },
                     "mode": "teinte",
                     "utils": Object {
                       "colorLevel": [Function],
@@ -681,6 +687,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                           [Function],
                         ],
                       ],
+                    },
+                    "fonts": Object {
+                      "family": Object {
+                        "body": "\\"Open Sans\\", \\"Helvetica Neue\\", Helvetica, Arial, sans-serif",
+                        "monospace": "\\"Roboto Mono\\", Menlo, Monaco, Consolas, \\"Courier New\\", monospace",
+                      },
                     },
                     "mode": "teinte",
                     "utils": Object {
@@ -1298,6 +1310,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                           [Function],
                         ],
                       ],
+                    },
+                    "fonts": Object {
+                      "family": Object {
+                        "body": "\\"Open Sans\\", \\"Helvetica Neue\\", Helvetica, Arial, sans-serif",
+                        "monospace": "\\"Roboto Mono\\", Menlo, Monaco, Consolas, \\"Courier New\\", monospace",
+                      },
                     },
                     "mode": "teinte",
                     "utils": Object {
