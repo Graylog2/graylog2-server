@@ -16,11 +16,11 @@ import EventDefinitionSummary from './EventDefinitionSummary';
 const StyledNav = styled(Nav)(({ theme }) => `
   &.nav {
     > li {
-      border: 1px solid ${theme.color.gray[80]};
+      border: 1px solid ${theme.colors.gray[80]};
       border-left: 0;
 
       &:first-child {
-        border-left: 1px solid ${theme.color.gray[80]};
+        border-left: 1px solid ${theme.colors.gray[80]};
         border-radius: 4px 0 0 4px;
 
         > a {
@@ -37,8 +37,8 @@ const StyledNav = styled(Nav)(({ theme }) => `
       }
 
       &:not(:last-child)::after {
-        background-color: ${theme.color.gray[100]};
-        border-color: ${theme.color.gray[80]};
+        background-color: ${theme.colors.gray[100]};
+        border-color: ${theme.colors.gray[80]};
         border-style: solid;
         border-width: 0 1px 1px 0;
         content: '';
@@ -53,11 +53,11 @@ const StyledNav = styled(Nav)(({ theme }) => `
       }
 
       &:hover::after {
-        background-color: ${theme.color.gray[90]};
+        background-color: ${theme.colors.gray[90]};
       }
 
       &.active::after {
-        background-color: ${theme.color.global.link};
+        background-color: ${theme.colors.global.link};
       }
 
       > a {

@@ -19,7 +19,7 @@ type Props = {
 };
 
 const Background: StyledComponent<{trend: ?string}, ThemeInterface, HTMLDivElement> = styled.div(({ theme, trend }) => {
-  const { variant } = theme.color;
+  const { variant } = theme.colors;
   const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
   return css`

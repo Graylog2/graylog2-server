@@ -9,7 +9,7 @@ const SystemMessagesTable = styled(Table)(({ theme }) => `
   font-size: 12px;
 
   a {
-    color: ${theme.color.global.textDefault};
+    color: ${theme.colors.global.textDefault};
   }
 `);
 

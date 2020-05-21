@@ -14,8 +14,8 @@ export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLD
   -ms-grid-row: 1;
   grid-column: 1;
   -ms-grid-column: 1;
-  background: ${theme.color.gray[10]};
-  color: ${theme.utils.contrastingColor(theme.color.gray[10], 'AA')};
+  background: ${theme.colors.gray[10]};
+  color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
   height: calc(100vh - 50px);
   padding-top: 20px;
   position: ${open ? 'fixed' : 'static'};
@@ -33,7 +33,7 @@ export const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement>
   bottom: 0;
   left: ${sidebarWidth.open};
   right: 0;
-  background: ${chroma(theme.color.brand.tertiary).alpha(0.25).css()};
+  background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
 `);
 
 export const SidebarHeader: StyledComponent<{open: boolean, hasTitle: boolean}, {}, typeof NavItemTitle> = styled(NavItemTitle)(({ hasTitle, open }) => {

@@ -24,7 +24,7 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLAnchorElement> = styled.a.
     border-color: transparent;
     border-style: solid;
     border-width: 5px 0 5px 5px;
-    border-left-color: ${theme.color.gray[80]};
+    border-left-color: ${theme.colors.gray[80]};
     margin-top: 5px;
     margin-right: -10px;
   }
@@ -47,7 +47,7 @@ const StyledSubmenu: StyledComponent<{left: boolean}, ThemeInterface, HTMLLIElem
   }
 
   &:hover > ${/* sc-selector */String(Toggle)}::after {
-    border-left-color: ${theme.color.gray[100]};
+    border-left-color: ${theme.colors.gray[100]};
   }
 `);
 

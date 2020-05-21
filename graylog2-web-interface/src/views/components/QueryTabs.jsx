@@ -23,7 +23,7 @@ const StyledQueryTabs = styled(Tabs)(({ theme }) => `
 
     > li {
       > a {
-        border-color: ${theme.color.gray[80]};
+        border-color: ${theme.colors.gray[80]};
       }
     }
 

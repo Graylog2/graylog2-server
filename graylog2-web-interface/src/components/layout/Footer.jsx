@@ -21,7 +21,7 @@ type Props = {
 const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.footer(({ theme }) => css`
   text-align: center;
   font-size: 11px;
-  color: ${theme.color.gray[70]};
+  color: ${theme.colors.gray[70]};
   margin-bottom: 15px;
   height: 20px;
 

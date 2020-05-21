@@ -7,7 +7,7 @@ import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = theme.utils.colorLevel(theme.color.variant.light[variant], -5);
+  const backgroundColor = theme.utils.colorLevel(theme.colors.variant.light[variant], -5);
   const textColor = theme.utils.readableColor(backgroundColor);
 
   return css`
@@ -27,15 +27,15 @@ const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
         &:hover,
         &:focus {
           color: ${textColor};
-          background-color: ${theme.color.variant.light[variant]};
+          background-color: ${theme.colors.variant.light[variant]};
         }
 
         &.active,
         &.active:hover,
         &.active:focus {
-          color: ${theme.utils.readableColor(theme.color.variant.light[variant])};
-          background-color: ${theme.color.variant.light[variant]};
-          border-color: ${theme.color.variant.light[variant]};
+          color: ${theme.utils.readableColor(theme.colors.variant.light[variant])};
+          background-color: ${theme.colors.variant.light[variant]};
+          border-color: ${theme.colors.variant.light[variant]};
         }
       }
     }
@@ -43,8 +43,8 @@ const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
 });
 
 const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
-  background-color: ${theme.color.global.contentBackground};
-  border-color: ${theme.color.gray[80]};
+  background-color: ${theme.colors.global.contentBackground};
+  border-color: ${theme.colors.gray[80]};
 
   .list-group-item-heading {
     font-weight: bold;
@@ -53,8 +53,8 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   &.disabled,
   &.disabled:hover,
   &.disabled:focus {
-    color: ${theme.color.gray[60]};
-    background-color: ${theme.color.gray[90]};
+    color: ${theme.colors.gray[60]};
+    background-color: ${theme.colors.gray[90]};
 
     .list-group-item-heading {
       color: inherit;
@@ -62,16 +62,16 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     }
 
     .list-group-item-text {
-      color: ${theme.color.gray[60]};
+      color: ${theme.colors.gray[60]};
     }
   }
 
   &.active,
   &.active:hover,
   &.active:focus {
-    color: ${theme.color.gray[100]};
-    background-color: ${theme.color.variant.light.primary};
-    border-color: ${theme.color.variant.light.primary};
+    color: ${theme.colors.gray[100]};
+    background-color: ${theme.colors.variant.light.primary};
+    border-color: ${theme.colors.variant.light.primary};
     z-index: auto;
 
     .list-group-item-heading,
@@ -82,32 +82,32 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     }
 
     .list-group-item-text {
-      color: ${theme.color.variant.light.primary};
+      color: ${theme.colors.variant.light.primary};
     }
   }
 
   a&,
   button& {
-    color: ${theme.color.global.link};
+    color: ${theme.colors.global.link};
 
     .list-group-item-heading {
-      color: ${theme.color.gray[20]};
+      color: ${theme.colors.gray[20]};
       font-weight: bold;
     }
 
     &:hover:not(.disabled),
     &:focus:not(.disabled) {
-      background-color: ${theme.color.gray[40]};
-      color: ${theme.utils.readableColor(theme.color.gray[40])};
+      background-color: ${theme.colors.gray[40]};
+      color: ${theme.utils.readableColor(theme.colors.gray[40])};
 
       &.active {
-        color: ${theme.utils.readableColor(theme.color.variant.primary)};
-        border-color: ${theme.color.variant.primary};
-        background-color: ${theme.color.variant.primary};
+        color: ${theme.utils.readableColor(theme.colors.variant.primary)};
+        border-color: ${theme.colors.variant.primary};
+        background-color: ${theme.colors.variant.primary};
       }
 
       .list-group-item-heading {
-        color: ${theme.utils.readableColor(theme.color.gray[40])};
+        color: ${theme.utils.readableColor(theme.colors.gray[40])};
       }
     }
   }

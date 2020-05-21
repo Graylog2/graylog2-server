@@ -21,7 +21,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   left: 50%;
   margin-left: -125px;
   top: 50px;
-  color: ${theme.utils.readableColor(chroma(theme.color.brand.tertiary).alpha(0.8).css())};
+  color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
   font-size: 80px;
   padding: 25px;
   z-index: 2000;
@@ -30,7 +30,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   cursor: pointer;
   border-radius: 10px;
   display: none;
-  background: ${chroma(theme.color.brand.tertiary).alpha(0.8).css()};
+  background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
 `);
 
 const App = ({ children, currentUser, location }) => {

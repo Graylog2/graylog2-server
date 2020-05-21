@@ -31,7 +31,7 @@ type State = {
 
 const AlertIcon: StyledComponent<{}, ThemeInterface, *> = styled(Icon)(({ theme }) => css`
   margin-right: 6px;
-  color: ${theme.color.variant.primary};
+  color: ${theme.colors.variant.primary};
 `);
 
 const NoSavedSearches: StyledComponent<{}, ThemeInterface, *> = styled(Alert)`

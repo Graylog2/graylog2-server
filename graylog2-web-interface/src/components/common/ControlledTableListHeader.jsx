@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { ListGroupItem } from 'components/graylog';
 
 const StyledListGroupItem = styled(ListGroupItem)(({ theme }) => `
-  background-color: ${theme.color.gray[90]};
+  background-color: ${theme.colors.gray[90]};
   font-size: 14px;
   padding: 0 15px;
 

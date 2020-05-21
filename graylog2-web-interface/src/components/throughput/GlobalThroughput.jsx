@@ -56,7 +56,7 @@ const ThroughputData = styled.span(({ dataIn, theme }) => `
   grid-template-rows: 1fr 1px;
   grid-column-gap: 3px;
   grid-row-gap: 0;
-  color: ${theme.color.global.textAlt};
+  color: ${theme.colors.global.textAlt};
 
   > span {
     grid-area: 1 / 1 / 2 / 2;
@@ -73,7 +73,7 @@ const ThroughputData = styled.span(({ dataIn, theme }) => `
     ${dataIn && `
       content: ' ';
       min-height: 1px;
-      background-color: ${theme.color.global.contentBackground};
+      background-color: ${theme.colors.global.contentBackground};
       display: block;
       grid-area: 2 / 1 / 3 / 3;
     `}

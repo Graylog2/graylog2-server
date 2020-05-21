@@ -33,18 +33,18 @@ const Blob = styled.span(({ theme }) => css`
   border: 1px solid;
 
   &.used-memory {
-    background-color: ${theme.color.variant.primary};
-    border-color: ${theme.color.variant.dark.primary};
+    background-color: ${theme.colors.variant.primary};
+    border-color: ${theme.colors.variant.dark.primary};
   }
 
   &.committed-memory {
-    background-color: ${theme.color.variant.warning};
-    border-color: ${theme.color.variant.dark.warning};
+    background-color: ${theme.colors.variant.warning};
+    border-color: ${theme.colors.variant.dark.warning};
   }
 
   &.max-memory {
-    background-color: ${theme.color.global.background};
-    border-color: ${theme.color.gray[80]};
+    background-color: ${theme.colors.global.background};
+    border-color: ${theme.colors.gray[80]};
   }
 `);
 
@@ -66,7 +66,7 @@ const JvmHeapUsage = createReactClass({
 
   mixins: [Reflux.connect(MetricsStore)],
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const { nodeId } = this.props;
 
     this.metricNames = {

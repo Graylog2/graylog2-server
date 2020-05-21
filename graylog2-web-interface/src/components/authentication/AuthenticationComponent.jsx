@@ -21,16 +21,16 @@ const AuthenticationStore = StoreProvider.getStore('Authentication');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const SubNavigationCol = styled(Col)(({ theme }) => `
-  border-right: ${theme.color.gray[80]} solid 1px;
+  border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
 const ContentPaneCol = styled(Col)(({ theme }) => `
-  border-left: ${theme.color.gray[80]} solid 1px;
+  border-left: ${theme.colors.gray[80]} solid 1px;
   margin-left: -1px;
 `);
 
 const NavItemDivider = styled(NavItem)(({ theme }) => `
-  border-bottom: ${theme.color.gray[80]} solid 1px;
+  border-bottom: ${theme.colors.gray[80]} solid 1px;
 `);
 
 const AuthenticationComponent = createReactClass({

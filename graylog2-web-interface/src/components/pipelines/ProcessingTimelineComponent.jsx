@@ -28,14 +28,14 @@ const StyledAlert = styled(Alert)`
 `;
 
 const PipelineStage = styled.div(({ idle, theme }) => `
-  border: 1px solid ${theme.color.gray[idle ? 50 : 70]};
+  border: 1px solid ${theme.colors.gray[idle ? 50 : 70]};
   border-radius: 4px;
   display: inline-block;
   margin-right: 15px;
   padding: 20px;
   text-align: center;
   width: 120px;
-  background-color: ${idle ? theme.utils.colorLevel(theme.color.global.contentBackground, 10) : theme.color.global.contentBackground};
+  background-color: ${idle ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10) : theme.colors.global.contentBackground};
 `);
 
 const PipelineNameTD = styled.td`

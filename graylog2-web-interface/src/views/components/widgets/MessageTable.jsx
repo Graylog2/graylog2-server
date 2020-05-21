@@ -68,7 +68,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
         padding-top: 0;
         padding-bottom: 5px;
         font-family: ${theme.fonts.family.monospace};
-        color: ${theme.color.variant.dark.info};
+        color: ${theme.colors.variant.dark.info};
       }
 
       .message-wrapper {
@@ -103,11 +103,11 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
     }
 
     &.message-group-toggled {
-      border-left: 7px solid ${theme.color.variant.light.info};
+      border-left: 7px solid ${theme.colors.variant.light.info};
     }
 
     &.message-highlight {
-      border-left: 7px solid ${theme.color.variant.light.success};
+      border-left: 7px solid ${theme.colors.variant.light.success};
     }
   }
 
@@ -123,7 +123,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
 
     th,
     td {
-      border: 1px ${theme.color.gray[80]} solid !important;
+      border: 1px ${theme.colors.gray[80]} solid !important;
       left: 0;
       padding: 5px;
       position: static;
@@ -132,16 +132,16 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
 `);
 
 const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = styled.thead(({ theme }) => `
-  background-color: ${theme.color.gray[90]};
-  color: ${theme.utils.readableColor(theme.color.gray[90])};
+  background-color: ${theme.colors.gray[90]};
+  color: ${theme.utils.readableColor(theme.colors.gray[90])};
 
   th {
     border: 0;
     font-size: 11px;
     font-weight: normal;
     white-space: nowrap;
-    background-color: ${theme.color.gray[90]};
-    color: ${theme.utils.readableColor(theme.color.gray[90])};
+    background-color: ${theme.colors.gray[90]};
+    color: ${theme.utils.readableColor(theme.colors.gray[90])};
   }
 `);
 

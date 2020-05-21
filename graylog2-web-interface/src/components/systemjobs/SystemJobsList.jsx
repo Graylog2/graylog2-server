@@ -8,7 +8,7 @@ import { SystemJob } from 'components/systemjobs';
 
 const SystemJobWrap = styled.div(({ theme }) => `
   margin-top: 10px;
-  border-bottom: 1px solid ${theme.color.gray[80]};
+  border-bottom: 1px solid ${theme.colors.gray[80]};
 
   .progress {
     margin-top: 2px;

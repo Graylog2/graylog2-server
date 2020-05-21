@@ -42,7 +42,7 @@ const OriginalChanges = styled.div`
 `;
 
 const FieldResultWrap = styled.div(({ resultType, theme }) => {
-  const { success, danger, info } = theme.color.variant.light;
+  const { success, danger, info } = theme.colors.variant.light;
   const types = {
     added: success,
     removed: danger,
