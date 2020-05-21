@@ -1,6 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<WidgetGrid /> should render with minimal props 1`] = `
+.c0 {
+  color: #1f1f1f;
+  margin: 0;
+  width: 100%;
+}
+
 <ConnectStoresWrapper[WidgetGrid] stores=titles
   allFields={Immutable.List []}
   data={Object {}}
@@ -31,7 +37,7 @@ exports[`<WidgetGrid /> should render with minimal props 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "WidgetGrid__DashboardWrap-sc-1bqopuh-0",
               "isStatic": false,
-              "lastClassName": "jaucQL",
+              "lastClassName": "c0",
               "rules": Array [
                 [Function],
               ],
@@ -49,7 +55,7 @@ exports[`<WidgetGrid /> should render with minimal props 1`] = `
         forwardedRef={null}
       >
         <div
-          className="WidgetGrid__DashboardWrap-sc-1bqopuh-0 jaucQL"
+          className="c0"
         >
           <span />
         </div>

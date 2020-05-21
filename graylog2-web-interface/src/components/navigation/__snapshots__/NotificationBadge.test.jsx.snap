@@ -1,6 +1,97 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NotificationBadge renders count when there are notifications 1`] = `
+.c2 {
+  background-color: #ad0707;
+  color: #fff;
+}
+
+.c0.nav > li > a:hover,
+.c0.nav > li > a:focus {
+  background-color: #e6e6e6;
+}
+
+.c0.nav > li.disabled > a {
+  color: #9b9b9b;
+}
+
+.c0.nav > li.disabled > a:hover,
+.c0.nav > li.disabled > a:focus {
+  color: #9b9b9b;
+}
+
+.c0.nav .open > a,
+.c0.nav .open > a:hover,
+.c0.nav .open > a:focus {
+  background-color: #e6e6e6;
+  border-color: #702785;
+}
+
+.c0.nav.nav-pills > li.active > a,
+.c0.nav.nav-pills > li.active > a:hover,
+.c0.nav.nav-pills > li.active > a:focus {
+  color: #fff;
+  background-color: #702785;
+}
+
+.c0.nav .nav-tabs {
+  border-bottom-color: rgb(198,207,231);
+}
+
+.c0.nav .nav-tabs > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+  color: #1f1f1f;
+  border-color: #cdcdcd #cdcdcd rgb(198,207,231);
+}
+
+.c0.nav .nav-tabs > li > a:hover {
+  background-color: #cdcdcd;
+  color: rgb(46,46,46);
+}
+
+.c0.nav .nav-tabs > li.active > a,
+.c0.nav .nav-tabs > li.active > a:hover,
+.c0.nav .nav-tabs > li.active > a:focus {
+  color: #1f1f1f;
+  background-color: #ffffff;
+  border-color: rgb(198,207,231);
+  border-bottom-color: transparent;
+}
+
+.c0.nav .nav-tabs > li.disabled > a,
+.c0.nav .nav-tabs > li.disabled > a:hover,
+.c0.nav .nav-tabs > li.disabled > a:focus {
+  color: #9b9b9b;
+  background-color: #ffffff;
+  border-color: #ffffff #ffffff rgb(198,207,231);
+  cursor: not-allowed;
+}
+
+.c0.nav.nav-justified > .active > a,
+.c0.nav.nav-justified > .active > a:hover,
+.c0.nav.nav-justified > .active > a:focus {
+  border-color: rgb(198,207,231);
+}
+
+.c1 a:hover {
+  border: 0;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+@media (min-width:768px) {
+  .c0.nav.nav-justified > li > a {
+    border-bottom-color: rgb(198,207,231);
+  }
+
+  .c0.nav.nav-justified > .active > a,
+  .c0.nav.nav-justified > .active > a:hover,
+  .c0.nav.nav-justified > .active > a:focus {
+    border-bottom-color: #ffffff;
+  }
+}
+
 <NotificationBadge
   total={42}
 >
@@ -19,7 +110,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "Nav-dzawzr-0",
             "isStatic": false,
-            "lastClassName": "htUNCU",
+            "lastClassName": "c0",
             "rules": Array [
               [Function],
             ],
@@ -39,7 +130,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
     >
       <Nav
         bsClass="nav"
-        className="Nav-dzawzr-0 htUNCU"
+        className="c0"
         justified={false}
         navbar={true}
         pullLeft={false}
@@ -47,7 +138,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
         stacked={false}
       >
         <ul
-          className="Nav-dzawzr-0 htUNCU nav navbar-nav"
+          className="c0 nav navbar-nav"
           role={null}
         >
           <LinkContainer
@@ -71,7 +162,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                     "componentStyle": ComponentStyle {
                       "componentId": "NotificationBadge__StyledInactiveNavItem-c049cm-0",
                       "isStatic": false,
-                      "lastClassName": "dMglXF",
+                      "lastClassName": "c1",
                       "rules": Array [
                         "a:hover{border:0;text-decoration:none;}",
                       ],
@@ -92,20 +183,20 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
               >
                 <InactiveNavItem
                   action="push"
-                  className="NotificationBadge__StyledInactiveNavItem-c049cm-0 dMglXF"
+                  className="c1"
                   onClick={[Function]}
                   onSelect={null}
                 >
                   <NavItem
                     action="push"
                     active={false}
-                    className="NotificationBadge__StyledInactiveNavItem-c049cm-0 dMglXF"
+                    className="c1"
                     disabled={false}
                     onClick={[Function]}
                     onSelect={null}
                   >
                     <li
-                      className="NotificationBadge__StyledInactiveNavItem-c049cm-0 dMglXF"
+                      className="c1"
                       role="presentation"
                     >
                       <SafeAnchor
@@ -138,7 +229,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                       "isStatic": false,
-                                      "lastClassName": "gDhrrS",
+                                      "lastClassName": "c2",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -159,12 +250,12 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                 <Badge
                                   bsClass="badge"
                                   bsStyle="danger"
-                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                                  className="c2"
                                   id="notification-badge"
                                   pullRight={false}
                                 >
                                   <span
-                                    className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge badge-danger"
+                                    className="c2 badge badge-danger"
                                     id="notification-badge"
                                   >
                                     42

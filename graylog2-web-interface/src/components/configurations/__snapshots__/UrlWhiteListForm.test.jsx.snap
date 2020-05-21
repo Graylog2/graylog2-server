@@ -1,6 +1,492 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`UrlWhitelistForm render the UrlWhitelistForm component should create new instance 1`] = `
+.c1.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c1.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c1.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c1.btn-danger[disabled],
+.c1.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c1.btn-danger[disabled]:hover,
+.c1.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c1.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c1.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c1.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c1.btn-default[disabled],
+.c1.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c1.btn-default[disabled]:hover,
+.c1.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c1.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c1.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c1.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c1.btn-info[disabled],
+.c1.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c1.btn-info[disabled]:hover,
+.c1.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c1.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c1.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c1.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c1.btn-link[disabled],
+.c1.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c1.btn-link[disabled]:hover,
+.c1.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c1.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c1.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c1.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c1.btn-primary[disabled],
+.c1.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c1.btn-primary[disabled]:hover,
+.c1.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c1.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c1.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c1.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c1.btn-success[disabled],
+.c1.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c1.btn-success[disabled]:hover,
+.c1.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c1.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c1.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c1.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c1.btn-warning[disabled],
+.c1.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c1.btn-warning[disabled]:hover,
+.c1.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c3 {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #cdcdcd;
+}
+
+.c3::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c3::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c3:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c3::placeholder {
+  color: #9b9b9b;
+}
+
+.c3:focus {
+  border-color: #6386c9;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(99,134,201,0.4);
+}
+
+.c3[disabled],
+.c3[readonly],
+fieldset[disabled] .c3 {
+  background-color: #cdcdcd;
+}
+
+.c3 ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c0 {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #838383;
+}
+
+.c2 {
+  background-color: #ffffff;
+  margin-top: 10px;
+}
+
+.c2.table > thead > tr > th,
+.c2.table > tbody > tr > th,
+.c2.table > tfoot > tr > th,
+.c2.table > thead > tr > td,
+.c2.table > tbody > tr > td,
+.c2.table > tfoot > tr > td {
+  border-top-color: #cdcdcd;
+}
+
+.c2.table > thead > tr > th {
+  border-bottom-color: #cdcdcd;
+}
+
+.c2.table > tbody + tbody {
+  border-top-color: #cdcdcd;
+}
+
+.c2 .table .table {
+  background-color: #ffffff;
+}
+
+.c2.table-bordered {
+  border-color: #cdcdcd;
+}
+
+.c2.table-bordered > thead > tr > th,
+.c2.table-bordered > tbody > tr > th,
+.c2.table-bordered > tfoot > tr > th,
+.c2.table-bordered > thead > tr > td,
+.c2.table-bordered > tbody > tr > td,
+.c2.table-bordered > tfoot > tr > td {
+  border-color: #cdcdcd;
+}
+
+.c2.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #e6e6e6;
+}
+
+.c2.table-hover > tbody > tr:hover {
+  background-color: #cdcdcd;
+}
+
+.c2.table > thead > tr > td.active,
+.c2.table > tbody > tr > td.active,
+.c2.table > tfoot > tr > td.active,
+.c2.table > thead > tr > th.active,
+.c2.table > tbody > tr > th.active,
+.c2.table > tfoot > tr > th.active,
+.c2.table > thead > tr.active > td,
+.c2.table > tbody > tr.active > td,
+.c2.table > tfoot > tr.active > td,
+.c2.table > thead > tr.active > th,
+.c2.table > tbody > tr.active > th,
+.c2.table > tfoot > tr.active > th {
+  background-color: rgb(216,216,216);
+}
+
+.c2.table-hover > tbody > tr > td.active:hover,
+.c2.table-hover > tbody > tr > th.active:hover,
+.c2.table-hover > tbody > tr.active:hover > td,
+.c2.table-hover > tbody > tr:hover > .active,
+.c2.table-hover > tbody > tr.active:hover > th {
+  background-color: rgb(220,220,220);
+}
+
+.c2.table > thead > tr > td.success,
+.c2.table > tbody > tr > td.success,
+.c2.table > tfoot > tr > td.success,
+.c2.table > thead > tr > th.success,
+.c2.table > tbody > tr > th.success,
+.c2.table > tfoot > tr > th.success,
+.c2.table > thead > tr.success > td,
+.c2.table > tbody > tr.success > td,
+.c2.table > tfoot > tr.success > td,
+.c2.table > thead > tr.success > th,
+.c2.table > tbody > tr.success > th,
+.c2.table > tfoot > tr.success > th {
+  background-color: rgb(114,193,128);
+}
+
+.c2.table-hover > tbody > tr > td.success:hover,
+.c2.table-hover > tbody > tr > th.success:hover,
+.c2.table-hover > tbody > tr.success:hover > td,
+.c2.table-hover > tbody > tr:hover > .success,
+.c2.table-hover > tbody > tr.success:hover > th {
+  background-color: rgb(135,200,146);
+}
+
+.c2.table > thead > tr > td.info,
+.c2.table > tbody > tr > td.info,
+.c2.table > tfoot > tr > td.info,
+.c2.table > thead > tr > th.info,
+.c2.table > tbody > tr > th.info,
+.c2.table > tfoot > tr > th.info,
+.c2.table > thead > tr.info > td,
+.c2.table > tbody > tr.info > td,
+.c2.table > tfoot > tr.info > td,
+.c2.table > thead > tr.info > th,
+.c2.table > tbody > tr.info > th,
+.c2.table > tfoot > tr.info > th {
+  background-color: rgb(114,144,205);
+}
+
+.c2.table-hover > tbody > tr > td.info:hover,
+.c2.table-hover > tbody > tr > th.info:hover,
+.c2.table-hover > tbody > tr.info:hover > td,
+.c2.table-hover > tbody > tr:hover > .info,
+.c2.table-hover > tbody > tr.info:hover > th {
+  background-color: rgb(135,159,210);
+}
+
+.c2.table > thead > tr > td.warning,
+.c2.table > tbody > tr > td.warning,
+.c2.table > tfoot > tr > td.warning,
+.c2.table > thead > tr > th.warning,
+.c2.table > tbody > tr > th.warning,
+.c2.table > tfoot > tr > th.warning,
+.c2.table > thead > tr.warning > td,
+.c2.table > tbody > tr.warning > td,
+.c2.table > tfoot > tr.warning > td,
+.c2.table > thead > tr.warning > th,
+.c2.table > tbody > tr.warning > th,
+.c2.table > tfoot > tr.warning > th {
+  background-color: rgb(255,220,114);
+}
+
+.c2.table-hover > tbody > tr > td.warning:hover,
+.c2.table-hover > tbody > tr > th.warning:hover,
+.c2.table-hover > tbody > tr.warning:hover > td,
+.c2.table-hover > tbody > tr:hover > .warning,
+.c2.table-hover > tbody > tr.warning:hover > th {
+  background-color: rgb(255,224,135);
+}
+
+.c2.table > thead > tr > td.danger,
+.c2.table > tbody > tr > td.danger,
+.c2.table > tfoot > tr > td.danger,
+.c2.table > thead > tr > th.danger,
+.c2.table > tbody > tr > th.danger,
+.c2.table > tfoot > tr > th.danger,
+.c2.table > thead > tr.danger > td,
+.c2.table > tbody > tr.danger > td,
+.c2.table > tfoot > tr.danger > td,
+.c2.table > thead > tr.danger > th,
+.c2.table > tbody > tr.danger > th,
+.c2.table > tfoot > tr.danger > th {
+  background-color: rgb(192,114,114);
+}
+
+.c2.table-hover > tbody > tr > td.danger:hover,
+.c2.table-hover > tbody > tr > th.danger:hover,
+.c2.table-hover > tbody > tr.danger:hover > td,
+.c2.table-hover > tbody > tr:hover > .danger,
+.c2.table-hover > tbody > tr.danger:hover > th {
+  background-color: rgb(199,135,135);
+}
+
 <UrlWhiteListForm
   disabled={false}
   onUpdate={[Function]}
@@ -81,12 +567,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
         >
           <FormGroup
             bsClass="form-group"
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+            className=""
             controlId="whitelist-disabled"
             validationState={null}
           >
             <div
-              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+              className="form-group"
             >
               <InputWrapper>
                 <span>
@@ -131,7 +617,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
                             "isStatic": false,
-                            "lastClassName": "kxWRDS",
+                            "lastClassName": "c0",
                             "rules": Array [
                               [Function],
                             ],
@@ -150,10 +636,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 kxWRDS"
+                        className="c0"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 kxWRDS help-block"
+                          className="c0 help-block"
                         >
                           Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk.
                         </span>
@@ -202,7 +688,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "jVYrA",
+              "lastClassName": "c1",
               "rules": Array [
                 [Function],
               ],
@@ -226,12 +712,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 jVYrA"
+          className="c1"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-default"
+            className="c1 btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -255,7 +741,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           "componentStyle": ComponentStyle {
             "componentId": "UrlWhiteListForm__StyledTable-sc-1nddwv6-0",
             "isStatic": false,
-            "lastClassName": "hJzPyZ",
+            "lastClassName": "c2",
             "rules": Array [
               [Function],
               "margin-top:10px;",
@@ -279,14 +765,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       <Table
         bordered={true}
         bsClass="table"
-        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hJzPyZ"
+        className="c2"
         condensed={false}
         hover={false}
         responsive={false}
         striped={true}
       >
         <table
-          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hJzPyZ table table-striped table-bordered"
+          className="c2 table table-striped table-bordered"
         >
           <thead>
             <tr>
@@ -378,12 +864,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="title-input0"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -414,7 +900,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "c3",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -440,7 +926,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="c3"
                                       componentClass="input"
                                       defaultValue="testam"
                                       inputRef={[Function]}
@@ -452,7 +938,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="c3 form-control"
                                         defaultValue="testam"
                                         id="title-input0"
                                         label=""
@@ -531,12 +1017,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="value-input0"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -567,7 +1053,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "c3",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -593,7 +1079,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="c3"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -605,7 +1091,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="c3 form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input0"
                                         label=""
@@ -681,12 +1167,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="url-input-type-0"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -2200,7 +2686,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "c1",
                             "rules": Array [
                               [Function],
                             ],
@@ -2223,12 +2709,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="c1"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="c1 btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -2326,12 +2812,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="title-input1"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -2362,7 +2848,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "c3",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2388,7 +2874,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="c3"
                                       componentClass="input"
                                       defaultValue="test"
                                       inputRef={[Function]}
@@ -2400,7 +2886,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="c3 form-control"
                                         defaultValue="test"
                                         id="title-input1"
                                         label=""
@@ -2479,12 +2965,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="value-input1"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -2515,7 +3001,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "c3",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2541,7 +3027,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="c3"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -2553,7 +3039,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="c3 form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input1"
                                         label=""
@@ -2629,12 +3115,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="url-input-type-1"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -4148,7 +4634,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "c1",
                             "rules": Array [
                               [Function],
                             ],
@@ -4171,12 +4657,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="c1"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="c1 btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -4274,12 +4760,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="title-input2"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -4310,7 +4796,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "c3",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -4336,7 +4822,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="c3"
                                       componentClass="input"
                                       defaultValue="test"
                                       inputRef={[Function]}
@@ -4348,7 +4834,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="c3 form-control"
                                         defaultValue="test"
                                         id="title-input2"
                                         label=""
@@ -4427,12 +4913,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="value-input2"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -4463,7 +4949,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "c3",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -4489,7 +4975,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="c3"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -4501,7 +4987,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="c3 form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input2"
                                         label=""
@@ -4577,12 +5063,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className=""
                           controlId="url-input-type-2"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -6096,7 +6582,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "c1",
                             "rules": Array [
                               [Function],
                             ],
@@ -6119,12 +6605,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="c1"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="c1 btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -6191,7 +6677,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "jVYrA",
+              "lastClassName": "c1",
               "rules": Array [
                 [Function],
               ],
@@ -6215,12 +6701,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 jVYrA"
+          className="c1"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-default"
+            className="c1 btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"

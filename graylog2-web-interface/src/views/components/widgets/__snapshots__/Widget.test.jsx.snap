@@ -1,10 +1,118 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<Widget /> should render with empty props 1`] = `
+.c0 {
+  height: inherit;
+  margin: 0;
+  padding: 20px;
+  display: grid;
+  display: -ms-grid;
+  grid-template-rows: auto minmax(10px,1fr);
+  -ms-grid-rows: auto minmax(10px,1fr);
+  -ms-grid-columns: 1fr;
+}
+
+.c0 .widget-top {
+  position: relative;
+  margin-bottom: -15px;
+  top: -5px;
+  font-size: 11px;
+  line-height: 11px;
+}
+
+.c0 .dc-chart {
+  float: none;
+}
+
+.c0 .controls {
+  display: none;
+  position: relative;
+  left: -3px;
+}
+
+.c0 .reloading {
+  margin-right: 2px;
+  font-weight: bold;
+  color: #005baf;
+  display: none;
+}
+
+.c0 .loading-failed {
+  color: #ad0707 !important;
+}
+
+.c0 .widget-title {
+  font-size: 18px;
+  height: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c0 .load-error {
+  color: #ad0707;
+  margin-right: 5px;
+}
+
+.c0 .widget-update-info {
+  text-align: left;
+  float: left;
+  font-size: 11px;
+  position: absolute;
+  bottom: 10px;
+  width: 130px;
+}
+
+.c0 .configuration dt {
+  text-transform: capitalize;
+}
+
+.c0 svg {
+  overflow: hidden;
+}
+
+.c0 .quickvalues-graph {
+  text-align: center;
+}
+
+.c0 .graph.scatterplot path.line {
+  display: none;
+}
+
+.c0 .actions {
+  position: absolute;
+  right: 15px;
+  bottom: 10px;
+}
+
+.c0 .actions div {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.c0 .actions button {
+  padding: 0 5px 0 5px;
+}
+
+.c0 .not-available {
+  font-size: 70px;
+}
+
+.c0 .loading,
+.c0 .not-available {
+  line-height: 100px;
+  text-align: center;
+}
+
+.c0 .loading .spinner,
+.c0 .not-available .spinner {
+  vertical-align: middle;
+}
+
 <body>
   <div>
     <div
-      class="WidgetFrame__WidgetWrap-sc-1uccjgg-0 laVatb"
+      class="c0"
       data-widget-id="widgetId"
       style="overflow: hidden;"
     >
