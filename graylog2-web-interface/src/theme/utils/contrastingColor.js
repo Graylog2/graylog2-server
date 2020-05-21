@@ -1,4 +1,9 @@
+// @flow strict
 import chroma from 'chroma-js';
+
+export type ContrastingColor = {
+  (string, void | string): string,
+};
 
 /**
  * Accepts a color and [WCAG distinguishable level](https://www.w3.org/TR/WCAG21/#distinguishable), it then returns a properly contrasting color.
@@ -10,14 +15,14 @@ import chroma from 'chroma-js';
  *
  */
 
-const contrastRatios = {
+const contrastRatios: {[string]: number} = {
   AA: 4.5, // https://www.w3.org/TR/WCAG21/#contrast-minimum
   AALarge: 3,
   AAA: 7, // https://www.w3.org/TR/WCAG21/#contrast-enhanced
   AAALarge: 4.5,
 };
 
-const contrastingColor = (color, wcagLevel = 'AAA') => {
+const contrastingColor = (color: string, wcagLevel?: string = 'AAA'): string => {
   const mixStep = 0.05;
   const mixColor = chroma(color).luminance() < 0.5 ? '#fff' : '#000';
   let mixture = 0;
