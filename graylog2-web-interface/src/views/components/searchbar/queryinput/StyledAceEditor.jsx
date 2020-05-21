@@ -13,7 +13,6 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     background-color: ${scTheme.color.global.inputBackground};
     color: ${scTheme.utils.contrastingColor(scTheme.color.global.inputBackground, 'AAA')};
 
-
     &.ace_multiselect .ace_selection.ace_start {
       box-shadow: 0 0 3px 0 ${scTheme.color.global.inputBackground};
     }
