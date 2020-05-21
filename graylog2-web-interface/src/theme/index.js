@@ -3,18 +3,6 @@ import colors from './colors';
 import breakpoints from './breakpoints';
 import utils, { type Utils } from './utils';
 
-const theme = {
-  color: {
-    ...colors,
-  },
-  breakpoint: {
-    ...breakpoints,
-  },
-  utils,
-};
-
-const themeModes: Array<string> = Object.keys(colors);
-
 export type ThemeInterface = {
   color: {
     brand: {
@@ -71,7 +59,17 @@ export type ThemeInterface = {
   utils: Utils,
 };
 
-export default theme;
+const theme: ThemeInterface = {
+  color: {
+    ...colors,
+  },
+  breakpoint: {
+    ...breakpoints,
+  },
+  utils,
+};
+
+const themeModes: Array<string> = Object.keys(colors);
 
 export {
   breakpoints as breakpoint,
@@ -79,3 +77,5 @@ export {
   utils,
   themeModes,
 };
+
+export default theme;

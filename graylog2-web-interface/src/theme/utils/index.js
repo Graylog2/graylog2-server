@@ -18,10 +18,11 @@ const utils: Utils = {
   readableColor,
 };
 
-export default utils;
 export {
   colorLevel,
   contrastingColor,
   opacify,
   readableColor,
 };
+
+export default utils;
