@@ -294,7 +294,8 @@ class Select extends React.Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps = (nextProps: Props) => {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps = (nextProps: Props) => {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
