@@ -1,7 +1,7 @@
 // @flow strict
 import colors from './colors';
 import breakpoints from './breakpoints';
-import utils from './utils';
+import utils, { type Utils } from './utils';
 
 const theme = {
   color: {
@@ -10,9 +10,7 @@ const theme = {
   breakpoint: {
     ...breakpoints,
   },
-  util: {
-    ...utils,
-  },
+  utils,
 };
 
 const themeModes: Array<string> = Object.keys(colors);
@@ -70,6 +68,7 @@ export type ThemeInterface = {
       },
     },
   },
+  utils: Utils,
 };
 
 export default theme;
@@ -77,6 +76,6 @@ export default theme;
 export {
   breakpoints as breakpoint,
   colors as color,
-  utils as util,
+  utils,
   themeModes,
 };

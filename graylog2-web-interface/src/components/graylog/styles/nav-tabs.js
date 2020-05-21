@@ -2,7 +2,7 @@ import { css } from 'styled-components';
 import { breakpoint } from 'theme';
 
 const navTabsStyles = css(({ theme }) => {
-  const borderColor = theme.util.colorLevel(theme.color.variant.info, -5);
+  const borderColor = theme.utils.colorLevel(theme.color.variant.info, -5);
 
   return css`
     .nav-tabs {
@@ -16,7 +16,7 @@ const navTabsStyles = css(({ theme }) => {
 
           &:hover {
             background-color: ${theme.color.gray[80]};
-            color: ${theme.util.contrastingColor(theme.color.gray[80])};
+            color: ${theme.utils.contrastingColor(theme.color.gray[80])};
           }
         }
 

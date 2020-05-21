@@ -22,15 +22,15 @@ const buttonStyles = ({ color }) => {
 
     const defaultBackground = variantColor;
     const defaultBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.05);
-    const defaultColor = isLink ? color.global.link : theme.util.contrastingColor(defaultBackground);
+    const defaultColor = isLink ? color.global.link : theme.utils.contrastingColor(defaultBackground);
 
     const activeBackground = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.10);
     const activeBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
-    const activeColor = isLink ? color.global.linkHover : theme.util.contrastingColor(activeBackground);
+    const activeColor = isLink ? color.global.linkHover : theme.utils.contrastingColor(activeBackground);
 
     const disabledBackground = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.20);
     const disabledBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
-    const disabledColor = isLink ? color.global.link : theme.util.contrastingColor(disabledBackground, 'AA');
+    const disabledColor = isLink ? color.global.link : theme.utils.contrastingColor(disabledBackground, 'AA');
 
     return css`
       &.btn-${variant} {
