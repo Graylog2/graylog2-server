@@ -4,12 +4,12 @@ import contrastingColor from './contrastingColor';
 import opacify from './opacify';
 import readableColor from './readableColor';
 
-export type Utils ={
+export type Utils = {
   colorLevel: any,
   contrastingColor: any,
   opacify: any,
   readableColor: any,
-}
+};
 
 const utils: Utils = {
   colorLevel,
