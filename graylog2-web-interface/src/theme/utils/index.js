@@ -1,13 +1,13 @@
 // @flow strict
 import colorLevel from './colorLevel';
 import contrastingColor from './contrastingColor';
-import opacify from './opacify';
+import opacify, { type Opacify } from './opacify';
 import readableColor, { type ReadableColor } from './readableColor';
 
 export type Utils = {
   colorLevel: any,
   contrastingColor: any,
-  opacify: any,
+  opacify: Opacify,
   readableColor: ReadableColor,
 };
 
