@@ -1,7 +1,7 @@
 // @flow strict
 import teinte from './variants/teinte';
 
-export type Colors = {
+export type Colors = {|
   brand: {
     primary: string,
     secondary: string,
@@ -84,10 +84,10 @@ export type Colors = {
       warning: string,
     },
   },
-};
+|};
 
 const colors = {
-  teinte,
+  ...teinte,
 };
 
 export default colors;

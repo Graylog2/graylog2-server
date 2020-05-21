@@ -12,11 +12,11 @@ const GraylogThemeProvider = ({ children }) => {
   return (
     <ThemeProvider theme={{
       mode: THEME_MODE,
-      colors: colors[THEME_MODE],
+      colors,
       breakpoints,
       utils,
       components: {
-        button: buttonStyles({ color: colors[THEME_MODE] }),
+        button: buttonStyles({ colors }),
       },
     }}>
       {children}

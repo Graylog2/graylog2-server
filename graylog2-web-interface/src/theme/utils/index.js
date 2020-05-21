@@ -5,10 +5,10 @@ import opacify from './opacify';
 import readableColor from './readableColor';
 
 export type Utils = {
-  colorLevel: mixed,
-  contrastingColor: mixed,
-  opacify: mixed,
-  readableColor: mixed,
+  colorLevel: any,
+  contrastingColor: any,
+  opacify: any,
+  readableColor: any,
 };
 
 const utils: Utils = {
