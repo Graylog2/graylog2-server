@@ -15,33 +15,33 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   &.top .tooltip-arrow,
   &.top-left .tooltip-arrow,
   &.top-right .tooltip-arrow {
-    border-top-color: ${theme.color.gray[10]};
+    border-top-color: ${theme.colors.gray[10]};
   }
 
   &.right .tooltip-arrow {
-    border-right-color: ${theme.color.gray[10]};
+    border-right-color: ${theme.colors.gray[10]};
   }
 
   &.left .tooltip-arrow {
-    border-left-color: ${theme.color.gray[10]};
+    border-left-color: ${theme.colors.gray[10]};
   }
 
   &.bottom .tooltip-arrow,
   &.bottom-left .tooltip-arrow,
   &.bottom-right .tooltip-arrow {
-    border-bottom-color: ${theme.color.gray[10]};
+    border-bottom-color: ${theme.colors.gray[10]};
   }
 
   .tooltip-inner {
-    color: ${util.readableColor(theme.color.gray[10])};
-    background-color: ${theme.color.gray[10]};
+    color: ${util.readableColor(theme.colors.gray[10])};
+    background-color: ${theme.colors.gray[10]};
     max-width: 300px;
 
     .datapoint-info {
       text-align: left;
 
       .date {
-        color: ${theme.color.gray[90]};
+        color: ${theme.colors.gray[90]};
       }
     }
   }

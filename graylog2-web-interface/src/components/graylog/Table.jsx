@@ -9,24 +9,24 @@ const variantRowStyles = css(({ theme }) => {
 
   const variants = {
     active: {
-      background: util.colorLevel(theme.color.global.tableBackgroundAlt, -10),
-      hover: util.colorLevel(theme.color.global.tableBackgroundAlt, -9),
+      background: util.colorLevel(theme.colors.global.tableBackgroundAlt, -10),
+      hover: util.colorLevel(theme.colors.global.tableBackgroundAlt, -9),
     },
     success: {
-      background: util.colorLevel(theme.color.variant.success, -10),
-      hover: util.colorLevel(theme.color.variant.success, -9),
+      background: util.colorLevel(theme.colors.variant.success, -10),
+      hover: util.colorLevel(theme.colors.variant.success, -9),
     },
     info: {
-      background: util.colorLevel(theme.color.variant.info, -10),
-      hover: util.colorLevel(theme.color.variant.info, -9),
+      background: util.colorLevel(theme.colors.variant.info, -10),
+      hover: util.colorLevel(theme.colors.variant.info, -9),
     },
     warning: {
-      background: util.colorLevel(theme.color.variant.warning, -10),
-      hover: util.colorLevel(theme.color.variant.warning, -9),
+      background: util.colorLevel(theme.colors.variant.warning, -10),
+      hover: util.colorLevel(theme.colors.variant.warning, -9),
     },
     danger: {
-      background: util.colorLevel(theme.color.variant.danger, -10),
-      hover: util.colorLevel(theme.color.variant.danger, -9),
+      background: util.colorLevel(theme.colors.variant.danger, -10),
+      hover: util.colorLevel(theme.colors.variant.danger, -9),
     },
   };
 
@@ -66,7 +66,7 @@ const variantRowStyles = css(({ theme }) => {
 
 const Table = styled(BootstrapTable)(({ theme }) => {
   return css`
-    background-color: ${theme.color.global.tableBackground};
+    background-color: ${theme.colors.global.tableBackground};
 
     &.table > thead > tr > th,
     &.table > tbody > tr > th,
@@ -74,23 +74,23 @@ const Table = styled(BootstrapTable)(({ theme }) => {
     &.table > thead > tr > td,
     &.table > tbody > tr > td,
     &.table > tfoot > tr > td {
-      border-top-color: ${theme.color.global.tableBackgroundAlt};
+      border-top-color: ${theme.colors.global.tableBackgroundAlt};
     }
 
     &.table > thead > tr > th {
-      border-bottom-color: ${theme.color.global.tableBackgroundAlt};
+      border-bottom-color: ${theme.colors.global.tableBackgroundAlt};
     }
 
     &.table > tbody + tbody {
-      border-top-color: ${theme.color.global.tableBackgroundAlt};
+      border-top-color: ${theme.colors.global.tableBackgroundAlt};
     }
 
     .table .table {
-      background-color: ${theme.color.gray[100]};
+      background-color: ${theme.colors.gray[100]};
     }
 
     &.table-bordered {
-      border-color: ${theme.color.global.tableBackgroundAlt};
+      border-color: ${theme.colors.global.tableBackgroundAlt};
     }
 
     &.table-bordered > thead > tr > th,
@@ -99,15 +99,15 @@ const Table = styled(BootstrapTable)(({ theme }) => {
     &.table-bordered > thead > tr > td,
     &.table-bordered > tbody > tr > td,
     &.table-bordered > tfoot > tr > td {
-      border-color: ${theme.color.global.tableBackgroundAlt};
+      border-color: ${theme.colors.global.tableBackgroundAlt};
     }
 
     &.table-striped > tbody > tr:nth-of-type(odd) {
-      background-color: ${theme.color.gray[90]};
+      background-color: ${theme.colors.gray[90]};
     }
 
     &.table-hover > tbody > tr:hover {
-      background-color: ${theme.color.global.tableBackgroundAlt};
+      background-color: ${theme.colors.global.tableBackgroundAlt};
     }
 
     ${variantRowStyles};

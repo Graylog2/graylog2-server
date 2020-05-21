@@ -14,8 +14,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   body {
-    background-color: ${theme.color.global.background};
-    color: ${theme.color.global.textDefault};
+    background-color: ${theme.colors.global.background};
+    color: ${theme.colors.global.textDefault};
     font-family: ${fontFamily};
     font-size: 12px;
     overflow-x: hidden;
@@ -33,7 +33,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   hr {
-    border-top: 1px solid ${theme.color.global.background};
+    border-top: 1px solid ${theme.colors.global.background};
   }
 
   h1,
@@ -45,7 +45,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     font-weight: normal;
     padding: 0;
     margin: 0;
-    color: ${theme.color.global.textDefault};
+    color: ${theme.colors.global.textDefault};
   }
 
   h1 {
@@ -66,11 +66,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   a {
-    color: ${theme.color.global.link};
+    color: ${theme.colors.global.link};
   }
 
   a:hover {
-    color: ${theme.color.global.linkHover};
+    color: ${theme.colors.global.linkHover};
   }
 
   /* Remove boostrap outline */
@@ -87,7 +87,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   input.form-control,
   select.form-control,
   textarea.form-control {
-    color: ${theme.color.gray[30]};
+    color: ${theme.colors.gray[30]};
     font-family: ${fontFamily};
 
     &:hover {
@@ -100,7 +100,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   legend small {
-    color: ${theme.color.gray[60]};
+    color: ${theme.colors.gray[60]};
     margin-left: 5px;
   }
 
@@ -112,13 +112,13 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   .content {
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: ${theme.color.global.contentBackground};
-    border: 1px solid ${theme.color.gray[80]};
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.gray[80]};
     margin-bottom: 10px;
 
     p.description {
       margin-top: 3px;
-      color: ${theme.color.gray[50]};
+      color: ${theme.colors.gray[50]};
     }
   }
 
@@ -162,7 +162,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .u-light {
-    border-bottom: 1px dotted ${theme.color.gray[70]};
+    border-bottom: 1px dotted ${theme.colors.gray[70]};
     margin-bottom: 5px;
     padding-bottom: 5px;
   }
@@ -180,7 +180,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .master-node {
-    color: ${theme.color.variant.dark.warning};
+    color: ${theme.colors.variant.dark.warning};
   }
 
   .loglevel-metrics-row {
@@ -204,7 +204,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .sources.overlay {
-    background-color: ${theme.color.gray[60]};
+    background-color: ${theme.colors.gray[60]};
     height: 200px;
     line-height: 200px;
     opacity: 0.2;
@@ -368,8 +368,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .sources th {
-    background-color: ${theme.color.gray[20]};
-    color: ${util.readableColor(theme.color.gray[20])};
+    background-color: ${theme.colors.gray[20]};
+    color: ${util.readableColor(theme.colors.gray[20])};
     font-weight: normal;
   }
 
@@ -379,8 +379,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .parse-error {
-    background-color: ${theme.color.variant.light.danger};
-    color: ${util.contrastingColor(theme.color.variant.light.danger)};
+    background-color: ${theme.colors.variant.light.danger};
+    color: ${util.contrastingColor(theme.colors.variant.light.danger)};
     padding-left: 2px;
     padding-right: 2px;
   }
@@ -398,8 +398,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .alerts th {
-    background-color: ${theme.color.gray[10]};
-    color: ${theme.color.global.textAlt};
+    background-color: ${theme.colors.gray[10]};
+    color: ${theme.colors.global.textAlt};
     font-weight: normal;
   }
 
@@ -408,11 +408,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .alerts th a:focus {
-    color: ${theme.color.global.textAlt};
+    color: ${theme.colors.global.textAlt};
   }
 
   .result-highlight-colored {
-    background-color: ${theme.color.variant.warning};
+    background-color: ${theme.colors.variant.warning};
   }
 
   .annotation .content {
@@ -572,7 +572,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   .alarm-callbacks li:not(:last-child) {
     margin-bottom: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid ${theme.color.gray[90]};
+    border-bottom: 1px solid ${theme.colors.gray[90]};
   }
 
   .threaddump {
@@ -629,14 +629,14 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .pill {
-    color: ${theme.color.global.textDefault};
-    background-color: ${theme.color.gray[90]};
+    color: ${theme.colors.global.textDefault};
+    background-color: ${theme.colors.gray[90]};
     padding: 6px 12px;
   }
 
   .tag-remove,
   .pill-remove {
-    color: ${theme.color.global.textDefault};
+    color: ${theme.colors.global.textDefault};
     cursor: pointer;
     margin-left: 5px;
   }

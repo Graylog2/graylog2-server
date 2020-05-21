@@ -4,7 +4,7 @@ This will allow developers to access all `theme` props in each component. In mos
 
 ```jsx static
 const StyledElement = styled.div(({ theme }) => `
-  background-color: ${theme.color.global.contentBackground};
+  background-color: ${theme.colors.global.contentBackground};
 `);
 ```
 
@@ -15,7 +15,7 @@ import styled, { type StyledComponent } from 'styled-components';
 import { type ThemeInterface } from 'theme';
 
 const StyledElement: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
-  background-color: ${theme.color.global.contentBackground};
+  background-color: ${theme.colors.global.contentBackground};
 `);
 ```
 
@@ -23,12 +23,12 @@ If you need to base some styles off of props, you can access them as well.
 
 ```jsx static
 const StyledElement = styled.div(({ wide, theme }) => `
-  background-color: ${theme.color.global.contentBackground};
+  background-color: ${theme.colors.global.contentBackground};
   width: ${wide ? '100%' : '50%'};
 `);
 // or
 const StyledElement: StyledComponent<{wide: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ wide, theme }) => `
-  background-color: ${theme.color.global.contentBackground};
+  background-color: ${theme.colors.global.contentBackground};
   width: ${wide ? '100%' : '50%'};
 `);
 

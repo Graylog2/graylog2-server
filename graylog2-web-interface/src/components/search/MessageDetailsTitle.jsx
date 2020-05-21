@@ -5,7 +5,7 @@ const Title = styled.h3(({ theme }) => `
   height: 30px;
 
   a {
-    color: ${theme.color.global.textDefault};
+    color: ${theme.colors.global.textDefault};
   }
 
   .label {

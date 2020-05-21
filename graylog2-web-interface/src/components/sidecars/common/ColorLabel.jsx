@@ -18,7 +18,7 @@ const ColorLabel = ({ color, size, text, theme }) => {
   const backgroundColor = d3.hsl(color);
   const borderColor = backgroundColor.darker();
   // Use dark font on brighter backgrounds and light font in darker backgrounds
-  const textColor = backgroundColor.l > 0.6 ? d3.rgb(theme.color.global.textDefault) : d3.rgb(theme.color.global.textAlt);
+  const textColor = backgroundColor.l > 0.6 ? d3.rgb(theme.colors.global.textDefault) : d3.rgb(theme.colors.global.textAlt);
 
   return (
     <ColorLabelWrap size={size}>

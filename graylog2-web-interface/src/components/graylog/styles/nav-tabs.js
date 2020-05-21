@@ -2,7 +2,7 @@ import { css } from 'styled-components';
 import { breakpoint, util } from 'theme';
 
 const navTabsStyles = css(({ theme }) => {
-  const borderColor = util.colorLevel(theme.color.variant.info, -5);
+  const borderColor = util.colorLevel(theme.colors.variant.info, -5);
 
   return css`
     .nav-tabs {
@@ -11,12 +11,12 @@ const navTabsStyles = css(({ theme }) => {
       > li {
         > a {
           transition: background-color 150ms ease-in-out;
-          color: ${theme.color.global.textDefault};
-          border-color: ${theme.color.gray[80]} ${theme.color.gray[80]} ${borderColor};
+          color: ${theme.colors.global.textDefault};
+          border-color: ${theme.colors.gray[80]} ${theme.colors.gray[80]} ${borderColor};
 
           &:hover {
-            background-color: ${theme.color.gray[80]};
-            color: ${util.contrastingColor(theme.color.gray[80])};
+            background-color: ${theme.colors.gray[80]};
+            color: ${util.contrastingColor(theme.colors.gray[80])};
           }
         }
 
@@ -24,8 +24,8 @@ const navTabsStyles = css(({ theme }) => {
           &,
           &:hover,
           &:focus {
-            color: ${theme.color.gray[10]};
-            background-color: ${theme.color.gray[100]};
+            color: ${theme.colors.gray[10]};
+            background-color: ${theme.colors.gray[100]};
             border-color: ${borderColor};
             border-bottom-color: transparent;
           }
@@ -35,9 +35,9 @@ const navTabsStyles = css(({ theme }) => {
           &,
           &:hover,
           &:focus {
-            color: ${theme.color.gray[60]};
-            background-color: ${theme.color.gray[100]};
-            border-color: ${theme.color.gray[100]} ${theme.color.gray[100]} ${borderColor};
+            color: ${theme.colors.gray[60]};
+            background-color: ${theme.colors.gray[100]};
+            border-color: ${theme.colors.gray[100]} ${theme.colors.gray[100]} ${borderColor};
             cursor: not-allowed;
           }
         }
@@ -61,7 +61,7 @@ const navTabsStyles = css(({ theme }) => {
         > .active > a,
         > .active > a:hover,
         > .active > a:focus {
-          border-bottom-color: ${theme.color.gray[100]};
+          border-bottom-color: ${theme.colors.gray[100]};
         }
       }
     }

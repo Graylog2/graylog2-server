@@ -19,13 +19,13 @@ type Props = {
 };
 
 const MessageDetailsDL: StyledComponent<{}, ThemeInterface, HTMLDListElement> = styled(MessageDetailsDefinitionList)(({ theme }) => `
-  color: ${theme.color.gray[40]};
+  color: ${theme.colors.gray[40]};
 
   dd {
     font-family: monospace;
 
     &:not(:last-child) {
-      border-bottom: 1px solid  ${theme.color.gray[90]};
+      border-bottom: 1px solid  ${theme.colors.gray[90]};
     }
   }
 `);

@@ -31,7 +31,7 @@ const MessageDetailsDefinitionList = styled.dl(({ theme }) => `
   }
 
   &.message-details-fields span:not(:last-child) dd {
-    border-bottom: 1px solid ${theme.color.gray[90]};
+    border-bottom: 1px solid ${theme.colors.gray[90]};
   }
 
   &.message-details-fields dd {

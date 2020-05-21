@@ -7,7 +7,7 @@ import { DataTable, Icon } from 'components/common';
 import { Badge } from 'components/graylog';
 
 const StyledBadge = styled(({ isFulfilled, theme, ...rest }) => <Badge {...rest} />)`
-  background-color: ${({ isFulfilled, theme }) => (isFulfilled ? theme.color.variant.success : theme.color.variant.danger)};
+  background-color: ${({ isFulfilled, theme }) => (isFulfilled ? theme.colors.variant.success : theme.colors.variant.danger)};
 `;
 
 class ContentPackConstraints extends React.Component {

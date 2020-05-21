@@ -28,7 +28,7 @@ type Props = {
 };
 
 const DecoratedField: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.small(({ theme }) => `
-  color: ${theme.color.gray[70]};
+  color: ${theme.colors.gray[70]};
   font-weight: normal;
 `);
 

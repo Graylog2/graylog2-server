@@ -8,7 +8,7 @@ const TimerangeWrap = styled.div(({ theme }) => `
   }
 
   .relative {
-    color: ${theme.color.gray[40]};
+    color: ${theme.colors.gray[40]};
   }
 
   .absolute {

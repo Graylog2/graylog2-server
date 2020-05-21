@@ -6,7 +6,7 @@ const HelpBlock = styled(BootstrapHelpBlock)(({ theme }) => css`
   display: block;
   margin-top: 5px;
   margin-bottom: 10px;
-  color: ${theme.color.gray[50]};
+  color: ${theme.colors.gray[50]};
 `);
 
 /** @component */

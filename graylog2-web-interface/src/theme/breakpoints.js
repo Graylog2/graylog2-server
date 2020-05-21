@@ -1,3 +1,4 @@
+// @flow strict
 const sizes = {
   xs: 480,
   sm: 768,
@@ -17,5 +18,13 @@ const breakpoints = {
   min,
   max,
 };
+
+console.log('breakpoints', breakpoints);
+
+// export type Breakpoints = {
+//   min: {
+
+//   }
+// }
 
 export default breakpoints;

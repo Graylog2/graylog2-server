@@ -18,7 +18,7 @@ import './webpack-resolver';
 
 const SourceCodeContainer = styled.div(({ darkMode, resizable, theme }) => `
   .ace_editor {
-    border: 1px solid ${theme.color.gray[80]};
+    border: 1px solid ${theme.colors.gray[80]};
     border-radius: 5px;
   }
 
@@ -32,8 +32,8 @@ const SourceCodeContainer = styled.div(({ darkMode, resizable, theme }) => `
 `);
 
 const Toolbar = styled.div(({ theme }) => `
-  background: ${theme.color.global.contentBackground};
-  border: 1px solid ${theme.color.gray[80]};
+  background: ${theme.colors.global.contentBackground};
+  border: 1px solid ${theme.colors.gray[80]};
   border-bottom: 0;
   border-radius: 5px 5px 0 0;
 

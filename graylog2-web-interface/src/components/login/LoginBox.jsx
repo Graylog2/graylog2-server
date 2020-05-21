@@ -6,8 +6,8 @@ import { Col, Row } from 'components/graylog';
 
 const LoginCol = styled(Col)(({ theme }) => css`
   padding: 15px;
-  background-color: ${theme.color.global.contentBackground};
-  border: 1px solid ${theme.color.gray[80]};
+  background-color: ${theme.colors.global.contentBackground};
+  border: 1px solid ${theme.colors.gray[80]};
   border-radius: 4px;
   box-shadow: 0 0 21px rgba(0, 0, 0, 0.75);
   margin-top: 120px;

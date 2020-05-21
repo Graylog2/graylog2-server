@@ -18,14 +18,14 @@ import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widg
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 
 const DashboardWrap = styled.div(({ theme }) => css`
-  color: ${theme.color.global.textDefault};
+  color: ${theme.colors.global.textDefault};
   margin: 0;
   width: 100%;
 `);
 
 const WidgetContainer = styled.div(({ theme }) => css`
-  background-color: ${theme.color.global.contentBackground};
-  border: 1px solid ${theme.color.gray[80]};
+  background-color: ${theme.colors.global.contentBackground};
+  border: 1px solid ${theme.colors.gray[80]};
   z-index: auto;
 `);
 

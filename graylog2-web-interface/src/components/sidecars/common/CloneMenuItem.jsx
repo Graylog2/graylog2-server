@@ -17,14 +17,14 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => `
     clear: both;
     font-weight: normal;
     line-height: 1.42857143;
-    color: ${theme.color.global.textDefault};
+    color: ${theme.colors.global.textDefault};
     white-space: nowrap;
 
     &:hover,
     &:focus {
       text-decoration: none;
-      color: ${util.contrastingColor(theme.color.gray[90])};
-      background-color: ${theme.color.gray[90]};
+      color: ${util.contrastingColor(theme.colors.gray[90])};
+      background-color: ${theme.colors.gray[90]};
     }
   }
 `);

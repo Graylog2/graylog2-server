@@ -21,7 +21,7 @@ const StyledTable = styled(Table)(({ theme }) => `
   word-break: break-all;
 
   thead > tr {
-    color: ${theme.color.global.textAlt};
+    color: ${theme.colors.global.textAlt};
   }
 
   td,
@@ -34,7 +34,7 @@ const StyledTable = styled(Table)(({ theme }) => `
     border: 0;
     font-size: 11px;
     font-weight: normal;
-    background-color: ${theme.color.gray[10]};
+    background-color: ${theme.colors.gray[10]};
     white-space: nowrap;
   }
 
@@ -47,11 +47,11 @@ const StyledTable = styled(Table)(({ theme }) => `
   }
 
   tbody.message-group-toggled {
-    border-left: 7px solid ${theme.color.variant.light.info};
+    border-left: 7px solid ${theme.colors.variant.light.info};
   }
 
   tbody.message-highlight {
-    border-left: 7px solid ${theme.color.variant.light.success};
+    border-left: 7px solid ${theme.colors.variant.light.success};
   }
 
   tr.fields-row {
@@ -67,7 +67,7 @@ const StyledTable = styled(Table)(({ theme }) => `
     padding-top: 0;
     padding-bottom: 5px;
     font-family: monospace;
-    color: ${theme.color.variant.dark.info};
+    color: ${theme.colors.variant.dark.info};
   }
 
   tr.message-row {
@@ -88,7 +88,7 @@ const StyledTable = styled(Table)(({ theme }) => `
         left: 5px;
         top: 4.5em;
         height: 1.5em;
-        background: linear-gradient(to bottom, ${chroma(theme.color.global.contentBackground).alpha(0).css()}, ${chroma(theme.color.global.contentBackground).alpha(1).css()} 95%);
+        background: linear-gradient(to bottom, ${chroma(theme.colors.global.contentBackground).alpha(0).css()}, ${chroma(theme.colors.global.contentBackground).alpha(1).css()} 95%);
       }
     }
   }
@@ -117,13 +117,13 @@ const StyledTable = styled(Table)(({ theme }) => `
 
   th i.sort-order-item {
     margin-right: 2px;
-    color: ${theme.color.gray[10]};
+    color: ${theme.colors.gray[10]};
     visiblity: hidden;
   }
 
   th i.sort-order-active,
   th:hover i.sort-order-item {
-    color: ${theme.color.global.textAlt};
+    color: ${theme.colors.global.textAlt};
   }
 `);
 

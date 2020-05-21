@@ -26,7 +26,7 @@ type DirectionStrategy = {
 };
 
 const SortIcon: StyledComponent<{sortActive: boolean}, ThemeInterface, HTMLButtonElement> = styled.button(({ sortActive, theme }) => {
-  const color = sortActive ? theme.color.gray[20] : theme.color.gray[70];
+  const color = sortActive ? theme.colors.gray[20] : theme.colors.gray[70];
 
   return css`
     border: 0;

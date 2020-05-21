@@ -7,7 +7,7 @@ import Icon from './Icon';
 
 const ScrollBtn = styled.button(({ theme }) => `
   opacity: 0.3;
-  background-color: ${theme.color.variant.primary};
+  background-color: ${theme.colors.variant.primary};
   width: 40px;
   height: 40px;
   position: fixed;
@@ -26,7 +26,7 @@ const ScrollBtn = styled.button(({ theme }) => `
 `);
 
 const ArrowUpIcon = styled(Icon)(({ theme }) => `
-  color: ${util.readableColor(theme.color.variant.primary)};
+  color: ${util.readableColor(theme.colors.variant.primary)};
   position: absolute;
   top: 50%;
   left: 50%;

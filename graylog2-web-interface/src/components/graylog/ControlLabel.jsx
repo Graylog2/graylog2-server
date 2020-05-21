@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { ControlLabel as BootstrapControlLabel } from 'react-bootstrap';
 
 const ControlLabel = styled(BootstrapControlLabel)(({ theme }) => css`
-  color: ${theme.color.global.textDefault};
+  color: ${theme.colors.global.textDefault};
   font-weight: bold;
   margin-bottom: 5px;
   display: inline-block;

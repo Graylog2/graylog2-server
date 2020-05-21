@@ -34,7 +34,7 @@ const DEFAULT_BAR = {
 };
 
 const boxShadow = (meta) => css`
-  box-shadow: ${meta} ${({ theme }) => chroma(theme.color.brand.secondary).alpha(0.1).css()};
+  box-shadow: ${meta} ${({ theme }) => chroma(theme.colors.brand.secondary).alpha(0.1).css()};
 `;
 
 const animatedStripes = keyframes`
@@ -56,7 +56,7 @@ const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
-  background-color: ${theme.color.gray[90]};
+  background-color: ${theme.colors.gray[90]};
   border-radius: 4px;
   ${boxShadow('inset 0 1px 2px')};
   display: flex;
@@ -64,7 +64,7 @@ const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled
 `);
 
 const Bar: StyledComponent<BarProps, ThemeInterface, HTMLDivElement> = styled.div(({ animated, striped, theme, value }) => {
-  const defaultStripColor = chroma(theme.color.global.contentBackground).alpha(0.25).css();
+  const defaultStripColor = chroma(theme.colors.global.contentBackground).alpha(0.25).css();
 
   return css`
     height: 100%;
@@ -75,7 +75,7 @@ const Bar: StyledComponent<BarProps, ThemeInterface, HTMLDivElement> = styled.di
     transition: width 500ms ease-in-out;
     width: ${value}%;
     max-width: 100%;
-    text-shadow: 0 1px 2px ${chroma(theme.color.gray[10]).alpha(0.4).css()}, 2px -1px 3px ${chroma(theme.color.gray[100]).alpha(0.5).css()};
+    text-shadow: 0 1px 2px ${chroma(theme.colors.gray[10]).alpha(0.4).css()}, 2px -1px 3px ${chroma(theme.colors.gray[100]).alpha(0.5).css()};
     ${(animated || striped) && css`
       background-image: linear-gradient(
         45deg,

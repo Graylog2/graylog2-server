@@ -17,7 +17,7 @@ import { Icon, LinkToNode, Spinner } from 'components/common';
 
 const InputIO = styled.span(({ theme }) => `
   .total {
-    color: ${theme.color.gray[70]};
+    color: ${theme.colors.gray[70]};
   }
 
   .value {

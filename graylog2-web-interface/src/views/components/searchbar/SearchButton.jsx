@@ -22,7 +22,7 @@ const DirtyButton: StyledComponent<{}, ThemeInterface, Button> = styled(StyledBu
     top: -5px;
     right: -6px;
     border-radius: 50%;
-    background-color: ${theme.color.variant.warning};
+    background-color: ${theme.colors.variant.warning};
   }
 `);
 

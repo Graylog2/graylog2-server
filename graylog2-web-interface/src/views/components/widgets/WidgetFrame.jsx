@@ -33,12 +33,12 @@ const WidgetWrap = styled.div(({ theme }) => css`
   .reloading {
     margin-right: 2px;
     font-weight: bold;
-    color: ${theme.color.variant.dark.info};
+    color: ${theme.colors.variant.dark.info};
     display: none;
   }
 
   .loading-failed {
-    color: ${theme.color.variant.danger} !important;
+    color: ${theme.colors.variant.danger} !important;
   }
 
   .widget-title {
@@ -50,7 +50,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   }
 
   .load-error {
-    color: ${theme.color.variant.danger};
+    color: ${theme.colors.variant.danger};
     margin-right: 5px;
   }
 

@@ -13,8 +13,8 @@ export const Title: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> 
   align-items: center;
   cursor: pointer;
   position: relative;
-  color: ${isSelected ? theme.color.variant.light.danger : 'inherit'};
-  background: ${isSelected ? theme.color.gray[10] : 'tranparent'};
+  color: ${isSelected ? theme.colors.variant.light.danger : 'inherit'};
+  background: ${isSelected ? theme.colors.gray[10] : 'tranparent'};
   ${((isSelected && expandRight) && css`
 
     &::after {
@@ -47,11 +47,11 @@ export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
 `;
 
 export const Content: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> = styled.div(({ isSelected, expandRight, theme }) => css`
-  color: ${util.readableColor(theme.color.global.contentBackground)};
-  background: ${theme.color.global.contentBackground};
+  color: ${util.readableColor(theme.colors.global.contentBackground)};
+  background: ${theme.colors.global.contentBackground};
   box-shadow:
-    inset 0 13px 5px -10px ${theme.color.gray[80]},
-    inset 0 -13px 5px -10px ${theme.color.gray[80]};
+    inset 0 13px 5px -10px ${theme.colors.gray[80]},
+    inset 0 -13px 5px -10px ${theme.colors.gray[80]};
   ${(isSelected ? css`
     padding: 20px;
   ` : css`

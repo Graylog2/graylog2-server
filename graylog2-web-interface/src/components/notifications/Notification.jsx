@@ -15,7 +15,7 @@ const StyledAlert = styled(Alert)(({ theme }) => `
   margin-top: 10px;
 
   i {
-    color: ${theme.color.gray[10]};
+    color: ${theme.colors.gray[10]};
   }
 
   form {

@@ -13,15 +13,15 @@ export const paginationStyles = css(({ theme }) => css`
     > li {
       > a,
       > span {
-        color: ${util.readableColor(theme.color.global.contentBackground)};
-        background-color: ${theme.color.global.contentBackground};
-        border-color: ${theme.color.gray[80]};
+        color: ${util.readableColor(theme.colors.global.contentBackground)};
+        background-color: ${theme.colors.global.contentBackground};
+        border-color: ${theme.colors.gray[80]};
 
         &:hover,
         &:focus {
-          color: ${theme.color.variant.dark.primary};
-          background-color: ${theme.color.gray[90]};
-          border-color: ${theme.color.gray[80]};
+          color: ${theme.colors.variant.dark.primary};
+          background-color: ${theme.colors.gray[90]};
+          border-color: ${theme.colors.gray[80]};
         }
       }
     }
@@ -31,9 +31,9 @@ export const paginationStyles = css(({ theme }) => css`
       &,
       &:hover,
       &:focus {
-        color: ${theme.color.variant.dark.primary};
-        background-color: ${theme.color.gray[90]};
-        border-color: ${theme.color.gray[80]};
+        color: ${theme.colors.variant.dark.primary};
+        background-color: ${theme.colors.gray[90]};
+        border-color: ${theme.colors.gray[80]};
       }
     }
 
@@ -44,9 +44,9 @@ export const paginationStyles = css(({ theme }) => css`
       > a,
       > a:hover,
       > a:focus {
-        color: ${theme.color.gray[60]};
-        background-color: ${theme.color.gray[80]};
-        border-color: ${theme.color.gray[80]};
+        color: ${theme.colors.gray[60]};
+        background-color: ${theme.colors.gray[80]};
+        border-color: ${theme.colors.gray[80]};
       }
     }
   }
