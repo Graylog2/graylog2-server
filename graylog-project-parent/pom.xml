@@ -23,12 +23,13 @@
         <module>../graylog2-server</module>
         <module>../integration-tests</module>
         <module>../full-backend-tests</module>
+        <module>../graylog-storage-elasticsearch6</module>
     </modules>
 
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>3.3.0-beta.4-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
