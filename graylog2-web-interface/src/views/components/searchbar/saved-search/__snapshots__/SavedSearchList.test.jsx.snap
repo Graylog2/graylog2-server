@@ -315,7 +315,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
   margin-bottom: 5px;
 }
 
-.c3 {
+.c2 {
   clear: right;
   display: -webkit-box;
   display: -webkit-flex;
@@ -325,30 +325,6 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-}
-
-.c2 {
-  background-color: rgb(198,207,231);
-  border-color: rgb(169,185,221);
-  color: #1f1f1f;
-}
-
-.c2 a:not(.btn) {
-  color: rgb(77,80,89);
-  font-weight: bold;
-  -webkit-text-decoration: underline;
-  text-decoration: underline;
-}
-
-.c2 a:not(.btn):hover,
-.c2 a:not(.btn):focus {
-  color: rgb(44,46,52);
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-.c2 a:not(.btn):active {
-  color: rgb(44,46,52);
 }
 
 <body
@@ -427,7 +403,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
               </form>
             </div>
             <div
-              class="c2 c3 alert alert-info"
+              class="c2 alert alert-info"
               role="alert"
             >
               <svg
@@ -1033,7 +1009,7 @@ button.c4:focus:not(.disabled) .list-group-item-heading {
                       15
                     </option>
                   </select>
-
+                  
                 </span>
               </div>
             </div>

@@ -1,11 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NotificationBadge renders count when there are notifications 1`] = `
-.c2 {
-  background-color: #ad0707;
-  color: #fff;
-}
-
 .c0.nav > li > a:hover,
 .c0.nav > li > a:focus {
   background-color: #e6e6e6;
@@ -229,7 +224,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                       "isStatic": false,
-                                      "lastClassName": "c2",
+                                      "lastClassName": "gDhrrS",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -250,12 +245,12 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                 <Badge
                                   bsClass="badge"
                                   bsStyle="danger"
-                                  className="c2"
+                                  className=""
                                   id="notification-badge"
                                   pullRight={false}
                                 >
                                   <span
-                                    className="c2 badge badge-danger"
+                                    className="badge badge-danger"
                                     id="notification-badge"
                                   >
                                     42
