@@ -21,10 +21,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.TestIndexSet;
@@ -46,7 +44,6 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -691,23 +688,6 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                 .containsOnly(indexRange0.indexName(), indexRange1.indexName());
         assertThat(searches.determineAffectedIndices(relativeRange, null))
                 .containsOnly(indexRange0.indexName(), indexRange1.indexName());
-    }
-
-    @Test
-    public void getTimestampRangeFilterReturnsNullIfTimeRangeIsNull() {
-        assertThat(IndexHelper.getTimestampRangeFilter(null)).isNull();
-    }
-
-    @Test
-    public void getTimestampRangeFilterReturnsRangeQueryWithGivenTimeRange() {
-        final DateTime from = new DateTime(2016, 1, 15, 12, 0, DateTimeZone.UTC);
-        final DateTime to = from.plusHours(1);
-        final TimeRange timeRange = AbsoluteRange.create(from, to);
-        final RangeQueryBuilder queryBuilder = (RangeQueryBuilder) IndexHelper.getTimestampRangeFilter(timeRange);
-        assertThat(queryBuilder).isNotNull();
-        assertThat(queryBuilder.fieldName()).isEqualTo("timestamp");
-        assertThat(queryBuilder.from()).isEqualTo(Tools.buildElasticSearchTimeFormat(from));
-        assertThat(queryBuilder.to()).isEqualTo(Tools.buildElasticSearchTimeFormat(to));
     }
 
     @Test
