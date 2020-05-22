@@ -35,16 +35,13 @@ const GlobalThroughputStore = Reflux.createStore({
     if (!update.metrics) {
       return;
     }
-    Object.keys(update.metrics).forEach((nodeId) => {
-      const inputMetric = update.metrics[nodeId][this.metrics.input];
-      const outputMetric = update.metrics[nodeId][this.metrics.output];
-      if (inputMetric) {
-        this.throughput = { ...this.throughput, input: inputMetric.metric.value };
-      }
-      if (outputMetric) {
-        this.throughput = { ...this.throughput, output: outputMetric.metric.value };
-      }
-    });
+    const input = Object.keys(update.metrics)
+      .map((nodeId) => update.metrics[nodeId][this.metrics.input]?.metric?.value ?? 0)
+      .reduce((prev, cur) => prev + cur, 0);
+    const output = Object.keys(update.metrics)
+      .map((nodeId) => update.metrics[nodeId][this.metrics.output]?.metric?.value ?? 0)
+      .reduce((prev, cur) => prev + cur, 0);
+    this.throughput = { input, output, loading: false };
 
     this.trigger({ throughput: this.throughput });
   },
