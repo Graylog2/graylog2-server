@@ -1,6 +1,5 @@
 // @flow strict
-
-import GlobalThroughputStore from "./GlobalThroughputStore";
+import GlobalThroughputStore from './GlobalThroughputStore';
 
 const expectedThroughput = (input, output) => ({ throughput: { input, output, loading: false } });
 const nodeThroughput = (input, output) => ({
@@ -33,7 +32,7 @@ describe('GlobalThroughputStore', () => {
     }, done);
 
     GlobalThroughputStore.updateMetrics(metricsUpdate({
-        node1: nodeThroughput(42, 17),
+      node1: nodeThroughput(42, 17),
     }));
   });
   it('should sum individual throughputs from response', (done) => {
@@ -42,9 +41,9 @@ describe('GlobalThroughputStore', () => {
     }, done);
 
     GlobalThroughputStore.updateMetrics(metricsUpdate({
-        node1: nodeThroughput(42, 17),
-        node2: nodeThroughput(549, 4980),
-        node3: nodeThroughput(18, 190),
+      node1: nodeThroughput(42, 17),
+      node2: nodeThroughput(549, 4980),
+      node3: nodeThroughput(18, 190),
     }));
   });
   it('should reset values between sequential updates', (done) => {
