@@ -5,7 +5,6 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesIT;
-import org.junit.Before;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class SearchesES6IT extends SearchesIT {
                 streamService,
                 indices,
                 indexSetRegistry,
-                new SearchesDriverES6(jestClient(), new Configuration(), scrollResultFactory)
+                new SearchesAdapterES6(jestClient(), new Configuration(), scrollResultFactory)
         );
     }
 }

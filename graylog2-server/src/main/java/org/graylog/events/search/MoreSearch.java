@@ -59,7 +59,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.SearchFailure;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.SearchesDriver;
+import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -114,8 +114,8 @@ public class MoreSearch extends Searches {
                       JestClient jestClient,
                       Configuration configuration,
                       ESQueryDecorators esQueryDecorators,
-                      SearchesDriver searchesDriver) {
-        super(indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, searchesDriver);
+                      SearchesAdapter searchesAdapter) {
+        super(indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, searchesAdapter);
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
         this.scrollResultFactory = scrollResultFactory;

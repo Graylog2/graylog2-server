@@ -48,7 +48,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
-public class SearchesDriverES6 implements SearchesDriver {
+public class SearchesAdapterES6 implements SearchesAdapter {
     public static final String AGG_CARDINALITY = "gl2_field_cardinality";
     public static final String AGG_HISTOGRAM = "gl2_histogram";
     public static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
@@ -66,7 +66,7 @@ public class SearchesDriverES6 implements SearchesDriver {
     private final ScrollResult.Factory scrollResultFactory;
 
     @Inject
-    public SearchesDriverES6(JestClient jestClient, Configuration configuration, ScrollResult.Factory scrollResultFactory) {
+    public SearchesAdapterES6(JestClient jestClient, Configuration configuration, ScrollResult.Factory scrollResultFactory) {
         this.jestClient = jestClient;
         this.configuration = configuration;
         this.scrollResultFactory = scrollResultFactory;

@@ -7,7 +7,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import java.util.List;
 import java.util.Set;
 
-public interface SearchesDriver {
+public interface SearchesAdapter {
     CountResult count(Set<String> affectedIndices, String query, TimeRange range, String filter);
 
     ScrollResult scroll(Set<String> affectedIndices, Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields);

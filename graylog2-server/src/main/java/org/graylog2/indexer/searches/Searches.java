@@ -117,7 +117,7 @@ public class Searches {
     private final StreamService streamService;
     private final Indices indices;
     private final IndexSetRegistry indexSetRegistry;
-    private final SearchesDriver searchesDriver;
+    private final SearchesAdapter searchesAdapter;
 
     @Inject
     public Searches(IndexRangeService indexRangeService,
@@ -125,7 +125,7 @@ public class Searches {
                     StreamService streamService,
                     Indices indices,
                     IndexSetRegistry indexSetRegistry,
-                    SearchesDriver searchesDriver) {
+                    SearchesAdapter searchesAdapter) {
         this.indexRangeService = requireNonNull(indexRangeService, "indexRangeService");
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
@@ -134,7 +134,7 @@ public class Searches {
         this.streamService = requireNonNull(streamService, "streamService");
         this.indices = requireNonNull(indices, "indices");
         this.indexSetRegistry = requireNonNull(indexSetRegistry, "indexSetRegistry");
-        this.searchesDriver = searchesDriver;
+        this.searchesAdapter = searchesAdapter;
     }
 
     public CountResult count(String query, TimeRange range) {
@@ -147,7 +147,7 @@ public class Searches {
             return CountResult.empty();
         }
 
-        final CountResult result = searchesDriver.count(affectedIndices, query, range, filter);
+        final CountResult result = searchesAdapter.count(affectedIndices, query, range, filter);
 
         recordEsMetrics(result.tookMs(), range);
 
@@ -162,7 +162,7 @@ public class Searches {
 
         final Sorting sorting = new Sorting("_doc", Sorting.Direction.ASC);
 
-        final ScrollResult result = searchesDriver.scroll(affectedIndices, indexWildcards, sorting, filter, query, range, limit, offset, fields);
+        final ScrollResult result = searchesAdapter.scroll(affectedIndices, indexWildcards, sorting, filter, query, range, limit, offset, fields);
 
         recordEsMetrics(result.tookMs(), range);
 
@@ -191,14 +191,14 @@ public class Searches {
         final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(config.range(), config.filter());
 
         final Set<String> indices = extractIndexNamesFromIndexRanges(indexRanges);
-        final SearchResult result = searchesDriver.search(indices, indexRanges, config);
+        final SearchResult result = searchesAdapter.search(indices, indexRanges, config);
         recordEsMetrics(result.tookMs(), config.range());
         return result;
     }
 
     public TermsResult terms(String field, List<String> stackedFields, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        TermsResult result = searchesDriver.terms(query, filter, range, affectedIndices, field, stackedFields, size, sorting);
+        TermsResult result = searchesAdapter.terms(query, filter, range, affectedIndices, field, stackedFields, size, sorting);
         recordEsMetrics(result.tookMs(), range);
         return result;
     }
@@ -225,7 +225,7 @@ public class Searches {
                                                Sorting.Direction sorting) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
 
-        final TermsHistogramResult result = searchesDriver.termsHistogram(query, filter, range, affectedIndices, field, stackedFields, size, sorting, interval);
+        final TermsHistogramResult result = searchesAdapter.termsHistogram(query, filter, range, affectedIndices, field, stackedFields, size, sorting, interval);
 
         recordEsMetrics(result.tookMs(), range);
         return result;
@@ -238,7 +238,7 @@ public class Searches {
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
 
-        final TermsStatsResult result = searchesDriver.termsStats(query, filter, range, affectedIndices, keyField, valueField, order, size);
+        final TermsStatsResult result = searchesAdapter.termsStats(query, filter, range, affectedIndices, keyField, valueField, order, size);
         recordEsMetrics(result.tookMs(), range);
         return result;
     }
@@ -266,7 +266,7 @@ public class Searches {
                                        boolean includeCount) {
         final Set<String> indices = indicesContainingField(determineAffectedIndices(range, filter), field);
 
-        final FieldStatsResult result = searchesDriver.fieldStats(query, filter, range, indices, field, includeCardinality, includeStats, includeCount);
+        final FieldStatsResult result = searchesAdapter.fieldStats(query, filter, range, indices, field, includeCardinality, includeStats, includeCount);
 
         recordEsMetrics(result.tookMs(), range);
         return result;
@@ -287,7 +287,7 @@ public class Searches {
 
     public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        final HistogramResult result = searchesDriver.histogram(query, filter, range, affectedIndices, interval);
+        final HistogramResult result = searchesAdapter.histogram(query, filter, range, affectedIndices, interval);
         recordEsMetrics(result.tookMs(), range);
         return result;
     }
@@ -309,7 +309,7 @@ public class Searches {
                                           boolean includeStats,
                                           boolean includeCardinality) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        final HistogramResult result = searchesDriver.fieldHistogram(query, filter, range, affectedIndices, field, interval, includeStats, includeCardinality);
+        final HistogramResult result = searchesAdapter.fieldHistogram(query, filter, range, affectedIndices, field, interval, includeStats, includeCardinality);
         recordEsMetrics(result.tookMs(), range);
         return result;
     }
