@@ -32,7 +32,7 @@ import javax.inject.Inject;
 
 public class CEFAmqpInput extends MessageInput {
 
-    private static final String NAME = "CEF AMQP Input";
+    private static final String NAME = "CEF AMQP";
 
     @AssistedInject
     public CEFAmqpInput(@Assisted Configuration configuration,
