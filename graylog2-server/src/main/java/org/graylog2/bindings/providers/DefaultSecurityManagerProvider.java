@@ -32,6 +32,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.MongoDbSessionDAO;
 import org.graylog2.security.OrderedAuthenticatingRealms;
+import org.graylog2.shared.security.ThrowingFirstSuccessfulStrategy;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -53,7 +54,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
         sm = new DefaultSecurityManager(orderedAuthenticatingRealms);
         final Authenticator authenticator = sm.getAuthenticator();
         if (authenticator instanceof ModularRealmAuthenticator) {
-            FirstSuccessfulStrategy strategy = new FirstSuccessfulStrategy();
+            FirstSuccessfulStrategy strategy = new ThrowingFirstSuccessfulStrategy();
             strategy.setStopAfterFirstSuccess(true);
             ((ModularRealmAuthenticator) authenticator).setAuthenticationStrategy(strategy);
         }

@@ -55,7 +55,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-@Api(value = "Search/Messages")
+@Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
 @Path("/views/search/messages")
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {

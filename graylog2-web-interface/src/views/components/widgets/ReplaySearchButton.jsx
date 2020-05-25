@@ -17,7 +17,7 @@ const DitheredIcon: StyledComponent<{}, {}, HTMLElement> = styled(Icon)`
 const NeutralLink: StyledComponent<{}, {}, HTMLAnchorElement> = styled.a`
   color: inherit;
   text-decoration: none;
-  
+
   &:visited {
     color: inherit;
   }
