@@ -12,7 +12,6 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.results.ResultMessage;
@@ -24,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
@@ -43,13 +43,13 @@ import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class MoreSearchAdapterES6 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES6.class);
-    private final Configuration configuration;
     private final MultiSearch multiSearch;
     private final Scroll scroll;
+    private Boolean allowLeadingWildcard;
 
     @Inject
-    public MoreSearchAdapterES6(Configuration configuration, MultiSearch multiSearch, Scroll scroll) {
-        this.configuration = configuration;
+    public MoreSearchAdapterES6(@Named("allow_leading_wildcard") Boolean allowLeadingWildcard, MultiSearch multiSearch, Scroll scroll) {
+        this.allowLeadingWildcard = allowLeadingWildcard;
         this.multiSearch = multiSearch;
         this.scroll = scroll;
     }
@@ -58,7 +58,7 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting, int page, int perPage, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams) {
         final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*")) ?
                 matchAllQuery() :
-                queryStringQuery(queryString).allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
+                queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
 
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
@@ -111,7 +111,7 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
     public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, String scrollTime, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
         final QueryBuilder query = (queryString.trim().isEmpty() || queryString.trim().equals("*")) ?
                 matchAllQuery() :
-                queryStringQuery(queryString).allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
+                queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
 
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
