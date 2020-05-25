@@ -16,7 +16,6 @@
  */
 package org.graylog2.dashboards;
 
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -27,18 +26,14 @@ import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -59,47 +54,6 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.clusterEventBus = clusterEventBus;
         this.serverEventBus = serverEventBus;
-    }
-
-    @Override
-    public Dashboard create(String title, String description, String creatorUserId, DateTime createdAt) {
-        Map<String, Object> dashboardData = Maps.newHashMap();
-        dashboardData.put(DashboardImpl.FIELD_TITLE, title);
-        dashboardData.put(DashboardImpl.FIELD_DESCRIPTION, description);
-        dashboardData.put(DashboardImpl.FIELD_CREATOR_USER_ID, creatorUserId);
-        dashboardData.put(DashboardImpl.FIELD_CREATED_AT, createdAt);
-
-        return new DashboardImpl(dashboardData);
-    }
-
-    private Dashboard create(ObjectId id, Map<String, Object> fields) {
-        final Dashboard dashboard = new DashboardImpl(id, fields);
-        // Add all widgets of this dashboard.
-        if (fields.containsKey(DashboardImpl.EMBEDDED_WIDGETS)) {
-            if (fields.get(DashboardImpl.EMBEDDED_WIDGETS) instanceof List) {
-                for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(DashboardImpl.EMBEDDED_WIDGETS)) {
-                    try {
-                        final DashboardWidget widget = dashboardWidgetCreator.fromPersisted(widgetFields);
-                        dashboard.addPersistedWidget(widget);
-                    } catch (InvalidRangeParametersException e) {
-                        LOG.error("Invalid range parameters of widget in dashboard: [" + dashboard.getId() + "]", e);
-                    }
-                }
-            }
-        }
-
-        return dashboard;
-    }
-
-    @Override
-    public Dashboard load(String id) throws NotFoundException {
-        final BasicDBObject o = (BasicDBObject) get(DashboardImpl.class, id);
-
-        if (o == null) {
-            throw new NotFoundException("Couldn't find dashboard with ID " + id);
-        }
-
-        return this.create((ObjectId) o.get(DashboardImpl.FIELD_ID), o.toMap());
     }
 
     @Override

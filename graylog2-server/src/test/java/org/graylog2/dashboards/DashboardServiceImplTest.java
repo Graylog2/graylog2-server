@@ -21,11 +21,8 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +35,6 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class DashboardServiceImplTest {
     @Rule
@@ -62,38 +58,6 @@ public class DashboardServiceImplTest {
                 dashboardWidgetCreator,
                 clusterEventBus,
                 serverEventBus);
-    }
-
-    @Test
-    public void testCreate() {
-        final String title = "Dashboard Title";
-        final String description = "This is the dashboard description";
-        final String creatorUserId = "foobar";
-        final DateTime createdAt = Tools.nowUTC();
-
-        final Dashboard dashboard = dashboardService.create(title, description, creatorUserId, createdAt);
-
-        assertNotNull(dashboard);
-        assertEquals(title, dashboard.getTitle());
-        assertEquals(description, dashboard.getDescription());
-        assertNotNull(dashboard.getId());
-        assertEquals(0, dashboardService.count());
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void testLoadNonExistentDashboard() throws NotFoundException {
-        this.dashboardService.load("54e3deadbeefdeadbeefaffe");
-    }
-
-    @Test
-    @MongoDBFixtures("singleDashboard.json")
-    public void testLoad() throws NotFoundException {
-        final String exampleDashboardId = "54e3deadbeefdeadbeefaffe";
-
-        final Dashboard dashboard = dashboardService.load(exampleDashboardId);
-
-        assertNotNull("Dashboard should have been found", dashboard);
-        assertEquals("Dashboard id should be the one that was retrieved", exampleDashboardId, dashboard.getId());
     }
 
     @Test
