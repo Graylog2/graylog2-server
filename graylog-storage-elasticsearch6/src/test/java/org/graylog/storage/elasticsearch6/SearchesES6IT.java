@@ -29,7 +29,7 @@ public class SearchesES6IT extends SearchesIT {
                 streamService,
                 indices,
                 indexSetRegistry,
-                new SearchesAdapterES6(jestClient(), new Configuration(), scrollResultFactory)
+                new SearchesAdapterES6(new Configuration(), new MultiSearch(jestClient()), new Scroll(scrollResultFactory, jestClient()))
         );
     }
 }

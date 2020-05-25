@@ -16,7 +16,6 @@
  */
 package org.graylog.events.search;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
@@ -30,13 +29,9 @@ import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStr
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -58,27 +53,23 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * This class contains search helper for the events system.
  */
-public class MoreSearch extends Searches {
+public class MoreSearch {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearch.class);
 
     private final StreamService streamService;
     private final IndexRangeService indexRangeService;
     private final ESQueryDecorators esQueryDecorators;
-    private final SearchesAdapter searchesAdapter;
+    private final MoreSearchAdapter moreSearchAdapter;
 
     @Inject
     public MoreSearch(StreamService streamService,
-                      Indices indices,
                       IndexRangeService indexRangeService,
-                      IndexSetRegistry indexSetRegistry,
-                      MetricRegistry metricRegistry,
                       ESQueryDecorators esQueryDecorators,
-                      SearchesAdapter searchesAdapter) {
-        super(indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, searchesAdapter);
+                      MoreSearchAdapter moreSearchAdapter) {
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
         this.esQueryDecorators = esQueryDecorators;
-        this.searchesAdapter = searchesAdapter;
+        this.moreSearchAdapter = moreSearchAdapter;
     }
 
     /**
@@ -102,7 +93,7 @@ public class MoreSearch extends Searches {
         final String queryString = parameters.query().trim();
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
 
-        return searchesAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
+        return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
@@ -155,7 +146,8 @@ public class MoreSearch extends Searches {
             throw e;
         }
 
-        searchesAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);searchesAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);
+        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);
+        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);
     }
 
     public Set<Stream> loadStreams(Set<String> streamIds) {

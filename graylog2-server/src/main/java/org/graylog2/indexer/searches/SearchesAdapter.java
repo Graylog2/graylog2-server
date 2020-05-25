@@ -16,13 +16,10 @@
  */
 package org.graylog2.indexer.searches;
 
-import org.graylog.events.processor.EventProcessorException;
-import org.graylog.events.search.MoreSearch;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.HistogramResult;
-import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsHistogramResult;
@@ -32,7 +29,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface SearchesAdapter {
     CountResult count(Set<String> affectedIndices, String query, TimeRange range, String filter);
@@ -52,11 +48,4 @@ public interface SearchesAdapter {
     HistogramResult histogram(String query, String filter, TimeRange range, Set<String> affectedIndices, Searches.DateHistogramInterval interval);
 
     HistogramResult fieldHistogram(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, Searches.DateHistogramInterval interval, boolean includeStats, boolean includeCardinality);
-
-    MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting, int page, int perPage, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams);
-
-    interface ScrollEventsCallback {
-        void accept(List<ResultMessage> results, AtomicBoolean requestContinue) throws EventProcessorException;
-    }
-    void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, String scrollTime, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 }
