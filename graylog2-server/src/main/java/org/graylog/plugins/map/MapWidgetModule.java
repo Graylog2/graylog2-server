@@ -18,14 +18,12 @@ package org.graylog.plugins.map;
 
 import org.graylog.plugins.map.geoip.MaxmindDataAdapter;
 import org.graylog.plugins.map.geoip.processor.GeoIpProcessor;
-import org.graylog.plugins.map.widget.strategy.MapWidgetStrategy;
 import org.graylog2.plugin.PluginModule;
 
 public class MapWidgetModule extends PluginModule {
     @Override
     protected void configure() {
         addMessageProcessor(GeoIpProcessor.class, GeoIpProcessor.Descriptor.class);
-        addWidgetStrategy(MapWidgetStrategy.class, MapWidgetStrategy.Factory.class);
         registerRestControllerPackage(getClass().getPackage().getName());
 
         installLookupDataAdapter(MaxmindDataAdapter.NAME,
