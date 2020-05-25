@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { Button, ButtonToolbar } from 'components/graylog';
 import Routes from 'routing/Routes';
 import { Timestamp } from 'components/common';
-import { util } from 'theme';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
@@ -15,11 +14,11 @@ import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import style from './SidecarRow.css';
 
 const SidecarTR = styled.tr(({ inactive, theme }) => `
-  color: ${inactive ? util.contrastingColor(theme.color.global.tableBackground, 'AA') : 'currentColor'};
+  color: ${inactive ? theme.utils.contrastingColor(theme.color.global.tableBackground, 'AA') : 'currentColor'};
   opacity: ${inactive ? 0.9 : 1};
 
   &:nth-of-type(2n+1) {
-    color: ${inactive ? util.contrastingColor(theme.color.global.tableBackgroundAlt, 'AA') : 'currentColor'};
+    color: ${inactive ? theme.utils.contrastingColor(theme.color.global.tableBackgroundAlt, 'AA') : 'currentColor'};
   }
 
   td:not(:last-child) {

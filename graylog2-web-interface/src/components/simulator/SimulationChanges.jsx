@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 import createReactClass from 'create-react-class';
 import { Col, Row } from 'components/graylog';
 
-import { util } from 'theme';
 import { Pluralize } from 'components/common';
 
 const SimulationChangesWrap = styled.div`
@@ -54,7 +53,7 @@ const FieldResultWrap = styled.div(({ resultType, theme }) => {
     dt,
     dd {
       background-color: ${types[resultType]};
-      color: ${util.contrastingColor(types[resultType])};
+      color: ${theme.utils.contrastingColor(types[resultType])};
     }
   `;
 });

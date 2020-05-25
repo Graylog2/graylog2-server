@@ -3,7 +3,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router';
 
-import { util } from 'theme';
 import { StyledBadge } from 'components/graylog/Badge';
 import Routes from 'routing/Routes';
 
@@ -19,7 +18,7 @@ const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
   return `
     margin-left: 4px;
     background-color: ${statuses[status]};
-    color: ${util.readableColor(statuses[status])};
+    color: ${theme.utils.readableColor(statuses[status])};
   `;
 });
 

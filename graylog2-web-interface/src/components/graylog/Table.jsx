@@ -2,31 +2,29 @@
 import { Table as BootstrapTable } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import { util } from 'theme';
-
 const variantRowStyles = css(({ theme }) => {
   let styles = '';
 
   const variants = {
     active: {
-      background: util.colorLevel(theme.color.global.tableBackgroundAlt, -10),
-      hover: util.colorLevel(theme.color.global.tableBackgroundAlt, -9),
+      background: theme.utils.colorLevel(theme.color.global.tableBackgroundAlt, -10),
+      hover: theme.utils.colorLevel(theme.color.global.tableBackgroundAlt, -9),
     },
     success: {
-      background: util.colorLevel(theme.color.variant.success, -10),
-      hover: util.colorLevel(theme.color.variant.success, -9),
+      background: theme.utils.colorLevel(theme.color.variant.success, -10),
+      hover: theme.utils.colorLevel(theme.color.variant.success, -9),
     },
     info: {
-      background: util.colorLevel(theme.color.variant.info, -10),
-      hover: util.colorLevel(theme.color.variant.info, -9),
+      background: theme.utils.colorLevel(theme.color.variant.info, -10),
+      hover: theme.utils.colorLevel(theme.color.variant.info, -9),
     },
     warning: {
-      background: util.colorLevel(theme.color.variant.warning, -10),
-      hover: util.colorLevel(theme.color.variant.warning, -9),
+      background: theme.utils.colorLevel(theme.color.variant.warning, -10),
+      hover: theme.utils.colorLevel(theme.color.variant.warning, -9),
     },
     danger: {
-      background: util.colorLevel(theme.color.variant.danger, -10),
-      hover: util.colorLevel(theme.color.variant.danger, -9),
+      background: theme.utils.colorLevel(theme.color.variant.danger, -10),
+      hover: theme.utils.colorLevel(theme.color.variant.danger, -9),
     },
   };
 

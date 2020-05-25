@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { util } from 'theme';
 import { MenuItem } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
@@ -23,7 +22,7 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => `
     &:hover,
     &:focus {
       text-decoration: none;
-      color: ${util.contrastingColor(theme.color.gray[90])};
+      color: ${theme.utils.contrastingColor(theme.color.gray[90])};
       background-color: ${theme.color.gray[90]};
     }
   }

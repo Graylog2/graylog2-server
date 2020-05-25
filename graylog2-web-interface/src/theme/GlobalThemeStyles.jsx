@@ -4,8 +4,6 @@ import 'opensans-npm-webfont/open_sans.css';
 import 'opensans-npm-webfont/open_sans_italic.css';
 import 'opensans-npm-webfont/open_sans_bold.css';
 
-import { util } from 'theme';
-
 const fontFamily = '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
 
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
@@ -369,7 +367,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .sources th {
     background-color: ${theme.color.gray[20]};
-    color: ${util.readableColor(theme.color.gray[20])};
+    color: ${theme.utils.readableColor(theme.color.gray[20])};
     font-weight: normal;
   }
 
@@ -380,7 +378,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .parse-error {
     background-color: ${theme.color.variant.light.danger};
-    color: ${util.contrastingColor(theme.color.variant.light.danger)};
+    color: ${theme.utils.contrastingColor(theme.color.variant.light.danger)};
     padding-left: 2px;
     padding-right: 2px;
   }

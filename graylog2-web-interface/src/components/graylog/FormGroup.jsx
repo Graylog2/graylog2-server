@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import styledTheme from 'styled-theming';
 import chroma from 'chroma-js';
 
-import { themeModes, util } from 'theme';
+import { themeModes } from 'theme';
 import FormControl from './FormControl';
 import { StyledAddon } from './InputGroup';
 
@@ -14,9 +14,9 @@ const VALID_STATES = ['error', 'warning', 'success'];
 
 const createCss = (validationState) => css(({ theme }) => {
   const variant = validationState === 'error' ? 'danger' : validationState;
-  const text = util.colorLevel(theme.color.variant[variant], 6);
+  const text = theme.utils.colorLevel(theme.color.variant[variant], 6);
   const border = theme.color.variant[variant];
-  const background = util.colorLevel(theme.color.variant[variant], -6);
+  const background = theme.utils.colorLevel(theme.color.variant[variant], -6);
 
   return css`
     &.has-${validationState} {

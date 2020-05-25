@@ -1,6 +1,6 @@
 // @flow strict
 import styled, { type StyledComponent, css } from 'styled-components';
-import { util, type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme';
 
 type StyleProps = {
   isSelected: boolean,
@@ -47,7 +47,7 @@ export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
 `;
 
 export const Content: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> = styled.div(({ isSelected, expandRight, theme }) => css`
-  color: ${util.readableColor(theme.color.global.contentBackground)};
+  color: ${theme.utils.readableColor(theme.color.global.contentBackground)};
   background: ${theme.color.global.contentBackground};
   box-shadow:
     inset 0 13px 5px -10px ${theme.color.gray[80]},
