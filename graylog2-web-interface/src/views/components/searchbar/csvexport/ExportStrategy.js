@@ -1,5 +1,5 @@
 // @flow strict
-import { Map, Set } from 'immutable';
+import { Set, List } from 'immutable';
 
 import View, { type ViewType } from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
@@ -8,10 +8,10 @@ import Query from 'views/logic/queries/Query';
 
 type ExportStrategy = {
   title: string,
-  shouldAllowWidgetSelection: (singleWidgetDownload: boolean, showWidgetSelection: boolean, widgets: Map<string, Widget>) => boolean,
+  shouldAllowWidgetSelection: (singleWidgetDownload: boolean, showWidgetSelection: boolean, widgets: List<Widget>) => boolean,
   shouldEnableDownload: (showWidgetSelection: boolean, selectedWidget: ?Widget, selectedFields: { field: string }[], loading: boolean) => boolean,
-  shouldShowWidgetSelection: (singleWidgetDownload: boolean, selectedWidget: ?Widget, widgets: Map<string, Widget>) => boolean,
-  initialWidget: (widgets: Map<string, Widget>, directExportWidgetId: ?string) => ?Widget,
+  shouldShowWidgetSelection: (singleWidgetDownload: boolean, selectedWidget: ?Widget, widgets: List<Widget>) => boolean,
+  initialWidget: (widgets: List<Widget>, directExportWidgetId: ?string) => ?Widget,
   downloadFile: (payload: ExportPayload, searchQueries: Set<Query>, searchType: ?any, searchId: string, filename: string) => Promise<void>,
 };
 

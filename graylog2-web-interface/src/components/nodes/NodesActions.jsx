@@ -3,7 +3,7 @@ import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import URI from 'urijs';
 
-import { DropdownButton, MenuItem, Button } from 'components/graylog';
+import { DropdownButton, DropdownSubmenu, MenuItem, Button } from 'components/graylog';
 import { ExternalLinkButton, IfPermitted } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
@@ -66,13 +66,10 @@ class NodesActions extends React.Component {
           </IfPermitted>
 
           <IfPermitted permissions="lbstatus:change">
-            <li className="dropdown-submenu left-submenu">
-              <a href="#">Override LB status</a>
-              <ul className="dropdown-menu">
-                <MenuItem onSelect={this._changeLBStatus('ALIVE')}>ALIVE</MenuItem>
-                <MenuItem onSelect={this._changeLBStatus('DEAD')}>DEAD</MenuItem>
-              </ul>
-            </li>
+            <DropdownSubmenu title="Override LB status" left>
+              <MenuItem onSelect={this._changeLBStatus('ALIVE')}>ALIVE</MenuItem>
+              <MenuItem onSelect={this._changeLBStatus('DEAD')}>DEAD</MenuItem>
+            </DropdownSubmenu>
           </IfPermitted>
 
           <IfPermitted permissions="node:shutdown">

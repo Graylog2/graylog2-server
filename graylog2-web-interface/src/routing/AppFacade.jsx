@@ -8,7 +8,6 @@ import connect from 'stores/connect';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import 'bootstrap/less/bootstrap.less';
-import 'stylesheets/bootstrap-submenus.less';
 import 'toastr/toastr.less';
 
 const SessionStore = StoreProvider.getStore('Session');

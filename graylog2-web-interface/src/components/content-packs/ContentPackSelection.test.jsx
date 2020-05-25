@@ -57,13 +57,13 @@ describe('<ContentPackSelection />', () => {
     wrapper.find('input#summary').simulate('change', { target: { name: 'summary', value: 'summary' } });
     wrapper.find('textarea#description').simulate('change', { target: { name: 'description', value: 'descr' } });
     wrapper.find('input#vendor').simulate('change', { target: { name: 'vendor', value: 'vendor' } });
-    wrapper.find('input#url').simulate('change', { target: { name: 'url', value: 'url' } });
+    wrapper.find('input#url').simulate('change', { target: { name: 'url', value: 'http://url' } });
     expect(changeFn.mock.calls.length).toBe(5);
     expect(resultedState.contentPack.name).toEqual('name');
     expect(resultedState.contentPack.summary).toEqual('summary');
     expect(resultedState.contentPack.description).toEqual('descr');
     expect(resultedState.contentPack.vendor).toEqual('vendor');
-    expect(resultedState.contentPack.url).toEqual('url');
+    expect(resultedState.contentPack.url).toEqual('http://url');
   });
 
   it('should add a entity if content selection was checked', () => {
@@ -93,8 +93,7 @@ describe('<ContentPackSelection />', () => {
     expect(changeFn.mock.calls.length).toBe(1);
   });
 
-  it('should remove a entity if content selection was unchecked', () => {
-    const contentPack = {};
+  describe('with several entities', () => {
     const breq = {
       title: 'breq',
       type: {
@@ -112,105 +111,95 @@ describe('<ContentPackSelection />', () => {
       id: 'beef124',
     };
     const entities = { spaceship: [breq, falcon] };
-    const selectedEntities = { spaceship: [breq, falcon] };
 
-    const changeFn = jest.fn((newState) => {
-      expect(newState.selectedEntities).toEqual({ spaceship: [falcon] });
+    it('should remove a entity if content selection was unchecked', () => {
+      const contentPack = {};
+      const selectedEntities = { spaceship: [breq, falcon] };
+
+      const changeFn = jest.fn((newState) => {
+        expect(newState.selectedEntities).toEqual({ spaceship: [falcon] });
+      });
+
+      const wrapper = mount(
+        <ContentPackSelection contentPack={contentPack}
+                              selectedEntities={selectedEntities}
+                              onStateChange={changeFn}
+                              entities={entities} />,
+      );
+      wrapper.find('div.fa-stack').simulate('click');
+      wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: false } });
+      expect(changeFn.mock.calls.length).toBe(1);
     });
 
-    const wrapper = mount(
-      <ContentPackSelection contentPack={contentPack}
-                            selectedEntities={selectedEntities}
-                            onStateChange={changeFn}
-                            entities={entities} />,
-    );
-    wrapper.find('div.fa-stack').simulate('click');
-    wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: false } });
-    expect(changeFn.mock.calls.length).toBe(1);
-  });
 
+    it('should filter expandableList of content selection', () => {
+      const contentPack = {};
+      const wrapper = mount(
+        <ContentPackSelection contentPack={contentPack}
+                              entities={entities} />,
+      );
 
-  it('should filter expandableList of content selection', () => {
-    const contentPack = {};
-    const breq = {
-      title: 'breq',
-      type: {
-        name: 'spaceship',
-        version: '1',
-      },
-      id: 'beef123',
-    };
-    const falcon = {
-      title: 'falcon',
-      type: {
-        name: 'spaceship',
-        version: '1',
-      },
-      id: 'beef124',
-    };
-    const entities = { spaceship: [breq, falcon] };
-    const wrapper = mount(
-      <ContentPackSelection contentPack={contentPack}
-                            entities={entities} />,
-    );
+      /*
+       * Search for falcon
+       *
+      /* Open menu to show all checkboxes */
+      wrapper.find('div.fa-stack').simulate('click');
 
-    /*
-     * Search for falcon
-     *
-    /* Open menu to show all checkboxes */
-    wrapper.find('div.fa-stack').simulate('click');
+      expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
+      wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'falcon' } });
+      wrapper.find('form').at(1).simulate('submit');
+      expect(wrapper.find('input[type="checkbox"]').length).toEqual(2);
 
-    expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
-    wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'falcon' } });
-    wrapper.find('form').at(1).simulate('submit');
-    expect(wrapper.find('input[type="checkbox"]').length).toEqual(2);
+      /*
+       * reset the search
+       */
+      wrapper.find("button[children='Reset']").simulate('click');
+      /* Open menu to show all checkboxes */
+      wrapper.find('div.fa-stack').simulate('click');
+      expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
+    });
 
-    /*
-     * reset the search
-     */
-    wrapper.find("button[children='Reset']").simulate('click');
-    /* Open menu to show all checkboxes */
-    wrapper.find('div.fa-stack').simulate('click');
-    expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
-  });
+    it('should validate that all fields are filled out', () => {
+      const wrapper = mount(<ContentPackSelection contentPack={{}} entities={entities} />);
+      wrapper.instance()._validate();
+      wrapper.update();
+      expect(wrapper.find('span[children="Must be filled out."]').length).toEqual(3);
 
-  it('should validate that all fields are filled out', () => {
-    const breq = {
-      title: 'breq',
-      type: {
-        name: 'spaceship',
-        version: '1',
-      },
-      id: 'beef123',
-    };
-    const falcon = {
-      title: 'falcon',
-      type: {
-        name: 'spaceship',
-        version: '1',
-      },
-      id: 'beef124',
-    };
-    const entities = { spaceship: [breq, falcon] };
+      const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} entities={entities} />);
+      wrapper2.instance()._validate();
+      wrapper2.update();
+      expect(wrapper2.find('span[children="Must be filled out."]').length).toEqual(2);
 
-    const wrapper = mount(<ContentPackSelection contentPack={{ }} entities={entities} />);
-    wrapper.instance()._validate();
-    wrapper.update();
-    expect(wrapper.find('span[children="Must be filled out."]').length).toEqual(3);
+      const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }}
+                                                   entities={entities} />);
+      wrapper1.instance()._validate();
+      wrapper1.update();
+      expect(wrapper1.find('span[children="Must be filled out."]').length).toEqual(1);
 
-    const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} entities={entities} />);
-    wrapper2.instance()._validate();
-    wrapper2.update();
-    expect(wrapper2.find('span[children="Must be filled out."]').length).toEqual(2);
+      const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }}
+                                                   entities={entities} />);
+      wrapper0.instance()._validate();
+      wrapper0.update();
+      expect(wrapper0.find('span[children="Must be filled out."]').length).toEqual(0);
+    });
 
-    const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }} entities={entities} />);
-    wrapper1.instance()._validate();
-    wrapper1.update();
-    expect(wrapper1.find('span[children="Must be filled out."]').length).toEqual(1);
+    it('should validate that URLs only have http or https protocols', () => {
+      const contentPack = { name: 'name', summary: 'summary', vendor: 'vendor' };
+      const protocols = [
+        // eslint-disable-next-line no-script-url
+        { protocol: 'javascript:', errors: 1 },
+        { protocol: 'ftp:', errors: 1 },
+        { protocol: 'http:', errors: 0 },
+        { protocol: 'https:', errors: 0 },
+      ];
 
-    const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }} entities={entities} />);
-    wrapper0.instance()._validate();
-    wrapper0.update();
-    expect(wrapper0.find('span[children="Must be filled out."]').length).toEqual(0);
+      protocols.forEach(({ protocol, errors }) => {
+        contentPack.url = `${protocol}//example.org`;
+        const invalidWrapper = mount(<ContentPackSelection contentPack={contentPack} entities={entities} />);
+        invalidWrapper.instance()._validate();
+        invalidWrapper.update();
+        expect(invalidWrapper.find('span[children="Must use a URL starting with http or https."]')).toHaveLength(errors);
+      });
+    });
   });
 });

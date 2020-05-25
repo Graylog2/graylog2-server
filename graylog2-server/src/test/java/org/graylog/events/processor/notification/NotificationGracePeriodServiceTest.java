@@ -22,6 +22,7 @@ import org.graylog.events.event.TestEvent;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.notifications.NotificationGracePeriodService;
 import org.graylog.events.processor.EventDefinition;
+import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -29,6 +30,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.Mockito.when;
 
 public class NotificationGracePeriodServiceTest {
@@ -86,6 +88,40 @@ public class NotificationGracePeriodServiceTest {
         event2.setEventTimestamp(event.getEventTimestamp().plus(11L));
         assertThat(notificationGracePeriodService.inGracePeriod(definition, "5678", event)).isFalse();
         assertThat(notificationGracePeriodService.inGracePeriod(definition, "5678", event2)).isFalse();
+    }
+
+    @Test
+    public void insideThenInsideGracePeriod() {
+        final NotificationGracePeriodService notificationGracePeriodService = new NotificationGracePeriodService();
+
+        when(settings.gracePeriodMs()).thenReturn(10L);
+        when(definition.notificationSettings()).thenReturn(settings);
+        when(definition.id()).thenReturn("1234");
+
+        final Event event = new TestEvent(DateTime.now(UTC), "testkey");
+        final Event event2 = new TestEvent(event.getEventTimestamp().plus(5L), "testkey");
+        final Event event3 = new TestEvent(event2.getEventTimestamp().plus(9L), "testkey");
+
+        assertThat(notificationGracePeriodService.inGracePeriod(definition, "5678", event)).isFalse();
+        assertThat(notificationGracePeriodService.inGracePeriod(definition, "5678", event2)).isTrue();
+        assertThat(notificationGracePeriodService.inGracePeriod(definition, "5678", event3)).isTrue();
+    }
+
+    @Test
+    public void insideThenOutsideGracePeriod() {
+        final NotificationGracePeriodService notificationGracePeriodService = new NotificationGracePeriodService();
+
+        when(settings.gracePeriodMs()).thenReturn(10L);
+        when(definition.notificationSettings()).thenReturn(settings);
+        when(definition.id()).thenReturn("1234");
+
+        final Event event = new TestEvent(DateTime.now(UTC), "testkey");
+        final Event event2 = new TestEvent(event.getEventTimestamp().plus(5L), "testkey");
+        final Event event3 = new TestEvent(event2.getEventTimestamp().plus(11L), "testkey");
+
+        assertThat(notificationGracePeriodService.inGracePeriod(definition, "5678", event)).isFalse();
+        assertThat(notificationGracePeriodService.inGracePeriod(definition, "5678", event2)).isTrue();
+        assertThat(notificationGracePeriodService.inGracePeriod(definition, "5678", event3)).isFalse();
     }
 
     @Test

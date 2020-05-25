@@ -102,7 +102,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": false,
-                          "lastClassName": "ibEGYG",
+                          "lastClassName": "fdBWEX",
                           "rules": Array [
                             [Function],
                           ],
@@ -126,7 +126,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 ibEGYG"
+                      className="FormControl-sc-1amoaox-0 fdBWEX"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -135,7 +135,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -438,7 +438,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "ibEGYG",
+                                                  "lastClassName": "fdBWEX",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -462,7 +462,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 ibEGYG"
+                                              className="FormControl-sc-1amoaox-0 fdBWEX"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -471,7 +471,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                                                className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -767,7 +767,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                     "isStatic": false,
-                                    "lastClassName": "bgAGM",
+                                    "lastClassName": "iEzmJe",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -786,11 +786,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             >
                               <ListGroupItem
                                 bsClass="list-group-item"
-                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                                 listItem={false}
                               >
                                 <span
-                                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
                                 >
                                   <ControlledTableListHeader__HeaderWrapper>
                                     <StyledComponent
@@ -848,7 +848,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "bgAGM",
+                                "lastClassName": "iEzmJe",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -867,11 +867,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                             >
                               No items to display
                             </span>
@@ -1032,7 +1032,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": false,
-                          "lastClassName": "ibEGYG",
+                          "lastClassName": "fdBWEX",
                           "rules": Array [
                             [Function],
                           ],
@@ -1056,7 +1056,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 ibEGYG"
+                      className="FormControl-sc-1amoaox-0 fdBWEX"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -1065,7 +1065,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -1394,7 +1394,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "ibEGYG",
+                                                  "lastClassName": "fdBWEX",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -1418,7 +1418,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 ibEGYG"
+                                              className="FormControl-sc-1amoaox-0 fdBWEX"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -1427,7 +1427,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                                                className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -1723,7 +1723,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                     "isStatic": false,
-                                    "lastClassName": "bgAGM",
+                                    "lastClassName": "iEzmJe",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1742,11 +1742,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             >
                               <ListGroupItem
                                 bsClass="list-group-item"
-                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                                 listItem={false}
                               >
                                 <span
-                                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
                                 >
                                   <ControlledTableListHeader__HeaderWrapper>
                                     <StyledComponent
@@ -1806,7 +1806,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "bgAGM",
+                                "lastClassName": "iEzmJe",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1825,11 +1825,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                             >
                               <div
                                 className="itemWrapper itemWrapperStatic"
@@ -1963,7 +1963,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "bgAGM",
+                                "lastClassName": "iEzmJe",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1982,11 +1982,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                             >
                               <div
                                 className="itemWrapper itemWrapperStatic"

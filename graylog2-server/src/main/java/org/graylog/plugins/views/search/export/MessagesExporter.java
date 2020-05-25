@@ -16,80 +16,8 @@
  */
 package org.graylog.plugins.views.search.export;
 
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.searchtypes.MessageList;
-
-import javax.inject.Inject;
 import java.util.function.Consumer;
 
-public class MessagesExporter {
-    private final ExportBackend backend;
-    private final ChunkDecorator chunkDecorator;
-    private final CommandFactory commandFactory;
-
-    @Inject
-    public MessagesExporter(ExportBackend backend, ChunkDecorator chunkDecorator, CommandFactory commandFactory) {
-        this.backend = backend;
-        this.chunkDecorator = chunkDecorator;
-        this.commandFactory = commandFactory;
-    }
-
-    public void export(MessagesRequest request, Consumer<SimpleMessageChunk> chunkForwarder) {
-        ExportMessagesCommand command = commandFactory.buildFromRequest(request);
-
-        export(command, chunkForwarder);
-    }
-
-    private void export(ExportMessagesCommand command, Consumer<SimpleMessageChunk> chunkForwarder) {
-        Consumer<SimpleMessageChunk> decoratedForwarder = chunk -> decorate(chunkForwarder, chunk, command);
-
-        backend.run(command, decoratedForwarder);
-    }
-
-    public void export(Search search, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
-        Query query = queryFrom(search);
-
-        ExportMessagesCommand command = commandFactory.buildWithSearchOnly(search, query, resultFormat);
-
-        export(command, chunkForwarder);
-    }
-
-    public void export(Search search, String searchTypeId, ResultFormat resultFormat, Consumer<SimpleMessageChunk> chunkForwarder) {
-        Query query = search.queryForSearchType(searchTypeId);
-
-        MessageList messageList = messageListFrom(query, searchTypeId);
-
-        ExportMessagesCommand command = commandFactory.buildWithMessageList(search, query, messageList, resultFormat);
-
-        export(command, chunkForwarder);
-    }
-
-    private MessageList messageListFrom(Query query, String searchTypeId) {
-
-        SearchType searchType = query.searchTypes().stream()
-                .filter(st -> st.id().equals(searchTypeId))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Error getting search type"));
-
-        if (!(searchType instanceof MessageList)) {
-            throw new ExportException("export is not supported for search type " + searchType.getClass());
-        }
-        return (MessageList) searchType;
-    }
-
-    private Query queryFrom(Search s) {
-        if (s.queries().size() > 1) {
-            throw new ExportException("Can't get messages for search with id " + s.id() + ", because it contains multiple queries");
-        }
-
-        return s.queries().stream().findFirst()
-                .orElseThrow(() -> new ExportException("Invalid Search object with empty Query"));
-    }
-
-    private void decorate(Consumer<SimpleMessageChunk> chunkForwarder, SimpleMessageChunk chunk, ExportMessagesCommand command) {
-        SimpleMessageChunk decoratedChunk = chunkDecorator.decorate(chunk, command);
-
-        chunkForwarder.accept(decoratedChunk);
-    }
+public interface MessagesExporter {
+    void export(ExportMessagesCommand command, Consumer<SimpleMessageChunk> chunkForwarder);
 }

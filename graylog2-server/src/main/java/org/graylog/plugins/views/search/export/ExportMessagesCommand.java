@@ -18,9 +18,7 @@ package org.graylog.plugins.views.search.export;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -39,7 +37,6 @@ public abstract class ExportMessagesCommand {
     public static final ElasticsearchQueryString DEFAULT_QUERY = ElasticsearchQueryString.empty();
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
     public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
-    public static final LinkedHashSet<Sort> DEFAULT_SORT = linkedHashSetOf(Sort.create("timestamp", SortOrder.DESC));
     public static final int DEFAULT_CHUNK_SIZE = 1000;
 
     public static AbsoluteRange defaultTimeRange() {
@@ -58,8 +55,6 @@ public abstract class ExportMessagesCommand {
     public abstract Set<String> streams();
 
     public abstract LinkedHashSet<String> fieldsInOrder();
-
-    public abstract LinkedHashSet<Sort> sort();
 
     public abstract List<Decorator> decorators();
 
@@ -91,8 +86,6 @@ public abstract class ExportMessagesCommand {
             return fieldsInOrder(linkedHashSetOf(fieldsInOrder));
         }
 
-        public abstract Builder sort(LinkedHashSet<Sort> sort);
-
         public abstract Builder decorators(List<Decorator> decorators);
 
         public abstract Builder chunkSize(int chunkSize);
@@ -111,7 +104,6 @@ public abstract class ExportMessagesCommand {
                     .streams(DEFAULT_STREAMS)
                     .queryString(DEFAULT_QUERY)
                     .fieldsInOrder(DEFAULT_FIELDS)
-                    .sort(DEFAULT_SORT)
                     .decorators(Collections.emptyList())
                     .chunkSize(DEFAULT_CHUNK_SIZE);
         }

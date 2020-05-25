@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.export.es;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportException;
@@ -26,7 +25,6 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.export.TestData;
-import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -40,20 +38,22 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
+public abstract class ElasticsearchExportBackendITBase extends ElasticsearchBaseTest {
 
     private IndexLookup indexLookup;
     private ElasticsearchExportBackend sut;
 
+    protected abstract RequestStrategy requestStrategy();
+
     @Before
     public void setUp() {
         indexLookup = mock(IndexLookup.class);
-        sut = new ElasticsearchExportBackend(new JestWrapper(jestClient()), indexLookup, false);
+
+        sut = new ElasticsearchExportBackend(indexLookup, requestStrategy(), false);
     }
 
     @Test
@@ -66,14 +66,14 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
 
         mockIndexLookupFor(command, "graylog_0", "graylog_1");
 
-        runWithExpectedResult(command, "timestamp,source,message",
-                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
+        runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
                 "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He",
-                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
+                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho"
         );
     }
 
-    private ExportMessagesCommand.Builder commandBuilderWithAllStreams() {
+    protected ExportMessagesCommand.Builder commandBuilderWithAllStreams() {
         return defaultCommandBuilder().streams(ImmutableSet.of("stream-01", "stream-02", "stream-03"));
     }
 
@@ -85,7 +85,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .queryString(ElasticsearchQueryString.builder().queryString("Ha Ho").build())
                 .build();
 
-        runWithExpectedResult(command, "timestamp,source,message",
+        runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
@@ -99,7 +99,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .timeRange(timerange("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.000Z"))
                 .build();
 
-        runWithExpectedResult(command, "timestamp,source,message",
+        runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
                 "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha"
         );
@@ -113,26 +113,11 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .fieldsInOrder("timestamp", "message")
                 .build();
 
-        runWithExpectedResult(command, "timestamp,message",
+        runWithExpectedResultIgnoringSort(command, "timestamp,message",
                 "graylog_0, 2015-01-01T04:00:00.000Z, Ho",
                 "graylog_0, 2015-01-01T03:00:00.000Z, Hi",
                 "graylog_1, 2015-01-01T02:00:00.000Z, He",
                 "graylog_0, 2015-01-01T01:00:00.000Z, Ha");
-    }
-
-    @Test
-    public void usesSorting() {
-        importFixture("messages.json");
-
-        ExportMessagesCommand command = commandBuilderWithAllStreams()
-                .sort(linkedHashSetOf(Sort.create("source", SortOrder.ASC), Sort.create("timestamp", SortOrder.DESC)))
-                .build();
-
-        runWithExpectedResult(command, "timestamp,source,message",
-                "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
-                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
-                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
-                "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He");
     }
 
     @Test
@@ -217,14 +202,28 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
                 .timeRange(allMessagesTimeRange());
     }
 
-    private void runWithExpectedResult(ExportMessagesCommand command, String resultFields, String... messageValues) {
+    protected void runWithExpectedResult(ExportMessagesCommand command, @SuppressWarnings("SameParameterValue") String resultFields, String... messageValues) {
         SimpleMessageChunk totalResult = collectTotalResult(command);
 
+        assertResultMatches(resultFields, totalResult, messageValues, true);
+    }
+
+    protected void runWithExpectedResultIgnoringSort(ExportMessagesCommand command, String resultFields, String... messageValues) {
+        SimpleMessageChunk totalResult = collectTotalResult(command);
+
+        assertResultMatches(resultFields, totalResult, messageValues, false);
+    }
+
+    private void assertResultMatches(String resultFields, SimpleMessageChunk totalResult, String[] messageValues, boolean expectSorted) {
         Object[][] values = Arrays.stream(messageValues).map(this::toObjectArray).toArray(Object[][]::new);
 
         SimpleMessageChunk expected = TestData.simpleMessageChunkWithIndexNames(resultFields, values);
 
         assertThat(totalResult).isEqualTo(expected);
+
+        if (expectSorted) {
+            assertThat(totalResult.messages()).containsExactlyElementsOf(expected.messages());
+        }
     }
 
     private Object[] toObjectArray(String s) {

@@ -509,7 +509,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "ibEGYG",
+                                                                                "lastClassName": "fdBWEX",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -533,7 +533,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         >
                                                                           <FormControl
                                                                             bsClass="form-control"
-                                                                            className="FormControl-sc-1amoaox-0 ibEGYG"
+                                                                            className="FormControl-sc-1amoaox-0 fdBWEX"
                                                                             componentClass="input"
                                                                             inputRef={[Function]}
                                                                             label="Filter Streams"
@@ -542,7 +542,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             type="text"
                                                                           >
                                                                             <input
-                                                                              className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                                                                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                                                               id="filter-streams-data-filter"
                                                                               label="Filter Streams"
                                                                               name="filter-streams-data-filter"
@@ -838,7 +838,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                 "componentStyle": ComponentStyle {
                                                                   "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                                   "isStatic": false,
-                                                                  "lastClassName": "bgAGM",
+                                                                  "lastClassName": "iEzmJe",
                                                                   "rules": Array [
                                                                     [Function],
                                                                   ],
@@ -857,11 +857,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           >
                                                             <ListGroupItem
                                                               bsClass="list-group-item"
-                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                                                               listItem={false}
                                                             >
                                                               <span
-                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
                                                               >
                                                                 <Input
                                                                   addonAfter={null}
@@ -999,7 +999,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             "componentStyle": ComponentStyle {
                                                               "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                               "isStatic": false,
-                                                              "lastClassName": "bgAGM",
+                                                              "lastClassName": "iEzmJe",
                                                               "rules": Array [
                                                                 [Function],
                                                               ],
@@ -1018,11 +1018,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       >
                                                         <ListGroupItem
                                                           bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                                                           listItem={false}
                                                         >
                                                           <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                                                           >
                                                             <div
                                                               className="itemWrapper "
@@ -1327,7 +1327,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             "componentStyle": ComponentStyle {
                                                               "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                               "isStatic": false,
-                                                              "lastClassName": "bgAGM",
+                                                              "lastClassName": "iEzmJe",
                                                               "rules": Array [
                                                                 [Function],
                                                               ],
@@ -1346,11 +1346,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       >
                                                         <ListGroupItem
                                                           bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                                                           listItem={false}
                                                         >
                                                           <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                                                           >
                                                             <div
                                                               className="itemWrapper "
@@ -1935,7 +1935,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "ibEGYG",
+                                                                                "lastClassName": "fdBWEX",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -1959,7 +1959,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         >
                                                                           <FormControl
                                                                             bsClass="form-control"
-                                                                            className="FormControl-sc-1amoaox-0 ibEGYG"
+                                                                            className="FormControl-sc-1amoaox-0 fdBWEX"
                                                                             componentClass="input"
                                                                             inputRef={[Function]}
                                                                             label="Filter Dashboards"
@@ -1968,7 +1968,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                             type="text"
                                                                           >
                                                                             <input
-                                                                              className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                                                                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                                                               id="filter-dashboards-data-filter"
                                                                               label="Filter Dashboards"
                                                                               name="filter-dashboards-data-filter"
@@ -2264,7 +2264,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                 "componentStyle": ComponentStyle {
                                                                   "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                                   "isStatic": false,
-                                                                  "lastClassName": "bgAGM",
+                                                                  "lastClassName": "iEzmJe",
                                                                   "rules": Array [
                                                                     [Function],
                                                                   ],
@@ -2283,11 +2283,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           >
                                                             <ListGroupItem
                                                               bsClass="list-group-item"
-                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                                                               listItem={false}
                                                             >
                                                               <span
-                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
                                                               >
                                                                 <Input
                                                                   addonAfter={null}
@@ -2425,7 +2425,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             "componentStyle": ComponentStyle {
                                                               "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                               "isStatic": false,
-                                                              "lastClassName": "bgAGM",
+                                                              "lastClassName": "iEzmJe",
                                                               "rules": Array [
                                                                 [Function],
                                                               ],
@@ -2444,11 +2444,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       >
                                                         <ListGroupItem
                                                           bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                                                           listItem={false}
                                                         >
                                                           <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                                                           >
                                                             <div
                                                               className="itemWrapper "
@@ -2753,7 +2753,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             "componentStyle": ComponentStyle {
                                                               "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                               "isStatic": false,
-                                                              "lastClassName": "bgAGM",
+                                                              "lastClassName": "iEzmJe",
                                                               "rules": Array [
                                                                 [Function],
                                                               ],
@@ -2772,11 +2772,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       >
                                                         <ListGroupItem
                                                           bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                                                           listItem={false}
                                                         >
                                                           <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                                                           >
                                                             <div
                                                               className="itemWrapper "
@@ -3603,7 +3603,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "ibEGYG",
+                                                                                "lastClassName": "fdBWEX",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -3627,7 +3627,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         >
                                                                           <FormControl
                                                                             bsClass="form-control"
-                                                                            className="FormControl-sc-1amoaox-0 ibEGYG"
+                                                                            className="FormControl-sc-1amoaox-0 fdBWEX"
                                                                             componentClass="input"
                                                                             inputRef={[Function]}
                                                                             label="Filter Streams"
@@ -3636,7 +3636,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             type="text"
                                                                           >
                                                                             <input
-                                                                              className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                                                                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                                                               id="filter-streams-data-filter"
                                                                               label="Filter Streams"
                                                                               name="filter-streams-data-filter"
@@ -3932,7 +3932,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                 "componentStyle": ComponentStyle {
                                                                   "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                                   "isStatic": false,
-                                                                  "lastClassName": "bgAGM",
+                                                                  "lastClassName": "iEzmJe",
                                                                   "rules": Array [
                                                                     [Function],
                                                                   ],
@@ -3951,11 +3951,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                           >
                                                             <ListGroupItem
                                                               bsClass="list-group-item"
-                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                                                               listItem={false}
                                                             >
                                                               <span
-                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
                                                               >
                                                                 <Input
                                                                   addonAfter={null}
@@ -4093,7 +4093,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             "componentStyle": ComponentStyle {
                                                               "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                               "isStatic": false,
-                                                              "lastClassName": "bgAGM",
+                                                              "lastClassName": "iEzmJe",
                                                               "rules": Array [
                                                                 [Function],
                                                               ],
@@ -4112,11 +4112,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       >
                                                         <ListGroupItem
                                                           bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                                                           listItem={false}
                                                         >
                                                           <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                                                           >
                                                             <div
                                                               className="itemWrapper "
@@ -4421,7 +4421,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             "componentStyle": ComponentStyle {
                                                               "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                               "isStatic": false,
-                                                              "lastClassName": "bgAGM",
+                                                              "lastClassName": "iEzmJe",
                                                               "rules": Array [
                                                                 [Function],
                                                               ],
@@ -4440,11 +4440,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       >
                                                         <ListGroupItem
                                                           bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                                                           listItem={false}
                                                         >
                                                           <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                                                           >
                                                             <div
                                                               className="itemWrapper "
@@ -5029,7 +5029,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                               "componentStyle": ComponentStyle {
                                                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                                                 "isStatic": false,
-                                                                                "lastClassName": "ibEGYG",
+                                                                                "lastClassName": "fdBWEX",
                                                                                 "rules": Array [
                                                                                   [Function],
                                                                                 ],
@@ -5053,7 +5053,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         >
                                                                           <FormControl
                                                                             bsClass="form-control"
-                                                                            className="FormControl-sc-1amoaox-0 ibEGYG"
+                                                                            className="FormControl-sc-1amoaox-0 fdBWEX"
                                                                             componentClass="input"
                                                                             inputRef={[Function]}
                                                                             label="Filter Dashboards"
@@ -5062,7 +5062,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                             type="text"
                                                                           >
                                                                             <input
-                                                                              className="FormControl-sc-1amoaox-0 ibEGYG form-control"
+                                                                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                                                               id="filter-dashboards-data-filter"
                                                                               label="Filter Dashboards"
                                                                               name="filter-dashboards-data-filter"
@@ -5358,7 +5358,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                 "componentStyle": ComponentStyle {
                                                                   "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                                   "isStatic": false,
-                                                                  "lastClassName": "bgAGM",
+                                                                  "lastClassName": "iEzmJe",
                                                                   "rules": Array [
                                                                     [Function],
                                                                   ],
@@ -5377,11 +5377,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                           >
                                                             <ListGroupItem
                                                               bsClass="list-group-item"
-                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                                                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                                                               listItem={false}
                                                             >
                                                               <span
-                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                                                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
                                                               >
                                                                 <Input
                                                                   addonAfter={null}
@@ -5519,7 +5519,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             "componentStyle": ComponentStyle {
                                                               "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                               "isStatic": false,
-                                                              "lastClassName": "bgAGM",
+                                                              "lastClassName": "iEzmJe",
                                                               "rules": Array [
                                                                 [Function],
                                                               ],
@@ -5538,11 +5538,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       >
                                                         <ListGroupItem
                                                           bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                                                           listItem={false}
                                                         >
                                                           <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                                                           >
                                                             <div
                                                               className="itemWrapper "
@@ -5847,7 +5847,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             "componentStyle": ComponentStyle {
                                                               "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                                               "isStatic": false,
-                                                              "lastClassName": "bgAGM",
+                                                              "lastClassName": "iEzmJe",
                                                               "rules": Array [
                                                                 [Function],
                                                               ],
@@ -5866,11 +5866,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       >
                                                         <ListGroupItem
                                                           bsClass="list-group-item"
-                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM"
+                                                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                                                           listItem={false}
                                                         >
                                                           <span
-                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 bgAGM list-group-item"
+                                                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                                                           >
                                                             <div
                                                               className="itemWrapper "

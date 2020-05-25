@@ -16,11 +16,11 @@
  */
 package org.graylog.plugins.views.search.export;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.searchtypes.Sort;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -32,17 +32,21 @@ import java.util.OptionalInt;
 import static org.graylog.plugins.views.search.export.ExportMessagesCommand.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.export.LinkedHashSetUtil.linkedHashSetOf;
 
+@JsonAutoDetect
 @AutoValue
 @JsonDeserialize(builder = ResultFormat.Builder.class)
 public abstract class ResultFormat {
+    private static final String FIELD_FIELDS = "fields_in_order";
+
+    @JsonProperty(FIELD_FIELDS)
     @NotEmpty
     public abstract LinkedHashSet<String> fieldsInOrder();
 
-    public abstract LinkedHashSet<Sort> sort();
-
+    @JsonProperty
     @Positive
     public abstract OptionalInt limit();
 
+    @JsonProperty
     public abstract Map<String, Object> executionState();
 
     public static ResultFormat.Builder builder() {
@@ -55,18 +59,11 @@ public abstract class ResultFormat {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        @JsonProperty("fields_in_order")
+        @JsonProperty(FIELD_FIELDS)
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);
 
         public Builder fieldsInOrder(String... fields) {
             return fieldsInOrder(linkedHashSetOf(fields));
-        }
-
-        @JsonProperty
-        public abstract Builder sort(LinkedHashSet<Sort> sort);
-
-        public Builder sort(Sort... sorts) {
-            return sort(linkedHashSetOf(sorts));
         }
 
         @JsonProperty
@@ -85,8 +82,7 @@ public abstract class ResultFormat {
         public static ResultFormat.Builder create() {
             return new AutoValue_ResultFormat.Builder()
                     .fieldsInOrder(DEFAULT_FIELDS)
-                    .executionState(Collections.emptyMap())
-                    .sort();
+                    .executionState(Collections.emptyMap());
         }
     }
 }
