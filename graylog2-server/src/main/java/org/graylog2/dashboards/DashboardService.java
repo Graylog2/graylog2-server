@@ -16,23 +16,14 @@
  */
 package org.graylog2.dashboards;
 
-import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.plugin.database.PersistedService;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public interface DashboardService extends PersistedService {
     List<Dashboard> all();
-
-    Set<Dashboard> loadByIds(Collection<String> ids);
-
-    void removeWidget(Dashboard dashboard, DashboardWidget widget);
     /**
      * @return the total number of dashboards
      */
     long count();
-
-    int destroy(Dashboard model);
 }

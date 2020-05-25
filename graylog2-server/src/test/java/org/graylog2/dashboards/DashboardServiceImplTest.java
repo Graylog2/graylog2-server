@@ -16,12 +16,9 @@
  */
 package org.graylog2.dashboards;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.shared.SuppressForbidden;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,9 +28,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class DashboardServiceImplTest {
@@ -51,13 +46,7 @@ public class DashboardServiceImplTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUpService() {
-        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
-        final EventBus serverEventBus = new EventBus("server-event-bus");
-        dashboardService = new DashboardServiceImpl(
-                mongodb.mongoConnection(),
-                dashboardWidgetCreator,
-                clusterEventBus,
-                serverEventBus);
+        dashboardService = new DashboardServiceImpl(mongodb.mongoConnection());
     }
 
     @Test
@@ -68,16 +57,6 @@ public class DashboardServiceImplTest {
 
         assertEquals("Should have returned exactly 1 document", 1, dashboards.size());
         assertEquals("Example dashboard", dashboard.getTitle());
-    }
-
-    @Test
-    @MongoDBFixtures("DashboardServiceImplTest.json")
-    public void testLoadByIds() {
-        assertThat(dashboardService.loadByIds(ImmutableSet.of())).isEmpty();
-        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
-        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001"))).hasSize(1);
-        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0001"))).hasSize(1);
-        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002", "54e300000000000000000000"))).hasSize(2);
     }
 
     @Test
