@@ -35,6 +35,7 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsService;
+import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.Role;
@@ -132,14 +133,14 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             return new SimpleAccount(principal, null, "ldap realm");
         } catch (LdapException e) {
             LOG.error("LDAP error", e);
+            throw new AuthenticationServiceUnavailableException("LDAP error", e);
         } catch (CursorException e) {
             LOG.error("Unable to read LDAP entry", e);
+            throw new AuthenticationServiceUnavailableException("Unable to read LDAP entry", e);
         } catch (Exception e) {
             LOG.error("Error during LDAP user account sync. Cannot log in user {}", principal, e);
+            throw new AuthenticationServiceUnavailableException("Error during LDAP user account sync", e);
         }
-
-        // Return null by default to ensure a login failure if anything goes wrong.
-        return null;
     }
 
     protected LdapNetworkConnection openLdapConnection(LdapSettings ldapSettings) throws LdapException {
