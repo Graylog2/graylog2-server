@@ -27,6 +27,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.AuthorizingRealm;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
@@ -373,6 +374,10 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, AuthenticatingRealm> authenticationRealmBinder() {
         return MapBinder.newMapBinder(binder(), String.class, AuthenticatingRealm.class);
+    }
+
+    protected MapBinder<String, AuthorizingRealm> authorizationOnlyRealmBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, AuthorizingRealm.class);
     }
 
     protected MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder() {
