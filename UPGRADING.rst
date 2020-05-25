@@ -4,6 +4,13 @@ Upgrading to Graylog 4.0.x
 
 .. _upgrade-from-33-to-40:
 
+Removal of legacy Saved Searches API
+====================================
+
+Starting with `3.3.0`, the pre-views Saved Searches API was replaced, moved to a `/legacy` prefix and marked for [deprecation](https://github.com/Graylog2/graylog2-server/blob/3.3.0/UPGRADING.rst#saved-searches-api).
+
+This PR is removing it altogether, as announced in the upgrade notes for 3.3.
+
 Removal of legacy redirects for Dashboards & Saved Search API
 =============================================================
 
