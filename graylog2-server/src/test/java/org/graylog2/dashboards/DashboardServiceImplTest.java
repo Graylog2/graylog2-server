@@ -18,12 +18,10 @@ package org.graylog2.dashboards;
 
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.shared.SuppressForbidden;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -39,9 +37,6 @@ public class DashboardServiceImplTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private DashboardService dashboardService;
-
-    @Mock
-    private DashboardWidgetCreator dashboardWidgetCreator;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
