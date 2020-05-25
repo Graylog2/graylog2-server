@@ -36,6 +36,7 @@ import org.graylog2.rest.models.system.sessions.responses.SessionValidationRespo
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ActorAwareAuthenticationToken;
 import org.graylog2.shared.security.ActorAwareAuthenticationTokenFactory;
+import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.graylog2.shared.security.SessionCreator;
 import org.graylog2.shared.security.ShiroAuthenticationFilter;
 import org.graylog2.shared.security.ShiroSecurityContext;
@@ -57,6 +58,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -124,11 +126,15 @@ public class SessionsResource extends RestResource {
         final String sessionId = shiroSecurityContext.getUsername();
         final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets);
 
-        Optional<Session> session = sessionCreator.create(sessionId, host, authToken);
-        if (session.isPresent()) {
-            return sessionResponseFactory.forSession(session.get());
-        } else {
-            throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
+        try {
+            Optional<Session> session = sessionCreator.create(sessionId, host, authToken);
+            if (session.isPresent()) {
+                return sessionResponseFactory.forSession(session.get());
+            } else {
+                throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
+            }
+        } catch (AuthenticationServiceUnavailableException e) {
+            throw new ServiceUnavailableException("Authentication service unavailable");
         }
     }
 
