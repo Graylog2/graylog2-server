@@ -134,7 +134,7 @@ public class SessionsResource extends RestResource {
                 throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
             }
         } catch (AuthenticationServiceUnavailableException e) {
-            throw new ServiceUnavailableException(e.getMessage());
+            throw new ServiceUnavailableException("Authentication service unavailable");
         }
     }
 
