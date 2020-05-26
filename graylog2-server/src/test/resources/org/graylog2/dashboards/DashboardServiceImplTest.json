@@ -1,7 +1,0 @@
-{
-  "dashboards": [
-    {"_id": {"$oid" : "54e3deadbeefdeadbeef0001"}, "title" : "Example 1", "description" : "Example 1", "creatorUserId" : "user1", "created_at" : { "$date" : "2018-03-26T11:01:00.000Z" }},
-    {"_id": {"$oid" : "54e3deadbeefdeadbeef0002"}, "title" : "Example 2", "description" : "Example 2", "creatorUserId" : "user2", "created_at" : { "$date" : "2018-03-27T12:02:00.0000Z" }},
-    {"_id": {"$oid" : "54e3deadbeefdeadbeef0003"}, "title" : "Example 3", "description" : "Example 3", "creatorUserId" : "user3", "created_at" : { "$date" : "2018-03-28T13:03:00.0000Z" }}
-  ]
-}

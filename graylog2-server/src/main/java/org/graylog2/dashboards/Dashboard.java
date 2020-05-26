@@ -16,37 +16,15 @@
  */
 package org.graylog2.dashboards;
 
-import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.plugin.database.Persisted;
 
 import java.util.List;
-import java.util.Map;
 
 public interface Dashboard extends Persisted {
     String getTitle();
 
-    void setTitle(String title);
-
     List<WidgetPosition> getPositions();
 
     void setPositions(List<WidgetPosition> widgetPositions);
-
-    String getDescription();
-
-    void setDescription(String description);
-
-    String getContentPack();
-
-    void setContentPack(String contentPack);
-
-    void addPersistedWidget(DashboardWidget widget);
-
-    DashboardWidget getWidget(String widgetId);
-
-    DashboardWidget addWidget(DashboardWidget widget);
-
-    DashboardWidget removeWidget(DashboardWidget widget);
-
-    Map<String, DashboardWidget> getWidgets();
 }

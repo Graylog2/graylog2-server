@@ -33,8 +33,6 @@ import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.dashboards.widgets.WidgetCacheTime;
-import org.graylog2.dashboards.widgets.WidgetEventsListener;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
@@ -140,7 +138,6 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(SetIndexReadOnlyAndCalculateRangeJob.Factory.class));
 
         install(new FactoryModuleBuilder().build(LdapSettingsImpl.Factory.class));
-        install(new FactoryModuleBuilder().build(WidgetCacheTime.Factory.class));
         install(new FactoryModuleBuilder().build(UserImpl.Factory.class));
 
         install(new FactoryModuleBuilder().build(EmailRecipients.Factory.class));
@@ -212,7 +209,6 @@ public class ServerBindings extends Graylog2Module {
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
         bind(StartPageCleanupListener.class).asEagerSingleton();
-        bind(WidgetEventsListener.class).asEagerSingleton();
         bind(UserPermissionsCleanupListener.class).asEagerSingleton();
     }
 

@@ -4,6 +4,18 @@ Upgrading to Graylog 4.0.x
 
 .. _upgrade-from-33-to-40:
 
+Removal of legacy Dashboard API
+===============================
+
+Starting with 3.3, the previous Dashboard API was replaced by the views API. Therefore it was moved to a ``/legacy`` prefix
+and marked for deprecation. Now it is removed altogether.
+
+Removal of legacy Saved Searches API
+====================================
+
+Starting with 3.3, the previous Saved Searches API was replaced by the views API. Therefore it was moved to a ``/legacy`` prefix
+and marked for deprecation. Now it is removed altogether.
+
 Removal of legacy redirects for Dashboards & Saved Search API
 =============================================================
 

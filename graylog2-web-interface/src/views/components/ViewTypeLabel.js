@@ -4,7 +4,7 @@ import type { ViewType } from 'views/logic/views/View';
 
 type Props = {
   type: ViewType,
-  capitalize: boolean,
+  capitalize?: boolean,
 };
 
 const capitalizeLabel = (label) => label[0].toUpperCase() + label.slice(1);

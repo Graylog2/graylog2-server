@@ -3,15 +3,14 @@ import * as React from 'react';
 import { List } from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
-import Routes from 'routing/Routes';
-import history from 'util/History';
-
+import { NotFoundErrorType } from 'logic/errors/ReportedErrors';
 import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewDeserializer from 'views/logic/views/ViewDeserializer';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import type { ViewJson } from 'views/logic/views/View';
+import ErrorsActions from 'actions/errors/ErrorsActions';
 import { SearchExecutionStateActions } from 'views/stores/SearchExecutionStateStore';
 
 import ShowViewPage from './ShowViewPage';
@@ -36,6 +35,9 @@ jest.mock('views/stores/SearchStore', () => ({
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateActions: {},
   SearchExecutionStateStore: { listen: jest.fn() },
+}));
+jest.mock('actions/errors/ErrorsActions', () => ({
+  report: jest.fn(),
 }));
 jest.mock('util/History', () => ({}));
 jest.mock('./ExtendedSearchPage', () => 'extended-search-page');
@@ -76,17 +78,20 @@ describe('ShowViewPage', () => {
     mount(<SimpleShowViewPage />);
     expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
   });
-  it('redirects to "Not Found" page if loading view returns 404', (done) => {
+  it('reports NotForundError error if loading view returns 404', (done) => {
     const error = new Error('Not found');
     // $FlowFixMe: Assigning to non-existing key on purpose
     error.status = 404;
     ViewManagementActions.get = mockAction(jest.fn(() => Promise.reject(error)));
-    history.replace = jest.fn();
 
     mount(<SimpleShowViewPage />);
 
     setImmediate(() => {
-      expect(history.replace).toHaveBeenCalledWith(Routes.NOTFOUND);
+      expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
+      expect(ErrorsActions.report).toHaveBeenCalledWith({
+        error,
+        type: NotFoundErrorType,
+      });
       done();
     });
   });
