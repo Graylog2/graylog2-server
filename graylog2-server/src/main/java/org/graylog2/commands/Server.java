@@ -52,7 +52,6 @@ import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
-import org.graylog2.bindings.WidgetStrategyBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.cluster.NodeService;
@@ -63,7 +62,6 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
-import org.graylog2.dashboards.DashboardBindings;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
@@ -148,8 +146,6 @@ public class Server extends ServerBootstrap {
                 new ObjectMapperModule(chainingClassLoader),
                 new RestApiBindings(),
                 new PasswordAlgorithmBindings(),
-                new WidgetStrategyBindings(),
-                new DashboardBindings(),
                 new DecoratorBindings(),
                 new AuditBindings(),
                 new AlertConditionBindings(),

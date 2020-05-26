@@ -16,29 +16,18 @@
  */
 package org.graylog2.dashboards;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class DashboardServiceImplTest {
     @Rule
@@ -49,51 +38,10 @@ public class DashboardServiceImplTest {
 
     private DashboardService dashboardService;
 
-    @Mock
-    private DashboardWidgetCreator dashboardWidgetCreator;
-
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUpService() {
-        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
-        final EventBus serverEventBus = new EventBus("server-event-bus");
-        dashboardService = new DashboardServiceImpl(
-                mongodb.mongoConnection(),
-                dashboardWidgetCreator,
-                clusterEventBus,
-                serverEventBus);
-    }
-
-    @Test
-    public void testCreate() {
-        final String title = "Dashboard Title";
-        final String description = "This is the dashboard description";
-        final String creatorUserId = "foobar";
-        final DateTime createdAt = Tools.nowUTC();
-
-        final Dashboard dashboard = dashboardService.create(title, description, creatorUserId, createdAt);
-
-        assertNotNull(dashboard);
-        assertEquals(title, dashboard.getTitle());
-        assertEquals(description, dashboard.getDescription());
-        assertNotNull(dashboard.getId());
-        assertEquals(0, dashboardService.count());
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void testLoadNonExistentDashboard() throws NotFoundException {
-        this.dashboardService.load("54e3deadbeefdeadbeefaffe");
-    }
-
-    @Test
-    @MongoDBFixtures("singleDashboard.json")
-    public void testLoad() throws NotFoundException {
-        final String exampleDashboardId = "54e3deadbeefdeadbeefaffe";
-
-        final Dashboard dashboard = dashboardService.load(exampleDashboardId);
-
-        assertNotNull("Dashboard should have been found", dashboard);
-        assertEquals("Dashboard id should be the one that was retrieved", exampleDashboardId, dashboard.getId());
+        dashboardService = new DashboardServiceImpl(mongodb.mongoConnection());
     }
 
     @Test
@@ -104,16 +52,6 @@ public class DashboardServiceImplTest {
 
         assertEquals("Should have returned exactly 1 document", 1, dashboards.size());
         assertEquals("Example dashboard", dashboard.getTitle());
-    }
-
-    @Test
-    @MongoDBFixtures("DashboardServiceImplTest.json")
-    public void testLoadByIds() {
-        assertThat(dashboardService.loadByIds(ImmutableSet.of())).isEmpty();
-        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
-        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001"))).hasSize(1);
-        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0001"))).hasSize(1);
-        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002", "54e300000000000000000000"))).hasSize(2);
     }
 
     @Test

@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -51,12 +50,6 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
     public static final String EMBEDDED_WIDGETS = "widgets";
     public static final String EMBEDDED_POSITIONS = "positions";
 
-    private Map<String, DashboardWidget> widgets = Maps.newHashMap();
-
-    public DashboardImpl(Map<String, Object> fields) {
-        super(fields);
-    }
-
     protected DashboardImpl(ObjectId id, Map<String, Object> fields) {
         super(id, fields);
     }
@@ -64,21 +57,6 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
     @Override
     public String getTitle() {
         return (String) fields.get(FIELD_TITLE);
-    }
-
-    @Override
-    public void setTitle(String title) {
-        this.fields.put(FIELD_TITLE, title);
-    }
-
-    @Override
-    public String getDescription() {
-        return (String) fields.get(FIELD_DESCRIPTION);
-    }
-
-    @Override
-    public void setDescription(String description) {
-        this.fields.put(FIELD_DESCRIPTION, description);
     }
 
     @Override
@@ -122,41 +100,6 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
         Map<String, Object> fields = getFields();
         checkNotNull(fields, "No fields found!");
         fields.put(DashboardImpl.EMBEDDED_POSITIONS, positions);
-    }
-
-    @Override
-    public String getContentPack() {
-        return (String) fields.get(FIELD_CONTENT_PACK);
-    }
-
-    @Override
-    public void setContentPack(String contentPack) {
-        this.fields.put(FIELD_CONTENT_PACK, contentPack);
-    }
-
-    @Override
-    public void addPersistedWidget(DashboardWidget widget) {
-        widgets.put(widget.getId(), widget);
-    }
-
-    @Override
-    public DashboardWidget getWidget(String widgetId) {
-        return widgets.get(widgetId);
-    }
-
-    @Override
-    public DashboardWidget addWidget(DashboardWidget widget) {
-        return widgets.put(widget.getId(), widget);
-    }
-
-    @Override
-    public DashboardWidget removeWidget(DashboardWidget widget) {
-        return widgets.remove(widget.getId());
-    }
-
-    @Override
-    public Map<String, DashboardWidget> getWidgets() {
-        return ImmutableMap.copyOf(widgets);
     }
 
     @Override
