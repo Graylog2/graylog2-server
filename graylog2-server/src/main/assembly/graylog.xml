@@ -57,5 +57,9 @@
             <destName>graylog.conf.example</destName>
             <outputDirectory>.</outputDirectory>
         </file>
+        <file>
+            <source>${project.basedir}/../graylog-storage-elasticsearch6/target/graylog-storage-elasticsearch6-${project.version}.jar</source>
+            <outputDirectory>plugin/</outputDirectory>
+        </file>
     </files>
 </assembly>
