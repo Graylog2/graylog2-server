@@ -43,7 +43,7 @@
     </fileSets>
     <files>
         <file>
-            <source>${project.build.directory}/graylog2-server-${project.version}-shaded.jar</source>
+            <source>${project.basedir}/../graylog2-server/target/graylog2-server-${project.version}-shaded.jar</source>
             <destName>graylog.jar</destName>
             <outputDirectory>.</outputDirectory>
         </file>
@@ -56,6 +56,10 @@
             <source>${project.basedir}/../misc/graylog.conf</source>
             <destName>graylog.conf.example</destName>
             <outputDirectory>.</outputDirectory>
+        </file>
+        <file>
+            <source>${project.basedir}/../graylog-storage-elasticsearch6/target/graylog-storage-elasticsearch6-${project.version}.jar</source>
+            <outputDirectory>plugin/</outputDirectory>
         </file>
     </files>
 </assembly>
