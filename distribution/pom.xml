@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>distribution</artifactId>
+    <name>Graylog Binary Distribution Tarball</name>
+    <description>Module solely performing final assembly step after all other modules artifacts have been built</description>
 
     <build>
         <plugins>
