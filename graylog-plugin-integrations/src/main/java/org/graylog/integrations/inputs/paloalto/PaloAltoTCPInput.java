@@ -38,7 +38,7 @@ import static org.graylog.integrations.inputs.paloalto.PaloAltoCodec.CK_TRAFFIC_
 
 public class PaloAltoTCPInput extends MessageInput {
 
-    public static final String NAME = "Palo Alto Networks Input (TCP)";
+    public static final String NAME = "Palo Alto Networks (TCP)";
 
     private static final Logger LOG = LoggerFactory.getLogger(PaloAltoTCPInput.class);
 
