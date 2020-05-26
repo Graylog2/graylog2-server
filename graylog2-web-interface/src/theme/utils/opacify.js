@@ -1,6 +1,11 @@
+// @flow strict
 import chroma from 'chroma-js';
 
-function opacify(color, amount) {
+export type Opacify = {
+  (string, number): string,
+};
+
+function opacify(color: string, amount: number): string {
   /**
    * Increases the opacity of a color. Its range for the amount is between 0 to 1.
    *
