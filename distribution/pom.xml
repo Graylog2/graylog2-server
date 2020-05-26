@@ -13,6 +13,10 @@
     <name>Graylog Binary Distribution Tarball</name>
     <description>Module solely performing final assembly step after all other modules artifacts have been built</description>
 
+    <properties>
+        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
