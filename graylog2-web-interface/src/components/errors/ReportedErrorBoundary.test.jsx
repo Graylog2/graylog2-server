@@ -5,7 +5,7 @@ import { act } from 'react-dom/test-utils';
 
 import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import { createReactError, createUnauthorizedError } from 'logic/errors/ReportedErrors';
+import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';
 import { FetchError } from 'logic/rest/FetchProvider';
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 
@@ -56,20 +56,47 @@ describe('ReportedErrorBoundary', () => {
       ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
     });
     await wait(() => expect(queryByText('Hello World!')).toBeNull());
-    await wait(() => expect(getByText('Something went wrong.')).not.toBeNull());
-    await wait(() => expect(getByText('The error message')).not.toBeNull());
+    expect(getByText('Something went wrong.')).not.toBeNull();
+    expect(getByText('The error message')).not.toBeNull();
+  });
+
+  it('displays not found page when not found error got reported', async () => {
+    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const response = { status: 404, body: { message: 'The request error message' } };
+
+    suppressConsole(() => {
+      ErrorsActions.report(createNotFoundError(new FetchError('The request error message', response)));
+    });
+
+    await wait(() => expect(queryByText('Hello World!')).toBeNull());
+    expect(getByText('Page not found')).not.toBeNull();
+    expect(getByText('The party gorilla was just here, but had another party to rock.')).not.toBeNull();
+  });
+
+  it('displays reported error with an unkown type', async () => {
+    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const response = { status: 404, body: { message: 'The error message' } };
+
+    suppressConsole(() => {
+      ErrorsActions.report({ ...createNotFoundError(new FetchError('The error message', response)), type: 'UnkownReportedError' });
+    });
+
+    await wait(() => expect(queryByText('Hello World!')).toBeNull());
+    expect(getByText('Something went wrong')).not.toBeNull();
+    expect(getByText(/The error message/)).not.toBeNull();
   });
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
     const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const response = { status: 403, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
-      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
+      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
     });
 
     await wait(() => expect(queryByText('Hello World!')).toBeNull());
-    await wait(() => expect(getByText('Missing Permissions')).not.toBeNull());
-    await wait(() => expect(getByText(/The request error message/)).not.toBeNull());
+    expect(getByText('Missing Permissions')).not.toBeNull();
+    expect(getByText(/The request error message/)).not.toBeNull();
   });
 
   it('resets error when navigation changes', async () => {
@@ -78,11 +105,12 @@ describe('ReportedErrorBoundary', () => {
     };
 
     const { getByText } = render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
+    const response = { status: 403, body: { message: 'The request error message' } };
 
     expect(getByText('Hello World!')).not.toBeNull();
 
     suppressConsole(() => {
-      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', new Error('The request error message'))));
+      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
     });
 
     await wait(() => expect(getByText('Missing Permissions')).not.toBeNull());
