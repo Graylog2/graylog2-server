@@ -1,0 +1,52 @@
+{
+  "id" : "5ece5e0a74ff709b0b0dc69a",
+  "queries" : [
+    {
+      "id" : "fa247d8f-7afa-45b7-b57e-3cdef4ee53be",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 300
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "search_types" : [
+        {
+          "timerange" : null,
+          "query" : null,
+          "streams" : [],
+          "id" : "ab258db5-d1f2-4d0c-8508-3b0e42a1b113",
+          "name" : "chart",
+          "series" : [
+            {
+              "type" : "count",
+              "id" : "Message Count"
+            }
+          ],
+          "sort" : [],
+          "rollup" : true,
+          "type" : "pivot",
+          "row_groups" : [],
+          "column_groups" : []
+        }
+      ]
+    },
+    {
+      "id" : "5faea09b-4187-4eda-9d59-7a86d4774c73",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 300
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "search_types" : []
+    }
+  ],
+  "parameters" : [],
+  "requires" : {},
+  "owner" : "admin",
+  "created_at" : "2020-05-27T12:33:14.938Z"
+}
