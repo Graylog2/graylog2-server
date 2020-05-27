@@ -1,13 +1,15 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
-
 import isDeepEqual from 'stores/isDeepEqual';
+
+import type { SearchType } from './SearchType';
 
 export type QueryId = string;
 
 export type FilterType = Immutable.Map<string, any>;
-type SearchTypeList = Array<any>;
+
+type SearchTypeList = Array<SearchType>;
 type InternalBuilderState = Immutable.Map<string, any>;
 
 type InternalState = {
@@ -105,7 +107,7 @@ export default class Query {
     return this._value.filter;
   }
 
-  get searchTypes(): Array<any> {
+  get searchTypes(): SearchTypeList {
     return this._value.searchTypes;
   }
 

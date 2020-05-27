@@ -42,6 +42,15 @@ describe('CSVExportModal', () => {
   const searchType = {
     id: 'search-type-id-1',
     type: 'messages',
+    streams: [],
+    sort: [],
+    filter: '',
+    name: null,
+    query: null,
+    timerange: null,
+    limit: 150,
+    decorators: [],
+    offset: 0,
   };
   const queries = [
     Query.builder().id('query-id-1').searchTypes([searchType]).build(),
