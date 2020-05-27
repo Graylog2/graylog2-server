@@ -11,6 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
 
+    <groupId>org.graylog</groupId>
     <artifactId>graylog-storage-elasticsearch6</artifactId>
     <name>graylog-storage-elasticsearch6</name>
     <description>Graylog Storage Module for Elasticsearch 6</description>
