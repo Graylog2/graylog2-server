@@ -16,20 +16,17 @@
  */
 package org.graylog2.indexer.indices;
 
-import org.graylog2.indexer.ElasticsearchException;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.google.auto.value.AutoValue;
 
-import java.util.Set;
+@AutoValue
+@JsonAutoDetect
+public abstract class IndexMoveResult {
+    public abstract int movedDocuments();
+    public abstract long tookMs();
+    public abstract boolean hasFailedItems();
 
-// TODO: This should actually be a `TooManyIndicesForAliasException`?
-public class TooManyAliasesException extends ElasticsearchException {
-    private final Set<String> indices;
-
-    public TooManyAliasesException(final Set<String> indices) {
-        super("More than one index in deflector alias: " + indices.toString());
-        this.indices = indices;
-    }
-
-    public Set<String> getIndices() {
-        return indices;
+    public static IndexMoveResult create(int movedDocuments, long tookMs, boolean hasFailedItems) {
+        return new AutoValue_IndexMoveResult(movedDocuments, tookMs, hasFailedItems);
     }
 }

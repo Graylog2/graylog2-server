@@ -37,9 +37,6 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
-import org.graylog2.indexer.messages.Messages;
-import org.graylog2.indexer.messages.MessagesAdapter;
-import org.graylog2.indexer.messages.TrafficAccounting;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -48,13 +45,11 @@ import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -68,14 +63,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 
-public class IndicesIT extends ElasticsearchBaseTest {
+public abstract class IndicesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    private MessagesAdapter messagesAdapter;
 
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
@@ -101,19 +93,21 @@ public class IndicesIT extends ElasticsearchBaseTest {
     private Indices indices;
     private IndexMappingFactory indexMappingFactory;
 
+    protected abstract IndicesAdapter indicesAdapter();
+
     @Before
     public void setUp() {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(jestClient());
         indexMappingFactory = new IndexMappingFactory(node);
-        indices = new Indices(jestClient(),
+        indices = new Indices(
                 new ObjectMapperProvider().get(),
                 indexMappingFactory,
-                new Messages(mock(TrafficAccounting.class), messagesAdapter, mock(ProcessingStatusRecorder.class)),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
-                eventBus);
+                eventBus,
+                indicesAdapter());
     }
 
     @Test
@@ -188,7 +182,7 @@ public class IndicesIT extends ElasticsearchBaseTest {
 
     @Test
     public void testTimestampStatsOfIndex() {
-        importFixture("IndicesIT.json");
+        importFixture("org/graylog2/indexer/indices/IndicesIT.json");
 
         IndexRangeStats stats = indices.indexRangeStatsOfIndex(INDEX_NAME);
 
