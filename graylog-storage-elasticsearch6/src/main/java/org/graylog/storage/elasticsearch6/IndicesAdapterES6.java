@@ -53,6 +53,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
@@ -345,8 +346,18 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     }
 
     @Override
-    public Health.Status waitForRecovery(String index) {
-        return waitForStatus(index, Health.Status.YELLOW);
+    public HealthStatus waitForRecovery(String index) {
+        final Health.Status status = waitForStatus(index, Health.Status.YELLOW);
+        return mapHealthStatus(status);
+    }
+
+    private HealthStatus mapHealthStatus(Health.Status status) {
+        switch (status) {
+            case RED: return HealthStatus.Red;
+            case YELLOW: return HealthStatus.Yellow;
+            case GREEN: return HealthStatus.Green;
+            default: throw new IllegalStateException("Unexpected cluster status: " + status);
+        }
     }
 
     private Health.Status waitForStatus(String index, Health.Status clusterHealthStatus) {

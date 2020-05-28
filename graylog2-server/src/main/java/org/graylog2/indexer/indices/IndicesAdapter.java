@@ -18,7 +18,6 @@ package org.graylog2.indexer.indices;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
-import io.searchbox.cluster.Health;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.joda.time.DateTime;
@@ -90,5 +89,5 @@ public interface IndicesAdapter {
 
     IndexRangeStats indexRangeStatsOfIndex(String index);
 
-    Health.Status waitForRecovery(String index);
+    HealthStatus waitForRecovery(String index);
 }
