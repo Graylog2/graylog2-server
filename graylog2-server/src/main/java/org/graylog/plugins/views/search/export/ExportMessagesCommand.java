@@ -78,6 +78,10 @@ public abstract class ExportMessagesCommand {
 
         public abstract Builder streams(Set<String> streams);
 
+        public Builder streams(String... streams) {
+            return streams(ImmutableSet.copyOf(streams));
+        }
+
         public abstract Builder queryString(ElasticsearchQueryString queryString);
 
         public abstract Builder fieldsInOrder(LinkedHashSet<String> fieldsInOrder);

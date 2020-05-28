@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface RequestStrategy {
     @SuppressWarnings("rawtypes")
@@ -36,5 +37,16 @@ public interface RequestStrategy {
      */
     default SearchSourceBuilder configure(SearchSourceBuilder ssb) {
         return ssb;
+    }
+
+    /**
+     * Overriding this allows implementers to remove streams containing messages that would can't be processed.
+     * Most prominently those that are lacking the required tie breaker field for search-after.
+     *
+     * @param streams Streams the user wants to export
+     * @return Streams that can be exported using the implementing RequestStrategy
+     */
+    default Set<String> removeUnsupportedStreams(Set<String> streams) {
+        return streams;
     }
 }
