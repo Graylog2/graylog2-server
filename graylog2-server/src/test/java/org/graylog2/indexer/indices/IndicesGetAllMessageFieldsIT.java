@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
@@ -49,12 +48,12 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
         final Node node = new Node(jestClient());
         //noinspection UnstableApiUsage
         indices = new Indices(
-                new ObjectMapper(),
                 new IndexMappingFactory(node),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus(),
-                indicesAdapter());
+                indicesAdapter()
+        );
     }
 
     @Test

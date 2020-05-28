@@ -102,12 +102,12 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         final Node node = new Node(jestClient());
         indexMappingFactory = new IndexMappingFactory(node);
         indices = new Indices(
-                new ObjectMapperProvider().get(),
                 indexMappingFactory,
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus,
-                indicesAdapter());
+                indicesAdapter()
+        );
     }
 
     @Test

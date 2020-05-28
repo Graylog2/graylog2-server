@@ -18,9 +18,9 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import io.searchbox.cluster.Health;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -261,7 +261,7 @@ public class MongoIndexSetTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
-        when(indices.waitForRecovery(newIndexName)).thenReturn(Health.Status.GREEN);
+        when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
         mongoIndexSet.cycle();
@@ -278,7 +278,7 @@ public class MongoIndexSetTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
-        when(indices.waitForRecovery(newIndexName)).thenReturn(Health.Status.GREEN);
+        when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
         final SetIndexReadOnlyAndCalculateRangeJob rangeJob = mock(SetIndexReadOnlyAndCalculateRangeJob.class);
         when(jobFactory.create(oldIndexName)).thenReturn(rangeJob);
@@ -300,7 +300,7 @@ public class MongoIndexSetTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
-        when(indices.waitForRecovery(newIndexName)).thenReturn(Health.Status.GREEN);
+        when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
         mongoIndexSet.cycle();
@@ -315,7 +315,7 @@ public class MongoIndexSetTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         when(indices.create(indexName, mongoIndexSet)).thenReturn(true);
-        when(indices.waitForRecovery(indexName)).thenReturn(Health.Status.GREEN);
+        when(indices.waitForRecovery(indexName)).thenReturn(HealthStatus.Green);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
         mongoIndexSet.cycle();
