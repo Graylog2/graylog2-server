@@ -17,12 +17,10 @@
 package org.graylog2.indexer.indices;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
-import io.searchbox.cluster.Health;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.ElasticsearchException;
@@ -62,17 +60,18 @@ public class Indices {
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
     public static final String REOPENED_ALIAS_SUFFIX = "_reopened";
 
-    private final ObjectMapper objectMapper;
     private final IndexMappingFactory indexMappingFactory;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
     private final EventBus eventBus;
-    private IndicesAdapter indicesAdapter;
+    private final IndicesAdapter indicesAdapter;
 
     @Inject
-    public Indices(ObjectMapper objectMapper, IndexMappingFactory indexMappingFactory,
-                   NodeId nodeId, AuditEventSender auditEventSender, EventBus eventBus, IndicesAdapter indicesAdapter) {
-        this.objectMapper = objectMapper;
+    public Indices(IndexMappingFactory indexMappingFactory,
+                   NodeId nodeId,
+                   AuditEventSender auditEventSender,
+                   EventBus eventBus,
+                   IndicesAdapter indicesAdapter) {
         this.indexMappingFactory = indexMappingFactory;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;
@@ -345,7 +344,7 @@ public class Indices {
         indicesAdapter.optimizeIndex(index, maxNumSegments, timeout);
     }
 
-    public Health.Status waitForRecovery(String index) {
+    public HealthStatus waitForRecovery(String index) {
         LOG.debug("Waiting until index health status of index {} is healthy", index);
         return indicesAdapter.waitForRecovery(index);
     }
