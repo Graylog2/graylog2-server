@@ -65,7 +65,8 @@ class BackendStartupIT {
         assertThat(pluginNames).containsExactlyInAnyOrder(
                 "Threat Intelligence Plugin",
                 "Collector",
-                "AWS plugins");
+                "AWS plugins",
+                "Elasticsearch 6 Support");
     }
 
     @Test
