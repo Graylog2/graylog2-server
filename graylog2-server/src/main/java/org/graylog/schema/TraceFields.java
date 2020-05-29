@@ -16,17 +16,6 @@
  */
 package org.graylog.schema;
 
-public enum TraceFields {
-    TRACE_ID("trace_id");
-
-    private String value;
-
-    TraceFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public class TraceFields {
+    public static final String TRACE_ID = "trace_id";
 }

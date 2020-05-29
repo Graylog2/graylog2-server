@@ -16,18 +16,7 @@
  */
 package org.graylog.schema;
 
-public enum EmailFields {
-    EMAIL_MESSAGE_ID("email_message_id"),
-    EMAIL_SUBJECT("email_subject");
-
-    private String value;
-
-    EmailFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public class EmailFields {
+    public static final String EMAIL_MESSAGE_ID = "email_message_id";
+    public static final String EMAIL_SUBJECT = "email_subject";
 }

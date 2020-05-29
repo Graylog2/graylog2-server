@@ -16,41 +16,30 @@
  */
 package org.graylog.schema;
 
-public enum HttpFields {
-    HTTP_APPLICATION("http_application"),
-    HTTP_BYTES("http_bytes"),
-    HTTP_CONTENT_TYPE("http_content_type"),
-    HTTP_HEADERS("http_headers"),
-    HTTP_HOST("http_host"),
-    HTTP_METHOD("http_method"),
-    HTTP_REFERER("http_referrer"),
-    HTTP_REQUEST_BYTES("http_request_bytes"),
-    HTTP_REQUEST_METHOD("http_request_method"),
-    HTTP_RESPONSE("http_response"),
-    HTTP_RESPONSE_BYTES("http_response_bytes"),
-    HTTP_RESPONSE_CODE("http_response_code"),
-    HTTP_URL("http_url"),
-    HTTP_URL_CATEGORY("http_url_category"),
-    HTTP_USER_AGENT("http_user_agent"),
-    HTTP_USER_AGENT_NAME("http_user_agent_name"),
-    HTTP_USER_AGENT_OS("http_user_agent_os"),
-    HTTP_VERSION("http_version"),
-    HTTP_XFF("http_version"),
+public class HttpFields {
+    public static final String HTTP_APPLICATION = "http_application";
+    public static final String HTTP_BYTES = "http_bytes";
+    public static final String HTTP_CONTENT_TYPE = "http_content_type";
+    public static final String HTTP_HEADERS = "http_headers";
+    public static final String HTTP_HOST = "http_host";
+    public static final String HTTP_METHOD = "http_method";
+    public static final String HTTP_REFERER = "http_referrer";
+    public static final String HTTP_REQUEST_BYTES = "http_request_bytes";
+    public static final String HTTP_REQUEST_METHOD = "http_request_method";
+    public static final String HTTP_RESPONSE = "http_response";
+    public static final String HTTP_RESPONSE_BYTES = "http_response_bytes";
+    public static final String HTTP_RESPONSE_CODE = "http_response_code";
+    public static final String HTTP_URL = "http_url";
+    public static final String HTTP_URL_CATEGORY = "http_url_category";
+    public static final String HTTP_USER_AGENT = "http_user_agent";
+    public static final String HTTP_USER_AGENT_NAME = "http_user_agent_name";
+    public static final String HTTP_USER_AGENT_OS = "http_user_agent_os";
+    public static final String HTTP_VERSION = "http_version";
+    public static final String HTTP_XFF = "http_version";
 
     // Derived and Enriched Fields
-    HTTP_URL_ANALYZED("http_url_analyzed"),
-    HTTP_URL_LENGTH("http_url_length"),
-    HTTP_USER_AGENT_ANALYZED("http_user_agent_analyzed"),
-    HTTP_USER_AGENT_LENGTH("http_user_agent_length");
-
-    private String value;
-
-    HttpFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+    public static final String HTTP_URL_ANALYZED = "http_url_analyzed";
+    public static final String HTTP_URL_LENGTH = "http_url_length";
+    public static final String HTTP_USER_AGENT_ANALYZED = "http_user_agent_analyzed";
+    public static final String HTTP_USER_AGENT_LENGTH = "http_user_agent_length";
 }

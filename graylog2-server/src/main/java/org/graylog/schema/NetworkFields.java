@@ -16,35 +16,23 @@
  */
 package org.graylog.schema;
 
-public enum NetworkFields {
-
-    NETWORK_APPLICATION("network_application"),
-    NETWORK_BYTES("network_application"),
-    NETWORK_BYTES_RX("network_bytes_rx"),
-    NETWORK_BYTES_TX("network_bytes_tx"),
-    NETWORK_COMMUNITY_ID("network_community_id"),
-    NETWORK_DIRECTION("network_direction"),
-    NETWORK_FORWARDED_IP("network_forwarded_ip"),
-    NETWORK_IANA_NUMBER("network_iana_number"),
-    NETWORK_INNER("network_inner"),
-    NETWORK_INTERFACE_IN("network_interface_oIN"),
-    NETWORK_INTERFACE_OUT("network_interface_out"),
-    NETWORK_NAME("network_name"),
-    NETWORK_PACKETS("network_packets"),
-    NETWORK_PROTOCOL("network_protocol"),
-    NETWORK_TRANSPORT("network_transport"),
-    NETWORK_TUNNEL_DURATION("network_tunnel_duration"),
-    NETWORK_TUNNEL_TYPE("network_tunnel_type"),
-    NETWORK_TYPE("network_type");
-
-    private String value;
-
-    NetworkFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public class NetworkFields {
+    public static final String NETWORK_APPLICATION = "network_application";
+    public static final String NETWORK_BYTES = "network_application";
+    public static final String NETWORK_BYTES_RX = "network_bytes_rx";
+    public static final String NETWORK_BYTES_TX = "network_bytes_tx";
+    public static final String NETWORK_COMMUNITY_ID = "network_community_id";
+    public static final String NETWORK_DIRECTION = "network_direction";
+    public static final String NETWORK_FORWARDED_IP = "network_forwarded_ip";
+    public static final String NETWORK_IANA_NUMBER = "network_iana_number";
+    public static final String NETWORK_INNER = "network_inner";
+    public static final String NETWORK_INTERFACE_IN = "network_interface_oIN";
+    public static final String NETWORK_INTERFACE_OUT = "network_interface_out";
+    public static final String NETWORK_NAME = "network_name";
+    public static final String NETWORK_PACKETS = "network_packets";
+    public static final String NETWORK_PROTOCOL = "network_protocol";
+    public static final String NETWORK_TRANSPORT = "network_transport";
+    public static final String NETWORK_TUNNEL_DURATION = "network_tunnel_duration";
+    public static final String NETWORK_TUNNEL_TYPE = "network_tunnel_type";
+    public static final String NETWORK_TYPE = "network_type";
 }

@@ -16,47 +16,38 @@
  */
 package org.graylog.schema;
 
-public enum DestinationFields {
-    DESTINATION_APPLICATION_NAME("destination_application_name"),
-    DESTINATION_BYTES("destination_bytes"),
-    DESTINATION_HOSTNAME("destination_hostname"),
-    DESTINATION_IP("destination_ip"),
-    DESTINATION_NAT_IP("destination_nat_ip"),
-    DESTINATION_NAT_PORT("destination_nat_port"),
-    DESTINATION_PACKETS("destination_packets"),
-    DESTINATION_PORT("destination_port"),
-    DESTINATION_VSYS_UUID("destination_vsys_uuid"),
-    DESTINATION_ZONE("destination_zone"),
+public class DestinationFields {
+    private static final String DESTINATION_PREFIX = "destination_";
+
+    public static final String DESTINATION_APPLICATION_NAME = "destination_application_name";
+    public static final String DESTINATION_BYTES = "destination_bytes";
+    public static final String DESTINATION_HOSTNAME = "destination_hostname";
+    public static final String DESTINATION_IP = "destination_ip";
+    public static final String DESTINATION_NAT_IP = "destination_nat_ip";
+    public static final String DESTINATION_NAT_PORT = "destination_nat_port";
+    public static final String DESTINATION_PACKETS = "destination_packets";
+    public static final String DESTINATION_PORT = "destination_port";
+    public static final String DESTINATION_VSYS_UUID = "destination_vsys_uuid";
+    public static final String DESTINATION_ZONE = "destination_zone";
 
     // Derived and Enriched Fields
-    DESTINATION_CATEGORY("destination_category"),
-    DESTINATION_LOCATION_NAME("destination_location_name"),
-    DESTINATION_MAC("destination_mac"),
-    DESTINATION_PRIORITY("destination_priority"),
-    DESTINATION_PRIORITY_LEVEL("destination_priority_level"),
-    DESTINATION_REFERENCE("destination_reference"),
+    public static final String DESTINATION_CATEGORY = "destination_category";
+    public static final String DESTINATION_LOCATION_NAME = "destination_location_name";
+    public static final String DESTINATION_MAC = "destination_mac";
+    public static final String DESTINATION_PRIORITY = "destination_priority";
+    public static final String DESTINATION_PRIORITY_LEVEL = "destination_priority_level";
+    public static final String DESTINATION_REFERENCE = "destination_reference";
 
     // Autonomous System Fields
-    DESTINATION_AS_DOMAIN("destination_as_domain"),
-    DESTINATION_AS_ISP("destination_as_isp"),
-    DESTINATION_AS_NUMBER("destination_as_number"),
-    DESTINATION_AS_ORGANIZATION_NAME("destination_as_organization_name"),
+    public static final String DESTINATION_AS_DOMAIN = DESTINATION_PREFIX + AutonomousSystemFields.AS_DOMAIN;
+    public static final String DESTINATION_AS_ISP = DESTINATION_PREFIX + AutonomousSystemFields.AS_ISP;
+    public static final String DESTINATION_AS_NUMBER = DESTINATION_PREFIX + AutonomousSystemFields.AS_NUMBER;
+    public static final String DESTINATION_AS_ORGANIZATION_NAME = DESTINATION_PREFIX + AutonomousSystemFields.AS_ORGANIZATION_NAME;
 
     // Geo Fields
-    DESTINATION_GEO_CITY_NAME("destination_geo_city_name"),
-    DESTINATION_GEO_STATE_NAME("destination_geo_state_name"),
-    DESTINATION_GEO_ISO_CODE("destination_geo_iso_code"),
-    DESTINATION_GEO_COUNTRY_NAME("destination_geo_country_name"),
-    DESTINATION_GEO_COORDINATES("destination_geo_coordinates");
-
-    private String value;
-
-    DestinationFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+    public static final String DESTINATION_GEO_CITY_NAME = DESTINATION_PREFIX + GeoFields.GEO_CITY_NAME;
+    public static final String DESTINATION_GEO_STATE_NAME = DESTINATION_PREFIX + GeoFields.GEO_STATE_NAME;
+    public static final String DESTINATION_GEO_ISO_CODE = DESTINATION_PREFIX + GeoFields.GEO_ISO_CODE;
+    public static final String DESTINATION_GEO_COUNTRY_NAME = DESTINATION_PREFIX + GeoFields.GEO_COUNTRY_NAME;
+    public static final String DESTINATION_GEO_COORDINATES = DESTINATION_PREFIX + GeoFields.GEO_COORDINATES;
 }

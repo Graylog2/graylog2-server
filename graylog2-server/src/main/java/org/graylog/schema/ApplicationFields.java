@@ -16,19 +16,8 @@
  */
 package org.graylog.schema;
 
-public enum ApplicationFields {
-    APPLICATION_NAME("application_name"),
-    APPLICATION_SSO_SIGNONMODE("application_sso_signonmode"),
-    APPLICATION_SSO_TARGET_NAME("application_sso_target_name");
-
-    private String value;
-
-    ApplicationFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public class ApplicationFields {
+    public static final String APPLICATION_NAME = "application_name";
+    public static final String APPLICATION_SSO_SIGNONMODE = "application_sso_signonmode";
+    public static final String APPLICATION_SSO_TARGET_NAME = "application_sso_target_name";
 }

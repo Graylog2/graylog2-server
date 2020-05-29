@@ -16,18 +16,7 @@
  */
 package org.graylog.schema;
 
-public enum CommonFields {
-    TIMESTAMP("timestamp"),
-    FULL_MESSAGE("full_message");
-
-    private String value;
-
-    CommonFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public class CommonFields {
+    public static final String TIMESTAMP = "timestamp";
+    public static final String FULL_MESSAGE = "full_message";
 }

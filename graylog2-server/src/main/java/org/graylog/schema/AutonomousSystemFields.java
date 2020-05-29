@@ -16,11 +16,9 @@
  */
 package org.graylog.schema;
 
-public class FileFields {
-    public static final String FILE_COMPANY = "file_company";
-    public static final String FILE_COMPILE_TIME = "file_compile_time";
-    public static final String FILE_NAME = "file_name";
-    public static final String FILE_PATH = "file_path";
-    public static final String FILE_SIZE = "file_size";
-    public static final String FILE_TYPE = "file_type";
+public class AutonomousSystemFields {
+    public static final String AS_DOMAIN = "as_domain";
+    public static final String AS_ISP = "as_isp";
+    public static final String AS_NUMBER = "as_number";
+    public static final String AS_ORGANIZATION_NAME = "as_organization_name";
 }

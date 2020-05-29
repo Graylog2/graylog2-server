@@ -16,48 +16,39 @@
  */
 package org.graylog.schema;
 
-public enum SourceFields {
-    SOURCE_BYTES("source_bytes"),
-    SOURCE_HOSTNAME("source_hostname"),
-    SOURCE_IP("source_ip"),
-    SOURCE_NAT_IP("source_nat_ip"),
-    SOURCE_NAT_PORT("source_nat_port"),
-    SOURCE_PACKETS("source_packets"),
-    SOURCE_PORT("source_port"),
-    SOURCE_USER("source_user"),
-    SOURCE_USER_EMAIL("source_user_email"),
-    SOURCE_VSYS_UUID("source_vsys_uuid"),
-    SOURCE_ZONE("source_zone"),
+public class SourceFields {
+    private static final String SOURCE_PREFIX = "source_";
+
+    public static final String SOURCE_BYTES = "source_bytes";
+    public static final String SOURCE_HOSTNAME = "source_hostname";
+    public static final String SOURCE_IP = "source_ip";
+    public static final String SOURCE_NAT_IP = "source_nat_ip";
+    public static final String SOURCE_NAT_PORT = "source_nat_port";
+    public static final String SOURCE_PACKETS = "source_packets";
+    public static final String SOURCE_PORT = "source_port";
+    public static final String SOURCE_USER = "source_user";
+    public static final String SOURCE_USER_EMAIL = "source_user_email";
+    public static final String SOURCE_VSYS_UUID = "source_vsys_uuid";
+    public static final String SOURCE_ZONE = "source_zone";
 
     // Derived and Enriched Fields
-    SOURCE_CATEGORY("source_category"),
-    SOURCE_LOCATION_NAME("source_location_name"),
-    SOURCE_MAC("source_mac"),
-    SOURCE_PRIORITY("source_priority"),
-    SOURCE_PRIORITY_LEVEL("source_priority_level"),
-    SOURCE_REFERENCE("source_reference"),
+    public static final String SOURCE_CATEGORY = "source_category";
+    public static final String SOURCE_LOCATION_NAME = "source_location_name";
+    public static final String SOURCE_MAC = "source_mac";
+    public static final String SOURCE_PRIORITY = "source_priority";
+    public static final String SOURCE_PRIORITY_LEVEL = "source_priority_level";
+    public static final String SOURCE_REFERENCE = "source_reference";
 
     // Autonomous System Fields
-    SOURCE_AS_DOMAIN("source_as_domain"),
-    SOURCE_AS_ISP("source_as_isp"),
-    SOURCE_AS_NUMBER("source_as_number"),
-    SOURCE_AS_ORGANIZATION_NAME("source_as_organization_name"),
+    public static final String DESTINATION_AS_DOMAIN = SOURCE_PREFIX + AutonomousSystemFields.AS_DOMAIN;
+    public static final String DESTINATION_AS_ISP = SOURCE_PREFIX + AutonomousSystemFields.AS_ISP;
+    public static final String DESTINATION_AS_NUMBER = SOURCE_PREFIX + AutonomousSystemFields.AS_NUMBER;
+    public static final String DESTINATION_AS_ORGANIZATION_NAME = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION_NAME;
 
     // Geo Fields
-    SOURCE_GEO_CITY_NAME("source_geo_city_name"),
-    SOURCE_GEO_STATE_NAME("source_geo_state_name"),
-    SOURCE_GEO_ISO_CODE("source_geo_iso_code"),
-    SOURCE_GEO_COUNTRY_NAME("source_geo_country_name"),
-    SOURCE_GEO_COORDINATES("source_geo_coordinates");
-
-    private String value;
-
-    SourceFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+    public static final String DESTINATION_GEO_CITY_NAME = SOURCE_PREFIX + GeoFields.GEO_CITY_NAME;
+    public static final String DESTINATION_GEO_STATE_NAME = SOURCE_PREFIX + GeoFields.GEO_STATE_NAME;
+    public static final String DESTINATION_GEO_ISO_CODE = SOURCE_PREFIX + GeoFields.GEO_ISO_CODE;
+    public static final String DESTINATION_GEO_COUNTRY_NAME = SOURCE_PREFIX + GeoFields.GEO_COUNTRY_NAME;
+    public static final String DESTINATION_GEO_COORDINATES = SOURCE_PREFIX + GeoFields.GEO_COORDINATES;
 }

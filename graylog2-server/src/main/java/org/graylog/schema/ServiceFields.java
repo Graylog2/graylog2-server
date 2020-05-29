@@ -16,18 +16,7 @@
  */
 package org.graylog.schema;
 
-public enum ServiceFields {
-    SERVICE_NAME("service_name"),
-    SERVICE_VERSION("service_version");
-
-    private String value;
-
-    ServiceFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public class ServiceFields {
+    public static final String SERVICE_NAME = "service_name";
+    public static final String SERVICE_VERSION = "service_version";
 }

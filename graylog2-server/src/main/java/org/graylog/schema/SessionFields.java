@@ -16,17 +16,6 @@
  */
 package org.graylog.schema;
 
-public enum SessionFields {
-    SESSION_ID("session_id");
-
-    private String value;
-
-    SessionFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public class SessionFields {
+    public static final String SESSION_ID = "session_id";
 }

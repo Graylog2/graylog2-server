@@ -16,11 +16,10 @@
  */
 package org.graylog.schema;
 
-public class FileFields {
-    public static final String FILE_COMPANY = "file_company";
-    public static final String FILE_COMPILE_TIME = "file_compile_time";
-    public static final String FILE_NAME = "file_name";
-    public static final String FILE_PATH = "file_path";
-    public static final String FILE_SIZE = "file_size";
-    public static final String FILE_TYPE = "file_type";
+public class GeoFields {
+    public static final String GEO_CITY_NAME = "geo_city_name";
+    public static final String GEO_STATE_NAME = "geo_state_name";
+    public static final String GEO_ISO_CODE = "geo_iso_code";
+    public static final String GEO_COUNTRY_NAME = "geo_country_name";
+    public static final String GEO_COORDINATES = "geo_coordinates";
 }

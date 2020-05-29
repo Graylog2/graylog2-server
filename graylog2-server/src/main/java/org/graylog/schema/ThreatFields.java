@@ -16,18 +16,7 @@
  */
 package org.graylog.schema;
 
-public enum ThreatFields {
-    THREAT_CATEGORY("threat_category"),
-    THREAT_DETECTED("threat_detected");
-
-    private String value;
-
-    ThreatFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+public class ThreatFields {
+    public static final String THREAT_CATEGORY = "threat_category";
+    public static final String THREAT_DETECTED = "threat_detected";
 }

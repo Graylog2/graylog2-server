@@ -16,27 +16,16 @@
  */
 package org.graylog.schema;
 
-public enum UserFields {
-    USER_COMMAND("user_command"),
-    USER_DOMAIN("user_domain"),
-    USER_EMAIL("user_email"),
-    USER_ID("user_id"),
-    USER_NAME("user_name"),
+public class UserFields {
+    public static final String USER_COMMAND = "user_command";
+    public static final String USER_DOMAIN = "user_domain";
+    public static final String USER_EMAIL = "user_email";
+    public static final String USER_ID = "user_id";
+    public static final String USER_NAME = "user_name";
 
     // Derived and Enriched Fields
-    USER_CATEGORY("user_category"),
-    USER_PRIORITY("user_priority"),
-    USER_PRIORITY_LEVEL("user_priority_level"),
-    USER_TYPE("user_type");
-
-    private String value;
-
-    UserFields(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+    public static final String USER_CATEGORY = "user_category";
+    public static final String USER_PRIORITY = "user_priority";
+    public static final String USER_PRIORITY_LEVEL = "user_priority_level";
+    public static final String USER_TYPE = "user_type";
 }
