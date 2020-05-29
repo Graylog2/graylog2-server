@@ -71,8 +71,9 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        final Node node = mock(Node.class);
         @SuppressWarnings("UnstableApiUsage") final Indices indices = new Indices(
-                new IndexMappingFactory(new Node(jestClient())),
+                new IndexMappingFactory(node),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 mock(EventBus.class),
