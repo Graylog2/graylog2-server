@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 
 public class SearchAfter implements RequestStrategy {
