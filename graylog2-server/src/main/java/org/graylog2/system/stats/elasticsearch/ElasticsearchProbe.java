@@ -28,6 +28,7 @@ import io.searchbox.cluster.PendingClusterTasks;
 import io.searchbox.cluster.Stats;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.indices.HealthStatus;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -105,7 +106,7 @@ public class ElasticsearchProbe {
                 pendingTasksSize,
                 pendingTasksTimeInQueue
         );
-        final ElasticsearchStats.HealthStatus healthStatus = getHealthStatus(clusterHealthJson.path("status").asText("RED"));
+        final HealthStatus healthStatus = getHealthStatus(clusterHealthJson.path("status").asText("RED"));
 
         return ElasticsearchStats.create(
                 clusterName,
@@ -116,7 +117,7 @@ public class ElasticsearchProbe {
                 indicesStats);
     }
 
-    private ElasticsearchStats.HealthStatus getHealthStatus(String status) {
-        return ElasticsearchStats.HealthStatus.valueOf(status.toUpperCase(Locale.ENGLISH));
+    private HealthStatus getHealthStatus(String status) {
+        return HealthStatus.fromString(status.toUpperCase(Locale.ENGLISH));
     }
 }
