@@ -87,7 +87,7 @@
         <!-- Dependencies -->
         <airline.version>2.7.2</airline.version>
         <amqp-client.version>5.8.0</amqp-client.version>
-        <antlr.version>4.7.1</antlr.version>
+        <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <auto-value.version>1.7</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
