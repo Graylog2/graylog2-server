@@ -1,4 +1,5 @@
 // @flow strict
+import * as Immutable from 'immutable';
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import Widget from '../widgets/Widget';
@@ -10,17 +11,20 @@ const _removeWidgetFromTab = (widgetId: string, queryId: string, dashboard: View
   const viewState = dashboard.state.get(queryId);
   const widgetIndex = viewState.widgets.findIndex((widget) => widget.id === widgetId);
   const widgetPosition = viewState.widgetPositions;
-  widgetPosition.delete(widgetId);
+  delete widgetPosition[widgetId];
+  const { widgetMapping } = viewState;
+  const newWidgetMapping = widgetMapping.remove(widgetId);
   const newViewState = viewState.toBuilder()
     .widgets(viewState.widgets.delete(widgetIndex))
-    .widgetPositions()
+    .widgetMapping(newWidgetMapping)
+    .widgetPositions(widgetPosition)
     .build();
   return dashboard.toBuilder()
     .state(dashboard.state.set(queryId, newViewState))
     .build();
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View): View => {
+const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, searchTypeIds: Immutable.Set<string>): View => {
   const viewState = dashboard.state.get(targetQueryId);
   const newViewState = viewState.toBuilder()
     .widgets(viewState.widgets.push(widget))
@@ -39,8 +43,9 @@ const MoveWidgetToTab = (widgetId: string, targetQueryId: QueryId, dashboard: Vi
 
   if (match) {
     const [widget, queryId] = match;
+    const searchTypes = dashboard.state.get(queryId).widgetMapping.get(widgetId);
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
-    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard));
+    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, searchTypes));
   }
   return undefined;
 };
