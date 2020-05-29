@@ -22,14 +22,14 @@ import java.util.stream.Stream;
 
 public class ClusterAllocationDiskSettingsFactory {
 
-    public static ClusterAllocationDiskSettings create(boolean enabled, String low, String high, String floodStage) throws Exception {
+    public static ClusterAllocationDiskSettings create(boolean enabled, String low, String high, String floodStage) {
         if (!enabled) {
             return ClusterAllocationDiskSettings.create(enabled, null);
         }
         return ClusterAllocationDiskSettings.create(enabled, createWatermarkSettings(low, high, floodStage));
     }
 
-    private static WatermarkSettings<?> createWatermarkSettings(String low, String high, String floodStage) throws Exception {
+    private static WatermarkSettings<?> createWatermarkSettings(String low, String high, String floodStage) {
         WatermarkSettings.SettingsType lowType = getType(low);
         WatermarkSettings.SettingsType highType = getType(high);
         if (Stream.of(lowType, highType).allMatch(s -> s == WatermarkSettings.SettingsType.ABSOLUTE)) {
@@ -49,7 +49,7 @@ public class ClusterAllocationDiskSettingsFactory {
             }
             return builder.build();
         }
-        throw new Exception("Error creating ClusterAllocationDiskWatermarkSettings. This should never happen.");
+        throw new IllegalStateException("Error creating ClusterAllocationDiskWatermarkSettings. This should never happen.");
     }
 
     private static WatermarkSettings.SettingsType getType(String value) {
