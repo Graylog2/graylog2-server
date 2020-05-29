@@ -26,6 +26,7 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
+import com.github.rholder.retry.WaitStrategy;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -74,9 +75,10 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
+    private static final WaitStrategy exponentialWait = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
     private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
             .retryIfException(t -> t instanceof IOException)
-            .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
+            .withWaitStrategy(exponentialWait)
             .withRetryListener(new RetryListener() {
                 @Override
                 public <V> void onRetry(Attempt<V> attempt) {
@@ -247,15 +249,12 @@ public class Messages {
     private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<Map.Entry<IndexSet, Message>> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
         Set<BulkResult.BulkResultItem> indexBlocks = indexBlocksFrom(allFailedItems);
         Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
-
         List<Map.Entry<IndexSet, Message>> blockedMessages = messagesForResultItems(chunk, indexBlocks);
 
+        long attempt = 1;
+
         while (!indexBlocks.isEmpty()) {
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            blockExecutionForAttempt(attempt++);
 
             BulkResult bulkResult = bulkIndexChunk(blockedMessages);
 
@@ -269,6 +268,16 @@ public class Messages {
         }
 
         return otherFailures;
+    }
+
+    private void blockExecutionForAttempt(long attempt) {
+        try {
+            long sleepTime = exponentialWait.computeSleepTime(new IndexBlockRetryAttempt(attempt));
+            LOG.info("sleeping " + sleepTime);
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Map.Entry<IndexSet, Message>> messagesForResultItems(List<Map.Entry<IndexSet, Message>> chunk, Set<BulkResult.BulkResultItem> indexBlocks) {
