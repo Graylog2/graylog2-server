@@ -79,6 +79,8 @@ public class ElasticsearchProbe {
                 clusterIndicesStats.path("fielddata").path("memory_size_in_bytes").asLong(-1L)
         );
 
+        // Pending Tasks
+
         final JestResult pendingClusterTasksResponse = JestUtils.execute(jestClient, new PendingClusterTasks.Builder().build(), () -> "Couldn't read Elasticsearch pending cluster tasks");
         final JsonNode pendingClusterTasks = pendingClusterTasksResponse.getJsonObject().path("tasks");
         final int pendingTasksSize = pendingClusterTasks.size();
@@ -89,6 +91,7 @@ public class ElasticsearchProbe {
             }
         }
 
+        // Cluster Health
         final Health clusterHealthRequest = new Health.Builder()
                 .addIndex(Arrays.asList(indexSetRegistry.getIndexWildcards()))
                 .build();
