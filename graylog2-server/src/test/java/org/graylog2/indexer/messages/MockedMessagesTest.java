@@ -180,6 +180,27 @@ public class MockedMessagesTest {
         assertThat(result).containsOnly("other-error-id");
     }
 
+    @Test
+    public void retriedIndexBlockErrorsThatFailWithDifferentErrorsAreTreatedAsPersistentFailures() throws IOException {
+        final BulkResult errorResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem indexBlockedError = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
+        final BulkResult.BulkResultItem initialIndexBlockedError = errorResultItem("other-error-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
+        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(indexBlockedError, initialIndexBlockedError));
+
+        final BulkResult secondErrorResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem otherError = errorResultItem("other-error-id", "something else", "something else");
+        when(secondErrorResult.getFailedItems()).thenReturn(ImmutableList.of(otherError));
+
+        when(jestClient.execute(any()))
+                .thenReturn(errorResult)
+                .thenReturn(secondErrorResult);
+
+        final List<String> result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
+
+        verify(jestClient, times(2)).execute(any());
+        assertThat(result).containsOnly("other-error-id");
+    }
+
     @NotNull
     private List<Map.Entry<IndexSet, Message>> messagesWithIds(String... ids) {
         return Arrays.stream(ids)

@@ -246,7 +246,7 @@ public class Messages {
 
     private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<Map.Entry<IndexSet, Message>> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
         Set<BulkResult.BulkResultItem> indexBlocks = indexBlocksFrom(allFailedItems);
-        Set<BulkResult.BulkResultItem> otherFailures = Sets.difference(new HashSet<>(allFailedItems), indexBlocks);
+        Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
 
         List<Map.Entry<IndexSet, Message>> blockedMessages = messagesForResultItems(chunk, indexBlocks);
 
@@ -259,8 +259,13 @@ public class Messages {
 
             BulkResult bulkResult = bulkIndexChunk(blockedMessages);
 
-            indexBlocks = indexBlocksFrom(bulkResult.getFailedItems());
+            List<BulkResult.BulkResultItem> failedItems = bulkResult.getFailedItems();
+
+            indexBlocks = indexBlocksFrom(failedItems);
             blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
+
+            Set<BulkResult.BulkResultItem> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
+            otherFailures.addAll(newOtherFailures);
         }
 
         return otherFailures;
