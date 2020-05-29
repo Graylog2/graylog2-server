@@ -36,9 +36,11 @@ import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.messages.Messages.INDEX_BLOCK_ERROR;
@@ -62,6 +64,7 @@ public class MockedMessagesTest {
             }
         }
 
+        @SuppressWarnings("SameParameterValue")
         MockedBulkResultItem createResultItem(String operation, String index, String type, String id, int status, String error, Integer version, String errorType, String errorReason) {
             return new MockedBulkResultItem(operation, index, type, id, status, error, version, errorType, errorReason);
         }
@@ -139,6 +142,52 @@ public class MockedMessagesTest {
         verify(jestClient, times(1)).execute(any());
     }
 
+    @Test
+    public void bulkIndexingShouldRetryIfIndexBlocked() throws IOException {
+        final BulkResult errorResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem errorItem = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
+        when(errorResult.isSucceeded()).thenReturn(false);
+        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(errorItem));
+
+        final BulkResult successResult = mock(BulkResult.class);
+
+        when(jestClient.execute(any()))
+                .thenReturn(errorResult)
+                .thenReturn(successResult);
+
+        final List<String> result = messages.bulkIndex(messagesWithIds("blocked-id"));
+
+        verify(jestClient, times(2)).execute(any());
+        assertThat(result).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void indexBlockedRetriesShouldOnlyRetryIndexBlockedErrors() throws IOException {
+        final BulkResult errorResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem indexBlockedError = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
+        final BulkResult.BulkResultItem otherError = errorResultItem("other-error-id", "something else", "something else");
+        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(indexBlockedError, otherError));
+
+        final BulkResult successResult = mock(BulkResult.class);
+
+        when(jestClient.execute(any()))
+                .thenReturn(errorResult)
+                .thenReturn(successResult);
+
+        final List<String> result = messages.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
+
+        verify(jestClient, times(2)).execute(any());
+        assertThat(result).containsOnly("other-error-id");
+    }
+
+    @NotNull
+    private List<Map.Entry<IndexSet, Message>> messagesWithIds(String... ids) {
+        return Arrays.stream(ids)
+                .map(this::messageWithId)
+                .map(m -> new AbstractMap.SimpleEntry<>(mock(IndexSet.class), m))
+                .collect(Collectors.toList());
+    }
+
     @NotNull
     private Message messageWithId(String id) {
         final Message mockedMessage = mock(Message.class);
@@ -154,29 +203,6 @@ public class MockedMessagesTest {
         );
     }
 
-    @Test
-    public void bulkIndexingShouldRetryIfFloodStageReached() throws IOException {
-        final BulkResult errorResult = mock(BulkResult.class);
-        final BulkResult.BulkResultItem errorItem = errorResultItem("BLOCKED_MESSAGE_ID", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
-        when(errorResult.isSucceeded()).thenReturn(false);
-        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(errorItem));
-
-        final BulkResult successResult = mock(BulkResult.class);
-        final BulkResult.BulkResultItem successItem = successResultItem("BLOCKED_MESSAGE_ID");
-        when(successResult.isSucceeded()).thenReturn(true);
-        when(successResult.getItems()).thenReturn(ImmutableList.of(successItem));
-
-        when(jestClient.execute(any()))
-                .thenReturn(errorResult)
-                .thenReturn(successResult);
-
-        final List<Map.Entry<IndexSet, Message>> messageList = messageListWith(messageWithId("BLOCKED_MESSAGE_ID"));
-        final List<String> result = messages.bulkIndex(messageList);
-
-        verify(jestClient, times(2)).execute(any());
-        assertThat(result).isNotNull().isEmpty();
-    }
-
     private BulkResult.BulkResultItem errorResultItem(String messageId, String errorType, String errorReason) {
         return new MockedBulkResult().createResultItem(
                 "index",
@@ -189,24 +215,5 @@ public class MockedMessagesTest {
                 errorType,
                 errorReason
         );
-    }
-
-    private BulkResult.BulkResultItem successResultItem(String messageId) {
-        return new MockedBulkResult().createResultItem(
-                "index",
-                "someindex",
-                "message",
-                messageId,
-                201,
-                null,
-                null,
-                null,
-                null
-        );
-    }
-
-    @Test
-    public void onlyFailedItemsAreRetriedWhenFloodStageReached() {
-
     }
 }
