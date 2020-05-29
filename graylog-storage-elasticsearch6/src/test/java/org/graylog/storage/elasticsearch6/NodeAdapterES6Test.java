@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.github.zafarkhaja.semver.ParseException;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
@@ -81,19 +80,6 @@ public class NodeAdapterES6Test {
     }
 
     @Test
-    public void retrievingVersionFailsIfElasticsearchVersionIsInvalid() throws Exception {
-        final JestResult jestResult = mock(JestResult.class);
-        when(jestResult.isSucceeded()).thenReturn(true);
-        when(jestResult.getJsonObject()).thenReturn(buildVersionJsonObject("Foobar"));
-        when(jestClient.execute(any(Ping.class))).thenReturn(jestResult);
-
-        assertThatThrownBy(() -> nodeAdapter.version())
-            .isInstanceOf(ElasticsearchException.class)
-            .hasMessageStartingWith("Unable to parse Elasticsearch version: Foobar")
-            .hasCauseInstanceOf(ParseException.class);
-    }
-
-    @Test
     public void retrievingVersionSucceedsIfElasticsearchVersionIsValid() throws Exception {
         final JestResult jestResult = mock(JestResult.class);
         when(jestResult.isSucceeded()).thenReturn(true);
@@ -102,7 +88,7 @@ public class NodeAdapterES6Test {
 
         final Optional<String> elasticsearchVersion = nodeAdapter.version();
 
-        assertThat(elasticsearchVersion).isEqualTo("5.4.0");
+        assertThat(elasticsearchVersion).contains("5.4.0");
     }
 
     private JsonNode buildVersionJsonObject(String foobar) {

@@ -16,7 +16,9 @@
  */
 package org.graylog2.indexer.cluster;
 
+import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
+import org.graylog2.indexer.ElasticsearchException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,6 +29,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 public class NodeTest {
@@ -59,5 +62,15 @@ public class NodeTest {
         final Optional<Version> elasticsearchVersion = node.getVersion();
 
         assertThat(elasticsearchVersion).contains(Version.forIntegers(5, 4, 0));
+    }
+
+    @Test
+    public void retrievingVersionFailsIfElasticsearchVersionIsInvalid() throws Exception {
+        when(nodeAdapter.version()).thenReturn(Optional.of("Foobar"));
+
+        assertThatThrownBy(() -> node.getVersion())
+                .isInstanceOf(ElasticsearchException.class)
+                .hasMessageStartingWith("Unable to parse Elasticsearch version: Foobar")
+                .hasCauseInstanceOf(ParseException.class);
     }
 }
