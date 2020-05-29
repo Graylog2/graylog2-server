@@ -189,7 +189,7 @@ class Widget extends React.Component<Props, State> {
     });
   };
 
-  _onMoveWidgetToTab = (widgetId, queryId) => {
+  _onMoveWidgetToTab = (widgetId, queryId, keepCopy) => {
     const { view } = this.props;
     const { view: activeView } = view;
 
@@ -197,7 +197,7 @@ class Widget extends React.Component<Props, State> {
       return;
     }
 
-    const newDashboard = MoveWidgetToTab(widgetId, queryId, activeView);
+    const newDashboard = MoveWidgetToTab(widgetId, queryId, activeView, keepCopy);
     if (newDashboard) {
       SearchActions.create(newDashboard.search).then((searchResponse) => {
         const updatedDashboard = newDashboard.toBuilder().search(searchResponse.search).build();
@@ -360,7 +360,7 @@ class Widget extends React.Component<Props, State> {
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                       </IfSearch>
                       <IfDashboard>
-                      <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Tab</MenuItem>
+                      <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
                     </IfDashboard>
                     <MenuItem divider />
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>

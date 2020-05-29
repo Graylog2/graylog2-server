@@ -63,7 +63,7 @@ Object {
       "selected_fields": undefined,
       "titles": Immutable.Map {},
       "widget_mapping": Immutable.Map {
-        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Immutable.Set [
+        "dead-beef": Immutable.Set [
           "dead-beef",
         ],
       },
@@ -86,7 +86,7 @@ Object {
             "visualization": "numeric",
           },
           "filter": undefined,
-          "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
+          "id": "dead-beef",
           "query": null,
           "streams": Array [],
           "timerange": null,
@@ -128,7 +128,7 @@ Object {
       "selected_fields": undefined,
       "titles": Immutable.Map {},
       "widget_mapping": Immutable.Map {
-        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": Immutable.Set [
+        "dead-beef": Immutable.Set [
           "dead-beef",
         ],
       },
@@ -151,7 +151,7 @@ Object {
             "visualization": "numeric",
           },
           "filter": undefined,
-          "id": "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
+          "id": "dead-beef",
           "query": null,
           "streams": Array [],
           "timerange": null,

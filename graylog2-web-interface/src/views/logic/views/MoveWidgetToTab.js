@@ -1,5 +1,5 @@
 // @flow strict
-import * as Immutable from 'immutable';
+import uuid from 'uuid/v4';
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import Widget from '../widgets/Widget';
@@ -24,10 +24,11 @@ const _removeWidgetFromTab = (widgetId: string, queryId: string, dashboard: View
     .build();
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, searchTypeIds: Immutable.Set<string>): View => {
+const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View): View => {
   const viewState = dashboard.state.get(targetQueryId);
+  const newWidget = widget.toBuilder().id(uuid()).build();
   const newViewState = viewState.toBuilder()
-    .widgets(viewState.widgets.push(widget))
+    .widgets(viewState.widgets.push(newWidget))
     .build();
   return dashboard.toBuilder()
     .state(dashboard.state.set(targetQueryId, newViewState))
@@ -43,9 +44,8 @@ const MoveWidgetToTab = (widgetId: string, targetQueryId: QueryId, dashboard: Vi
 
   if (match) {
     const [widget, queryId] = match;
-    const searchTypes = dashboard.state.get(queryId).widgetMapping.get(widgetId);
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
-    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, searchTypes));
+    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard));
   }
   return undefined;
 };
