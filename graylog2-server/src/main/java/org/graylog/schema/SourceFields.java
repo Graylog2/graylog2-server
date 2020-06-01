@@ -40,15 +40,15 @@ public class SourceFields {
     public static final String SOURCE_REFERENCE = "source_reference";
 
     // Autonomous System Fields
-    public static final String DESTINATION_AS_DOMAIN = SOURCE_PREFIX + AutonomousSystemFields.AS_DOMAIN;
-    public static final String DESTINATION_AS_ISP = SOURCE_PREFIX + AutonomousSystemFields.AS_ISP;
-    public static final String DESTINATION_AS_NUMBER = SOURCE_PREFIX + AutonomousSystemFields.AS_NUMBER;
-    public static final String DESTINATION_AS_ORGANIZATION_NAME = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION_NAME;
+    public static final String SOURCE_AS_DOMAIN = SOURCE_PREFIX + AutonomousSystemFields.AS_DOMAIN;
+    public static final String SOURCE_AS_ISP = SOURCE_PREFIX + AutonomousSystemFields.AS_ISP;
+    public static final String SOURCE_AS_NUMBER = SOURCE_PREFIX + AutonomousSystemFields.AS_NUMBER;
+    public static final String SOURCE_AS_ORGANIZATION_NAME = SOURCE_PREFIX + AutonomousSystemFields.AS_ORGANIZATION_NAME;
 
     // Geo Fields
-    public static final String DESTINATION_GEO_CITY_NAME = SOURCE_PREFIX + GeoFields.GEO_CITY_NAME;
-    public static final String DESTINATION_GEO_STATE_NAME = SOURCE_PREFIX + GeoFields.GEO_STATE_NAME;
-    public static final String DESTINATION_GEO_ISO_CODE = SOURCE_PREFIX + GeoFields.GEO_ISO_CODE;
-    public static final String DESTINATION_GEO_COUNTRY_NAME = SOURCE_PREFIX + GeoFields.GEO_COUNTRY_NAME;
-    public static final String DESTINATION_GEO_COORDINATES = SOURCE_PREFIX + GeoFields.GEO_COORDINATES;
+    public static final String SOURCE_GEO_CITY_NAME = SOURCE_PREFIX + GeoFields.GEO_CITY_NAME;
+    public static final String SOURCE_GEO_STATE_NAME = SOURCE_PREFIX + GeoFields.GEO_STATE_NAME;
+    public static final String SOURCE_GEO_ISO_CODE = SOURCE_PREFIX + GeoFields.GEO_ISO_CODE;
+    public static final String SOURCE_GEO_COUNTRY_NAME = SOURCE_PREFIX + GeoFields.GEO_COUNTRY_NAME;
+    public static final String SOURCE_GEO_COORDINATES = SOURCE_PREFIX + GeoFields.GEO_COORDINATES;
 }
