@@ -23,6 +23,8 @@
         <module>graylog-project-parent</module>
         <module>graylog-plugin-parent</module>
         <module>graylog-plugin-archetype</module>
+        <module>graylog-storage-elasticsearch6</module>
+        <module>distribution</module>
     </modules>
 
     <groupId>org.graylog</groupId>
@@ -85,7 +87,7 @@
         <!-- Dependencies -->
         <airline.version>2.7.2</airline.version>
         <amqp-client.version>5.8.0</amqp-client.version>
-        <antlr.version>4.7.1</antlr.version>
+        <antlr.version>4.8-1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <auto-value.version>1.7</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
@@ -129,7 +131,7 @@
         <json-path.version>2.4.0</json-path.version>
         <kafka.version>0.9.0.1</kafka.version>
         <log4j.version>2.13.0</log4j.version>
-        <metrics.version>4.0.3</metrics.version>
+        <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>3.12.1</mongodb-driver.version>
         <mongojack.version>2.10.1</mongojack.version>
         <natty.version>0.13</natty.version>
@@ -141,7 +143,7 @@
         <pkts.version>3.0.5</pkts.version>
         <protobuf.version>3.11.4</protobuf.version>
         <reflections.version>0.9.12</reflections.version>
-        <retrofit.version>2.8.1</retrofit.version>
+        <retrofit.version>2.9.0</retrofit.version>
         <scala.version>2.11.8</scala.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.5.2</shiro.version>
@@ -310,7 +312,7 @@
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>
                     <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>6.14</version>
+                    <version>6.17</version>
                     <configuration>
                         <skip>true</skip>
                     </configuration>

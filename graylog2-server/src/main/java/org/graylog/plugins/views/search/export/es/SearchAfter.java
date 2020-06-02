@@ -16,23 +16,31 @@
  */
 package org.graylog.plugins.views.search.export.es;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.sort.Sort;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog2.plugin.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.newArrayList;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 
 public class SearchAfter implements RequestStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchAfter.class);
 
-    private static final String TIEBREAKER_FIELD = Message.FIELD_GL2_MESSAGE_ID;
+    static final String DEFAULT_TIEBREAKER_FIELD = Message.FIELD_GL2_MESSAGE_ID;
+    static final String EVENTS_TIEBREAKER_FIELD = Message.FIELD_ID;
 
     private final JestWrapper jestWrapper;
 
@@ -46,23 +54,29 @@ public class SearchAfter implements RequestStrategy {
     @SuppressWarnings("rawtypes")
     @Override
     public List<SearchResult.Hit<Map, Void>> nextChunk(Search.Builder search, ExportMessagesCommand command) {
-        SearchResult result = search(search);
+
+        SearchResult result = search(search, command);
         List<SearchResult.Hit<Map, Void>> hits = result.getHits(Map.class, false);
         searchAfterValues = lastHitSortFrom(hits);
         return hits;
     }
 
-    private SearchResult search(Search.Builder search) {
-        Search.Builder modified = search.addSort(timestampDescending());
+    private SearchResult search(Search.Builder search, ExportMessagesCommand command) {
+        Search.Builder modified = search.addSort(configureSort(command));
 
         return jestWrapper.execute(modified.build(), () -> "Failed to execute Search After request");
     }
 
-    private ArrayList<Sort> timestampDescending() {
+    private ArrayList<Sort> configureSort(ExportMessagesCommand command) {
         return newArrayList(
                 new Sort("timestamp", Sort.Sorting.DESC),
-                new Sort(TIEBREAKER_FIELD, Sort.Sorting.DESC)
+                new Sort(tieBreakerFrom(command.streams()), Sort.Sorting.DESC)
         );
+    }
+
+    private String tieBreakerFrom(Set<String> streams) {
+        boolean hasOnlyEventStreams = Sets.difference(streams, DEFAULT_EVENT_STREAM_IDS).size() == 0;
+        return hasOnlyEventStreams ? EVENTS_TIEBREAKER_FIELD : DEFAULT_TIEBREAKER_FIELD;
     }
 
     @SuppressWarnings("rawtypes")
@@ -78,5 +92,19 @@ public class SearchAfter implements RequestStrategy {
     @Override
     public SearchSourceBuilder configure(SearchSourceBuilder ssb) {
         return searchAfterValues == null ? ssb : ssb.searchAfter(searchAfterValues);
+    }
+
+    @Override
+    public Set<String> removeUnsupportedStreams(Set<String> streams) {
+        boolean hasEventStreams = Sets.intersection(streams, DEFAULT_EVENT_STREAM_IDS).size() > 0;
+        Sets.SetView<String> others = Sets.difference(streams, DEFAULT_EVENT_STREAM_IDS);
+        boolean hasOthers = others.size() > 0;
+
+        if (hasEventStreams && hasOthers) {
+            LOG.warn("Search After requests for a mix of event streams and others are not supported. Removing event streams.");
+            return ImmutableSet.copyOf(others);
+        }
+
+        return streams;
     }
 }

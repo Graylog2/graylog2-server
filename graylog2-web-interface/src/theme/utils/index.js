@@ -1,9 +1,24 @@
-import colorLevel from './colorLevel';
-import contrastingColor from './contrastingColor';
-import opacify from './opacify';
-import readableColor from './readableColor';
+// @flow strict
+import colorLevel, { type ColorLevel } from './colorLevel';
+import contrastingColor, { type ContrastingColor } from './contrastingColor';
+import opacify, { type Opacify } from './opacify';
+import readableColor, { type ReadableColor } from './readableColor';
 
-const utils = {
+export type Utils = {
+  colorLevel: ColorLevel,
+  contrastingColor: ContrastingColor,
+  opacify: Opacify,
+  readableColor: ReadableColor,
+};
+
+const utils: Utils = {
+  colorLevel,
+  contrastingColor,
+  opacify,
+  readableColor,
+};
+
+export {
   colorLevel,
   contrastingColor,
   opacify,
@@ -11,9 +26,3 @@ const utils = {
 };
 
 export default utils;
-export {
-  colorLevel,
-  contrastingColor,
-  opacify,
-  readableColor,
-};

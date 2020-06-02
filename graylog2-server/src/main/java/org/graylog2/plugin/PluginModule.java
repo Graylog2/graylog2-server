@@ -41,7 +41,6 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
-import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -183,10 +182,6 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addMessageProcessor(Class<? extends MessageProcessor> processorClass, Class<? extends MessageProcessor.Descriptor> descriptorClass) {
         processorBinder().addBinding().to(processorClass);
         processorDescriptorBinder().addBinding().to(descriptorClass);
-    }
-
-    protected <T extends WidgetStrategy> void addWidgetStrategy(Class<T> widgetStrategyClass, Class<? extends WidgetStrategy.Factory<T>> factory) {
-        installWidgetStrategy(widgetStrategyBinder(), widgetStrategyClass, factory);
     }
 
     protected void addPermissions(Class<? extends PluginPermissions> permissionsClass) {

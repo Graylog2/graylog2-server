@@ -25,14 +25,16 @@ import org.testcontainers.containers.Network;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
+
 public class NodeInstance {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodeInstance.class);
 
     private final GenericContainer<?> container;
 
-    public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri) {
-        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri);
+    public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, int[] extraPorts) {
+        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, extraPorts);
         GenericContainer<?> container = NodeContainerFactory.buildContainer(config);
         return new NodeInstance(container);
     }
@@ -49,12 +51,16 @@ public class NodeInstance {
         LOG.info("Restarted node container in " + sw.elapsed(TimeUnit.SECONDS));
     }
 
-    public String getUri() {
+    public String uri() {
         return String.format(Locale.US, "http://%s", container.getContainerIpAddress());
     }
 
-    public int getApiPort() {
-        return container.getFirstMappedPort();
+    public int apiPort() {
+        return mappedPortFor(API_PORT);
+    }
+
+    public int mappedPortFor(int originalPort) {
+        return container.getMappedPort(originalPort);
     }
 
     public void printLog() {

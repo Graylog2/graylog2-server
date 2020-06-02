@@ -8,6 +8,7 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import ViewState from './ViewState';
 import Search from '../search/Search';
+import type { SearchType as QuerySearchType } from '../queries/SearchType';
 import type { QueryId } from '../queries/Query';
 import type { WidgetMapping } from './types';
 import type { ViewStateJson } from './ViewState';
@@ -140,7 +141,7 @@ export default class View {
     return this._value.requires || {};
   }
 
-  getSearchTypeByWidgetId(widgetId: string) {
+  getSearchTypeByWidgetId(widgetId: string): ?QuerySearchType {
     const widgetMapping = this.state.map((state) => state.widgetMapping).flatten(true);
     const searchTypeId = widgetMapping.get(widgetId).first();
     if (!searchTypeId) {

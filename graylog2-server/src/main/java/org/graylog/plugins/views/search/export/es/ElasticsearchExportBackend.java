@@ -67,25 +67,25 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     @Override
-    public void run(ExportMessagesCommand request, Consumer<SimpleMessageChunk> chunkCollector) {
+    public void run(ExportMessagesCommand command, Consumer<SimpleMessageChunk> chunkCollector) {
         boolean isFirstChunk = true;
         int totalCount = 0;
 
         while (true) {
-            List<SearchResult.Hit<Map, Void>> hits = search(request);
+            List<SearchResult.Hit<Map, Void>> hits = search(command);
 
             if (hits.isEmpty()) {
                 return;
             }
 
-            boolean success = publishChunk(chunkCollector, hits, request.fieldsInOrder(), isFirstChunk);
+            boolean success = publishChunk(chunkCollector, hits, command.fieldsInOrder(), isFirstChunk);
             if (!success) {
                 return;
             }
 
             totalCount += hits.size();
-            if (request.limit().isPresent() && totalCount >= request.limit().getAsInt()) {
-                LOG.info("Limit of {} reached. Stopping message retrieval.", request.limit().getAsInt());
+            if (command.limit().isPresent() && totalCount >= command.limit().getAsInt()) {
+                LOG.info("Limit of {} reached. Stopping message retrieval.", command.limit().getAsInt());
                 return;
             }
 
@@ -93,16 +93,16 @@ public class ElasticsearchExportBackend implements ExportBackend {
         }
     }
 
-    private List<SearchResult.Hit<Map, Void>> search(ExportMessagesCommand request) {
-        Search.Builder search = prepareSearchRequest(request);
+    private List<SearchResult.Hit<Map, Void>> search(ExportMessagesCommand command) {
+        Search.Builder search = prepareSearchRequest(command);
 
-        return requestStrategy.nextChunk(search, request);
+        return requestStrategy.nextChunk(search, command);
     }
 
-    private Search.Builder prepareSearchRequest(ExportMessagesCommand request) {
-        SearchSourceBuilder ssb = searchSourceBuilderFrom(request);
+    private Search.Builder prepareSearchRequest(ExportMessagesCommand command) {
+        SearchSourceBuilder ssb = searchSourceBuilderFrom(command);
 
-        Set<String> indices = indicesFor(request);
+        Set<String> indices = indicesFor(command);
         return new Search.Builder(ssb.toString())
                 .addType(IndexMapping.TYPE_MESSAGE)
                 .allowNoIndices(false)
@@ -110,51 +110,48 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .addIndex(indices);
     }
 
-    private SearchSourceBuilder searchSourceBuilderFrom(ExportMessagesCommand request) {
-        QueryBuilder query = queryFrom(request);
+    private SearchSourceBuilder searchSourceBuilderFrom(ExportMessagesCommand command) {
+        QueryBuilder query = queryFrom(command);
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
-                .size(request.chunkSize());
+                .size(command.chunkSize());
 
         return requestStrategy.configure(ssb);
     }
 
-    private QueryBuilder queryFrom(ExportMessagesCommand request) {
+    private QueryBuilder queryFrom(ExportMessagesCommand command) {
         return boolQuery()
-                .filter(queryStringFilter(request))
-                .filter(timestampFilter(request))
-                .filter(streamsFilter(request));
+                .filter(queryStringFilter(command))
+                .filter(timestampFilter(command))
+                .filter(streamsFilter(command));
     }
 
-    private QueryBuilder queryStringFilter(ExportMessagesCommand request) {
-        ElasticsearchQueryString backendQuery = request.queryString();
+    private QueryBuilder queryStringFilter(ExportMessagesCommand command) {
+        ElasticsearchQueryString backendQuery = command.queryString();
         return backendQuery.isEmpty() ?
                 matchAllQuery() :
                 queryStringQuery(backendQuery.queryString()).allowLeadingWildcard(allowLeadingWildcard);
     }
 
-    private QueryBuilder timestampFilter(ExportMessagesCommand request) {
-        return requireNonNull(IndexHelper.getTimestampRangeFilter(request.timeRange()));
+    private QueryBuilder timestampFilter(ExportMessagesCommand command) {
+        return requireNonNull(IndexHelper.getTimestampRangeFilter(command.timeRange()));
     }
 
-    private TermsQueryBuilder streamsFilter(ExportMessagesCommand request) {
-        return termsQuery(Message.FIELD_STREAMS, request.streams());
+    private TermsQueryBuilder streamsFilter(ExportMessagesCommand command) {
+        Set<String> streams = requestStrategy.removeUnsupportedStreams(command.streams());
+        return termsQuery(Message.FIELD_STREAMS, streams);
     }
 
-    private Set<String> indicesFor(ExportMessagesCommand request) {
-        return indexLookup.indexNamesForStreamsInTimeRange(request.streams(), request.timeRange());
+    private Set<String> indicesFor(ExportMessagesCommand command) {
+        return indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange());
     }
 
     private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, boolean isFirstChunk) {
-        SimpleMessageChunk hitsWithOnlyRelevantFields = buildHitsWithRelevantFields(hits, desiredFieldsInOrder);
-
-        if (isFirstChunk) {
-            hitsWithOnlyRelevantFields = hitsWithOnlyRelevantFields.toBuilder().isFirstChunk(true).build();
-        }
+        SimpleMessageChunk chunk = chunkFrom(hits, desiredFieldsInOrder, isFirstChunk);
 
         try {
-            chunkCollector.accept(hitsWithOnlyRelevantFields);
+            chunkCollector.accept(chunk);
             return true;
         } catch (Exception e) {
             LOG.warn("Chunk publishing threw exception. Stopping search after queries", e);
@@ -162,11 +159,20 @@ public class ElasticsearchExportBackend implements ExportBackend {
         }
     }
 
-    private SimpleMessageChunk buildHitsWithRelevantFields(List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder) {
-        LinkedHashSet<SimpleMessage> set = hits.stream()
+    private SimpleMessageChunk chunkFrom(List<SearchResult.Hit<Map, Void>> hits, LinkedHashSet<String> desiredFieldsInOrder, boolean isFirstChunk) {
+        LinkedHashSet<SimpleMessage> messages = messagesFrom(hits);
+
+        return SimpleMessageChunk.builder()
+                .fieldsInOrder(desiredFieldsInOrder)
+                .messages(messages)
+                .isFirstChunk(isFirstChunk)
+                .build();
+    }
+
+    private LinkedHashSet<SimpleMessage> messagesFrom(List<SearchResult.Hit<Map, Void>> hits) {
+        return hits.stream()
                 .map(h -> buildHitWithAllFields(h.source, h.index))
                 .collect(toCollection(LinkedHashSet::new));
-        return SimpleMessageChunk.from(desiredFieldsInOrder, set);
     }
 
     private SimpleMessage buildHitWithAllFields(Map source, String index) {

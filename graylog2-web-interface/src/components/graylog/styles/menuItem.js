@@ -1,7 +1,5 @@
 import { css } from 'styled-components';
 
-import { util } from 'theme';
-
 const menuItemStyles = css(({ theme }) => css`
   .dropdown-menu {
     > li > a {
@@ -9,29 +7,29 @@ const menuItemStyles = css(({ theme }) => css`
 
       :hover,
       :focus {
-        color: ${util.contrastingColor(theme.color.gray[90])};
+        color: ${theme.utils.contrastingColor(theme.color.gray[90])};
         background-color: ${theme.color.gray[90]};
       }
     }
 
     > .active > a {
-      color: ${util.contrastingColor(theme.color.variant.light.info)};
+      color: ${theme.utils.contrastingColor(theme.color.variant.light.info)};
       background-color: ${theme.color.variant.light.info};
 
       :hover,
       :focus {
-        color: ${util.contrastingColor(theme.color.variant.info)};
+        color: ${theme.utils.contrastingColor(theme.color.variant.info)};
         background-color: ${theme.color.variant.info};
       }
     }
 
     > .disabled > a {
-      color: ${util.contrastingColor(theme.color.gray[90], 'AA')};
+      color: ${theme.utils.contrastingColor(theme.color.gray[90], 'AA')};
       background-color: ${theme.color.gray[90]};
 
       :hover,
       :focus {
-        color: ${util.contrastingColor(theme.color.gray[90], 'AA')};
+        color: ${theme.utils.contrastingColor(theme.color.gray[90], 'AA')};
       }
     }
   }

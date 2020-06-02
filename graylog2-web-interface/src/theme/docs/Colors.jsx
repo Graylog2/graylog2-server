@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import ClipboardJS from 'clipboard';
 
-import { util } from 'theme';
 import { Tooltip } from 'components/graylog';
 
 const Name = styled.span`
@@ -29,11 +28,11 @@ const Wrapped = styled.div`
   position: relative;
 `;
 
-export const Swatch = styled.button(({ color }) => `
+const Swatch = styled.button(({ color, theme }) => `
   height: 60px;
   background-color: ${color};
   border: 1px solid #222;
-  color: ${util.readableColor(color)};
+  color: ${theme.utils.readableColor(color)};
   padding: 3px;
   cursor: pointer;
   display: flex;

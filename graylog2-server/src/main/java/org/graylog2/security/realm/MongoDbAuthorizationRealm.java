@@ -38,6 +38,7 @@ import java.util.List;
 
 public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
+    public static final String NAME = "mongodb-authorization-realm";
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbAuthorizationRealm.class);
     private final UserService userService;
 

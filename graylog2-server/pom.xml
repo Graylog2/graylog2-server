@@ -764,30 +764,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-server-artifact</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <attach>true</attach>
-                    <appendAssemblyId>true</appendAssemblyId>
-                    <descriptors>
-                        <descriptor>src/main/assembly/graylog.xml</descriptor>
-                    </descriptors>
-                    <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
-                    <!-- FIXME: Use a proper output directory. parent.parent.build.directory is a hack… -->
-                    <outputDirectory>${project.parent.parent.build.directory}/assembly</outputDirectory>
-                    <finalName>graylog-${project.version}-${maven.build.timestamp}</finalName>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>

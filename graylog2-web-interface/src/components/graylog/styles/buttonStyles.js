@@ -1,8 +1,6 @@
 import chroma from 'chroma-js';
 import { css } from 'styled-components';
 
-import { util } from 'theme';
-
 const buttonStyles = ({ color }) => {
   const variants = {
     danger: color.variant.danger,
@@ -16,7 +14,7 @@ const buttonStyles = ({ color }) => {
 
   const mixColor = (originalColor) => chroma.mix(originalColor, color.global.textDefault, 0.15);
 
-  return Object.keys(variants).map((variant) => {
+  return Object.keys(variants).map((variant) => css(({ theme }) => {
     const variantColor = variants[variant];
     const isLink = variant === 'link';
 
@@ -24,15 +22,15 @@ const buttonStyles = ({ color }) => {
 
     const defaultBackground = variantColor;
     const defaultBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.05);
-    const defaultColor = isLink ? color.global.link : util.contrastingColor(defaultBackground);
+    const defaultColor = isLink ? color.global.link : theme.utils.contrastingColor(defaultBackground);
 
     const activeBackground = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.10);
     const activeBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
-    const activeColor = isLink ? color.global.linkHover : util.contrastingColor(activeBackground);
+    const activeColor = isLink ? color.global.linkHover : theme.utils.contrastingColor(activeBackground);
 
     const disabledBackground = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.20);
     const disabledBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
-    const disabledColor = isLink ? color.global.link : util.contrastingColor(disabledBackground, 'AA');
+    const disabledColor = isLink ? color.global.link : theme.utils.contrastingColor(disabledBackground, 'AA');
 
     return css`
       &.btn-${variant} {
@@ -75,7 +73,7 @@ const buttonStyles = ({ color }) => {
         }
       }
     `;
-  });
+  }));
 };
 
 export default buttonStyles;

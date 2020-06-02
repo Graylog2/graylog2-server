@@ -190,12 +190,12 @@
     "webpack-dev-server": "^3.8.0",
     "webpack-hot-middleware": "^2.25.0",
     "webpack-merge": "^4.2.2",
-    "yargs": "^10.0.3"
+    "yargs": "^15.3.1"
   },
   "resolutions": {
     "jquery": "3.4.1",
     "jsdom": "15.2.1",
     "upath": "1.0.5",
-    "ace-builds": "1.4.9"
+    "ace-builds": "1.4.11"
   }
 }

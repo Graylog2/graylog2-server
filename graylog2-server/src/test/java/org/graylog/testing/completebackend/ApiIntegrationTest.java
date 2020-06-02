@@ -37,4 +37,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Tag("integration")
 public @interface ApiIntegrationTest {
     Lifecycle serverLifecycle() default Lifecycle.METHOD;
+
+    int[] extraPorts() default {};
 }

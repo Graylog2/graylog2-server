@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import { util } from 'theme';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
 const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
@@ -33,7 +32,7 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 
   .tooltip-inner {
-    color: ${util.readableColor(theme.color.gray[10])};
+    color: ${theme.utils.readableColor(theme.color.gray[10])};
     background-color: ${theme.color.gray[10]};
     max-width: 300px;
 

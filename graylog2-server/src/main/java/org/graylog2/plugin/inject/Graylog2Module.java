@@ -27,6 +27,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.AuthorizingRealm;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
@@ -36,7 +37,6 @@ import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -290,26 +290,6 @@ public abstract class Graylog2Module extends AbstractModule {
         installOutput(outputMapBinder, target, factoryClass);
     }
 
-    protected MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder() {
-        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<WidgetStrategy.Factory<? extends WidgetStrategy>>() {
-        });
-    }
-
-    protected void installWidgetStrategy(MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder,
-                                         Class<? extends WidgetStrategy> target,
-                                         Class<? extends WidgetStrategy.Factory<? extends WidgetStrategy>> targetFactory) {
-        install(new FactoryModuleBuilder().implement(WidgetStrategy.class, target).build(targetFactory));
-        widgetStrategyBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
-    }
-
-    protected void installWidgetStrategyWithAlias(MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder,
-                                                  String key,
-                                                  Class<? extends WidgetStrategy> target,
-                                                  Class<? extends WidgetStrategy.Factory<? extends WidgetStrategy>> targetFactory) {
-        installWidgetStrategy(widgetStrategyBinder, target, targetFactory);
-        widgetStrategyBinder.addBinding(key).to(Key.get(targetFactory));
-    }
-
     protected Multibinder<PluginPermissions> permissionsBinder() {
         return Multibinder.newSetBinder(binder(), PluginPermissions.class);
     }
@@ -373,6 +353,10 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, AuthenticatingRealm> authenticationRealmBinder() {
         return MapBinder.newMapBinder(binder(), String.class, AuthenticatingRealm.class);
+    }
+
+    protected MapBinder<String, AuthorizingRealm> authorizationOnlyRealmBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, AuthorizingRealm.class);
     }
 
     protected MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder() {

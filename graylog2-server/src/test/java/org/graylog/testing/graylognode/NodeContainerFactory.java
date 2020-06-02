@@ -30,6 +30,8 @@ import java.nio.file.Paths;
 import java.time.Duration;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.graylog.testing.graylognode.NodeContainerConfig.API_PORT;
+import static org.graylog.testing.graylognode.NodeContainerConfig.DEBUG_PORT;
 import static org.graylog.testing.graylognode.ResourceUtil.resourceToTmpFile;
 
 public class NodeContainerFactory {
@@ -39,8 +41,6 @@ public class NodeContainerFactory {
     private static final int EXECUTABLE_MODE = 0100755;
     // sha2 for password "admin"
     private static final String ADMIN_PW_SHA2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-    private static final int API_PORT = 9000;
-    private static final int DEBUG_PORT = 5005;
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
         if (!config.skipPackaging) {
@@ -75,6 +75,7 @@ public class NodeContainerFactory {
 
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), graylogHome + "/graylog.jar", BindMode.READ_ONLY)
+                .withFileSystemBind(property("storage_module_elasticsearch6_jar"), graylogHome + "/plugin/graylog-storage-elasticsearch6.jar", BindMode.READ_ONLY)
                 .withFileSystemBind(property("aws_plugin_jar"), graylogHome + "/plugin/graylog-plugin-aws.jar", BindMode.READ_ONLY)
                 .withFileSystemBind(property("threatintel_plugin_jar"), graylogHome + "/plugin/graylog-plugin-threatintel.jar", BindMode.READ_ONLY)
                 .withFileSystemBind(property("collector_plugin_jar"), graylogHome + "/plugin/graylog-plugin-collector.jar", BindMode.READ_ONLY)
@@ -87,16 +88,14 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_ROOT_PASSWORD_SHA2", ADMIN_PW_SHA2)
                 .withEnv("GRAYLOG_LB_RECOGNITION_PERIOD_SECONDS", "0")
                 .withEnv("GRAYLOG_VERSIONCHECKS", "false")
-                .waitingFor(Wait.forHttp("/api"))
-                .withExposedPorts(API_PORT)
+                .waitingFor(Wait.forLogMessage(".*Graylog server up and running.*", 1))
+                .withExposedPorts(config.portsToExpose())
                 .withStartupTimeout(Duration.of(120, SECONDS));
 
+        container.start();
+
         if (config.enableDebugging) {
-            container.addExposedPort(DEBUG_PORT);
-            container.start();
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
-        } else {
-            container.start();
         }
         return container;
     }
