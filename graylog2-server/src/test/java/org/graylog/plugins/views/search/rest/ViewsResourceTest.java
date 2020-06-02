@@ -21,8 +21,11 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
+import org.graylog2.dashboards.events.DashboardDeletedEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.users.UserService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +39,7 @@ import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -75,11 +79,18 @@ public class ViewsResourceTest {
     @Mock
     private IsViewSharedForUser isViewSharedForUser;
 
+    @Mock
+    private ClusterEventBus clusterEventBus;
+
+    @Mock
+    private UserService userService;
+
     private ViewsResource viewsResource;
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser) {
-            super(viewService, viewSharingService, isViewSharedForUser);
+        ViewsTestResource(ViewService viewService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser, ClusterEventBus clusterEventBus, UserService userService) {
+            super(viewService, viewSharingService, isViewSharedForUser, clusterEventBus);
+            this.userService = userService;
         }
 
         @Override
@@ -96,7 +107,8 @@ public class ViewsResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, viewSharingService, isViewSharedForUser);
+        this.viewsResource = new ViewsTestResource(viewService, viewSharingService, isViewSharedForUser, clusterEventBus, userService);
+        when(subject.isPermitted("dashboards:create")).thenReturn(true);
     }
 
     @Test
@@ -110,8 +122,6 @@ public class ViewsResourceTest {
 
         when(currentUser.getName()).thenReturn("basti");
         when(currentUser.isLocalAdmin()).thenReturn(true);
-
-        when(subject.isPermitted("dashboards:create")).thenReturn(true);
 
         this.viewsResource.create(view);
 
@@ -134,5 +144,23 @@ public class ViewsResourceTest {
     public void invalidObjectIdReturnsViewNotFoundException() {
         expectedException.expect(NotFoundException.class);
         this.viewsResource.get("invalid");
+    }
+
+    @Test
+    public void deletingDashboardTriggersEvent() {
+        final String viewId = "foobar";
+        when(subject.isPermitted(ViewsRestPermissions.VIEW_DELETE + ":" + viewId)).thenReturn(true);
+        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+        when(view.id()).thenReturn(viewId);
+        when(viewService.get(viewId)).thenReturn(Optional.of(view));
+        when(userService.loadAll()).thenReturn(Collections.emptyList());
+
+        this.viewsResource.delete(viewId);
+
+        final ArgumentCaptor<DashboardDeletedEvent> eventCaptor = ArgumentCaptor.forClass(DashboardDeletedEvent.class);
+        verify(clusterEventBus, times(1)).post(eventCaptor.capture());
+        final DashboardDeletedEvent dashboardDeletedEvent = eventCaptor.getValue();
+
+        assertThat(dashboardDeletedEvent.dashboardId()).isEqualTo("foobar");
     }
 }
