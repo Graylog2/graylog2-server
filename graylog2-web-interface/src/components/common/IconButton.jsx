@@ -15,6 +15,7 @@ const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.b
   width: 25px;
   border: 0
 
+  background-color: transparent;
   cursor: pointer;
   color: ${theme.color.gray[70]};
   font-size: 16px;
