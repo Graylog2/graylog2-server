@@ -101,7 +101,7 @@
     "react-day-picker": "^5.0.0",
     "react-dnd": "^7.0.2",
     "react-dnd-html5-backend": "^2.0.0",
-    "react-grid-layout": "^0.16.6",
+    "react-grid-layout": "^0.18.3",
     "react-immutable-proptypes": "^2.1.0",
     "react-isolated-scroll": "^0.1.1",
     "react-leaflet": "^2.3.0",
