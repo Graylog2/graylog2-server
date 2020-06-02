@@ -234,8 +234,10 @@ public class StreamResource extends RestResource {
         final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
         final PaginatedList<StreamDTO> result = paginatedStreamService
                 .findPaginated(searchQuery, permissionFilter, page, perPage, sort, order);
+        final List<String> streamIds = result.stream().map(streamDTO -> streamDTO.id()).collect(Collectors.toList());
+        final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);
         final List<StreamDTO> streams = result.stream().map(streamDTO -> {
-            List<StreamRule> rules = streamRuleService.loadForStreamId(streamDTO.id());
+            List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
             return streamDTO.toBuilder().rules(rules).build();
         }).collect(Collectors.toList());
         final long total = paginatedStreamService.count();
