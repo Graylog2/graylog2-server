@@ -1,18 +1,24 @@
 package org.graylog.storage.elasticsearch6;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.NodesInfo;
+import io.searchbox.cluster.PendingClusterTasks;
+import io.searchbox.cluster.Stats;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.ClusterAdapter;
+import org.graylog2.indexer.cluster.PendingTasksStats;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettingsFactory;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
@@ -21,6 +27,10 @@ import org.graylog2.indexer.cluster.jest.GetAllocationDiskSettings;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
+import org.graylog2.system.stats.elasticsearch.ClusterStats;
+import org.graylog2.system.stats.elasticsearch.IndicesStats;
+import org.graylog2.system.stats.elasticsearch.NodesStats;
+import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,6 +175,77 @@ public class ClusterAdapterES6 implements ClusterAdapter {
 
             return ClusterHealth.create(health.path("status").asText().toLowerCase(Locale.ENGLISH), shards);
         });
+    }
+
+    @Override
+    public ShardStats shardStats(List<String> indices) {
+        final Health clusterHealthRequest = new Health.Builder()
+                .addIndex(indices)
+                .build();
+        final JestResult clusterHealthResponse = JestUtils.execute(jestClient, clusterHealthRequest, () -> "Couldn't read Elasticsearch cluster health");
+        final JsonNode clusterHealthJson = clusterHealthResponse.getJsonObject();
+        return ShardStats.create(
+                clusterHealthJson.path("number_of_nodes").asInt(-1),
+                clusterHealthJson.path("number_of_data_nodes").asInt(-1),
+                clusterHealthJson.path("active_shards").asInt(-1),
+                clusterHealthJson.path("relocating_shards").asInt(-1),
+                clusterHealthJson.path("active_primary_shards").asInt(-1),
+                clusterHealthJson.path("initializing_shards").asInt(-1),
+                clusterHealthJson.path("unassigned_shards").asInt(-1),
+                clusterHealthJson.path("timed_out").asBoolean()
+        );
+    }
+
+    @Override
+    public PendingTasksStats pendingTasks() {
+        final JestResult pendingClusterTasksResponse = JestUtils.execute(jestClient, new PendingClusterTasks.Builder().build(), () -> "Couldn't read Elasticsearch pending cluster tasks");
+        final JsonNode pendingClusterTasks = pendingClusterTasksResponse.getJsonObject().path("tasks");
+        final int pendingTasksSize = pendingClusterTasks.size();
+        final List<Long> pendingTasksTimeInQueue = Lists.newArrayListWithCapacity(pendingTasksSize);
+        for (JsonNode jsonElement : pendingClusterTasks) {
+            if (jsonElement.has("time_in_queue_millis")) {
+                pendingTasksTimeInQueue.add(jsonElement.get("time_in_queue_millis").asLong());
+            }
+        }
+
+        return PendingTasksStats.create(pendingTasksSize, pendingTasksTimeInQueue);
+    }
+
+    @Override
+    public ClusterStats clusterStats() {
+        final JestResult clusterStatsResponse = JestUtils.execute(jestClient, new Stats.Builder().build(), () -> "Couldn't read Elasticsearch cluster stats");
+        final JsonNode clusterStatsResponseJson = clusterStatsResponse.getJsonObject();
+        final String clusterName = clusterStatsResponseJson.path("cluster_name").asText();
+
+        String clusterVersion = null;
+        if (clusterStatsResponseJson.path("nodes").path("versions").isArray()) {
+            final ArrayNode versions = (ArrayNode) clusterStatsResponseJson.path("nodes").path("versions");
+            // We just use the first version in the "versions" array. This is not correct if there are different
+            // versions running in the cluster, but that is not recommended anyway.
+            final JsonNode versionNode = versions.path(0);
+            if (versionNode.getNodeType() != JsonNodeType.MISSING) {
+                clusterVersion = versionNode.asText();
+            }
+        }
+
+        final JsonNode countStats = clusterStatsResponseJson.path("nodes").path("count");
+
+        final NodesStats nodesStats = NodesStats.create(
+                countStats.path("total").asInt(-1),
+                countStats.path("master_only").asInt(-1),
+                countStats.path("data_only").asInt(-1),
+                countStats.path("master_data").asInt(-1),
+                countStats.path("client").asInt(-1)
+        );
+
+        final JsonNode clusterIndicesStats = clusterStatsResponseJson.path("indices");
+        final IndicesStats indicesStats = IndicesStats.create(
+                clusterIndicesStats.path("count").asInt(-1),
+                clusterIndicesStats.path("store").path("size_in_bytes").asLong(-1L),
+                clusterIndicesStats.path("fielddata").path("memory_size_in_bytes").asLong(-1L)
+        );
+
+        return ClusterStats.create(clusterName, clusterVersion, nodesStats, indicesStats);
     }
 
     private JsonNode getNodeInfo(String nodeId) {

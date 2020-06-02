@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.indexer.cluster.PendingTasksStats;
 
 import java.util.List;
 
@@ -56,6 +57,21 @@ public abstract class ClusterHealth {
 
     @JsonProperty
     public abstract List<Long> pendingTasksTimeInQueue();
+
+    public static ClusterHealth from(ShardStats shardStats, PendingTasksStats pendingTasksStats) {
+        return create(
+                shardStats.numberOfNodes(),
+                shardStats.numberOfDataNodes(),
+                shardStats.activeShards(),
+                shardStats.relocatingShards(),
+                shardStats.activePrimaryShards(),
+                shardStats.initializingShards(),
+                shardStats.unassignedShards(),
+                shardStats.timedOut(),
+                pendingTasksStats.pendingTasks(),
+                pendingTasksStats.pendingTasksTimeInQueue()
+        );
+    }
 
     public static ClusterHealth create(int numberOfNodes,
                                        int numberOfDataNodes,
