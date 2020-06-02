@@ -7,7 +7,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import CombinedProvider from 'injection/CombinedProvider';
-import PaginationHelper from 'util/PaginationHelper';
+import PaginationURL from 'util/PaginationURL';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
@@ -50,7 +50,7 @@ const StreamsStore = Reflux.createStore({
   callbacks: [],
 
   searchPaginated(page, perPage, query) {
-    const url = PaginationHelper.urlGenerator(ApiRoutes.StreamsApiController.paginated().url, page, perPage, query);
+    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, page, perPage, query);
     return fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
         const pagination = {
