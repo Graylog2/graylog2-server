@@ -19,14 +19,10 @@ package org.graylog2.indexer.searches;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog2.Configuration;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.TestIndexSet;
@@ -48,7 +44,6 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -83,7 +78,7 @@ import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SearchesIT extends ElasticsearchBaseTest {
+public abstract class SearchesIT extends ElasticsearchBaseTest {
     private static final String REQUEST_TIMER_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.requests";
     private static final String RANGES_HISTOGRAM_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.ranges";
 
@@ -145,49 +140,33 @@ public class SearchesIT extends ElasticsearchBaseTest {
     private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
     @Mock
-    private IndexRangeService indexRangeService;
+    protected IndexRangeService indexRangeService;
 
     @Mock
-    private StreamService streamService;
+    protected StreamService streamService;
 
     @Mock
-    private Indices indices;
+    protected Indices indices;
 
     @Mock
-    private IndexSetRegistry indexSetRegistry;
+    protected IndexSetRegistry indexSetRegistry;
 
-    private MetricRegistry metricRegistry;
-    private Searches searches;
+    protected MetricRegistry metricRegistry;
+    protected Searches searches;
 
     @Before
     public void setUp() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
         metricRegistry = new MetricRegistry();
-        searches = new Searches(
-            new Configuration(),
-            indexRangeService,
-            metricRegistry,
-            streamService,
-            indices,
-            indexSetRegistry,
-                jestClient(),
-            new ScrollResult.Factory() {
-                @Override
-                public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
-                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
-                }
-                @Override
-                public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
-                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
-                }
-            }
-        );
+        this.searches = createSearches();
     }
+
+    public abstract Searches createSearches();
 
     @Test
     public void testCountWithoutFilter() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -198,7 +177,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void testCountWithFilter() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
                 .id("id")
@@ -233,7 +212,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void testCountWithInvalidFilter() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -245,7 +224,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void countRecordsMetrics() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -260,7 +239,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void testTerms() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -278,7 +257,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void testTermsWithNonExistingIndex() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final SortedSet<IndexRange> indexRanges = ImmutableSortedSet
                 .orderedBy(IndexRange.COMPARATOR)
@@ -313,7 +292,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void termsRecordsMetrics() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -332,7 +311,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void testTermsAscending() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         TermsResult result = searches.terms("n", 1, "*", null, AbsoluteRange.create(
             new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -347,7 +326,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void testTermsStats() throws Exception {
-        importFixture("SearchesIT-terms_stats.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT-terms_stats.json");
 
         TermsStatsResult r = searches.termsStats("f", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
                 AbsoluteRange.create(
@@ -363,7 +342,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void termsStatsRecordsMetrics() throws Exception {
-        importFixture("SearchesIT-terms_stats.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT-terms_stats.json");
 
         TermsStatsResult r = searches.termsStats("f", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
                 AbsoluteRange.create(
@@ -384,7 +363,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void testFieldStats() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -403,7 +382,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void fieldStatsRecordsMetrics() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -423,7 +402,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testHistogram() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.HOUR, range);
@@ -442,7 +421,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testHistogramWithNonExistingIndex() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final SortedSet<IndexRange> indexRanges = ImmutableSortedSet
                 .orderedBy(IndexRange.COMPARATOR)
@@ -477,7 +456,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void histogramRecordsMetrics() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC));
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.MINUTE, range);
@@ -496,7 +475,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testFieldHistogram() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.HOUR, null, range, false);
@@ -516,7 +495,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testFieldHistogramWithMonth() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MONTH, null, range, false);
@@ -534,7 +513,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testFieldHistogramWithQuarter() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.QUARTER, null, range, false);
@@ -552,7 +531,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testFieldHistogramWithYear() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.YEAR, null, range, false);
@@ -569,7 +548,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void fieldHistogramRecordsMetrics() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range, false);
@@ -712,23 +691,6 @@ public class SearchesIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void getTimestampRangeFilterReturnsNullIfTimeRangeIsNull() {
-        assertThat(IndexHelper.getTimestampRangeFilter(null)).isNull();
-    }
-
-    @Test
-    public void getTimestampRangeFilterReturnsRangeQueryWithGivenTimeRange() {
-        final DateTime from = new DateTime(2016, 1, 15, 12, 0, DateTimeZone.UTC);
-        final DateTime to = from.plusHours(1);
-        final TimeRange timeRange = AbsoluteRange.create(from, to);
-        final RangeQueryBuilder queryBuilder = (RangeQueryBuilder) IndexHelper.getTimestampRangeFilter(timeRange);
-        assertThat(queryBuilder).isNotNull();
-        assertThat(queryBuilder.fieldName()).isEqualTo("timestamp");
-        assertThat(queryBuilder.from()).isEqualTo(Tools.buildElasticSearchTimeFormat(from));
-        assertThat(queryBuilder.to()).isEqualTo(Tools.buildElasticSearchTimeFormat(to));
-    }
-
-    @Test
     public void determineAffectedIndicesFilterIndexPrefix() throws Exception {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final MongoIndexRange indexRange0 = MongoIndexRange.create("graylog_0", now, now.plusDays(1), now, 0);
@@ -758,7 +720,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void searchDoesNotIncludeJestMetadata() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final SearchResult searchResult = searches.search("_id:1", range, 0, 0, Sorting.DEFAULT);
@@ -770,7 +732,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void fieldStatsDoesNotIncludeJestMetadata() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final FieldStatsResult fieldStatsResult = searches.fieldStats("n", "_id:1", range);
@@ -784,7 +746,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void searchReturnsCorrectTotalHits() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final SearchResult searchResult = searches.search("*", range, 5, 0, Sorting.DEFAULT);
@@ -797,7 +759,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void searchReturnsResultWithSelectiveFields() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final SearchesConfig searchesConfig = SearchesConfig.builder()
@@ -816,7 +778,7 @@ public class SearchesIT extends ElasticsearchBaseTest {
 
     @Test
     public void scrollReturnsResultWithSelectiveFields() throws Exception {
-        importFixture("SearchesIT.json");
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
