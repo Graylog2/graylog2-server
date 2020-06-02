@@ -14,54 +14,71 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards;
+package org.graylog2.migrations.V20180214093600_AdjustDashboardPositionToNewResolution;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.dashboards.widgets.WidgetPosition;
-import org.graylog2.database.CollectionName;
-import org.graylog2.database.PersistedImpl;
-import org.graylog2.database.validators.DateValidator;
-import org.graylog2.database.validators.FilledStringValidator;
-import org.graylog2.database.validators.OptionalStringValidator;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Integer.parseInt;
 
-@CollectionName("dashboards")
-public class DashboardImpl extends PersistedImpl implements Dashboard {
-    public static final String FIELD_ID = "_id";
-    public static final String FIELD_TITLE = "title";
-    public static final String FIELD_DESCRIPTION = "description";
-    public static final String FIELD_CONTENT_PACK = "content_pack";
-    public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
-    public static final String FIELD_CREATED_AT = "created_at";
-    public static final String EMBEDDED_WIDGETS = "widgets";
-    public static final String EMBEDDED_POSITIONS = "positions";
+class MigrationDashboard {
+    static final String FIELD_ID = "_id";
+    private static final String FIELD_TITLE = "title";
+    private static final String FIELD_DESCRIPTION = "description";
+    private static final String FIELD_CONTENT_PACK = "content_pack";
+    private static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    private static final String FIELD_CREATED_AT = "created_at";
+    private static final String EMBEDDED_POSITIONS = "positions";
 
-    protected DashboardImpl(ObjectId id, Map<String, Object> fields) {
-        super(id, fields);
+    private final Map<String, Object> fields;
+    private final ObjectId id;
+    private final AtomicReference<String> hexId = new AtomicReference<>(null);
+
+    MigrationDashboard(final ObjectId id, @Nullable final Map<String, Object> fields) {
+        this.id = id;
+
+        if (null != this.id) {
+            hexId.set(this.id.toHexString());
+        }
+
+        if(fields == null) {
+            this.fields = new HashMap<>();
+        } else {
+            this.fields = new HashMap<>(fields.size());
+
+            // Transform all java.util.Date's to JodaTime because MongoDB gives back java.util.Date's. #lol
+            for (Map.Entry<String, Object> field : fields.entrySet()) {
+                final String key = field.getKey();
+                final Object value = field.getValue();
+                if (value instanceof Date) {
+                    this.fields.put(key, new DateTime(value, DateTimeZone.UTC));
+                } else {
+                    this.fields.put(key, value);
+                }
+            }
+        }
     }
 
-    @Override
-    public String getTitle() {
+    String getTitle() {
         return (String) fields.get(FIELD_TITLE);
     }
 
-    @Override
-    public List<WidgetPosition> getPositions() {
-        final BasicDBObject positions = (BasicDBObject) fields.get(DashboardImpl.EMBEDDED_POSITIONS);
+    List<WidgetPosition> getPositions() {
+        final BasicDBObject positions = (BasicDBObject) fields.get(MigrationDashboard.EMBEDDED_POSITIONS);
         if (positions == null) {
             return Collections.emptyList();
         }
@@ -85,8 +102,7 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
         return result;
     }
 
-    @Override
-    public void setPositions(List<WidgetPosition> widgetPositions) {
+    void setPositions(List<WidgetPosition> widgetPositions) {
         checkNotNull(widgetPositions, "widgetPositions must be given");
         final Map<String, Map<String, Integer>> positions = new HashMap<>(widgetPositions.size());
         for (WidgetPosition widgetPosition : widgetPositions) {
@@ -99,11 +115,14 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
         }
         Map<String, Object> fields = getFields();
         checkNotNull(fields, "No fields found!");
-        fields.put(DashboardImpl.EMBEDDED_POSITIONS, positions);
+        fields.put(MigrationDashboard.EMBEDDED_POSITIONS, positions);
     }
 
-    @Override
-    public Map<String, Validator> getValidations() {
+    Map<String, Object> getFields() {
+        return fields;
+    }
+
+    Map<String, Validator> getValidations() {
         return ImmutableMap.<String, Validator>builder()
                 .put(FIELD_TITLE, new FilledStringValidator())
                 .put(FIELD_DESCRIPTION, new FilledStringValidator())
@@ -113,30 +132,19 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
                 .build();
     }
 
-    @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Collections.emptyMap();
+    String getId() {
+        // Performance - toHexString is expensive so we cache it.
+        final String s = hexId.get();
+        if (s == null && id != null) {
+            final String hexString = getObjectId().toHexString();
+            hexId.compareAndSet(null, hexString);
+            return hexString;
+        }
+
+        return s;
     }
 
-    @Override
-    public Map<String, Object> asMap() {
-        // We work on the result a bit to allow correct JSON serializing.
-        Map<String, Object> result = Maps.newHashMap(fields);
-
-        // TODO this sucks and should be done somewhere globally.
-        result.remove(FIELD_ID);
-        result.put("id", ((ObjectId) fields.get(FIELD_ID)).toHexString());
-        result.remove(FIELD_CREATED_AT);
-        result.put(FIELD_CREATED_AT, Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT)));
-
-        if (!result.containsKey(EMBEDDED_WIDGETS)) {
-            result.put(EMBEDDED_WIDGETS, Collections.emptyList());
-        }
-
-        if (!result.containsKey(EMBEDDED_POSITIONS)) {
-            result.put(EMBEDDED_POSITIONS, Collections.emptyMap());
-        }
-
-        return result;
+    private ObjectId getObjectId() {
+        return this.id;
     }
 }

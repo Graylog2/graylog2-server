@@ -35,7 +35,6 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
@@ -162,7 +161,7 @@ public class StreamCatalogTest {
     @Test
     public void createExcerpt() {
         final ImmutableMap<String, Object> fields = ImmutableMap.of(
-                DashboardImpl.FIELD_TITLE, "Stream Title"
+                "title", "Stream Title"
         );
         final StreamImpl stream = new StreamImpl(fields);
         final EntityExcerpt excerpt = facade.createExcerpt(stream);

@@ -21,8 +21,6 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
-import org.graylog2.dashboards.DashboardService;
-import org.graylog2.dashboards.DashboardServiceImpl;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.IndexFailureServiceImpl;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -53,7 +51,6 @@ public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(SystemMessageService.class).to(SystemMessageServiceImpl.class);
-        bind(DashboardService.class).to(DashboardServiceImpl.class);
         bind(AlertService.class).to(AlertServiceImpl.class);
         bind(NotificationService.class).to(NotificationServiceImpl.class);
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class);
