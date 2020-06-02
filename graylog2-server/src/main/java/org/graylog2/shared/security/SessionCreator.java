@@ -60,11 +60,14 @@ public class SessionCreator {
      * @param currentSessionId A session id, if one exists currently.
      * @param host Host the request to create a session originates from.
      * @param authToken Authentication token to log the user in.
-     * @return A session for the authenticated user.
-     * @throws AuthenticationException if authenticating the user fails
+     * @return A session for the authenticated user wrapped in an {@link Optional}, or an empty {@link Optional} if
+     *         authentication failed.
+     * @throws AuthenticationServiceUnavailableException If authenticating the user fails not due to an issue with the
+     *                                                   credentials but because of an external resource being
+     *                                                   unavailable
      */
     public Optional<Session> create(@Nullable String currentSessionId, String host,
-                                    ActorAwareAuthenticationToken authToken) {
+            ActorAwareAuthenticationToken authToken) throws AuthenticationServiceUnavailableException {
 
         final String previousSessionId = StringUtils.defaultIfBlank(currentSessionId, null);
         final Subject subject = new Subject.Builder().sessionId(previousSessionId).host(host).buildSubject();
@@ -98,6 +101,15 @@ public class SessionCreator {
             auditEventSender.success(AuditActor.user(username), SESSION_CREATE, auditEventContext);
 
             return Optional.of(session);
+        } catch (AuthenticationServiceUnavailableException e) {
+            log.info("Session creation failed due to authentication service being unavailable. Actor: \"{}\"",
+                    authToken.getActor().urn());
+            final Map<String, Object> auditEventContext = ImmutableMap.of(
+                    "remote_address", host,
+                    "message", "Authentication service unavailable: " + e.getMessage()
+            );
+            auditEventSender.failure(authToken.getActor(), SESSION_CREATE, auditEventContext);
+            throw e;
         } catch (AuthenticationException e) {
             log.info("Invalid credentials in session create request. Actor: \"{}\"", authToken.getActor().urn());
             final Map<String, Object> auditEventContext = ImmutableMap.of(
