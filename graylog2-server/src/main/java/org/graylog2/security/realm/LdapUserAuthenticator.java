@@ -139,7 +139,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             throw new AuthenticationServiceUnavailableException("Unable to read LDAP entry", e);
         } catch (Exception e) {
             LOG.error("Error during LDAP user account sync. Cannot log in user {}", principal, e);
-            throw new AuthenticationServiceUnavailableException("Error during LDAP user account sync", e);
+            return null;
         }
     }
 
