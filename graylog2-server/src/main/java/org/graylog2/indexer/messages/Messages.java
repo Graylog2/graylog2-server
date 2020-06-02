@@ -27,6 +27,7 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -74,11 +75,23 @@ import static com.codahale.metrics.MetricRegistry.name;
 @Singleton
 public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
+
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
-    private static final WaitStrategy exponentialWait = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+
+    @VisibleForTesting
+    static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+
+    // the wait strategy uses powers of 2 to compute wait times.
+    // see https://github.com/rholder/guava-retrying/blob/177b6c9b9f3e7957f404f0bdb8e23374cb1de43f/src/main/java/com/github/rholder/retry/WaitStrategies.java#L304
+    // using 500 leads to the expected exponential pattern of 1000, 2000, 4000, 8000, ...
+    private static final int retrySecondsMultiplier = 500;
+
+    @VisibleForTesting
+    static final WaitStrategy exponentialWaitSeconds = WaitStrategies.exponentialWait(retrySecondsMultiplier, MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+
     private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
             .retryIfException(t -> t instanceof IOException)
-            .withWaitStrategy(exponentialWait)
+            .withWaitStrategy(exponentialWaitMilliseconds)
             .withRetryListener(new RetryListener() {
                 @Override
                 public <V> void onRetry(Attempt<V> attempt) {
@@ -272,7 +285,7 @@ public class Messages {
 
     private void blockExecutionForAttempt(long attempt) {
         try {
-            long sleepTime = exponentialWait.computeSleepTime(new IndexBlockRetryAttempt(attempt));
+            long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
             LOG.info("sleeping " + sleepTime);
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
