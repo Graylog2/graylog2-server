@@ -43,10 +43,10 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
 
   return (
     <>
+      {resultsSection}
       <Section>
         {viewMetadata.summary || <i>No {viewTypeLabel} summary.</i>}
       </Section>
-      {resultsSection}
       <Section>
         {viewMetadata.description || <i>No {viewTypeLabel} description.</i>}
       </Section>
