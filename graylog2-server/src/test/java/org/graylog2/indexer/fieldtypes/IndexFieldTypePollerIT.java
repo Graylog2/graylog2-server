@@ -28,13 +28,13 @@ import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,7 +77,7 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         final Indices indices = new Indices(jestClient(),
                 new ObjectMapperProvider().get(),
                 new IndexMappingFactory(new Node(jestClient())),
-                new Messages(new MetricRegistry(), mock(MessagesAdapter.class)),
+                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus("index-field-type-poller-it"));

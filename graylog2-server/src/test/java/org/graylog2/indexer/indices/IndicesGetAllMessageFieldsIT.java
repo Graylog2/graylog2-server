@@ -25,8 +25,8 @@ import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
         indices = new Indices(jestClient(),
                 new ObjectMapper(),
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), mock(MessagesAdapter.class)),
+                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus());
