@@ -130,6 +130,7 @@ class KeyValueTable extends React.Component {
           <Input type="text"
                  name="newKey"
                  id="newKey"
+                 data-testid="newKey"
                  bsSize="small"
                  placeholder={this.props.headers[0]}
                  value={this.state.newKey}
@@ -139,6 +140,7 @@ class KeyValueTable extends React.Component {
           <Input type="text"
                  name="newValue"
                  id="newValue"
+                 data-testid="newValue"
                  bsSize="small"
                  placeholder={this.props.headers[1]}
                  value={this.state.newValue}
