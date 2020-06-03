@@ -22,6 +22,8 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.realm.Realm;
 
+import java.util.Collection;
+
 /**
  * An authentication strategy pretty much the same as the {@link FirstSuccessfulStrategy} with the difference that it
  * will memoize a {@link AuthenticationServiceUnavailableException} thrown by any attempt. It will rethrow this
@@ -34,6 +36,17 @@ import org.apache.shiro.realm.Realm;
 public class ThrowingFirstSuccessfulStrategy extends FirstSuccessfulStrategy {
 
     private AuthenticationServiceUnavailableException unavailableException;
+
+    /**
+     * Clear a possible {@link AuthenticationServiceUnavailableException} because this strategy will be re-used for
+     * multiple authentication processes.
+     */
+    @Override
+    public AuthenticationInfo beforeAllAttempts(Collection<? extends Realm> realms,
+            AuthenticationToken token) throws AuthenticationException {
+        unavailableException = null;
+        return super.beforeAllAttempts(realms, token);
+    }
 
     /**
      * If the attempt failed due to an {@link AuthenticationServiceUnavailableException}, memoize that exception. Will
