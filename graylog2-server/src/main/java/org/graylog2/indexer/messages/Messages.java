@@ -217,7 +217,7 @@ public class Messages {
 
             indexedSuccessfully += chunk.size();
 
-            Set<BulkResult.BulkResultItem> remainingFailures = retryIfIndexBlocksPresent(chunk, result.getFailedItems());
+            Set<BulkResult.BulkResultItem> remainingFailures = retryOnlyIndexBlockItemsForever(chunk, result.getFailedItems());
 
             failedItems.addAll(remainingFailures);
             if (isSystemTraffic) {
@@ -259,7 +259,7 @@ public class Messages {
         return runBulkRequest(bulk.build(), chunk.size());
     }
 
-    private Set<BulkResult.BulkResultItem> retryIfIndexBlocksPresent(List<Map.Entry<IndexSet, Message>> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
+    private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<Map.Entry<IndexSet, Message>> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
         Set<BulkResult.BulkResultItem> indexBlocks = indexBlocksFrom(allFailedItems);
         final Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
         List<Map.Entry<IndexSet, Message>> blockedMessages = messagesForResultItems(chunk, indexBlocks);
