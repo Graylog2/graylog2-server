@@ -1,3 +1,4 @@
+// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
@@ -5,23 +6,38 @@ import { URLWhiteListInput, KeyValueTable } from 'components/common';
 
 import ObjectUtils from 'util/ObjectUtils';
 
-class HTTPJSONPathAdapterFieldSet extends React.Component {
+type Headers = {[string]: string };
+
+type Config = {
+  headers: Headers,
+  url: string,
+  single_value_jsonpath: string,
+  multi_value_jsonpath: string,
+  user_agent: string,
+};
+
+type Props = {
+  config: Config,
+  updateConfig: (Config) => void,
+  handleFormEvent: (Event) => void,
+  validationState: (string) => void,
+  validationMessage: (string, string) => void,
+};
+
+class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
   static propTypes = {
     config: PropTypes.object.isRequired,
-    // eslint-disable-next-line react/no-unused-prop-types
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
     validationState: PropTypes.func.isRequired,
     validationMessage: PropTypes.func.isRequired,
   };
 
-  state = {};
-
-  onHTTPHeaderUpdate = (headers) => {
+  onHTTPHeaderUpdate = (headers: Headers) => {
     const { config, updateConfig } = this.props;
     const configChange = ObjectUtils.clone(config);
     configChange.headers = headers;
-    updateConfig(config);
+    updateConfig(configChange);
   };
 
   render() {
