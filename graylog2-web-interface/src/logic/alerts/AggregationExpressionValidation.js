@@ -16,7 +16,7 @@ const flattenValidationTree = (validationTree, errors = []) => {
 const validateExpressionTree = (expression, series, validationTree = {}) => {
   switch (expression.expr) {
     case 'number':
-      return (Number.isSafeInteger(expression.value) ? {} : { message: 'Threshold must be a valid number' });
+      return (Number.isNaN(expression.value) ? { message: 'Threshold must be a valid number' } : {});
     case 'number-ref':
       /* eslint-disable no-case-declarations */
       const error = { message: 'Function must be set' };
