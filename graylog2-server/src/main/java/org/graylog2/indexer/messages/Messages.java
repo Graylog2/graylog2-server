@@ -26,8 +26,11 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
+import com.github.rholder.retry.WaitStrategy;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
@@ -56,6 +59,7 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -71,10 +75,23 @@ import static com.codahale.metrics.MetricRegistry.name;
 @Singleton
 public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
+
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
+
+    @VisibleForTesting
+    static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+
+    // the wait strategy uses powers of 2 to compute wait times.
+    // see https://github.com/rholder/guava-retrying/blob/177b6c9b9f3e7957f404f0bdb8e23374cb1de43f/src/main/java/com/github/rholder/retry/WaitStrategies.java#L304
+    // using 500 leads to the expected exponential pattern of 1000, 2000, 4000, 8000, ...
+    private static final int retrySecondsMultiplier = 500;
+
+    @VisibleForTesting
+    static final WaitStrategy exponentialWaitSeconds = WaitStrategies.exponentialWait(retrySecondsMultiplier, MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+
     private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
             .retryIfException(t -> t instanceof IOException)
-            .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
+            .withWaitStrategy(exponentialWaitMilliseconds)
             .withRetryListener(new RetryListener() {
                 @Override
                 public <V> void onRetry(Attempt<V> attempt) {
@@ -86,6 +103,9 @@ public class Messages {
                 }
             })
             .build();
+
+    static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
+    static final String INDEX_BLOCK_REASON = "blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];";
 
     private final Meter invalidTimestampMeter;
     private final JestClient client;
@@ -108,7 +128,7 @@ public class Messages {
         this.useExpectContinue = useExpectContinue;
 
         // TODO: Magic number
-        this.indexFailureQueue =  new LinkedBlockingQueue<>(1000);
+        this.indexFailureQueue = new LinkedBlockingQueue<>(1000);
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
@@ -119,8 +139,7 @@ public class Messages {
             throw new DocumentNotFoundException(index, messageId);
         }
 
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> message = (Map<String, Object>) result.getSourceAsObject(Map.class, false);
+        @SuppressWarnings("unchecked") final Map<String, Object> message = (Map<String, Object>) result.getSourceAsObject(Map.class, false);
 
         return ResultMessage.parseFromSource(result.getId(), result.getIndex(), message);
     }
@@ -129,10 +148,9 @@ public class Messages {
         final Analyze analyze = new Analyze.Builder().index(index).analyzer(analyzer).text(toAnalyze).build();
         final JestResult result = client.execute(analyze);
 
-        @SuppressWarnings("unchecked")
-        final List<Map<String, Object>> tokens = (List<Map<String, Object>>) result.getValue("tokens");
+        @SuppressWarnings("unchecked") final List<Map<String, Object>> tokens = (List<Map<String, Object>>) result.getValue("tokens");
         final List<String> terms = new ArrayList<>(tokens.size());
-        tokens.forEach(token -> terms.add((String)token.get("token")));
+        tokens.forEach(token -> terms.add((String) token.get("token")));
 
         return terms;
     }
@@ -149,9 +167,10 @@ public class Messages {
         int chunkSize = messageList.size();
         int offset = 0;
         List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
-        for (;;) {
+        for (; ; ) {
             try {
-                failedItems.addAll(bulkIndexChunked(messageList, isSystemTraffic, offset, chunkSize));
+                List<BulkResult.BulkResultItem> failures = bulkIndexChunked(messageList, isSystemTraffic, offset, chunkSize);
+                failedItems.addAll(failures);
                 break; // on success
             } catch (EntityTooLargeException e) {
                 LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
@@ -167,7 +186,6 @@ public class Messages {
             }
         }
 
-
         if (!failedItems.isEmpty()) {
             final Set<String> failedIds = failedItems.stream().map(item -> item.id).collect(Collectors.toSet());
             recordTimestamp(messageList, failedIds);
@@ -182,25 +200,14 @@ public class Messages {
         chunkSize = Math.min(messageList.size(), chunkSize);
 
         final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
-        final Iterable<List<Map.Entry<IndexSet, Message>>> partition = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
-        int partitionCount = 1;
+        final Iterable<List<Map.Entry<IndexSet, Message>>> chunks = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
+        int chunkCount = 1;
         int indexedSuccessfully = 0;
-        for (List<Map.Entry<IndexSet, Message>> subMessageList: partition) {
-            Bulk.Builder bulk = new Bulk.Builder();
+        for (List<Map.Entry<IndexSet, Message>> chunk : chunks) {
 
-            long messageSizes = 0;
-            for (Map.Entry<IndexSet, Message> entry : subMessageList) {
-                final Message message = entry.getValue();
-                messageSizes += message.getSize();
+            long messageSizes = chunk.stream().mapToLong(m -> m.getValue().getSize()).sum();
 
-                bulk.addAction(new Index.Builder(message.toElasticSearchObject(invalidTimestampMeter))
-                        .index(entry.getKey().getWriteIndexAlias())
-                        .type(IndexMapping.TYPE_MESSAGE)
-                        .id(message.getId())
-                        .build());
-            }
-
-            final BulkResult result = runBulkRequest(bulk.build(), subMessageList.size());
+            final BulkResult result = bulkIndexChunk(chunk);
 
             if (result.getResponseCode() == 413) {
                 throw new EntityTooLargeException(indexedSuccessfully, failedItems);
@@ -208,8 +215,11 @@ public class Messages {
 
             // TODO should we check result.isSucceeded()?
 
-            indexedSuccessfully += subMessageList.size();
-            failedItems.addAll(result.getFailedItems());
+            indexedSuccessfully += chunk.size();
+
+            Set<BulkResult.BulkResultItem> remainingFailures = retryOnlyIndexBlockItemsForever(chunk, result.getFailedItems());
+
+            failedItems.addAll(remainingFailures);
             if (isSystemTraffic) {
                 systemTrafficCounter.inc(messageSizes);
             } else {
@@ -218,19 +228,88 @@ public class Messages {
             if (LOG.isDebugEnabled()) {
                 String chunkInfo = "";
                 if (chunkSize != messageList.size()) {
-                    chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", partitionCount,
-                            (int) Math.ceil((double)messageList.size() / chunkSize), offset);
+                    chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", chunkCount,
+                            (int) Math.ceil((double) messageList.size() / chunkSize), offset);
                 }
                 LOG.debug("Index: Bulk indexed {} messages{}, failures: {}",
                         result.getItems().size(), chunkInfo, failedItems.size());
             }
-            if (!result.getFailedItems().isEmpty()) {
+            if (!remainingFailures.isEmpty()) {
                 LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
-                        result.getFailedItems().size(), result.getErrorMessage());
+                        remainingFailures.size(), result.getErrorMessage());
             }
-            partitionCount++;
+            chunkCount++;
         }
         return failedItems;
+    }
+
+    private BulkResult bulkIndexChunk(List<Map.Entry<IndexSet, Message>> chunk) {
+        Bulk.Builder bulk = new Bulk.Builder();
+
+        for (Map.Entry<IndexSet, Message> entry : chunk) {
+            final Message message = entry.getValue();
+
+            bulk.addAction(new Index.Builder(message.toElasticSearchObject(invalidTimestampMeter))
+                    .index(entry.getKey().getWriteIndexAlias())
+                    .type(IndexMapping.TYPE_MESSAGE)
+                    .id(message.getId())
+                    .build());
+        }
+
+        return runBulkRequest(bulk.build(), chunk.size());
+    }
+
+    private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<Map.Entry<IndexSet, Message>> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
+        Set<BulkResult.BulkResultItem> indexBlocks = indexBlocksFrom(allFailedItems);
+        final Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
+        List<Map.Entry<IndexSet, Message>> blockedMessages = messagesForResultItems(chunk, indexBlocks);
+
+        LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
+
+        long attempt = 1;
+
+        while (!indexBlocks.isEmpty()) {
+            waitBeforeRetrying(attempt++);
+
+            final BulkResult bulkResult = bulkIndexChunk(blockedMessages);
+
+            final List<BulkResult.BulkResultItem> failedItems = bulkResult.getFailedItems();
+
+            indexBlocks = indexBlocksFrom(failedItems);
+            blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
+
+            final Set<BulkResult.BulkResultItem> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
+            otherFailures.addAll(newOtherFailures);
+
+            if (indexBlocks.isEmpty()) {
+                LOG.info("Retries were successful after {} attempts. Ingestion will continue now.", attempt);
+            }
+        }
+
+        return otherFailures;
+    }
+
+    private void waitBeforeRetrying(long attempt) {
+        try {
+            final long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Map.Entry<IndexSet, Message>> messagesForResultItems(List<Map.Entry<IndexSet, Message>> chunk, Set<BulkResult.BulkResultItem> indexBlocks) {
+        final Set<String> blockedMessageIds = indexBlocks.stream().map(item -> item.id).collect(Collectors.toSet());
+
+        return chunk.stream().filter(entry -> blockedMessageIds.contains(entry.getValue().getId())).collect(Collectors.toList());
+    }
+
+    private Set<BulkResult.BulkResultItem> indexBlocksFrom(List<BulkResult.BulkResultItem> allFailedItems) {
+        return allFailedItems.stream().filter(this::hasFailedDueToBlockedIndex).collect(Collectors.toSet());
+    }
+
+    private boolean hasFailedDueToBlockedIndex(BulkResult.BulkResultItem item) {
+        return item.errorType.equals(INDEX_BLOCK_ERROR) && item.errorReason.equals(INDEX_BLOCK_REASON);
     }
 
     private void recordTimestamp(List<Map.Entry<IndexSet, Message>> messageList, Set<String> failedIds) {
@@ -266,9 +345,9 @@ public class Messages {
 
     private List<String> propagateFailure(List<BulkResult.BulkResultItem> items, List<Map.Entry<IndexSet, Message>> messageList) {
         final Map<String, Message> messageMap = messageList.stream()
-            .map(Map.Entry::getValue)
-            .distinct()
-            .collect(Collectors.toMap(Message::getId, Function.identity()));
+                .map(Map.Entry::getValue)
+                .distinct()
+                .collect(Collectors.toMap(Message::getId, Function.identity()));
         final List<String> failedMessageIds = new ArrayList<>(items.size());
         final List<IndexFailure> indexFailures = new ArrayList<>(items.size());
         for (BulkResult.BulkResultItem item : items) {
@@ -317,7 +396,7 @@ public class Messages {
         private final int indexedSuccessfully;
         private final List<BulkResult.BulkResultItem> failedItems;
 
-        public EntityTooLargeException(int indexedSuccessfully, List<BulkResult.BulkResultItem> failedItems)  {
+        public EntityTooLargeException(int indexedSuccessfully, List<BulkResult.BulkResultItem> failedItems) {
             this.indexedSuccessfully = indexedSuccessfully;
             this.failedItems = failedItems;
         }
