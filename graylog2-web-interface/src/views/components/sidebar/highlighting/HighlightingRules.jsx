@@ -1,13 +1,10 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useContext } from 'react';
 import styled from 'styled-components';
 
-import connect from 'stores/connect';
-
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
-import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
-import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 
 import HighlightingRule, { HighlightingRuleGrid } from './HighlightingRule';
 import ColorPreview from './ColorPreview';
@@ -16,11 +13,8 @@ const Headline = styled.h4`
   margin-bottom: 10px;
 `;
 
-type Props = {
-  rules: Array<Rule>,
-};
-
-const HighlightingRules = ({ rules = [] }: Props) => {
+const HighlightingRules = () => {
+  const rules = useContext(HighlightingRulesContext) ?? [];
   return (
     <>
       <Headline>Highlighting</Headline>
@@ -34,12 +28,4 @@ const HighlightingRules = ({ rules = [] }: Props) => {
   );
 };
 
-HighlightingRules.propTypes = {
-  rules: PropTypes.arrayOf(PropTypes.instanceOf(Rule)),
-};
-
-HighlightingRules.defaultProps = {
-  rules: [],
-};
-
-export default connect(HighlightingRules, { rules: HighlightingRulesStore });
+export default HighlightingRules;
