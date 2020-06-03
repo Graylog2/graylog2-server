@@ -24,7 +24,6 @@ import io.searchbox.core.BulkResult;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -201,7 +200,6 @@ public class MockedMessagesTest {
         assertThat(result).containsOnly("other-error-id");
     }
 
-    @NotNull
     private List<Map.Entry<IndexSet, Message>> messagesWithIds(String... ids) {
         return Arrays.stream(ids)
                 .map(this::messageWithId)
@@ -209,7 +207,6 @@ public class MockedMessagesTest {
                 .collect(Collectors.toList());
     }
 
-    @NotNull
     private Message messageWithId(String id) {
         final Message mockedMessage = mock(Message.class);
         when(mockedMessage.getId()).thenReturn(id);
@@ -217,7 +214,6 @@ public class MockedMessagesTest {
         return mockedMessage;
     }
 
-    @NotNull
     private List<Map.Entry<IndexSet, Message>> messageListWith(Message mockedMessage) {
         return ImmutableList.of(
                 new AbstractMap.SimpleEntry<>(mock(IndexSet.class), mockedMessage)

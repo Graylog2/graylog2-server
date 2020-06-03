@@ -217,7 +217,7 @@ public class Messages {
 
             indexedSuccessfully += chunk.size();
 
-            Set<BulkResult.BulkResultItem> remainingFailures = retryOnlyIndexBlockItemsForever(chunk, result.getFailedItems());
+            Set<BulkResult.BulkResultItem> remainingFailures = retryIfIndexBlocksPresent(chunk, result.getFailedItems());
 
             failedItems.addAll(remainingFailures);
             if (isSystemTraffic) {
@@ -259,25 +259,31 @@ public class Messages {
         return runBulkRequest(bulk.build(), chunk.size());
     }
 
-    private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<Map.Entry<IndexSet, Message>> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
+    private Set<BulkResult.BulkResultItem> retryIfIndexBlocksPresent(List<Map.Entry<IndexSet, Message>> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
         Set<BulkResult.BulkResultItem> indexBlocks = indexBlocksFrom(allFailedItems);
-        Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
+        final Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
         List<Map.Entry<IndexSet, Message>> blockedMessages = messagesForResultItems(chunk, indexBlocks);
+
+        LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
 
         long attempt = 1;
 
         while (!indexBlocks.isEmpty()) {
             blockExecutionForAttempt(attempt++);
 
-            BulkResult bulkResult = bulkIndexChunk(blockedMessages);
+            final BulkResult bulkResult = bulkIndexChunk(blockedMessages);
 
-            List<BulkResult.BulkResultItem> failedItems = bulkResult.getFailedItems();
+            final List<BulkResult.BulkResultItem> failedItems = bulkResult.getFailedItems();
 
             indexBlocks = indexBlocksFrom(failedItems);
             blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
 
-            Set<BulkResult.BulkResultItem> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
+            final Set<BulkResult.BulkResultItem> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
             otherFailures.addAll(newOtherFailures);
+
+            if (indexBlocks.isEmpty()) {
+                LOG.info("Retries were successful after {} attempts. Ingestion will continue now.", attempt);
+            }
         }
 
         return otherFailures;
@@ -285,8 +291,7 @@ public class Messages {
 
     private void blockExecutionForAttempt(long attempt) {
         try {
-            long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
-            LOG.info("sleeping " + sleepTime);
+            final long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -294,7 +299,7 @@ public class Messages {
     }
 
     private List<Map.Entry<IndexSet, Message>> messagesForResultItems(List<Map.Entry<IndexSet, Message>> chunk, Set<BulkResult.BulkResultItem> indexBlocks) {
-        Set<String> blockedMessageIds = indexBlocks.stream().map(item -> item.id).collect(Collectors.toSet());
+        final Set<String> blockedMessageIds = indexBlocks.stream().map(item -> item.id).collect(Collectors.toSet());
 
         return chunk.stream().filter(entry -> blockedMessageIds.contains(entry.getValue().getId())).collect(Collectors.toList());
     }
