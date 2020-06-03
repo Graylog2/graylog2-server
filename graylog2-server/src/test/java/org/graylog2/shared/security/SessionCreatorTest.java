@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -194,6 +195,42 @@ public class SessionCreatorTest {
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
         verify(auditEventSender).failure(eq(AuditActor.user("username")), anyString(),
                 argThat(map -> StringUtils.containsIgnoreCase((String) map.get("message"), "unavailable")));
+    }
+
+    /**
+     * Test that the service unavailable exception is cleared when the service becomes available again
+     */
+    @Test
+    public void serviceUnavailableStateIsCleared() {
+        setUpUserMock();
+
+        assertFalse(SecurityUtils.getSubject().isAuthenticated());
+
+        final AtomicBoolean doThrow = new AtomicBoolean(true);
+        final SimpleAccountRealm switchableRealm = new SimpleAccountRealm() {
+            @Override
+            protected AuthenticationInfo doGetAuthenticationInfo(
+                    AuthenticationToken token) throws AuthenticationException {
+                if (doThrow.get()) {
+                    throw new AuthenticationServiceUnavailableException("not available");
+                } else {
+                    return super.doGetAuthenticationInfo(token);
+                }
+            }
+        };
+
+        securityManager.setRealms(ImmutableList.of(switchableRealm, new SimpleAccountRealm()));
+
+        // realm will throw an exception on auth attempt
+        assertThatThrownBy(() -> sessionCreator.create(null, "host", validToken)).isInstanceOf(
+                AuthenticationServiceUnavailableException.class);
+        assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
+
+        // switch realm to not throw an exception but simply reject the credentials
+        doThrow.set(false);
+
+        sessionCreator.create(null, "host", validToken);
+        assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
     }
 
     private void setUpUserMock() {
