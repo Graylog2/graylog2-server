@@ -7,7 +7,7 @@ import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 
 public class MessagesES6IT extends MessagesIT {
     @Override
-    protected MessagesAdapter createMessages(MetricRegistry metricRegistry) {
+    protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
         return new MessagesAdapterES6(jestClient(), true, metricRegistry, new InMemoryProcessingStatusRecorder());
     }
 }

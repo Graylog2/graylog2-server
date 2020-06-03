@@ -17,7 +17,6 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
@@ -28,13 +27,13 @@ import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +48,6 @@ import static org.mockito.Mockito.mock;
 public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
 
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private IndexFieldTypePoller poller;
 
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
@@ -71,13 +69,12 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
             .build();
     private TestIndexSet indexSet;
 
-
     @Before
     public void setUp() throws Exception {
         final Indices indices = new Indices(jestClient(),
                 new ObjectMapperProvider().get(),
                 new IndexMappingFactory(new Node(jestClient())),
-                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
+                new Messages(new MetricRegistry(), mock(MessagesAdapter.class)),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus("index-field-type-poller-it"));

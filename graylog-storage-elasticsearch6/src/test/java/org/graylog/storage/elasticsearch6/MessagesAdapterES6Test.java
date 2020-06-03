@@ -16,10 +16,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.storage.elasticsearch6.MessagesAdapterES6.INDEX_BLOCK_ERROR;
+import static org.graylog.storage.elasticsearch6.MessagesAdapterES6.INDEX_BLOCK_REASON;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -30,14 +34,12 @@ import static org.mockito.Mockito.when;
 class MessagesAdapterES6Test {
     private MessagesAdapterES6 messagesAdapter;
     private JestClient jestClient;
-    private MetricRegistry metricRegistry;
-    private ProcessingStatusRecorder processingStatusRecorder;
 
     @BeforeEach
     void setUp() {
         this.jestClient = mock(JestClient.class);
-        this.metricRegistry = mock(MetricRegistry.class);
-        this.processingStatusRecorder = mock(ProcessingStatusRecorder.class);
+        final MetricRegistry metricRegistry = mock(MetricRegistry.class);
+        final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
         this.messagesAdapter = new MessagesAdapterES6(jestClient, true, metricRegistry, processingStatusRecorder);
     }
 
@@ -94,9 +96,7 @@ class MessagesAdapterES6Test {
         when(mockedMessage.getId()).thenReturn(messageId);
         when(mockedMessage.getTimestamp()).thenReturn(DateTime.now(DateTimeZone.UTC));
 
-        final List<IndexingRequest> messageList = ImmutableList.of(
-                IndexingRequest.create(mock(IndexSet.class), mockedMessage)
-        );
+        final List<IndexingRequest> messageList = messageListWith(mockedMessage);
 
         final List<IndexFailure> result = messagesAdapter.bulkIndex(messageList, (successes) -> {});
 
@@ -115,13 +115,105 @@ class MessagesAdapterES6Test {
                 .thenThrow(new IOException("Boom!"))
                 .thenReturn(jestResult);
 
-        final List<IndexingRequest> messageList = ImmutableList.of(
-                IndexingRequest.create(mock(IndexSet.class), mock(Message.class))
-        );
+        final List<IndexingRequest> messageList = messageListWith(mock(Message.class));
+
         final List<IndexFailure> result = messagesAdapter.bulkIndex(messageList, (successes) -> {});
 
         assertThat(result).isNotNull().isEmpty();
 
         verify(jestClient, times(2)).execute(any());
+    }
+
+    @Test
+    public void bulkIndexingShouldRetryIfIndexBlocked() throws IOException {
+        final BulkResult errorResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem errorItem = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
+        when(errorResult.isSucceeded()).thenReturn(false);
+        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(errorItem));
+
+        final BulkResult successResult = mock(BulkResult.class);
+
+        when(jestClient.execute(any()))
+                .thenReturn(errorResult)
+                .thenReturn(successResult);
+
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id"), (successes) -> {});
+
+        verify(jestClient, times(2)).execute(any());
+        assertThat(result).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void indexBlockedRetriesShouldOnlyRetryIndexBlockedErrors() throws IOException {
+        final BulkResult errorResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem indexBlockedError = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
+        final BulkResult.BulkResultItem otherError = errorResultItem("other-error-id", "something else", "something else");
+        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(indexBlockedError, otherError));
+
+        final BulkResult successResult = mock(BulkResult.class);
+
+        when(jestClient.execute(any()))
+                .thenReturn(errorResult)
+                .thenReturn(successResult);
+
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"), (successes) -> {});
+
+        verify(jestClient, times(2)).execute(any());
+        assertThat(result).extracting(IndexFailure::letterId).containsOnly("other-error-id");
+    }
+
+    @Test
+    public void retriedIndexBlockErrorsThatFailWithDifferentErrorsAreTreatedAsPersistentFailures() throws IOException {
+        final BulkResult errorResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem indexBlockedError = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
+        final BulkResult.BulkResultItem initialIndexBlockedError = errorResultItem("other-error-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
+        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(indexBlockedError, initialIndexBlockedError));
+
+        final BulkResult secondErrorResult = mock(BulkResult.class);
+        final BulkResult.BulkResultItem otherError = errorResultItem("other-error-id", "something else", "something else");
+        when(secondErrorResult.getFailedItems()).thenReturn(ImmutableList.of(otherError));
+
+        when(jestClient.execute(any()))
+                .thenReturn(errorResult)
+                .thenReturn(secondErrorResult);
+
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"), (successes) -> {});
+
+        verify(jestClient, times(2)).execute(any());
+        assertThat(result).extracting(IndexFailure::letterId).containsOnly("other-error-id");
+    }
+
+    private List<IndexingRequest> messagesWithIds(String... ids) {
+        return Arrays.stream(ids)
+                .map(this::messageWithId)
+                .map(m -> IndexingRequest.create(mock(IndexSet.class), m))
+                .collect(Collectors.toList());
+    }
+
+    private Message messageWithId(String id) {
+        final Message mockedMessage = mock(Message.class);
+        when(mockedMessage.getId()).thenReturn(id);
+        when(mockedMessage.getTimestamp()).thenReturn(DateTime.now(DateTimeZone.UTC));
+        return mockedMessage;
+    }
+
+    private List<IndexingRequest> messageListWith(Message mockedMessage) {
+        return ImmutableList.of(
+                IndexingRequest.create(mock(IndexSet.class), mockedMessage)
+        );
+    }
+
+    private BulkResult.BulkResultItem errorResultItem(String messageId, String errorType, String errorReason) {
+        return new MockedBulkResult().createResultItem(
+                "index",
+                "someindex",
+                "message",
+                messageId,
+                400,
+                "{\"type\":\"" + errorType + "\",\"reason\":\"" + errorReason + "\"}}",
+                null,
+                errorType,
+                errorReason
+        );
     }
 }

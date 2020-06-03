@@ -25,11 +25,12 @@ import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -43,6 +44,9 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
+    @Mock
+    private MessagesAdapter messagesAdapter;
+
     private Indices indices;
 
     @Before
@@ -52,7 +56,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
         indices = new Indices(jestClient(),
                 new ObjectMapper(),
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
+                new Messages(new MetricRegistry(), messagesAdapter),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus());
