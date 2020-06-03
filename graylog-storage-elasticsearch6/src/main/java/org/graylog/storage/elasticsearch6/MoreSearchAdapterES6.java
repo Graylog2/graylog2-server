@@ -48,7 +48,7 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
     private Boolean allowLeadingWildcard;
 
     @Inject
-    public MoreSearchAdapterES6(@Named("allow_leading_wildcard") Boolean allowLeadingWildcard, MultiSearch multiSearch, Scroll scroll) {
+    public MoreSearchAdapterES6(@Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard, MultiSearch multiSearch, Scroll scroll) {
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.multiSearch = multiSearch;
         this.scroll = scroll;
