@@ -117,42 +117,21 @@ public class Messages {
 
     @Inject
     public Messages(MetricRegistry metricRegistry,
-                    JestClient client,
-                    ProcessingStatusRecorder processingStatusRecorder,
-                    @Named("elasticsearch_use_expect_continue") boolean useExpectContinue) {
-        invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
+                    MessagesAdapter messagesAdapter) {
         outputByteCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         systemTrafficCounter = metricRegistry.counter(GlobalMetricNames.SYSTEM_OUTPUT_TRAFFIC);
-        this.client = client;
-        this.processingStatusRecorder = processingStatusRecorder;
-        this.useExpectContinue = useExpectContinue;
+        this.messagesAdapter = messagesAdapter;
 
         // TODO: Magic number
         this.indexFailureQueue = new LinkedBlockingQueue<>(1000);
     }
 
     public ResultMessage get(String messageId, String index) throws DocumentNotFoundException, IOException {
-        final Get get = new Get.Builder(index, messageId).type(IndexMapping.TYPE_MESSAGE).build();
-        final DocumentResult result = client.execute(get);
-
-        if (!result.isSucceeded()) {
-            throw new DocumentNotFoundException(index, messageId);
-        }
-
-        @SuppressWarnings("unchecked") final Map<String, Object> message = (Map<String, Object>) result.getSourceAsObject(Map.class, false);
-
-        return ResultMessage.parseFromSource(result.getId(), result.getIndex(), message);
+        return messagesAdapter.get(messageId, index);
     }
 
     public List<String> analyze(String toAnalyze, String index, String analyzer) throws IOException {
-        final Analyze analyze = new Analyze.Builder().index(index).analyzer(analyzer).text(toAnalyze).build();
-        final JestResult result = client.execute(analyze);
-
-        @SuppressWarnings("unchecked") final List<Map<String, Object>> tokens = (List<Map<String, Object>>) result.getValue("tokens");
-        final List<String> terms = new ArrayList<>(tokens.size());
-        tokens.forEach(token -> terms.add((String) token.get("token")));
-
-        return terms;
+        return messagesAdapter.analyze(toAnalyze, index, analyzer);
     }
 
     public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
