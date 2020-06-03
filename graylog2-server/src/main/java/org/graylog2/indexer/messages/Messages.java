@@ -269,7 +269,7 @@ public class Messages {
         long attempt = 1;
 
         while (!indexBlocks.isEmpty()) {
-            blockExecutionForAttempt(attempt++);
+            waitBeforeRetrying(attempt++);
 
             final BulkResult bulkResult = bulkIndexChunk(blockedMessages);
 
@@ -289,7 +289,7 @@ public class Messages {
         return otherFailures;
     }
 
-    private void blockExecutionForAttempt(long attempt) {
+    private void waitBeforeRetrying(long attempt) {
         try {
             final long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
             Thread.sleep(sleepTime);
