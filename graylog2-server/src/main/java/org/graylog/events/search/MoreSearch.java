@@ -16,25 +16,9 @@
  */
 package org.graylog.events.search;
 
-import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.MultiSearch;
-import io.searchbox.core.MultiSearchResult;
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
-import io.searchbox.core.search.sort.Sort;
-import io.searchbox.params.Parameters;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
@@ -44,24 +28,11 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
-import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.FieldTypeException;
-import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.results.ScrollResult;
-import org.graylog2.indexer.searches.SearchFailure;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
@@ -69,59 +40,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Objects.requireNonNull;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 /**
  * This class contains search helper for the events system.
  */
-public class MoreSearch extends Searches {
+public class MoreSearch {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearch.class);
 
     private final StreamService streamService;
     private final IndexRangeService indexRangeService;
-    private final ScrollResult.Factory scrollResultFactory;
-    private final JestClient jestClient;
-    private final boolean allowLeadingWildcardSearches;
     private final ESQueryDecorators esQueryDecorators;
+    private final MoreSearchAdapter moreSearchAdapter;
 
     @Inject
     public MoreSearch(StreamService streamService,
-                      Indices indices,
                       IndexRangeService indexRangeService,
-                      IndexSetRegistry indexSetRegistry,
-                      MetricRegistry metricRegistry,
-                      ScrollResult.Factory scrollResultFactory,
-                      JestClient jestClient,
-                      Configuration configuration,
                       ESQueryDecorators esQueryDecorators,
-                      SearchesAdapter searchesAdapter) {
-        super(indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, searchesAdapter);
+                      MoreSearchAdapter moreSearchAdapter) {
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
-        this.scrollResultFactory = scrollResultFactory;
-        this.jestClient = jestClient;
-        this.allowLeadingWildcardSearches = configuration.isAllowLeadingWildcardSearches();
         this.esQueryDecorators = esQueryDecorators;
+        this.moreSearchAdapter = moreSearchAdapter;
     }
 
     /**
@@ -145,103 +93,7 @@ public class MoreSearch extends Searches {
         final String queryString = parameters.query().trim();
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
 
-        final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*")) ?
-                matchAllQuery() :
-                queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcardSearches);
-
-        final BoolQueryBuilder filter = boolQuery()
-                .filter(query)
-                .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(parameters.timerange())));
-
-        if (!isNullOrEmpty(filterString)) {
-            filter.filter(queryStringQuery(filterString));
-        }
-
-        if (!forbiddenSourceStreams.isEmpty()) {
-            // If an event has any stream in "source_streams" that the calling search user is not allowed to access,
-            // the event must not be in the search result.
-            filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
-        }
-
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(filter)
-                .from((parameters.page() - 1) * parameters.perPage())
-                .size(parameters.perPage())
-                .sort(sorting.getField(), sorting.asElastic());
-
-        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-                .addType(IndexMapping.TYPE_MESSAGE)
-                .addIndex(affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices)
-                .allowNoIndices(false)
-                .ignoreUnavailable(false);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
-            LOG.debug("Execute search: {}", searchBuilder.build().toString());
-        }
-
-        final SearchResult searchResult = wrapInMultiSearch(searchBuilder.build(), () -> "Unable to perform search query");
-
-        @SuppressWarnings("unchecked") final List<ResultMessage> hits = searchResult.getHits(Map.class, false).stream()
-                .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source, hit.highlight))
-                .collect(Collectors.toList());
-
-        return Result.builder()
-                .results(hits)
-                .resultsCount(searchResult.getTotal())
-                .duration(tookMsFromSearchResult(searchResult))
-                .usedIndexNames(affectedIndices)
-                .executedQuery(searchSourceBuilder.toString())
-                .build();
-    }
-
-    protected long tookMsFromSearchResult(JestResult searchResult) {
-        final JsonNode tookMs = searchResult.getJsonObject().path("took");
-        if (tookMs.isNumber()) {
-            return tookMs.asLong();
-        } else {
-            throw new ElasticsearchException("Unexpected response structure: " + searchResult.getJsonString());
-        }
-    }
-
-    private <T extends JestResult> T checkForFailedShards(T result) throws FieldTypeException {
-        // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets
-        // if at least one of the index sets comes back with a result, the overall result will have the aggregation
-        // but not considered failed entirely. however, if one shard has the error, we will refuse to respond
-        // otherwise we would be showing empty graphs for non-numeric fields.
-        final JsonNode shards = result.getJsonObject().path("_shards");
-        final double failedShards = shards.path("failed").asDouble();
-
-        if (failedShards > 0) {
-            final SearchFailure searchFailure = new SearchFailure(shards);
-            final List<String> nonNumericFieldErrors = searchFailure.getNonNumericFieldErrors();
-
-            if (!nonNumericFieldErrors.isEmpty()) {
-                throw new FieldTypeException("Unable to perform search query", nonNumericFieldErrors);
-            }
-
-            throw new ElasticsearchException("Unable to perform search query", searchFailure.getErrors());
-        }
-
-        return result;
-    }
-
-    protected io.searchbox.core.SearchResult wrapInMultiSearch(Search search, Supplier<String> errorMessage) {
-        final MultiSearch multiSearch = new MultiSearch.Builder(search).build();
-        final MultiSearchResult multiSearchResult = JestUtils.execute(jestClient, multiSearch, errorMessage);
-
-        final List<MultiSearchResult.MultiSearchResponse> responses = multiSearchResult.getResponses();
-        if (responses.size() != 1) {
-            throw new ElasticsearchException("Expected exactly 1 search result, but got " + responses.size());
-        }
-
-        final MultiSearchResult.MultiSearchResponse response = responses.get(0);
-        if (response.isError) {
-            throw JestUtils.specificException(errorMessage, response.error);
-        }
-
-        return checkForFailedShards(response.searchResult);
+        return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
@@ -294,72 +146,8 @@ public class MoreSearch extends Searches {
             throw e;
         }
 
-        final QueryBuilder query = (queryString.trim().isEmpty() || queryString.trim().equals("*")) ?
-                matchAllQuery() :
-                queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcardSearches);
-
-        final BoolQueryBuilder filter = boolQuery()
-                .filter(query)
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(timeRange)));
-
-        // Filtering with an empty streams list doesn't work and would return zero results
-        if (!streams.isEmpty()) {
-            filter.filter(termsQuery(Message.FIELD_STREAMS, streams));
-        }
-
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(filter)
-                .size(batchSize);
-
-        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-                .addType(IndexMapping.TYPE_MESSAGE)
-                // Scroll requests contain the indices in the URL. If the list of indices is too long, the request can
-                // fail. There is no way of executing a scroll search without having the list of indices in the URL,
-                // as of this writing. (ES 6.8/7.1)
-                .addIndex(affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices)
-                // For correlation need the oldest messages to come in first
-                .addSort(new Sort("timestamp", Sort.Sorting.ASC))
-                .allowNoIndices(false)
-                .ignoreUnavailable(false)
-                .setParameter(Parameters.SCROLL, scrollTime);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
-            LOG.debug("Execute search: {}", searchBuilder.build().toString());
-        }
-
-        final SearchResult result = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to scroll indices.");
-
-        final ScrollResult scrollResult = scrollResultFactory.create(result, searchSourceBuilder.toString(), scrollTime, Collections.emptyList());
-        final AtomicBoolean continueScrolling = new AtomicBoolean(true);
-
-        final Stopwatch stopwatch = Stopwatch.createStarted();
-        try {
-            ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
-            while (continueScrolling.get() && scrollChunk != null) {
-                final List<ResultMessage> messages = scrollChunk.getMessages();
-
-                LOG.debug("Passing <{}> messages to callback", messages.size());
-                resultCallback.call(Collections.unmodifiableList(messages), continueScrolling);
-
-                // Stop if the resultCallback told us to stop
-                if (!continueScrolling.get()) {
-                    break;
-                }
-
-                scrollChunk = scrollResult.nextChunk();
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } finally {
-            try {
-                // Tell Elasticsearch that we are done with the scroll so it can release resources as soon as possible
-                // instead of waiting for the scroll timeout to kick in.
-                scrollResult.cancel();
-            } catch (Exception ignored) {
-            }
-            LOG.debug("Scrolling done - took {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
-        }
+        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);
+        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);
     }
 
     public Set<Stream> loadStreams(Set<String> streamIds) {
