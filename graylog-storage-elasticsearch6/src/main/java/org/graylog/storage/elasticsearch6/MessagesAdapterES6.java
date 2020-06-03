@@ -9,8 +9,11 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
+import com.github.rholder.retry.WaitStrategy;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
@@ -26,6 +29,7 @@ import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
+import org.graylog2.indexer.messages.IndexBlockRetryAttempt;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -40,6 +44,7 @@ import javax.inject.Named;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -54,8 +59,24 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class MessagesAdapterES6 implements MessagesAdapter {
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
     private static final Logger LOG = LoggerFactory.getLogger(MessagesAdapterES6.class);
+
+    @VisibleForTesting
+    static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+
+    // the wait strategy uses powers of 2 to compute wait times.
+    // see https://github.com/rholder/guava-retrying/blob/177b6c9b9f3e7957f404f0bdb8e23374cb1de43f/src/main/java/com/github/rholder/retry/WaitStrategies.java#L304
+    // using 500 leads to the expected exponential pattern of 1000, 2000, 4000, 8000, ...
+    private static final int retrySecondsMultiplier = 500;
+
+    @VisibleForTesting
+    static final WaitStrategy exponentialWaitSeconds = WaitStrategies.exponentialWait(retrySecondsMultiplier, MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+
+    static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
+    static final String INDEX_BLOCK_REASON = "blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];";
+
     private final JestClient client;
-    private boolean useExpectContinue;
+    private final boolean useExpectContinue;
+
     private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
             .retryIfException(t -> t instanceof IOException)
             .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
@@ -73,7 +94,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
     private final Meter invalidTimestampMeter;
     private final ProcessingStatusRecorder processingStatusRecorder;
-
 
     @Inject
     public MessagesAdapterES6(JestClient client,
@@ -150,7 +170,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
                     .map(IndexingRequest::message)
                     .distinct()
                     .collect(Collectors.toMap(Message::getId, Function.identity()));
-            final List<String> failedMessageIds = new ArrayList<>(failedItems.size());
             final List<IndexFailure> indexFailures = new ArrayList<>(failedItems.size());
             for (BulkResult.BulkResultItem item : failedItems) {
                 LOG.warn("Failed to index message: index=<{}> id=<{}> error=<{}>", item.index, item.id, item.error);
@@ -166,8 +185,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
                         .build();
 
                 indexFailures.add(new IndexFailureImpl(doc));
-
-                failedMessageIds.add(item.id);
             }
             return indexFailures;
         } else {
@@ -196,32 +213,18 @@ public class MessagesAdapterES6 implements MessagesAdapter {
     }
 
 
-    private List<BulkResult.BulkResultItem> bulkIndexChunked(final List<IndexingRequest> messageList,
-                                                             Consumer<Long> successCallback,
-                                                             int offset,
-                                                             int chunkSize) throws EntityTooLargeException {
+    private List<BulkResult.BulkResultItem> bulkIndexChunked(final List<IndexingRequest> messageList, Consumer<Long> successCallback, int offset, int chunkSize) throws EntityTooLargeException {
         chunkSize = Math.min(messageList.size(), chunkSize);
 
         final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
-        final Iterable<List<IndexingRequest>> partition = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
-        int partitionCount = 1;
+        final Iterable<List<IndexingRequest>> chunks = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
+        int chunkCount = 1;
         int indexedSuccessfully = 0;
-        for (List<IndexingRequest> subMessageList: partition) {
-            Bulk.Builder bulk = new Bulk.Builder();
+        for (List<IndexingRequest> chunk : chunks) {
 
-            long messageSizes = 0;
-            for (IndexingRequest entry : subMessageList) {
-                final Message message = entry.message();
-                messageSizes += message.getSize();
+            long messageSizes = chunk.stream().mapToLong(m -> m.message().getSize()).sum();
 
-                bulk.addAction(new Index.Builder(message.toElasticSearchObject(invalidTimestampMeter))
-                        .index(entry.indexSet().getWriteIndexAlias())
-                        .type(IndexMapping.TYPE_MESSAGE)
-                        .id(message.getId())
-                        .build());
-            }
-
-            final BulkResult result = runBulkRequest(bulk.build(), subMessageList.size());
+            final BulkResult result = bulkIndexChunk(chunk);
 
             if (result.getResponseCode() == 413) {
                 throw new EntityTooLargeException(indexedSuccessfully, failedItems);
@@ -229,27 +232,100 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
             // TODO should we check result.isSucceeded()?
 
-            indexedSuccessfully += subMessageList.size();
-            failedItems.addAll(result.getFailedItems());
+            indexedSuccessfully += chunk.size();
 
             successCallback.accept(messageSizes);
 
+            final Set<BulkResult.BulkResultItem> remainingFailures = retryOnlyIndexBlockItemsForever(chunk, result.getFailedItems());
+
+            failedItems.addAll(remainingFailures);
             if (LOG.isDebugEnabled()) {
                 String chunkInfo = "";
                 if (chunkSize != messageList.size()) {
-                    chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", partitionCount,
-                            (int) Math.ceil((double)messageList.size() / chunkSize), offset);
+                    chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", chunkCount,
+                            (int) Math.ceil((double) messageList.size() / chunkSize), offset);
                 }
                 LOG.debug("Index: Bulk indexed {} messages{}, failures: {}",
                         result.getItems().size(), chunkInfo, failedItems.size());
             }
-            if (!result.getFailedItems().isEmpty()) {
+            if (!remainingFailures.isEmpty()) {
                 LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
-                        result.getFailedItems().size(), result.getErrorMessage());
+                        remainingFailures.size(), result.getErrorMessage());
             }
-            partitionCount++;
+            chunkCount++;
         }
         return failedItems;
+    }
+
+    private BulkResult bulkIndexChunk(List<IndexingRequest> chunk) {
+        final Bulk.Builder bulk = new Bulk.Builder();
+
+        for (IndexingRequest entry : chunk) {
+            final Message message = entry.message();
+
+            bulk.addAction(new Index.Builder(message.toElasticSearchObject(invalidTimestampMeter))
+                    .index(entry.indexSet().getWriteIndexAlias())
+                    .type(IndexMapping.TYPE_MESSAGE)
+                    .id(message.getId())
+                    .build());
+        }
+
+        return runBulkRequest(bulk.build(), chunk.size());
+    }
+
+    private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<IndexingRequest> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
+        Set<BulkResult.BulkResultItem> indexBlocks = indexBlocksFrom(allFailedItems);
+        final Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
+        List<IndexingRequest> blockedMessages = messagesForResultItems(chunk, indexBlocks);
+
+        if (!indexBlocks.isEmpty()) {
+            LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
+        }
+
+        long attempt = 1;
+
+        while (!indexBlocks.isEmpty()) {
+            waitBeforeRetrying(attempt++);
+
+            final BulkResult bulkResult = bulkIndexChunk(blockedMessages);
+
+            final List<BulkResult.BulkResultItem> failedItems = bulkResult.getFailedItems();
+
+            indexBlocks = indexBlocksFrom(failedItems);
+            blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
+
+            final Set<BulkResult.BulkResultItem> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
+            otherFailures.addAll(newOtherFailures);
+
+            if (indexBlocks.isEmpty()) {
+                LOG.info("Retries were successful after {} attempts. Ingestion will continue now.", attempt);
+            }
+        }
+
+        return otherFailures;
+    }
+
+    private void waitBeforeRetrying(long attempt) {
+        try {
+            final long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<IndexingRequest> messagesForResultItems(List<IndexingRequest> chunk, Set<BulkResult.BulkResultItem> indexBlocks) {
+        final Set<String> blockedMessageIds = indexBlocks.stream().map(item -> item.id).collect(Collectors.toSet());
+
+        return chunk.stream().filter(entry -> blockedMessageIds.contains(entry.message().getId())).collect(Collectors.toList());
+    }
+
+    private Set<BulkResult.BulkResultItem> indexBlocksFrom(List<BulkResult.BulkResultItem> allFailedItems) {
+        return allFailedItems.stream().filter(this::hasFailedDueToBlockedIndex).collect(Collectors.toSet());
+    }
+
+    private boolean hasFailedDueToBlockedIndex(BulkResult.BulkResultItem item) {
+        return item.errorType.equals(INDEX_BLOCK_ERROR) && item.errorReason.equals(INDEX_BLOCK_REASON);
     }
 
     private void recordTimestamp(List<IndexingRequest> messageList, Set<String> failedIds) {
