@@ -39,6 +39,7 @@ import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -47,7 +48,6 @@ import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -105,7 +105,7 @@ public class IndicesIT extends ElasticsearchBaseTest {
         indices = new Indices(jestClient(),
                 new ObjectMapperProvider().get(),
                 indexMappingFactory,
-                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
+                new Messages(new MetricRegistry(), mock(MessagesAdapter.class)),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus);
