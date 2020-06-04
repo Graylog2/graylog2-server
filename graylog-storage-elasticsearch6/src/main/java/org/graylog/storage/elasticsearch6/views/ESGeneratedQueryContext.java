@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch;
+package org.graylog.storage.elasticsearch6.views;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;

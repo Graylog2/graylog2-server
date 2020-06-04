@@ -17,7 +17,7 @@
 package org.graylog.plugins.views.search.export;
 
 import com.google.common.collect.ImmutableMultimap;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;

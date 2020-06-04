@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch.searchtypes;
+package org.graylog.storage.elasticsearch6.views.searchtypes;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.name.Named;
@@ -30,10 +30,10 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.indexer.results.ResultMessage;

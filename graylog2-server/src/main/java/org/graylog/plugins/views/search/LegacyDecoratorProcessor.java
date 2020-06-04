@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot;
+package org.graylog.plugins.views.search;
 
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorProcessor;

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets;
+package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets;
 
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.DateHistogramAggregation;
@@ -24,9 +24,9 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggre
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;

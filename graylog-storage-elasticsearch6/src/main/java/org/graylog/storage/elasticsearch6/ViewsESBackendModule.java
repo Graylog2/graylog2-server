@@ -18,32 +18,13 @@ package org.graylog.storage.elasticsearch6;
 
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import io.searchbox.core.search.aggregation.Aggregation;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESEventList;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESDateRangeHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESTimeHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESValuesHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESAverageHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESCardinalityHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESCountHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESMaxHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESMinHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESPercentilesHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESStdDevHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESSumHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESSumOfSquaresHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESVarianceHandler;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -62,10 +43,33 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch6.views.ElasticsearchBackend;
+import org.graylog.storage.elasticsearch6.views.searchtypes.ESEventList;
+import org.graylog.storage.elasticsearch6.views.searchtypes.ESMessageList;
+import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESDateRangeHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESTimeHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESValuesHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESAverageHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESCardinalityHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESCountHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESMaxHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESMinHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESPercentilesHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESStdDevHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESSumHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESSumOfSquaresHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESVarianceHandler;
 
 public class ViewsESBackendModule extends ViewsModule {
     @Override
     protected void configure() {
+        install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
+
         // Calling this once to set up binder, so injection does not fail.
         esQueryDecoratorBinder();
 

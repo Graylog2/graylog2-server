@@ -35,7 +35,6 @@ import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
-import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
 import org.graylog.plugins.views.search.export.DecoratingMessagesExporter;
@@ -173,7 +172,6 @@ public class ViewsBindings extends ViewsModule {
 
         install(new FactoryModuleBuilder().build(ViewRequirements.Factory.class));
         install(new FactoryModuleBuilder().build(SearchRequirements.Factory.class));
-        install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
 
         registerViewRequirement(RequiresParameterSupport.class);
         registerSearchRequirement(SearchRequiresParameterSupport.class);

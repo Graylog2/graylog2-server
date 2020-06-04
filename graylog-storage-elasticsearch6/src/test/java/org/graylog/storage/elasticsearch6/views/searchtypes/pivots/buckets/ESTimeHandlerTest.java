@@ -17,11 +17,11 @@
 package org.graylog.storage.elasticsearch6.views.searchtypes.pivots.buckets;
 
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESTimeHandler;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
