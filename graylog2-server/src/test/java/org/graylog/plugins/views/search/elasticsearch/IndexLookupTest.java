@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
-import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.database.Persisted;
