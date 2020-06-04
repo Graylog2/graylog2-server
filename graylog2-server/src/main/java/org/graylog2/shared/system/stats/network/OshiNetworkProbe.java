@@ -2,6 +2,7 @@ package org.graylog2.shared.system.stats.network;
 
 import org.graylog2.shared.system.stats.OshiService;
 import oshi.hardware.NetworkIF;
+import oshi.software.os.InternetProtocolStats;
 
 import javax.inject.Inject;
 import java.net.InetAddress;
@@ -37,39 +38,57 @@ public class OshiNetworkProbe implements NetworkProbe {
         localAddress = localAddress1;
         String primaryInterface = "";
 
+
         Map<String, NetworkStats.Interface> ifaces = new HashMap<>();
         for (NetworkIF it : service.getHal().getNetworkIFs()) {
-            for (InterfaceAddress that : it.getNetworkInterface().getInterfaceAddresses()) {
+            for (InterfaceAddress that : it.queryNetworkInterface().getInterfaceAddresses()) {
                 if (localAddress.equalsIgnoreCase(that.getAddress().getHostAddress())) {
                     primaryInterface = it.getName();
                     break;
                 }
             }
             NetworkStats.Interface anInterface = NetworkStats.Interface.create(
-                it.getName(),
-                it.getNetworkInterface().getInterfaceAddresses().stream().map(address -> address.getAddress().getHostAddress()).collect(Collectors.toSet()),
-                it.getMacaddr(),
-                ((long) it.getMTU()),
-                NetworkStats.InterfaceStats.create(
-                    it.getPacketsRecv(),
-                    it.getInErrors(),
-                    0,
-                    0,
-                    0,
-                    it.getPacketsSent(),
-                    it.getOutErrors(),
-                    0,
-                    0,
-                    0,
-                    0,
-                    it.getBytesRecv(),
-                    it.getBytesSent()
-                )
+                    it.getName(),
+                    it.queryNetworkInterface().getInterfaceAddresses().stream().map(address -> address.getAddress().getHostAddress()).collect(Collectors.toSet()),
+                    it.getMacaddr(),
+                    it.getMTU(),
+                    NetworkStats.InterfaceStats.create(
+                            it.getPacketsRecv(),
+                            it.getInErrors(),
+                            it.getInDrops(),
+                            -1,
+                            -1,
+                            it.getPacketsSent(),
+                            it.getOutErrors(),
+                            -1,
+                            -1,
+                            -1,
+                            it.getCollisions(),
+                            it.getBytesRecv(),
+                            it.getBytesSent()
+                    )
 
             );
             ifaces.putIfAbsent(anInterface.name(), anInterface);
         }
 
-        return NetworkStats.create(primaryInterface, ifaces, null);
+        final InternetProtocolStats stats = service.getOs().getInternetProtocolStats();
+        final InternetProtocolStats.TcpStats ipv4Stats = stats.getTCPv4Stats();
+        final InternetProtocolStats.TcpStats ipv6Stats = stats.getTCPv6Stats();
+
+        final NetworkStats.TcpStats tcpStats = NetworkStats.TcpStats.create(
+                ipv4Stats.getConnectionsActive() + ipv6Stats.getConnectionsActive(),
+                ipv4Stats.getConnectionsPassive() + ipv6Stats.getConnectionsPassive(),
+                ipv4Stats.getConnectionFailures() + ipv6Stats.getConnectionFailures(),
+                ipv4Stats.getConnectionsReset() + ipv6Stats.getConnectionsReset(),
+                ipv4Stats.getConnectionsEstablished() + ipv6Stats.getConnectionsEstablished(),
+                ipv4Stats.getSegmentsReceived() + ipv6Stats.getSegmentsReceived(),
+                ipv4Stats.getSegmentsSent() + ipv6Stats.getSegmentsSent(),
+                ipv4Stats.getSegmentsRetransmitted() + ipv6Stats.getSegmentsRetransmitted(),
+                ipv4Stats.getInErrors() + ipv6Stats.getInErrors(),
+                ipv4Stats.getOutResets() + ipv6Stats.getOutResets()
+        );
+
+        return NetworkStats.create(primaryInterface, ifaces, tcpStats);
     }
 }

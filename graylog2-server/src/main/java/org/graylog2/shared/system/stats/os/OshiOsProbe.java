@@ -5,6 +5,7 @@ import oshi.hardware.CentralProcessor;
 import oshi.hardware.CentralProcessor.TickType;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
+import oshi.hardware.VirtualMemory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -35,7 +36,9 @@ public class OshiOsProbe implements OsProbe {
             globalMemory.getAvailable(),
             globalMemory.getTotal() - globalMemory.getAvailable());
 
-        final Swap swap = Swap.create(globalMemory.getSwapTotal(), globalMemory.getSwapTotal() - globalMemory.getSwapUsed(), globalMemory.getSwapUsed());
+        final VirtualMemory virtualMemory = globalMemory.getVirtualMemory();
+
+        final Swap swap = Swap.create(virtualMemory.getSwapTotal(),  virtualMemory.getSwapTotal() - virtualMemory.getSwapUsed(), virtualMemory.getSwapUsed());
 
         final CentralProcessor centralProcessor = hardware.getProcessor();
 
@@ -46,10 +49,27 @@ public class OshiOsProbe implements OsProbe {
         short idle = (short) (ticks[TickType.IDLE.getIndex()] - prevTicks[TickType.IDLE.getIndex()]);
         short steal = (short) (ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()]);
 
+        final CentralProcessor.ProcessorIdentifier processorIdentifier = centralProcessor.getProcessorIdentifier();
 
-        final Processor proc = Processor.create(centralProcessor.getModel(), centralProcessor.getVendor(), ((int) centralProcessor.getVendorFreq()), centralProcessor.getLogicalProcessorCount(), centralProcessor.getPhysicalPackageCount(), centralProcessor.getLogicalProcessorCount() / centralProcessor.getPhysicalPackageCount(), -1, sys, user, idle, steal);
+        final Processor proc = Processor.create(
+                processorIdentifier.getModel(),
+                processorIdentifier.getVendor(),
+                ((int) processorIdentifier.getVendorFreq()/1000),
+                centralProcessor.getLogicalProcessorCount(),
+                centralProcessor.getPhysicalPackageCount(),
+                centralProcessor.getLogicalProcessorCount() / centralProcessor.getPhysicalPackageCount(),
+                -1,
+                sys,
+                user,
+                idle,
+                steal);
 
 
-        return OsStats.create(centralProcessor.getSystemLoadAverage(3), centralProcessor.getSystemUptime(), proc, mem, swap);
+        return OsStats.create(
+                centralProcessor.getSystemLoadAverage(3),
+                service.getOs().getSystemUptime(),
+                proc,
+                mem,
+                swap);
     }
 }

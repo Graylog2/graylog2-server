@@ -71,11 +71,8 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter("message_recordings_enable")
     private boolean messageRecordingsEnable = false;
 
-    @Parameter("disable_sigar")
-    private boolean disableSigar = false;
-
-    @Parameter("enable_oshi")
-    private boolean enableOshi = false;
+    @Parameter("disable_oshi")
+    private boolean disableOshi = false;
 
     @Parameter(value = "http_proxy_uri")
     private URI httpProxyUri;
@@ -165,12 +162,8 @@ public abstract class BaseConfiguration extends PathConfiguration {
         return messageRecordingsEnable;
     }
 
-    public boolean isDisableSigar() {
-        return disableSigar;
-    }
-
-    public boolean isEnableOshi() {
-        return enableOshi;
+    public boolean isDisableOshi() {
+        return disableOshi;
     }
 
     public URI getHttpProxyUri() {

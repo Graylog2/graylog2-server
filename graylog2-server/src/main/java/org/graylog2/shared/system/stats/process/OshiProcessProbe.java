@@ -20,9 +20,6 @@ public class OshiProcessProbe implements ProcessProbe {
 
     @Override
     public ProcessStats processStats() {
-
-        final HardwareAbstractionLayer hardware = service.getHal();
-
         final OperatingSystem os = service.getOs();
 
         final FileSystem fs = os.getFileSystem();
@@ -31,7 +28,7 @@ public class OshiProcessProbe implements ProcessProbe {
 
         final OSProcess proc = os.getProcess(os.getProcessId());
 
-        final ProcessStats.Cpu cpu = ProcessStats.Cpu.create(((short) proc.calculateCpuPercent()), proc.getKernelTime(), proc.getUserTime(), proc.getUpTime());
+        final ProcessStats.Cpu cpu = ProcessStats.Cpu.create(((short) proc.getProcessCpuLoadCumulative()), proc.getKernelTime(), proc.getUserTime(), proc.getUpTime());
 
         final ProcessStats.Memory mem = ProcessStats.Memory.create(proc.getVirtualSize(), proc.getResidentSetSize(), -1);
 

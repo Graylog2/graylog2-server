@@ -78,7 +78,6 @@ RUN \
     ${GRAYLOG_HOME}/log \
     ${GRAYLOG_HOME}/plugin
 
-COPY sigar ${GRAYLOG_HOME}/lib/sigar
 COPY docker-entrypoint.sh /
 COPY graylog.conf ${GRAYLOG_HOME}/data/config
 COPY log4j2.xml ${GRAYLOG_HOME}/data/config
