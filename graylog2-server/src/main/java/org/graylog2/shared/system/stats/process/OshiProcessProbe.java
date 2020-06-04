@@ -17,8 +17,6 @@
 package org.graylog2.shared.system.stats.process;
 
 import org.graylog2.shared.system.stats.OshiService;
-import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
 import oshi.software.os.FileSystem;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;

@@ -44,17 +44,17 @@ public class OshiOsProbe implements OsProbe {
         final GlobalMemory globalMemory = hardware.getMemory();
 
         final Memory mem = Memory.create(
-            globalMemory.getTotal(),
-            globalMemory.getAvailable(),
-            (short) (globalMemory.getAvailable() * 100 / globalMemory.getTotal()),
-            globalMemory.getTotal() - globalMemory.getAvailable(),
-            (short) ((globalMemory.getTotal() - globalMemory.getAvailable()) * 100 / globalMemory.getTotal()),
-            globalMemory.getAvailable(),
-            globalMemory.getTotal() - globalMemory.getAvailable());
+                globalMemory.getTotal(),
+                globalMemory.getAvailable(),
+                (short) (globalMemory.getAvailable() * 100 / globalMemory.getTotal()),
+                globalMemory.getTotal() - globalMemory.getAvailable(),
+                (short) ((globalMemory.getTotal() - globalMemory.getAvailable()) * 100 / globalMemory.getTotal()),
+                globalMemory.getAvailable(),
+                globalMemory.getTotal() - globalMemory.getAvailable());
 
         final VirtualMemory virtualMemory = globalMemory.getVirtualMemory();
 
-        final Swap swap = Swap.create(virtualMemory.getSwapTotal(),  virtualMemory.getSwapTotal() - virtualMemory.getSwapUsed(), virtualMemory.getSwapUsed());
+        final Swap swap = Swap.create(virtualMemory.getSwapTotal(), virtualMemory.getSwapTotal() - virtualMemory.getSwapUsed(), virtualMemory.getSwapUsed());
 
         final CentralProcessor centralProcessor = hardware.getProcessor();
 
@@ -70,7 +70,7 @@ public class OshiOsProbe implements OsProbe {
         final Processor proc = Processor.create(
                 processorIdentifier.getModel(),
                 processorIdentifier.getVendor(),
-                ((int) processorIdentifier.getVendorFreq()/1000),
+                ((int) processorIdentifier.getVendorFreq() / 1000),
                 centralProcessor.getLogicalProcessorCount(),
                 centralProcessor.getPhysicalPackageCount(),
                 centralProcessor.getLogicalProcessorCount() / centralProcessor.getPhysicalPackageCount(),
