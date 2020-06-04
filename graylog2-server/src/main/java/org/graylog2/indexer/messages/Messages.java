@@ -84,13 +84,23 @@ public class Messages {
                 .map(entry -> IndexingRequest.create(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        final Consumer<Long> successCallback = isSystemTraffic
-                ? systemTrafficCounter::inc
-                : outputByteCounter::inc;
-        final List<IndexFailure> indexFailures = messagesAdapter.bulkIndex(indexingRequestList, successCallback);
+        final List<IndexFailure> indexFailures = messagesAdapter.bulkIndex(indexingRequestList);
 
         final Set<String> failedIds = indexFailures.stream().map(IndexFailure::letterId).collect(Collectors.toSet());
         recordTimestamp(indexingRequestList, failedIds);
+
+        final long totalSizeOfIndexedMessages = indexingRequestList.stream()
+                .map(IndexingRequest::message)
+                .filter(message -> message.getId() != null)
+                .filter(message -> !failedIds.contains(message.getId()))
+                .mapToLong(Message::getSize)
+                .sum();
+
+        if (isSystemTraffic) {
+            systemTrafficCounter.inc(totalSizeOfIndexedMessages);
+        } else {
+            outputByteCounter.inc(totalSizeOfIndexedMessages);
+        }
 
         return propagateFailure(indexFailures);
     }

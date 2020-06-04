@@ -61,7 +61,7 @@ class MessagesAdapterES6Test {
 
     @Test
     public void bulkIndexingShouldNotDoAnythingForEmptyList() throws Exception {
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(Collections.emptyList(), (successes) -> {});
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(Collections.emptyList());
 
         assertThat(result).isNotNull()
                 .isEmpty();
@@ -98,7 +98,7 @@ class MessagesAdapterES6Test {
 
         final List<IndexingRequest> messageList = messageListWith(mockedMessage);
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messageList, (successes) -> {});
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(messageList);
 
         assertThat(result).hasSize(1);
 
@@ -117,7 +117,7 @@ class MessagesAdapterES6Test {
 
         final List<IndexingRequest> messageList = messageListWith(mock(Message.class));
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messageList, (successes) -> {});
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(messageList);
 
         assertThat(result).isNotNull().isEmpty();
 
@@ -137,7 +137,7 @@ class MessagesAdapterES6Test {
                 .thenReturn(errorResult)
                 .thenReturn(successResult);
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id"), (successes) -> {});
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id"));
 
         verify(jestClient, times(2)).execute(any());
         assertThat(result).isNotNull().isEmpty();
@@ -156,7 +156,7 @@ class MessagesAdapterES6Test {
                 .thenReturn(errorResult)
                 .thenReturn(successResult);
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"), (successes) -> {});
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
         verify(jestClient, times(2)).execute(any());
         assertThat(result).extracting(IndexFailure::letterId).containsOnly("other-error-id");
@@ -177,7 +177,7 @@ class MessagesAdapterES6Test {
                 .thenReturn(errorResult)
                 .thenReturn(secondErrorResult);
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"), (successes) -> {});
+        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
         verify(jestClient, times(2)).execute(any());
         assertThat(result).extracting(IndexFailure::letterId).containsOnly("other-error-id");

@@ -54,6 +54,6 @@ public class MockedMessagesTest {
         assertThat(result).isNotNull()
                 .isEmpty();
 
-        verify(messagesAdapter, never()).bulkIndex(any(), any());
+        verify(messagesAdapter, never()).bulkIndex(any());
     }
 }

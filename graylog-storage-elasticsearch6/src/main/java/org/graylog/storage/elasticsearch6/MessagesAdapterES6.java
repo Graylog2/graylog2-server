@@ -50,7 +50,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -134,8 +133,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
     }
 
     @Override
-    public List<IndexFailure> bulkIndex(List<IndexingRequest> messageList,
-                                  Consumer<Long> successCallback) {
+    public List<IndexFailure> bulkIndex(List<IndexingRequest> messageList) {
         if (messageList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -145,7 +143,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
         for (;;) {
             try {
-                final List<BulkResult.BulkResultItem> failures = bulkIndexChunked(messageList, successCallback, offset, chunkSize);
+                final List<BulkResult.BulkResultItem> failures = bulkIndexChunked(messageList, offset, chunkSize);
                 failedItems.addAll(failures);
                 break; // on success
             } catch (EntityTooLargeException e) {
@@ -210,7 +208,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
     }
 
 
-    private List<BulkResult.BulkResultItem> bulkIndexChunked(final List<IndexingRequest> messageList, Consumer<Long> successCallback, int offset, int chunkSize) throws EntityTooLargeException {
+    private List<BulkResult.BulkResultItem> bulkIndexChunked(final List<IndexingRequest> messageList, int offset, int chunkSize) throws EntityTooLargeException {
         chunkSize = Math.min(messageList.size(), chunkSize);
 
         final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
@@ -218,9 +216,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         int chunkCount = 1;
         int indexedSuccessfully = 0;
         for (List<IndexingRequest> chunk : chunks) {
-
-            long messageSizes = chunk.stream().mapToLong(m -> m.message().getSize()).sum();
-
             final BulkResult result = bulkIndexChunk(chunk);
 
             if (result.getResponseCode() == 413) {
@@ -230,8 +225,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             // TODO should we check result.isSucceeded()?
 
             indexedSuccessfully += chunk.size();
-
-            successCallback.accept(messageSizes);
 
             final Set<BulkResult.BulkResultItem> remainingFailures = retryOnlyIndexBlockItemsForever(chunk, result.getFailedItems());
 
