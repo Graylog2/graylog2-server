@@ -35,7 +35,6 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
-import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,16 +91,14 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             .build();
 
     private final Meter invalidTimestampMeter;
-    private final ProcessingStatusRecorder processingStatusRecorder;
 
     @Inject
     public MessagesAdapterES6(JestClient client,
                               @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
-                              MetricRegistry metricRegistry, ProcessingStatusRecorder processingStatusRecorder) {
+                              MetricRegistry metricRegistry) {
         this.client = client;
         this.useExpectContinue = useExpectContinue;
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
-        this.processingStatusRecorder = processingStatusRecorder;
     }
 
     @Override
@@ -325,18 +322,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
     private boolean hasFailedDueToBlockedIndex(BulkResult.BulkResultItem item) {
         return item.errorType.equals(INDEX_BLOCK_ERROR) && item.errorReason.equals(INDEX_BLOCK_REASON);
-    }
-
-    private void recordTimestamp(List<IndexingRequest> messageList, Set<String> failedIds) {
-        for (final IndexingRequest entry : messageList) {
-            final Message message = entry.message();
-
-            if (failedIds.contains(message.getId())) {
-                continue;
-            }
-
-            processingStatusRecorder.updatePostIndexingReceiveTime(message.getReceiveTime());
-        }
     }
 
     private static class EntityTooLargeException extends Exception {
