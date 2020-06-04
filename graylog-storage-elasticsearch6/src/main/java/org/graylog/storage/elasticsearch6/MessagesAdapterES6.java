@@ -160,32 +160,43 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             }
         }
 
+        return indexFailuresFromMessages(failedItems, messageList);
+    }
 
-        if (!failedItems.isEmpty()) {
-            final Map<String, Message> messageMap = messageList.stream()
-                    .map(IndexingRequest::message)
-                    .distinct()
-                    .collect(Collectors.toMap(Message::getId, Function.identity()));
-            final List<IndexFailure> indexFailures = new ArrayList<>(failedItems.size());
-            for (BulkResult.BulkResultItem item : failedItems) {
-                LOG.warn("Failed to index message: index=<{}> id=<{}> error=<{}>", item.index, item.id, item.error);
-
-                // Write failure to index_failures.
-                final Message messageEntry = messageMap.get(item.id);
-                final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                        .put("letter_id", item.id)
-                        .put("index", item.index)
-                        .put("type", item.type)
-                        .put("message", item.error)
-                        .put("timestamp", messageEntry.getTimestamp())
-                        .build();
-
-                indexFailures.add(new IndexFailureImpl(doc));
-            }
-            return indexFailures;
-        } else {
+    private List<IndexFailure> indexFailuresFromMessages(List<BulkResult.BulkResultItem> failedItems, List<IndexingRequest> messageList) {
+        if (failedItems.isEmpty()) {
             return Collections.emptyList();
         }
+
+        final Map<String, Message> messageMap = messageList.stream()
+                .map(IndexingRequest::message)
+                .distinct()
+                .collect(Collectors.toMap(Message::getId, Function.identity()));
+        final List<IndexFailure> indexFailures = new ArrayList<>(failedItems.size());
+        for (BulkResult.BulkResultItem item : failedItems) {
+            LOG.warn("Failed to index message: index=<{}> id=<{}> error=<{}>", item.index, item.id, item.error);
+
+            // Write failure to index_failures.
+            final Message messageEntry = messageMap.get(item.id);
+
+            final IndexFailure indexFailure = indexFailureFromResultItem(item, messageEntry);
+
+            indexFailures.add(indexFailure);
+        }
+
+        return indexFailures;
+    }
+
+    private IndexFailure indexFailureFromResultItem(BulkResult.BulkResultItem item, Message messageEntry) {
+        final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
+                .put("letter_id", item.id)
+                .put("index", item.index)
+                .put("type", item.type)
+                .put("message", item.error)
+                .put("timestamp", messageEntry.getTimestamp())
+                .build();
+
+        return new IndexFailureImpl(doc);
     }
 
     private BulkResult runBulkRequest(final Bulk request, int count) {

@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -87,12 +86,19 @@ public class Messages {
         final List<IndexFailure> indexFailures = messagesAdapter.bulkIndex(indexingRequestList);
 
         final Set<String> failedIds = indexFailures.stream().map(IndexFailure::letterId).collect(Collectors.toSet());
-        recordTimestamp(indexingRequestList, failedIds);
+        final List<IndexingRequest> successfullRequests = indexingRequestList.stream()
+                .filter(indexingRequest -> !failedIds.contains(indexingRequest.message().getId()))
+                .collect(Collectors.toList());
 
-        final long totalSizeOfIndexedMessages = indexingRequestList.stream()
+        recordTimestamp(successfullRequests);
+        accountTotalMessageSizes(successfullRequests, isSystemTraffic);
+
+        return propagateFailure(indexFailures);
+    }
+
+    private void accountTotalMessageSizes(List<IndexingRequest> successfullRequests, boolean isSystemTraffic) {
+        final long totalSizeOfIndexedMessages = successfullRequests.stream()
                 .map(IndexingRequest::message)
-                .filter(message -> message.getId() != null)
-                .filter(message -> !failedIds.contains(message.getId()))
                 .mapToLong(Message::getSize)
                 .sum();
 
@@ -101,17 +107,11 @@ public class Messages {
         } else {
             outputByteCounter.inc(totalSizeOfIndexedMessages);
         }
-
-        return propagateFailure(indexFailures);
     }
 
-    private void recordTimestamp(List<IndexingRequest> messageList, Set<String> failedIds) {
+    private void recordTimestamp(List<IndexingRequest> messageList) {
         for (final IndexingRequest entry : messageList) {
             final Message message = entry.message();
-
-            if (failedIds.contains(message.getId())) {
-                continue;
-            }
 
             processingStatusRecorder.updatePostIndexingReceiveTime(message.getReceiveTime());
         }
