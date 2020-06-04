@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch.searchtypes;
+package org.graylog.storage.elasticsearch6.views.searchtypes;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.engine.ESQueryDecorator;
 import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;

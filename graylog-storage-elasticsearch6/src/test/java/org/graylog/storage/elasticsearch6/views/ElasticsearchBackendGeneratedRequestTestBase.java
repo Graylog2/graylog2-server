@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch;
+package org.graylog.storage.elasticsearch6.views;
 
 import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.http.JestHttpClient;
@@ -25,6 +25,12 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
+import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchBackend;
+import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
+import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;

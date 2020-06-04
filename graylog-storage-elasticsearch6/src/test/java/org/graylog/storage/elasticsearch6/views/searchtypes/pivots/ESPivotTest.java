@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot;
+package org.graylog.storage.elasticsearch6.views.searchtypes.pivots;
 
 import com.google.common.collect.ImmutableList;
 import com.jayway.jsonpath.DocumentContext;
@@ -33,6 +33,9 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESValuesHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESCountHandler;

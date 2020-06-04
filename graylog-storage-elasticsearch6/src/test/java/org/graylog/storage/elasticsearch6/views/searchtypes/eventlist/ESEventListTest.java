@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch.searchtypes.eventlist;
+package org.graylog.storage.elasticsearch6.views.searchtypes.eventlist;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

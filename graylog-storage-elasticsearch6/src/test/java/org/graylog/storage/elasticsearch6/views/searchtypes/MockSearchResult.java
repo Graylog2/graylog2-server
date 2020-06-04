@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch.searchtypes;
+package org.graylog.storage.elasticsearch6.views.searchtypes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.core.SearchResult;

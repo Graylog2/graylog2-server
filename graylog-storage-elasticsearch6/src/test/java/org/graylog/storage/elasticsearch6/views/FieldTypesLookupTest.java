@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch;
+package org.graylog.storage.elasticsearch6.views;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;

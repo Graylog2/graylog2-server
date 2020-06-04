@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets;
+package org.graylog.storage.elasticsearch6.views.searchtypes.pivots.buckets;
 
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
