@@ -28,7 +28,7 @@ class WidgetHorizontalStretch extends React.Component {
     const icon = stretched ? 'compress' : 'arrows-h';
     const title = stretched ? 'Compress width' : 'Stretch width';
     return (
-      <IconButton tabIndex={0} onClick={this._onClick} name={icon} title={title} />
+      <IconButton onClick={this._onClick} name={icon} title={title} />
     );
   }
 }
