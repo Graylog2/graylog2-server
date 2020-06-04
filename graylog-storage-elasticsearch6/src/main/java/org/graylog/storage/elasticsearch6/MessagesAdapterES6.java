@@ -142,10 +142,11 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
         int chunkSize = messageList.size();
         int offset = 0;
-        List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
+        final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
         for (;;) {
             try {
-                failedItems.addAll(bulkIndexChunked(messageList, successCallback, offset, chunkSize));
+                final List<BulkResult.BulkResultItem> failures = bulkIndexChunked(messageList, successCallback, offset, chunkSize);
+                failedItems.addAll(failures);
                 break; // on success
             } catch (EntityTooLargeException e) {
                 LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
