@@ -72,3 +72,14 @@ exports[`CustomHighlighting renders value as is when no rules exist 1`] = `
   42
 </PossiblyHighlight>
 `;
+
+exports[`CustomHighlighting renders value when HighlightingRulesContext is not provided 1`] = `
+<PossiblyHighlight
+  color="#ffec3d"
+  field="foo"
+  highlightRanges={Object {}}
+  value={42}
+>
+  42
+</PossiblyHighlight>
+`;
