@@ -163,9 +163,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
 
         if (!failedItems.isEmpty()) {
-            final Set<String> failedIds = failedItems.stream().map(item -> item.id).collect(Collectors.toSet());
-            recordTimestamp(messageList, failedIds);
-
             final Map<String, Message> messageMap = messageList.stream()
                     .map(IndexingRequest::message)
                     .distinct()
@@ -188,7 +185,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             }
             return indexFailures;
         } else {
-            recordTimestamp(messageList, Collections.emptySet());
             return Collections.emptyList();
         }
     }
@@ -340,7 +336,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         }
     }
 
-    private class EntityTooLargeException extends Exception {
+    private static class EntityTooLargeException extends Exception {
         private final int indexedSuccessfully;
         private final List<BulkResult.BulkResultItem> failedItems;
 

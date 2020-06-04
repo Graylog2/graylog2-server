@@ -25,6 +25,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -47,13 +49,15 @@ public class Messages {
     private final Counter outputByteCounter;
     private final Counter systemTrafficCounter;
     private final MessagesAdapter messagesAdapter;
+    private final ProcessingStatusRecorder processingStatusRecorder;
 
     @Inject
     public Messages(MetricRegistry metricRegistry,
-                    MessagesAdapter messagesAdapter) {
+                    MessagesAdapter messagesAdapter, ProcessingStatusRecorder processingStatusRecorder) {
         outputByteCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         systemTrafficCounter = metricRegistry.counter(GlobalMetricNames.SYSTEM_OUTPUT_TRAFFIC);
         this.messagesAdapter = messagesAdapter;
+        this.processingStatusRecorder = processingStatusRecorder;
 
         // TODO: Magic number
         this.indexFailureQueue = new LinkedBlockingQueue<>(1000);
@@ -85,7 +89,22 @@ public class Messages {
                 : outputByteCounter::inc;
         final List<IndexFailure> indexFailures = messagesAdapter.bulkIndex(indexingRequestList, successCallback);
 
+        final Set<String> failedIds = indexFailures.stream().map(IndexFailure::letterId).collect(Collectors.toSet());
+        recordTimestamp(indexingRequestList, failedIds);
+
         return propagateFailure(indexFailures);
+    }
+
+    private void recordTimestamp(List<IndexingRequest> messageList, Set<String> failedIds) {
+        for (final IndexingRequest entry : messageList) {
+            final Message message = entry.message();
+
+            if (failedIds.contains(message.getId())) {
+                continue;
+            }
+
+            processingStatusRecorder.updatePostIndexingReceiveTime(message.getReceiveTime());
+        }
     }
 
     private List<String> propagateFailure(List<IndexFailure> indexFailures) {

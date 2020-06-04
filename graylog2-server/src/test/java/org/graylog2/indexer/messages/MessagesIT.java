@@ -34,6 +34,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.Message;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -49,6 +50,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public abstract class MessagesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "messages_it_deflector";
@@ -85,7 +87,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().waitForGreenStatus(INDEX_NAME);
         count = new Count.Builder().addIndex(INDEX_NAME).build();
         final MetricRegistry metricRegistry = new MetricRegistry();
-        messages = new Messages(metricRegistry, createMessagesAdapter(metricRegistry));
+        messages = new Messages(metricRegistry, createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class));
     }
 
     @After

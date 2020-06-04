@@ -17,8 +17,7 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.searchbox.core.BulkResult;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +30,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -44,7 +44,7 @@ public class MockedMessagesTest {
 
     @Before
     public void setUp() throws Exception {
-        this.messages = new Messages(new MetricRegistry(), messagesAdapter);
+        this.messages = new Messages(new MetricRegistry(), messagesAdapter, mock(ProcessingStatusRecorder.class));
     }
 
     @Test
