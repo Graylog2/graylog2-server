@@ -43,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 // JSON data in: src/test/resources/org/graylog2/indexer/fieldtypes/IndexFieldTypePollerIT.json
-public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
+public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
 
     private IndexFieldTypePoller poller;
@@ -67,6 +67,8 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
             .build();
     private TestIndexSet indexSet;
 
+    protected abstract IndicesAdapter createIndicesAdapter();
+
     @Before
     public void setUp() throws Exception {
         final Indices indices = new Indices(
@@ -74,12 +76,12 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus("index-field-type-poller-it"),
-                mock(IndicesAdapter.class)
+                createIndicesAdapter()
         );
         poller = new IndexFieldTypePoller(jestClient(), indices, new MetricRegistry());
         indexSet = new TestIndexSet(indexSetConfig);
 
-        importFixture("IndexFieldTypePollerIT.json");
+        importFixture("org/graylog2/indexer/fieldtypes/IndexFieldTypePollerIT.json");
     }
 
     @Test
