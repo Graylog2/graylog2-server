@@ -167,7 +167,7 @@ public class Messages {
         int chunkSize = messageList.size();
         int offset = 0;
         List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
-        for (; ; ) {
+        for (;;) {
             try {
                 List<BulkResult.BulkResultItem> failures = bulkIndexChunked(messageList, isSystemTraffic, offset, chunkSize);
                 failedItems.addAll(failures);
@@ -264,7 +264,9 @@ public class Messages {
         final Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
         List<Map.Entry<IndexSet, Message>> blockedMessages = messagesForResultItems(chunk, indexBlocks);
 
-        LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
+        if (!indexBlocks.isEmpty()) {
+            LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
+        }
 
         long attempt = 1;
 
