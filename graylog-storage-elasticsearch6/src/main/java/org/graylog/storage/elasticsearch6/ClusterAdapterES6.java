@@ -40,7 +40,7 @@ public class ClusterAdapterES6 implements ClusterAdapter {
 
     @Inject
     public ClusterAdapterES6(JestClient jestClient,
-                             @Named("elasticsearch_request_timeout") Duration requestTimeout) {
+                             @Named("elasticsearch_socket_timeout") Duration requestTimeout) {
         this.jestClient = jestClient;
         this.requestTimeout = requestTimeout;
     }
