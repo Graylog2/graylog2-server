@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { fireEvent, render } from 'wrappedTestingLibrary';
+import { fireEvent, render, cleanup } from 'wrappedTestingLibrary';
 import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
 
 describe('HTTPJSONPathAdapterFieldSet', () => {
@@ -11,6 +11,8 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
     multi_value_jsonpath: 'bar.foo',
     user_agent: 'smith',
   };
+
+  afterEach(cleanup);
 
   it('should render the field set', () => {
     const { container } = render(
