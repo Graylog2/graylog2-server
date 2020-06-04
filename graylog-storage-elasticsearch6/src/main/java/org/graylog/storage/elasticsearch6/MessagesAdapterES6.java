@@ -113,8 +113,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             throw new DocumentNotFoundException(index, messageId);
         }
 
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> message = (Map<String, Object>) result.getSourceAsObject(Map.class, false);
+        @SuppressWarnings("unchecked") final Map<String, Object> message = (Map<String, Object>) result.getSourceAsObject(Map.class, false);
 
         return ResultMessage.parseFromSource(result.getId(), result.getIndex(), message);
     }
@@ -124,10 +123,9 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         final Analyze analyze = new Analyze.Builder().index(index).analyzer(analyzer).text(toAnalyze).build();
         final JestResult result = client.execute(analyze);
 
-        @SuppressWarnings("unchecked")
-        final List<Map<String, Object>> tokens = (List<Map<String, Object>>) result.getValue("tokens");
+        @SuppressWarnings("unchecked") final List<Map<String, Object>> tokens = (List<Map<String, Object>>) result.getValue("tokens");
         final List<String> terms = new ArrayList<>(tokens.size());
-        tokens.forEach(token -> terms.add((String)token.get("token")));
+        tokens.forEach(token -> terms.add((String) token.get("token")));
 
         return terms;
     }
