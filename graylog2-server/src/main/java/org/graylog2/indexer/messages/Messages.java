@@ -167,7 +167,7 @@ public class Messages {
         int chunkSize = messageList.size();
         int offset = 0;
         List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
-        for (; ; ) {
+        for (;;) {
             try {
                 List<BulkResult.BulkResultItem> failures = bulkIndexChunked(messageList, isSystemTraffic, offset, chunkSize);
                 failedItems.addAll(failures);
