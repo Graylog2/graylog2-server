@@ -17,13 +17,13 @@
 package org.graylog.plugins.views.search.export.es;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
 import io.searchbox.core.Search;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 

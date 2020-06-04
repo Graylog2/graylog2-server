@@ -17,19 +17,19 @@
 package org.graylog.plugins.views.search.export.es;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.jayway.jsonpath.JsonPath;
 import io.searchbox.action.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import net.minidev.json.JSONArray;
-import org.elasticsearch.common.util.set.Sets;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.util.List;
