@@ -54,6 +54,8 @@ public class OshiFsProbe implements FsProbe {
                 configuration.getPluginDir(),
                 kafkaJournalConfiguration.getMessageJournalDir()
         );
+
+        init();
     }
 
     private void init() {
