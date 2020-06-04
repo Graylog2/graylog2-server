@@ -32,7 +32,6 @@ import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
-import org.graylog.plugins.views.ESBackendModule;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.scheduler.JobSchedulerConfiguration;
@@ -157,7 +156,6 @@ public class Server extends ServerBootstrap {
                 new SidecarModule(),
                 new ContentPacksModule(),
                 new ViewsBindings(),
-                new ESBackendModule(),
                 new JobSchedulerModule(),
                 new EventsModule(),
                 new FreeEnterpriseModule()

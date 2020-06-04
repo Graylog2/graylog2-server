@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views;
+package org.graylog.storage.elasticsearch6;
 
 import com.google.inject.Scopes;
+import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESEventList;
@@ -52,7 +53,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 
-public class ESBackendModule extends ViewsModule {
+public class ViewsESBackendModule extends ViewsModule {
     @Override
     protected void configure() {
         // Calling this once to set up binder, so injection does not fail.
