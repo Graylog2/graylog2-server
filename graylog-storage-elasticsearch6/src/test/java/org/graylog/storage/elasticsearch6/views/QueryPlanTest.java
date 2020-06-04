@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.engine;
+package org.graylog.storage.elasticsearch6.views;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +30,8 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
+import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.QueryPlan;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
