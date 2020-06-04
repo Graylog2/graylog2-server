@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards;
 
+import com.google.common.collect.Sets;
 import org.bson.Document;
-import org.elasticsearch.common.util.set.Sets;
 
 import java.util.Collection;
 import java.util.Collections;

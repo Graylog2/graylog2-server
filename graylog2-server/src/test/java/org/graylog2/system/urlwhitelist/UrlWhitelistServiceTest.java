@@ -16,11 +16,11 @@
  */
 package org.graylog2.system.urlwhitelist;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
 
