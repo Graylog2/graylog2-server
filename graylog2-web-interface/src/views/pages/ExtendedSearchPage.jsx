@@ -17,7 +17,6 @@ import type {
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
 
-import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -71,13 +70,14 @@ const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
 
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
   (props) => ({
+
     ...props,
     queryId: props.viewMetadata.activeQuery,
     results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
   }));
-
 const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
   (props) => ({
+
     ...props,
     allFields: props.fieldTypes.all,
     fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
@@ -161,36 +161,34 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       <InteractiveContext.Consumer>
         {(interactive) => (
           <ViewAdditionalContextProvider>
-            <HighlightingRulesProvider>
-              <GridContainer id="main-row" interactive={interactive}>
+            <GridContainer id="main-row" interactive={interactive}>
+              <IfInteractive>
+                <ConnectedSideBar>
+                  <ConnectedFieldList />
+                </ConnectedSideBar>
+              </IfInteractive>
+              <SearchArea>
                 <IfInteractive>
-                  <ConnectedSideBar>
-                    <ConnectedFieldList />
-                  </ConnectedSideBar>
+                  <HeaderElements />
+                  <IfDashboard>
+                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                  </IfDashboard>
+                  <IfSearch>
+                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                  </IfSearch>
+
+                  <QueryBarElements />
+
+                  <IfDashboard>
+                    <QueryBar />
+                  </IfDashboard>
                 </IfInteractive>
-                <SearchArea>
-                  <IfInteractive>
-                    <HeaderElements />
-                    <IfDashboard>
-                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    </IfDashboard>
-                    <IfSearch>
-                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    </IfSearch>
-
-                    <QueryBarElements />
-
-                    <IfDashboard>
-                      <QueryBar />
-                    </IfDashboard>
-                  </IfInteractive>
-                  <HighlightMessageInQuery query={location.query}>
-                    <SearchResult />
-                  </HighlightMessageInQuery>
-                  <Footer />
-                </SearchArea>
-              </GridContainer>
-            </HighlightingRulesProvider>
+                <HighlightMessageInQuery query={location.query}>
+                  <SearchResult />
+                </HighlightMessageInQuery>
+                <Footer />
+              </SearchArea>
+            </GridContainer>
           </ViewAdditionalContextProvider>
         )}
       </InteractiveContext.Consumer>

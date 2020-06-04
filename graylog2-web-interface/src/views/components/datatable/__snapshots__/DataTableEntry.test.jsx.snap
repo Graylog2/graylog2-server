@@ -102,45 +102,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="nf_dst_address"
               value="192.168.1.24"
             >
-              <Value
+              <CustomHighlighting
                 field="nf_dst_address"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "unknown",
-                      "properties": Immutable.Set [],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value="192.168.1.24"
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="nf_dst_address"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "unknown",
-                            "properties": Immutable.Set [],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value="192.168.1.24"
-                    />
-                  }
+                <Value
                   field="nf_dst_address"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -152,12 +126,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value="192.168.1.24"
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="nf_dst_address"
                         render={[Function]}
@@ -173,28 +143,50 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value="192.168.1.24"
                       />
                     }
+                    field="nf_dst_address"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "unknown",
+                          "properties": Immutable.Set [],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value="192.168.1.24"
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="nf_dst_address"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "unknown",
-                              "properties": Immutable.Set [],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value="192.168.1.24"
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="nf_dst_address"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "unknown",
+                                "properties": Immutable.Set [],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value="192.168.1.24"
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="nf_dst_address"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -206,7 +198,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                           }
                           value="192.168.1.24"
                         >
-                          <DecoratedValue
+                          <Component
                             field="nf_dst_address"
                             type={
                               FieldType {
@@ -219,7 +211,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="192.168.1.24"
                           >
-                            <Component
+                            <DecoratedValue
                               field="nf_dst_address"
                               type={
                                 FieldType {
@@ -232,7 +224,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="192.168.1.24"
                             >
-                              <Highlight
+                              <Component
                                 field="nf_dst_address"
                                 type={
                                   FieldType {
@@ -245,27 +237,41 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="192.168.1.24"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="nf_dst_address"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "unknown",
+                                        "properties": Immutable.Set [],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="192.168.1.24"
                                 >
-                                  192.168.1.24
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="nf_dst_address"
+                                    highlightRanges={Object {}}
+                                    value="192.168.1.24"
+                                  >
+                                    192.168.1.24
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -282,51 +288,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="count()"
               value={84}
             >
-              <Value
+              <CustomHighlighting
                 field="count()"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "long",
-                      "properties": Immutable.Set [
-                        "numeric",
-                        "enumerable",
-                      ],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={84}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="count()"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "long",
-                            "properties": Immutable.Set [
-                              "numeric",
-                              "enumerable",
-                            ],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={84}
-                    />
-                  }
+                <Value
                   field="count()"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -341,12 +315,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={84}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="count()"
                         render={[Function]}
@@ -365,31 +335,32 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={84}
                       />
                     }
+                    field="count()"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={84}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="count()"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "long",
-                              "properties": Immutable.Set [
-                                "numeric",
-                                "enumerable",
-                              ],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={84}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="count()"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -402,9 +373,33 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="84"
+                          value={84}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="count()"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "long",
+                                "properties": Immutable.Set [
+                                  "numeric",
+                                  "enumerable",
+                                ],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={84}
                         >
-                          <DecoratedValue
+                          <Component
                             field="count()"
                             type={
                               FieldType {
@@ -420,7 +415,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="84"
                           >
-                            <Component
+                            <DecoratedValue
                               field="count()"
                               type={
                                 FieldType {
@@ -436,7 +431,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="84"
                             >
-                              <Highlight
+                              <Component
                                 field="count()"
                                 type={
                                   FieldType {
@@ -452,27 +447,44 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="84"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="count()"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "long",
+                                        "properties": Immutable.Set [
+                                          "numeric",
+                                          "enumerable",
+                                        ],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="84"
                                 >
-                                  84
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="count()"
+                                    highlightRanges={Object {}}
+                                    value="84"
+                                  >
+                                    84
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -492,45 +504,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="max(timestamp)"
               value={1554106041841}
             >
-              <Value
+              <CustomHighlighting
                 field="max(timestamp)"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "unknown",
-                      "properties": Immutable.Set [],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={1554106041841}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="max(timestamp)"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "unknown",
-                            "properties": Immutable.Set [],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={1554106041841}
-                    />
-                  }
+                <Value
                   field="max(timestamp)"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -542,12 +528,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={1554106041841}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="max(timestamp)"
                         render={[Function]}
@@ -563,28 +545,29 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={1554106041841}
                       />
                     }
+                    field="max(timestamp)"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "unknown",
+                          "properties": Immutable.Set [],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={1554106041841}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="max(timestamp)"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "unknown",
-                              "properties": Immutable.Set [],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={1554106041841}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="max(timestamp)"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -594,9 +577,30 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="1554106041841"
+                          value={1554106041841}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="max(timestamp)"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "unknown",
+                                "properties": Immutable.Set [],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={1554106041841}
                         >
-                          <DecoratedValue
+                          <Component
                             field="max(timestamp)"
                             type={
                               FieldType {
@@ -609,7 +613,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="1554106041841"
                           >
-                            <Component
+                            <DecoratedValue
                               field="max(timestamp)"
                               type={
                                 FieldType {
@@ -622,7 +626,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="1554106041841"
                             >
-                              <Highlight
+                              <Component
                                 field="max(timestamp)"
                                 type={
                                   FieldType {
@@ -635,27 +639,41 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="1554106041841"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="max(timestamp)"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "unknown",
+                                        "properties": Immutable.Set [],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="1554106041841"
                                 >
-                                  1554106041841
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="max(timestamp)"
+                                    highlightRanges={Object {}}
+                                    value="1554106041841"
+                                  >
+                                    1554106041841
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -675,51 +693,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="card(timestamp)"
               value={20}
             >
-              <Value
+              <CustomHighlighting
                 field="card(timestamp)"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "long",
-                      "properties": Immutable.Set [
-                        "numeric",
-                        "enumerable",
-                      ],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={20}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="card(timestamp)"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "long",
-                            "properties": Immutable.Set [
-                              "numeric",
-                              "enumerable",
-                            ],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={20}
-                    />
-                  }
+                <Value
                   field="card(timestamp)"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -734,12 +720,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={20}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="card(timestamp)"
                         render={[Function]}
@@ -758,31 +740,32 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={20}
                       />
                     }
+                    field="card(timestamp)"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={20}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="card(timestamp)"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "long",
-                              "properties": Immutable.Set [
-                                "numeric",
-                                "enumerable",
-                              ],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={20}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="card(timestamp)"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -795,9 +778,33 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="20"
+                          value={20}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="card(timestamp)"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "long",
+                                "properties": Immutable.Set [
+                                  "numeric",
+                                  "enumerable",
+                                ],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={20}
                         >
-                          <DecoratedValue
+                          <Component
                             field="card(timestamp)"
                             type={
                               FieldType {
@@ -813,7 +820,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="20"
                           >
-                            <Component
+                            <DecoratedValue
                               field="card(timestamp)"
                               type={
                                 FieldType {
@@ -829,7 +836,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="20"
                             >
-                              <Highlight
+                              <Component
                                 field="card(timestamp)"
                                 type={
                                   FieldType {
@@ -845,27 +852,44 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="20"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="card(timestamp)"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "long",
+                                        "properties": Immutable.Set [
+                                          "numeric",
+                                          "enumerable",
+                                        ],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="20"
                                 >
-                                  20
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="card(timestamp)"
+                                    highlightRanges={Object {}}
+                                    value="20"
+                                  >
+                                    20
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -885,51 +909,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="count()"
               value={20}
             >
-              <Value
+              <CustomHighlighting
                 field="count()"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "long",
-                      "properties": Immutable.Set [
-                        "numeric",
-                        "enumerable",
-                      ],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={20}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="count()"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "long",
-                            "properties": Immutable.Set [
-                              "numeric",
-                              "enumerable",
-                            ],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={20}
-                    />
-                  }
+                <Value
                   field="count()"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -944,12 +936,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={20}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="count()"
                         render={[Function]}
@@ -968,31 +956,32 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={20}
                       />
                     }
+                    field="count()"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={20}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="count()"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "long",
-                              "properties": Immutable.Set [
-                                "numeric",
-                                "enumerable",
-                              ],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={20}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="count()"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -1005,9 +994,33 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="20"
+                          value={20}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="count()"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "long",
+                                "properties": Immutable.Set [
+                                  "numeric",
+                                  "enumerable",
+                                ],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={20}
                         >
-                          <DecoratedValue
+                          <Component
                             field="count()"
                             type={
                               FieldType {
@@ -1023,7 +1036,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="20"
                           >
-                            <Component
+                            <DecoratedValue
                               field="count()"
                               type={
                                 FieldType {
@@ -1039,7 +1052,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="20"
                             >
-                              <Highlight
+                              <Component
                                 field="count()"
                                 type={
                                   FieldType {
@@ -1055,27 +1068,44 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="20"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="count()"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "long",
+                                        "properties": Immutable.Set [
+                                          "numeric",
+                                          "enumerable",
+                                        ],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="20"
                                 >
-                                  20
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="count()"
+                                    highlightRanges={Object {}}
+                                    value="20"
+                                  >
+                                    20
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -1098,45 +1128,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="max(timestamp)"
               value={1554106041841}
             >
-              <Value
+              <CustomHighlighting
                 field="max(timestamp)"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "unknown",
-                      "properties": Immutable.Set [],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={1554106041841}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="max(timestamp)"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "unknown",
-                            "properties": Immutable.Set [],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={1554106041841}
-                    />
-                  }
+                <Value
                   field="max(timestamp)"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -1148,12 +1152,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={1554106041841}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="max(timestamp)"
                         render={[Function]}
@@ -1169,28 +1169,29 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={1554106041841}
                       />
                     }
+                    field="max(timestamp)"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "unknown",
+                          "properties": Immutable.Set [],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={1554106041841}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="max(timestamp)"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "unknown",
-                              "properties": Immutable.Set [],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={1554106041841}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="max(timestamp)"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -1200,9 +1201,30 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="1554106041841"
+                          value={1554106041841}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="max(timestamp)"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "unknown",
+                                "properties": Immutable.Set [],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={1554106041841}
                         >
-                          <DecoratedValue
+                          <Component
                             field="max(timestamp)"
                             type={
                               FieldType {
@@ -1215,7 +1237,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="1554106041841"
                           >
-                            <Component
+                            <DecoratedValue
                               field="max(timestamp)"
                               type={
                                 FieldType {
@@ -1228,7 +1250,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="1554106041841"
                             >
-                              <Highlight
+                              <Component
                                 field="max(timestamp)"
                                 type={
                                   FieldType {
@@ -1241,27 +1263,41 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="1554106041841"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="max(timestamp)"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "unknown",
+                                        "properties": Immutable.Set [],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="1554106041841"
                                 >
-                                  1554106041841
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="max(timestamp)"
+                                    highlightRanges={Object {}}
+                                    value="1554106041841"
+                                  >
+                                    1554106041841
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -1284,51 +1320,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="card(timestamp)"
               value={14}
             >
-              <Value
+              <CustomHighlighting
                 field="card(timestamp)"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "long",
-                      "properties": Immutable.Set [
-                        "numeric",
-                        "enumerable",
-                      ],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={14}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="card(timestamp)"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "long",
-                            "properties": Immutable.Set [
-                              "numeric",
-                              "enumerable",
-                            ],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={14}
-                    />
-                  }
+                <Value
                   field="card(timestamp)"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -1343,12 +1347,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={14}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="card(timestamp)"
                         render={[Function]}
@@ -1367,31 +1367,32 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={14}
                       />
                     }
+                    field="card(timestamp)"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={14}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="card(timestamp)"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "long",
-                              "properties": Immutable.Set [
-                                "numeric",
-                                "enumerable",
-                              ],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={14}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="card(timestamp)"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -1404,9 +1405,33 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="14"
+                          value={14}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="card(timestamp)"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "long",
+                                "properties": Immutable.Set [
+                                  "numeric",
+                                  "enumerable",
+                                ],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={14}
                         >
-                          <DecoratedValue
+                          <Component
                             field="card(timestamp)"
                             type={
                               FieldType {
@@ -1422,7 +1447,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="14"
                           >
-                            <Component
+                            <DecoratedValue
                               field="card(timestamp)"
                               type={
                                 FieldType {
@@ -1438,7 +1463,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="14"
                             >
-                              <Highlight
+                              <Component
                                 field="card(timestamp)"
                                 type={
                                   FieldType {
@@ -1454,27 +1479,44 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="14"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="card(timestamp)"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "long",
+                                        "properties": Immutable.Set [
+                                          "numeric",
+                                          "enumerable",
+                                        ],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="14"
                                 >
-                                  14
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="card(timestamp)"
+                                    highlightRanges={Object {}}
+                                    value="14"
+                                  >
+                                    14
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -1494,51 +1536,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="count()"
               value={64}
             >
-              <Value
+              <CustomHighlighting
                 field="count()"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "long",
-                      "properties": Immutable.Set [
-                        "numeric",
-                        "enumerable",
-                      ],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={64}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="count()"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "long",
-                            "properties": Immutable.Set [
-                              "numeric",
-                              "enumerable",
-                            ],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={64}
-                    />
-                  }
+                <Value
                   field="count()"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -1553,12 +1563,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={64}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="count()"
                         render={[Function]}
@@ -1577,31 +1583,32 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={64}
                       />
                     }
+                    field="count()"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={64}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="count()"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "long",
-                              "properties": Immutable.Set [
-                                "numeric",
-                                "enumerable",
-                              ],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={64}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="count()"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -1614,9 +1621,33 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="64"
+                          value={64}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="count()"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "long",
+                                "properties": Immutable.Set [
+                                  "numeric",
+                                  "enumerable",
+                                ],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={64}
                         >
-                          <DecoratedValue
+                          <Component
                             field="count()"
                             type={
                               FieldType {
@@ -1632,7 +1663,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="64"
                           >
-                            <Component
+                            <DecoratedValue
                               field="count()"
                               type={
                                 FieldType {
@@ -1648,7 +1679,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="64"
                             >
-                              <Highlight
+                              <Component
                                 field="count()"
                                 type={
                                   FieldType {
@@ -1664,27 +1695,44 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="64"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="count()"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "long",
+                                        "properties": Immutable.Set [
+                                          "numeric",
+                                          "enumerable",
+                                        ],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="64"
                                 >
-                                  64
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="count()"
+                                    highlightRanges={Object {}}
+                                    value="64"
+                                  >
+                                    64
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -1707,45 +1755,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="max(timestamp)"
               value={1554106041841}
             >
-              <Value
+              <CustomHighlighting
                 field="max(timestamp)"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "unknown",
-                      "properties": Immutable.Set [],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={1554106041841}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="max(timestamp)"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "unknown",
-                            "properties": Immutable.Set [],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={1554106041841}
-                    />
-                  }
+                <Value
                   field="max(timestamp)"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -1757,12 +1779,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={1554106041841}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="max(timestamp)"
                         render={[Function]}
@@ -1778,28 +1796,29 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={1554106041841}
                       />
                     }
+                    field="max(timestamp)"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "unknown",
+                          "properties": Immutable.Set [],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={1554106041841}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="max(timestamp)"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "unknown",
-                              "properties": Immutable.Set [],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={1554106041841}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="max(timestamp)"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -1809,9 +1828,30 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="1554106041841"
+                          value={1554106041841}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="max(timestamp)"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "unknown",
+                                "properties": Immutable.Set [],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={1554106041841}
                         >
-                          <DecoratedValue
+                          <Component
                             field="max(timestamp)"
                             type={
                               FieldType {
@@ -1824,7 +1864,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="1554106041841"
                           >
-                            <Component
+                            <DecoratedValue
                               field="max(timestamp)"
                               type={
                                 FieldType {
@@ -1837,7 +1877,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="1554106041841"
                             >
-                              <Highlight
+                              <Component
                                 field="max(timestamp)"
                                 type={
                                   FieldType {
@@ -1850,27 +1890,41 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="1554106041841"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="max(timestamp)"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "unknown",
+                                        "properties": Immutable.Set [],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="1554106041841"
                                 >
-                                  1554106041841
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="max(timestamp)"
+                                    highlightRanges={Object {}}
+                                    value="1554106041841"
+                                  >
+                                    1554106041841
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
         <td
@@ -1893,51 +1947,19 @@ exports[`DataTableEntry does not fail without types 1`] = `
               }
             }
           >
-            <CustomHighlighting
+            <ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules
               field="card(timestamp)"
               value={16}
             >
-              <Value
+              <CustomHighlighting
                 field="card(timestamp)"
-                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
-                render={[Function]}
-                type={
-                  FieldType {
-                    "value": Immutable.Map {
-                      "type": "long",
-                      "properties": Immutable.Set [
-                        "numeric",
-                        "enumerable",
-                      ],
-                      "indexNames": Immutable.Set [],
-                    },
-                  }
-                }
+                highlightingRules={Object {}}
                 value={16}
               >
-                <ValueActions
-                  element={
-                    <TypeSpecificValue
-                      field="card(timestamp)"
-                      render={[Function]}
-                      type={
-                        FieldType {
-                          "value": Immutable.Map {
-                            "type": "long",
-                            "properties": Immutable.Set [
-                              "numeric",
-                              "enumerable",
-                            ],
-                            "indexNames": Immutable.Set [],
-                          },
-                        }
-                      }
-                      value={16}
-                    />
-                  }
+                <Value
                   field="card(timestamp)"
-                  menuContainer={<body />}
                   queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                  render={[Function]}
                   type={
                     FieldType {
                       "value": Immutable.Map {
@@ -1952,12 +1974,8 @@ exports[`DataTableEntry does not fail without types 1`] = `
                   }
                   value={16}
                 >
-                  <OverlayDropdown
-                    menuContainer={<body />}
-                    onToggle={[Function]}
-                    placement="right"
-                    show={false}
-                    toggle={
+                  <ValueActions
+                    element={
                       <TypeSpecificValue
                         field="card(timestamp)"
                         render={[Function]}
@@ -1976,31 +1994,32 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         value={16}
                       />
                     }
+                    field="card(timestamp)"
+                    menuContainer={<body />}
+                    queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={16}
                   >
-                    <span
-                      className="dropdowntoggle"
-                      onClick={[Function]}
-                      role="presentation"
-                    >
-                      <TypeSpecificValue
-                        field="card(timestamp)"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "long",
-                              "properties": Immutable.Set [
-                                "numeric",
-                                "enumerable",
-                              ],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={16}
-                      >
-                        <Component
+                    <OverlayDropdown
+                      menuContainer={<body />}
+                      onToggle={[Function]}
+                      placement="right"
+                      show={false}
+                      toggle={
+                        <TypeSpecificValue
                           field="card(timestamp)"
+                          render={[Function]}
                           type={
                             FieldType {
                               "value": Immutable.Map {
@@ -2013,9 +2032,33 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               },
                             }
                           }
-                          value="16"
+                          value={16}
+                        />
+                      }
+                    >
+                      <span
+                        className="dropdowntoggle"
+                        onClick={[Function]}
+                        role="presentation"
+                      >
+                        <TypeSpecificValue
+                          field="card(timestamp)"
+                          render={[Function]}
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "long",
+                                "properties": Immutable.Set [
+                                  "numeric",
+                                  "enumerable",
+                                ],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          value={16}
                         >
-                          <DecoratedValue
+                          <Component
                             field="card(timestamp)"
                             type={
                               FieldType {
@@ -2031,7 +2074,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                             }
                             value="16"
                           >
-                            <Component
+                            <DecoratedValue
                               field="card(timestamp)"
                               type={
                                 FieldType {
@@ -2047,7 +2090,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                               }
                               value="16"
                             >
-                              <Highlight
+                              <Component
                                 field="card(timestamp)"
                                 type={
                                   FieldType {
@@ -2063,27 +2106,44 @@ exports[`DataTableEntry does not fail without types 1`] = `
                                 }
                                 value="16"
                               >
-                                <PossiblyHighlight
-                                  color="#ffec3d"
+                                <Highlight
                                   field="card(timestamp)"
-                                  highlightRanges={Object {}}
+                                  type={
+                                    FieldType {
+                                      "value": Immutable.Map {
+                                        "type": "long",
+                                        "properties": Immutable.Set [
+                                          "numeric",
+                                          "enumerable",
+                                        ],
+                                        "indexNames": Immutable.Set [],
+                                      },
+                                    }
+                                  }
                                   value="16"
                                 >
-                                  16
-                                </PossiblyHighlight>
-                              </Highlight>
-                            </Component>
-                          </DecoratedValue>
-                        </Component>
-                      </TypeSpecificValue>
-                      <span
-                        className="caret"
-                      />
-                    </span>
-                  </OverlayDropdown>
-                </ValueActions>
-              </Value>
-            </CustomHighlighting>
+                                  <PossiblyHighlight
+                                    color="#ffec3d"
+                                    field="card(timestamp)"
+                                    highlightRanges={Object {}}
+                                    value="16"
+                                  >
+                                    16
+                                  </PossiblyHighlight>
+                                </Highlight>
+                              </Component>
+                            </DecoratedValue>
+                          </Component>
+                        </TypeSpecificValue>
+                        <span
+                          className="caret"
+                        />
+                      </span>
+                    </OverlayDropdown>
+                  </ValueActions>
+                </Value>
+              </CustomHighlighting>
+            </ConnectStoresWrapper[CustomHighlighting] stores=highlightingRules>
           </Provider>
         </td>
       </tr>
