@@ -63,8 +63,8 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  searchPaginated(page, perPage, query, resolve) {
-    const url = this._url(PaginationURL('tables', page, perPage, query, resolve));
+  searchPaginated(page, perPage, query, resolve = true) {
+    const url = this._url(PaginationURL('tables', page, perPage, query, { resolve }));
     const promise = fetch('GET', url);
 
     promise.then((response) => {

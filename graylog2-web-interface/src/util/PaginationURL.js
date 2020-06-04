@@ -1,12 +1,21 @@
 // @flow strict
 import URI from 'urijs';
 
-export default (destUrl: string, page: number, perPage: number, query: string, resolve: boolean = true): string => {
-  const uri = new URI(destUrl).addSearch('page', page)
-    .addSearch('per_page', perPage)
-    .addSearch('resolve', resolve.toString());
+type AdditionalQueries = { [string]: any };
+
+export default (destUrl: string, page: number, perPage: number, query: string, additional: AdditionalQueries = {}): string => {
+  let uri = new URI(destUrl).addSearch('page', page)
+    .addSearch('per_page', perPage);
+  if (additional) {
+    Object.keys(additional).forEach((field) => {
+      const value = (additional[field] && typeof additional[field].toString === 'function')
+        ? additional[field].toString()
+        : additional[field];
+      uri = uri.addSearch(field, value);
+    });
+  }
   if (query) {
-    return uri.addSearch('query', encodeURIComponent(query)).toString();
+    uri.addSearch('query', encodeURIComponent(query));
   }
   return uri.toString();
 };
