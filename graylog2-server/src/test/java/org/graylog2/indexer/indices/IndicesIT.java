@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -40,6 +39,7 @@ import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.messages.TrafficAccounting;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -110,7 +110,7 @@ public class IndicesIT extends ElasticsearchBaseTest {
         indices = new Indices(jestClient(),
                 new ObjectMapperProvider().get(),
                 indexMappingFactory,
-                new Messages(new MetricRegistry(), messagesAdapter, mock(ProcessingStatusRecorder.class)),
+                new Messages(mock(TrafficAccounting.class), messagesAdapter, mock(ProcessingStatusRecorder.class)),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus);

@@ -9,7 +9,6 @@ import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.plugin.Message;
-import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,8 +38,7 @@ class MessagesAdapterES6Test {
     void setUp() {
         this.jestClient = mock(JestClient.class);
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
-        this.messagesAdapter = new MessagesAdapterES6(jestClient, true, metricRegistry, processingStatusRecorder);
+        this.messagesAdapter = new MessagesAdapterES6(jestClient, true, metricRegistry);
     }
 
     public static class MockedBulkResult extends BulkResult {

@@ -87,7 +87,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().waitForGreenStatus(INDEX_NAME);
         count = new Count.Builder().addIndex(INDEX_NAME).build();
         final MetricRegistry metricRegistry = new MetricRegistry();
-        messages = new Messages(metricRegistry, createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class));
+        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class));
     }
 
     @After

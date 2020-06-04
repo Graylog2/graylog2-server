@@ -16,14 +16,11 @@
  */
 package org.graylog2.indexer.messages;
 
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricRegistry;
 import io.searchbox.core.Index;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
@@ -45,16 +42,15 @@ public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
 
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
-    private final Counter outputByteCounter;
-    private final Counter systemTrafficCounter;
     private final MessagesAdapter messagesAdapter;
     private final ProcessingStatusRecorder processingStatusRecorder;
+    private final TrafficAccounting trafficAccounting;
 
     @Inject
-    public Messages(MetricRegistry metricRegistry,
-                    MessagesAdapter messagesAdapter, ProcessingStatusRecorder processingStatusRecorder) {
-        outputByteCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
-        systemTrafficCounter = metricRegistry.counter(GlobalMetricNames.SYSTEM_OUTPUT_TRAFFIC);
+    public Messages(TrafficAccounting trafficAccounting,
+                    MessagesAdapter messagesAdapter,
+                    ProcessingStatusRecorder processingStatusRecorder) {
+        this.trafficAccounting = trafficAccounting;
         this.messagesAdapter = messagesAdapter;
         this.processingStatusRecorder = processingStatusRecorder;
 
@@ -91,7 +87,7 @@ public class Messages {
                 .collect(Collectors.toList());
 
         recordTimestamp(successfullRequests);
-        accountTotalMessageSizes(successfullRequests, isSystemTraffic);
+        accountTotalMessageSizes(indexingRequestList, isSystemTraffic);
 
         return propagateFailure(indexFailures);
     }
@@ -103,9 +99,9 @@ public class Messages {
                 .sum();
 
         if (isSystemTraffic) {
-            systemTrafficCounter.inc(totalSizeOfIndexedMessages);
+            trafficAccounting.addSystemTraffic(totalSizeOfIndexedMessages);
         } else {
-            outputByteCounter.inc(totalSizeOfIndexedMessages);
+            trafficAccounting.addOutputTraffic(totalSizeOfIndexedMessages);
         }
     }
 

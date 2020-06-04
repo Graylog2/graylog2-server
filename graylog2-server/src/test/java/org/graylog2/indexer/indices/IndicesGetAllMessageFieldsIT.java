@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
@@ -26,6 +25,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.messages.TrafficAccounting;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.junit.Before;
@@ -57,7 +57,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
         indices = new Indices(jestClient(),
                 new ObjectMapper(),
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), messagesAdapter, mock(ProcessingStatusRecorder.class)),
+                new Messages(mock(TrafficAccounting.class), messagesAdapter, mock(ProcessingStatusRecorder.class)),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus());
