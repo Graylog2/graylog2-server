@@ -16,9 +16,9 @@
  */
 package org.graylog2.system.stats;
 
+import org.graylog.plugins.views.search.views.DashboardService;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
-import org.graylog2.dashboards.DashboardService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
 import org.graylog2.security.ldap.LdapSettingsService;
@@ -46,11 +46,11 @@ public class ClusterStatsService {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final OutputService outputService;
-    private final DashboardService dashboardService;
     private final LdapSettingsService ldapSettingsService;
     private final RoleService roleService;
     private final AlertService alertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    private final DashboardService dashboardService;
 
     @Inject
     public ClusterStatsService(ElasticsearchProbe elasticsearchProbe,
@@ -60,11 +60,11 @@ public class ClusterStatsService {
                                StreamService streamService,
                                StreamRuleService streamRuleService,
                                OutputService outputService,
-                               DashboardService dashboardService,
                                LdapSettingsService ldapSettingsService,
                                RoleService roleService,
                                AlertService alertService,
-                               AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
+                               AlarmCallbackConfigurationService alarmCallbackConfigurationService,
+                               DashboardService dashboardService) {
         this.elasticsearchProbe = elasticsearchProbe;
         this.mongoProbe = mongoProbe;
         this.userService = userService;
@@ -72,11 +72,11 @@ public class ClusterStatsService {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
-        this.dashboardService = dashboardService;
         this.ldapSettingsService = ldapSettingsService;
         this.roleService = roleService;
         this.alertService = alertService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
+        this.dashboardService = dashboardService;
     }
 
     public ClusterStats clusterStats() {
@@ -89,7 +89,7 @@ public class ClusterStatsService {
                 userService.count(),
                 outputService.count(),
                 outputService.countByType(),
-                dashboardService.count(),
+                countDashboards(),
                 inputService.totalCount(),
                 inputService.globalCount(),
                 inputService.totalCountByType(),
@@ -98,6 +98,10 @@ public class ClusterStatsService {
                 ldapStats(),
                 alarmStats()
         );
+    }
+
+    private long countDashboards() {
+        return dashboardService.count();
     }
 
     public ElasticsearchStats elasticsearchStats() {

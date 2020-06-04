@@ -14,42 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.migrations;
+package org.graylog2.migrations.V20180214093600_AdjustDashboardPositionToNewResolution;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.dashboards.Dashboard;
-import org.graylog2.dashboards.DashboardService;
-import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.google.auto.value.AutoValue;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 /**
  * Migration adjusting the position of dashboard widgets to the higher resolution of the
  * grid layout.
  */
-public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migration {
+public class Migration extends org.graylog2.migrations.Migration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(V20180214093600_AdjustDashboardPositionToNewResolution.class);
-    private final DashboardService dashboardService;
+    private static final Logger LOG = LoggerFactory.getLogger(Migration.class);
+    private final MigrationDashboardService dashboardService;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V20180214093600_AdjustDashboardPositionToNewResolution(DashboardService dashboardService,
-                                                                  ClusterConfigService clusterConfigService) {
+    public Migration(MigrationDashboardService dashboardService,
+                     ClusterConfigService clusterConfigService) {
         this.dashboardService = dashboardService;
         this.clusterConfigService = clusterConfigService;
     }
@@ -65,7 +61,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
         }
 
         Map<String, String> dashboardIds = new HashMap<>();
-        for (Dashboard dashboard : dashboardService.all()) {
+        for (MigrationDashboard dashboard : dashboardService.all()) {
             final List<WidgetPosition> oldPositions = dashboard.getPositions();
             if (oldPositions.isEmpty()) {
                 dashboardIds.put(dashboard.getId(), "skipped");
@@ -112,7 +108,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
 
         @JsonCreator
         public static MigrationCompleted create(@JsonProperty("dashboard_ids")Map<String, String> dashboardIds) {
-            return new AutoValue_V20180214093600_AdjustDashboardPositionToNewResolution_MigrationCompleted(dashboardIds);
+            return new AutoValue_Migration_MigrationCompleted(dashboardIds);
         }
     }
 }

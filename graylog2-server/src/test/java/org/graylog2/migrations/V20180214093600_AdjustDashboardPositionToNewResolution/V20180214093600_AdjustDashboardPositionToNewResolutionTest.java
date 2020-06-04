@@ -14,12 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.migrations;
+package org.graylog2.migrations.V20180214093600_AdjustDashboardPositionToNewResolution;
 
 import com.google.common.collect.ImmutableList;
-import org.graylog2.dashboards.Dashboard;
-import org.graylog2.dashboards.DashboardService;
-import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,6 +25,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collections;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -35,26 +35,23 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
-import java.util.List;
-
 public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private V20180214093600_AdjustDashboardPositionToNewResolution adjustDashboardResolutionMigration;
+    private Migration adjustDashboardResolutionMigration;
 
     @Mock
     private ClusterConfigService clusterConfigService;
 
     @Mock
-    private DashboardService dashboardService;
+    private MigrationDashboardService dashboardService;
 
     @Before
     public void setUp() throws Exception {
         this.clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.get(any())).thenReturn(null);
-        this.adjustDashboardResolutionMigration = new V20180214093600_AdjustDashboardPositionToNewResolution(
+        this.adjustDashboardResolutionMigration = new Migration(
                 dashboardService,
                 clusterConfigService
         );
@@ -71,7 +68,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
 
     @Test
     public void doNotMigrateAnythingWithDashboardsWithoutPositions() throws Exception {
-        final Dashboard dashboard = mock(Dashboard.class);
+        final MigrationDashboard dashboard = mock(MigrationDashboard.class);
         when(dashboard.getId()).thenReturn("uuu-iii-ddd");
         when(dashboard.getPositions()).thenReturn(Collections.emptyList());
         when(this.dashboardService.all()).thenReturn(Collections.singletonList(dashboard));
@@ -90,7 +87,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
         final List<WidgetPosition> newPositions1 = Collections.singletonList(
                 WidgetPosition.builder().id("my-position-id").width(10).height(8).col(3).row(3).build());
 
-        final Dashboard dashboard1 = mock(Dashboard.class);
+        final MigrationDashboard dashboard1 = mock(MigrationDashboard.class);
         when(dashboard1.getPositions()).thenReturn(oldPositions1);
         when(dashboard1.getId()).thenReturn("uuu-iii-ddd");
 
@@ -101,7 +98,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
         final List<WidgetPosition> newPositions2 = Collections.singletonList(
                 WidgetPosition.builder().id("your-position-id").width(2).height(2).col(1).row(1).build());
 
-        final Dashboard dashboard2 = mock(Dashboard.class);
+        final MigrationDashboard dashboard2 = mock(MigrationDashboard.class);
         when(dashboard2.getPositions()).thenReturn(oldPositions2);
         when(dashboard2.getId()).thenReturn("uuu-iii-eee");
 
@@ -114,11 +111,11 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
                 WidgetPosition.builder().id("his-position-id").width(2).height(2).col(1).row(1).build(),
                 WidgetPosition.builder().id("her-position-id").width(4).height(4).col(3).row(3).build());
 
-        final Dashboard dashboard3 = mock(Dashboard.class);
+        final MigrationDashboard dashboard3 = mock(MigrationDashboard.class);
         when(dashboard3.getPositions()).thenReturn(oldPositions3);
         when(dashboard3.getId()).thenReturn("uuu-iii-eee");
 
-        List<Dashboard> dashboards = ImmutableList.of(dashboard1, dashboard2, dashboard3);
+        List<MigrationDashboard> dashboards = ImmutableList.of(dashboard1, dashboard2, dashboard3);
         when(this.dashboardService.all()).thenReturn(dashboards);
 
         this.adjustDashboardResolutionMigration.upgrade();

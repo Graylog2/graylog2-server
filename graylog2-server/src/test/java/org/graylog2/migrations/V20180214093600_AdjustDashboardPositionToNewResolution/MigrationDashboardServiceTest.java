@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards;
+package org.graylog2.migrations.V20180214093600_AdjustDashboardPositionToNewResolution;
 
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -29,26 +29,26 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class DashboardServiceImplTest {
+public class MigrationDashboardServiceTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private DashboardService dashboardService;
+    private MigrationDashboardService dashboardService;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUpService() {
-        dashboardService = new DashboardServiceImpl(mongodb.mongoConnection());
+        dashboardService = new MigrationDashboardService(mongodb.mongoConnection());
     }
 
     @Test
     @MongoDBFixtures("singleDashboard.json")
     public void testAll() {
-        final List<Dashboard> dashboards = dashboardService.all();
-        final Dashboard dashboard = dashboards.get(0);
+        final List<MigrationDashboard> dashboards = dashboardService.all();
+        final MigrationDashboard dashboard = dashboards.get(0);
 
         assertEquals("Should have returned exactly 1 document", 1, dashboards.size());
         assertEquals("Example dashboard", dashboard.getTitle());
