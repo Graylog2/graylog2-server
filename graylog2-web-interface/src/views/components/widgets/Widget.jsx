@@ -56,7 +56,7 @@ const WidgetActionsWBar = styled.div`
     margin-right: 5px;
 
     :last-child {
-      margin-right: 0
+      margin-right: 0;
     }
   }
 `;
