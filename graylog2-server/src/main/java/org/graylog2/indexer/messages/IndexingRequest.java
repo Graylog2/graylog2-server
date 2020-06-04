@@ -14,10 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.messages;
 
-import org.graylog2.plugin.database.Persisted;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.google.auto.value.AutoValue;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.plugin.Message;
 
-public interface IndexFailure extends Persisted {
-    String letterId();
+import javax.validation.constraints.NotNull;
+
+@AutoValue
+@JsonAutoDetect
+public abstract class IndexingRequest {
+    public abstract IndexSet indexSet();
+    public abstract Message message();
+
+    public static IndexingRequest create(@NotNull IndexSet indexSet, @NotNull Message message) {
+        return new AutoValue_IndexingRequest(indexSet, message);
+    }
+
 }
