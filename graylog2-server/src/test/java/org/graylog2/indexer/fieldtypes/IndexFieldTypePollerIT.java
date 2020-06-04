@@ -68,6 +68,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     private TestIndexSet indexSet;
 
     protected abstract IndicesAdapter createIndicesAdapter();
+    protected abstract IndexFieldTypePollerAdapter createIndexFieldTypePollerAdapter();
 
     @Before
     public void setUp() throws Exception {
@@ -79,7 +80,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 mock(EventBus.class),
                 createIndicesAdapter()
         );
-        poller = new IndexFieldTypePoller(jestClient(), indices, new MetricRegistry());
+        poller = new IndexFieldTypePoller(indices, new MetricRegistry(), createIndexFieldTypePollerAdapter());
         indexSet = new TestIndexSet(indexSetConfig);
 
         importFixture("org/graylog2/indexer/fieldtypes/IndexFieldTypePollerIT.json");
