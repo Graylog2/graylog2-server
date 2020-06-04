@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
-import CurrentUserContext from 'components/contexts/CurrentUserContext';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import { Scratchpad, Icon, Spinner } from 'components/common';
 import Navigation from 'components/navigation/Navigation';
@@ -42,12 +42,12 @@ const App = ({ children, location }) => (
                       fullName={currentUser.full_name}
                       loginName={currentUser.username}
                       permissions={currentUser.permissions} />
+          <ScrollToHint id="scroll-to-hint">
+            <Icon name="arrow-up" />
+          </ScrollToHint>
+          <Scratchpad />
           <ReportedErrorBoundary>
             <RuntimeErrorBoundary>
-              <ScrollToHint id="scroll-to-hint">
-                <Icon name="arrow-up" />
-              </ScrollToHint>
-              <Scratchpad />
               {children}
             </RuntimeErrorBoundary>
           </ReportedErrorBoundary>
