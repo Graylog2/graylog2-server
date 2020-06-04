@@ -82,18 +82,18 @@ public class Messages {
         final List<IndexFailure> indexFailures = messagesAdapter.bulkIndex(indexingRequestList);
 
         final Set<String> failedIds = indexFailures.stream().map(IndexFailure::letterId).collect(Collectors.toSet());
-        final List<IndexingRequest> successfullRequests = indexingRequestList.stream()
+        final List<IndexingRequest> successfulRequests = indexingRequestList.stream()
                 .filter(indexingRequest -> !failedIds.contains(indexingRequest.message().getId()))
                 .collect(Collectors.toList());
 
-        recordTimestamp(successfullRequests);
+        recordTimestamp(successfulRequests);
         accountTotalMessageSizes(indexingRequestList, isSystemTraffic);
 
         return propagateFailure(indexFailures);
     }
 
-    private void accountTotalMessageSizes(List<IndexingRequest> successfullRequests, boolean isSystemTraffic) {
-        final long totalSizeOfIndexedMessages = successfullRequests.stream()
+    private void accountTotalMessageSizes(List<IndexingRequest> requests, boolean isSystemTraffic) {
+        final long totalSizeOfIndexedMessages = requests.stream()
                 .map(IndexingRequest::message)
                 .mapToLong(Message::getSize)
                 .sum();

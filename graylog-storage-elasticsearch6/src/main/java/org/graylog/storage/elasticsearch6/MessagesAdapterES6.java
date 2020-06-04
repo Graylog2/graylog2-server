@@ -171,7 +171,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         for (BulkResult.BulkResultItem item : failedItems) {
             LOG.warn("Failed to index message: index=<{}> id=<{}> error=<{}>", item.index, item.id, item.error);
 
-            // Write failure to index_failures.
             final Message messageEntry = messageMap.get(item.id);
 
             final IndexFailure indexFailure = indexFailureFromResultItem(item, messageEntry);
