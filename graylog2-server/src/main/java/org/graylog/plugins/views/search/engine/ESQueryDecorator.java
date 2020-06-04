@@ -14,11 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch;
+package org.graylog.plugins.views.search.engine;
 
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;

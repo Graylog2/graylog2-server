@@ -17,12 +17,20 @@
 package org.graylog.storage.elasticsearch6;
 
 import com.google.inject.Scopes;
+import com.google.inject.TypeLiteral;
+import com.google.inject.binder.ScopedBindingBuilder;
+import com.google.inject.multibindings.MapBinder;
+import io.searchbox.core.search.aggregation.Aggregation;
 import org.graylog.plugins.views.ViewsModule;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESEventList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESDateRangeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESValuesHandler;
@@ -38,7 +46,9 @@ import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.E
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESVarianceHandler;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
@@ -79,5 +89,43 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotBucketHandler(Values.NAME, ESValuesHandler.class);
         registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);
         registerPivotBucketHandler(DateRangeBucket.NAME, ESDateRangeHandler.class);
+    }
+
+    private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {
+        return MapBinder.newMapBinder(binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>>() {});
+
+    }
+
+    private ScopedBindingBuilder registerPivotBucketHandler(
+            String name,
+            Class<? extends ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> implementation
+    ) {
+        return pivotBucketHandlerBinder().addBinding(name).to(implementation);
+    }
+
+    protected MapBinder<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
+        return MapBinder.newMapBinder(binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>>() {});
+
+    }
+
+    private ScopedBindingBuilder registerPivotSeriesHandler(
+            String name,
+            Class<? extends ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> implementation
+    ) {
+        return pivotSeriesHandlerBinder().addBinding(name).to(implementation);
+    }
+
+    private MapBinder<String, ESSearchTypeHandler<? extends SearchType>> esSearchTypeHandlerBinder() {
+        return MapBinder.newMapBinder(binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<ESSearchTypeHandler<? extends SearchType>>() {});
+    }
+
+    private ScopedBindingBuilder registerESSearchTypeHandler(String name, Class<? extends ESSearchTypeHandler<? extends SearchType>> implementation) {
+        return esSearchTypeHandlerBinder().addBinding(name).to(implementation);
     }
 }

@@ -19,9 +19,7 @@ package org.graylog.plugins.views.search.elasticsearch;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.engine.ESQueryDecorator;
 
 import javax.inject.Inject;
 import java.util.Collections;
