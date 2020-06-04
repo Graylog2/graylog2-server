@@ -17,21 +17,32 @@ jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({ Current
 
 describe('CurrentUserPreferencesProvider', () => {
   afterEach(cleanup);
+  const SimpleCurrentUserPreferencesProvider = ({ children }: {children: JestMockFn<*, *>}) => (
+    <CurrentUserPreferencesProvider>
+      <UserPreferencesContext.Consumer>
+        {children}
+      </UserPreferencesContext.Consumer>
+    </CurrentUserPreferencesProvider>
+  );
 
   const renderSUT = (): ((UserPreferences) => null) => {
     const consume = jest.fn();
     render(
       <CurrentUserProvider>
-        <CurrentUserPreferencesProvider>
-          <UserPreferencesContext.Consumer>
-            {consume}
-          </UserPreferencesContext.Consumer>
-        </CurrentUserPreferencesProvider>
+        <SimpleCurrentUserPreferencesProvider>
+          {consume}
+        </SimpleCurrentUserPreferencesProvider>
       </CurrentUserProvider>,
     );
     return consume;
   };
 
+  it('provides default user preferences when CurrentUserContext is not provided', () => {
+    const consume = jest.fn();
+    render(<SimpleCurrentUserPreferencesProvider>{consume}</SimpleCurrentUserPreferencesProvider>);
+
+    expect(consume).toHaveBeenCalledWith(defaultUserPreferences);
+  });
   it('provides default user preferences with empty store', () => {
     const consume = renderSUT();
 
