@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import HighlightingRuleContext from 'views/components/contexts/HighlightingRulesContext';
+import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -18,18 +18,26 @@ const renderDecorators = (decorators, field, value) => decorators.map((Decorator
 describe('CustomHighlighting', () => {
   const field = 'foo';
   const value = 42;
-  const SimpleCustomHighlighting = ({ highlightingRules }: {highlightingRules: Array<HighlightingRule>}) => (
-    <HighlightingRuleContext.Provider value={highlightingRules}>
-      <CustomHighlighting field={field} value={value}>
-        <DecoratorContext.Consumer>
-          {(decorators) => renderDecorators(decorators, field, value)}
-        </DecoratorContext.Consumer>
-      </CustomHighlighting>
-    </HighlightingRuleContext.Provider>
+  const SimpleCustomHighlighting = () => (
+    <CustomHighlighting field={field} value={value}>
+      <DecoratorContext.Consumer>
+        {(decorators) => renderDecorators(decorators, field, value)}
+      </DecoratorContext.Consumer>
+    </CustomHighlighting>
   );
 
+  const CustomHighlightingWithContext = ({ highlightingRules }: {highlightingRules: Array<HighlightingRule>}) => (
+    <HighlightingRulesContext.Provider value={highlightingRules}>
+      <SimpleCustomHighlighting />
+    </HighlightingRulesContext.Provider>
+  );
+
+  it('renders value when HighlightingRulesContext is not provided', () => {
+    const wrapper = mount(<SimpleCustomHighlighting />);
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
+  });
   it('renders value as is when no rules exist', () => {
-    const wrapper = mount(<SimpleCustomHighlighting highlightingRules={[]} />);
+    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[]} />);
     expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('renders value as is when no rule for this field exists', () => {
@@ -38,7 +46,7 @@ describe('CustomHighlighting', () => {
       .value(String(value))
       .color('#bc98fd')
       .build();
-    const wrapper = mount(<SimpleCustomHighlighting highlightingRules={[rule]} />);
+    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
     expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
@@ -48,7 +56,7 @@ describe('CustomHighlighting', () => {
       .value(String(value))
       .color('#bc98fd')
       .build();
-    const wrapper = mount(<SimpleCustomHighlighting highlightingRules={[rule]} />);
+    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[rule]} />);
     expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('does not render highlight if rule value only matches substring', () => {
@@ -57,7 +65,7 @@ describe('CustomHighlighting', () => {
       .value('2')
       .color('#bc98fd')
       .build();
-    const wrapper = mount(<SimpleCustomHighlighting highlightingRules={[rule]} />);
+    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[rule]} />);
     expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('does not render highlight if rule value does not match', () => {
@@ -66,7 +74,7 @@ describe('CustomHighlighting', () => {
       .value('23')
       .color('#bc98fd')
       .build();
-    const wrapper = mount(<SimpleCustomHighlighting highlightingRules={[rule]} />);
+    const wrapper = mount(<CustomHighlightingWithContext highlightingRules={[rule]} />);
     expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
 });
