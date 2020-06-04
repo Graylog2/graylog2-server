@@ -65,5 +65,11 @@
             <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.revinate</groupId>
+            <artifactId>assertj-json</artifactId>
+            <version>${assertj-json.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
