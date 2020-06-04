@@ -9,13 +9,13 @@ import HighlightingRules from './HighlightingRules';
 jest.mock('stores/connect', () => (x) => x);
 
 describe('HighlightingRules', () => {
-  it('renders search term legend even when HighlightingRulesContext.Provider is not defined', () => {
+  it('renders search term legend even when HighlightingRulesContext is not provided', () => {
     const wrapper = mount(<HighlightingRules />);
     expect(wrapper.text()).toMatch(/Search terms/);
   });
   it('renders search term legend even when rules are empty', () => {
     const wrapper = mount(
-      <HighlightingRuleContext.Provider value={undefined}>
+      <HighlightingRuleContext.Provider value={[]}>
         <HighlightingRules />
       </HighlightingRuleContext.Provider>,
     );
