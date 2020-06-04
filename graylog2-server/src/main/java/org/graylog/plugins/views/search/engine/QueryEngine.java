@@ -24,7 +24,7 @@ import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.elasticsearch.QueryMetadataDecorator;
+import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;

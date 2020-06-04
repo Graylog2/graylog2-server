@@ -14,14 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch;
-
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryMetadata;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryMetadata;
-import org.graylog.plugins.views.search.Search;
+package org.graylog.plugins.views.search;
 
 public interface QueryMetadataDecorator {
     QueryMetadata decorate(Search search, Query query, QueryMetadata queryMetadata);

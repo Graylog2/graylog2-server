@@ -14,9 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.elasticsearch;
+package org.graylog.plugins.views.search;
 
-import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStreams;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.streams.Stream;
 import org.junit.Rule;
@@ -60,12 +59,12 @@ public class IndexRangeContainsOneOfStreamsTest {
 
         assertThat(predicate.test(indexRange)).isFalse();
     }
-    
+
     @Test
     public void currentIndexRangeShouldMatchIfManaged() {
         when(indexRange.streamIds()).thenReturn(null);
         when(indexRange.indexName()).thenReturn(indexName);
-        
+
         when(stream1.getId()).thenReturn("stream1");
         when(stream1.getIndexSet().isManagedIndex(eq(indexName))).thenReturn(true);
 

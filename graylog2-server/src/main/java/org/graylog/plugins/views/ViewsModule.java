@@ -24,7 +24,7 @@ import io.searchbox.core.search.aggregation.Aggregation;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorator;
-import org.graylog.plugins.views.search.elasticsearch.QueryMetadataDecorator;
+import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotSeriesSpecHandler;
@@ -35,8 +35,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.sharing.SharingStrategy;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchType;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 
