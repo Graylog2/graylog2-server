@@ -249,6 +249,7 @@ public class StreamResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get a list of all streams")
+    @Deprecated
     @Produces(MediaType.APPLICATION_JSON)
     public StreamListResponse get() {
         final List<Stream> allStreams = streamService.loadAll();
