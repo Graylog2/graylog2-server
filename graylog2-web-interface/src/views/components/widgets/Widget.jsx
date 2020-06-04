@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
+import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';
@@ -49,6 +50,16 @@ import CopyToDashboard from './CopyToDashboardForm';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import IfDashboard from '../dashboard/IfDashboard';
 import ReplaySearchButton from './ReplaySearchButton';
+
+const WidgetActionsWBar = styled.div`
+  > * {
+    margin-right: 5px;
+
+    :last-child {
+      margin-right: 0;
+    }
+  }
+`;
 
 type Props = {
   id: string,
@@ -302,33 +313,33 @@ class Widget extends React.Component<Props, State> {
                             loading={loading}
                             onRename={(newTitle) => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
-                <IfInteractive>
-                  <IfDashboard>
-                    <ReplaySearchButton />
-                    {' '}
-                  </IfDashboard>
-                  <WidgetHorizontalStretch widgetId={widget.id}
-                                           widgetType={widget.type}
-                                           onStretch={onPositionsChange}
-                                           position={position} />
-                  {' '}
-                  <WidgetActionDropdown>
-                    <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                    <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-                    {type === MessagesWidget.type && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
-                    <IfSearch>
-                      <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
-                    </IfSearch>
-                    <MenuItem divider />
-                    <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-                  </WidgetActionDropdown>
-                  {showCopyToDashboard && (
-                    <CopyToDashboard widgetId={id}
-                                     onSubmit={this._onCopyToDashboard}
-                                     onCancel={this._onToggleCopyToDashboard} />
-                  )}
-                  {showCsvExport && <CSVExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
-                </IfInteractive>
+                <WidgetActionsWBar>
+                  <IfInteractive>
+                    <IfDashboard>
+                      <ReplaySearchButton />
+                    </IfDashboard>
+                    <WidgetHorizontalStretch widgetId={widget.id}
+                                             widgetType={widget.type}
+                                             onStretch={onPositionsChange}
+                                             position={position} />
+                    <WidgetActionDropdown>
+                      <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                      <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                      {type === MessagesWidget.type && <MenuItem onSelect={() => this._onToggleCSVExport()}>Export to CSV</MenuItem>}
+                      <IfSearch>
+                        <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
+                      </IfSearch>
+                      <MenuItem divider />
+                      <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
+                    </WidgetActionDropdown>
+                    {showCopyToDashboard && (
+                      <CopyToDashboard widgetId={id}
+                                       onSubmit={this._onCopyToDashboard}
+                                       onCancel={this._onToggleCopyToDashboard} />
+                    )}
+                    {showCsvExport && <CSVExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
+                  </IfInteractive>
+                </WidgetActionsWBar>
               </WidgetHeader>
             )}
           </InteractiveContext.Consumer>

@@ -6,7 +6,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 
 import AppContentGrid from 'components/layout/AppContentGrid';
-import { DocumentTitle } from 'components/common';
+import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
 const GlobalStyle = createGlobalStyle`

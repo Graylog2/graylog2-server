@@ -20,6 +20,7 @@ export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExternalLink } from './ExternalLink';
 export { default as ExternalLinkButton } from './ExternalLinkButton';
 export { default as Icon } from './Icon';
+export { default as IconButton } from './IconButton';
 export { default as IfPermitted } from './IfPermitted';
 export { default as InteractableModal } from './InteractableModal';
 export { default as ISODurationInput } from './ISODurationInput';
