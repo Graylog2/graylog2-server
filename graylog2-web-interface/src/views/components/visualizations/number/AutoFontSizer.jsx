@@ -34,7 +34,7 @@ const _updateFontSize = (setFontSize, currentSize, newSize) => {
 const useAutoFontSize = (target, _container, height, width) => {
   // This hook will update the font size based on the difference between the dimensions of the container and its child.
   // The font size is being recalculated, until the mentioned difference is within the tolerance.
-  const tolerance = 0.01;
+  const tolerance = 0.05;
   const [fontSize, setFontSize] = useState(20);
 
   useEffect(() => {
