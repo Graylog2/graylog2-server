@@ -1,13 +1,14 @@
 // @flow strict
 import uuid from 'uuid/v4';
+import type { QueryId } from 'views/logic/queries/Query';
+import type { WidgetId } from 'views/logic/views/types';
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import Widget from '../widgets/Widget';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 
-type QueryId = string;
 
-const _removeWidgetFromTab = (widgetId: string, queryId: string, dashboard: View): View => {
+const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: View): View => {
   const viewState = dashboard.state.get(queryId);
   const widgetIndex = viewState.widgets.findIndex((widget) => widget.id === widgetId);
   const widgetPosition = viewState.widgetPositions;
@@ -35,7 +36,7 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
     .build();
 };
 
-const MoveWidgetToTab = (widgetId: string, targetQueryId: QueryId, dashboard: View, copy: boolean = false): ?View => {
+const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: View, copy: boolean = false): ?View => {
   if (dashboard.type !== View.Type.Dashboard) {
     return undefined;
   }
