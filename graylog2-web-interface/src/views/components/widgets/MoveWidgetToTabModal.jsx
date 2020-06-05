@@ -4,6 +4,8 @@ import { Map } from 'immutable';
 import { ListGroup, ListGroupItem } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
+import { useStore } from 'stores/connect';
+import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 
 import View from 'views/logic/views/View';
 
@@ -27,8 +29,9 @@ const _tabList = (view: View): Array<TabEntry> => {
 const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => {
   const [selectedTab, setSelectedTab] = useState(null);
   const [keepCopy, setKeepCopy] = useState(false);
+  const { id: activeQuery } = useStore(CurrentQueryStore);
 
-  const list = _tabList(view);
+  const list = _tabList(view).filter(({ id }) => id !== activeQuery);
 
   const tabList = list.map(({ id, name }) => (
     <ListGroupItem onClick={() => setSelectedTab(id)}
