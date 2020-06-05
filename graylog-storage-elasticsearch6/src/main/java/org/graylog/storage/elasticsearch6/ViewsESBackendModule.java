@@ -25,6 +25,7 @@ import io.searchbox.core.search.aggregation.Aggregation;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -45,6 +46,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch6.views.ElasticsearchBackend;
+import org.graylog.storage.elasticsearch6.views.export.ElasticsearchExportBackend;
+import org.graylog.storage.elasticsearch6.views.export.RequestStrategy;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESEventList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch6.views.searchtypes.ESSearchTypeHandler;
@@ -93,6 +96,9 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotBucketHandler(Values.NAME, ESValuesHandler.class);
         registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);
         registerPivotBucketHandler(DateRangeBucket.NAME, ESDateRangeHandler.class);
+
+        bind(ExportBackend.class).to(ElasticsearchExportBackend.class);
+        bind(RequestStrategy.class).to(org.graylog.storage.elasticsearch6.views.export.Scroll.class);
     }
 
     private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.export.es;
+package org.graylog.storage.elasticsearch6.views.export;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
@@ -38,8 +38,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.plugins.views.search.export.es.SearchAfter.DEFAULT_TIEBREAKER_FIELD;
-import static org.graylog.plugins.views.search.export.es.SearchAfter.EVENTS_TIEBREAKER_FIELD;
+import static org.graylog.storage.elasticsearch6.views.export.SearchAfter.DEFAULT_TIEBREAKER_FIELD;
+import static org.graylog.storage.elasticsearch6.views.export.SearchAfter.EVENTS_TIEBREAKER_FIELD;
 import static org.graylog2.plugin.Message.FIELD_TIMESTAMP;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;

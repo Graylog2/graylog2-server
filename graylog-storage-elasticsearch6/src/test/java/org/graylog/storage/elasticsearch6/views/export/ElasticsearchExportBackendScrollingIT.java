@@ -14,27 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.export.es;
+package org.graylog.storage.elasticsearch6.views.export;
 
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
-public class ElasticsearchExportBackendSearchAfterIT extends ElasticsearchExportBackendITBase {
+public class ElasticsearchExportBackendScrollingIT extends ElasticsearchExportBackendITBase {
     @Override
     protected RequestStrategy requestStrategy() {
-        return new SearchAfter(new JestWrapper(jestClient()));
+        return new Scroll(new ObjectMapperProvider().get(), new JestWrapper(jestClient()));
     }
 
     @Test
-    public void sortsByTimestampDescending() {
+    public void containsAllResultsInNoParticularOrder() {
         importFixture("messages.json");
 
         ExportMessagesCommand command = commandBuilderWithAllStreams().build();
 
-        runWithExpectedResult(command, "timestamp,source,message",
-                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
-                "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
+        runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
                 "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He",
-                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha");
+                "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
+                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho");
     }
 }
