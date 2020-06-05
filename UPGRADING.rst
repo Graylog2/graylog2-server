@@ -9,8 +9,8 @@ Deprecation of API endpoint for unpaginated listing of streams
 
 In 4.0 we introduce a new API endpoint to retrieve streams from the backend: '/streams/paginated' which allows
 to pass pagination parameters.
-We therefore mark '/streams' as deprecated. User which use this endpoint for scripting purpose should change
-their scripts to the new endpoint, so they only need to to change the URL when '/streams/paginated' will become
+We therefore mark '/streams' as deprecated. User who use this endpoint for scripting purpose should change
+their scripts to the format of the new endpoint, so they only need to to change the URL when '/streams/paginated' will become
 '/streams'.
 
 Removal of legacy Dashboard API
