@@ -1,7 +1,8 @@
 // @flow strict
 import React, { useState } from 'react';
 import { Map } from 'immutable';
-import { Button, ListGroup, ListGroupItem, Modal } from 'components/graylog';
+import { ListGroup, ListGroupItem } from 'components/graylog';
+import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 
 import View from 'views/logic/views/View';
@@ -30,36 +31,30 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   const list = _tabList(view);
 
   const tabList = list.map(({ id, name }) => (
-    <ListGroupItem header={name}
-                   onClick={() => setSelectedTab(id)}
+    <ListGroupItem onClick={() => setSelectedTab(id)}
                    active={id === selectedTab}
-                   key={id} />
+                   key={id}>
+      {name}
+    </ListGroupItem>
   ));
   const renderResult = list && list.length > 0
     ? <ListGroup>{tabList}</ListGroup>
     : <span>No dashboards found</span>;
 
   return (
-    <Modal show>
-      <Modal.Body>
-        {renderResult}
-        <Input type="checkbox"
-               id="keepCopy"
-               name="keepCopy"
-               label="Keep Copy on this Page"
-               onChange={(e) => setKeepCopy(e.target.checked)}
-               help="When 'Keep Copy on the Page' is enabled, the widget will be copied and not moved to another page"
-               checked={keepCopy} />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button bsStyle="primary"
-                disabled={selectedTab === null}
-                onClick={() => onSubmit(widgetId, selectedTab, keepCopy)}>
-          Select
-        </Button>
-        <Button onClick={onCancel}>Cancel</Button>
-      </Modal.Footer>
-    </Modal>
+    <BootstrapModalForm show
+                        onCancel={onCancel}
+                        onSubmitForm={() => onSubmit(widgetId, selectedTab, keepCopy)}
+                        title="Choose Target Page">
+      {renderResult}
+      <Input type="checkbox"
+             id="keepCopy"
+             name="keepCopy"
+             label="Keep Copy on this Page"
+             onChange={(e) => setKeepCopy(e.target.checked)}
+             help="When 'Keep Copy on the Page' is enabled, the widget will be copied and not moved to another page"
+             checked={keepCopy} />
+    </BootstrapModalForm>
   );
 };
 
