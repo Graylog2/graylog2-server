@@ -48,7 +48,7 @@ import WidgetColorContext from './WidgetColorContext';
 import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
-import MoveWidgetToTabForm from './MoveWidgetToTab';
+import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import IfDashboard from '../dashboard/IfDashboard';
 import ReplaySearchButton from './ReplaySearchButton';
@@ -372,10 +372,10 @@ class Widget extends React.Component<Props, State> {
                     )}
                     {showCsvExport && <CSVExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
                   {showMoveWidgetToTab && (
-                    <MoveWidgetToTabForm view={view.view}
-                                         widgetId={widget.id}
-                                         onCancel={this._onToggleMoveWidgetToTab}
-                                         onSubmit={this._onMoveWidgetToTab} />
+                    <MoveWidgetToTabModal view={view.view}
+                                          widgetId={widget.id}
+                                          onCancel={this._onToggleMoveWidgetToTab}
+                                          onSubmit={this._onMoveWidgetToTab} />
                   )}
                   </IfInteractive>
                 </WidgetActionsWBar>

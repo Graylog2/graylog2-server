@@ -23,7 +23,7 @@ const _tabList = (view: View): Array<TabEntry> => {
   });
 };
 
-const MoveWidgetToTab = ({ view, onCancel, onSubmit, widgetId }: Props) => {
+const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => {
   const [selectedTab, setSelectedTab] = useState(null);
   const [keepCopy, setKeepCopy] = useState(false);
 
@@ -63,4 +63,4 @@ const MoveWidgetToTab = ({ view, onCancel, onSubmit, widgetId }: Props) => {
   );
 };
 
-export default MoveWidgetToTab;
+export default MoveWidgetToTabModal;
