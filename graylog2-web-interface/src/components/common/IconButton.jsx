@@ -31,6 +31,7 @@ const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.b
 
 
 type Props = {
+  focusable?: boolean,
   title: string,
   onClick?: () => void,
 };
@@ -41,8 +42,8 @@ const handleClick = (onClick) => {
   }
 };
 
-const IconButton = ({ title, onClick, ...rest }: Props) => (
-  <Wrapper title={title} onClick={() => handleClick(onClick)}>
+const IconButton = ({ title, onClick, focusable, ...rest }: Props) => (
+  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)}>
     <Icon {...rest} />
   </Wrapper>
 );
@@ -53,6 +54,7 @@ IconButton.propTypes = {
 };
 
 IconButton.defaultProps = {
+  focusable: true,
   onClick: undefined,
   title: undefined,
 };

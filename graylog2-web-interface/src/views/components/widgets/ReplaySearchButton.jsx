@@ -29,7 +29,7 @@ const ReplaySearchButton = () => {
   const searchLink = buildSearchLink(timerange, query.query_string, streams);
   return (
     <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
-      <IconButton name="play" />
+      <IconButton name="play" focusable={false} />
     </NeutralLink>
   );
 };
