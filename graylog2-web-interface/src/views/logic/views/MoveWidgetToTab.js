@@ -11,14 +11,14 @@ import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: View): View => {
   const viewState = dashboard.state.get(queryId);
   const widgetIndex = viewState.widgets.findIndex((widget) => widget.id === widgetId);
-  const widgetPosition = viewState.widgetPositions;
-  delete widgetPosition[widgetId];
+  const { widgetPositions } = viewState;
+  delete widgetPositions[widgetId];
   const { widgetMapping } = viewState;
   const newWidgetMapping = widgetMapping.remove(widgetId);
   const newViewState = viewState.toBuilder()
     .widgets(viewState.widgets.delete(widgetIndex))
     .widgetMapping(newWidgetMapping)
-    .widgetPositions(widgetPosition)
+    .widgetPositions(widgetPositions)
     .build();
   return dashboard.toBuilder()
     .state(dashboard.state.set(queryId, newViewState))
@@ -38,7 +38,7 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
 
 const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: View, copy: boolean = false): ?View => {
   if (dashboard.type !== View.Type.Dashboard) {
-    return undefined;
+    throw new Error(`Unexpected type ${dashboard.type} expected ${View.Type.Dashboard}`);
   }
 
   const match: ?[Widget, QueryId] = FindWidgetAndQueryIdInView(widgetId, dashboard);
