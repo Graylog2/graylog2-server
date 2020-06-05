@@ -235,7 +235,7 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
     @Override
     public void setReadOnly(String index) {
-        // https://www.elastic.co/guide/en/elasticsearch/reference/2.4/indices-update-settings.html
+        // https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-update-settings.html
         final Map<String, Object> settings = ImmutableMap.of(
                 "index", ImmutableMap.of("blocks",
                         ImmutableMap.of(
@@ -361,7 +361,7 @@ public class IndicesAdapterES6 implements IndicesAdapter {
         }
     }
 
-    private Health.Status waitForStatus(String index, Health.Status clusterHealthStatus) {
+    private Health.Status waitForStatus(String index, @SuppressWarnings("SameParameterValue") Health.Status clusterHealthStatus) {
         final Health request = new Health.Builder()
                 .addIndex(index)
                 .waitForStatus(clusterHealthStatus)

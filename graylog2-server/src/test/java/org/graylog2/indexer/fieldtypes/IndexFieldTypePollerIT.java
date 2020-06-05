@@ -71,11 +71,11 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        final Indices indices = new Indices(
+        @SuppressWarnings("UnstableApiUsage") final Indices indices = new Indices(
                 new IndexMappingFactory(new Node(jestClient())),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
-                new EventBus("index-field-type-poller-it"),
+                mock(EventBus.class),
                 createIndicesAdapter()
         );
         poller = new IndexFieldTypePoller(jestClient(), indices, new MetricRegistry());
