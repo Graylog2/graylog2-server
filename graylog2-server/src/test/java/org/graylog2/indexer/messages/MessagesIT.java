@@ -21,8 +21,6 @@ import com.google.common.collect.Maps;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Index;
 import joptsimple.internal.Strings;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
@@ -102,10 +100,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         source.put("message", "message");
         source.put("source", "source");
         source.put("timestamp", "2017-04-13 15:29:00.000");
-        final Index indexRequest = messages.prepareIndexRequest(index, source, "1");
-        final DocumentResult indexResponse = jestClient().execute(indexRequest);
 
-        assertThat(indexResponse.isSucceeded()).isTrue();
+        assertThat(indexMessage(index, source, "1")).isTrue();
 
         final ResultMessage resultMessage = messages.get("1", index);
         final Message message = resultMessage.getMessage();
@@ -113,6 +109,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(message.hasField(JestResult.ES_METADATA_ID)).isFalse();
         assertThat(message.hasField(JestResult.ES_METADATA_VERSION)).isFalse();
     }
+
+    protected abstract boolean indexMessage(String index, Map<String, Object> source, String id);
 
     @Test
     public void testIfTooLargeBatchesGetSplitUp() throws Exception {

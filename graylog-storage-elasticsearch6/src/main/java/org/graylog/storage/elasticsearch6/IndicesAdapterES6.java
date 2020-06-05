@@ -59,7 +59,6 @@ import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
-import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.Message;
@@ -90,14 +89,14 @@ import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
 public class IndicesAdapterES6 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES6.class);
     private final JestClient jestClient;
-    private ObjectMapper objectMapper;
-    private Messages messages;
+    private final ObjectMapper objectMapper;
+    private final IndexingHelper indexingHelper;
 
     @Inject
-    public IndicesAdapterES6(JestClient jestClient, ObjectMapper objectMapper, Messages messages) {
+    public IndicesAdapterES6(JestClient jestClient, ObjectMapper objectMapper, IndexingHelper indexingHelper) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
-        this.messages = messages;
+        this.indexingHelper = indexingHelper;
     }
 
     @Override
@@ -138,7 +137,7 @@ public class IndicesAdapterES6 implements IndicesAdapter {
                         .orElse(Collections.emptyMap());
                 final String id = (String) doc.remove("_id");
 
-                bulkRequestBuilder.addAction(messages.prepareIndexRequest(target, doc, id));
+                bulkRequestBuilder.addAction(indexingHelper.prepareIndexRequest(target, doc, id));
             }
 
             final BulkResult bulkResult = JestUtils.execute(jestClient, bulkRequestBuilder.build(), () -> "Couldn't bulk index messages into index " + target);

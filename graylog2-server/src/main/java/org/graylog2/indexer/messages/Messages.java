@@ -130,16 +130,6 @@ public class Messages {
                 .collect(Collectors.toList());
     }
 
-    public Index prepareIndexRequest(String index, Map<String, Object> source, String id) {
-        source.remove(Message.FIELD_ID);
-
-        return new Index.Builder(source)
-                .index(index)
-                .type(IndexMapping.TYPE_MESSAGE)
-                .id(id)
-                .build();
-    }
-
     public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {
         return indexFailureQueue;
     }
