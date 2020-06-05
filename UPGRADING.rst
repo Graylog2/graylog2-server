@@ -4,11 +4,14 @@ Upgrading to Graylog 4.0.x
 
 .. _upgrade-from-33-to-40:
 
-Mark 'List of streams' in Streams API als deprecated
-====================================================
+Deprecation of API endpoint for unpaginated listing of streams
+==============================================================
 
-In 4.0 we introduce a new API endpoint to retrieve streams from the backend: '/streams/paginated'.
-We therefore mark '/streams' as deprecated. This endpoint will be removed in the next version.
+In 4.0 we introduce a new API endpoint to retrieve streams from the backend: '/streams/paginated' which allows
+to pass pagination parameters.
+We therefore mark '/streams' as deprecated. User which use this endpoint for scripting purpose should change
+their scripts to the new endpoint, so they only need to to change the URL when '/streams/paginated' will become
+'/streams'.
 
 Removal of legacy Dashboard API
 ===============================
