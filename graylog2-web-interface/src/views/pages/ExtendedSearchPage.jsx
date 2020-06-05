@@ -41,6 +41,8 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import SearchPageLayoutContext from 'views/components/contexts/SearchPageLayoutContext';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
@@ -53,8 +55,8 @@ const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElem
     display: grid;
     grid-template-rows: 1fr;
     -ms-grid-rows: 1fr;
-    grid-template-columns: 50px 1fr;
-    -ms-grid-columns: 50px 1fr;
+    grid-template-columns: auto 1fr;
+    -ms-grid-columns: auto 1fr;
   ` : '')}
 `;
 
@@ -160,38 +162,44 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       </IfInteractive>
       <InteractiveContext.Consumer>
         {(interactive) => (
-          <ViewAdditionalContextProvider>
-            <HighlightingRulesProvider>
-              <GridContainer id="main-row" interactive={interactive}>
-                <IfInteractive>
-                  <ConnectedSideBar>
-                    <ConnectedFieldList />
-                  </ConnectedSideBar>
-                </IfInteractive>
-                <SearchArea>
-                  <IfInteractive>
-                    <HeaderElements />
-                    <IfDashboard>
-                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    </IfDashboard>
-                    <IfSearch>
-                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    </IfSearch>
+          <SearchPageLayoutProvider>
+            <SearchPageLayoutContext.Consumer>
+              {(pageLayout) => (
+                <ViewAdditionalContextProvider>
+                  <HighlightingRulesProvider>
+                    <GridContainer id="main-row" interactive={interactive} sidebarPinned={pageLayout?.layout.sidebar.pinned}>
+                      <IfInteractive>
+                        <ConnectedSideBar>
+                          <ConnectedFieldList />
+                        </ConnectedSideBar>
+                      </IfInteractive>
+                      <SearchArea>
+                        <IfInteractive>
+                          <HeaderElements />
+                          <IfDashboard>
+                            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                          </IfDashboard>
+                          <IfSearch>
+                            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                          </IfSearch>
 
-                    <QueryBarElements />
+                          <QueryBarElements />
 
-                    <IfDashboard>
-                      <QueryBar />
-                    </IfDashboard>
-                  </IfInteractive>
-                  <HighlightMessageInQuery query={location.query}>
-                    <SearchResult />
-                  </HighlightMessageInQuery>
-                  <Footer />
-                </SearchArea>
-              </GridContainer>
-            </HighlightingRulesProvider>
-          </ViewAdditionalContextProvider>
+                          <IfDashboard>
+                            <QueryBar />
+                          </IfDashboard>
+                        </IfInteractive>
+                        <HighlightMessageInQuery query={location.query}>
+                          <SearchResult />
+                        </HighlightMessageInQuery>
+                        <Footer />
+                      </SearchArea>
+                    </GridContainer>
+                  </HighlightingRulesProvider>
+                </ViewAdditionalContextProvider>
+              )}
+            </SearchPageLayoutContext.Consumer>
+          </SearchPageLayoutProvider>
         )}
       </InteractiveContext.Consumer>
     </CurrentViewTypeProvider>

@@ -6,10 +6,10 @@ import { Title as NavItemTitle } from './NavItem.styles';
 
 const sidebarWidth = {
   open: '250px',
-  closed: '100%', // width is defined in parent container
+  closed: '50px', // width is defined in parent container
 };
 
-export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ open, theme }) => css`
+export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ open, theme, isPinned }) => css`
   grid-row: 1;
   -ms-grid-row: 1;
   grid-column: 1;
@@ -18,10 +18,11 @@ export const Container: StyledComponent<{ open: boolean }, ThemeInterface, HTMLD
   color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
   height: calc(100vh - 50px);
   padding-top: 20px;
-  position: ${open ? 'fixed' : 'static'};
+  position: ${open && !isPinned ? 'fixed' : 'static'};
   top: 50px;
-  width: ${open ? sidebarWidth.open : sidebarWidth.closed};
+  width: ${(open && !isPinned) ? sidebarWidth.open : sidebarWidth.closed};
   box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);
+  margin-right: ${isPinned ? '270px' : 0};
 
   /* z-index is needed for ie11 */
   z-index: ${open ? 20 : 'auto'};

@@ -2,10 +2,12 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { capitalize, isString } from 'lodash';
+import styled from 'styled-components';
 
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import type { ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import SearchPageLayoutContext from 'views/components/contexts/SearchPageLayoutContext';
 
 import { AddWidgetButton } from 'views/components/sidebar';
 import { Icon, Spinner } from 'components/common';
@@ -14,6 +16,11 @@ import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
 import ViewDescription from './ViewDescription';
+
+const PinButton = styled.div`
+  bottom: 0;
+  position: absolute;
+`;
 
 type Props = {
   children: React.Element<any>,
@@ -77,6 +84,8 @@ class SideBar extends React.Component<Props, State> {
 
   toggleOpen = () => {
     const { open, selectedKey } = this.state;
+    const { searchPageLayout, setSearchPageLayout } = this.props;
+
     this.setState({
       open: !open,
       selectedKey: open ? undefined : selectedKey,
@@ -90,10 +99,13 @@ class SideBar extends React.Component<Props, State> {
 
   onNavItemClick = (key: string) => () => {
     const { open, selectedKey } = this.state;
+    const { searchPageLayout } = this.props;
+    const isPinned = searchPageLayout?.sidebar.pinned;
+
     const nextKey = key === selectedKey ? undefined : key;
     this.setState(
       { selectedKey: nextKey },
-      () => !open && this.toggleOpen(),
+      () => !isPinned && !open && this.toggleOpen(),
     );
   };
 
@@ -112,11 +124,28 @@ class SideBar extends React.Component<Props, State> {
     return viewMetadata.title || defaultTitle;
   }
 
+  toggleSidebarPinning = () => {
+    const { setSearchPageLayout, searchPageLayout } = this.props;
+    const { selectedKey } = this.state;
+    const isPinned = searchPageLayout?.sidebar.pinned;
+    const updatedLayout = {
+      ...searchPageLayout,
+      sidebar: { pinned: !isPinned },
+    };
+    this.setState({
+      selectedKey: !isPinned ? selectedKey ?? 'viewDescription' : undefined,
+      open: false,
+    });
+    setSearchPageLayout(updatedLayout);
+  }
+
   render() {
-    const { results, viewMetadata, children, queryId } = this.props;
+    const { results, viewMetadata, children, queryId, searchPageLayout } = this.props;
     const { open, selectedKey } = this.state;
 
-    const toggleIcon = open
+    const isPinned = searchPageLayout?.sidebar.pinned;
+
+    const toggleIcon = (open || isPinned)
       ? 'times'
       : 'chevron-right';
     return (
@@ -124,35 +153,42 @@ class SideBar extends React.Component<Props, State> {
         {(viewType) => {
           const title = this.sidebarTitle(viewType);
           return (
-            <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
-              {open && <ContentOverlay onClick={this.toggleOpen} />}
-              <SidebarHeader role="presentation" onClick={this.toggleOpen} hasTitle={!!title} open={open}>
-                {open && title && <Headline title={title}>{title}</Headline>}
+            <Container ref={(node) => { this.wrapperRef = node; }} open={open} isPinned={searchPageLayout?.sidebar.pinned}>
+              {(open && !isPinned) && <ContentOverlay onClick={this.toggleOpen} />}
+              <SidebarHeader role="presentation" onClick={isPinned ? this.toggleSidebarPinning : this.toggleOpen} hasTitle={!!title} open={open}>
+                {(open && !isPinned) && title && <Headline title={title}>{title}</Headline>}
                 <ToggleIcon><Icon name={toggleIcon} /></ToggleIcon>
               </SidebarHeader>
               <HorizontalRuler />
-              <NavItem isSelected={open && selectedKey === 'viewDescription'}
+              <NavItem sidebarIsPinned={isPinned}
+                       isSelected={(open || isPinned) && selectedKey === 'viewDescription'}
                        text="Description"
                        icon="info"
                        onClick={this.onNavItemClick('viewDescription')}
-                       isOpen={open}>
+                       isOpen={open}
+                       expandRight={isPinned}>
                 {this.navItemChildren(<ViewDescription viewMetadata={viewMetadata} results={results} />)}
               </NavItem>
-              <NavItem isSelected={open && selectedKey === 'createWidget'}
+              <NavItem sidebarIsPinned={isPinned}
+                       isSelected={(open || isPinned) && selectedKey === 'createWidget'}
                        text="Create"
                        icon="plus"
                        onClick={this.onNavItemClick('createWidget')}
-                       isOpen={open}>
-                {this.navItemChildren(<AddWidgetButton onClick={this.toggleOpen} toggleAutoClose={this.toggleAutoClose} queryId={queryId} />)}
+                       isOpen={open}
+                       expandRight={isPinned}>
+                {this.navItemChildren(<AddWidgetButton onClick={!isPinned ? this.toggleOpen : () => {}} toggleAutoClose={this.toggleAutoClose} queryId={queryId} />)}
               </NavItem>
-              <NavItem isSelected={open && selectedKey === 'highlighting'}
+              <NavItem sidebarIsPinned={isPinned}
+                       isSelected={(open || isPinned) && selectedKey === 'highlighting'}
                        text="Formatting & Highlighting"
                        icon="paragraph"
                        onClick={this.onNavItemClick('highlighting')}
-                       isOpen={open}>
+                       isOpen={open}
+                       expandRight={isPinned}>
                 {this.navItemChildren(<HighlightingRules />)}
               </NavItem>
-              <NavItem isSelected={open && selectedKey === 'fields'}
+              <NavItem sidebarIsPinned={isPinned}
+                       isSelected={(open || isPinned) && selectedKey === 'fields'}
                        text="Fields"
                        icon="subscript"
                        onClick={this.onNavItemClick('fields')}
@@ -160,6 +196,14 @@ class SideBar extends React.Component<Props, State> {
                        isOpen={open}>
                 {this.navItemChildren(children)}
               </NavItem>
+              <PinButton>
+                <NavItem sidebarIsPinned={isPinned}
+                         text={isPinned ? 'Unpin Sidebar' : 'Pin Sidebar'}
+                         isSelected={isPinned}
+                         icon="thumb-tack"
+                         onClick={this.toggleSidebarPinning}
+                         isOpen={open} />
+              </PinButton>
             </Container>
           );
         }}
@@ -168,4 +212,12 @@ class SideBar extends React.Component<Props, State> {
   }
 }
 
-export default SideBar;
+const SidebarWithContext = (props: Props) => (
+  <SearchPageLayoutContext.Consumer>
+    {(searchPageLayout) => {
+      return <SideBar {...props} searchPageLayout={searchPageLayout?.layout} setSearchPageLayout={searchPageLayout?.setLayout} />;
+    }}
+  </SearchPageLayoutContext.Consumer>
+);
+
+export default SidebarWithContext;

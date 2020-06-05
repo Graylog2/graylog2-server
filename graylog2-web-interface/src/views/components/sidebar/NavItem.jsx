@@ -14,10 +14,13 @@ type Props = {
   text: string,
   icon: string,
   onClick: (string) => void,
-  children: React.Element<any>,
+  children: ?React.Element<any>,
 };
 
-const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClick }: Props) => {
+const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClick, sidebarIsPinned }: Props) => {
+  if (text === 'Fields') {
+    console.log('isSelected', isSelected);
+  }
   // eslint-disable-next-line no-nested-ternary
   return (
     <>
@@ -25,19 +28,21 @@ const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClic
         <TitleIcon><Icon name={icon} /></TitleIcon>
         {(isOpen && <TitleText>{text}</TitleText>)}
       </Title>
-      <SizeMe monitorHeight refreshRate={100}>
-        {({ size }) => {
-          return (
-            <Content isSelected={isSelected} expandRight={expandRight}>
-              {
-                isSelected && children
-                  ? React.cloneElement(children, { listHeight: size.height - 150 })
-                  : <span />
-              }
-            </Content>
-          );
-        }}
-      </SizeMe>
+      {children && (
+        <SizeMe monitorHeight refreshRate={100}>
+          {({ size }) => {
+            return (
+              <Content isSelected={isSelected} expandRight={expandRight} sidebarIsPinned={sidebarIsPinned}>
+                {
+                  isSelected && children
+                    ? React.cloneElement(children, { listHeight: size.height - 150 })
+                    : <span />
+                }
+              </Content>
+            );
+          }}
+        </SizeMe>
+      )}
     </>
   );
 };
