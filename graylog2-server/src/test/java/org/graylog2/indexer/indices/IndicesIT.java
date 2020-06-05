@@ -23,8 +23,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import io.searchbox.client.JestResult;
-import io.searchbox.cluster.State;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
@@ -95,18 +93,21 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
     protected abstract IndicesAdapter indicesAdapter();
 
+    private IndicesAdapter indicesAdapter;
+
     @Before
     public void setUp() {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
         final Node node = new Node(jestClient());
         indexMappingFactory = new IndexMappingFactory(node);
+        indicesAdapter = indicesAdapter();
         indices = new Indices(
                 indexMappingFactory,
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus,
-                indicesAdapter()
+                indicesAdapter
         );
     }
 
@@ -122,19 +123,12 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     public void testClose() {
         final String index = client().createRandomIndex("indices_it_");
 
-        assertThat(getIndexState(index)).isEqualTo("open");
+        assertThat(indicesAdapter.isOpen(index)).isTrue();
 
         indices.close(index);
 
-        assertThat(getIndexState(index)).isEqualTo("close");
-    }
-
-    private String getIndexState(String index) {
-        final State beforeRequest = new State.Builder().indices(index).withMetadata().build();
-
-        final JestResult beforeResponse = client().executeWithExpectedSuccess(beforeRequest, "failed to get index metadata");
-
-        return beforeResponse.getJsonObject().path("metadata").path("indices").path(index).path("state").asText();
+        assertThat(indicesAdapter.isClosed(index)).isTrue();
+        //assertThat(getIndexState(index)).isEqualTo("close");
     }
 
     @Test

@@ -90,4 +90,8 @@ public interface IndicesAdapter {
     IndexRangeStats indexRangeStatsOfIndex(String index);
 
     HealthStatus waitForRecovery(String index);
+
+    boolean isOpen(String index);
+
+    boolean isClosed(String index);
 }

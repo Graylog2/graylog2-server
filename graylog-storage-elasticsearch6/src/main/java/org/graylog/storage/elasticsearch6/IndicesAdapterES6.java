@@ -621,4 +621,22 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     private JsonNode getClusterStateIndicesMetadata(JsonNode clusterStateJson) {
         return clusterStateJson.path("metadata").path("indices");
     }
+
+    @Override
+    public boolean isOpen(String index) {
+        return getIndexState(index).equals("open");
+    }
+
+    @Override
+    public boolean isClosed(String index) {
+        return getIndexState(index).equals("close");
+    }
+
+    private String getIndexState(String index) {
+        final State request = new State.Builder().indices(index).withMetadata().build();
+
+        final JestResult response = JestUtils.execute(jestClient, request, () -> "Failed to get index metadata");
+
+        return response.getJsonObject().path("metadata").path("indices").path(index).path("state").asText();
+    }
 }
