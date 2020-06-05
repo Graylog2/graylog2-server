@@ -193,7 +193,7 @@ public class HttpPollTransport extends ThrottleableTransport {
         final Request.Builder requestBuilder = new Request.Builder().get()
                 .url(url)
                 .headers(Headers.of(headersMap));
-        if (method.toUpperCase().equals(HttpMethod.POST.name().toUpperCase())) {
+        if (method.toUpperCase(Locale.ENGLISH).equals(HttpMethod.POST.name().toUpperCase(Locale.ENGLISH))) {
             requestBuilder.post(RequestBody.create(null, body));
         }
         return requestBuilder.build();
