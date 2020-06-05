@@ -59,7 +59,14 @@ Object {
       "formatting": Object {
         "highlighting": Array [],
       },
-      "positions": Immutable.Map {},
+      "positions": Immutable.Map {
+        "dead-beef": Object {
+          "col": 0,
+          "height": 4,
+          "row": 0,
+          "width": 4,
+        },
+      },
       "selected_fields": undefined,
       "titles": Immutable.Map {},
       "widget_mapping": Immutable.Map {
@@ -124,7 +131,14 @@ Object {
       "formatting": Object {
         "highlighting": Array [],
       },
-      "positions": Immutable.Map {},
+      "positions": Immutable.Map {
+        "dead-beef": Object {
+          "col": 0,
+          "height": 4,
+          "row": 0,
+          "width": 4,
+        },
+      },
       "selected_fields": undefined,
       "titles": Immutable.Map {},
       "widget_mapping": Immutable.Map {

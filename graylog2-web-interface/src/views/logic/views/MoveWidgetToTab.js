@@ -6,6 +6,7 @@ import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import Widget from '../widgets/Widget';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
+import WidgetPosition from '../widgets/WidgetPosition';
 
 
 const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: View): View => {
@@ -25,15 +26,22 @@ const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: V
     .build();
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View): View => {
+const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetPosition: WidgetPosition): View => {
   const viewState = dashboard.state.get(targetQueryId);
   const newWidget = widget.toBuilder().id(uuid()).build();
+  const { widgetPositions } = viewState;
+  widgetPositions[newWidget.id] = widgetPosition;
   const newViewState = viewState.toBuilder()
     .widgets(viewState.widgets.push(newWidget))
+    .widgetPositions(widgetPositions)
     .build();
   return dashboard.toBuilder()
     .state(dashboard.state.set(targetQueryId, newViewState))
     .build();
+};
+
+const _getWidgetPosition = (widgetId: WidgetId, queryId: QueryId, view: View): WidgetPosition => {
+  return view.state.get(queryId).widgetPositions[widgetId];
 };
 
 const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: View, copy: boolean = false): ?View => {
@@ -45,8 +53,12 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
 
   if (match) {
     const [widget, queryId] = match;
+    const newWidgetPosition = _getWidgetPosition(widgetId, queryId, dashboard).toBuilder()
+      .col(0)
+      .row(0)
+      .build();
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
-    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard));
+    return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, newWidgetPosition));
   }
   return undefined;
 };
