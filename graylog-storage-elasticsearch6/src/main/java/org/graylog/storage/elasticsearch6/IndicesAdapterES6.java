@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -71,7 +72,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -132,12 +132,14 @@ public class IndicesAdapterES6 implements IndicesAdapter {
 
             final Bulk.Builder bulkRequestBuilder = new Bulk.Builder();
             for (JsonNode jsonElement : scrollHits) {
-                final Map<String, Object> doc = Optional.ofNullable(jsonElement.path("_source"))
+                Optional.ofNullable(jsonElement.path("_source"))
                         .map(sourceJson -> objectMapper.<Map<String, Object>>convertValue(sourceJson, TypeReferences.MAP_STRING_OBJECT))
-                        .orElse(Collections.emptyMap());
-                final String id = (String) doc.remove("_id");
-
-                bulkRequestBuilder.addAction(indexingHelper.prepareIndexRequest(target, doc, id));
+                        .ifPresent(doc -> {
+                            final String id = (String) doc.remove("_id");
+                            if (!Strings.isNullOrEmpty(id)) {
+                                bulkRequestBuilder.addAction(indexingHelper.prepareIndexRequest(target, doc, id));
+                            }
+                        });
             }
 
             final BulkResult bulkResult = JestUtils.execute(jestClient, bulkRequestBuilder.build(), () -> "Couldn't bulk index messages into index " + target);
