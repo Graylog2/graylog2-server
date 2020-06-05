@@ -248,6 +248,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                 <br />
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -281,6 +282,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}
@@ -540,6 +542,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                 <br />
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -573,6 +576,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}
@@ -1301,6 +1305,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                 <br />
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -1334,6 +1339,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}
@@ -1593,6 +1599,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                 <br />
                 <SearchForm
                   buttonLeftMargin={5}
+                  focusAfterMount={false}
                   label={null}
                   loadingLabel="Loading..."
                   onQueryChange={[Function]}
@@ -1626,6 +1633,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                       >
                         <input
                           autoComplete="off"
+                          autoFocus={false}
                           className="query form-control"
                           id="common-search-form-query-input"
                           onChange={[Function]}

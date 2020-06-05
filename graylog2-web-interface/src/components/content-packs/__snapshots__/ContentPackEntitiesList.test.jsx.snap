@@ -19,6 +19,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
       onQueryChange={[Function]}
@@ -52,6 +53,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
           >
             <input
               autoComplete="off"
+              autoFocus={false}
               className="query form-control"
               id="common-search-form-query-input"
               onChange={[Function]}
@@ -386,6 +388,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
       onQueryChange={[Function]}
@@ -419,6 +422,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
           >
             <input
               autoComplete="off"
+              autoFocus={false}
               className="query form-control"
               id="common-search-form-query-input"
               onChange={[Function]}
