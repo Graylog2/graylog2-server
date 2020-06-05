@@ -16,45 +16,51 @@ type Props = {
 };
 
 const _multiplierForElement = (element, targetWidth, targetHeight) => {
+  const childSizeRatio = 0.8; // Propotion of the child size in relation to the container
   const contentWidth = element.offsetWidth;
   const contentHeight = element.offsetHeight;
 
-  const widthMultiplier = (targetWidth * 0.8) / contentWidth;
-  const heightMultiplier = (targetHeight * 0.8) / contentHeight;
+  const widthMultiplier = (targetWidth * childSizeRatio) / contentWidth;
+  const heightMultiplier = (targetHeight * childSizeRatio) / contentHeight;
   return Math.min(widthMultiplier, heightMultiplier);
 };
 
-const AutoFontSizer = ({ children, target, height, width }: Props) => {
+const _updateFontSize = (setFontSize, currentSize, newSize) => {
+  if (currentSize !== newSize && newSize !== 0 && Number.isFinite(newSize)) {
+    setFontSize(newSize);
+  }
+};
+
+const useAutoFontSize = (target, _container, height, width) => {
+  // This hook will update the font size based on the difference between the dimensions of the container and its child.
+  // The font size is being recalculated, until the mentioned difference is within the tolerance.
+  const tolerance = 0.01;
   const [fontSize, setFontSize] = useState(20);
-  const _container = useRef<?HTMLElement>();
 
   useEffect(() => {
     const container = target ? { current: { children: [target] } } : _container;
-    if (!container.current) {
-      return;
-    }
+    const containerChildren = container?.current?.children;
 
-    const { children: containerChildren } = container.current;
-
-    if (containerChildren.length <= 0) {
+    if (!containerChildren || containerChildren.length <= 0) {
       return;
     }
 
     const contentElement = containerChildren[0];
     const multiplier = _multiplierForElement(contentElement, width, height);
-
-    if (Math.abs(1 - multiplier) <= 0.01) {
+    if (Math.abs(1 - multiplier) <= tolerance) {
       return;
     }
 
-    const newFontsize = Math.floor(fontSize * multiplier);
-
-    if (fontSize !== newFontsize && newFontsize !== 0 && Number.isFinite(newFontsize)) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      setFontSize(newFontsize);
-    }
+    const newFontSize = Math.floor(fontSize * multiplier);
+    _updateFontSize(setFontSize, fontSize, newFontSize);
   }, [target, _container, fontSize, height, width]);
 
+  return fontSize;
+};
+
+const AutoFontSizer = ({ children, target, height, width }: Props) => {
+  const _container = useRef<?HTMLElement>();
+  const fontSize = useAutoFontSize(target, _container, height, width);
   // $FlowFixMe: non-ideal react type declaration requires forced casting
   const _mixedContainer: { current: mixed } = _container;
 
