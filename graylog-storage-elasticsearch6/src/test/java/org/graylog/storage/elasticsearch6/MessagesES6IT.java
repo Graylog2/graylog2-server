@@ -52,7 +52,7 @@ public class MessagesES6IT extends MessagesIT {
         assertThat(message.hasField(JestResult.ES_METADATA_VERSION)).isFalse();
     }
 
-    protected boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id) {
+    private boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id) {
         final Index indexRequest = indexingHelper.prepareIndexRequest(index, source, id);
         final DocumentResult indexResponse = JestUtils.execute(jestClient(), indexRequest, () -> "Unable to index message");
 
