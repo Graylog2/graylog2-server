@@ -1,6 +1,5 @@
 // @flow strict
 import React, { useState } from 'react';
-import { Map } from 'immutable';
 import { ListGroup, ListGroupItem } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';

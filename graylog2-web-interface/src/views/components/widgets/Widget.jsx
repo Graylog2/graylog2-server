@@ -360,9 +360,9 @@ class Widget extends React.Component<Props, State> {
                         <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                       </IfSearch>
                       <IfDashboard>
-                      <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
-                    </IfDashboard>
-                    <MenuItem divider />
+                        <MenuItem onSelect={this._onToggleMoveWidgetToTab}>Move to Page</MenuItem>
+                      </IfDashboard>
+                      <MenuItem divider />
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                     </WidgetActionDropdown>
                     {showCopyToDashboard && (
@@ -371,12 +371,12 @@ class Widget extends React.Component<Props, State> {
                                        onCancel={this._onToggleCopyToDashboard} />
                     )}
                     {showCsvExport && <CSVExportModal view={view.view} directExportWidgetId={widget.id} closeModal={this._onToggleCSVExport} />}
-                  {showMoveWidgetToTab && (
-                    <MoveWidgetToTabModal view={view.view}
-                                          widgetId={widget.id}
-                                          onCancel={this._onToggleMoveWidgetToTab}
-                                          onSubmit={this._onMoveWidgetToTab} />
-                  )}
+                    {showMoveWidgetToTab && (
+                      <MoveWidgetToTabModal view={view.view}
+                                            widgetId={widget.id}
+                                            onCancel={this._onToggleMoveWidgetToTab}
+                                            onSubmit={this._onMoveWidgetToTab} />
+                    )}
                   </IfInteractive>
                 </WidgetActionsWBar>
               </WidgetHeader>
