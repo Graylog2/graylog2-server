@@ -85,15 +85,22 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 ? query.usedStreamIds()
                 : messageList.effectiveStreams();
 
-        final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, SortOrder.DESC)));
+        final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
         sorts.forEach(sort -> {
             final FieldSortBuilder fieldSort = SortBuilders.fieldSort(sort.field())
-                    .order(sort.order());
+                    .order(toSortOrder(sort.order()));
             final Optional<String> fieldType = queryContext.fieldType(effectiveStreamIds, sort.field());
             searchSourceBuilder.sort(fieldType.map(fieldSort::unmappedType).orElse(fieldSort));
         });
     }
 
+    private SortOrder toSortOrder(Sort.Order sortOrder) {
+        switch (sortOrder) {
+            case ASC: return SortOrder.ASC;
+            case DESC: return SortOrder.DESC;
+            default: throw new IllegalStateException("Invalid sort order: " + sortOrder);
+        }
+    }
     private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {
         if (!allowHighlighting)
             return;

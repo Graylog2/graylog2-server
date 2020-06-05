@@ -149,7 +149,7 @@ public class ESMessageListTest {
                 .limit(100)
                 .offset(0)
                 .streams(Collections.singleton(stream))
-                .sort(Collections.singletonList(Sort.create(sortField, SortOrder.ASC)))
+                .sort(Collections.singletonList(Sort.create(sortField, Sort.Order.ASC)))
                 .build();
     }
 
