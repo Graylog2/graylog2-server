@@ -18,15 +18,11 @@ package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Count;
-import io.searchbox.core.CountResult;
 import joptsimple.internal.Strings;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -42,10 +38,8 @@ import org.junit.Test;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -53,9 +47,7 @@ import static org.mockito.Mockito.mock;
 public abstract class MessagesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "messages_it_deflector";
 
-    private Messages messages;
-
-    private Count count;
+    protected Messages messages;
 
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
@@ -83,7 +75,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
-        count = new Count.Builder().addIndex(INDEX_NAME).build();
         final MetricRegistry metricRegistry = new MetricRegistry();
         messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class));
     }
@@ -92,25 +83,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void tearDown() {
         client().deleteIndices(INDEX_NAME);
     }
-
-    @Test
-    public void getResultDoesNotContainJestMetadataFields() throws Exception {
-        final String index = UUID.randomUUID().toString();
-        final Map<String, Object> source = new HashMap<>();
-        source.put("message", "message");
-        source.put("source", "source");
-        source.put("timestamp", "2017-04-13 15:29:00.000");
-
-        assertThat(indexMessage(index, source, "1")).isTrue();
-
-        final ResultMessage resultMessage = messages.get("1", index);
-        final Message message = resultMessage.getMessage();
-        assertThat(message).isNotNull();
-        assertThat(message.hasField(JestResult.ES_METADATA_ID)).isFalse();
-        assertThat(message.hasField(JestResult.ES_METADATA_VERSION)).isFalse();
-    }
-
-    protected abstract boolean indexMessage(String index, Map<String, Object> source, String id);
 
     @Test
     public void testIfTooLargeBatchesGetSplitUp() throws Exception {
@@ -125,9 +97,10 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         Thread.sleep(2000); // wait for ES to finish indexing
 
-        final CountResult result = jestClient().execute(count);
-        assertThat(result.getCount()).isEqualTo(MESSAGECOUNT);
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT);
     }
+
+    protected abstract Double messageCount(String indexName);
 
     @Test
     public void unevenTooLargeBatchesGetSplitUp() throws Exception {
@@ -140,9 +113,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(failedItems).isEmpty();
 
         Thread.sleep(2000); // wait for ES to finish indexing
-        final CountResult result = jestClient().execute(count);
 
-        assertThat(result.getCount()).isEqualTo(MESSAGECOUNT + LARGE_MESSAGECOUNT);
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT + LARGE_MESSAGECOUNT);
     }
 
     private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
