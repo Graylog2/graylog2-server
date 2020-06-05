@@ -16,9 +16,7 @@
  */
 package org.graylog2.indexer.messages;
 
-import io.searchbox.core.Index;
 import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -128,16 +126,6 @@ public class Messages {
         return indexFailures.stream()
                 .map(IndexFailure::letterId)
                 .collect(Collectors.toList());
-    }
-
-    public Index prepareIndexRequest(String index, Map<String, Object> source, String id) {
-        source.remove(Message.FIELD_ID);
-
-        return new Index.Builder(source)
-                .index(index)
-                .type(IndexMapping.TYPE_MESSAGE)
-                .id(id)
-                .build();
     }
 
     public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {
