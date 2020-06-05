@@ -68,7 +68,7 @@ const NodeLoggers = createReactClass({
                         bsStyle="primary"
                         className="trigger-log-level-metrics"
                         onClick={() => this.setState({ showDetails: !this.state.showDetails })}>
-                  <Icon name="dashboard" />{' '}
+                  <Icon name="tachometer-alt" />{' '}
                   {this.state.showDetails ? 'Hide' : 'Show'} log level metrics
                 </Button>
               </div>

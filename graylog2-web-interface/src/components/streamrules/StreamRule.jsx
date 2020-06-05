@@ -58,7 +58,7 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
         <Button bsStyle="link"
                 bsSize="xsmall"
                 onClick={_onDelete}>
-          <Icon name="trash-o" />
+          <Icon name="trash-alt" />
         </Button>
         <Button bsStyle="link"
                 bsSize="xsmall"

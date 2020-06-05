@@ -1,8 +1,8 @@
 Examples:
 ```js
-<p><strong>Default:</strong> <Icon name="pencil" /></p>
+<p><strong>Default:</strong> <Icon name="pencil-alt" /></p>
 
-<p><strong>Spinning:</strong> <Icon name="refresh" spin /></p>
+<p><strong>Spinning:</strong> <Icon name="sync" spin /></p>
 
 <p><strong>Pulsing:</strong> <Icon name="spinner" pulse /></p>
 
@@ -19,7 +19,7 @@ Examples:
 
 <p>
   <strong>Flipped:</strong>
-  <Icon name="hand-paper-o" flip="horizontal" />{' '}<Icon name="hand-paper-o" />
+  <Icon name="hand-paper" flip="horizontal" />{' '}<Icon name="hand-paper" />
 </p>
 
 ```

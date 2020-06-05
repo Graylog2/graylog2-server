@@ -18,9 +18,9 @@ const iconClass = (type) => {
     case 'int':
     case 'long':
     case 'short':
-      return 'line-chart';
+      return 'chart-line';
     case 'date':
-      return 'calendar';
+      return 'calendar-alt';
     default:
       return 'question-circle';
   }

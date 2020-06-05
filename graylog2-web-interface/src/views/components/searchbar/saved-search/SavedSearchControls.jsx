@@ -226,7 +226,6 @@ class SavedSearchControls extends React.Component<Props, State> {
     );
 
     const loaded = (view && view.id);
-    const savedSearchStyle = loaded ? 'star' : 'star-o';
     let savedSearchColor: string = '';
     if (loaded) {
       savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
@@ -258,21 +257,21 @@ class SavedSearchControls extends React.Component<Props, State> {
             <ButtonGroup>
               <>
                 <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-                  <Icon style={{ color: savedSearchColor }} name={savedSearchStyle} /> Save
+                  <Icon style={{ color: savedSearchColor }} name="star" /> Save
                 </Button>
                 {savedSearchForm}
               </>
               <Button title="Load a previously saved search"
                       onClick={this.toggleListModal}>
-                <Icon name="folder-o" /> Load
+                <Icon name="folder" /> Load
               </Button>
               {savedSearchList}
               <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
                 <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
                   <Icon name="edit" /> Edit metadata
                 </MenuItem>
-                <MenuItem onSelect={this.loadAsDashboard}><Icon name="dashboard" /> Export to dashboard</MenuItem>
-                <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download" /> Export to CSV</MenuItem>
+                <MenuItem onSelect={this.loadAsDashboard}><Icon name="tachometer-alt" /> Export to dashboard</MenuItem>
+                <MenuItem onSelect={this.toggleCSVExport}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
                 <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
                   <Icon name="eraser" /> Reset search
                 </MenuItem>

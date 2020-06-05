@@ -188,13 +188,13 @@ const Scratchpad = () => {
                   spellCheck={false} />
 
         <Footer>
-          <SavingMessage visible={recentlySaved}><Icon name="hdd-o" /> Saved!</SavingMessage>
+          <SavingMessage visible={recentlySaved}><Icon name="hdd" /> Saved!</SavingMessage>
           <SplitButton title={CopyWithIcon}
                        bsStyle="info"
                        data-clipboard-button
                        data-clipboard-target={`#${TEXTAREA_ID}`}
                        id="scratchpad-actions">
-            <MenuItem onClick={openConfirmClear}><Icon name="trash" /> Clear</MenuItem>
+            <MenuItem onClick={openConfirmClear}><Icon name="trash-alt" /> Clear</MenuItem>
           </SplitButton>
         </Footer>
 

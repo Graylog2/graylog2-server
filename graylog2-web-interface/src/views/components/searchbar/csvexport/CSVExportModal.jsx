@@ -112,7 +112,7 @@ const CSVExportModal = ({ closeModal, fields, view, directExportWidgetId, execut
         <Button type="button" onClick={_startDownload} disabled={!enableDownload} bsStyle="primary" data-testid="csv-download-button">
           {loading
             ? <Spinner text="Downloading..." delay={0} />
-            : <><Icon name="cloud-download" />&nbsp;Start Download</>}
+            : <><Icon name="cloud-download-alt" />&nbsp;Start Download</>}
         </Button>
       </Modal.Footer>
     </BootstrapModalWrapper>

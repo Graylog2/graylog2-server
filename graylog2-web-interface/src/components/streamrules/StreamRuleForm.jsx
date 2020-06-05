@@ -112,7 +112,7 @@ class StreamRuleForm extends React.Component {
               <br /><br />
               Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
                                                                       title="More information"
-                                                                      text={<Icon name="lightbulb-o" />} />
+                                                                      text={<Icon name="lightbulb" />} />
             </Well>
           </Col>
         </div>

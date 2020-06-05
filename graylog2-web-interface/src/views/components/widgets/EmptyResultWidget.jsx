@@ -15,7 +15,7 @@ const popover = (
 
     <ul>
       <li>
-        <Icon name="group" />&nbsp;
+        <Icon name="users" />&nbsp;
         <a href="https://www.graylog.org/community-support/" target="_blank" rel="noopener noreferrer">Community support</a>
       </li>
       <li>

@@ -118,7 +118,7 @@ class StreamRulesEditor extends React.Component {
       }
       return (
         <>
-          <MatchIcon name="remove" /> This message would not be routed to this stream.
+          <MatchIcon name="times" /> This message would not be routed to this stream.
         </>
       );
     }
