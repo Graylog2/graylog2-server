@@ -16,9 +16,7 @@
  */
 package org.graylog2.indexer.messages;
 
-import io.searchbox.core.Index;
 import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
