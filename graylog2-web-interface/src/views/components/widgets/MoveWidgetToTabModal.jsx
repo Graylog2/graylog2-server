@@ -5,6 +5,7 @@ import { ListGroup, ListGroupItem } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 import { useStore } from 'stores/connect';
+import QueryTitle from 'views/logic/queries/QueryTitle';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 
 import View from 'views/logic/views/View';
@@ -20,9 +21,9 @@ type TabEntry = { id: string, name: string };
 
 const _tabList = (view: View): Array<TabEntry> => {
   const queryIds = Object.keys(view.state.toObject());
-  return queryIds.map((queryId, index) => {
-    const tabTitle = view.state.get(queryId).titles.get('tab', Map({ title: `Page#${index + 1}` }));
-    return ({ id: queryId, name: tabTitle.get('title') });
+  return queryIds.map((queryId) => {
+    const tabTitle = QueryTitle(view, queryId) || 'Unknown Page title';
+    return ({ id: queryId, name: tabTitle });
   });
 };
 
