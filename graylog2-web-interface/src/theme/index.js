@@ -28,4 +28,4 @@ export {
   themeModes,
 };
 
-export default theme;
+export type { ThemeInterface };
