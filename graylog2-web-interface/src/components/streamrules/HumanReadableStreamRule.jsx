@@ -8,6 +8,8 @@ class HumanReadableStreamRule extends React.Component {
 
   ALWAYS_MATCH_RULE_TYPE = 7;
 
+  MATCH_INPUT = 8;
+
   static propTypes = {
     streamRule: PropTypes.object.isRequired,
     streamRuleTypes: PropTypes.array.isRequired,
@@ -38,6 +40,10 @@ class HumanReadableStreamRule extends React.Component {
   _formatRuleField = (streamRule) => {
     if (streamRule.field) {
       return streamRule.field;
+    }
+
+    if (String(streamRule.type) === String(this.MATCH_INPUT)) {
+      return 'gl_source_input_id';
     }
 
     return this.EMPTY_TAG;
