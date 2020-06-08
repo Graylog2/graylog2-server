@@ -212,7 +212,6 @@ Object {
                           <strong>
                             must 
                           </strong>
-                          match exactly
                            
                           <em>
                             &lt;empty&gt;
@@ -541,16 +540,15 @@ Object {
                          
                         <span>
                           <em>
-                            field_1
+                            &lt;empty&gt;
                           </em>
                            
                           <strong>
                             must 
                           </strong>
-                          match exactly
                            
                           <em>
-                            value_1
+                            &lt;empty&gt;
                           </em>
                         </span>
                       </p>

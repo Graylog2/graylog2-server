@@ -40,7 +40,10 @@ type Props = {
   onClose: () => void,
 };
 
-type State = StreamRule;
+type State = {
+  streamRule: StreamRule,
+  error: string,
+};
 
 class StreamRuleForm extends React.Component<Props, State> {
   static defaultProps = {
@@ -55,30 +58,53 @@ class StreamRuleForm extends React.Component<Props, State> {
 
   MATCH_INPUT = 8;
 
+  PLACEHOLDER_INPUT = 0;
+
   constructor(props) {
     super(props);
 
-    this.state = props.streamRule;
+    this.state = {
+      streamRule: props.streamRule,
+      error: '',
+    };
   }
 
   componentDidMount() {
     InputsActions.list();
   }
 
+  _validateMatchInput = () => {
+    const { streamRule: { value } } = this.state;
+    if (String(value) === String(this.PLACEHOLDER_INPUT)) {
+      this.setState({ error: 'Please choose an input' });
+      return false;
+    }
+
+    this.setState({ error: '' });
+    return true;
+  };
+
   _onSubmit = () => {
-    const { type } = this.state;
+    const { streamRule: currentStreamRule } = this.state;
+    const { type } = currentStreamRule;
     const { streamRule, onSubmit } = this.props;
     const { onClose } = this.props;
 
     if (type === this.ALWAYS_MATCH_RULE_TYPE) {
-      this.setState({ field: '' });
+      currentStreamRule.field = '';
+      this.setState({ streamRule: currentStreamRule });
     }
 
     if (type === this.FIELD_PRESENCE_RULE_TYPE || type === this.ALWAYS_MATCH_RULE_TYPE) {
-      this.setState({ value: '' });
+      currentStreamRule.value = '';
+      this.setState({ streamRule: currentStreamRule });
     }
-
-    onSubmit(streamRule.id, this.state);
+    if (String(type) === String(this.MATCH_INPUT)) {
+      if (!this._validateMatchInput()) {
+        return;
+      }
+    }
+    onSubmit(streamRule.id, currentStreamRule);
     onClose();
   };
 
@@ -90,10 +116,13 @@ class StreamRuleForm extends React.Component<Props, State> {
   );
 
   handleChange = (event) => {
-    const change = {};
+    const { streamRule } = this.state;
 
-    change[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    this.setState(change);
+    streamRule[event.target.name] = FormsUtils.getValueFromInput(event.target);
+    if (event.target.name === 'type' && String(streamRule.type) === String(this.MATCH_INPUT)) {
+      streamRule.value = String(this.PLACEHOLDER_INPUT);
+    }
+    this.setState({ streamRule });
   };
 
   _formatInputOptions = (input) => (
@@ -103,25 +132,37 @@ class StreamRuleForm extends React.Component<Props, State> {
   );
 
   valueBox = () => {
-    const { value, type } = this.state;
+    const { streamRule: { value, type }, error } = this.state;
     const { inputs } = this.props;
     switch (String(type)) {
       case String(this.FIELD_PRESENCE_RULE_TYPE):
       case String(this.ALWAYS_MATCH_RULE_TYPE):
         return '';
-      case String(this.MATCH_INPUT):
+      case String(this.MATCH_INPUT): {
+        const bsStyle = error && error.length > 0 ? 'error' : undefined;
         return (
-          <Input id="Value" type="select" required label="Value" name="value" value={value} onChange={this.handleChange}>
+          <Input bsStyle={bsStyle}
+                 help={error}
+                 id="Value"
+                 type="select"
+                 required
+                 label="Value"
+                 name="value"
+                 value={value}
+                 data-testid="input-selection"
+                 onChange={this.handleChange}>
+            <option value={this.PLACEHOLDER_INPUT}>Choose Input</option>
             {inputs.map(this._formatInputOptions)}
           </Input>
         );
+      }
       default:
         return <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} />;
     }
   };
 
   fieldBox = () => {
-    const { field, type } = this.state;
+    const { streamRule: { field, type } } = this.state;
     switch (String(type)) {
       case String(this.ALWAYS_MATCH_RULE_TYPE):
       case String(this.MATCH_INPUT):
@@ -132,7 +173,7 @@ class StreamRuleForm extends React.Component<Props, State> {
   };
 
   render() {
-    const { type, inverted, description } = this.state;
+    const { streamRule: { type, inverted, description } } = this.state;
     const { streamRuleTypes: ruleTypes, title, onClose } = this.props;
 
     const streamRuleTypes = ruleTypes.map(this._formatStreamRuleType);
@@ -149,7 +190,7 @@ class StreamRuleForm extends React.Component<Props, State> {
         <div>
           <Col md={8}>
             {fieldBox}
-            <Input id="Type" type="select" required label="Type" name="type" value={type} onChange={this.handleChange}>
+            <Input id="Type" data-testid="rule-type-selection" type="select" required label="Type" name="type" value={type} onChange={this.handleChange}>
               {streamRuleTypes}
             </Input>
             {valueBox}

@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 import StreamRuleForm from './StreamRuleForm';
 
 jest.mock('components/common', () => ({
@@ -54,5 +54,30 @@ describe('StreamRuleForm', () => {
                       title="Bach" />,
     );
     expect(container).toMatchSnapshot();
+  });
+
+  it('should validate the selection of match input', () => {
+    const submit = jest.fn();
+    const inputs = [
+      { id: 'my-id', title: 'title', name: 'name' },
+    ];
+    const { getByTestId, getByText } = render(
+      <StreamRuleForm onSubmit={submit}
+                      streamRule={getStreamRule()}
+                      inputs={inputs}
+                      streamRuleTypes={streamRuleTypes}
+                      title="Bach" />,
+    );
+
+    const ruleTypeSelection = getByTestId('rule-type-selection');
+    fireEvent.change(ruleTypeSelection, { target: { name: 'type', value: 8 } });
+    const submitBtn = getByText('Save');
+    fireEvent.click(submitBtn);
+    expect(submit).toHaveBeenCalledTimes(0);
+
+    const inputSelection = getByTestId('input-selection');
+    fireEvent.change(inputSelection, { target: { name: 'value', value: 'my-id' } });
+    fireEvent.click(submitBtn);
+    expect(submit).toHaveBeenCalledTimes(1);
   });
 });
