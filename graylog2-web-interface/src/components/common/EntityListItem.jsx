@@ -52,11 +52,12 @@ class EntityListItem extends React.Component {
      * Add any content that is related to the entity and needs more space to be displayed. This is mostly use
      * to show configuration options.
      */
-    contentRow: PropTypes.node.isRequired,
+    contentRow: PropTypes.node,
   };
 
   static defaultProps = {
     actions: undefined,
+    contentRow: undefined,
     createdFromContentPack: false,
     description: undefined,
     titleSuffix: undefined,
@@ -102,9 +103,11 @@ class EntityListItem extends React.Component {
           </Col>
         </Row>
 
-        <Row className="row-sm">
-          {contentRow}
-        </Row>
+        {contentRow && (
+          <Row className="row-sm">
+            {contentRow}
+          </Row>
+        )}
       </StyledListItem>
     );
   }
