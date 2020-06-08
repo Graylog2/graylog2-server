@@ -22,6 +22,7 @@ public class SourceFields {
     public static final String SOURCE_BYTES = "source_bytes";
     public static final String SOURCE_HOSTNAME = "source_hostname";
     public static final String SOURCE_IP = "source_ip";
+    public static final String SOURCE_IPV6 = "source_ipv6";
     public static final String SOURCE_NAT_IP = "source_nat_ip";
     public static final String SOURCE_NAT_PORT = "source_nat_port";
     public static final String SOURCE_PACKETS = "source_packets";
