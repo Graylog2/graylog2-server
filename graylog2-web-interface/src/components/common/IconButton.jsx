@@ -10,22 +10,22 @@ const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.b
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  
+
   height: 25px;
   width: 25px;
   border: 0
 
   background-color: transparent;
   cursor: pointer;
-  color: ${theme.color.gray[70]};
+  color: ${theme.colors.gray[70]};
   font-size: 16px;
 
   :hover {
-    background-color: ${theme.color.gray[90]};
+    background-color: ${theme.colors.gray[90]};
   }
 
   :active {
-    background-color: ${theme.color.gray[80]};
+    background-color: ${theme.colors.gray[80]};
   }
 `);
 

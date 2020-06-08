@@ -11,7 +11,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     height: 34px !important;
     width: 100% !important;
     background-color: ${scTheme.colors.global.inputBackground};
-    color: ${theme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
+    color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
 
     &.ace_multiselect .ace_selection.ace_start {
       box-shadow: 0 0 3px 0 ${scTheme.colors.global.inputBackground};
@@ -19,7 +19,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
 
     .ace_gutter {
       background: ${scTheme.colors.global.inputBackground};
-      color: ${theme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
+      color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
     }
 
     .ace_print-margin {
