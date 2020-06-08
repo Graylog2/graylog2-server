@@ -183,6 +183,7 @@ const ApiRoutes = {
   },
   StreamsApiController: {
     index: () => { return { url: '/streams' }; },
+    paginated: () => { return { url: '/streams/paginated' }; },
     get: (streamId) => { return { url: `/streams/${streamId}` }; },
     create: () => { return { url: '/streams' }; },
     update: (streamId) => { return { url: `/streams/${streamId}` }; },

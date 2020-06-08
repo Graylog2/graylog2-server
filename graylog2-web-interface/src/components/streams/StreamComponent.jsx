@@ -1,14 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Alert } from 'components/graylog';
-import { IfPermitted, TypeAheadDataFilter, Icon } from 'components/common';
+import { Alert } from 'components/graylog';
+import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import Spinner from 'components/common/Spinner';
 import StreamList from './StreamList';
-
 import CreateStreamButton from './CreateStreamButton';
 
 const StreamsStore = StoreProvider.getStore('Streams');
@@ -21,7 +19,20 @@ class StreamComponent extends React.Component {
     indexSets: PropTypes.array.isRequired,
   };
 
-  state = {};
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      pagination: {
+        page: 1,
+        perPage: 10,
+        count: 0,
+        total: 0,
+        query: '',
+      },
+    };
+  }
+
 
   componentDidMount() {
     this.loadData();
@@ -32,41 +43,58 @@ class StreamComponent extends React.Component {
     StreamRulesStore.onChange(this.loadData);
   }
 
-  componentDidUpdate() {
-    if (this.state.filteredStreams === null) {
-      this._filterStreams();
-    }
-  }
-
   componentWillUnmount() {
     StreamsStore.unregister(this.loadData);
     StreamRulesStore.unregister(this.loadData);
   }
 
-  loadData = () => {
-    StreamsStore.load((streams) => {
-      this.setState({
-        streams: streams,
-        filteredStreams: null,
+  loadData = (callback) => {
+    const { state } = this;
+    const { page, perPage, query } = state.pagination;
+    StreamsStore.searchPaginated(page, perPage, query)
+      .then(({ streams, pagination }) => {
+        this.setState({
+          streams: streams,
+          pagination: pagination,
+        });
+      })
+      .then(() => {
+        if (callback) {
+          callback();
+        }
       });
-    });
-  };
-
-  _filterStreams = () => {
-    if (this.streamFilter) {
-      this.streamFilter.filterData();
-    }
-  };
-
-  _updateFilteredStreams = (filteredStreams) => {
-    this.setState({ filteredStreams: filteredStreams });
   };
 
   _isLoading = () => {
-    return !(this.state.streams && this.state.streamRuleTypes);
+    const { state } = this;
+    return !(state.streams && state.streamRuleTypes);
+  };
+
+  _onPageChange = (newPage, newPerPage) => {
+    const { pagination } = this.state;
+    const newPagination = Object.assign(pagination, {
+      page: newPage,
+      perPage: newPerPage,
+    });
+    this.setState({ pagination: newPagination }, this.loadData);
+  };
+
+  _onSearch = (query, resetLoadingCallback) => {
+    const { pagination } = this.state;
+    const newPagination = Object.assign(pagination, { query: query });
+    this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
+  };
+
+  _onReset = () => {
+    const { pagination } = this.state;
+    const newPagination = Object.assign(pagination, { query: '' });
+    this.setState({ pagination: newPagination }, this.loadData);
   };
 
   render() {
+    const { streams, pagination, streamRuleTypes } = this.state;
+    const { currentUser, onStreamSave, indexSets } = this.props;
+
     if (this._isLoading()) {
       return (
         <div style={{ marginLeft: 10 }}>
@@ -75,15 +103,15 @@ class StreamComponent extends React.Component {
       );
     }
 
-    if (this.state.streams.length === 0) {
+    if (streams.length === 0) {
       const createStreamButton = (
         <IfPermitted permissions="streams:create">
           <CreateStreamButton bsSize="small"
                               bsStyle="link"
                               className="btn-text"
                               buttonText="Create one now"
-                              indexSets={this.props.indexSets}
-                              onSave={this.props.onStreamSave} />
+                              indexSets={indexSets}
+                              onSave={onStreamSave} />
         </IfPermitted>
       );
 
@@ -94,34 +122,24 @@ class StreamComponent extends React.Component {
       );
     }
 
-    const streamsList = this.state.filteredStreams ? (
-      <StreamList streams={this.state.filteredStreams}
-                  streamRuleTypes={this.state.streamRuleTypes}
-                  permissions={this.props.currentUser.permissions}
-                  user={this.props.currentUser}
-                  onStreamSave={this.props.onStreamSave}
-                  indexSets={this.props.indexSets} />
-    ) : <Spinner />;
+    const streamsList = (
+      <StreamList streams={streams}
+                  streamRuleTypes={streamRuleTypes}
+                  permissions={currentUser.permissions}
+                  user={currentUser}
+                  onStreamSave={onStreamSave}
+                  indexSets={indexSets} />
+    );
 
     return (
       <div>
-        <Row className="row-sm">
-          <Col md={8}>
-            <TypeAheadDataFilter id="stream-data-filter"
-                                 ref={(streamFilter) => { this.streamFilter = streamFilter; }}
-                                 label="Filter streams"
-                                 data={this.state.streams}
-                                 displayKey="title"
-                                 filterSuggestions={[]}
-                                 searchInKeys={['title', 'description']}
-                                 onDataFiltered={this._updateFilteredStreams} />
-          </Col>
-        </Row>
-        <Row>
-          <Col md={12}>
-            {streamsList}
-          </Col>
-        </Row>
+        <PaginatedList onChange={this._onPageChange}
+                       totalItems={pagination.total}>
+          <div style={{ marginBottom: 15 }}>
+            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
+          </div>
+          <div>{streamsList}</div>
+        </PaginatedList>
       </div>
     );
   }
