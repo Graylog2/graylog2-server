@@ -1,10 +1,8 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { values, merge, fill, find, isEmpty, get } from 'lodash';
 
-
-import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationData } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { ChartDefinition, ExtractedSeries } from '../ChartData';
@@ -131,7 +129,7 @@ const HeatmapVisualization: VisualizationComponent = makeVisualization(({ config
 
 HeatmapVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object)).isRequired,
+  data: AggregationData.isRequired,
 };
 
 export default HeatmapVisualization;
