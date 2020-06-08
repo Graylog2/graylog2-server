@@ -18,8 +18,6 @@ package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -30,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AutoIntervalBoundariesTest {
     @Test
     public void rangeBoundariesMustBeConnectedAndSpanEverything() {
-        final ImmutableMap<Range<Duration>, DateHistogramInterval> ranges = AutoInterval.boundaries.asMapOfRanges();
+        final ImmutableMap<Range<Duration>, DateInterval> ranges = AutoInterval.boundaries.asMapOfRanges();
         final int rangeCount = ranges.size();
         final Range<Duration> firstRange = ranges.keySet().asList().get(0);
         assertThat(firstRange.hasLowerBound()).as("first range's lower bound should be unbounded").isFalse();

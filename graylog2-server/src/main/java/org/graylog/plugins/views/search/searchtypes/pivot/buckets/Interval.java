@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 @JsonTypeInfo(
@@ -34,5 +33,5 @@ public interface Interval {
     @JsonProperty(TYPE_FIELD)
     String type();
 
-    DateHistogramInterval toDateHistogramInterval(TimeRange timerange);
+    DateInterval toDateInterval(TimeRange timerange);
 }

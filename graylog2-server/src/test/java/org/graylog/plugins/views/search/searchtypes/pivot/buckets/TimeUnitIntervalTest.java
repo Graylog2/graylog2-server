@@ -102,7 +102,7 @@ public class TimeUnitIntervalTest {
         public void allowsPositiveQuantityAndKnownUnit() throws InvalidRangeParametersException {
             final TimeUnitInterval interval = builder().timeunit(timeunit).build();
 
-            assertThat(interval.toDateHistogramInterval(RelativeRange.create(300)))
+            assertThat(interval.toDateInterval(RelativeRange.create(300)))
                     .isEqualTo(new DateHistogramInterval(expectedTimeunit));
         }
     }

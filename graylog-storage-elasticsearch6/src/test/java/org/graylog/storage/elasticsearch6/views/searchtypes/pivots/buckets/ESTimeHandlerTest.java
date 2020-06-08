@@ -16,15 +16,15 @@
  */
 package org.graylog.storage.elasticsearch6.views.searchtypes.pivots.buckets;
 
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESTimeHandler;
-import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;
+import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -81,7 +81,7 @@ public class ESTimeHandlerTest {
     @Test
     public void timeSpecIntervalIsCalculatedOnPivotTimerangeIfOverridden() throws InvalidRangeParametersException {
         final ArgumentCaptor<TimeRange> timeRangeCaptor = ArgumentCaptor.forClass(TimeRange.class);
-        when(interval.toDateHistogramInterval(timeRangeCaptor.capture())).thenReturn(DateHistogramInterval.DAY);
+        when(interval.toDateInterval(timeRangeCaptor.capture())).thenReturn(DateInterval.days(1));
         when(pivot.timerange()).thenReturn(Optional.of(DerivedTimeRange.of(RelativeRange.create(4242))));
 
         this.esTimeHandler.doCreateAggregation("foobar", pivot, time, esPivot, queryContext, query);
@@ -93,7 +93,7 @@ public class ESTimeHandlerTest {
     @Test
     public void timeSpecIntervalIsCalculatedOnQueryTimeRangeIfNoPivotTimeRange() throws InvalidRangeParametersException {
         final ArgumentCaptor<TimeRange> timeRangeCaptor = ArgumentCaptor.forClass(TimeRange.class);
-        when(interval.toDateHistogramInterval(timeRangeCaptor.capture())).thenReturn(DateHistogramInterval.DAY);
+        when(interval.toDateInterval(timeRangeCaptor.capture())).thenReturn(DateInterval.days(1));
         when(pivot.timerange()).thenReturn(Optional.empty());
         when(query.timerange()).thenReturn(RelativeRange.create(2323));
 

@@ -23,7 +23,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.Range;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -38,37 +37,37 @@ public abstract class AutoInterval implements Interval {
     public static final String type = "auto";
 
     @VisibleForTesting
-    static final ImmutableRangeMap<Duration, DateHistogramInterval> boundaries = ImmutableRangeMap.<Duration, DateHistogramInterval>builder()
-            .put(Range.atMost( Duration.ofMillis(20)), new DateHistogramInterval("1ms"))
-            .put(Range.openClosed(Duration.ofMillis(20), Duration.ofMillis(200)), new DateHistogramInterval("5ms"))
-            .put(Range.openClosed(Duration.ofMillis(200), Duration.ofMillis(500)), new DateHistogramInterval("10ms"))
-            .put(Range.openClosed(Duration.ofMillis(500), Duration.ofMillis(1000)), new DateHistogramInterval("20ms"))
-            .put(Range.openClosed(Duration.ofMillis(1000), Duration.ofSeconds(2)), new DateHistogramInterval("40ms"))
-            .put(Range.openClosed(Duration.ofSeconds(2), Duration.ofSeconds(10)), new DateHistogramInterval("200ms"))
-            .put(Range.openClosed(Duration.ofSeconds(10), Duration.ofSeconds(30)), new DateHistogramInterval("500ms"))
-            .put(Range.openClosed(Duration.ofSeconds(30), Duration.ofMinutes(1)), DateHistogramInterval.seconds(1))
-            .put(Range.openClosed(Duration.ofMinutes(1), Duration.ofMinutes(2)), DateHistogramInterval.seconds(2))
-            .put(Range.openClosed(Duration.ofMinutes(2), Duration.ofMinutes(4)), DateHistogramInterval.seconds(5))
-            .put(Range.openClosed(Duration.ofMinutes(4), Duration.ofMinutes(7)), DateHistogramInterval.seconds(10))
-            .put(Range.openClosed(Duration.ofMinutes(7), Duration.ofMinutes(10)), DateHistogramInterval.seconds(20))
-            .put(Range.openClosed(Duration.ofMinutes(10), Duration.ofMinutes(30)), DateHistogramInterval.seconds(30))
-            .put(Range.openClosed(Duration.ofMinutes(30), Duration.ofHours(1)), DateHistogramInterval.MINUTE)
-            .put(Range.openClosed(Duration.ofHours(1), Duration.ofHours(2)), DateHistogramInterval.minutes(2))
-            .put(Range.openClosed(Duration.ofHours(2), Duration.ofHours(4)), DateHistogramInterval.minutes(5))
-            .put(Range.openClosed(Duration.ofHours(4), Duration.ofHours(12)), DateHistogramInterval.minutes(10))
-            .put(Range.openClosed(Duration.ofHours(12), Duration.ofHours(16)), DateHistogramInterval.minutes(15))
-            .put(Range.openClosed(Duration.ofHours(16), Duration.ofDays(1)), DateHistogramInterval.minutes(30))
-            .put(Range.openClosed(Duration.ofDays(1), Duration.ofDays(2)), DateHistogramInterval.HOUR)
-            .put(Range.openClosed(Duration.ofDays(2), Duration.ofDays(4)), DateHistogramInterval.hours(2))
-            .put(Range.openClosed(Duration.ofDays(4), Duration.ofDays(10)), DateHistogramInterval.hours(4))
-            .put(Range.openClosed(Duration.ofDays(10), Duration.ofDays(12)), DateHistogramInterval.hours(6))
-            .put(Range.openClosed(Duration.ofDays(12), Duration.ofDays(28)), DateHistogramInterval.hours(12))
-            .put(Range.openClosed(Duration.ofDays(28), Duration.ofDays(60)), DateHistogramInterval.DAY)
-            .put(Range.openClosed(Duration.ofDays(60), Duration.ofDays(120)), DateHistogramInterval.days(2))
-            .put(Range.openClosed(Duration.ofDays(120), Duration.ofDays(180)), DateHistogramInterval.days(3))
-            .put(Range.openClosed(Duration.ofDays(180), Duration.ofDays(365)), DateHistogramInterval.WEEK)
-            .put(Range.open(Duration.ofDays(365), Duration.ofDays(730)), DateHistogramInterval.days(14))
-            .put(Range.atLeast(Duration.ofDays(730)), DateHistogramInterval.MONTH)
+    static final ImmutableRangeMap<Duration, DateInterval> boundaries = ImmutableRangeMap.<Duration, DateInterval>builder()
+            .put(Range.atMost( Duration.ofMillis(20)), new DateInterval(1, "ms"))
+            .put(Range.openClosed(Duration.ofMillis(20), Duration.ofMillis(200)), new DateInterval(5, "ms"))
+            .put(Range.openClosed(Duration.ofMillis(200), Duration.ofMillis(500)), new DateInterval(10, "ms"))
+            .put(Range.openClosed(Duration.ofMillis(500), Duration.ofMillis(1000)), new DateInterval(20, "ms"))
+            .put(Range.openClosed(Duration.ofMillis(1000), Duration.ofSeconds(2)), new DateInterval(40, "ms"))
+            .put(Range.openClosed(Duration.ofSeconds(2), Duration.ofSeconds(10)), new DateInterval(200, "ms"))
+            .put(Range.openClosed(Duration.ofSeconds(10), Duration.ofSeconds(30)), new DateInterval(500, "ms"))
+            .put(Range.openClosed(Duration.ofSeconds(30), Duration.ofMinutes(1)), DateInterval.seconds(1))
+            .put(Range.openClosed(Duration.ofMinutes(1), Duration.ofMinutes(2)), DateInterval.seconds(2))
+            .put(Range.openClosed(Duration.ofMinutes(2), Duration.ofMinutes(4)), DateInterval.seconds(5))
+            .put(Range.openClosed(Duration.ofMinutes(4), Duration.ofMinutes(7)), DateInterval.seconds(10))
+            .put(Range.openClosed(Duration.ofMinutes(7), Duration.ofMinutes(10)), DateInterval.seconds(20))
+            .put(Range.openClosed(Duration.ofMinutes(10), Duration.ofMinutes(30)), DateInterval.seconds(30))
+            .put(Range.openClosed(Duration.ofMinutes(30), Duration.ofHours(1)), DateInterval.minutes(1))
+            .put(Range.openClosed(Duration.ofHours(1), Duration.ofHours(2)), DateInterval.minutes(2))
+            .put(Range.openClosed(Duration.ofHours(2), Duration.ofHours(4)), DateInterval.minutes(5))
+            .put(Range.openClosed(Duration.ofHours(4), Duration.ofHours(12)), DateInterval.minutes(10))
+            .put(Range.openClosed(Duration.ofHours(12), Duration.ofHours(16)), DateInterval.minutes(15))
+            .put(Range.openClosed(Duration.ofHours(16), Duration.ofDays(1)), DateInterval.minutes(30))
+            .put(Range.openClosed(Duration.ofDays(1), Duration.ofDays(2)), DateInterval.hours(1))
+            .put(Range.openClosed(Duration.ofDays(2), Duration.ofDays(4)), DateInterval.hours(2))
+            .put(Range.openClosed(Duration.ofDays(4), Duration.ofDays(10)), DateInterval.hours(4))
+            .put(Range.openClosed(Duration.ofDays(10), Duration.ofDays(12)), DateInterval.hours(6))
+            .put(Range.openClosed(Duration.ofDays(12), Duration.ofDays(28)), DateInterval.hours(12))
+            .put(Range.openClosed(Duration.ofDays(28), Duration.ofDays(60)), DateInterval.days(1))
+            .put(Range.openClosed(Duration.ofDays(60), Duration.ofDays(120)), DateInterval.days(2))
+            .put(Range.openClosed(Duration.ofDays(120), Duration.ofDays(180)), DateInterval.days(3))
+            .put(Range.openClosed(Duration.ofDays(180), Duration.ofDays(365)), DateInterval.weeks(1))
+            .put(Range.open(Duration.ofDays(365), Duration.ofDays(730)), DateInterval.days(14))
+            .put(Range.atLeast(Duration.ofDays(730)), DateInterval.months(1))
             .build();
 
     @JsonProperty
@@ -79,7 +78,7 @@ public abstract class AutoInterval implements Interval {
     public abstract Double scaling();
 
     @Override
-    public DateHistogramInterval toDateHistogramInterval(TimeRange timerange) {
+    public DateInterval toDateInterval(TimeRange timerange) {
         //noinspection UnnecessaryBoxing
         final Duration duration = Duration.ofMillis(
                 Math.round(new Double(timerange.getTo().getMillis() - timerange.getFrom().getMillis()) / 1000 * scaling() * 1000)

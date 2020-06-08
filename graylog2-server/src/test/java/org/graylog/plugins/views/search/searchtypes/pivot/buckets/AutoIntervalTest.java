@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -83,7 +82,7 @@ public class AutoIntervalTest {
 
     public AutoIntervalTest(TimeRange range, double scalingFactor, String expectedResult, String description) {
         final AutoInterval autoInterval = AutoInterval.create(scalingFactor);
-        this.result = autoInterval.toDateHistogramInterval(range).toString();
+        this.result = autoInterval.toDateInterval(range).toString();
         this.expectedResult = expectedResult;
     }
 
