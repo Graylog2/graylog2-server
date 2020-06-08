@@ -32,7 +32,7 @@ import javax.inject.Inject;
 
 public class CEFKafkaInput extends MessageInput {
 
-    private static final String NAME = "CEF Kafka Input";
+    private static final String NAME = "CEF Kafka";
 
     @AssistedInject
     public CEFKafkaInput(@Assisted Configuration configuration,

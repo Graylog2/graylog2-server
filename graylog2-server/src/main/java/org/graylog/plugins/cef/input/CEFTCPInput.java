@@ -32,7 +32,7 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import javax.inject.Inject;
 
 public class CEFTCPInput extends MessageInput {
-    private static final String NAME = "CEF TCP Input";
+    private static final String NAME = "CEF TCP";
 
     @AssistedInject
     public CEFTCPInput(@Assisted Configuration configuration,
