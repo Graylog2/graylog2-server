@@ -18,7 +18,7 @@ exports[`<Widget /> should render with empty props 1`] = `
           class="Widget__WidgetActionsWBar-sc-1k4o2f7-0 ckMMeL"
         >
           <button
-            class="IconButton__Wrapper-sc-1q956yw-0 kZTuI"
+            class="IconButton__Wrapper-sc-1q956yw-0 gTaYSZ"
             tabindex="0"
             title="Stretch width"
           >
@@ -34,7 +34,7 @@ exports[`<Widget /> should render with empty props 1`] = `
             >
               <span>
                 <button
-                  class="IconButton__Wrapper-sc-1q956yw-0 kZTuI"
+                  class="IconButton__Wrapper-sc-1q956yw-0 gTaYSZ"
                   tabindex="0"
                   title="Open actions dropdown"
                 >

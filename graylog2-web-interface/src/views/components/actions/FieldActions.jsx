@@ -36,7 +36,7 @@ type FieldElementProps = {
 const FieldElement: StyledComponent<FieldElementProps, ThemeInterface, HTMLSpanElement> = styled.span.attrs({
   className: 'field-element',
 })(({ active, disabled, theme }) => `
-  color: ${active ? theme.color.variant.info : 'currentColor'};
+  color: ${active ? theme.colors.variant.info : 'currentColor'};
   opacity: ${disabled ? '0.3' : '1'};
 `);
 

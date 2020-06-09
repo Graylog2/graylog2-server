@@ -17,7 +17,7 @@ const SortableListGroup = styled(ListGroup)(({ disableDragging, theme }) => css`
   }
 
   .over {
-    border: 1px dashed ${theme.color.gray[50]};
+    border: 1px dashed ${theme.colors.gray[50]};
   }
 
   .list-group-item {

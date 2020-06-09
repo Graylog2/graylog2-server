@@ -40,7 +40,7 @@ const IconStack = styled.div(({ theme }) => `
     vertical-align: text-top;
 
     &:hover [class*="fa-"] {
-      color: ${theme.color.variant.primary};
+      color: ${theme.colors.variant.primary};
       opacity: 1;
     }
   }
@@ -49,7 +49,7 @@ const IconStack = styled.div(({ theme }) => `
     opacity: 0;
 
     ~ [class*="fa-"]:hover {
-      color: ${theme.color.global.contentBackground};
+      color: ${theme.colors.global.contentBackground};
     }
   }
 `);
@@ -68,11 +68,11 @@ const Header = styled.button`
 const Subheader = styled.span(({ theme }) => `
   font-size: 0.95em;
   margin-left: 0.5em;
-  color: ${theme.color.gray[70]};
+  color: ${theme.colors.gray[70]};
 `);
 
 const ExpandableContent = styled.div(({ theme }) => `
-  border-left: 1px ${theme.color.gray[90]} solid;
+  border-left: 1px ${theme.colors.gray[90]} solid;
   margin-left: 35px;
   margin-top: 10px;
   padding-left: 5px;

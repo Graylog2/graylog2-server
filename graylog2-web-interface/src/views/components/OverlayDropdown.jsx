@@ -9,7 +9,7 @@ import styles from './OverlayDropdown.css';
 const StyledList = styled.ul(({ show, theme }) => `
   padding-left: 5px;
   padding-right: 5px;
-  color: ${theme.color.gray[40]};
+  color: ${theme.colors.gray[40]};
   z-index: 1050;
   min-width: 'max-content';
   display: ${show ? 'block' : 'none'};

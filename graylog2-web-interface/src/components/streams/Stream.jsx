@@ -25,7 +25,7 @@ const StreamListItem = styled.li(({ theme }) => `
   padding: 15px 0;
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${theme.color.variant.light.info};
+    border-bottom: 1px solid ${theme.colors.variant.light.info};
   }
 
   .stream-data {

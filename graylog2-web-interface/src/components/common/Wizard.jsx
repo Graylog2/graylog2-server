@@ -7,7 +7,7 @@ import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylo
 import Icon from './Icon';
 
 const SubnavigationCol = styled(Col)(({ theme }) => `
-  border-right: ${theme.color.gray[80]} solid 1px;
+  border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
 const HorizontalCol = styled(Col)`

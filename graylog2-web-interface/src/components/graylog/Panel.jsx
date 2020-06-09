@@ -10,13 +10,13 @@ import bsStyleThemeVariant from './variants/bsStyle';
 const PanelHeading = styled(BootstrapPanel.Heading)``;
 
 const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
-  background-color: ${theme.color.gray[90]};
-  border-top-color: ${theme.color.gray[80]};
+  background-color: ${theme.colors.gray[90]};
+  border-top-color: ${theme.colors.gray[80]};
 `);
 
 const panelVariantStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = theme.utils.colorLevel(theme.color.variant.light[variant], -10);
-  const borderColor = theme.utils.colorLevel(theme.color.variant.light[variant], 10);
+  const backgroundColor = theme.utils.colorLevel(theme.colors.variant.light[variant], -10);
+  const borderColor = theme.utils.colorLevel(theme.colors.variant.light[variant], 10);
 
   return css`
     border-color: ${borderColor};
@@ -45,7 +45,7 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
 });
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
-  background-color: ${theme.utils.colorLevel(theme.color.global.background, -4)};
+  background-color: ${theme.utils.colorLevel(theme.colors.global.background, -4)};
 
   > ${PanelHeading} {
     .panel-title,
@@ -58,13 +58,13 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
     > ${PanelHeading} {
       + .panel-collapse > .panel-body,
       + .panel-collapse > .list-group {
-        border-top-color: ${theme.color.gray[90]};
+        border-top-color: ${theme.colors.gray[90]};
       }
     }
 
     > ${PanelFooter} {
       + .panel-collapse .panel-body {
-        border-bottom-color: ${theme.color.gray[90]};
+        border-bottom-color: ${theme.colors.gray[90]};
       }
     }
   }
@@ -73,8 +73,8 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
 `);
 
 const deprecatedVariantStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = theme.utils.colorLevel(theme.color.variant.light[variant], -10);
-  const borderColor = theme.utils.colorLevel(theme.color.variant.light[variant], 10);
+  const backgroundColor = theme.utils.colorLevel(theme.colors.variant.light[variant], -10);
+  const borderColor = theme.utils.colorLevel(theme.colors.variant.light[variant], 10);
 
   return css`
     /** NOTE: Deprecated & should be removed in 4.0 */
@@ -110,24 +110,24 @@ const deprecatedVariantStyles = (hex, variant) => css(({ theme }) => {
 
 const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   /** NOTE: Deprecated & should be removed in 4.0 */
-  background-color: ${theme.utils.colorLevel(theme.color.global.background, -4)};
+  background-color: ${theme.utils.colorLevel(theme.colors.global.background, -4)};
 
   .panel-footer {
-    background-color: ${theme.color.gray[90]};
-    border-top-color: ${theme.color.gray[80]};
+    background-color: ${theme.colors.gray[90]};
+    border-top-color: ${theme.colors.gray[80]};
   }
 
   .panel-group {
     .panel-heading {
       + .panel-collapse > .panel-body,
       + .panel-collapse > .list-group {
-        border-top-color: ${theme.color.gray[90]};
+        border-top-color: ${theme.colors.gray[90]};
       }
     }
 
     .panel-footer {
       + .panel-collapse .panel-body {
-        border-bottom-color: ${theme.color.gray[90]};
+        border-bottom-color: ${theme.colors.gray[90]};
       }
     }
   }

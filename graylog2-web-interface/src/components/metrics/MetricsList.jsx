@@ -11,7 +11,7 @@ const MetricListWrap = styled.ul(({ theme }) => `
     margin-bottom: 5px;
 
     .prefix {
-      color: ${theme.color.gray[70]};
+      color: ${theme.colors.gray[70]};
     }
 
     .name {

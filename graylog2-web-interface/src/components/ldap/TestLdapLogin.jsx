@@ -27,7 +27,7 @@ const LoginResultPanel = styled(Panel)`
 `;
 
 const StatusIcon = styled(Icon)(({ status, theme }) => `
-  color: ${theme.color.variant[status]};
+  color: ${theme.colors.variant[status]};
 `);
 
 

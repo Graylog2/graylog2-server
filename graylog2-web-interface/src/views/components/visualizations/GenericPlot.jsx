@@ -146,13 +146,13 @@ class GenericPlot extends React.Component<Props, State> {
       yaxis: {
         automargin: true,
         tickfont: {
-          color: theme.color.gray[50],
+          color: theme.colors.gray[50],
         },
       },
       xaxis: {
         automargin: true,
         tickfont: {
-          color: theme.color.gray[50],
+          color: theme.colors.gray[50],
         },
       },
     };

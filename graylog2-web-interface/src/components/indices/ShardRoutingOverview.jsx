@@ -16,25 +16,25 @@ const ShardRoutingWrap = styled.div(({ theme }) => `
     }
 
     .shard-started {
-      background-color: ${theme.utils.colorLevel(theme.color.variant.light.success, -2)};
+      background-color: ${theme.utils.colorLevel(theme.colors.variant.light.success, -2)};
     }
 
     .shard-relocating {
-      background-color: ${theme.utils.colorLevel(theme.color.variant.light.primary, -2)};
+      background-color: ${theme.utils.colorLevel(theme.colors.variant.light.primary, -2)};
     }
 
     .shard-initializing {
-      background-color: ${theme.utils.colorLevel(theme.color.variant.light.warning, -5)};
+      background-color: ${theme.utils.colorLevel(theme.colors.variant.light.warning, -5)};
     }
 
     .shard-unassigned {
-      background-color: ${theme.utils.colorLevel(theme.color.variant.light.default, -2)};
+      background-color: ${theme.utils.colorLevel(theme.colors.variant.light.default, -2)};
     }
 
     .shard-primary .id {
       font-weight: bold;
       margin-bottom: 3px;
-      border-bottom: 1px solid ${theme.color.gray[10]};
+      border-bottom: 1px solid ${theme.colors.gray[10]};
     }
   }
 

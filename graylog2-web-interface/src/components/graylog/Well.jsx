@@ -3,8 +3,8 @@ import { Well as BootstrapWell } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
 const Well = styled(BootstrapWell)(({ theme }) => css`
-  background-color: ${theme.color.gray[90]};
-  border-color: ${theme.color.gray[80]};
+  background-color: ${theme.colors.gray[90]};
+  border-color: ${theme.colors.gray[80]};
 `);
 
 /** @component */

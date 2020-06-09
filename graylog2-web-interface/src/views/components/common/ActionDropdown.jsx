@@ -36,7 +36,7 @@ type ActionDropdownProps = {
 const StyledDropdownMenu: StyledComponent<ActionDropdownState, ThemeInterface, HTMLUListElement> = styled.ul(({ show, theme }) => `
   display: ${show ? 'block' : 'none'};
   min-width: max-content;
-  color: ${theme.color.gray[40]};
+  color: ${theme.colors.gray[40]};
 `);
 
 const ActionToggle = ({ children, onClick }: ActionToggleProps) => {

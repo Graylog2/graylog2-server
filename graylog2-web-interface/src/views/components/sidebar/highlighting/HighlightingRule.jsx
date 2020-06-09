@@ -45,7 +45,7 @@ const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   justify-content: center;
 
   :active {
-    background-color: ${theme.color.gray[90]}
+    background-color: ${theme.colors.gray[90]}
   }
 `);
 

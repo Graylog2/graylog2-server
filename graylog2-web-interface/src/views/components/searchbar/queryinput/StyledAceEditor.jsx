@@ -10,33 +10,33 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   &.ace-queryinput {
     height: 34px !important;
     width: 100% !important;
-    background-color: ${scTheme.color.global.inputBackground};
-    color: ${scTheme.utils.contrastingColor(scTheme.color.global.inputBackground, 'AAA')};
+    background-color: ${scTheme.colors.global.inputBackground};
+    color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
 
     &.ace_multiselect .ace_selection.ace_start {
-      box-shadow: 0 0 3px 0 ${scTheme.color.global.inputBackground};
+      box-shadow: 0 0 3px 0 ${scTheme.colors.global.inputBackground};
     }
 
     .ace_gutter {
-      background: ${scTheme.color.global.inputBackground};
-      color: ${scTheme.utils.contrastingColor(scTheme.color.global.inputBackground, 'AAA')};
+      background: ${scTheme.colors.global.inputBackground};
+      color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
     }
 
     .ace_print-margin {
       width: 1px;
-      background: ${scTheme.color.global.inputBackground};
+      background: ${scTheme.colors.global.inputBackground};
     }
 
     .ace_cursor {
-      color: ${scTheme.color.gray[50]};
+      color: ${scTheme.colors.gray[50]};
     }
 
     .ace_marker-layer .ace_selection {
-      background: ${scTheme.color.variant.lightest.default};
+      background: ${scTheme.colors.variant.lightest.default};
     }
 
     .ace_marker-layer .ace_step {
-      background: ${scTheme.color.variant.warning};
+      background: ${scTheme.colors.variant.warning};
     }
 
     .ace_marker-layer .ace_bracket {
@@ -45,19 +45,19 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     }
 
     .ace_marker-layer .ace_active-line {
-      background: ${scTheme.color.global.inputBackground};
+      background: ${scTheme.colors.global.inputBackground};
     }
 
     .ace_gutter-active-line {
-      background-color: ${scTheme.color.global.inputBackground};
+      background-color: ${scTheme.colors.global.inputBackground};
     }
 
     .ace_marker-layer .ace_selected-word {
-      border: 1px solid ${scTheme.color.gray[80]};
+      border: 1px solid ${scTheme.colors.gray[80]};
     }
 
     .ace_invisible {
-      color: ${scTheme.color.global.inputBackground};
+      color: ${scTheme.colors.global.inputBackground};
     }
 
     .ace_keyword,
@@ -65,11 +65,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_storage,
     .ace_storage.ace_type,
     .ace_support.ace_type {
-      color: ${scTheme.color.variant.primary};
+      color: ${scTheme.colors.variant.primary};
     }
 
     .ace_keyword.ace_operator {
-      color: ${scTheme.color.variant.darker.info};
+      color: ${scTheme.colors.variant.darker.info};
     }
 
     .ace_constant.ace_character,
@@ -78,44 +78,44 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_keyword.ace_other.ace_unit,
     .ace_support.ace_constant,
     .ace_variable.ace_parameter {
-      color: ${scTheme.color.variant.dark.danger};
+      color: ${scTheme.colors.variant.dark.danger};
     }
 
     .ace_constant.ace_other {
-      color: ${scTheme.color.variant.default};
+      color: ${scTheme.colors.variant.default};
     }
 
     .ace_invalid {
-      color: ${scTheme.utils.readableColor(scTheme.color.brand.primary)};
-      background-color: ${scTheme.color.brand.primary};
+      color: ${scTheme.utils.readableColor(scTheme.colors.brand.primary)};
+      background-color: ${scTheme.colors.brand.primary};
     }
 
     .ace_invalid.ace_deprecated {
-      color: ${scTheme.utils.readableColor(scTheme.color.brand.primary)};
-      background-color: ${scTheme.color.variant.dark.primary};
+      color: ${scTheme.utils.readableColor(scTheme.colors.brand.primary)};
+      background-color: ${scTheme.colors.variant.dark.primary};
     }
 
     .ace_fold {
-      background-color: ${scTheme.color.variant.info};
-      border-color: ${scTheme.utils.contrastingColor(scTheme.color.global.inputBackground, 'AAA')};
+      background-color: ${scTheme.colors.variant.info};
+      border-color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
     }
 
     .ace_entity.ace_name.ace_function,
     .ace_support.ace_function,
     .ace_variable,
     .ace_term {
-      color: ${scTheme.color.variant.info};
+      color: ${scTheme.colors.variant.info};
     }
 
     .ace_support.ace_class,
     .ace_support.ace_type {
-      color: ${scTheme.color.variant.dark.warning};
+      color: ${scTheme.colors.variant.dark.warning};
     }
 
     .ace_heading,
     .ace_markup.ace_heading,
     .ace_string {
-      color: ${scTheme.color.variant.dark.success};
+      color: ${scTheme.colors.variant.dark.success};
     }
 
     .ace_entity.ace_name.ace_tag,
@@ -123,11 +123,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_meta.ace_tag,
     .ace_string.ace_regexp,
     .ace_variable {
-      color: ${scTheme.color.brand.primary};
+      color: ${scTheme.colors.brand.primary};
     }
 
     .ace_comment {
-      color: ${scTheme.color.gray[60]};
+      color: ${scTheme.colors.gray[60]};
     }
 
     .ace_indent-guide {

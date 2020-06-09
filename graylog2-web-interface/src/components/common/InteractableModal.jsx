@@ -30,7 +30,7 @@ const StyledRnd = styled(Rnd)(({ theme }) => css`
   box-shadow: 0 0 9px rgba(31, 31, 31, 0.25),
     0 0 6px rgba(31, 31, 31, 0.25),
     0 0 3px rgba(31, 31, 31, 0.25);
-  background-color: ${theme.color.gray[20]};
+  background-color: ${theme.colors.gray[20]};
   border-radius: 3px;
   flex-direction: column;
   display: flex !important;
@@ -46,20 +46,20 @@ const Header = styled.header(({ theme }) => css`
   padding: 6px 12px 9px;
   display: flex;
   align-items: center;
-  background-color: ${theme.color.gray[30]};
-  border-bottom: 1px solid ${theme.color.gray[10]};
+  background-color: ${theme.colors.gray[30]};
+  border-bottom: 1px solid ${theme.colors.gray[10]};
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   cursor: move;
 `);
 
 const Title = styled.h3(({ theme }) => css`
-  color: ${theme.color.global.textAlt};
+  color: ${theme.colors.global.textAlt};
   flex: 1;
 `);
 
 const DragBars = styled(Icon)(({ theme }) => css`
-  color: ${theme.color.gray[70]};
+  color: ${theme.colors.gray[70]};
   margin-right: 9px;
 `);
 

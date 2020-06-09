@@ -19,7 +19,7 @@ const HEADERS = ['Description', 'Key', 'Type', 'Event Definition', 'Timestamp'];
 
 const ExpandedTR = styled.tr(({ theme }) => `
   > td {
-    border-top: 1px solid ${theme.color.gray[80]} !important;
+    border-top: 1px solid ${theme.colors.gray[80]} !important;
     padding: 10px 8px 8px 35px !important;
   }
 
@@ -40,7 +40,7 @@ const ExpandedTR = styled.tr(({ theme }) => `
 `);
 
 const EventsTbody = styled.tbody(({ expanded, theme }) => `
-    border-left: ${expanded ? `3px solid ${theme.color.variant.light.info}` : ''};
+    border-left: ${expanded ? `3px solid ${theme.colors.variant.light.info}` : ''};
     border-collapse: ${expanded ? 'separate' : 'collapse'};
 `);
 
@@ -51,12 +51,12 @@ const CollapsibleTr = styled.tr`
 const EventsTable = styled(Table)(({ theme }) => `
   tr {
     &:hover {
-      background-color: ${theme.color.gray[90]};
+      background-color: ${theme.colors.gray[90]};
     }
 
     &${ExpandedTR} {
       &:hover {
-        background-corlor: ${theme.color.global.contentBackground}
+        background-corlor: ${theme.colors.global.contentBackground}
       }
     }
   }

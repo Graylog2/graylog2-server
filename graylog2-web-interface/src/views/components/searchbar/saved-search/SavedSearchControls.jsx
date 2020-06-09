@@ -57,7 +57,7 @@ class SavedSearchControls extends React.Component<Props, State> {
       username: PropTypes.string.isRequired,
     }).isRequired,
     theme: PropTypes.shape({
-      color: PropTypes.object,
+      colors: PropTypes.object,
     }).isRequired,
   };
 
@@ -210,7 +210,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const savedSearchStyle = loaded ? 'star' : 'star-o';
     let savedSearchColor: string = '';
     if (loaded) {
-      savedSearchColor = dirty ? theme.color.variant.warning : theme.color.variant.info;
+      savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
     }
 
     const disableReset = !(dirty || loaded);

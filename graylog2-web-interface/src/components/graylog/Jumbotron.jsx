@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components';
 import { Jumbotron as BootstrapJumbotron } from 'react-bootstrap';
 
 export const StyledJumbotron = styled(BootstrapJumbotron)(({ theme }) => css`
-  color: ${theme.color.global.textDefault};
-  background-color: ${theme.color.global.contentBackground};
+  color: ${theme.colors.global.textDefault};
+  background-color: ${theme.colors.global.contentBackground};
 `);
 
 const Jumbotron = forwardRef((props, ref) => {

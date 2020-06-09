@@ -2,12 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
-import { util } from 'theme';
 import Icon from './Icon';
 
 const ScrollBtn = styled.button(({ theme }) => `
   opacity: 0.3;
-  background-color: ${theme.color.variant.primary};
+  background-color: ${theme.colors.variant.primary};
   width: 40px;
   height: 40px;
   position: fixed;
@@ -26,7 +25,7 @@ const ScrollBtn = styled.button(({ theme }) => `
 `);
 
 const ArrowUpIcon = styled(Icon)(({ theme }) => `
-  color: ${util.readableColor(theme.color.variant.primary)};
+  color: ${theme.utils.readableColor(theme.colors.variant.primary)};
   position: absolute;
   top: 50%;
   left: 50%;

@@ -7,17 +7,17 @@ import chroma from 'chroma-js';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
 const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
-  const borderColor = chroma(theme.color.gray[10]).alpha(0.2).css();
+  const borderColor = chroma(theme.colors.gray[10]).alpha(0.2).css();
 
   return css`
-    background-color: ${theme.color.global.contentBackground};
+    background-color: ${theme.colors.global.contentBackground};
     border-color: ${borderColor};
 
     &.top > .arrow {
       border-top-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
-        border-top-color: ${theme.color.gray[100]};
+        border-top-color: ${theme.colors.gray[100]};
       }
     }
 
@@ -25,7 +25,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
       border-right-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
-        border-right-color: ${theme.color.gray[100]};
+        border-right-color: ${theme.colors.gray[100]};
       }
     }
 
@@ -33,7 +33,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
       border-bottom-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
-        border-bottom-color: ${theme.color.gray[100]};
+        border-bottom-color: ${theme.colors.gray[100]};
       }
     }
 
@@ -41,12 +41,12 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
       border-left-color: ${theme.utils.opacify(borderColor, 0.05)};
 
       &::after {
-        border-left-color: ${theme.color.gray[100]};
+        border-left-color: ${theme.colors.gray[100]};
       }
     }
 
     .popover-title {
-      background-color: ${theme.color.gray[90]};
+      background-color: ${theme.colors.gray[90]};
     }
   `;
 });

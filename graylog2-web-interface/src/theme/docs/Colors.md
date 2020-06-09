@@ -56,7 +56,7 @@ const SectionWrap = (mode, section) => {
               <StyledColorSwatch name={name}
                                  section={section}
                                  color={mode[name]}
-                                 copyText={`theme.color.${copyTextName}`} />
+                                 copyText={`theme.colors.${copyTextName}`} />
             )
           }
         })}
@@ -73,7 +73,7 @@ const SectionWrap = (mode, section) => {
                   <StyledColorSwatch name={subname}
                                      section={section}
                                      color={mode[name][subname]}
-                                     copyText={`theme.color.${section}.${name}.${subname}`} />
+                                     copyText={`theme.colors.${section}.${name}.${subname}`} />
                 ))}
               </Swatches>
             </>

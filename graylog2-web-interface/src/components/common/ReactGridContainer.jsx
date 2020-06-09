@@ -30,7 +30,7 @@ const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(({ theme }
   }
 
   .react-grid-item.react-grid-placeholder {
-    background: ${theme.color.variant.info};
+    background: ${theme.colors.variant.info};
   }
 
   .actions {

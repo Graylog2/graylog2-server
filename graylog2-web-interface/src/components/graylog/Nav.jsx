@@ -10,16 +10,16 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
       > a {
         &:hover,
         &:focus {
-          background-color: ${theme.color.gray[90]};
+          background-color: ${theme.colors.gray[90]};
         }
       }
 
       &.disabled > a {
-        color: ${theme.color.gray[60]};
+        color: ${theme.colors.gray[60]};
 
         &:hover,
         &:focus {
-          color: ${theme.color.gray[60]};
+          color: ${theme.colors.gray[60]};
         }
       }
     }
@@ -28,8 +28,8 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
       &,
       &:hover,
       &:focus {
-        background-color: ${theme.color.gray[90]};
-        border-color: ${theme.color.variant.primary};
+        background-color: ${theme.colors.gray[90]};
+        border-color: ${theme.colors.variant.primary};
       }
     }
 
@@ -39,8 +39,8 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
           &,
           &:hover,
           &:focus {
-            color: ${theme.color.global.textAlt};
-            background-color: ${theme.color.variant.primary};
+            color: ${theme.colors.global.textAlt};
+            background-color: ${theme.colors.variant.primary};
           }
         }
       }

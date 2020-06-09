@@ -3,12 +3,10 @@ import colors from './colors';
 import breakpoints from './breakpoints';
 import fonts from './fonts';
 import utils from './utils';
-import { type ThemeInterface } from './types';
+import type { ThemeInterface } from './types';
 
 const theme: ThemeInterface = {
-  color: {
-    ...colors,
-  },
+  colors,
   breakpoint: {
     ...breakpoints,
   },
@@ -16,13 +14,13 @@ const theme: ThemeInterface = {
   fonts,
 };
 
-const themeModes: Array<string> = Object.keys(colors);
+const themeModes: Array<string> = ['teinte'];
 
 export default theme;
 
 export {
   breakpoints as breakpoint,
-  colors as color,
+  colors,
   fonts,
   utils,
   themeModes,

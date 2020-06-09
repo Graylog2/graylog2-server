@@ -20,7 +20,7 @@ const UsersStore = StoreProvider.getStore('Users');
 const RolesStore = StoreProvider.getStore('Roles');
 
 const ActiveIcon = styled(Icon)(({ theme }) => `
-  color: ${theme.color.variant.success};
+  color: ${theme.colors.variant.success};
 `);
 
 const UserList = createReactClass({

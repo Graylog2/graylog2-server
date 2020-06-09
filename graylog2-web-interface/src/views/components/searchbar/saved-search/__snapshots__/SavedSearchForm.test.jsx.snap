@@ -31,7 +31,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
               <ThemeProvider
                 theme={
                   Object {
-                    "color": Object {
+                    "colors": Object {
                       "brand": Object {
                         "primary": "#ff3633",
                         "secondary": "#fff",
@@ -577,7 +577,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
               <ThemeProvider
                 theme={
                   Object {
-                    "color": Object {
+                    "colors": Object {
                       "brand": Object {
                         "primary": "#ff3633",
                         "secondary": "#fff",
@@ -1200,7 +1200,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
               <ThemeProvider
                 theme={
                   Object {
-                    "color": Object {
+                    "colors": Object {
                       "brand": Object {
                         "primary": "#ff3633",
                         "secondary": "#fff",
