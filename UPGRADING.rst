@@ -11,6 +11,16 @@ Prior to v3.3.3, the certificates of LDAP servers which are connected to using a
 
 A `CVE <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-15813>`_ is tracked for this issue.
 
+Deprecation of API endpoint for unpaginated listing of grok patterns
+====================================================================
+
+In 3.0 we introduce a new API endpoint to retrieve grok patterns from the backend: '/system/grok/paginated' which allows
+to pass pagination parameters.
+We therefore mark '/system/grok' as deprecated. Users who use this endpoint for scripting purpose should change
+their scripts to the format of the new endpoint, so they only need to to change the URL when '/system/grok/paginated' will become
+'/system/grok'.
+
+
 Deprecation of API endpoint for unpaginated listing of streams
 ==============================================================
 

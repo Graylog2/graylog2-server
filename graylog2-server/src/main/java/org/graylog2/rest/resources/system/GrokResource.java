@@ -69,7 +69,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
 @RequiresAuthentication
 @Path("/system/grok")
 @Produces("application/json")
@@ -98,6 +97,7 @@ public class GrokResource extends RestResource {
 
     @GET
     @Timed
+    @Deprecated
     @ApiOperation("Get all existing grok patterns")
     public GrokPatternList listGrokPatterns() {
         checkPermission(RestPermissions.INPUTS_READ);
