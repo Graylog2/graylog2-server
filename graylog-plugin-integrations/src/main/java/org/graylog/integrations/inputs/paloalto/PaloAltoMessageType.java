@@ -20,5 +20,9 @@ public enum PaloAltoMessageType {
 
     SYSTEM,
     THREAT,
-    TRAFFIC
+    TRAFFIC,
+    CONFIG,
+    CORRELATION,
+    HIP,
+    GLOBAL_PROTECT
 }

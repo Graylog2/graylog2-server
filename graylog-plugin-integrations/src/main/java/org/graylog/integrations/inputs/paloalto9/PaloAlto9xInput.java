@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.integrations.inputs.paloalto;
+package org.graylog.integrations.inputs.paloalto9;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
@@ -32,25 +32,20 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-import static org.graylog.integrations.inputs.paloalto.PaloAltoCodec.CK_SYSTEM_TEMPLATE;
-import static org.graylog.integrations.inputs.paloalto.PaloAltoCodec.CK_THREAT_TEMPLATE;
-import static org.graylog.integrations.inputs.paloalto.PaloAltoCodec.CK_TRAFFIC_TEMPLATE;
+public class PaloAlto9xInput extends MessageInput {
+    private static final Logger LOG = LoggerFactory.getLogger(PaloAlto9xInput.class);
 
-public class PaloAltoTCPInput extends MessageInput {
-
-    public static final String NAME = "Palo Alto Networks TCP (PAN-OS v8.x)";
-
-    private static final Logger LOG = LoggerFactory.getLogger(PaloAltoTCPInput.class);
+    public static final String NAME = "Palo Alto Networks TCP (PAN-OS v9.x)";
 
     @Inject
-    public PaloAltoTCPInput(@Assisted Configuration configuration,
-                            MetricRegistry metricRegistry,
-                            SyslogTcpTransport.Factory transport,
-                            LocalMetricRegistry localRegistry,
-                            PaloAltoCodec.Factory codec,
-                            Config config,
-                            Descriptor descriptor,
-                            ServerStatus serverStatus) {
+    public PaloAlto9xInput(@Assisted Configuration configuration,
+                           MetricRegistry metricRegistry,
+                           SyslogTcpTransport.Factory transport,
+                           LocalMetricRegistry localRegistry,
+                           PaloAlto9xCodec.Factory codec,
+                           PaloAlto9xInput.Config config,
+                           PaloAlto9xInput.Descriptor descriptor,
+                           ServerStatus serverStatus) {
         super(
                 metricRegistry,
                 configuration,
@@ -64,29 +59,19 @@ public class PaloAltoTCPInput extends MessageInput {
 
     @Override
     public void launch(InputBuffer buffer) throws MisfireException {
-
-        // Parse the templates to log any errors immediately on input startup.
-        PaloAltoTemplates templates = PaloAltoTemplates.newInstance(configuration.getString(CK_SYSTEM_TEMPLATE, PaloAltoTemplateDefaults.SYSTEM_TEMPLATE),
-                configuration.getString(CK_THREAT_TEMPLATE, PaloAltoTemplateDefaults.THREAT_TEMPLATE),
-                configuration.getString(CK_TRAFFIC_TEMPLATE, PaloAltoTemplateDefaults.TRAFFIC_TEMPLATE));
-
-        if (templates.hasErrors()) {
-            throw new MisfireException(templates.errorMessageSummary("\n"));
-        }
-
         super.launch(buffer);
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<PaloAltoTCPInput> {
+    public interface Factory extends MessageInput.Factory<PaloAlto9xInput> {
         @Override
-        PaloAltoTCPInput create(Configuration configuration);
+        PaloAlto9xInput create(Configuration configuration);
 
         @Override
-        Config getConfig();
+        PaloAlto9xInput.Config getConfig();
 
         @Override
-        Descriptor getDescriptor();
+        PaloAlto9xInput.Descriptor getDescriptor();
     }
 
     public static class Descriptor extends MessageInput.Descriptor {
@@ -99,7 +84,7 @@ public class PaloAltoTCPInput extends MessageInput {
     public static class Config extends MessageInput.Config {
 
         @Inject
-        public Config(SyslogTcpTransport.Factory transport, PaloAltoCodec.Factory codec) {
+        public Config(SyslogTcpTransport.Factory transport, PaloAlto9xCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

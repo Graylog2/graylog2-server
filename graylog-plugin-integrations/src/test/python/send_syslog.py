@@ -71,6 +71,7 @@ class SyslogSender(object):
 
 def send_single_message(client, message):
     client.send(message)
+    client.close()
 
 
 def send_messages_from_file(client, file):
@@ -78,6 +79,7 @@ def send_messages_from_file(client, file):
     for line in input_file:
         client.send(line)
     input_file.close()
+    client.close()
 
 
 if __name__ == "__main__":

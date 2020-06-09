@@ -28,6 +28,8 @@ import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTCPInput;
+import org.graylog.integrations.inputs.paloalto9.PaloAlto9xCodec;
+import org.graylog.integrations.inputs.paloalto9.PaloAlto9xInput;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
 import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
@@ -90,10 +92,15 @@ public class IntegrationsModule extends PluginModule {
         addCodec("ipfix", IpfixCodec.class);
         addTransport("ipfix-udp", IpfixUdpTransport.class);
 
-        // Palo Alto Networks
+        // Palo Alto Networks 8x
         LOG.debug("Registering message input: {}", PaloAltoTCPInput.NAME);
         addMessageInput(PaloAltoTCPInput.class);
         addCodec(PaloAltoCodec.NAME, PaloAltoCodec.class);
+
+        // Palo Alto Networks 9x
+        LOG.debug("Registering message input: {}", PaloAlto9xInput.NAME);
+        addMessageInput(PaloAlto9xInput.class);
+        addCodec(PaloAlto9xCodec.NAME, PaloAlto9xCodec.class);
 
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);

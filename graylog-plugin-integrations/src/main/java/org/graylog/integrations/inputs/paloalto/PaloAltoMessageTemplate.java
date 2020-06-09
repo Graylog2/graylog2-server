@@ -34,6 +34,7 @@ import java.util.Set;
 public class PaloAltoMessageTemplate {
 
     private Set<PaloAltoFieldTemplate> fields = new HashSet<>();
+
     private List<String> parseErrors = new ArrayList<>();
 
     public Set<PaloAltoFieldTemplate> getFields() {
