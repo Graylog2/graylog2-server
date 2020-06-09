@@ -19,6 +19,7 @@ exports[`<Widget /> should render with empty props 1`] = `
         >
           <button
             class="IconButton__Wrapper-sc-1q956yw-0 kZTuI"
+            tabindex="0"
             title="Stretch width"
           >
             <svg
@@ -34,6 +35,7 @@ exports[`<Widget /> should render with empty props 1`] = `
               <span>
                 <button
                   class="IconButton__Wrapper-sc-1q956yw-0 kZTuI"
+                  tabindex="0"
                   title="Open actions dropdown"
                 >
                   <svg
