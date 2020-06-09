@@ -27,7 +27,7 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
@@ -84,7 +84,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 new QueryStringParser(),
                 jestClient,
                 indexLookup,
-                new ESQueryDecorators(Collections.emptySet()),
+                new QueryStringDecorators(Collections.emptySet()),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false
         );

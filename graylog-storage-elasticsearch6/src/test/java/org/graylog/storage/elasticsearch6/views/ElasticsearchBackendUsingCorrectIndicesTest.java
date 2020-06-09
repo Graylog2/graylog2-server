@@ -24,7 +24,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBackendTestBase {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake())
+            MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators.Fake())
     );
     private static final QueryStringParser queryStringParser = new QueryStringParser();
 
@@ -90,7 +90,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                 queryStringParser,
                 jestClient,
                 indexLookup,
-                new ESQueryDecorators.Fake(),
+                new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false);
     }

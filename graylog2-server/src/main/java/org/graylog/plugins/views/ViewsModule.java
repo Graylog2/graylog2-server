@@ -22,7 +22,7 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.engine.ESQueryDecorator;
+import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
@@ -93,11 +93,11 @@ public abstract class ViewsModule extends PluginModule {
         return queryBackendBinder().addBinding(name).to(implementation);
     }
 
-    protected void registerESQueryDecorator(Class<? extends ESQueryDecorator> esQueryDecorator) {
+    protected void registerESQueryDecorator(Class<? extends QueryStringDecorator> esQueryDecorator) {
         esQueryDecoratorBinder().addBinding().to(esQueryDecorator);
     }
 
-    protected Multibinder<ESQueryDecorator> esQueryDecoratorBinder() {
-        return Multibinder.newSetBinder(binder(), ESQueryDecorator.class);
+    protected Multibinder<QueryStringDecorator> esQueryDecoratorBinder() {
+        return Multibinder.newSetBinder(binder(), QueryStringDecorator.class);
     }
 }

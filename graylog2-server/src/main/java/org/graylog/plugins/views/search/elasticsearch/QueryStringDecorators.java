@@ -19,23 +19,23 @@ package org.graylog.plugins.views.search.elasticsearch;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.engine.ESQueryDecorator;
+import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Set;
 
-public class ESQueryDecorators implements ESQueryDecorator {
-    private final Set<ESQueryDecorator> queryDecorators;
+public class QueryStringDecorators implements QueryStringDecorator {
+    private final Set<QueryStringDecorator> queryDecorators;
 
-    public static class Fake extends ESQueryDecorators {
+    public static class Fake extends QueryStringDecorators {
         public Fake() {
             super(Collections.emptySet());
         }
     }
 
     @Inject
-    public ESQueryDecorators(Set<ESQueryDecorator> queryDecorators) {
+    public QueryStringDecorators(Set<QueryStringDecorator> queryDecorators) {
         this.queryDecorators = queryDecorators;
     }
 

@@ -22,6 +22,6 @@ import org.graylog.plugins.views.search.SearchJob;
 
 import java.util.Set;
 
-public interface ESQueryDecorator {
+public interface QueryStringDecorator {
     String decorate(String queryString, SearchJob job, Query query, Set<QueryResult> results);
 }

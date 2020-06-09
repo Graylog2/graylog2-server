@@ -31,7 +31,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
-import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -54,12 +54,12 @@ import java.util.stream.Collectors;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
-    private final ESQueryDecorators esQueryDecorators;
+    private final QueryStringDecorators esQueryDecorators;
     private final LegacyDecoratorProcessor decoratorProcessor;
     private final boolean allowHighlighting;
 
     @Inject
-    public ESMessageList(ESQueryDecorators esQueryDecorators,
+    public ESMessageList(QueryStringDecorators esQueryDecorators,
                          LegacyDecoratorProcessor decoratorProcessor,
                          @Named("allow_highlighting") boolean allowHighlighting) {
         this.esQueryDecorators = esQueryDecorators;
@@ -68,7 +68,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     @VisibleForTesting
-    public ESMessageList(ESQueryDecorators esQueryDecorators) {
+    public ESMessageList(QueryStringDecorators esQueryDecorators) {
         this(esQueryDecorators, new LegacyDecoratorProcessor.Fake(), false);
     }
 

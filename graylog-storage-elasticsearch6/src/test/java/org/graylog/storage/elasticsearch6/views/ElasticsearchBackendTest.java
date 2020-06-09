@@ -24,7 +24,7 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
@@ -54,7 +54,7 @@ public class ElasticsearchBackendTest {
     @BeforeClass
     public static void setup() {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
+        handlers.put(MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators.Fake()));
 
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         final QueryStringParser queryStringParser = new QueryStringParser();
@@ -62,7 +62,7 @@ public class ElasticsearchBackendTest {
                 queryStringParser,
                 null,
                 mock(IndexLookup.class),
-                new ESQueryDecorators.Fake(),
+                new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false);
     }

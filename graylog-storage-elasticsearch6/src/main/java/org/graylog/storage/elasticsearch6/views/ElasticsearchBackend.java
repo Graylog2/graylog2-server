@@ -37,7 +37,7 @@ import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
@@ -82,7 +82,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final QueryStringParser queryStringParser;
     private final JestClient jestClient;
     private final IndexLookup indexLookup;
-    private final ESQueryDecorators esQueryDecorators;
+    private final QueryStringDecorators esQueryDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final boolean allowLeadingWildcard;
 
@@ -91,7 +91,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 QueryStringParser queryStringParser,
                                 JestClient jestClient,
                                 IndexLookup indexLookup,
-                                ESQueryDecorators esQueryDecorators,
+                                QueryStringDecorators esQueryDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
