@@ -14,7 +14,7 @@ const theme: ThemeInterface = {
   fonts,
 };
 
-const themeModes: Array<string> = Object.keys(colors);
+const themeModes: Array<string> = ['teinte'];
 
 export default theme;
 
