@@ -214,6 +214,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private void triggerDeletedEvent(ViewDTO dto) {
         if (dto != null && dto.type() != null && dto.type().equals(ViewDTO.Type.DASHBOARD)) {
             final DashboardDeletedEvent dashboardDeletedEvent = DashboardDeletedEvent.create(dto.id());
+            //noinspection UnstableApiUsage
             clusterEventBus.post(dashboardDeletedEvent);
         }
     }
