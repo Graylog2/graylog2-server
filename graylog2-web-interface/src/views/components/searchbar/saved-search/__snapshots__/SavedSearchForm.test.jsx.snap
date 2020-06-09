@@ -31,6 +31,20 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
               <ThemeProvider
                 theme={
                   Object {
+                    "breakpoints": Object {
+                      "max": Object {
+                        "lg": "1199px",
+                        "md": "991px",
+                        "sm": "767px",
+                        "xs": "479px",
+                      },
+                      "min": Object {
+                        "lg": "1200px",
+                        "md": "992px",
+                        "sm": "768px",
+                        "xs": "480px",
+                      },
+                    },
                     "colors": Object {
                       "brand": Object {
                         "primary": "#ff3633",
@@ -577,6 +591,20 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
               <ThemeProvider
                 theme={
                   Object {
+                    "breakpoints": Object {
+                      "max": Object {
+                        "lg": "1199px",
+                        "md": "991px",
+                        "sm": "767px",
+                        "xs": "479px",
+                      },
+                      "min": Object {
+                        "lg": "1200px",
+                        "md": "992px",
+                        "sm": "768px",
+                        "xs": "480px",
+                      },
+                    },
                     "colors": Object {
                       "brand": Object {
                         "primary": "#ff3633",
@@ -1200,6 +1228,20 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
               <ThemeProvider
                 theme={
                   Object {
+                    "breakpoints": Object {
+                      "max": Object {
+                        "lg": "1199px",
+                        "md": "991px",
+                        "sm": "767px",
+                        "xs": "479px",
+                      },
+                      "min": Object {
+                        "lg": "1200px",
+                        "md": "992px",
+                        "sm": "768px",
+                        "xs": "480px",
+                      },
+                    },
                     "colors": Object {
                       "brand": Object {
                         "primary": "#ff3633",
