@@ -30,7 +30,9 @@ import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.views.search.views.sharing.ViewSharing;
 import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -82,14 +84,17 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final SearchQueryParser searchQueryParser;
     private final ViewSharingService viewSharingService;
     private final IsViewSharedForUser isViewSharedForUser;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public ViewsResource(ViewService dbService,
                          ViewSharingService viewSharingService,
-                         IsViewSharedForUser isViewSharedForUser) {
+                         IsViewSharedForUser isViewSharedForUser,
+                         ClusterEventBus clusterEventBus) {
         this.dbService = dbService;
         this.viewSharingService = viewSharingService;
         this.isViewSharedForUser = isViewSharedForUser;
+        this.clusterEventBus = clusterEventBus;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
@@ -156,6 +161,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
     public ViewDTO create(@ApiParam @Valid ViewDTO dto) throws ValidationException {
+        if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
+            checkPermission(RestPermissions.DASHBOARDS_CREATE);
+        }
         final String username = getCurrentUser() == null ? null : getCurrentUser().getName();
         final ViewDTO savedDto = dbService.save(dto.toBuilder().owner(username).build());
         ensureUserPermissions(savedDto);
@@ -199,7 +207,16 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final ViewDTO dto = loadView(id);
         dbService.delete(id);
         removeUserPermissions(dto);
+        triggerDeletedEvent(dto);
         return dto;
+    }
+
+    private void triggerDeletedEvent(ViewDTO dto) {
+        if (dto != null && dto.type() != null && dto.type().equals(ViewDTO.Type.DASHBOARD)) {
+            final DashboardDeletedEvent dashboardDeletedEvent = DashboardDeletedEvent.create(dto.id());
+            //noinspection UnstableApiUsage
+            clusterEventBus.post(dashboardDeletedEvent);
+        }
     }
 
     private ViewDTO loadView(String id) {

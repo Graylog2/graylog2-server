@@ -46,12 +46,12 @@ export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   cursor: pointer;
 `;
 
-export const Content: StyledComponent<StyleProps, {}, HTMLDivElement> = styled.div(({ isSelected, expandRight }) => css`
-  color: #666;
-  background: #fff;
+export const Content: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> = styled.div(({ isSelected, expandRight, theme }) => css`
+  color: ${theme.utils.readableColor(theme.color.global.contentBackground)};
+  background: ${theme.color.global.contentBackground};
   box-shadow:
-    inset 0 13px 5px -10px #ccc,
-    inset 0 -13px 5px -10px #ccc;
+    inset 0 13px 5px -10px ${theme.color.gray[80]},
+    inset 0 -13px 5px -10px ${theme.color.gray[80]};
   ${(isSelected ? css`
     padding: 20px;
   ` : css`

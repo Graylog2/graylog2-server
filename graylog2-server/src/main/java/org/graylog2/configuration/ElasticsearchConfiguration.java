@@ -88,9 +88,6 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
 
-    @Parameter(value = "elasticsearch_request_timeout", validator = PositiveDurationValidator.class)
-    private Duration requestTimeout = Duration.minutes(1L);
-
     @Parameter(value = "elasticsearch_index_optimization_timeout", validator = PositiveDurationValidator.class)
     private Duration indexOptimizationTimeout = Duration.hours(1L);
 
@@ -177,10 +174,6 @@ public class ElasticsearchConfiguration {
     @Deprecated // Should be removed in Graylog 3.0
     public boolean isDisableIndexOptimization() {
         return disableIndexOptimization;
-    }
-
-    public Duration getRequestTimeout() {
-        return requestTimeout;
     }
 
     public Duration getIndexOptimizationTimeout() {

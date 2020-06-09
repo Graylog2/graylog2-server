@@ -183,6 +183,7 @@ const ApiRoutes = {
   },
   StreamsApiController: {
     index: () => { return { url: '/streams' }; },
+    paginated: () => { return { url: '/streams/paginated' }; },
     get: (streamId) => { return { url: `/streams/${streamId}` }; },
     create: () => { return { url: '/streams' }; },
     update: (streamId) => { return { url: `/streams/${streamId}` }; },
@@ -353,6 +354,8 @@ const ApiRoutes = {
     analyze: (index, string) => { return { url: `/messages/${index}/analyze?string=${string}` }; },
     parse: () => { return { url: '/messages/parse' }; },
     single: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
+    exportSearch: ((searchId) => { return { url: `/views/search/messages/${searchId}` }; }),
+    exportSearchType: ((searchId, searchTypeId) => { return { url: `/views/search/messages/${searchId}/${searchTypeId}` }; }),
   },
   MapDataController: {
     search: () => { return { url: '/search/mapdata' }; },

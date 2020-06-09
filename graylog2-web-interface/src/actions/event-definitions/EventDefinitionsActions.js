@@ -7,6 +7,8 @@ const EventDefinitionsActions = Reflux.createActions({
   create: { asyncResult: true },
   update: { asyncResult: true },
   delete: { asyncResult: true },
+  enable: { asyncResult: true },
+  disable: { asyncResult: true },
 });
 
 export default EventDefinitionsActions;

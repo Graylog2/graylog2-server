@@ -1,9 +1,8 @@
 // @flow strict
 import React, { useEffect } from 'react';
-import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { css } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
@@ -41,14 +40,13 @@ import IfSearch from 'views/components/search/IfSearch';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import style from '!style/useable!css!./ExtendedSearchPage.css';
 import HighlightMessageInQuery from '../components/messagelist/HighlightMessageInQuery';
 
-const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
+const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElement> = styled.div`
   ${({ interactive }) => (interactive ? css`
     height: calc(100vh - 50px);
     display: -ms-grid;
@@ -60,8 +58,8 @@ const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ` : '')}
 `;
 
-const SearchArea = styled(AppContentGrid)`
-  height: 100%;
+const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
+  height: calc(100vh - 50px);
   grid-column: 2;
   -ms-grid-column: 2;
   grid-row: 1;
@@ -123,13 +121,6 @@ const ViewAdditionalContextProvider = connect(
   ({ view, configs: { searchesClusterConfig } }) => ({ value: { view: view.view, analysisDisabledFields: searchesClusterConfig.analysis_disabled_fields } }),
 );
 
-const useStyle = () => {
-  useEffect(() => {
-    style.use();
-    return () => style.unuse();
-  }, []);
-};
-
 const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRefreshHooks }: Props) => {
   const { pathname, search } = router.getCurrentLocation();
   const query = `${pathname}${search}`;
@@ -140,8 +131,6 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
 
     bindSearchParamsFromQuery({ view, query: location.query, retry: () => Promise.resolve() });
   }, [query]);
-
-  useStyle();
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -172,34 +161,36 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       <InteractiveContext.Consumer>
         {(interactive) => (
           <ViewAdditionalContextProvider>
-            <GridContainer id="main-row" interactive={interactive}>
-              <IfInteractive>
-                <ConnectedSideBar>
-                  <ConnectedFieldList />
-                </ConnectedSideBar>
-              </IfInteractive>
-              <SearchArea>
+            <HighlightingRulesProvider>
+              <GridContainer id="main-row" interactive={interactive}>
                 <IfInteractive>
-                  <HeaderElements />
-                  <IfDashboard>
-                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfDashboard>
-                  <IfSearch>
-                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfSearch>
-
-                  <QueryBarElements />
-
-                  <IfDashboard>
-                    <QueryBar />
-                  </IfDashboard>
+                  <ConnectedSideBar>
+                    <ConnectedFieldList />
+                  </ConnectedSideBar>
                 </IfInteractive>
-                <HighlightMessageInQuery query={location.query}>
-                  <SearchResult />
-                </HighlightMessageInQuery>
-                <Footer />
-              </SearchArea>
-            </GridContainer>
+                <SearchArea>
+                  <IfInteractive>
+                    <HeaderElements />
+                    <IfDashboard>
+                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfDashboard>
+                    <IfSearch>
+                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfSearch>
+
+                    <QueryBarElements />
+
+                    <IfDashboard>
+                      <QueryBar />
+                    </IfDashboard>
+                  </IfInteractive>
+                  <HighlightMessageInQuery query={location.query}>
+                    <SearchResult />
+                  </HighlightMessageInQuery>
+                  <Footer />
+                </SearchArea>
+              </GridContainer>
+            </HighlightingRulesProvider>
           </ViewAdditionalContextProvider>
         )}
       </InteractiveContext.Consumer>

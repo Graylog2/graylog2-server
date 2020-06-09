@@ -12,6 +12,8 @@ export default class AggregationWidget extends Widget {
 
   static type = 'AGGREGATION';
 
+  static defaultTitle = 'Untitled Aggregation'
+
   static fromJSON(value) {
     const { id, config, filter, timerange, query, streams } = value;
     return new AggregationWidget(id, AggregationWidgetConfig.fromJSON(config), filter, timerange, query, streams);

@@ -15,7 +15,7 @@ type Props = {
   icon: string,
   onClick: (string) => void,
   children: React.Element<any>,
-}
+};
 
 const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClick }: Props) => {
   // eslint-disable-next-line no-nested-ternary

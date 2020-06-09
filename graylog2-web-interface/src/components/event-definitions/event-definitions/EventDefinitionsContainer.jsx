@@ -48,6 +48,22 @@ class EventDefinitionsContainer extends React.Component {
     };
   };
 
+  handleEnable = (definition) => {
+    return () => {
+      if (window.confirm(`Are you sure you want to enable "${definition.title}"?`)) {
+        EventDefinitionsActions.enable(definition);
+      }
+    };
+  };
+
+  handleDisable = (definition) => {
+    return () => {
+      if (window.confirm(`Are you sure you want to disable "${definition.title}"?`)) {
+        EventDefinitionsActions.disable(definition);
+      }
+    };
+  };
+
   render() {
     const { eventDefinitions } = this.props;
 
@@ -57,11 +73,14 @@ class EventDefinitionsContainer extends React.Component {
 
     return (
       <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions}
+                        context={eventDefinitions.context}
                         pagination={eventDefinitions.pagination}
                         query={eventDefinitions.query}
                         onPageChange={this.handlePageChange}
                         onQueryChange={this.handleQueryChange}
-                        onDelete={this.handleDelete} />
+                        onDelete={this.handleDelete}
+                        onEnable={this.handleEnable}
+                        onDisable={this.handleDisable} />
     );
   }
 }

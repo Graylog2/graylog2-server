@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedSet;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -29,15 +30,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableSortedSet;
 
 import javax.ws.rs.BadRequestException;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

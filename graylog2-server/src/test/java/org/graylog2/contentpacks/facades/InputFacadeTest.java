@@ -41,7 +41,6 @@ import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
@@ -247,7 +246,7 @@ public class InputFacadeTest {
     @Test
     public void createExcerpt() {
         final ImmutableMap<String, Object> fields = ImmutableMap.of(
-                DashboardImpl.FIELD_TITLE, "Dashboard Title"
+                "title", "Dashboard Title"
         );
         final InputImpl input = new InputImpl(fields);
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);

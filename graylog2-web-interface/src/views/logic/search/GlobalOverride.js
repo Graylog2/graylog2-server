@@ -7,20 +7,20 @@ export type MessageListOptions = {
     limit: number;
     offset: number;
   };
-}
+};
 
 type InternalState = {
   timerange?: TimeRange,
   query?: QueryString,
   keepSearchTypes?: string[],
-  searchTypes?: MessageListOptions
+  searchTypes?: MessageListOptions,
 };
 
 type JsonRepresentation = {
   timerange?: TimeRange,
   query?: QueryString,
   keep_search_types?: string[],
-  search_types?: MessageListOptions
+  search_types?: MessageListOptions,
 };
 
 export default class GlobalOverride {

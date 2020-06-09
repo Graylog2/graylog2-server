@@ -19,4 +19,5 @@ package org.graylog2.indexer;
 import org.graylog2.plugin.database.Persisted;
 
 public interface IndexFailure extends Persisted {
+    String letterId();
 }

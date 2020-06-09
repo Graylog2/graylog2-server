@@ -29,13 +29,14 @@ const SystemJobsStore = Reflux.createStore({
   getJob(jobId) {
     const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.getJob(jobId).url);
     const promise = fetch('GET', url).then((response) => {
-      this.jobsById[response.id] = response;
+      this.jobsById = { ...this.jobsById, [response.id]: response };
       this.trigger({ jobsById: this.jobsById });
 
       return response;
     }, () => {
       // If we get an error (probably 404 because the job is gone), remove the job from the cache and trigger an update.
-      delete (this.jobsById[jobId]);
+      const { [jobId]: currentJob, ...rest } = this.jobsById;
+      this.jobsById = rest;
       this.trigger({ jobsById: this.jobsById });
     });
     SystemJobsActions.getJob.promise(promise);

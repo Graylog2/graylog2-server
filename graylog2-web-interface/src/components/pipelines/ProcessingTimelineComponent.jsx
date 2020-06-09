@@ -27,12 +27,36 @@ const StyledAlert = styled(Alert)`
   padding: 9px;
 `;
 
+const PipelineStage = styled.div(({ idle, theme }) => `
+  border: 1px solid ${theme.color.gray[idle ? 50 : 70]};
+  border-radius: 4px;
+  display: inline-block;
+  margin-right: 15px;
+  padding: 20px;
+  text-align: center;
+  width: 120px;
+  background-color: ${idle ? theme.utils.colorLevel(theme.color.global.contentBackground, 10) : theme.color.global.contentBackground};
+`);
+
+const PipelineNameTD = styled.td`
+  max-width: 300px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 300px;
+`;
+
+const StreamListTD = styled.td`
+  max-width: 150px;
+  width: 150px;
+  word-wrap: break-word;
+`;
+
 const ProcessingTimelineComponent = createReactClass({
   displayName: 'ProcessingTimelineComponent',
   mixins: [Reflux.connect(PipelinesStore), Reflux.connect(PipelineConnectionsStore)],
 
   componentDidMount() {
-    this.style.use();
     PipelinesActions.list();
     PipelineConnectionsActions.list();
 
@@ -40,13 +64,6 @@ const ProcessingTimelineComponent = createReactClass({
       this.setState({ streams });
     });
   },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  // eslint-disable-next-line
-  style: require('!style/useable!css!./ProcessingTimelineComponent.css'),
 
   _calculateUsedStages(pipelines) {
     return pipelines
@@ -78,11 +95,11 @@ const ProcessingTimelineComponent = createReactClass({
     this.usedStages.forEach((usedStage) => {
       if (stageNumbers.indexOf(usedStage) === -1) {
         formattedStages.push(
-          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage idle-stage">Idle</div>,
+          <PipelineStage key={`${pipeline.id}-stage${usedStage}`} idle>Idle</PipelineStage>,
         );
       } else {
         formattedStages.push(
-          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage used-stage">Stage {usedStage}</div>,
+          <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>Stage {usedStage}</PipelineStage>,
         );
       }
     }, this);
@@ -95,21 +112,21 @@ const ProcessingTimelineComponent = createReactClass({
 
     return (
       <tr key={pipeline.id}>
-        <td className="pipeline-name">
+        <PipelineNameTD>
           <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>{pipeline.title}</Link><br />
           {pipeline.description}
           <br />
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
             <CounterRate prefix="Throughput:" suffix="msg/s" />
           </MetricContainer>
-        </td>
-        <td className="stream-list">
+        </PipelineNameTD>
+        <StreamListTD>
           <PipelineConnectionsList pipeline={pipeline}
                                    connections={connections}
                                    streams={streams}
                                    streamsFormatter={this._formatConnectedStreams}
                                    noConnectionsMessage={<em>Not connected</em>} />
-        </td>
+        </StreamListTD>
         <td>{this._formatStages(pipeline, pipeline.stages)}</td>
         <td>
           <Button bsStyle="primary" bsSize="xsmall" onClick={this._deletePipeline(pipeline)}>Delete</Button>

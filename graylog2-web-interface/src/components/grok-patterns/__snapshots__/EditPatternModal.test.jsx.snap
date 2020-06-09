@@ -13,13 +13,76 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
   validPatternName={[Function]}
 >
   <span>
-    <button
-      className="btn btn-success"
+    <ForwardRef
+      bsStyle="success"
       onClick={[Function]}
-      type="button"
     >
-      Create pattern
-    </button>
+      <Button__StyledButton
+        bsStyle="success"
+        onClick={[Function]}
+      >
+        <StyledComponent
+          bsStyle="success"
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "SIZES": Array [
+                "large",
+                "small",
+                "xsmall",
+              ],
+              "STYLES": Array [
+                "success",
+                "warning",
+                "danger",
+                "info",
+                "default",
+                "primary",
+                "link",
+              ],
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Button__StyledButton-c9cbmb-0",
+                "isStatic": false,
+                "lastClassName": "jVYrA",
+                "rules": Array [
+                  [Function],
+                ],
+              },
+              "displayName": "Button__StyledButton",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          onClick={[Function]}
+        >
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="success"
+            className="Button__StyledButton-c9cbmb-0 jVYrA"
+            disabled={false}
+            onClick={[Function]}
+          >
+            <button
+              className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-success"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Create pattern
+            </button>
+          </Button>
+        </StyledComponent>
+      </Button__StyledButton>
+    </ForwardRef>
     <BootstrapModalForm
       bsSize="large"
       cancelButtonText="Cancel"
@@ -68,7 +131,7 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "DnwXA",
+                  "lastClassName": "UjHmV",
                   "rules": Array [
                     [Function],
                   ],
@@ -93,7 +156,7 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
               backdrop="static"
               bsClass="modal"
               bsSize="large"
-              className="Modal-nuree8-0 DnwXA"
+              className="Modal-nuree8-0 UjHmV"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}
@@ -165,15 +228,82 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
   validPatternName={[Function]}
 >
   <span>
-    <button
-      className="btn btn-info btn-xs"
+    <ForwardRef
+      bsSize="xs"
+      bsStyle="info"
       onClick={[Function]}
-      type="button"
     >
-      <span>
-        Edit
-      </span>
-    </button>
+      <Button__StyledButton
+        bsSize="xs"
+        bsStyle="info"
+        onClick={[Function]}
+      >
+        <StyledComponent
+          bsSize="xs"
+          bsStyle="info"
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "SIZES": Array [
+                "large",
+                "small",
+                "xsmall",
+              ],
+              "STYLES": Array [
+                "success",
+                "warning",
+                "danger",
+                "info",
+                "default",
+                "primary",
+                "link",
+              ],
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Button__StyledButton-c9cbmb-0",
+                "isStatic": false,
+                "lastClassName": "jVYrA",
+                "rules": Array [
+                  [Function],
+                ],
+              },
+              "displayName": "Button__StyledButton",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          onClick={[Function]}
+        >
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsSize="xs"
+            bsStyle="info"
+            className="Button__StyledButton-c9cbmb-0 jVYrA"
+            disabled={false}
+            onClick={[Function]}
+          >
+            <button
+              className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-xs btn-info"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              <span>
+                Edit
+              </span>
+            </button>
+          </Button>
+        </StyledComponent>
+      </Button__StyledButton>
+    </ForwardRef>
     <BootstrapModalForm
       bsSize="large"
       cancelButtonText="Cancel"
@@ -222,7 +352,7 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "DnwXA",
+                  "lastClassName": "UjHmV",
                   "rules": Array [
                     [Function],
                   ],
@@ -247,7 +377,7 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
               backdrop="static"
               bsClass="modal"
               bsSize="large"
-              className="Modal-nuree8-0 DnwXA"
+              className="Modal-nuree8-0 UjHmV"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}

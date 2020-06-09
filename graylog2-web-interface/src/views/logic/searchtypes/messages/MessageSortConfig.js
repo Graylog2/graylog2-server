@@ -1,7 +1,7 @@
 // @flow strict
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
-export type MessageSortConfigJson = {
+type MessageSortConfigJson = {
   field: string,
   order: 'ASC' | 'DESC',
 };
@@ -9,7 +9,7 @@ export type MessageSortConfigJson = {
 type InternalState = {
   field: string,
   direction: Direction,
-}
+};
 
 export default class MessageSortConfig {
   _value: InternalState

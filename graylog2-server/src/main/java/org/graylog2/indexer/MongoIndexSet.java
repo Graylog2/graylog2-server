@@ -21,10 +21,10 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.inject.assistedinject.Assisted;
-import io.searchbox.cluster.Health;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
@@ -295,7 +295,7 @@ public class MongoIndexSet implements IndexSet {
         }
 
         LOG.info("Waiting for allocation of index <{}>.", newTarget);
-        Health.Status healthStatus = indices.waitForRecovery(newTarget);
+        HealthStatus healthStatus = indices.waitForRecovery(newTarget);
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
         addDeflectorIndexRange(newTarget);

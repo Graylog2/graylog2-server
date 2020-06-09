@@ -133,7 +133,7 @@ export default {
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<*>) => data[0],
       searchTypes: MessageConfigGenerator,
-      titleGenerator: () => 'Untitled Message Table',
+      titleGenerator: () => MessagesWidget.defaultTitle,
     },
     {
       type: 'AGGREGATION',
@@ -158,7 +158,7 @@ export default {
         if (widget.config.series.length > 0) {
           return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')}`;
         }
-        return 'Untitled Aggregation';
+        return AggregationWidget.defaultTitle;
       },
     },
     {

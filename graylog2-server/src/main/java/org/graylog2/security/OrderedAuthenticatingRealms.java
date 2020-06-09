@@ -23,6 +23,7 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.Realm;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.LenientExplicitOrdering;
 
 import javax.annotation.Nonnull;
@@ -32,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -92,5 +94,9 @@ public class OrderedAuthenticatingRealms extends AbstractCollection<Realm> {
     @Override
     public int size() {
         return orderedRealms.get().size();
+    }
+
+    public Optional<Realm> getRootAccountRealm() {
+        return orderedRealms.get().stream().filter(r -> r instanceof RootAccountRealm).findFirst();
     }
 }

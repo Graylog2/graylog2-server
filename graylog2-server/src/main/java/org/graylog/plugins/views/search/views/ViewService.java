@@ -64,7 +64,9 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
-                .collect(Collectors.toCollection(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage)));
+                .collect(Collectors.toCollection(() -> viewsList.grandTotal()
+                        .map(grandTotal -> new PaginatedList<ViewDTO>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage, grandTotal))
+                        .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
     }
 
     public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,

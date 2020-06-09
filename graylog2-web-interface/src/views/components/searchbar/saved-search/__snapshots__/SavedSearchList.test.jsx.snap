@@ -16,7 +16,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 DnwXA in modal"
+      class="fade Modal-nuree8-0 UjHmV in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -57,7 +57,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -92,21 +92,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
-              disabled=""
-              type="button"
-            >
-              Load
-            </button>
-            <button
-              class="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
-              disabled=""
-              type="button"
-            >
-              Delete
-            </button>
-            <button
-              class="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
               type="button"
             >
               Cancel
@@ -135,7 +121,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 DnwXA in modal"
+      class="fade Modal-nuree8-0 UjHmV in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -176,7 +162,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 iWqiEF submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -187,7 +173,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 iWqiEF reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -210,7 +196,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fcGLmv form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -241,10 +227,20 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
               class="list-group"
             >
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                 type="button"
               >
                 test-0
+                <span>
+                  <span
+                    class="SavedSearchList__DeleteButton-sc-1r3qvm6-2 hOFiKI"
+                  >
+                    <svg
+                      class="svg-inline--fa fa-trash-alt"
+                      data-testid="delete-foo-bar-0"
+                    />
+                  </span>
+                </span>
               </button>
             </div>
             <div
@@ -334,21 +330,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
-              disabled=""
-              type="button"
-            >
-              Load
-            </button>
-            <button
-              class="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
-              disabled=""
-              type="button"
-            >
-              Delete
-            </button>
-            <button
-              class="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
               type="button"
             >
               Cancel

@@ -23,6 +23,11 @@ import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
+import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.WatermarkSettings;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +43,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class ClusterIT extends ElasticsearchBaseTest {
+public abstract class ClusterIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "cluster_it_" + System.nanoTime();
     private static final String ALIAS_NAME = "cluster_it_alias_" + System.nanoTime();
 
@@ -50,6 +55,8 @@ public class ClusterIT extends ElasticsearchBaseTest {
 
     private Cluster cluster;
 
+    protected abstract ClusterAdapter clusterAdapter(Duration timeout);
+
     @Before
     public void setUp() throws Exception {
         client().createIndex(INDEX_NAME, 1, 0);
@@ -59,7 +66,8 @@ public class ClusterIT extends ElasticsearchBaseTest {
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder().setNameFormat("cluster-it-%d").build()
         );
-        cluster = new Cluster(jestClient(), indexSetRegistry, scheduler, Duration.seconds(1L));
+        final Duration requestTimeout = Duration.seconds(1L);
+        cluster = new Cluster(indexSetRegistry, scheduler, requestTimeout, clusterAdapter(requestTimeout));
     }
 
     @Test
@@ -69,37 +77,55 @@ public class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    public void getDiskUsageStats() {
+        final Set<NodeDiskUsageStats> diskUsageStats = cluster.getDiskUsageStats();
+        assertThat(diskUsageStats).isNotEmpty();
+    }
+
+    @Test
+    public void getClusterAllocationDiskSettings() throws Exception{
+        final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
+
+        //Default Elasticsearch settings in Elasticsearch 5.6
+        assertThat(clusterAllocationDiskSettings.ThresholdEnabled()).isTrue();
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().type()).isEqualTo(WatermarkSettings.SettingsType.PERCENTAGE);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().low()).isEqualTo(85D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().high()).isEqualTo(90D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().floodStage()).isNull();
+    }
+
+    @Test
     public void health() throws Exception {
         final String index = client().createRandomIndex("cluster_it_");
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
 
-        final Optional<JsonNode> health = cluster.health();
+        final Optional<HealthStatus> health = cluster.health();
         assertThat(health)
                 .isPresent()
-                .hasValueSatisfying(json -> assertThat(json.path("status").asText()).isEqualTo("green"));
+                .hasValueSatisfying(status -> assertThat(status).isEqualTo(HealthStatus.Green));
 
     }
 
     @Test
     public void health_returns_empty_with_missing_index() {
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{"does_not_exist"});
-        final Optional<JsonNode> health = cluster.health();
+        final Optional<HealthStatus> health = cluster.health();
         assertThat(health).isEmpty();
     }
 
     @Test
     public void deflectorHealth() {
         when(indexSetRegistry.getWriteIndexAliases()).thenReturn(new String[]{ALIAS_NAME});
-        final Optional<JsonNode> deflectorHealth = cluster.deflectorHealth();
+        final Optional<HealthStatus> deflectorHealth = cluster.deflectorHealth();
         assertThat(deflectorHealth)
                 .isPresent()
-                .hasValueSatisfying(json -> assertThat(json.path("status").asText()).isEqualTo("green"));
+                .hasValueSatisfying(status -> assertThat(status).isEqualTo(HealthStatus.Green));
     }
 
     @Test
     public void deflectorHealth_returns_empty_with_missing_index() {
         when(indexSetRegistry.getWriteIndexAliases()).thenReturn(new String[]{"does_not_exist"});
-        final Optional<JsonNode> deflectorHealth = cluster.deflectorHealth();
+        final Optional<HealthStatus> deflectorHealth = cluster.deflectorHealth();
         assertThat(deflectorHealth).isEmpty();
     }
 

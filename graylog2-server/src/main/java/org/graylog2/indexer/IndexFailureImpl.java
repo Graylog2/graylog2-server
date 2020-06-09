@@ -39,6 +39,11 @@ public class IndexFailureImpl extends PersistedImpl implements IndexFailure {
     }
 
     @Override
+    public String letterId() {
+        return (String)fields.get("letter_id");
+    }
+
+    @Override
     public Map<String, Object> asMap() {
         return ImmutableMap.<String, Object>builder()
                 .put("timestamp", Tools.getISO8601String((DateTime) fields.get("timestamp")))

@@ -18,23 +18,17 @@ package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Count;
-import io.searchbox.core.CountResult;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Index;
 import joptsimple.internal.Strings;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.Message;
-import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -44,19 +38,16 @@ import org.junit.Test;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
-public class MessagesIT extends ElasticsearchBaseTest {
+public abstract class MessagesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "messages_it_deflector";
 
-    private Messages messages;
-
-    private Count count;
+    protected Messages messages;
 
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
@@ -77,37 +68,20 @@ public class MessagesIT extends ElasticsearchBaseTest {
             .build();
     private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
+    protected abstract MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry);
+
     @Before
     public void setUp() throws Exception {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
         client().waitForGreenStatus(INDEX_NAME);
-        count = new Count.Builder().addIndex(INDEX_NAME).build();
-        messages = new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true);
+        final MetricRegistry metricRegistry = new MetricRegistry();
+        messages = new Messages(mock(TrafficAccounting.class), createMessagesAdapter(metricRegistry), mock(ProcessingStatusRecorder.class));
     }
 
     @After
     public void tearDown() {
         client().deleteIndices(INDEX_NAME);
-    }
-
-    @Test
-    public void getResultDoesNotContainJestMetadataFields() throws Exception {
-        final String index = UUID.randomUUID().toString();
-        final Map<String, Object> source = new HashMap<>();
-        source.put("message", "message");
-        source.put("source", "source");
-        source.put("timestamp", "2017-04-13 15:29:00.000");
-        final Index indexRequest = messages.prepareIndexRequest(index, source, "1");
-        final DocumentResult indexResponse = jestClient().execute(indexRequest);
-
-        assertThat(indexResponse.isSucceeded()).isTrue();
-
-        final ResultMessage resultMessage = messages.get("1", index);
-        final Message message = resultMessage.getMessage();
-        assertThat(message).isNotNull();
-        assertThat(message.hasField(JestResult.ES_METADATA_ID)).isFalse();
-        assertThat(message.hasField(JestResult.ES_METADATA_VERSION)).isFalse();
     }
 
     @Test
@@ -123,9 +97,10 @@ public class MessagesIT extends ElasticsearchBaseTest {
 
         Thread.sleep(2000); // wait for ES to finish indexing
 
-        final CountResult result = jestClient().execute(count);
-        assertThat(result.getCount()).isEqualTo(MESSAGECOUNT);
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT);
     }
+
+    protected abstract Double messageCount(String indexName);
 
     @Test
     public void unevenTooLargeBatchesGetSplitUp() throws Exception {
@@ -138,9 +113,8 @@ public class MessagesIT extends ElasticsearchBaseTest {
         assertThat(failedItems).isEmpty();
 
         Thread.sleep(2000); // wait for ES to finish indexing
-        final CountResult result = jestClient().execute(count);
 
-        assertThat(result.getCount()).isEqualTo(MESSAGECOUNT + LARGE_MESSAGECOUNT);
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT + LARGE_MESSAGECOUNT);
     }
 
     private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {

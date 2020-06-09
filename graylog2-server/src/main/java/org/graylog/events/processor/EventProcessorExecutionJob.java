@@ -237,6 +237,11 @@ public class EventProcessorExecutionJob implements Job {
 
         public abstract Builder toBuilder();
 
+        public boolean hasEqualSchedule(Config other) {
+            return processingWindowSize() == other.processingWindowSize() &&
+                    processingHopSize() == other.processingHopSize();
+        }
+
         @AutoValue.Builder
         public static abstract class Builder implements JobDefinitionConfig.Builder<Builder> {
             @JsonCreator

@@ -1,7 +1,9 @@
 // @flow strict
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { type StyledComponent, css } from 'styled-components';
+
+import { type ThemeInterface } from 'theme';
 
 import Version from 'util/Version';
 import connect from 'stores/connect';
@@ -12,21 +14,21 @@ const SystemStore = StoreProvider.getStore('System');
 type Props = {
   system?: {
     version: string,
-    hostname: string
+    hostname: string,
   },
 };
 
-const StyledFooter = styled.footer`
+const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.footer(({ theme }) => css`
   text-align: center;
   font-size: 11px;
-  color: #aaa;
+  color: ${theme.color.gray[70]};
   margin-bottom: 15px;
   height: 20px;
 
   @media print {
     display: none;
   }
-`;
+`);
 
 const Footer = ({ system }: Props) => {
   const [jvm, setJvm] = useState();

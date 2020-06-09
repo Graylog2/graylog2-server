@@ -1,14 +1,53 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-
-import { ColorPickerPopover, Icon } from 'components/common';
+import styled, { type StyledComponent } from 'styled-components';
+import { type ThemeInterface } from 'theme';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 
-import styles from './HighlightingRules.css';
+import { ColorPickerPopover, Icon } from 'components/common';
+import ColorPreview from './ColorPreview';
+
+export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+  display: grid;
+  display: -ms-grid;
+  margin-top: 5px;
+  grid-template-columns: max-content 1fr max-content;
+  -ms-grid-columns: max-content 1fr max-content;
+  word-break: break-word;
+
+  > *:nth-child(1) {
+    grid-column: 1;
+    -ms-grid-column: 1;
+  }
+
+  > *:nth-child(2) {
+    grid-column: 2;
+    -ms-grid-column: 2;
+  }
+
+  > *:nth-child(3) {
+    grid-column: 3;
+    -ms-grid-column: 3;
+  }
+`;
+
+const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => `
+  width: 2rem;
+  height: 2rem;
+  margin-left: 0.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  :active {
+    background-color: ${theme.color.gray[90]}
+  }
+`);
 
 type Props = {
   rule: Rule,
@@ -30,19 +69,20 @@ const onDelete = (e, rule) => {
 const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color } = rule;
   return (
-    <div className={styles.highlightingRuleBlock}>
+    <HighlightingRuleGrid>
       <ColorPickerPopover id="formatting-rule-color"
                           placement="right"
                           color={color}
                           colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                          triggerNode={<div className={styles.colorElement} style={{ backgroundColor: color }} />}
+                          triggerNode={<ColorPreview color={color} />}
                           onChange={(newColor, _, hidePopover) => updateColor(rule, newColor, hidePopover)} />
-      {' '}
-      for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
-      <span role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
+      <div>
+        for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
+      </div>
+      <DeleteIcon role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
         <Icon name="trash-o" />
-      </span>
-    </div>
+      </DeleteIcon>
+    </HighlightingRuleGrid>
   );
 };
 

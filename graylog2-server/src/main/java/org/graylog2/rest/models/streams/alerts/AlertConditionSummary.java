@@ -65,7 +65,6 @@ public abstract class AlertConditionSummary {
                                                @JsonProperty("parameters") Map<String, Object> parameters,
                                                @JsonProperty("in_grace") Boolean inGrace,
                                                @JsonProperty("title") @Nullable String title) {
-        checkNotNull(inGrace);
         return new AutoValue_AlertConditionSummary(id, type, creatorUserId, createdAt, parameters, inGrace, title);
     }
 

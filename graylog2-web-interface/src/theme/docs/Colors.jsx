@@ -1,32 +1,45 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import ClipboardJS from 'clipboard';
 
-import { util } from 'theme';
-import { OverlayTrigger, Tooltip } from 'components/graylog';
+import { Tooltip } from 'components/graylog';
 
-const Name = styled.div`
+const Name = styled.span`
   flex: 1;
   font-weight: bold;
+  text-align: left;
 `;
 
-const Value = styled.div`
+const Value = styled.span`
   text-align: right;
   opacity: 0.5;
   transition: opacity 150ms ease-in-out;
 `;
 
-const Swatch = styled.div(({ color }) => `
+const StyledTooltip = styled(Tooltip).attrs((props) => ({
+  className: props.opened ? 'in' : '',
+}))(({ opened }) => `
+  display: ${opened ? 'block' : 'none'}
+`);
+
+const Wrapped = styled.div`
+  flex: 1;
+  position: relative;
+`;
+
+const Swatch = styled.button(({ color, theme }) => `
   height: 60px;
   background-color: ${color};
   border: 1px solid #222;
-  color: ${util.readableColor(color)};
-  display: flex;
+  color: ${theme.utils.readableColor(color)};
   padding: 3px;
-  flex-direction: column;
   cursor: pointer;
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 3px 6px;
+  width: 100%;
 
   &:hover {
     ${Value} {
@@ -35,29 +48,21 @@ const Swatch = styled.div(({ color }) => `
   }
 `);
 
-
-const Wrapped = ({ copyText, children }) => {
-  if (!copyText) {
-    return <>{children}</>;
-  }
-
-  return (
-    <OverlayTrigger placement="top"
-                    overlay={<Tooltip id={`tooltip-swatch-${copyText}`}>Copied!</Tooltip>}
-                    trigger="click"
-                    delayShow={300}
-                    delayHide={150}>
-      {children}
-    </OverlayTrigger>
-  );
-};
-
 const ColorSwatch = ({ className, color, name, copyText }) => {
+  const [opened, setOpened] = useState(false);
+  const swatchRef = useRef();
   let clipboard;
 
   useEffect(() => {
     if (ClipboardJS.isSupported() && !!copyText) {
-      clipboard = new ClipboardJS('[data-clipboard-button]', {});
+      clipboard = new ClipboardJS(swatchRef.current, {});
+
+      clipboard.on('success', () => {
+        setOpened(true);
+        setTimeout(() => {
+          setOpened(false);
+        }, 1000);
+      });
     }
 
     return () => {
@@ -68,11 +73,18 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
   }, []);
 
   return (
-    <Wrapped copyText={copyText}>
+    <Wrapped className={className}>
+      <StyledTooltip placement="top"
+                     opened={opened}
+                     positionTop={-32}
+                     id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
+        Copied!
+      </StyledTooltip>
+
       <Swatch color={color}
-              className={className}
               data-clipboard-button
-              data-clipboard-text={copyText}>
+              data-clipboard-text={copyText}
+              ref={swatchRef}>
         <Name>{name}</Name>
         <Value>{color}</Value>
       </Swatch>
@@ -91,11 +103,6 @@ ColorSwatch.defaultProps = {
   className: undefined,
   copyText: undefined,
   name: '',
-};
-
-Wrapped.propTypes = {
-  children: PropTypes.node.isRequired,
-  copyText: PropTypes.string.isRequired,
 };
 
 export default ColorSwatch;

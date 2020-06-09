@@ -32,7 +32,7 @@ const ContentPacksPage = createReactClass({
 
   _deleteContentPack(contentPackId) {
     // eslint-disable-next-line no-alert
-    if (window.confirm('You are about to delete this content pack, are you sure?')) {
+    if (window.confirm('You are about to delete this Content Pack, are you sure?')) {
       ContentPacksActions.delete(contentPackId).then(() => {
         UserNotification.success('Content Pack deleted successfully.', 'Success');
         ContentPacksActions.list();
@@ -54,7 +54,7 @@ const ContentPacksPage = createReactClass({
       UserNotification.success('Content Pack installed successfully.', 'Success');
     }, (error) => {
       UserNotification.error(`Installing content pack failed with status: ${error}.
-         Could not install content pack with ID: ${contentPackId}`);
+         Could not install Content Pack with ID: ${contentPackId}`);
     });
   },
 
@@ -66,22 +66,22 @@ const ContentPacksPage = createReactClass({
     }
 
     return (
-      <DocumentTitle title="Content packs">
+      <DocumentTitle title="Content Packs">
         <span>
-          <PageHeader title="Content packs">
+          <PageHeader title="Content Packs">
             <span>
-              Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
+              Content Packs accelerate the set up process for a specific data source. A Content Pack can include inputs/extractors, streams, and dashboards.
             </span>
 
             <span>
-              Find more content packs in {' '}
+              Find more Content Packs in {' '}
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
 
             <ButtonToolbar>
               <ContentPackUploadControls />
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
-                <Button bsStyle="success">Create a content pack</Button>
+                <Button bsStyle="success">Create a Content Pack</Button>
               </LinkContainer>
               <Button bsStyle="info" active>Content Packs</Button>
             </ButtonToolbar>

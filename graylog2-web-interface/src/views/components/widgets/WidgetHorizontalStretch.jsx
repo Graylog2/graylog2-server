@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { widgetDefinition } from 'views/logic/Widgets';
-import { Icon } from 'components/common';
-import style from './WidgetHorizontalStretch.css';
+import { IconButton } from 'components/common';
 
 class WidgetHorizontalStretch extends React.Component {
   static propTypes = {
@@ -25,11 +24,11 @@ class WidgetHorizontalStretch extends React.Component {
   render() {
     const { position } = this.props;
     const { width } = position;
-    const icon = width === Infinity ? 'compress' : 'arrows-h';
+    const stretched = width === Infinity;
+    const icon = stretched ? 'compress' : 'arrows-h';
+    const title = stretched ? 'Compress width' : 'Stretch width';
     return (
-      <span>
-        <Icon role="link" tabIndex={0} onClick={this._onClick} name={icon} className={style.button} />
-      </span>
+      <IconButton onClick={this._onClick} name={icon} title={title} />
     );
   }
 }

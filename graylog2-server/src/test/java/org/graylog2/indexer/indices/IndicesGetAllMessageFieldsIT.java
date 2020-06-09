@@ -16,17 +16,14 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,23 +36,25 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
+public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private Indices indices;
 
+    protected abstract IndicesAdapter indicesAdapter();
+
     @Before
     public void setUp() throws Exception {
-        final Node node = new Node(jestClient());
+        final Node node = new Node(mock(NodeAdapter.class));
         //noinspection UnstableApiUsage
-        indices = new Indices(jestClient(),
-                new ObjectMapper(),
+        indices = new Indices(
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
-                new EventBus());
+                new EventBus(),
+                indicesAdapter()
+        );
     }
 
     @Test
@@ -78,7 +77,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     @Test
     @SkipDefaultIndexTemplate
     public void GetAllMessageFieldsForSingleIndexShouldReturnCompleteList() {
-        importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
+        importFixture("org/graylog2/indexer/indices/IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String[] indexNames = new String[]{"get_all_message_fields_0"};
         final Set<String> result = indices.getAllMessageFields(indexNames);
@@ -101,7 +100,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     @Test
     @SkipDefaultIndexTemplate
     public void GetAllMessageFieldsForMultipleIndicesShouldReturnCompleteList() {
-        importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
+        importFixture("org/graylog2/indexer/indices/IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String[] indexNames = new String[]{"get_all_message_fields_0", "get_all_message_fields_1"};
         final Set<String> result = indices.getAllMessageFields(indexNames);
@@ -137,7 +136,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     @Test
     @SkipDefaultIndexTemplate
     public void GetAllMessageFieldsForIndicesForSingleIndexShouldReturnCompleteList() {
-        importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
+        importFixture("org/graylog2/indexer/indices/IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String indexName = "get_all_message_fields_0";
         final String[] indexNames = new String[]{indexName};
@@ -172,7 +171,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     @Test
     @SkipDefaultIndexTemplate
     public void GetAllMessageFieldsForIndicesForMultipleIndicesShouldReturnCompleteList() {
-        importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
+        importFixture("org/graylog2/indexer/indices/IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String[] indexNames = new String[]{"get_all_message_fields_0", "get_all_message_fields_1"};
         final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(indexNames);

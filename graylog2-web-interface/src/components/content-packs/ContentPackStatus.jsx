@@ -1,43 +1,48 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
-import { Badge } from 'components/graylog';
+import styled from 'styled-components';
 import { Link } from 'react-router';
+
+import { StyledBadge } from 'components/graylog/Badge';
 import Routes from 'routing/Routes';
 
-import ContentPackStatusStyle from './ContentPackStatus.css';
-
-class ContentPackStatus extends React.Component {
-  static propTypes = {
-    states: PropTypes.arrayOf(PropTypes.string),
-    contentPackId: PropTypes.string.isRequired,
+const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
+  const { success, info, warning, danger } = theme.color.variant.dark;
+  const statuses = {
+    installed: success,
+    updatable: info,
+    edited: warning,
+    error: danger,
   };
 
-  static defaultProps = {
-    states: [],
-  };
+  return `
+    margin-left: 4px;
+    background-color: ${statuses[status]};
+    color: ${theme.utils.readableColor(statuses[status])};
+  `;
+});
 
-  static styleMap = {
-    installed: ContentPackStatusStyle.installed,
-    updatable: ContentPackStatusStyle.updatable,
-    edited: ContentPackStatusStyle.edited,
-    error: ContentPackStatusStyle.error,
-  };
+const ContentPackStatus = ({ contentPackId, states }) => {
+  const badges = states.map((state) => (
+    <Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(contentPackId)}>
+      <StatusBadge status={state}>{state}</StatusBadge>
+    </Link>
+  ));
 
-  render() {
-    const badges = this.props.states.map((state) => {
-      return (
-        <Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(this.props.contentPackId)}>
-          <Badge key={state} bsClass={`badge ${ContentPackStatus.styleMap[state]}`}>{state}</Badge>
-        </Link>
-      );
-    });
-    return (
-      <span>
-        {badges}
-      </span>
-    );
-  }
-}
+  return (
+    <span>
+      {badges}
+    </span>
+  );
+};
+
+ContentPackStatus.propTypes = {
+  states: PropTypes.arrayOf(PropTypes.string),
+  contentPackId: PropTypes.string.isRequired,
+};
+
+ContentPackStatus.defaultProps = {
+  states: [],
+};
 
 export default ContentPackStatus;

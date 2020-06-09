@@ -16,12 +16,12 @@
  */
 package org.graylog2.periodical;
 
-import io.searchbox.cluster.Health;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.notifications.Notification;
@@ -160,7 +160,7 @@ public class IndexRotationThread extends Periodical {
                     LOG.warn(msg);
                     activityWriter.write(new Activity(msg, IndexRotationThread.class));
 
-                    if (Health.Status.RED == indices.waitForRecovery(shouldBeTarget)) {
+                    if (indices.waitForRecovery(shouldBeTarget) == HealthStatus.Red) {
                         LOG.error("New target index for deflector didn't get healthy within timeout. Skipping deflector update.");
                     } else {
                         indexSet.pointTo(shouldBeTarget, currentTarget);

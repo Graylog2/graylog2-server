@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { get } from 'lodash';
+import UserNotification from 'util/UserNotification';
 
 import { FormGroup, HelpBlock, Radio } from 'components/graylog';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
@@ -79,6 +80,7 @@ class ShareViewModal extends React.Component<Props, State> {
   _onSave = () => {
     const { view } = this.props;
     const { viewSharing } = this.state;
+    const viewTypeLabel = ViewTypeLabel({ type: view.type });
     let promise;
     if (viewSharing) {
       promise = ViewSharingActions.create(view.id, viewSharing);
@@ -86,7 +88,12 @@ class ShareViewModal extends React.Component<Props, State> {
       promise = ViewSharingActions.remove(view.id);
     }
     const { onClose } = this.props;
-    promise.then(() => onClose(viewSharing));
+    promise.then(() => {
+      onClose(viewSharing);
+      UserNotification.success(`Sharing ${viewTypeLabel} "${view.title}" was successful!`, 'Success!');
+    }).catch((error) => {
+      UserNotification.error(`Sharing ${viewTypeLabel} failed: ${error?.additional?.body?.message ?? error}`, 'Error!');
+    });
   };
 
   // eslint-disable-next-line react/destructuring-assignment
@@ -151,6 +158,7 @@ class ShareViewModal extends React.Component<Props, State> {
                   isDisabled={type !== SpecificRoles.Type}
                   value={rolesValue}
                   placeholder="Select roles"
+                  stripDiacritics
                   onChange={this._onRolesChange}
                   options={rolesOptions} />
           <HelpBlock>Only users with these roles can access the {viewTypeLabel}.</HelpBlock>
@@ -164,6 +172,7 @@ class ShareViewModal extends React.Component<Props, State> {
                   isDisabled={type !== SpecificUsers.Type}
                   value={userValue}
                   placeholder="Select users"
+                  stripDiacritics
                   onChange={this._onUsersChange}
                   options={userOptions || []} />
           <HelpBlock>Only these users can access the {viewTypeLabel}.</HelpBlock>

@@ -106,6 +106,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
+import org.graylog.plugins.pipelineprocessor.functions.strings.FirstNonNull;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
@@ -155,6 +156,7 @@ import org.mockito.junit.MockitoRule;
 import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -261,6 +263,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(StartsWith.NAME, new StartsWith());
         functions.put(Replace.NAME, new Replace());
         functions.put(Length.NAME, new Length());
+        functions.put(FirstNonNull.NAME, new FirstNonNull());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
@@ -360,6 +363,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
 
         functionRegistry = new FunctionRegistry(functions);
+    }
+
+    @Test
+    public void stringConcat(){
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
+
+        assertThat(message.hasField("result")).isTrue();
+        assertThat(message.getField("result")).isEqualTo("aabbcc");
     }
 
     @Test
@@ -1125,5 +1137,19 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         verifyNoMoreInteractions(lookupTable);
 
         assertThat(message.getField("new_value")).isEqualTo(result);
+    }
+
+    @Test
+    public void firstNonNull() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message.getField("not_found")).isNull();
+        assertThat(message.getField("first_found")).isEqualTo("first");
+        assertThat(message.getField("middle_found")).isEqualTo("middle");
+        assertThat(message.getField("last_found")).isEqualTo("last");
+
+        assertThat(message.getField("list_found")).isInstanceOf(List.class);
+        assertThat(message.getField("int_found")).isInstanceOf(Long.class);
     }
 }

@@ -7,8 +7,8 @@ import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import { IfPermitted, Spinner, Icon } from 'components/common';
 
-const NodeRow = styled.div`
-  border-bottom: 1px solid #ccc;
+const NodeRow = styled.div(({ theme }) => `
+  border-bottom: 1px solid ${theme.color.gray[80]};
   padding-bottom: 8px;
   margin-bottom: 8px;
   margin-top: 0;
@@ -20,7 +20,7 @@ const NodeRow = styled.div`
   .well {
     margin-bottom: 0;
     margin-top: 3px;
-    font-family: monospace;
+    font-family: ${theme.fonts.family.monospace};
     font-size: 11px;
   }
 
@@ -43,7 +43,7 @@ const NodeRow = styled.div`
   .dropdown-menu a.selected {
     font-weight: bold;
   }
-`;
+`);
 
 const NodeRowInfo = styled.div`
   position: relative;
@@ -65,34 +65,57 @@ class Output extends React.Component {
     output: PropTypes.object.isRequired,
     types: PropTypes.object.isRequired,
     getTypeDefinition: PropTypes.func.isRequired,
+    onUpdate: PropTypes.func,
     removeOutputFromStream: PropTypes.func.isRequired,
     removeOutputGlobally: PropTypes.func.isRequired,
   };
 
-  state = {};
+  static defaultProps = {
+    streamId: '',
+    onUpdate: () => {},
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      typeDefinition: undefined,
+    };
+  }
 
   componentDidMount() {
+    const { getTypeDefinition, output } = this.props;
+
     if (!this._typeNotAvailable()) {
-      this.props.getTypeDefinition(this.props.output.type, (typeDefinition) => {
-        this.setState({ typeDefinition: typeDefinition });
+      getTypeDefinition(output.type, (typeDefinition) => {
+        this.setState({ typeDefinition });
       });
     }
   }
 
   _onDeleteFromStream = () => {
-    this.props.removeOutputFromStream(this.props.output.id, this.props.streamId);
+    const { removeOutputFromStream, output, streamId } = this.props;
+
+    removeOutputFromStream(output.id, streamId);
   };
 
   _onDeleteGlobally = () => {
-    this.props.removeOutputGlobally(this.props.output.id);
+    const { removeOutputGlobally, output } = this.props;
+
+    removeOutputGlobally(output.id);
   };
 
   _typeNotAvailable = () => {
-    return (this.props.types[this.props.output.type] === undefined);
+    const { types, output } = this.props;
+
+    return (types[output.type] === undefined);
   };
 
   render() {
-    if (!this._typeNotAvailable() && !this.state.typeDefinition) {
+    const { typeDefinition } = this.state;
+    const { onUpdate, getTypeDefinition } = this.props;
+
+    if (!this._typeNotAvailable() && !typeDefinition) {
       return <Spinner />;
     }
 
@@ -114,7 +137,7 @@ class Output extends React.Component {
         <ConfigurationWell key={`configuration-well-output-${output.id}`}
                            id={output.id}
                            configuration={output.configuration}
-                           typeDefinition={this.state.typeDefinition} />
+                           typeDefinition={typeDefinition} />
       );
     }
 
@@ -149,8 +172,8 @@ class Output extends React.Component {
                 <IfPermitted permissions="outputs:edit">
                   <EditOutputButton disabled={this._typeNotAvailable()}
                                     output={output}
-                                    onUpdate={this.props.onUpdate}
-                                    getTypeDefinition={this.props.getTypeDefinition} />
+                                    onUpdate={onUpdate}
+                                    getTypeDefinition={getTypeDefinition} />
                 </IfPermitted>
                 {deleteFromStreamButton}
                 <IfPermitted permissions="outputs:terminate">

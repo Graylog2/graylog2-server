@@ -17,6 +17,7 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
+    'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
     'max-classes-per-file': 'off',
     'max-len': 'off',
     'new-cap': 'off',
@@ -43,5 +44,22 @@ module.exports = {
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
     'react/static-property-placement': 'off',
+
+    // eslint-plugin-flowtype configs, `recommended` is too weak in a couple of places:
+    'flowtype/delimiter-dangle': [1, 'always-multiline'],
+    'flowtype/no-weak-types': [
+      2,
+      {
+        any: false,
+      },
+    ],
+    'flowtype/require-valid-file-annotation': [
+      2,
+      'never', {
+        annotationStyle: 'line',
+        strict: true,
+      },
+    ],
+    'flowtype/semi': [2, 'always'],
   },
 };

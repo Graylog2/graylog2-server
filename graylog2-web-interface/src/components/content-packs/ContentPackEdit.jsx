@@ -139,7 +139,7 @@ class ContentPackEdit extends React.Component {
             </AutoAffix>
           ) : undefined}
         </Wizard>
-        <ScrollButton possition="middle" />
+        <ScrollButton position="middle" />
       </div>
     );
   }

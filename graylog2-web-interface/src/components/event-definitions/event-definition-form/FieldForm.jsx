@@ -225,6 +225,7 @@ class FieldForm extends React.Component {
                      validationState={validation.errors['config.providers[0].type'] ? 'error' : null}>
             <ControlLabel>Set Value From</ControlLabel>
             <Select name="event-field-provider"
+                    ignoreAccents={false}
                     placeholder="Select Value Source"
                     onChange={this.handleProviderTypeChange}
                     options={this.formatFieldValueProviders()}

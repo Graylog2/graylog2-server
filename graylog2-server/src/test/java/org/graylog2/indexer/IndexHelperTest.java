@@ -17,6 +17,10 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -84,6 +88,23 @@ public class IndexHelperTest {
             "graylog_production_5",
             "graylog_production_6");
         assertThat(IndexHelper.getOldestIndices(indexSet, 1)).containsOnly("graylog_production_0");
+    }
+
+    @Test
+    public void getTimestampRangeFilterReturnsNullIfTimeRangeIsNull() {
+        assertThat(IndexHelper.getTimestampRangeFilter(null)).isNull();
+    }
+
+    @Test
+    public void getTimestampRangeFilterReturnsRangeQueryWithGivenTimeRange() {
+        final DateTime from = new DateTime(2016, 1, 15, 12, 0, DateTimeZone.UTC);
+        final DateTime to = from.plusHours(1);
+        final TimeRange timeRange = AbsoluteRange.create(from, to);
+        final RangeQueryBuilder queryBuilder = (RangeQueryBuilder) IndexHelper.getTimestampRangeFilter(timeRange);
+        assertThat(queryBuilder).isNotNull();
+        assertThat(queryBuilder.fieldName()).isEqualTo("timestamp");
+        assertThat(queryBuilder.from()).isEqualTo(Tools.buildElasticSearchTimeFormat(from));
+        assertThat(queryBuilder.to()).isEqualTo(Tools.buildElasticSearchTimeFormat(to));
     }
 
     @Test

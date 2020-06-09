@@ -22,6 +22,7 @@ import Query from 'views/logic/queries/Query';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import asMock from 'helpers/mocking/AsMock';
 import ViewState from 'views/logic/views/ViewState';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 
 import Widget from './Widget';
 
@@ -253,6 +254,30 @@ describe('<Widget />', () => {
     fireEvent.click(saveButton);
 
     expect(WidgetActions.update).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
+  });
+
+  it('does not display export to CSV action if widget is not a message table', () => {
+    const dummyWidget = { config: {}, id: 'widgetId', type: 'dummy' };
+    const { getByTestId, queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
+
+    const actionToggle = getByTestId('widgetActionDropDown');
+    fireEvent.click(actionToggle);
+
+    expect(queryByText('Export to CSV')).toBeNull();
+  });
+
+  it('allows export to CSV for message tables', () => {
+    ViewStore.getInitialState = jest.fn(() => viewStoreState);
+    const messagesWidget = { config: {}, id: 'widgetId', type: MessagesWidget.type };
+    const { getByTestId, getByText } = render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
+
+    const actionToggle = getByTestId('widgetActionDropDown');
+    fireEvent.click(actionToggle);
+
+    const exportButton = getByText('Export to CSV');
+    fireEvent.click(exportButton);
+
+    expect(getByText('Export message table search results to CSV')).not.toBeNull();
   });
 
   describe('copy widget to dashboard', () => {

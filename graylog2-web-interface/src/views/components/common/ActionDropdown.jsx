@@ -1,6 +1,9 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled, { type StyledComponent } from 'styled-components';
+
+import { type ThemeInterface } from 'theme';
 import { MenuItem } from 'components/graylog';
 import { Overlay } from 'react-overlays';
 import StopPropagation from './StopPropagation';
@@ -14,6 +17,27 @@ type ActionToggleProps = {
   children: React.Node,
   onClick: (SyntheticInputEvent<HTMLButtonElement>) => void,
 };
+
+type ActionDropdownState = {
+  show: boolean,
+};
+
+type FilterPropsProps = {
+  children: React.Node,
+  style?: { [string]: any },
+};
+
+type ActionDropdownProps = {
+  children: React.Node,
+  container?: HTMLElement,
+  element: React.Node,
+};
+
+const StyledDropdownMenu: StyledComponent<ActionDropdownState, ThemeInterface, HTMLUListElement> = styled.ul(({ show, theme }) => `
+  display: ${show ? 'block' : 'none'};
+  min-width: max-content;
+  color: ${theme.color.gray[40]};
+`);
 
 const ActionToggle = ({ children, onClick }: ActionToggleProps) => {
   const handleClick = (e) => {
@@ -48,25 +72,10 @@ ActionToggle.defaultProps = {
   onClick: () => {},
 };
 
-type FilterPropsProps = {
-  children: React.Node,
-  style?: { [string]: any },
-};
-
 const FilterProps = ({ children, style }: FilterPropsProps) => React.Children.map(
   children,
   (child) => React.cloneElement(child, { style: { ...style, ...child.props.style } }),
 );
-
-type ActionDropdownProps = {
-  children: React.Node,
-  container?: HTMLElement,
-  element: React.Node,
-};
-
-type ActionDropdownState = {
-  show: boolean,
-};
 
 class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdownState> {
   target: ?HTMLElement;
@@ -91,15 +100,10 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
   render() {
     const { children, container, element } = this.props;
     const { show } = this.state;
-    const displayMenu = show ? { display: 'block' } : { display: 'none' };
-    const listStyle = {
-      minWidth: 'max-content',
-      color: '#666666',
-    };
 
     const mappedChildren = React.Children.map(
       children,
-      (child) => React.cloneElement(child, {
+      (child) => child && React.cloneElement(child, {
         ...child.props,
         ...(child.props.onSelect ? {
           onSelect: (eventKey, event) => {
@@ -122,10 +126,10 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
                  onHide={this._onToggle}
                  target={() => this.target}>
           <FilterProps>
-            <ul className="dropdown-menu" style={({ ...listStyle, ...displayMenu })}>
+            <StyledDropdownMenu show={show} className="dropdown-menu">
               <MenuItem header>Actions</MenuItem>
               {mappedChildren}
-            </ul>
+            </StyledDropdownMenu>
           </FilterProps>
         </Overlay>
       </StopPropagation>

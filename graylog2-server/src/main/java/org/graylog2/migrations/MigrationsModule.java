@@ -16,6 +16,7 @@
  */
 package org.graylog2.migrations;
 
+import org.graylog2.migrations.V20180214093600_AdjustDashboardPositionToNewResolution.Migration;
 import org.graylog2.plugin.PluginModule;
 
 public class MigrationsModule extends PluginModule {
@@ -33,7 +34,7 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20161216123500_DefaultIndexSetMigration.class);
         addMigration(V20170110150100_FixAlertConditionsMigration.class);
         addMigration(V20170607164210_MigrateReopenedIndicesToAliases.class);
-        addMigration(V20180214093600_AdjustDashboardPositionToNewResolution.class);
+        addMigration(Migration.class);
         addMigration(V2018070614390000_EnforceUniqueGrokPatterns.class);
         addMigration(V20180718155800_AddContentPackIdAndRev.class);
         addMigration(V20180924111644_AddDefaultGrokPatterns.class);

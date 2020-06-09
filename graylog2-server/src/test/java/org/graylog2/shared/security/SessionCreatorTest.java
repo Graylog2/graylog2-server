@@ -16,8 +16,16 @@
  */
 package org.graylog2.shared.security;
 
+import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
@@ -28,6 +36,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,11 +44,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SessionCreatorTest {
     private static final long SESSION_TIMEOUT = Long.MAX_VALUE;
@@ -65,7 +88,12 @@ public class SessionCreatorTest {
 
         SimpleAccountRealm realm = new SimpleAccountRealm();
         realm.addAccount(validToken.getUsername(), String.valueOf(validToken.getPassword()));
+
+        // Set up a security manager like in DefaultSecurityManagerProvider
         securityManager = new DefaultSecurityManager(realm);
+        FirstSuccessfulStrategy strategy = new ThrowingFirstSuccessfulStrategy();
+        strategy.setStopAfterFirstSuccess(true);
+        ((ModularRealmAuthenticator) securityManager.getAuthenticator()).setAuthenticationStrategy(strategy);
         SecurityUtils.setSecurityManager(securityManager);
     }
 
@@ -136,9 +164,89 @@ public class SessionCreatorTest {
         assertTrue(SecurityUtils.getSubject().isAuthenticated());
     }
 
+    @Test
+    public void throwingRealmDoesNotInhibitAuthentication() {
+        setUpUserMock();
+
+        assertFalse(SecurityUtils.getSubject().isAuthenticated());
+
+        // Put a throwing realm in the first position. Authentication should still be successful, because the second
+        // realm will find an account for the user
+        final List<Realm> realms = new ArrayList<>(securityManager.getRealms());
+        realms.add(0, throwingRealm());
+        securityManager.setRealms(realms);
+
+        assertThat(sessionCreator.create(null, "host", validToken)).isPresent();
+        assertThat(SecurityUtils.getSubject().isAuthenticated()).isTrue();
+        verify(auditEventSender).success(eq(AuditActor.user("username")), anyString(), anyMap());
+    }
+
+    @Test
+    public void serviceUnavailable() {
+        setUpUserMock();
+
+        assertFalse(SecurityUtils.getSubject().isAuthenticated());
+
+        // First realm will throw, second realm will be unable to authenticate because user has no account
+        securityManager.setRealms(ImmutableList.of(throwingRealm(), new SimpleAccountRealm()));
+
+        assertThatThrownBy(() -> sessionCreator.create(null, "host", validToken)).isInstanceOf(
+                AuthenticationServiceUnavailableException.class);
+        assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
+        verify(auditEventSender).failure(eq(AuditActor.user("username")), anyString(),
+                argThat(map -> StringUtils.containsIgnoreCase((String) map.get("message"), "unavailable")));
+    }
+
+    /**
+     * Test that the service unavailable exception is cleared when the service becomes available again
+     */
+    @Test
+    public void serviceUnavailableStateIsCleared() {
+        setUpUserMock();
+
+        assertFalse(SecurityUtils.getSubject().isAuthenticated());
+
+        final AtomicBoolean doThrow = new AtomicBoolean(true);
+        final SimpleAccountRealm switchableRealm = new SimpleAccountRealm() {
+            @Override
+            protected AuthenticationInfo doGetAuthenticationInfo(
+                    AuthenticationToken token) throws AuthenticationException {
+                if (doThrow.get()) {
+                    throw new AuthenticationServiceUnavailableException("not available");
+                } else {
+                    return super.doGetAuthenticationInfo(token);
+                }
+            }
+        };
+
+        securityManager.setRealms(ImmutableList.of(switchableRealm, new SimpleAccountRealm()));
+
+        // realm will throw an exception on auth attempt
+        assertThatThrownBy(() -> sessionCreator.create(null, "host", validToken)).isInstanceOf(
+                AuthenticationServiceUnavailableException.class);
+        assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
+
+        // switch realm to not throw an exception but simply reject the credentials
+        doThrow.set(false);
+
+        sessionCreator.create(null, "host", validToken);
+        assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
+    }
+
     private void setUpUserMock() {
         User user = mock(User.class);
         when(user.getSessionTimeoutMs()).thenReturn(SESSION_TIMEOUT);
         when(userService.load("username")).thenReturn(user);
+    }
+
+    @NotNull
+    private SimpleAccountRealm throwingRealm() {
+        return new SimpleAccountRealm() {
+            @Override
+            protected AuthenticationInfo doGetAuthenticationInfo(
+                    AuthenticationToken token) throws AuthenticationException {
+                throw new AuthenticationServiceUnavailableException("not available");
+            }
+        };
     }
 }

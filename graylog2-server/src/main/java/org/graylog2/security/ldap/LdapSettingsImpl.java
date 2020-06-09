@@ -25,7 +25,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
-import org.apache.shiro.codec.Hex;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
@@ -43,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -154,10 +152,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
         // set new salt value, if we didn't have any.
         if (getSystemPasswordSalt().isEmpty()) {
             LOG.debug("Generating new salt for LDAP system password.");
-            final SecureRandom random = new SecureRandom();
-            byte[] saltBytes = new byte[8];
-            random.nextBytes(saltBytes);
-            setSystemPasswordSalt(Hex.encodeToString(saltBytes));
+            setSystemPasswordSalt(AESTools.generateNewSalt());
         }
         final String encrypted = AESTools.encrypt(
                 systemPassword,

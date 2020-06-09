@@ -5,7 +5,6 @@ const webpackConfig = require('./webpack.config.js');
 module.exports = {
   require: [
     'bootstrap/less/bootstrap.less',
-    'stylesheets/bootstrap-submenus.less',
     'toastr/toastr.less',
     'stylesheets/typeahead.less',
     'injection/builtins.js',
@@ -20,10 +19,15 @@ module.exports = {
       content: 'docs/styleguide.md',
     },
     {
+      name: 'Documentation',
+      content: 'docs/documentation.md',
+    },
+    {
       name: 'Theming Details',
+      content: 'src/theme/docs/Details.md',
       sections: [
         {
-          name: 'ThemeProvider',
+          name: 'ThemeProvider & Usage',
           content: 'src/theme/docs/ThemeProvider.md',
         },
         {
@@ -35,10 +39,6 @@ module.exports = {
           content: 'src/theme/docs/Utilities.md',
         },
       ],
-    },
-    {
-      name: 'Documentation',
-      content: 'docs/documentation.md',
     },
     {
       name: 'Tests',

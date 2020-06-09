@@ -42,17 +42,17 @@ describe('SystemMenu', () => {
     };
     it.each`
     permissions                    | count | links
-    ${[]}                          | ${3}  | ${['Overview', 'Nodes', 'Enterprise']}
-    ${['clusterconfigentry:read']} | ${4}  | ${['Configurations']}
-    ${['inputs:read']}             | ${4}  | ${['Inputs']}
-    ${['outputs:read']}            | ${4}  | ${['Outputs']}
-    ${['indices:read']}            | ${4}  | ${['Indices']}
-    ${['loggers:read']}            | ${4}  | ${['Logging']}
-    ${['users:list']}              | ${4}  | ${['Authentication']}
-    ${['roles:read']}              | ${4}  | ${['Authentication']}
-    ${['dashboards:create', 'inputs:create', 'streams:create']} | ${5}  | ${['Content Packs']}
-    ${['inputs:edit']}             | ${6}  | ${['Grok Patterns', 'Lookup Tables', 'Sidecars']}
-    ${['inputs:create']}           | ${4}  | ${['Pipelines']}
+    ${[]}                          | ${2}  | ${['Overview', 'Nodes']}
+    ${['clusterconfigentry:read']} | ${3}  | ${['Configurations']}
+    ${['inputs:read']}             | ${3}  | ${['Inputs']}
+    ${['outputs:read']}            | ${3}  | ${['Outputs']}
+    ${['indices:read']}            | ${3}  | ${['Indices']}
+    ${['loggers:read']}            | ${3}  | ${['Logging']}
+    ${['users:list']}              | ${3}  | ${['Authentication']}
+    ${['roles:read']}              | ${3}  | ${['Authentication']}
+    ${['dashboards:create', 'inputs:create', 'streams:create']} | ${4}  | ${['Content Packs']}
+    ${['inputs:edit']}             | ${5}  | ${['Grok Patterns', 'Lookup Tables', 'Sidecars']}
+    ${['inputs:create']}           | ${3}  | ${['Pipelines']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
   describe('uses items from plugins:', () => {

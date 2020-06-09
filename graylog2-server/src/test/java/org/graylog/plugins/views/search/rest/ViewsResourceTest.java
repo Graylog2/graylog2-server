@@ -17,13 +17,15 @@
 package org.graylog.plugins.views.search.rest;
 
 import org.apache.shiro.subject.Subject;
-import org.graylog.plugins.views.search.rest.ViewsResource;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
+import org.graylog2.dashboards.events.DashboardDeletedEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.users.UserService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,10 +36,13 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -45,6 +50,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ViewsResourceTest {
+    @Before
+    public void setUpInjector() {
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
+    }
+
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -69,11 +79,18 @@ public class ViewsResourceTest {
     @Mock
     private IsViewSharedForUser isViewSharedForUser;
 
+    @Mock
+    private ClusterEventBus clusterEventBus;
+
+    @Mock
+    private UserService userService;
+
     private ViewsResource viewsResource;
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser) {
-            super(viewService, viewSharingService, isViewSharedForUser);
+        ViewsTestResource(ViewService viewService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser, ClusterEventBus clusterEventBus, UserService userService) {
+            super(viewService, viewSharingService, isViewSharedForUser, clusterEventBus);
+            this.userService = userService;
         }
 
         @Override
@@ -90,7 +107,8 @@ public class ViewsResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.viewsResource = new ViewsTestResource(viewService, viewSharingService, isViewSharedForUser);
+        this.viewsResource = new ViewsTestResource(viewService, viewSharingService, isViewSharedForUser, clusterEventBus, userService);
+        when(subject.isPermitted("dashboards:create")).thenReturn(true);
     }
 
     @Test
@@ -98,6 +116,7 @@ public class ViewsResourceTest {
         final ViewDTO.Builder builder = mock(ViewDTO.Builder.class);
 
         when(view.toBuilder()).thenReturn(builder);
+        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
         when(builder.owner(any())).thenReturn(builder);
         when(builder.build()).thenReturn(view);
 
@@ -112,9 +131,36 @@ public class ViewsResourceTest {
     }
 
     @Test
+    public void shouldNotCreateADashboardWithoutPermission() throws Exception {
+        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+
+        when(subject.isPermitted("dashboards:create")).thenReturn(false);
+
+        assertThatThrownBy(() -> this.viewsResource.create(view))
+                .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
         expectedException.expect(NotFoundException.class);
         this.viewsResource.get("invalid");
+    }
+
+    @Test
+    public void deletingDashboardTriggersEvent() {
+        final String viewId = "foobar";
+        when(subject.isPermitted(ViewsRestPermissions.VIEW_DELETE + ":" + viewId)).thenReturn(true);
+        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+        when(view.id()).thenReturn(viewId);
+        when(viewService.get(viewId)).thenReturn(Optional.of(view));
+        when(userService.loadAll()).thenReturn(Collections.emptyList());
+
+        this.viewsResource.delete(viewId);
+
+        final ArgumentCaptor<DashboardDeletedEvent> eventCaptor = ArgumentCaptor.forClass(DashboardDeletedEvent.class);
+        verify(clusterEventBus, times(1)).post(eventCaptor.capture());
+        final DashboardDeletedEvent dashboardDeletedEvent = eventCaptor.getValue();
+
+        assertThat(dashboardDeletedEvent.dashboardId()).isEqualTo("foobar");
     }
 }

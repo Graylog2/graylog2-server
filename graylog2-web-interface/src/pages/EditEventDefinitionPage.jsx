@@ -37,7 +37,14 @@ class EditEventDefinitionPage extends React.Component {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
       EventDefinitionsActions.get(params.definitionId)
         .then(
-          (eventDefinition) => this.setState({ eventDefinition: eventDefinition }),
+          (response) => {
+            const eventDefinition = response.event_definition;
+            // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
+            // backend. This field will be removed in the event definitions store before sending an event definition
+            // back to the server.
+            eventDefinition.config._is_scheduled = response.context.scheduler.is_scheduled;
+            this.setState({ eventDefinition });
+          },
           (error) => {
             if (error.status === 404) {
               history.push(Routes.ALERTS.DEFINITIONS.LIST);

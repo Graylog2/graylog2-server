@@ -42,7 +42,7 @@ describe('QueriesStore', () => {
   it('retrieves and propagates queries from ViewStore upon updates', (done) => {
     const query1 = Query.builder().id('query1').build();
     const queries = [query1];
-    const callback = asMock(ViewStore).listen.mock.calls[0][0];
+    const callback = asMock(ViewStore.listen).mock.calls[0][0];
     const unsubscribe = QueriesStore.listen((newQueries) => {
       expect(newQueries).toEqual(Immutable.OrderedMap<QueryId, Query>({ query1 }));
       done();
@@ -64,7 +64,7 @@ describe('QueriesStore', () => {
       .build();
     const queries = [query1];
     beforeEach(() => {
-      const callback = asMock(ViewStore).listen.mock.calls[0][0];
+      const callback = asMock(ViewStore.listen).mock.calls[0][0];
 
       callback({
         view: {

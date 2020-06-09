@@ -1,11 +1,11 @@
-// @flow
+// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css, keyframes, type StyledComponent } from 'styled-components';
 // $FlowFixMe removing in future iteration
 import chroma from 'chroma-js';
 
-import { util, type ThemeInterface } from 'theme';
+import { type ThemeInterface } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 type ProgressBarProps = {
@@ -47,12 +47,12 @@ const animatedStripes = keyframes`
   }
 `;
 
-const progressBarVariants = (color) => css`
+const progressBarVariants = (color) => css(({ theme }) => `
   background-color: ${color};
-  color: ${util.readableColor(color)};
-`;
+  color: ${theme.utils.readableColor(color)};
+`);
 
-const ProgressWrap: StyledComponent<{}, ThemeInterface, *> = styled.div(({ theme }) => css`
+const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   height: 20px;
   margin-bottom: 20px;
   overflow: hidden;
@@ -63,7 +63,7 @@ const ProgressWrap: StyledComponent<{}, ThemeInterface, *> = styled.div(({ theme
   align-items: center;
 `);
 
-const Bar: StyledComponent<BarProps, ThemeInterface, *> = styled.div(({ animated, striped, theme, value }) => {
+const Bar: StyledComponent<BarProps, ThemeInterface, HTMLDivElement> = styled.div(({ animated, striped, theme, value }) => {
   const defaultStripColor = chroma(theme.color.global.contentBackground).alpha(0.25).css();
 
   return css`
@@ -75,7 +75,7 @@ const Bar: StyledComponent<BarProps, ThemeInterface, *> = styled.div(({ animated
     transition: width 500ms ease-in-out;
     width: ${value}%;
     max-width: 100%;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 2px -1px 3px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 2px ${chroma(theme.color.gray[10]).alpha(0.4).css()}, 2px -1px 3px ${chroma(theme.color.gray[100]).alpha(0.5).css()};
     ${(animated || striped) && css`
       background-image: linear-gradient(
         45deg,

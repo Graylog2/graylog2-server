@@ -1,7 +1,6 @@
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
@@ -9,6 +8,11 @@ const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const GlobalThroughputStore = Reflux.createStore({
   listenables: [],
+  throughput: {
+    input: 0,
+    output: 0,
+    loading: false,
+  },
   metrics: {
     input: 'org.graylog2.throughput.input.1-sec-rate',
     output: 'org.graylog2.throughput.output.1-sec-rate',
@@ -21,28 +25,25 @@ const GlobalThroughputStore = Reflux.createStore({
     this.listenTo(MetricsStore, this.updateMetrics);
     setInterval(MetricsActions.list, this.INTERVAL);
   },
+
+  getInitialState() {
+    return { throughput: this.throughput };
+  },
+
   INTERVAL: 2000,
   updateMetrics(update) {
     if (!update.metrics) {
       return;
     }
-    const throughput = {
-      input: 0,
-      output: 0,
-      loading: false,
-    };
-    Object.keys(update.metrics).forEach((nodeId) => {
-      const inputMetric = update.metrics[nodeId][this.metrics.input];
-      const outputMetric = update.metrics[nodeId][this.metrics.output];
-      if (inputMetric) {
-        throughput.input += inputMetric.metric.value;
-      }
-      if (outputMetric) {
-        throughput.output += outputMetric.metric.value;
-      }
-    });
+    const input = Object.keys(update.metrics)
+      .map((nodeId) => update.metrics[nodeId][this.metrics.input]?.metric?.value ?? 0)
+      .reduce((prev, cur) => prev + cur, 0);
+    const output = Object.keys(update.metrics)
+      .map((nodeId) => update.metrics[nodeId][this.metrics.output]?.metric?.value ?? 0)
+      .reduce((prev, cur) => prev + cur, 0);
+    this.throughput = { input, output, loading: false };
 
-    this.trigger({ throughput: throughput });
+    this.trigger({ throughput: this.throughput });
   },
 });
 

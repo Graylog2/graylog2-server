@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
+import { fonts } from 'theme';
 import Icon from './Icon';
 
 type Option = { [string]: any };
@@ -113,7 +114,7 @@ const menu = (base) => ({
 const singleValueAndPlaceholder = (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: fonts.family.body,
   fontSize: '14px',
   fontWeight: 400,
   color: '#666',
@@ -122,7 +123,7 @@ const singleValueAndPlaceholder = (base) => ({
 const placeholder = (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: fonts.family.body,
   fontSize: '14px',
   fontWeight: 400,
   color: '#999',
@@ -187,6 +188,7 @@ type Props = {
   delimiter?: string,
   disabled?: boolean,
   displayKey?: string,
+  ignoreAccents?: boolean,
   inputProps?: { [string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
@@ -222,6 +224,8 @@ class Select extends React.Component<Props, State> {
     disabled: PropTypes.bool,
     /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
     displayKey: PropTypes.string,
+    /** Indicates whether the auto-completion should return results including accents/diacritics when searching for their non-accent counterpart */
+    ignoreAccents: PropTypes.bool,
     /**
      * @deprecated Use `inputId` or custom components with the `components` prop instead.
      * Custom attributes for the input (inside the Select).
@@ -269,6 +273,7 @@ class Select extends React.Component<Props, State> {
     delimiter: ',',
     disabled: false,
     displayKey: 'label',
+    ignoreAccents: true,
     inputProps: undefined,
     matchProp: 'any',
     multi: false,
@@ -289,7 +294,8 @@ class Select extends React.Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps = (nextProps: Props) => {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps = (nextProps: Props) => {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
@@ -359,6 +365,13 @@ class Select extends React.Component<Props, State> {
     });
   };
 
+  createCustomFilter = (stringify: (any) => string) => {
+    const { matchProp, ignoreAccents } = this.props;
+    const options = { ignoreAccents };
+
+    return matchProp === 'any' ? createFilter(options) : createFilter({ ...options, stringify });
+  };
+
   render() {
     const {
       allowCreate = false,
@@ -391,7 +404,7 @@ class Select extends React.Component<Props, State> {
     } = this.props;
 
     const stringify = (option) => option[matchProp];
-    const customFilter = matchProp === 'any' ? createFilter() : createFilter({ stringify });
+    const customFilter = this.createCustomFilter(stringify);
 
     const mergedComponents: { [string]: React.ComponentType<any> } = {
       ..._components,

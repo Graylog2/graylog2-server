@@ -1,7 +1,36 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
+
 import { Row, Col } from 'components/graylog';
 import Icon from './Icon';
+
+const StyledListItem = styled.li(({ theme }) => `
+  display: block;
+  padding: 15px 0;
+
+  h2 .label {
+    margin-left: 5px;
+    line-height: 2;
+    vertical-align: bottom;
+  }
+
+  .item-description {
+    min-height: 17px;
+    margin: 5px 0;
+  }
+
+  .item-actions > .btn,
+  .item-actions > .btn-group,
+  .item-actions > span > .btn {
+    margin-left: 5px;
+    margin-bottom: 5px;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${theme.color.variant.light.info};
+  }
+`);
 
 /**
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.
@@ -10,7 +39,7 @@ import Icon from './Icon';
 class EntityListItem extends React.Component {
   static propTypes = {
     /** Entity's title. */
-    title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
     /** Text to append to the title. Usually the type or a short description. */
     titleSuffix: PropTypes.any,
     /** Description of the element, which can accommodate more text than `titleSuffix`. */
@@ -23,39 +52,47 @@ class EntityListItem extends React.Component {
      * Add any content that is related to the entity and needs more space to be displayed. This is mostly use
      * to show configuration options.
      */
-    contentRow: PropTypes.node,
+    contentRow: PropTypes.node.isRequired,
   };
 
   static defaultProps = {
+    actions: undefined,
     createdFromContentPack: false,
+    description: undefined,
+    titleSuffix: undefined,
   };
 
   render() {
-    let titleSuffix;
-    if (this.props.titleSuffix) {
-      titleSuffix = <small>{this.props.titleSuffix}</small>;
-    }
+    const {
+      actions,
+      contentRow,
+      createdFromContentPack,
+      description,
+      title,
+      titleSuffix,
+    } = this.props;
+    const wrappedTitleSuffix = titleSuffix ? <small>{titleSuffix}</small> : null;
 
     const actionsContainer = (
       <div className="item-actions text-right">
-        {this.props.actions}
+        {actions}
       </div>
     );
 
     return (
-      <li className="entity-list-item">
+      <StyledListItem>
         <Row className="row-sm">
           <Col md={12}>
             <div className="pull-right hidden-xs">
               {actionsContainer}
             </div>
-            <h2>{this.props.title} {titleSuffix}</h2>
-            {(this.props.createdFromContentPack || this.props.description)
+            <h2>{title} {wrappedTitleSuffix}</h2>
+            {(createdFromContentPack || description)
               && (
               <div className="item-description">
-                {this.props.createdFromContentPack
+                {createdFromContentPack
                 && <span><Icon name="cube" title="Created from content pack" />&nbsp;</span>}
-                <span>{this.props.description}</span>
+                <span>{description}</span>
               </div>
               )}
           </Col>
@@ -66,9 +103,9 @@ class EntityListItem extends React.Component {
         </Row>
 
         <Row className="row-sm">
-          {this.props.contentRow}
+          {contentRow}
         </Row>
-      </li>
+      </StyledListItem>
     );
   }
 }

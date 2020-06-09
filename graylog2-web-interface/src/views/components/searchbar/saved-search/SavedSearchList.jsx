@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
+// $FlowFixMe should be there
 import styled, { css, type StyledComponent } from 'styled-components';
 
 import Routes from 'routing/Routes';
@@ -19,14 +20,14 @@ type Props = {
   toggleModal: () => void,
   deleteSavedSearch: (View) => Promise<View>,
   views: SavedSearchesState,
-}
+};
 
 type State = {
   selectedSavedSearch?: string,
   query: string,
   page: number,
   perPage: number,
-}
+};
 
 const AlertIcon: StyledComponent<{}, ThemeInterface, *> = styled(Icon)(({ theme }) => css`
   margin-right: 6px;
@@ -37,6 +38,12 @@ const NoSavedSearches: StyledComponent<{}, ThemeInterface, *> = styled(Alert)`
   clear: right;
   display: flex;
   align-items: center;
+`;
+
+const DeleteButton: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span`
+  position: absolute;
+  top: 10px;
+  right: 10px;
 `;
 
 class SavedSearchList extends React.Component<Props, State> {
@@ -93,9 +100,12 @@ class SavedSearchList extends React.Component<Props, State> {
     toggleModal();
   };
 
-  onDelete = (selectedSavedSearch) => {
+  onDelete = (e, selectedSavedSearch) => {
     const { views, deleteSavedSearch } = this.props;
     const { list } = views;
+
+    e.stopPropagation();
+
     if (list) {
       const viewIndex = list.findIndex((v) => v.id === selectedSavedSearch);
       if (viewIndex < 0) {
@@ -117,11 +127,19 @@ class SavedSearchList extends React.Component<Props, State> {
     const { selectedSavedSearch } = this.state;
     const savedSearchList = (views.list || []).map((savedSearch) => {
       return (
-        <ListGroupItem active={selectedSavedSearch === savedSearch.id}
-                       onClick={() => this.setState({ selectedSavedSearch: savedSearch.id })}
-                       key={savedSearch.id}>
-          {savedSearch.title}
-        </ListGroupItem>
+        <ViewLoaderContext.Consumer key={savedSearch.id}>
+          {(loaderFunc) => (
+            <ListGroupItem active={selectedSavedSearch === savedSearch.id}
+                           onClick={() => this.onLoad(savedSearch.id, loaderFunc)}>
+              {savedSearch.title}
+              <span>
+                <DeleteButton bsSize="xsmall" bsStyle="danger" onClick={(e) => this.onDelete(e, savedSearch.id)}>
+                  <Icon name="trash" ttile="Delete" data-testid={`delete-${savedSearch.id}`} />
+                </DeleteButton>
+              </span>
+            </ListGroupItem>
+          )}
+        </ViewLoaderContext.Consumer>
       );
     });
 
@@ -145,24 +163,12 @@ class SavedSearchList extends React.Component<Props, State> {
     return (
       <Modal show>
         <Modal.Body>
-          <SearchForm onSearch={this.handleSearch}
+          <SearchForm focusAfterMount
+                      onSearch={this.handleSearch}
                       onReset={this.handleSearchReset} />
           {renderResult}
         </Modal.Body>
         <Modal.Footer>
-          <ViewLoaderContext.Consumer>
-            {(loaderFunc) => (
-              <Button disabled={!selectedSavedSearch}
-                      bsStyle="primary"
-                      onClick={() => { this.onLoad(selectedSavedSearch, loaderFunc); }}>
-                Load
-              </Button>
-            )}
-          </ViewLoaderContext.Consumer>
-          <Button disabled={!selectedSavedSearch}
-                  onClick={() => { this.onDelete(selectedSavedSearch); }}>
-            Delete
-          </Button>
           <Button onClick={toggleModal}>Cancel</Button>
         </Modal.Footer>
       </Modal>

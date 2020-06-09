@@ -3,7 +3,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import { Link } from 'react-router';
 
-import { Button, ButtonGroup, Col, Label, Row } from 'components/graylog';
+import { Button, ButtonGroup, Col, Label, MessageDetailsDefinitionList, Row } from 'components/graylog';
 import { ClipboardButton, Icon, Timestamp } from 'components/common';
 
 import StreamLink from 'components/streams/StreamLink';
@@ -129,14 +129,14 @@ class MessageDetail extends React.Component {
             {this._formatMessageActions()}
             <MessageDetailsTitle>
               <Icon name="envelope" />
-            &nbsp;
+              &nbsp;
               {messageTitle}
             </MessageDetailsTitle>
           </Col>
         </Row>
         <Row>
           <Col md={3}>
-            <dl className="message-details">
+            <MessageDetailsDefinitionList>
               {timestamp}
               {receivedBy}
 
@@ -152,7 +152,7 @@ class MessageDetail extends React.Component {
               </ul>
             </dd>
             )}
-            </dl>
+            </MessageDetailsDefinitionList>
           </Col>
           <Col md={9}>
             <div>

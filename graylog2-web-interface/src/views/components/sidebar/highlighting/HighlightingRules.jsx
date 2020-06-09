@@ -1,41 +1,31 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
-
-import connect from 'stores/connect';
+import { useContext } from 'react';
+import styled from 'styled-components';
 
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
-import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
-import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 
-import HighlightingRule from './HighlightingRule';
-import ColorBox from './ColorBox';
-import styles from './HighlightingRules.css';
+import HighlightingRule, { HighlightingRuleGrid } from './HighlightingRule';
+import ColorPreview from './ColorPreview';
 
-type Props = {
-  rules: Array<Rule>,
-};
+const Headline = styled.h4`
+  margin-bottom: 10px;
+`;
 
-const HighlightingRules = ({ rules = [] }: Props) => {
+const HighlightingRules = () => {
+  const rules = useContext(HighlightingRulesContext) ?? [];
   return (
     <>
-      <h4 className={styles.headline}>Highlighting</h4>
-      <div id="search-term-color" className={styles.highlightingRuleBlock}>
-        <ColorBox color={DEFAULT_HIGHLIGHT_COLOR} />
-        Search terms
-      </div>
+      <Headline>Highlighting</Headline>
+      <HighlightingRuleGrid>
+        <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
+        <div>Search terms</div>
+      </HighlightingRuleGrid>
 
       {rules.map((rule) => <HighlightingRule key={`${rule.field}-${rule.value}-${rule.color}`} rule={rule} />)}
     </>
   );
 };
 
-HighlightingRules.propTypes = {
-  rules: PropTypes.arrayOf(PropTypes.instanceOf(Rule)),
-};
-
-HighlightingRules.defaultProps = {
-  rules: [],
-};
-
-export default connect(HighlightingRules, { rules: HighlightingRulesStore });
+export default HighlightingRules;

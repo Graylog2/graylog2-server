@@ -17,27 +17,21 @@
 package org.graylog2.indexer.cluster;
 
 import com.github.zafarkhaja.semver.Version;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Ping;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.cluster.jest.JestUtils;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
 public class Node {
-    private final JestClient jestClient;
+    private final NodeAdapter nodeAdapter;
 
     @Inject
-    public Node(JestClient jestClient) {
-        this.jestClient = jestClient;
+    public Node(NodeAdapter nodeAdapter) {
+        this.nodeAdapter = nodeAdapter;
     }
 
     public Optional<Version> getVersion() {
-        final Ping request = new Ping.Builder().build();
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to retrieve Elasticsearch version");
-        return Optional.ofNullable(jestResult.getJsonObject().path("version").path("number").asText(null))
+        return nodeAdapter.version()
             .map(this::parseVersion);
     }
 

@@ -56,7 +56,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
             "componentStyle": ComponentStyle {
               "componentId": "Table-ztr4bi-0",
               "isStatic": false,
-              "lastClassName": "lbroLI",
+              "lastClassName": "biajjI",
               "rules": Array [
                 [Function],
               ],
@@ -77,14 +77,14 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
         <Table
           bordered={true}
           bsClass="table"
-          className="Table-ztr4bi-0 lbroLI top-margin"
+          className="Table-ztr4bi-0 biajjI top-margin"
           condensed={true}
           hover={false}
           responsive={false}
           striped={true}
         >
           <table
-            className="Table-ztr4bi-0 lbroLI top-margin table table-striped table-bordered table-condensed"
+            className="Table-ztr4bi-0 biajjI top-margin table table-striped table-bordered table-condensed"
           >
             <thead>
               <tr>
@@ -212,7 +212,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "DnwXA",
+                  "lastClassName": "UjHmV",
                   "rules": Array [
                     [Function],
                   ],
@@ -237,7 +237,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
               backdrop="static"
               bsClass="modal"
               bsSize="lg"
-              className="Modal-nuree8-0 DnwXA"
+              className="Modal-nuree8-0 UjHmV"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}

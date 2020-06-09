@@ -33,13 +33,13 @@ class FilterPreview extends React.Component {
     });
   };
 
-  renderSearchResult = (searchResult) => {
-    if (searchResult.messages.length === 0) {
+  renderSearchResult = (searchResult = {}) => {
+    if (!searchResult.messages || searchResult.messages.length === 0) {
       return <p>Could not find any messages with the current search criteria.</p>;
     }
 
     return (
-      <Table striped hover condensed>
+      <Table striped condensed bordered>
         <thead>
           <tr>
             <th>Timestamp</th>
@@ -55,6 +55,8 @@ class FilterPreview extends React.Component {
 
   render() {
     const { isFetchingData, searchResult, errors, displayPreview } = this.props;
+
+    const renderedResults = isFetchingData ? <Spinner text="Loading filter preview..." /> : this.renderSearchResult(searchResult);
 
     return (
       <>
@@ -79,12 +81,13 @@ class FilterPreview extends React.Component {
         </HelpPanel>
 
         {displayPreview && (
-          <Panel className={styles.filterPreview} header={<h3>Filter Preview</h3>}>
-            {errors.length > 0 ? (
-              <p className="text-danger">{errors[0].description}</p>
-            ) : (
-              isFetchingData ? <Spinner text="Loading filter preview..." /> : this.renderSearchResult(searchResult)
-            )}
+          <Panel className={styles.filterPreview} bsStyle="default">
+            <Panel.Heading>
+              <Panel.Title>Filter Preview</Panel.Title>
+            </Panel.Heading>
+            <Panel.Body>
+              {errors.length > 0 ? <p className="text-danger">{errors[0].description}</p> : renderedResults}
+            </Panel.Body>
           </Panel>
         )}
       </>

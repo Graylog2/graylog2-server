@@ -5,13 +5,12 @@ import styled from 'styled-components';
 import { Row, Col, Checkbox } from 'components/graylog';
 import * as Immutable from 'immutable';
 
-import SortableSelect from 'views/components/aggregationbuilder/SortableSelect';
+import FieldSelect from 'views/components/widgets/FieldSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { defaultCompare } from 'views/logic/DefaultCompare';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
@@ -21,10 +20,6 @@ const FullHeightCol = styled(Col)`
   height: 100%;
   padding-bottom: 10px;
   overflow: auto;
-`;
-
-const ValueComponent = styled.span`
-  padding: 2px 5px;
 `;
 
 const _onFieldSelectionChanged = (fields, config, onChange) => {
@@ -58,12 +53,6 @@ type Props = {
 const EditMessageList = ({ children, config, fields, onChange }: Props) => {
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
-  const fieldsForSelect = fields
-    .map((fieldType) => fieldType.name)
-    .map((fieldName) => ({ label: fieldName, value: fieldName }))
-    .valueSeq()
-    .toJS()
-    .sort((v1, v2) => defaultCompare(v1.label, v2.label));
   const selectedFieldsForSelect = config.fields.map((fieldName) => ({ field: fieldName }));
 
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
@@ -72,10 +61,9 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
     <Row style={{ height: '100%', paddingBottom: '15px' }}>
       <FullHeightCol md={3}>
         <DescriptionBox description="Fields">
-          <SortableSelect options={fieldsForSelect}
-                          onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
-                          valueComponent={({ children: _children }) => <ValueComponent>{_children}</ValueComponent>}
-                          value={selectedFieldsForSelect} />
+          <FieldSelect fields={fields}
+                       onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
+                       value={selectedFieldsForSelect} />
           <Checkbox checked={config.showMessageRow} onChange={() => _onShowMessageRowChanged(config, onChange)}>
             Show message in new row
           </Checkbox>

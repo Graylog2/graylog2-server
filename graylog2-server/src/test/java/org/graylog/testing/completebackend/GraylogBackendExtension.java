@@ -30,6 +30,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.http.ContentType.JSON;
@@ -49,17 +50,28 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 
+        ApiIntegrationTest annotation = annotationFrom(context);
+
+        lifecycle = annotation.serverLifecycle();
+
         Stopwatch sw = Stopwatch.createStarted();
 
-        lifecycle = Lifecycle.from(context);
-
-        backend = GraylogBackend.createStarted();
+        backend = GraylogBackend.createStarted(annotation.extraPorts());
 
         context.getStore(NAMESPACE).put(context.getRequiredTestClass().getName(), backend);
 
         sw.stop();
 
         LOG.info("Backend started after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
+    }
+
+    private static ApiIntegrationTest annotationFrom(ExtensionContext context) {
+        Optional<Class<?>> testClass = context.getTestClass();
+
+        if (!testClass.isPresent())
+            throw new RuntimeException("Error determining test class from ExtensionContext");
+
+        return testClass.get().getAnnotation(ApiIntegrationTest.class);
     }
 
     @Override
@@ -91,8 +103,8 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
     private RequestSpecification requestSpec() {
         return new RequestSpecBuilder().build()
-                .baseUri(backend.getUri())
-                .port(backend.getApiPort())
+                .baseUri(backend.uri())
+                .port(backend.apiPort())
                 .basePath("/api")
                 .accept(JSON)
                 .contentType(JSON)

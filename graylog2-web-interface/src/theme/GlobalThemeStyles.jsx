@@ -1,11 +1,5 @@
 import { createGlobalStyle, css } from 'styled-components';
 
-import 'opensans-npm-webfont/open_sans.css';
-import 'opensans-npm-webfont/open_sans_italic.css';
-import 'opensans-npm-webfont/open_sans_bold.css';
-
-const fontFamily = '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
-
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   #editor {
     height: 256px;
@@ -13,7 +7,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   body {
     background-color: ${theme.color.global.background};
-    font-family: ${fontFamily};
+    color: ${theme.color.global.textDefault};
+    font-family: ${theme.fonts.family.body};
     font-size: 12px;
     overflow-x: hidden;
     margin-top: 50px;
@@ -85,7 +80,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   select.form-control,
   textarea.form-control {
     color: ${theme.color.gray[30]};
-    font-family: ${fontFamily};
+    font-family: ${theme.fonts.family.body};
 
     &:hover {
       border-color: hsl(0, 0%, 70%);
@@ -112,11 +107,11 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     background-color: ${theme.color.global.contentBackground};
     border: 1px solid ${theme.color.gray[80]};
     margin-bottom: 10px;
-  }
 
-  .content p.description {
-    margin-top: 3px;
-    color: ${theme.color.gray[50]};
+    p.description {
+      margin-top: 3px;
+      color: ${theme.color.gray[50]};
+    }
   }
 
   .actions-lg .actions-container {
@@ -177,7 +172,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .master-node {
-    color: #f89406;
+    color: ${theme.color.variant.dark.warning};
   }
 
   .loglevel-metrics-row {
@@ -365,8 +360,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .sources th {
-    background-color: #333;
-    color: ${theme.color.global.textAlt};
+    background-color: ${theme.color.gray[20]};
+    color: ${theme.utils.readableColor(theme.color.gray[20])};
     font-weight: normal;
   }
 
@@ -376,8 +371,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .parse-error {
-    background-color: #f2dede;
-    color: #a94442;
+    background-color: ${theme.color.variant.light.danger};
+    color: ${theme.utils.contrastingColor(theme.color.variant.light.danger)};
     padding-left: 2px;
     padding-right: 2px;
   }
@@ -426,7 +421,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     margin-top: 5px;
     margin-bottom: 0;
     padding: 9px;
-    font-family: monospace;
+    font-family: ${theme.fonts.family.monospace};
     word-wrap: break-word;
   }
 
@@ -498,7 +493,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .btn-text {
-    font-family: ${fontFamily};
+    font-family: ${theme.fonts.family.body};
     font-size: 12px;
     padding: 0;
     vertical-align: baseline;
@@ -506,86 +501,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .message-loader-form input {
     margin-right: 5px;
-  }
-
-  ul.entity-list {
-    padding: 0;
-    margin: 0;
-
-    li.entity-list-item {
-      display: block;
-      padding: 15px 0;
-
-      h2 .label {
-        margin-left: 5px;
-        line-height: 2;
-        vertical-align: bottom;
-      }
-
-      .item-description {
-        min-height: 17px;
-        margin: 5px 0;
-      }
-
-      .item-actions > .btn,
-      .item-actions > .btn-group,
-      .item-actions > span > .btn {
-        margin-left: 5px;
-        margin-bottom: 5px;
-      }
-    }
-
-    li.entity-list-item:not(:last-child) {
-      border-bottom: 1px solid ${theme.color.variant.light.info};
-    }
-  }
-
-  dl.message-details {
-    margin-top: 10px;
-    margin-bottom: 0;
-  }
-
-  dl.message-details dt {
-    font-weight: bold;
-    margin-left: 1px;
-  }
-
-  dl.message-details dd {
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-    margin-left: 1px; /* Ensures that italic text is not cut */
-  }
-
-  dl.message-details-fields span:not(:last-child) dd {
-    border-bottom: 1px solid ${theme.color.gray[90]};
-  }
-
-  dl.message-details-fields dd {
-    white-space: pre-wrap;
-  }
-
-  dl.message-details-fields .field-value {
-    font-family: monospace;
-  }
-
-  dl.message-details-fields dd.message-field .field-value {
-    max-height: 500px;
-    overflow: auto;
-  }
-
-  dl.message-details dd.stream-list ul {
-    list-style-type: disc;
-    padding-left: 25px;
-  }
-
-  dl.message-details dd.stream-list ul li {
-    margin-top: 3px;
-  }
-
-  dl.message-details dd div.message-field-actions {
-    padding-left: 10px;
-    position: relative;
-    top: -10px;
   }
 
   nav.navbar-fixed-top ul.dropdown-menu li a {
@@ -729,6 +644,12 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .form-control.message-id-input {
     width: 300px;
+  }
+
+  /* additional styles for 'StyledAceEditor' */
+  .ace_editor.ace_autocomplete.ace-queryinput {
+    width: 600px !important;
+    margin-top: 6px;
   }
 `);
 

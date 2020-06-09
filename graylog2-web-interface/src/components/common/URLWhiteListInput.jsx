@@ -17,8 +17,8 @@ type Props = {
   url: string,
   labelClassName: string,
   wrapperClassName: string,
-  urlType: string
-}
+  urlType: string,
+};
 const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, labelClassName, wrapperClassName, urlType }: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
@@ -82,6 +82,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
 
   const addButton = isWhitelistError() && !isWhitelisted ? <URLWhiteListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
   const helpMessage = <>{validationState === null ? ownValidationMessage : validationMessage} {addButton}</>;
+  const bsStyle = currentValidationState === '' ? null : currentValidationState;
   return (
     <Input type="text"
            id="url"
@@ -92,7 +93,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
            required
            onChange={onChange}
            help={helpMessage}
-           bsStyle={currentValidationState}
+           bsStyle={bsStyle}
            value={url}
            labelClassName={labelClassName}
            wrapperClassName={wrapperClassName} />

@@ -39,6 +39,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.Message;
@@ -59,10 +60,16 @@ import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
+import org.graylog2.rest.resources.streams.responses.StreamPageListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.PaginatedStreamService;
+import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleImpl;
@@ -81,12 +88,14 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -101,6 +110,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -111,15 +121,23 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class StreamResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
 
+    protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE))
+            .put(StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION))
+            .build();
+
+    private final PaginatedStreamService paginatedStreamService;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final AlertService alertService;
+    private final SearchQueryParser searchQueryParser;
 
     @Inject
     public StreamResource(StreamService streamService,
+                          PaginatedStreamService paginatedStreamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
                           IndexSetRegistry indexSetRegistry,
@@ -131,6 +149,8 @@ public class StreamResource extends RestResource {
         this.indexSetRegistry = indexSetRegistry;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.alertService = alertService;
+        this.paginatedStreamService = paginatedStreamService;
+        this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
     @POST
@@ -191,7 +211,45 @@ public class StreamResource extends RestResource {
 
     @GET
     @Timed
+    @Path("/paginated")
+    @ApiOperation(value = "Get a paginated list of streams")
+    @Produces(MediaType.APPLICATION_JSON)
+    public StreamPageListResponse getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+        @ApiParam(name = "sort",
+                value = "The field to sort the result on",
+                required = true,
+                allowableValues = "title,description")
+        @DefaultValue(StreamImpl.FIELD_TITLE) @QueryParam("sort") String sort,
+        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+        @DefaultValue("asc") @QueryParam("order") String order) {
+
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+        final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
+        final PaginatedList<StreamDTO> result = paginatedStreamService
+                .findPaginated(searchQuery, permissionFilter, page, perPage, sort, order);
+        final List<String> streamIds = result.stream().map(streamDTO -> streamDTO.id()).collect(Collectors.toList());
+        final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);
+        final List<StreamDTO> streams = result.stream().map(streamDTO -> {
+            List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
+            return streamDTO.toBuilder().rules(rules).build();
+        }).collect(Collectors.toList());
+        final long total = paginatedStreamService.count();
+        final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(streams,
+                result.pagination().total(), result.pagination().page(), result.pagination().perPage());
+        return StreamPageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams);
+    }
+
+    @GET
+    @Timed
     @ApiOperation(value = "Get a list of all streams")
+    @Deprecated
     @Produces(MediaType.APPLICATION_JSON)
     public StreamListResponse get() {
         final List<Stream> allStreams = streamService.loadAll();

@@ -3,6 +3,7 @@ import Badge from './Badge';
 import Button from './Button';
 import ControlLabel from './ControlLabel';
 import DropdownButton from './DropdownButton';
+import DropdownSubmenu from './DropdownSubmenu';
 import FormControl from './FormControl';
 import FormGroup from './FormGroup';
 import HelpBlock from './HelpBlock';
@@ -11,6 +12,7 @@ import Jumbotron from './Jumbotron';
 import Label from './Label';
 import ListGroup from './ListGroup';
 import ListGroupItem from './ListGroupItem';
+import MessageDetailsDefinitionList from './MessageDetailsDefinitionList';
 import Modal from './Modal';
 import Nav from './Nav';
 import Navbar from './Navbar';
@@ -32,6 +34,7 @@ export {
   Button,
   ControlLabel,
   DropdownButton,
+  DropdownSubmenu,
   FormControl,
   FormGroup,
   HelpBlock,
@@ -40,6 +43,7 @@ export {
   Label,
   ListGroup,
   ListGroupItem,
+  MessageDetailsDefinitionList,
   Modal,
   Nav,
   Navbar,

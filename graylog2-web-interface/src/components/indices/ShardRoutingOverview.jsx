@@ -1,39 +1,41 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-
-import { ShardRouting } from 'components/indices';
 import naturalSort from 'javascript-natural-sort';
 
-const ShardRoutingWrap = styled.div`
-  .shards .shard {
-    padding: 10px;
-    margin: 5px;
-    width: 50px;
-    float: left;
-    text-align: center;
-  }
+import { ShardRouting } from 'components/indices';
 
-  .shards .shard-started {
-    background-color: #dff0d8;
-  }
+const ShardRoutingWrap = styled.div(({ theme }) => `
+  .shards {
+    .shard {
+      padding: 10px;
+      margin: 5px;
+      width: 50px;
+      float: left;
+      text-align: center;
+    }
 
-  .shards .shard-relocating {
-    background-color: #de9df4;
-  }
+    .shard-started {
+      background-color: ${theme.utils.colorLevel(theme.color.variant.light.success, -2)};
+    }
 
-  .shards .shard-initializing {
-    background-color: #f4ddbc;
-  }
+    .shard-relocating {
+      background-color: ${theme.utils.colorLevel(theme.color.variant.light.primary, -2)};
+    }
 
-  .shards .shard-unassigned {
-    background-color: #c3c3c3;
-  }
+    .shard-initializing {
+      background-color: ${theme.utils.colorLevel(theme.color.variant.light.warning, -5)};
+    }
 
-  .shards .shard-primary .id {
-    font-weight: bold;
-    margin-bottom: 3px;
-    border-bottom: 1px solid #000;
+    .shard-unassigned {
+      background-color: ${theme.utils.colorLevel(theme.color.variant.light.default, -2)};
+    }
+
+    .shard-primary .id {
+      font-weight: bold;
+      margin-bottom: 3px;
+      border-bottom: 1px solid ${theme.color.gray[10]};
+    }
   }
 
   .description {
@@ -41,36 +43,32 @@ const ShardRoutingWrap = styled.div`
     margin-top: 2px;
     margin-left: 6px;
   }
-`;
+`);
 
-class ShardRoutingOverview extends React.Component {
-  static propTypes = {
-    routing: PropTypes.array.isRequired,
-    indexName: PropTypes.string.isRequired,
-  };
+const ShardRoutingOverview = ({ indexName, routing }) => {
+  return (
+    <ShardRoutingWrap>
+      <h3>Shard routing</h3>
 
-  render() {
-    const { indexName, routing } = this.props;
-    return (
-      <ShardRoutingWrap>
-        <h3>Shard routing</h3>
+      <ul className="shards">
+        {routing
+          .sort((shard1, shard2) => naturalSort(shard1.id, shard2.id))
+          .map((route) => <ShardRouting key={`${indexName}-shard-route-${route.node_id}-${route.id}`} route={route} />)}
+      </ul>
+      <br style={{ clear: 'both' }} />
 
-        <ul className="shards">
-          {routing
-            .sort((shard1, shard2) => naturalSort(shard1.id, shard2.id))
-            .map((route) => <ShardRouting key={`${indexName}-shard-route-${route.node_id}-${route.id}`} route={route} />)}
-        </ul>
+      <div className="description">
+        Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
+        when primaries leave the cluster. Size and document counts only reflect primary shards and no
+        possible replica duplication.
+      </div>
+    </ShardRoutingWrap>
+  );
+};
 
-        <br style={{ clear: 'both' }} />
-
-        <div className="description">
-          Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
-          when primaries leave the cluster. Size and document counts only reflect primary shards and no
-          possible replica duplication.
-        </div>
-      </ShardRoutingWrap>
-    );
-  }
-}
+ShardRoutingOverview.propTypes = {
+  routing: PropTypes.array.isRequired,
+  indexName: PropTypes.string.isRequired,
+};
 
 export default ShardRoutingOverview;

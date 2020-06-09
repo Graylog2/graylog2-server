@@ -102,7 +102,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": false,
-                          "lastClassName": "fcGLmv",
+                          "lastClassName": "fdBWEX",
                           "rules": Array [
                             [Function],
                           ],
@@ -126,7 +126,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 fcGLmv"
+                      className="FormControl-sc-1amoaox-0 fdBWEX"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -135,7 +135,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -191,7 +191,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "iWqiEF",
+                            "lastClassName": "jVYrA",
                             "rules": Array [
                               [Function],
                             ],
@@ -215,13 +215,13 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="primary"
-                        className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                        className="Button__StyledButton-c9cbmb-0 jVYrA"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
                           disabled={true}
                           id="create-token"
                           type="submit"
@@ -438,7 +438,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "fcGLmv",
+                                                  "lastClassName": "fdBWEX",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -462,7 +462,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 fcGLmv"
+                                              className="FormControl-sc-1amoaox-0 fdBWEX"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -471,7 +471,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                                className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -531,7 +531,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "jVYrA",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -559,7 +559,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
+                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                               disabled={false}
                               style={
                                 Object {
@@ -569,7 +569,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -630,7 +630,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iWqiEF",
+                                  "lastClassName": "jVYrA",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -659,7 +659,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
+                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -670,7 +670,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -708,60 +708,128 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   className="list-group"
                 >
                   <ControlledTableListHeader>
-                    <ForwardRef
-                      className="listGroupHeader"
-                    >
-                      <ListGroupItem__StyledListGroupItem
-                        className="listGroupHeader"
-                      >
-                        <StyledComponent
-                          className="listGroupHeader"
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "STYLES": Array [
-                                "success",
-                                "warning",
-                                "danger",
-                                "info",
+                    <ControlledTableListHeader__StyledListGroupItem>
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                              "isStatic": false,
+                              "lastClassName": "cNtVlO",
+                              "rules": Array [
+                                [Function],
                               ],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                "isStatic": false,
-                                "lastClassName": "kRfOAP",
-                                "rules": Array [
-                                  [Function],
-                                ],
+                            },
+                            "displayName": "ControlledTableListHeader__StyledListGroupItem",
+                            "foldedComponentIds": Array [],
+                            "propTypes": Object {
+                              "bsStyle": [Function],
+                            },
+                            "render": [Function],
+                            "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                            "target": Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "defaultProps": Object {
+                                "bsStyle": undefined,
                               },
-                              "displayName": "ListGroupItem__StyledListGroupItem",
-                              "foldedComponentIds": Array [],
+                              "propTypes": Object {
+                                "bsStyle": [Function],
+                              },
                               "render": [Function],
-                              "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                            },
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                      >
+                        <ForwardRef
+                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                         >
-                          <ListGroupItem
-                            bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader"
-                            listItem={false}
+                          <ListGroupItem__StyledListGroupItem
+                            className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                           >
-                            <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader list-group-item"
+                            <StyledComponent
+                              className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                    "isStatic": false,
+                                    "lastClassName": "iEzmJe",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "ListGroupItem__StyledListGroupItem",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
                             >
-                              <div
-                                className="headerWrapper"
-                              />
-                            </span>
-                          </ListGroupItem>
-                        </StyledComponent>
-                      </ListGroupItem__StyledListGroupItem>
-                    </ForwardRef>
+                              <ListGroupItem
+                                bsClass="list-group-item"
+                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                                listItem={false}
+                              >
+                                <span
+                                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                                >
+                                  <ControlledTableListHeader__HeaderWrapper>
+                                    <StyledComponent
+                                      forwardedComponent={
+                                        Object {
+                                          "$$typeof": Symbol(react.forward_ref),
+                                          "attrs": Array [],
+                                          "componentStyle": ComponentStyle {
+                                            "componentId": "ControlledTableListHeader__HeaderWrapper-tr2y34-1",
+                                            "isStatic": false,
+                                            "lastClassName": "ekhgZW",
+                                            "rules": Array [
+                                              "margin:10px 0;min-height:20px;",
+                                            ],
+                                          },
+                                          "displayName": "ControlledTableListHeader__HeaderWrapper",
+                                          "foldedComponentIds": Array [],
+                                          "render": [Function],
+                                          "styledComponentId": "ControlledTableListHeader__HeaderWrapper-tr2y34-1",
+                                          "target": "div",
+                                          "toString": [Function],
+                                          "warnTooManyClasses": [Function],
+                                          "withComponent": [Function],
+                                        }
+                                      }
+                                      forwardedRef={null}
+                                    >
+                                      <div
+                                        className="ControlledTableListHeader__HeaderWrapper-tr2y34-1 ekhgZW"
+                                      />
+                                    </StyledComponent>
+                                  </ControlledTableListHeader__HeaderWrapper>
+                                </span>
+                              </ListGroupItem>
+                            </StyledComponent>
+                          </ListGroupItem__StyledListGroupItem>
+                        </ForwardRef>
+                      </StyledComponent>
+                    </ControlledTableListHeader__StyledListGroupItem>
                   </ControlledTableListHeader>
                   <ControlledTableListItem>
                     <ForwardRef>
@@ -780,7 +848,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "kRfOAP",
+                                "lastClassName": "iEzmJe",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -799,11 +867,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                             >
                               No items to display
                             </span>
@@ -964,7 +1032,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": false,
-                          "lastClassName": "fcGLmv",
+                          "lastClassName": "fdBWEX",
                           "rules": Array [
                             [Function],
                           ],
@@ -988,7 +1056,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 fcGLmv"
+                      className="FormControl-sc-1amoaox-0 fdBWEX"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -997,7 +1065,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -1053,7 +1121,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "hGhRKT",
+                            "lastClassName": "jVYrA",
                             "rules": Array [
                               [Function],
                             ],
@@ -1077,13 +1145,13 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="primary"
-                        className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                        className="Button__StyledButton-c9cbmb-0 jVYrA"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-primary"
+                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
                           disabled={true}
                           id="create-token"
                           type="submit"
@@ -1326,7 +1394,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "fcGLmv",
+                                                  "lastClassName": "fdBWEX",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -1350,7 +1418,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 fcGLmv"
+                                              className="FormControl-sc-1amoaox-0 fdBWEX"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -1359,7 +1427,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 fcGLmv form-control"
+                                                className="FormControl-sc-1amoaox-0 fdBWEX form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -1419,7 +1487,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "hGhRKT",
+                                  "lastClassName": "jVYrA",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1447,7 +1515,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
+                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                               disabled={false}
                               style={
                                 Object {
@@ -1457,7 +1525,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -1518,7 +1586,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "hGhRKT",
+                                  "lastClassName": "jVYrA",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1547,7 +1615,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 iWqiEF"
+                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -1558,7 +1626,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 iWqiEF btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -1596,60 +1664,128 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   className="list-group"
                 >
                   <ControlledTableListHeader>
-                    <ForwardRef
-                      className="listGroupHeader"
-                    >
-                      <ListGroupItem__StyledListGroupItem
-                        className="listGroupHeader"
-                      >
-                        <StyledComponent
-                          className="listGroupHeader"
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "STYLES": Array [
-                                "success",
-                                "warning",
-                                "danger",
-                                "info",
+                    <ControlledTableListHeader__StyledListGroupItem>
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                              "isStatic": false,
+                              "lastClassName": "cNtVlO",
+                              "rules": Array [
+                                [Function],
                               ],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                                "isStatic": false,
-                                "lastClassName": "kRfOAP",
-                                "rules": Array [
-                                  [Function],
-                                ],
+                            },
+                            "displayName": "ControlledTableListHeader__StyledListGroupItem",
+                            "foldedComponentIds": Array [],
+                            "propTypes": Object {
+                              "bsStyle": [Function],
+                            },
+                            "render": [Function],
+                            "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
+                            "target": Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "defaultProps": Object {
+                                "bsStyle": undefined,
                               },
-                              "displayName": "ListGroupItem__StyledListGroupItem",
-                              "foldedComponentIds": Array [],
+                              "propTypes": Object {
+                                "bsStyle": [Function],
+                              },
                               "render": [Function],
-                              "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                            },
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                      >
+                        <ForwardRef
+                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                         >
-                          <ListGroupItem
-                            bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader"
-                            listItem={false}
+                          <ListGroupItem__StyledListGroupItem
+                            className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
                           >
-                            <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP listGroupHeader list-group-item"
+                            <StyledComponent
+                              className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "STYLES": Array [
+                                    "success",
+                                    "warning",
+                                    "danger",
+                                    "info",
+                                  ],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                    "isStatic": false,
+                                    "lastClassName": "iEzmJe",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "ListGroupItem__StyledListGroupItem",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
                             >
-                              <div
-                                className="headerWrapper"
-                              />
-                            </span>
-                          </ListGroupItem>
-                        </StyledComponent>
-                      </ListGroupItem__StyledListGroupItem>
-                    </ForwardRef>
+                              <ListGroupItem
+                                bsClass="list-group-item"
+                                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO"
+                                listItem={false}
+                              >
+                                <span
+                                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 cNtVlO list-group-item"
+                                >
+                                  <ControlledTableListHeader__HeaderWrapper>
+                                    <StyledComponent
+                                      forwardedComponent={
+                                        Object {
+                                          "$$typeof": Symbol(react.forward_ref),
+                                          "attrs": Array [],
+                                          "componentStyle": ComponentStyle {
+                                            "componentId": "ControlledTableListHeader__HeaderWrapper-tr2y34-1",
+                                            "isStatic": false,
+                                            "lastClassName": "ekhgZW",
+                                            "rules": Array [
+                                              "margin:10px 0;min-height:20px;",
+                                            ],
+                                          },
+                                          "displayName": "ControlledTableListHeader__HeaderWrapper",
+                                          "foldedComponentIds": Array [],
+                                          "render": [Function],
+                                          "styledComponentId": "ControlledTableListHeader__HeaderWrapper-tr2y34-1",
+                                          "target": "div",
+                                          "toString": [Function],
+                                          "warnTooManyClasses": [Function],
+                                          "withComponent": [Function],
+                                        }
+                                      }
+                                      forwardedRef={null}
+                                    >
+                                      <div
+                                        className="ControlledTableListHeader__HeaderWrapper-tr2y34-1 ekhgZW"
+                                      />
+                                    </StyledComponent>
+                                  </ControlledTableListHeader__HeaderWrapper>
+                                </span>
+                              </ListGroupItem>
+                            </StyledComponent>
+                          </ListGroupItem__StyledListGroupItem>
+                        </ForwardRef>
+                      </StyledComponent>
+                    </ControlledTableListHeader__StyledListGroupItem>
                   </ControlledTableListHeader>
                   <ControlledTableListItem
                     key="item-beef2001"
@@ -1670,7 +1806,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "kRfOAP",
+                                "lastClassName": "iEzmJe",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1689,11 +1825,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                             >
                               <div
                                 className="itemWrapper itemWrapperStatic"
@@ -1752,7 +1888,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "hGhRKT",
+                                                  "lastClassName": "jVYrA",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -1776,12 +1912,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               bsClass="btn"
                                               bsSize="xsmall"
                                               bsStyle="primary"
-                                              className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                                               disabled={false}
                                               onClick={[Function]}
                                             >
                                               <button
-                                                className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-xs btn-primary"
                                                 disabled={false}
                                                 onClick={[Function]}
                                                 type="button"
@@ -1827,7 +1963,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "kRfOAP",
+                                "lastClassName": "iEzmJe",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1846,11 +1982,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 kRfOAP list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
                             >
                               <div
                                 className="itemWrapper itemWrapperStatic"
@@ -1909,7 +2045,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "hGhRKT",
+                                                  "lastClassName": "jVYrA",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -1933,12 +2069,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               bsClass="btn"
                                               bsSize="xsmall"
                                               bsStyle="primary"
-                                              className="Button__StyledButton-c9cbmb-0 hGhRKT"
+                                              className="Button__StyledButton-c9cbmb-0 jVYrA"
                                               disabled={false}
                                               onClick={[Function]}
                                             >
                                               <button
-                                                className="Button__StyledButton-c9cbmb-0 hGhRKT btn btn-xs btn-primary"
+                                                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-xs btn-primary"
                                                 disabled={false}
                                                 onClick={[Function]}
                                                 type="button"

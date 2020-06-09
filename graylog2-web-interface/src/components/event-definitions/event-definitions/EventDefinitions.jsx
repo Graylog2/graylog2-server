@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import moment from 'moment';
-import {} from 'moment-duration-format';
 
-import { Button, Col, DropdownButton, MenuItem, Row } from 'components/graylog';
+import lodash from 'lodash';
+
+import { Button, Col, DropdownButton, Label, MenuItem, Row } from 'components/graylog';
 import Routes from 'routing/Routes';
 
 import {
@@ -14,20 +14,27 @@ import {
   EntityListItem,
   IfPermitted,
   PaginatedList,
-  Pluralize,
   SearchForm,
 } from 'components/common';
 
+import EventDefinitionDescription from './EventDefinitionDescription';
 import styles from './EventDefinitions.css';
 
 class EventDefinitions extends React.Component {
   static propTypes = {
     eventDefinitions: PropTypes.array.isRequired,
+    context: PropTypes.object,
     pagination: PropTypes.object.isRequired,
     query: PropTypes.string.isRequired,
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    onEnable: PropTypes.func.isRequired,
+    onDisable: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    context: {},
   };
 
   getConditionPlugin = (type) => {
@@ -57,42 +64,24 @@ class EventDefinitions extends React.Component {
     );
   };
 
-  renderDescription = (definition) => {
-    let schedulingInformation = 'Not scheduled.';
-    if (definition.config.search_within_ms && definition.config.execute_every_ms) {
-      const executeEveryFormatted = moment.duration(definition.config.execute_every_ms)
-        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
-      const searchWithinFormatted = moment.duration(definition.config.search_within_ms)
-        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
-      schedulingInformation = `Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
-    }
-
-    let notificationsInformation = <span>Does <b>not</b> trigger any Notifications.</span>;
-    if (definition.notifications.length > 0) {
-      notificationsInformation = (
-        <span>
-          Triggers {definition.notifications.length}{' '}
-          <Pluralize singular="Notification" plural="Notifications" value={definition.notifications.length} />.
-        </span>
-      );
-    }
-
-    return (
-      <>
-        <p>{definition.description}</p>
-        <p>{schedulingInformation} {notificationsInformation}</p>
-      </>
-    );
+  renderDescription = (definition, context) => {
+    return <EventDefinitionDescription definition={definition} context={context} />;
   };
 
   render() {
-    const { eventDefinitions, pagination, query, onPageChange, onQueryChange, onDelete } = this.props;
+    const { eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onEnable, onDisable } = this.props;
 
     if (pagination.grandTotal === 0) {
       return this.renderEmptyContent();
     }
 
     const items = eventDefinitions.map((definition) => {
+      const isScheduled = lodash.get(context, `scheduler.${definition.id}.is_scheduled`, true);
+
+      let toggle = <MenuItem onClick={onDisable(definition)}>Disable</MenuItem>;
+      if (!isScheduled) {
+        toggle = <MenuItem onClick={onEnable(definition)}>Enable</MenuItem>;
+      }
       const actions = (
         <React.Fragment key={`actions-${definition.id}`}>
           <IfPermitted permissions={`eventdefinitions:edit:${definition.id}`}>
@@ -102,6 +91,8 @@ class EventDefinitions extends React.Component {
           </IfPermitted>
           <IfPermitted permissions={`eventdefinitions:delete:${definition.id}`}>
             <DropdownButton id="more-dropdown" title="More" pullRight>
+              {toggle}
+              <MenuItem divider />
               <MenuItem onClick={onDelete(definition)}>Delete</MenuItem>
             </DropdownButton>
           </IfPermitted>
@@ -109,12 +100,17 @@ class EventDefinitions extends React.Component {
       );
 
       const plugin = this.getConditionPlugin(definition.config.type);
-      const titleSuffix = plugin.displayName || definition.config.type;
+      let titleSuffix = plugin.displayName || definition.config.type;
+
+      if (!isScheduled) {
+        titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);
+      }
+
       return (
         <EntityListItem key={`event-definition-${definition.id}`}
                         title={definition.title}
                         titleSuffix={titleSuffix}
-                        description={this.renderDescription(definition)}
+                        description={this.renderDescription(definition, context)}
                         noItemsText="Could not find any items with the given filter."
                         actions={actions} />
       );

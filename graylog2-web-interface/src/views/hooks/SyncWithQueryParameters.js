@@ -9,7 +9,6 @@ import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
-import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 
 const useActionListeners = (actions, callback, dependencies) => {
   useEffect(() => {
@@ -61,7 +60,7 @@ export const syncWithQueryParameters = (query: string, action: (string) => mixed
 export const useSyncWithQueryParameters = (query: string) => {
   useEffect(() => syncWithQueryParameters(query, history.replace), []);
   useActionListeners(
-    [QueriesActions.query.completed, QueriesActions.timerange.completed, QueryFiltersActions.streams.completed],
+    [QueriesActions.update.completed],
     () => syncWithQueryParameters(query),
     [query],
   );

@@ -21,8 +21,6 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
-import org.graylog2.dashboards.DashboardService;
-import org.graylog2.dashboards.DashboardServiceImpl;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.IndexFailureServiceImpl;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -34,8 +32,6 @@ import org.graylog2.inputs.persistence.InputStatusService;
 import org.graylog2.inputs.persistence.MongoInputStatusService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
-import org.graylog2.savedsearches.SavedSearchService;
-import org.graylog2.savedsearches.SavedSearchServiceImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.MongoDBSessionService;
@@ -55,7 +51,6 @@ public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(SystemMessageService.class).to(SystemMessageServiceImpl.class);
-        bind(DashboardService.class).to(DashboardServiceImpl.class);
         bind(AlertService.class).to(AlertServiceImpl.class);
         bind(NotificationService.class).to(NotificationServiceImpl.class);
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class);
@@ -67,7 +62,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(UserService.class).to(UserServiceImpl.class);
         bind(StreamService.class).to(StreamServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class);
-        bind(SavedSearchService.class).to(SavedSearchServiceImpl.class);
         bind(LdapSettingsService.class).to(LdapSettingsServiceImpl.class);
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();

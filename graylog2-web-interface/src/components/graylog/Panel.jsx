@@ -5,32 +5,26 @@ import styled, { css } from 'styled-components';
 import { Panel as BootstrapPanel } from 'react-bootstrap';
 
 import deprecationNotice from 'util/deprecationNotice';
-import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const PanelHeading = styled(BootstrapPanel.Heading)``;
 
 const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
-  background-color: ${theme.color.gray[80]};
-  border-top-color: ${theme.color.gray[90]};
+  background-color: ${theme.color.gray[90]};
+  border-top-color: ${theme.color.gray[80]};
 `);
 
 const panelVariantStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = util.colorLevel(theme.color.variant.light[variant], -9);
-  const borderColor = util.colorLevel(theme.color.variant.dark[variant], -10);
+  const backgroundColor = theme.utils.colorLevel(theme.color.variant.light[variant], -10);
+  const borderColor = theme.utils.colorLevel(theme.color.variant.light[variant], 10);
 
   return css`
     border-color: ${borderColor};
 
-    & > ${PanelHeading} {
-      color: ${util.readableColor(backgroundColor)};
+    > ${PanelHeading} {
+      color: ${theme.utils.contrastingColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
-
-      > .panel-title,
-      > .panel-title > * {
-        font-size: 16px;
-      }
 
       + .panel-collapse > .panel-body {
         border-top-color: ${borderColor};
@@ -42,7 +36,7 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
       }
     }
 
-    & > ${PanelFooter} {
+    > ${PanelFooter} {
       + .panel-collapse > .panel-body {
         border-bottom-color: ${borderColor};
       }
@@ -51,15 +45,24 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
 });
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
+  background-color: ${theme.utils.colorLevel(theme.color.global.background, -4)};
+
+  > ${PanelHeading} {
+    .panel-title,
+    .panel-title h3 {
+      font-size: 16px;
+    }
+  }
+
   .panel-group {
-    ${PanelHeading} {
+    > ${PanelHeading} {
       + .panel-collapse > .panel-body,
       + .panel-collapse > .list-group {
         border-top-color: ${theme.color.gray[90]};
       }
     }
 
-    ${PanelFooter} {
+    > ${PanelFooter} {
       + .panel-collapse .panel-body {
         border-bottom-color: ${theme.color.gray[90]};
       }
@@ -69,16 +72,16 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   ${bsStyleThemeVariant(panelVariantStyles)};
 `);
 
-const deprecatedVariantStyles = (hex) => css(({ theme }) => {
-  const backgroundColor = theme.color.global.background;
-  const borderColor = theme.color.gray[80];
+const deprecatedVariantStyles = (hex, variant) => css(({ theme }) => {
+  const backgroundColor = theme.utils.colorLevel(theme.color.variant.light[variant], -10);
+  const borderColor = theme.utils.colorLevel(theme.color.variant.light[variant], 10);
 
   return css`
     /** NOTE: Deprecated & should be removed in 4.0 */
     border-color: ${borderColor};
 
     & > .panel-heading {
-      color: ${util.colorLevel(backgroundColor, 9)};
+      color: ${theme.utils.contrastingColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
@@ -107,11 +110,11 @@ const deprecatedVariantStyles = (hex) => css(({ theme }) => {
 
 const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   /** NOTE: Deprecated & should be removed in 4.0 */
-  background-color: ${theme.color.global.background};
+  background-color: ${theme.utils.colorLevel(theme.color.global.background, -4)};
 
   .panel-footer {
-    background-color: ${theme.color.gray[80]};
-    border-top-color: ${theme.color.gray[90]};
+    background-color: ${theme.color.gray[90]};
+    border-top-color: ${theme.color.gray[80]};
   }
 
   .panel-group {
@@ -145,7 +148,7 @@ const Panel = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsExpanded((defaultExpanded && expanded)
       || (!defaultExpanded && expanded)
       || (defaultExpanded && isExpanded === expanded));

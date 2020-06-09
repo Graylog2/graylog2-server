@@ -10,7 +10,7 @@ const SupportLink = ({ small, children }) => {
           <td style={{ width: '40px' }}>
             <span className={`fa-stack ${!small && 'fa-lg'}`}>
               <Icon name="circle" className="fa-stack-2x" />
-              <Icon name="lightbulb-o" className="fa-stack-1x" inverse />
+              <Icon name="lightbulb" className="fa-stack-1x" inverse />
             </span>
           </td>
           <td>

@@ -4,7 +4,7 @@ exports[`<Widget /> should render with empty props 1`] = `
 <body>
   <div>
     <div
-      class="WidgetFrame__WidgetWrap-sc-1uccjgg-0 kljUyp"
+      class="WidgetFrame__WidgetWrap-sc-1uccjgg-0 laVatb"
       data-widget-id="widgetId"
       style="overflow: hidden;"
     >
@@ -14,26 +14,39 @@ exports[`<Widget /> should render with empty props 1`] = `
         loading="false"
         title="Widget Title"
       >
-        <span>
-          <svg
-            class="svg-inline--fa fa-arrows-alt-h"
-          />
-        </span>
-         
-        <span
-          role="presentation"
+        <div
+          class="Widget__WidgetActionsWBar-sc-1k4o2f7-0 ckMMeL"
         >
+          <button
+            class="IconButton__Wrapper-sc-1q956yw-0 kZTuI"
+            tabindex="0"
+            title="Stretch width"
+          >
+            <svg
+              class="svg-inline--fa fa-arrows-alt-h"
+            />
+          </button>
           <span
             role="presentation"
           >
-            <span>
-              <svg
-                class="svg-inline--fa fa-chevron-down"
-                data-testid="widgetActionDropDown"
-              />
+            <span
+              role="presentation"
+            >
+              <span>
+                <button
+                  class="IconButton__Wrapper-sc-1q956yw-0 kZTuI"
+                  tabindex="0"
+                  title="Open actions dropdown"
+                >
+                  <svg
+                    class="svg-inline--fa fa-chevron-down"
+                    data-testid="widgetActionDropDown"
+                  />
+                </button>
+              </span>
             </span>
           </span>
-        </span>
+        </div>
       </widget-header>
       <div
         class="spinnerContainer"
