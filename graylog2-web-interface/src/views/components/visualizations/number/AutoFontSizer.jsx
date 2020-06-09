@@ -4,8 +4,8 @@ import styled, { type StyledComponent } from 'styled-components';
 
 /**
  * This component will calculate the largest possible font size for the provided child.
- * The calculation is based the difference between the dimensions of the container and its child.
- * The font size is being recalculated, until the mentioned difference is within the defined tolerance.
+ * The calculation is based on the ratio of the current dimensions of the child and the dimensions of its container.
+ * The font size is being multiplied by this ratio, unless it has a difference to 1 that is smaller than the defined tolerance.
  */
 
 const TOLERANCE = 0.05;
