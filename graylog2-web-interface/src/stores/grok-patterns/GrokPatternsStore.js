@@ -4,7 +4,7 @@ import Reflux from 'reflux';
 import fetch, { fetchPlainText } from 'logic/rest/FetchProvider';
 import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
 type GrokPattern = {
@@ -21,7 +21,7 @@ type GrokPatternTest = {
 };
 
 const GrokPatternsStore = Reflux.createStore({
-  URL: URLUtils.qualifyUrl('/system/grok'),
+  URL: qualifyUrl('/system/grok'),
 
   loadPatterns(callback: (patterns: Array<GrokPattern>) => void) {
     const failCallback = (error) => {
@@ -50,7 +50,7 @@ const GrokPatternsStore = Reflux.createStore({
 
   searchPaginated(page, perPage, query) {
     const url = PaginationURL(ApiRoutes.GrokPatternsController.paginated().url, page, perPage, query);
-    const promise = fetch('GET', URLUtils.qualifyUrl(url))
+    const promise = fetch('GET', qualifyUrl(url))
       .then((response: any) => {
         const pagination = {
           count: response.pagination.count,
@@ -91,7 +91,7 @@ const GrokPatternsStore = Reflux.createStore({
       sampleData: pattern.sampleData,
     };
 
-    fetch('POST', URLUtils.qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest)
+    fetch('POST', qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest)
       .then(
         (response) => {
           callback(response);
