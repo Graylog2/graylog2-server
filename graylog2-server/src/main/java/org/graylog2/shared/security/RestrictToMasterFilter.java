@@ -32,7 +32,7 @@ public class RestrictToMasterFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        LOG.warn("Rejected request that is only allowed against master nodes. Returning HTTP 403.");
+        LOG.warn("Rejected request to <{}> which is only allowed against master nodes.", requestContext.getUriInfo().getPath());
         throw new ForbiddenException("Request is only allowed against master nodes.");
     }
 }
