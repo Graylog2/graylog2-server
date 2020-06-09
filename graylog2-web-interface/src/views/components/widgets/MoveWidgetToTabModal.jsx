@@ -6,6 +6,7 @@ import Input from 'components/bootstrap/Input';
 import { useStore } from 'stores/connect';
 import QueryTitle from 'views/logic/queries/QueryTitle';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
+import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 
 import View from 'views/logic/views/View';
 
@@ -18,8 +19,7 @@ type Props = {
 
 type TabEntry = { id: string, name: string };
 
-const _tabList = (view: View): Array<TabEntry> => {
-  const queryIds = Object.keys(view.state.toObject());
+const _tabList = (view: View, queryIds): Array<TabEntry> => {
   return queryIds.map((queryId) => {
     const tabTitle = QueryTitle(view, queryId) || 'Unknown Page title';
     return ({ id: queryId, name: tabTitle });
@@ -30,8 +30,9 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   const [selectedTab, setSelectedTab] = useState(null);
   const [keepCopy, setKeepCopy] = useState(false);
   const { id: activeQuery } = useStore(CurrentQueryStore);
+  const queryIds = useStore(QueryIdsStore);
 
-  const list = _tabList(view).filter(({ id }) => id !== activeQuery);
+  const list = _tabList(view, queryIds.toArray()).filter(({ id }) => id !== activeQuery);
 
   const tabList = list.map(({ id, name }) => (
     <ListGroupItem onClick={() => setSelectedTab(id)}
@@ -42,7 +43,7 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   ));
   const renderResult = list && list.length > 0
     ? <ListGroup>{tabList}</ListGroup>
-    : <span>No dashboards found</span>;
+    : <span>No pages found</span>;
 
   return (
     <BootstrapModalForm show
