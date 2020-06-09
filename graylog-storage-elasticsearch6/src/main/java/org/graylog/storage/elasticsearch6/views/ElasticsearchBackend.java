@@ -82,7 +82,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     private final QueryStringParser queryStringParser;
     private final JestClient jestClient;
     private final IndexLookup indexLookup;
-    private final QueryStringDecorators esQueryDecorators;
+    private final QueryStringDecorators queryStringDecorators;
     private final ESGeneratedQueryContext.Factory queryContextFactory;
     private final boolean allowLeadingWildcard;
 
@@ -91,7 +91,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                 QueryStringParser queryStringParser,
                                 JestClient jestClient,
                                 IndexLookup indexLookup,
-                                QueryStringDecorators esQueryDecorators,
+                                QueryStringDecorators queryStringDecorators,
                                 ESGeneratedQueryContext.Factory queryContextFactory,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.elasticsearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
@@ -99,7 +99,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.jestClient = jestClient;
         this.indexLookup = indexLookup;
 
-        this.esQueryDecorators = esQueryDecorators;
+        this.queryStringDecorators = queryStringDecorators;
         this.queryContextFactory = queryContextFactory;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
@@ -116,7 +116,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final Set<SearchType> searchTypes = query.searchTypes();
 
-        final String queryString = this.esQueryDecorators.decorate(backendQuery.queryString(), job, query, results);
+        final String queryString = this.queryStringDecorators.decorate(backendQuery.queryString(), job, query, results);
         final QueryBuilder normalizedRootQuery = normalizeQueryString(queryString);
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
@@ -153,7 +153,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
             searchType.query().ifPresent(q -> {
                 final ElasticsearchQueryString searchTypeBackendQuery = (ElasticsearchQueryString) q;
-                final String searchTypeQueryString = this.esQueryDecorators.decorate(searchTypeBackendQuery.queryString(), job, query, results);
+                final String searchTypeQueryString = this.queryStringDecorators.decorate(searchTypeBackendQuery.queryString(), job, query, results);
                 final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
                 searchTypeOverrides.must(normalizedSearchTypeQuery);
             });
@@ -199,7 +199,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 // Skipping stream filter, will be extracted elsewhere
                 return Optional.empty();
             case QueryStringFilter.NAME:
-                return Optional.of(QueryBuilders.queryStringQuery(this.esQueryDecorators.decorate(((QueryStringFilter) filter).query(), job, query, results)));
+                return Optional.of(QueryBuilders.queryStringQuery(this.queryStringDecorators.decorate(((QueryStringFilter) filter).query(), job, query, results)));
         }
         return Optional.empty();
     }
