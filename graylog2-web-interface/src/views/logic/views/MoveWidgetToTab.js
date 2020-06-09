@@ -54,8 +54,8 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
   if (match) {
     const [widget, queryId] = match;
     const newWidgetPosition = _getWidgetPosition(widgetId, queryId, dashboard).toBuilder()
-      .col(1)
-      .row(1)
+      .col(0)
+      .row(0)
       .build();
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
     return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, newWidgetPosition));
