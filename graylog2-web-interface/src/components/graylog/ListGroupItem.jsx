@@ -1,5 +1,4 @@
 import React, { forwardRef } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
@@ -118,16 +117,9 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
   ${variantStyles};
 `);
 
-const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
-  return <StyledListGroupItem bsStyle={bsStyle} ref={ref} {...props} />;
+const ListGroupItem = forwardRef((props, ref) => {
+  return <StyledListGroupItem {...props} ref={ref} />;
 });
 
-ListGroupItem.propTypes = {
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info']),
-};
-
-ListGroupItem.defaultProps = {
-  bsStyle: undefined,
-};
 
 export default ListGroupItem;
