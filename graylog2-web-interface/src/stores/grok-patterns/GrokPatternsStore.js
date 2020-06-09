@@ -2,7 +2,7 @@
 import Reflux from 'reflux';
 
 import fetch, { fetchPlainText } from 'logic/rest/FetchProvider';
-import PaginationHelper from 'util/PaginationHelper';
+import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -49,7 +49,7 @@ const GrokPatternsStore = Reflux.createStore({
   },
 
   searchPaginated(page, perPage, query) {
-    const url = PaginationHelper.urlGenerator(ApiRoutes.GrokPatternsController.paginated().url, page, perPage, query);
+    const url = PaginationURL(ApiRoutes.GrokPatternsController.paginated().url, page, perPage, query);
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then((response: any) => {
         const pagination = {
