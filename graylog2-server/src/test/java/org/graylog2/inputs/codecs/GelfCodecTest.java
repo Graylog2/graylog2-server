@@ -33,6 +33,8 @@ import org.mockito.junit.MockitoRule;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -95,6 +97,33 @@ public class GelfCodecTest {
         assertThat(message).isNotNull();
         assertThat(message.getField("version")).isEqualTo("3.11");
         assertThat(message.getField("source")).isEqualTo("example.org");
+    }
+    @Test
+    public void decodeMessages() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"_version\": \"5.11\""
+                + "}"
+                + "\n"
+                + "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"_version\": \"3.11\","
+                + "\"foo\": \"bar\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        final ArrayList<Message> messages = (ArrayList<Message>) codec.decodeMessages(rawMessage);
+
+        assertThat(messages).isNotNull();
+        assertThat(messages).size().isEqualTo(2);
+        assertThat(messages.get(0).getField("version")).isEqualTo("5.11");
+        assertThat(messages.get(0).getField("source")).isEqualTo("example.org");
+        assertThat(messages.get(1).getField("version")).isEqualTo("3.11");
+        assertThat(messages.get(1).getField("foo")).isEqualTo("bar");
     }
 
     @Test

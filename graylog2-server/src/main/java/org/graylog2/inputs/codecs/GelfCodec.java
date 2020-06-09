@@ -36,6 +36,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -46,11 +47,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 @Codec(name = "gelf", displayName = "GELF")
-public class GelfCodec extends AbstractCodec {
+public class GelfCodec extends AbstractCodec implements MultiMessageCodec {
     private static final Logger log = LoggerFactory.getLogger(GelfCodec.class);
     private static final String CK_DECOMPRESS_SIZE_LIMIT = "decompress_size_limit";
     private static final int DEFAULT_DECOMPRESS_SIZE_LIMIT = 8388608;
@@ -64,8 +67,8 @@ public class GelfCodec extends AbstractCodec {
         super(configuration);
         this.aggregator = aggregator;
         this.objectMapper = new ObjectMapper().enable(
-            JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
-            JsonParser.Feature.ALLOW_TRAILING_COMMA);
+                JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
+                JsonParser.Feature.ALLOW_TRAILING_COMMA);
         this.decompressSizeLimit = configuration.getInt(CK_DECOMPRESS_SIZE_LIMIT, DEFAULT_DECOMPRESS_SIZE_LIMIT);
     }
 
@@ -123,7 +126,11 @@ public class GelfCodec extends AbstractCodec {
     public Message decode(@Nonnull final RawMessage rawMessage) {
         final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload(), rawMessage.getRemoteAddress());
         final String json = gelfMessage.getJSON(decompressSizeLimit);
+        log.error("debug json {}",json);
+        return decodeOne(json, rawMessage);
+    }
 
+    protected Message decodeOne(String json, @Nonnull final RawMessage rawMessage) {
         final JsonNode node;
 
         try {
@@ -133,7 +140,7 @@ public class GelfCodec extends AbstractCodec {
             }
         } catch (final Exception e) {
             log.error("Could not parse JSON, first 400 characters: " +
-                              StringUtils.abbreviate(json, 403), e);
+                    StringUtils.abbreviate(json, 403), e);
             throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
         }
 
@@ -280,6 +287,26 @@ public class GelfCodec extends AbstractCodec {
         return aggregator;
     }
 
+    @Nullable
+    @Override
+    public Collection<Message> decodeMessages(@Nonnull RawMessage rawMessage) {
+        final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload(), rawMessage.getRemoteAddress());
+        ArrayList<Message> messages = new ArrayList<>();
+        final String payload = gelfMessage.getJSON(decompressSizeLimit);
+        log.error("debug json messages {}",payload);
+        //split by \n
+        for (String jsonChunk : payload.split("\\r?\\n")) {
+            try {
+                messages.add(decodeOne(jsonChunk, rawMessage));
+            } catch (Exception ignored) {
+            } //suppress individual errors for chunks. Check what we have in resulting array  later
+        }
+        if (messages.isEmpty()) {
+            throw new IllegalStateException("could not find any valid json in the packet");
+        }
+        return messages;
+    }
+
     @FactoryClass
     public interface Factory extends AbstractCodec.Factory<GelfCodec> {
         @Override
@@ -298,11 +325,11 @@ public class GelfCodec extends AbstractCodec {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest requestedConfiguration = super.getRequestedConfiguration();
             requestedConfiguration.addField(new NumberField(
-                CK_DECOMPRESS_SIZE_LIMIT,
-                "Decompressed size limit",
-                DEFAULT_DECOMPRESS_SIZE_LIMIT,
-                "The maximum number of bytes after decompression.",
-                ConfigurationField.Optional.OPTIONAL));
+                    CK_DECOMPRESS_SIZE_LIMIT,
+                    "Decompressed size limit",
+                    DEFAULT_DECOMPRESS_SIZE_LIMIT,
+                    "The maximum number of bytes after decompression.",
+                    ConfigurationField.Optional.OPTIONAL));
 
             return requestedConfiguration;
         }
