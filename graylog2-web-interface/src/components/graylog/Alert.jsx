@@ -1,16 +1,13 @@
-import React, { forwardRef, useMemo } from 'react';
+import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-import bsStyleThemeVariant from './variants/bsStyle';
 
-const styleVariants = ['danger', 'info', 'success', 'warning'];
-
-const alertStyles = (hex) => css(({ theme }) => {
-  const borderColor = theme.utils.colorLevel(hex, -7);
-  const backgroundColor = theme.utils.colorLevel(hex, -5);
+const StyledAlert = styled(BootstrapAlert)(({ bsStyle, theme }) => {
+  const borderColor = theme.colors.variant.light[bsStyle];
+  const backgroundColor = theme.colors.variant.lightest[bsStyle];
 
   return css`
     background-color: ${backgroundColor};
@@ -23,35 +20,28 @@ const alertStyles = (hex) => css(({ theme }) => {
       text-decoration: underline;
 
       &:hover,
-      &:focus {
-        color: ${theme.utils.contrastingColor(backgroundColor, 'AAA')};
-        text-decoration: none;
-      }
-
+      &:focus,
       &:active {
         color: ${theme.utils.contrastingColor(backgroundColor, 'AAA')};
+      }
+
+      &:hover,
+      &:focus {
+        text-decoration: none;
       }
     }
   `;
 });
 
-
 const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
-  const StyledAlert = useMemo(
-    () => styled(BootstrapAlert)`
-      ${bsStyleThemeVariant(alertStyles, {}, styleVariants)}
-    `,
-    [bsStyle],
-  );
-
   return (
-    <StyledAlert bsStyle={bsStyle} ref={ref} {...props} />
+    <StyledAlert {...props} bsStyle={bsStyle} ref={ref} />
   );
 });
 
 Alert.propTypes = {
   /** Bootstrap `bsStyle` variant name */
-  bsStyle: PropTypes.oneOf(styleVariants),
+  bsStyle: PropTypes.oneOf(['danger', 'info', 'success', 'warning']),
 };
 
 Alert.defaultProps = {
