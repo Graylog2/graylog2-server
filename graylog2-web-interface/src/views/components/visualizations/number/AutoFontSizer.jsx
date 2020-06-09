@@ -3,8 +3,9 @@ import React, { type Element, type ElementRef, useEffect, useRef, useState } fro
 import styled, { type StyledComponent } from 'styled-components';
 
 /**
- * This component will update the font size based on the difference between the dimensions of the container and its child.
- * The font size is being recalculated, until the mentioned difference is within the tolerance.
+ * This component will calculate the largest possible font size for the provided child.
+ * The calculation is based the difference between the dimensions of the container and its child.
+ * The font size is being recalculated, until the mentioned difference is within the defined tolerance.
  */
 
 const TOLERANCE = 0.05;
