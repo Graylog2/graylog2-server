@@ -4,7 +4,7 @@ import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
-const MessageTerms = styled.spa(({ theme }) => `
+const MessageTerms = styled.span(({ theme }) => `
   margin-right: 8px;
   font-family: ${theme.fonts.family.monospace};
 `);
