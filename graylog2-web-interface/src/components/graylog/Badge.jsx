@@ -3,9 +3,9 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Badge as BootstrapBadge } from 'react-bootstrap';
 
-import bsStyleThemeVariant from './variants/bsStyle';
 
-const cssBuilder = (backgroundColor) => css(({ theme }) => {
+const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
+  const backgroundColor = theme.colors.variant[bsStyle];
   const textColor = theme.utils.readableColor(backgroundColor);
 
   return css`
@@ -13,10 +13,6 @@ const cssBuilder = (backgroundColor) => css(({ theme }) => {
     color: ${textColor};
   `;
 });
-
-const StyledBadge = styled(BootstrapBadge)`
-  ${bsStyleThemeVariant(cssBuilder)}
-`;
 
 const Badge = forwardRef(({ ...props }, ref) => {
   return (
