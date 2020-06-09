@@ -33,7 +33,7 @@ export const Title: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> 
 `);
 
 export const TitleText: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
-  font-size: 16px;
+  font-size: ${theme.fonts.size.body}
   display: inline;
   margin-left: 10px;
   overflow: hidden;

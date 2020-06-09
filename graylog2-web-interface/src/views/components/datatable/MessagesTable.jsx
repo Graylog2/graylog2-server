@@ -12,7 +12,7 @@ const MessagesContainer = styled.div`
 
 const StyledTable = styled(Table)(({ theme }) => `
   position: relative;
-  font-size: 11px;
+  font-size: ${theme.fonts.size.bodySmall};
   margin-top: 15px;
   margin-bottom: 60px;
   border-collapse: collapse;
@@ -32,7 +32,7 @@ const StyledTable = styled(Table)(({ theme }) => `
 
   > thead th {
     border: 0;
-    font-size: 11px;
+    font-size: ${theme.fonts.size.bodySmall};
     font-weight: normal;
     background-color: ${theme.colors.gray[10]};
     white-space: nowrap;

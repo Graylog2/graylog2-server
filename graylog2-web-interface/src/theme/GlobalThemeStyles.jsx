@@ -5,11 +5,14 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     height: 256px;
   }
 
+  html {
+    font-size: ${theme.fonts.size.root};
+  }
+
   body {
     background-color: ${theme.colors.global.background};
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
-    font-size: 12px;
     overflow-x: hidden;
     margin-top: 50px;
     min-height: calc(100vh - 50px);
@@ -41,19 +44,19 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   h1 {
-    font-size: 28px;
+    font-size: ${theme.fonts.size.h1};
   }
 
   h2 {
-    font-size: 21px;
+    font-size: ${theme.fonts.size.h2};
   }
 
   h3 {
-    font-size: 18px;
+    font-size: ${theme.fonts.size.h3};
   }
 
   h4 {
-    font-size: 14px;
+    font-size: ${theme.fonts.size.h4};
     font-weight: normal;
   }
 
@@ -88,7 +91,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   label {
-    font-size: 14px;
+    font-size: ${theme.fonts.size.bodyLarge};
   }
 
   legend small {
@@ -249,7 +252,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .configuration-field-optional {
     margin-left: 5px;
-    font-size: 11px;
+    font-size: ${theme.fonts.size.bodySmall};
   }
 
   .index-description {
@@ -494,7 +497,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .btn-text {
     font-family: ${theme.fonts.family.body};
-    font-size: 12px;
+    font-size: ${theme.fonts.size.bodySmall};
     padding: 0;
     vertical-align: baseline;
   }
@@ -504,7 +507,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   nav.navbar-fixed-top ul.dropdown-menu li a {
-    font-size: 12px;
+    font-size: ${theme.fonts.size.bodySmall};
   }
 
   nav.navbar-fixed-top ul.dropdown-menu {
@@ -568,7 +571,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .threaddump {
-    font-size: 11px;
+    font-size: ${theme.fonts.size.bodySmall};
   }
 
   h2.extractor-title {
@@ -616,7 +619,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .tag,
   .pill {
-    font-size: 14px;
+    font-size: ${theme.fonts.size.body};
     margin-right: 5px;
   }
 

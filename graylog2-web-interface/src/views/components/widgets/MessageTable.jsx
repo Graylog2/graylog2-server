@@ -29,7 +29,7 @@ const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
 
 const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.table(({ theme }) => `
   position: relative;
-  font-size: 11px;
+  font-size: ${theme.fonts.size.bodySmall};
   margin-top: 0;
   margin-bottom: 60px;
   border-collapse: collapse;
@@ -134,7 +134,7 @@ const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = 
 
   th {
     border: 0;
-    font-size: 11px;
+    font-size: ${theme.fonts.size.bodySmall};
     font-weight: normal;
     white-space: nowrap;
     background-color: ${theme.colors.gray[90]};

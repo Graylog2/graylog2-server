@@ -21,7 +21,7 @@ const NodeRow = styled.div(({ theme }) => `
     margin-bottom: 0;
     margin-top: 3px;
     font-family: ${theme.fonts.family.monospace};
-    font-size: 11px;
+    font-size: ${theme.fonts.size.bodySmall};
   }
 
   .xtrc-converters {
