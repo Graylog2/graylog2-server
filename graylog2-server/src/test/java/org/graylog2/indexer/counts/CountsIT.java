@@ -46,7 +46,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CountsIT extends ElasticsearchBaseTest {
+public abstract class CountsIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME_1 = "index_set_1_counts_test_0";
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
     @Rule
@@ -60,13 +60,15 @@ public class CountsIT extends ElasticsearchBaseTest {
     private IndexSet indexSet2;
     private Counts counts;
 
+    protected abstract CountsAdapter countsAdapter();
+
     @Before
     public void setUp() throws Exception {
         client().createIndex(INDEX_NAME_1, 1, 0);
         client().createIndex(INDEX_NAME_2, 1, 0);
         client().waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2);
 
-        counts = new Counts(jestClient(), indexSetRegistry);
+        counts = new Counts(indexSetRegistry, countsAdapter());
 
         final IndexSetConfig indexSetConfig1 = IndexSetConfig.builder()
                 .id("id-1")
