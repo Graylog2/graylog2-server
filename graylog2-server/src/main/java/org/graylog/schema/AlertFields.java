@@ -23,6 +23,10 @@ public class AlertFields {
     public static final String ALERT_SIGNATURE = "alert_signature";
     public static final String ALERT_SIGNATURE_ID = "alert_signature_id";
 
+    // To Be Removed
+    @Deprecated
+    public static final String ALERT_SIGNATURE_CATEGORY = "alert_signature_category"
+
     // Derived and Enriched Fields
     public static final String ALERT_SEVERITY = "alert_severity";
     public static final String ALERT_SEVERITY_LEVEL = "alert_severity_level";
