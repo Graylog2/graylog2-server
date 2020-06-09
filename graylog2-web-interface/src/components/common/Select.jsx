@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
+import { fonts } from 'theme';
 import Icon from './Icon';
 
 type Option = { [string]: any };
@@ -113,7 +114,7 @@ const menu = (base) => ({
 const singleValueAndPlaceholder = (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: fonts.family.body,
   fontSize: '14px',
   fontWeight: 400,
   color: '#666',
@@ -122,7 +123,7 @@ const singleValueAndPlaceholder = (base) => ({
 const placeholder = (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: fonts.family.body,
   fontSize: '14px',
   fontWeight: 400,
   color: '#999',
@@ -293,7 +294,8 @@ class Select extends React.Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps = (nextProps: Props) => {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps = (nextProps: Props) => {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });

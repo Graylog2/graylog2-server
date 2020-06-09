@@ -6,13 +6,13 @@ import { Well } from 'components/graylog';
 
 import MessageLoader from './MessageLoader';
 
-const NewExampleWell = styled(Well)`
+const NewExampleWell = styled(Well)(({ theme }) => `
   margin-bottom: 5px;
-  font-family: monospace;
+  font-family: ${theme.fonts.family.monospace};
   font-size: 14px;
   white-space: pre-wrap;
   word-wrap: break-word;
-`;
+`);
 
 const NoExample = styled.div`
   margin-top: 15px;

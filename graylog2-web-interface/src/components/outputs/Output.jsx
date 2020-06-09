@@ -20,7 +20,7 @@ const NodeRow = styled.div(({ theme }) => `
   .well {
     margin-bottom: 0;
     margin-top: 3px;
-    font-family: monospace;
+    font-family: ${theme.fonts.family.monospace};
     font-size: 11px;
   }
 
