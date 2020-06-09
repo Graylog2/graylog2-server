@@ -22,6 +22,7 @@ import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.plugin.system.NodeId;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +46,7 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
 
     @Before
     public void setUp() throws Exception {
-        final Node node = new Node(jestClient());
+        final Node node = new Node(mock(NodeAdapter.class));
         //noinspection UnstableApiUsage
         indices = new Indices(
                 new IndexMappingFactory(node),
