@@ -12,7 +12,6 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;

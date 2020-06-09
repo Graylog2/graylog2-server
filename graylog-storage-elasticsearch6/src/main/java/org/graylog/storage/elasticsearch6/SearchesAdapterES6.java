@@ -26,7 +26,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog2.Configuration;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.CountResult;

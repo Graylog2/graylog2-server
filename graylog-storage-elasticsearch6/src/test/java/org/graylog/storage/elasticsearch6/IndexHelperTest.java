@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer;
+package org.graylog.storage.elasticsearch6;
 
-import com.google.common.collect.ImmutableMap;
+import org.assertj.core.api.Assertions;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -31,13 +31,7 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Map;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class IndexHelperTest {
     @Rule
@@ -54,45 +48,8 @@ public class IndexHelperTest {
     }
 
     @Test
-    public void testGetOldestIndices() {
-        final Map<String, Integer> indexNumbers = ImmutableMap.<String, Integer>builder()
-                .put("graylog_production_1", 1)
-                .put("graylog_production_7",7)
-                .put("graylog_production_0",0)
-                .put("graylog_production_2",2)
-                .put("graylog_production_4",4)
-                .put("graylog_production_6",6)
-                .put("graylog_production_3",3)
-                .put("graylog_production_5",5)
-                .put("graylog_production_8",8)
-                .put("graylog_production_9",9)
-                .put("graylog_production_10",10)
-                .put("graylog_production_110",110)
-                .put("graylog_production_125",125)
-                .put("graylog_production_20",20)
-                .put("graylog_production_21",21)
-                .build();
-
-        final IndexSet indexSet = mock(IndexSet.class);
-        when(indexSet.extractIndexNumber(anyString())).thenAnswer(
-                invocationOnMock -> Optional.ofNullable(indexNumbers.get(invocationOnMock.<String>getArgument(0))));
-        when(indexSet.getManagedIndices()).thenReturn(indexNumbers.keySet().toArray(new String[0]));
-        when(indexSet.getIndexPrefix()).thenReturn("graylog_production");
-
-        assertThat(IndexHelper.getOldestIndices(indexSet, 7)).containsOnly(
-            "graylog_production_0",
-            "graylog_production_1",
-            "graylog_production_2",
-            "graylog_production_3",
-            "graylog_production_4",
-            "graylog_production_5",
-            "graylog_production_6");
-        assertThat(IndexHelper.getOldestIndices(indexSet, 1)).containsOnly("graylog_production_0");
-    }
-
-    @Test
     public void getTimestampRangeFilterReturnsNullIfTimeRangeIsNull() {
-        assertThat(IndexHelper.getTimestampRangeFilter(null)).isNull();
+        Assertions.assertThat(IndexHelper.getTimestampRangeFilter(null)).isNull();
     }
 
     @Test
@@ -105,12 +62,5 @@ public class IndexHelperTest {
         assertThat(queryBuilder.fieldName()).isEqualTo("timestamp");
         assertThat(queryBuilder.from()).isEqualTo(Tools.buildElasticSearchTimeFormat(from));
         assertThat(queryBuilder.to()).isEqualTo(Tools.buildElasticSearchTimeFormat(to));
-    }
-
-    @Test
-    public void testGetOldestIndicesWithEmptySetAndTooHighOffset() {
-        final IndexSet indexSet = mock(IndexSet.class);
-        when(indexSet.getManagedIndices()).thenReturn(new String[0]);
-        assertThat(IndexHelper.getOldestIndices(indexSet, 9001)).isEmpty();
     }
 }

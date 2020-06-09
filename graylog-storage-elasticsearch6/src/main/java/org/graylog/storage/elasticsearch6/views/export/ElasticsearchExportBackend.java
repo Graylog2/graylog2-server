@@ -28,7 +28,7 @@ import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog2.indexer.IndexHelper;
+import org.graylog.storage.elasticsearch6.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
