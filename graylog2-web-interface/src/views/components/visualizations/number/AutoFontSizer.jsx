@@ -2,6 +2,14 @@
 import React, { type Element, type ElementRef, useEffect, useRef, useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
+/**
+ * This component will update the font size based on the difference between the dimensions of the container and its child.
+ * The font size is being recalculated, until the mentioned difference is within the tolerance.
+ */
+
+const TOLERANCE = 0.05;
+const CHILD_SIZE_RATIO = 0.8; // Proportion of the child size in relation to the container
+
 const FontSize: StyledComponent<{ fontSize: number }, {}, HTMLDivElement> = styled.div`
   height: 100%;
   width: 100%;
@@ -16,25 +24,18 @@ type Props = {
 };
 
 const _multiplierForElement = (element, targetWidth, targetHeight) => {
-  const childSizeRatio = 0.8; // Propotion of the child size in relation to the container
   const contentWidth = element.offsetWidth;
   const contentHeight = element.offsetHeight;
 
-  const widthMultiplier = (targetWidth * childSizeRatio) / contentWidth;
-  const heightMultiplier = (targetHeight * childSizeRatio) / contentHeight;
+  const widthMultiplier = (targetWidth * CHILD_SIZE_RATIO) / contentWidth;
+  const heightMultiplier = (targetHeight * CHILD_SIZE_RATIO) / contentHeight;
+
   return Math.min(widthMultiplier, heightMultiplier);
 };
 
-const _updateFontSize = (setFontSize, currentSize, newSize) => {
-  if (currentSize !== newSize && newSize !== 0 && Number.isFinite(newSize)) {
-    setFontSize(newSize);
-  }
-};
+const isValidFontSize = (fontSize) => fontSize !== 0 && Number.isFinite(fontSize);
 
 const useAutoFontSize = (target, _container, height, width) => {
-  // This hook will update the font size based on the difference between the dimensions of the container and its child.
-  // The font size is being recalculated, until the mentioned difference is within the tolerance.
-  const tolerance = 0.05;
   const [fontSize, setFontSize] = useState(20);
 
   useEffect(() => {
@@ -47,12 +48,14 @@ const useAutoFontSize = (target, _container, height, width) => {
 
     const contentElement = containerChildren[0];
     const multiplier = _multiplierForElement(contentElement, width, height);
-    if (Math.abs(1 - multiplier) <= tolerance) {
+    if (Math.abs(1 - multiplier) <= TOLERANCE) {
       return;
     }
 
     const newFontSize = Math.floor(fontSize * multiplier);
-    _updateFontSize(setFontSize, fontSize, newFontSize);
+    if (newFontSize !== fontSize && isValidFontSize(newFontSize)) {
+      setFontSize(newFontSize);
+    }
   }, [target, _container, fontSize, height, width]);
 
   return fontSize;
