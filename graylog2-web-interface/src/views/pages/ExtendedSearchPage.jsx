@@ -70,20 +70,25 @@ const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
   overflow-y: auto;
 `;
 
-const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
+const ConnectedSideBar = connect(
+  SideBar,
+  { viewMetadata: ViewMetadataStore, searches: SearchStore },
   (props) => ({
-
     ...props,
     queryId: props.viewMetadata.activeQuery,
     results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
-  }));
-const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
-  (props) => ({
+  }),
+);
 
+const ConnectedFieldList = connect(
+  FieldList,
+  { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
+  (props) => ({
     ...props,
     allFields: props.fieldTypes.all,
     fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
-  }));
+  }),
+);
 
 type Props = {
   route: any,

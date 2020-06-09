@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-type SearchPageLayoutType = {
+export type SearchPageLayoutType = {
   layout: {
     sidebar: { pinned: boolean },
   },

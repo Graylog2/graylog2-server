@@ -56,7 +56,13 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
 
 ViewDescription.propTypes = {
   results: PropTypes.object.isRequired,
-  viewMetadata: PropTypes.object.isRequired,
+  viewMetadata: PropTypes.shape({
+    activeQuery: PropTypes.string,
+    description: PropTypes.string,
+    id: PropTypes.string,
+    summary: PropTypes.string,
+    title: PropTypes.string,
+  }).isRequired,
 };
 
 export default ViewDescription;
