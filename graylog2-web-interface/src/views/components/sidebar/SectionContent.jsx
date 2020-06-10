@@ -24,7 +24,7 @@ type Props = {
 };
 
 export const Container: StyledComponent<{ isPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isPinned }) => `
-  color: ${theme.utils.readableColor(theme.colors.global.contentBackground)};
+  color: ${theme.colors.global.textDefault};
   background: ${theme.colors.global.contentBackground};
   position: ${isPinned ? 'static' : 'fixed'}
   box-shadow:
@@ -102,7 +102,7 @@ const SectionContent = ({ section, closeSidebar, sectionProps, isPinned, searchP
                 <IconButton name={isPinned ? 'layer-group' : 'columns'} title={`${isPinned ? 'Unpin' : 'Pin'} sidebar`} onClick={() => toggleSidebarPinning(searchPageLayout)} />
               </PinContentButton>
             </Header>
-            <HorizontalRule fullWidth />
+            <HorizontalRule />
             <SectionTitle>{section.title}</SectionTitle>
             <Content {...sectionProps} />
           </Container>
