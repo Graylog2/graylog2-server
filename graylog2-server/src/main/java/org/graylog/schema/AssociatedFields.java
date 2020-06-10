@@ -24,4 +24,5 @@ public class AssociatedFields {
     public static final String ASSOCIATED_MAC = "associated_mac";
     public static final String ASSOCIATED_USER_ID = "associated_user_id";
     public static final String ASSOCIATED_USER_NAME = "associated_user_name";
+    public static final String ASSOCIATED_USER_REFERENCE = "associated_user_reference";
 }
