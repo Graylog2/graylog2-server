@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageBase;
 import org.graylog.integrations.inputs.paloalto.PaloAltoParser;
+import org.graylog.schema.EventFields;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -34,9 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.CONFIG;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.CORRELATION;
@@ -108,6 +107,8 @@ public class PaloAlto9xCodec implements Codec {
                     LOG.error("Unsupported PAN type [{}]. Not adding any parsed fields.", p.panType());
                 }
         }
+
+        message.addField(EventFields.EVENT_SOURCE_PRODUCT, "PAN");
 
         // Store full message if configured.
         if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {

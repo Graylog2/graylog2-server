@@ -2,9 +2,16 @@ package org.graylog.integrations.inputs.paloalto9;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog.integrations.inputs.paloalto.PaloAltoParser;
+import org.graylog.schema.AlertFields;
+import org.graylog.schema.ApplicationFields;
+import org.graylog.schema.DestinationFields;
+import org.graylog.schema.EmailFields;
 import org.graylog.schema.EventFields;
+import org.graylog.schema.FileFields;
 import org.graylog.schema.HostFields;
+import org.graylog.schema.HttpFields;
 import org.graylog.schema.NetworkFields;
+import org.graylog.schema.SessionFields;
 import org.graylog.schema.SourceFields;
 import org.graylog.schema.ThreatFields;
 import org.graylog.schema.UserFields;
@@ -45,6 +52,7 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
         
         assertThat(out.getField(EventFields.EVENT_CREATED), is("2020/05/26 04:11:09"));
         assertThat(out.getField(HostFields.HOST_ID), is("007000000018919"));
@@ -53,18 +61,19 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(Message.FIELD_TIMESTAMP), is("2020/05/26 04:11:09"));
         assertThat(out.getField(SourceFields.SOURCE_REFERENCE), is("86.181.133.251"));
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), nullValue());
+        assertThat(out.getField(UserFields.USER_COMMAND), is("multi-clone"));
         assertThat(out.getField(UserFields.USER_NAME), is("aduncan@paloaltonetworks.com"));
         assertThat(out.getField(VendorFields.VENDOR_SIGNIN_PROTOCOL), is("Web"));
         assertThat(out.getField(VendorFields.VENDOR_EVENT_OUTCOME), is("Succeeded"));
-        assertThat(out.getField(UserFields.USER_COMMAND), is("vsys  vsys1 profiles virus"));
+        assertThat(out.getField(UserFields.USER_COMMAND_PATH), is("vsys  vsys1 profiles virus"));
         assertThat(out.getField(PaloAlto9xFields.PAN_BEFORE_CHANGE_DETAIL), nullValue());
         assertThat(out.getField(PaloAlto9xFields.PAN_AFTER_CHANGE_DETAIL), is("default-1  { decoder { http  { action default; wildfire-action default; } http2  { action default; wildfire-action default; } smtp  { action default; wildfire-action default; } imap  { action default; wildfire-action default; } pop3  { action default; wildfire-action default; } ftp  { action default; wildfire-action default; } smb  { action default; wildfire-action default; } } }"));
         assertThat(out.getField(EventFields.EVENT_UID), is("5481"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_PANORAMA), is("0x8000000000000000"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is("0"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is("0"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is("0"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is(0L));
         assertThat(out.getField(HostFields.HOST_VIRTFW_HOSTNAME), nullValue());
         assertThat(out.getField(HostFields.HOST_HOSTNAME), is("uk1"));
     }
@@ -80,6 +89,7 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
         assertThat(out.getField(EventFields.EVENT_CREATED), is("2020/05/31 17:19:44"));
         assertThat(out.getField(HostFields.HOST_ID), is("0007SE00209"));
@@ -91,10 +101,10 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(HostFields.HOST_VIRTFW_ID), nullValue());
         assertThat(out.getField(ThreatFields.THREAT_CATEGORY), is("compromised-host"));
         assertThat(out.getField(EventFields.EVENT_SEVERITY), is("medium"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is("31"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is("40"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is("0"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is(31L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is(40L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is(0L));
         assertThat(out.getField(HostFields.HOST_VIRTFW_HOSTNAME), nullValue());
         assertThat(out.getField(HostFields.HOST_HOSTNAME), is("uk1rama"));
         assertThat(out.getField(HostFields.HOST_VIRTFW_UID), nullValue());
@@ -114,6 +124,7 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
 
         assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is("2020/04/01 10:49:35"));
         assertThat(out.getField(HostFields.HOST_ID), is("015351000040055"));
@@ -126,7 +137,7 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(PaloAlto9xFields.PAN_TUNNEL_STAGE), is("before-login"));
         assertThat(out.getField(PaloAlto9xFields.PAN_AUTH_METHOD), nullValue());
         assertThat(out.getField(NetworkFields.NETWORK_TUNNEL_TYPE), nullValue());
-        assertThat(out.getField(SourceFields.SOURCE_USER_EMAIL), nullValue());
+        assertThat(out.getField(SourceFields.SOURCE_USER), nullValue());
         assertThat(out.getField(PaloAlto9xFields.PAN_SOURCE_REGION), is("192.168.0.0-192.168.255.255"));
         assertThat(out.getField(SourceFields.SOURCE_HOSTNAME), nullValue());
         assertThat(out.getField(VendorFields.VENDOR_PUBLIC_IP), is("192.168.45.33"));
@@ -161,6 +172,33 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
+
+        assertThat(out.getField(EventFields.EVENT_CREATED), is("2020/03/18 04:03:19"));
+        assertThat(out.getField(EventFields.EVENT_OBSERVER_UID), nullValue());
+        assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("HIPMATCH"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("0"));
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is("2020/03/18 04:02:55"));
+        assertThat(out.getField(SourceFields.SOURCE_USER), is("user1@prismaissase.com"));
+        assertThat(out.getField(HostFields.HOST_VIRTFW_ID), is("vsys1"));
+        assertThat(out.getField(EventFields.EVENT_OBSERVER_HOSTNAME), is("DFWMACW12KG8WL"));
+        assertThat(out.getField(HostFields.HOST_TYPE), is("Mac"));
+        assertThat(out.getField(SourceFields.SOURCE_IP), is("172.1.19.3"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_HIP), is("test-Object"));
+        assertThat(out.getField(EventFields.EVENT_REPEAT_COUNT), is(1L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_HIP_TYPE), is("object"));
+        assertThat(out.getField(EventFields.EVENT_UID), is("28"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_PANORAMA), is("0x8600000000000000"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is(15L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is(18L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is(0L));
+        assertThat(out.getField(HostFields.HOST_VIRTFW_HOSTNAME), nullValue());
+        assertThat(out.getField(HostFields.HOST_HOSTNAME), is("GP cloud service"));
+        assertThat(out.getField(HostFields.HOST_VIRTFW_UID), is("1"));
+        assertThat(out.getField(SourceFields.SOURCE_IPV6), is("0.0.0.0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_GP_HOSTID), is("4c:32:75:9a:5f:ed"));
+        assertThat(out.getField(HostFields.HOST_ID), nullValue());
     }
 
     @Test
@@ -174,6 +212,7 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
         
         assertThat(out.getField(EventFields.EVENT_CREATED), is("2020/03/19 10:12:57"));
         assertThat(out.getField(HostFields.HOST_ID), is("007000016479"));
@@ -184,14 +223,14 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out.getField(PaloAlto9xFields.PAN_EVENT_NAME), is("general"));
         assertThat(out.getField(PaloAlto9xFields.PAN_EVENT_OBJECT), nullValue());
         assertThat(out.getField(PaloAlto9xFields.PAN_MODULE), is("general"));
-        assertThat(out.getField(VendorFields.VENDOR_EVENT_SEVERITY), is("informational"));
+        assertThat(out.getField(EventFields.EVENT_SEVERITY), is("informational"));
         assertThat(out.getField(VendorFields.VENDOR_EVENT_DESCRIPTION), is("Failed to connect to address: (null) port: 3978, conn id: triallr-(null)-2-192.168.1.232"));
         assertThat(out.getField(EventFields.EVENT_UID), is("21682381"));
         assertThat(out.getField(PaloAlto9xFields.PAN_LOG_PANORAMA), is("0x8000000000000000"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is("0"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is("0"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is("0"));
-        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is(0L));
         assertThat(out.getField(HostFields.HOST_VIRTFW_HOSTNAME), nullValue());
         assertThat(out.getField(HostFields.HOST_HOSTNAME), is("sg2"));
     }
@@ -207,6 +246,102 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
+
+        // Field 0 is FUTURE USE
+        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is("2020/05/19 07:37:27"));
+        assertThat(out.getField(HostFields.HOST_ID), is("007200002536"));
+        assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("THREAT"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("spyware"));
+
+        // Field 5 is FUTURE USE
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is("2020/05/19 07:37:27"));
+        assertThat(out.getField(SourceFields.SOURCE_IP), is("10.154.229.167"));
+        assertThat(out.getField(DestinationFields.DESTINATION_IP), is("190.253.254.254"));
+        assertThat(out.getField(SourceFields.SOURCE_NAT_IP), nullValue());
+
+        assertThat(out.getField(DestinationFields.DESTINATION_NAT_IP), nullValue());
+        assertThat(out.getField("rule_name"), is("General Business Apps")); // TODO: Need constant
+        assertThat(out.getField(SourceFields.SOURCE_USER), is("pancademo\\andy.miller"));
+        assertThat(out.getField("target_user"), nullValue()); // TODO: Need constant
+        assertThat(out.getField(ApplicationFields.APPLICATION_NAME), is("unknown-udp"));
+
+        assertThat(out.getField(HostFields.HOST_VIRTFW_ID), is("vsys1"));
+        assertThat(out.getField(SourceFields.SOURCE_ZONE), is("L3-TAP"));
+        assertThat(out.getField(DestinationFields.DESTINATION_ZONE), is("L3-TAP"));
+        assertThat(out.getField(NetworkFields.NETWORK_INTERFACE_IN), is("ethernet1/2"));
+        assertThat(out.getField(NetworkFields.NETWORK_INTERFACE_OUT), is("ethernet1/2"));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_ACITON), nullValue());
+        // Field 21 is FUTURE USE
+        assertThat(out.getField(SessionFields.SESSION_ID), is(70860L));
+        assertThat(out.getField(EventFields.EVENT_REPEAT_COUNT), is(1L));
+        assertThat(out.getField(SourceFields.SOURCE_PORT), is(1111L));
+
+        assertThat(out.getField(DestinationFields.DESTINATION_PORT), is(16471L));
+        assertThat(out.getField(SourceFields.SOURCE_NAT_PORT), is(0L));
+        assertThat(out.getField(DestinationFields.DESTINATION_NAT_PORT), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_FLAGS), is("0x80002000"));
+        assertThat(out.getField(NetworkFields.NETWORK_PROTOCOL), is("udp"));
+
+        assertThat(out.getField(VendorFields.VENDOR_EVENT_ACTION), is("drop"));
+        assertThat(out.getField(AlertFields.ALERT_INDICATOR), nullValue()); // TODO: Key used twice
+        assertThat(out.getField(AlertFields.ALERT_SIGNATURE_ID), is("ZeroAccess.Gen Command and Control Traffic(13235)"));
+        assertThat(out.getField(AlertFields.ALERT_CATEGORY), is("any"));
+        assertThat(out.getField(VendorFields.VENDOR_ALERT_SEVERITY), is("critical"));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_ALERT_DIRECTION), is("client-to-server"));
+        assertThat(out.getField(EventFields.EVENT_UID), is("6241468001"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_PANORAMA), is("0x2000000000000000"));
+        assertThat(out.getField(SourceFields.SOURCE_LOCATION_NAME), is("10.0.0.0-10.255.255.255"));
+        assertThat(out.getField(DestinationFields.DESTINATION_LOCATION_NAME), is("Colombia"));
+
+        // Field 40 is FUTURE USE
+        assertThat(out.getField(HttpFields.HTTP_CONTENT_TYPE), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_PCAP_ID), is("1206236073597030482"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_WILDFIRE_HASH), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_CLOUD_HOSTNAME), nullValue());
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_URL_INDEX), is(0L));
+        assertThat(out.getField(HttpFields.HTTP_USER_AGENT_NAME), nullValue());
+        assertThat(out.getField(FileFields.FILE_TYPE), nullValue());
+        assertThat(out.getField(HttpFields.HTTP_XFF), nullValue());
+        assertThat(out.getField(HttpFields.HTTP_REFERER), nullValue());
+
+        assertThat(out.getField(SourceFields.SOURCE_USER_EMAIL), nullValue());
+        assertThat(out.getField(EmailFields.EMAIL_SUBJECT), nullValue());
+        assertThat(out.getField("target_user_email"), nullValue()); // TODO: Need constant
+        assertThat(out.getField(PaloAlto9xFields.PAN_WILDFIRE_REPORT_ID), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is(31L));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is(12L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is(0L));
+        assertThat(out.getField(HostFields.HOST_VIRTFW_HOSTNAME), nullValue());
+        assertThat(out.getField(HostFields.HOST_HOSTNAME), is("us1"));
+
+        // Field 60 is FUTURE USE
+        assertThat(out.getField(SourceFields.SOURCE_VSYS_UUID), nullValue());
+        assertThat(out.getField(DestinationFields.DESTINATION_VSYS_UUID), nullValue());
+        assertThat(out.getField(HttpFields.HTTP_METHOD), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_TUNNEL_ID), is("0"));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_MONITOR_TAG), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_PARENT_SESSION_ID), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_PARENT_START_TIME), nullValue());
+        assertThat(out.getField(NetworkFields.NETWORK_TUNNEL_TYPE), is("N/A"));
+        // assertThat(out.getField(AlertFields.ALERT_CATEGORY), is("botnet")); // TODO: Used twice
+
+        assertThat(out.getField(AlertFields.ALERT_DEFINITIONS_VERSION), is("AppThreat-8270-6076"));
+        // Field 71 is FUTURE USE
+        assertThat(out.getField(PaloAlto9xFields.PAN_ASSOC_ID), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_PPID), is(4294967295L));
+        assertThat(out.getField(HttpFields.HTTP_HEADERS), nullValue());
+
+        assertThat(out.getField(HttpFields.HTTP_URL_CATEGORY), nullValue());
+        assertThat(out.getField("policy_uid"), is("f0724261-cf8b-479b-8208-fd3c7ac3af0b")); // TODO: Need constant
+        assertThat(out.getField(PaloAlto9xFields.PAN_HTTP2), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DYNUSERGROUP_NAME), nullValue());
     }
 
     @Test
@@ -220,5 +355,96 @@ public class PaloAlto9xTemplatesTest {
         assertThat(out, notNullValue());
         assertThat(out.getField(Message.FIELD_FULL_MESSAGE), is(rawMessage));
         assertThat(out.getField(Message.FIELD_MESSAGE), is(log));
+        assertThat(out.getField(EventFields.EVENT_SOURCE_PRODUCT), is("PAN"));
+
+        // Field 0 is FUTURE USE
+        assertThat(out.getField(EventFields.EVENT_RECEIVED_TIME), is("2020/05/19 07:34:54"));
+        assertThat(out.getField(HostFields.HOST_ID), is("007200002536"));
+        assertThat(out.getField(EventFields.EVENT_LOG_NAME), is("TRAFFIC"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_SUBTYPE), is("end"));
+
+        // Field 5 is FUTURE USE
+        assertThat(out.getField(Message.FIELD_TIMESTAMP), is("2020/05/19 07:34:54"));
+        assertThat(out.getField(SourceFields.SOURCE_IP), is("10.154.172.134"));
+        assertThat(out.getField(DestinationFields.DESTINATION_IP), is("151.151.88.132"));
+        assertThat(out.getField(SourceFields.SOURCE_NAT_IP), nullValue());
+
+        assertThat(out.getField(DestinationFields.DESTINATION_NAT_IP), nullValue());
+        assertThat(out.getField("rule_name"), is("IT Sanctioned SaaS Apps-443")); // TODO: Need constant
+        assertThat(out.getField(SourceFields.SOURCE_USER), is("pancademo\\steven.reid"));
+        assertThat(out.getField("target_user_name"), nullValue()); // TODO: Need constant
+        assertThat(out.getField(NetworkFields.NETWORK_APPLICATION), is("ssl"));
+
+        assertThat(out.getField(HostFields.HOST_VIRTFW_ID), is("vsys1"));
+        assertThat(out.getField(SourceFields.SOURCE_ZONE), is("L3-TAP"));
+        assertThat(out.getField(DestinationFields.DESTINATION_ZONE), is("L3-TAP"));
+        assertThat(out.getField(NetworkFields.NETWORK_INTERFACE_IN), is("ethernet1/2"));
+        assertThat(out.getField(NetworkFields.NETWORK_INTERFACE_OUT), is("ethernet1/2"));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_ACITON), nullValue());
+        // Field 21 is FUTURE USE
+        assertThat(out.getField(SessionFields.SESSION_ID), is(33903L));
+        assertThat(out.getField(EventFields.EVENT_REPEAT_COUNT), is(1L));
+        assertThat(out.getField(SourceFields.SOURCE_PORT), is(57090L));
+
+        assertThat(out.getField(DestinationFields.DESTINATION_PORT), is(443L));
+        assertThat(out.getField(SourceFields.SOURCE_NAT_PORT), is(0L));
+        assertThat(out.getField(DestinationFields.DESTINATION_NAT_PORT), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_FLAGS), is("0x6c"));
+        assertThat(out.getField(NetworkFields.NETWORK_PROTOCOL), is("tcp"));
+
+        assertThat(out.getField(VendorFields.VENDOR_EVENT_ACTION), is("allow"));
+        assertThat(out.getField(NetworkFields.NETWORK_BYTES), is(6802L));
+        assertThat(out.getField(NetworkFields.NETWORK_BYTES_TX), is(3876L));
+        assertThat(out.getField(NetworkFields.NETWORK_BYTES_RX), is(2926L));
+        assertThat(out.getField(NetworkFields.NETWORK_PACKETS), is(26L));
+
+        assertThat(out.getField(EventFields.EVENT_START), is("2020/05/19 07:32:48"));
+        assertThat(out.getField(EventFields.EVENT_DURATION), is(97L));
+        assertThat(out.getField(HttpFields.HTTP_URL_CATEGORY), is("financial-services"));
+        // Field 38 is FUTURE USE
+        assertThat(out.getField(EventFields.EVENT_UID), is("18621234943"));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_LOG_PANORAMA), is("0x0"));
+        assertThat(out.getField(SourceFields.SOURCE_LOCATION_NAME), is("10.0.0.0-10.255.255.255"));
+        assertThat(out.getField(DestinationFields.DESTINATION_LOCATION_NAME), is("United States"));
+        // Field 43 is FUTURE USE
+        assertThat(out.getField(SourceFields.SOURCE_PACKETS), is(17L));
+
+        assertThat(out.getField(DestinationFields.DESTINATION_PACKETS), is(9L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_SESSION_END_REASON), is("tcp-rst-from-server"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1), is(31L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2), is(12L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3), is(0L));
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4), is(0L));
+        assertThat(out.getField(HostFields.HOST_VIRTFW_HOSTNAME), nullValue());
+        assertThat(out.getField(HostFields.HOST_HOSTNAME), is("us1"));
+        assertThat(out.getField(VendorFields.VENDOR_EVENT_DESCRIPTION), is("from-policy"));
+        assertThat(out.getField(SourceFields.SOURCE_VSYS_UUID), nullValue());
+
+        assertThat(out.getField(DestinationFields.DESTINATION_VSYS_UUID), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_TUNNEL_ID), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_MONITOR_TAG), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_PARENT_SESSION_ID), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_PARENT_START_TIME), nullValue());
+
+        assertThat(out.getField(NetworkFields.NETWORK_TUNNEL_TYPE), is("N/A"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_ASSOC_ID), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_SCTP_CHUNKS_SUM), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_SCTP_CHUNKS_TX), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_SCTP_CHUNKS_RX), is("0"));
+
+        assertThat(out.getField("policy_uid"), is("30468339-a760-46b2-b80b-ee873e6d11e4")); // TODO: Need constant
+        assertThat(out.getField(PaloAlto9xFields.PAN_HTTP2), is("0"));
+        assertThat(out.getField(PaloAlto9xFields.PAN_LINK_CHANGES), is(0L));
+        assertThat(out.getField(PaloAlto9xFields.PAN_SDWAN_POLICY_ID), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_LINK_SWITCHES), nullValue());
+
+        assertThat(out.getField(PaloAlto9xFields.PAN_SDWAN_CLUSTER), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_SDWAN_DEVICE_TYPE), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_SDWAN_CLUSTER_TYPE), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_SDWAN_SITE_NAME), nullValue());
+        assertThat(out.getField(PaloAlto9xFields.PAN_DYNUSERGROUP_NAME), nullValue());
     }
 }

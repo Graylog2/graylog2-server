@@ -62,22 +62,22 @@ public class PaloAlto9xTemplates {
         fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
         fields.add(create(SourceFields.SOURCE_REFERENCE, 7, STRING));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 8, STRING));
-        // Field 9 (command) is not mapped
+        fields.add(create(UserFields.USER_COMMAND, 9, STRING));
 
         fields.add(create(UserFields.USER_NAME, 10, STRING));
         fields.add(create(VendorFields.VENDOR_SIGNIN_PROTOCOL, 11, STRING));
         fields.add(create(VendorFields.VENDOR_EVENT_OUTCOME, 12, STRING));
-        fields.add(create(UserFields.USER_COMMAND, 13, STRING));
+        fields.add(create(UserFields.USER_COMMAND_PATH, 13, STRING));
         fields.add(create(PaloAlto9xFields.PAN_BEFORE_CHANGE_DETAIL, 14, STRING));
 
         fields.add(create(PaloAlto9xFields.PAN_AFTER_CHANGE_DETAIL, 15, STRING));
         fields.add(create(EventFields.EVENT_UID, 16, STRING));
         fields.add(create(PaloAlto9xFields.PAN_LOG_PANORAMA, 17, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 18, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 19, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 18, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 19, LONG));
 
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 20, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 21, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 20, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 21, LONG));
         fields.add(create(HostFields.HOST_VIRTFW_HOSTNAME, 22, STRING));
         fields.add(create(HostFields.HOST_HOSTNAME, 23, STRING));
 
@@ -101,11 +101,11 @@ public class PaloAlto9xTemplates {
 
         fields.add(create(ThreatFields.THREAT_CATEGORY, 10, STRING));
         fields.add(create(EventFields.EVENT_SEVERITY, 11, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 12, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 13, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 14, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 12, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 13, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 14, LONG));
 
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 15, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 15, LONG));
         fields.add(create(HostFields.HOST_VIRTFW_HOSTNAME, 16, STRING));
         fields.add(create(HostFields.HOST_HOSTNAME, 17, STRING));
         fields.add(create(HostFields.HOST_VIRTFW_UID, 18, STRING));
@@ -122,18 +122,18 @@ public class PaloAlto9xTemplates {
 
         // Field 0 is FUTURE USE
         fields.add(create(EventFields.EVENT_CREATED, 1, STRING));
-        // fields.add(create(HostFields.HOST_ID, 2, STRING));  // TODO: Used twice
+        fields.add(create(EventFields.EVENT_OBSERVER_UID, 2, STRING));
         fields.add(create(EventFields.EVENT_LOG_NAME, 3, STRING));
-        fields.add(create("pan_log_subtype", 4, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
 
         // Field 5 is FUTURE USE
         fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
         fields.add(create(SourceFields.SOURCE_USER, 7, STRING));
         fields.add(create(HostFields.HOST_VIRTFW_ID, 8, STRING));
-        fields.add(create(HostFields.HOST_HOSTNAME, 9, STRING)); // TODO: Used twice
+        fields.add(create(EventFields.EVENT_OBSERVER_HOSTNAME, 9, STRING));
 
         fields.add(create(HostFields.HOST_TYPE, 10, STRING));
-        fields.add(create(SourceFields.SOURCE_IP, 11, STRING)); // TODO: Used twice
+        fields.add(create(SourceFields.SOURCE_IP, 11, STRING));
         fields.add(create(PaloAlto9xFields.PAN_HIP, 12, STRING));
         fields.add(create(EventFields.EVENT_REPEAT_COUNT, 13, LONG));
         fields.add(create(PaloAlto9xFields.PAN_HIP_TYPE, 14, STRING));
@@ -142,18 +142,18 @@ public class PaloAlto9xTemplates {
         // Field 16 is FUTURE USE
         fields.add(create(EventFields.EVENT_UID, 17, STRING));
         fields.add(create(PaloAlto9xFields.PAN_LOG_PANORAMA, 18, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 19, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 19, LONG));
 
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 20, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 21, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 22, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 20, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 21, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 22, LONG));
         fields.add(create(HostFields.HOST_VIRTFW_HOSTNAME, 23, STRING));
-        // fields.add(create(HostFields.HOST_HOSTNAME, 24, STRING)); // TODO: Used twice
+        fields.add(create(HostFields.HOST_HOSTNAME, 24, STRING));
 
         fields.add(create(HostFields.HOST_VIRTFW_UID, 25, STRING));
-        // fields.add(create(SourceFields.SOURCE_IP, 26, STRING)); // TODO: Used twice
+        fields.add(create(SourceFields.SOURCE_IPV6, 26, STRING));
         fields.add(create(PaloAlto9xFields.PAN_GP_HOSTID, 27, STRING));
-        fields.add(create(HostFields.HOST_ID, 28, STRING)); // TODO: Used twice
+        fields.add(create(HostFields.HOST_ID, 28, STRING));
 
         return toTemplate(fields);
     }
@@ -177,7 +177,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_TUNNEL_STAGE, 11, STRING));
         fields.add(create(PaloAlto9xFields.PAN_AUTH_METHOD, 12, STRING));
         fields.add(create(NetworkFields.NETWORK_TUNNEL_TYPE, 13, STRING));
-        fields.add(create(SourceFields.SOURCE_USER_EMAIL, 14, STRING));
+        fields.add(create(SourceFields.SOURCE_USER, 14, STRING));
 
         fields.add(create(PaloAlto9xFields.PAN_SOURCE_REGION, 15, STRING));
         fields.add(create(SourceFields.SOURCE_HOSTNAME, 16, STRING));
@@ -227,16 +227,16 @@ public class PaloAlto9xTemplates {
         // Field 10 is FUTURE USE
         // Field 11 is FUTURE USE
         fields.add(create(PaloAlto9xFields.PAN_MODULE, 12, STRING));
-        fields.add(create(VendorFields.VENDOR_EVENT_SEVERITY, 13, STRING));
+        fields.add(create(EventFields.EVENT_SEVERITY, 13, STRING));
         fields.add(create(VendorFields.VENDOR_EVENT_DESCRIPTION, 14, STRING));
 
         fields.add(create(EventFields.EVENT_UID, 15, STRING));
         fields.add(create(PaloAlto9xFields.PAN_LOG_PANORAMA, 16, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 17, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 18, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 19, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 17, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 18, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 19, LONG));
 
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 20, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 20, LONG));
         fields.add(create(HostFields.HOST_VIRTFW_HOSTNAME, 21, STRING));
         fields.add(create(HostFields.HOST_HOSTNAME, 22, STRING));
 
@@ -261,8 +261,8 @@ public class PaloAlto9xTemplates {
         fields.add(create(DestinationFields.DESTINATION_NAT_IP, 10, STRING));
         fields.add(create("rule_name", 11, STRING)); // TODO: Need constant
         fields.add(create(SourceFields.SOURCE_USER, 12, STRING));
-        fields.add(create("target_user_name", 13, STRING)); // TODO: Need constant
-        fields.add(create(ApplicationFields.APPLICATION_NAME, 14, STRING)); // TODO: Network Application?
+        fields.add(create("target_user", 13, STRING)); // TODO: Need constant
+        fields.add(create(ApplicationFields.APPLICATION_NAME, 14, STRING));
 
         fields.add(create(HostFields.HOST_VIRTFW_ID, 15, STRING));
         fields.add(create(SourceFields.SOURCE_ZONE, 16, STRING));
@@ -283,11 +283,9 @@ public class PaloAlto9xTemplates {
         fields.add(create(NetworkFields.NETWORK_PROTOCOL, 29, STRING));
 
         fields.add(create(VendorFields.VENDOR_EVENT_ACTION, 30, STRING));
-        fields.add(create(HttpFields.HTTP_URL, 31, STRING));  // TODO: Dual-use position
-        fields.add(create(FileFields.FILE_NAME, 31, STRING)); // TODO: Dual-use position
+        fields.add(create(AlertFields.ALERT_INDICATOR, 31, STRING));
         fields.add(create(AlertFields.ALERT_SIGNATURE_ID, 32, STRING));
-        // fields.add(create(HttpFields.HTTP_URL_CATEGORY, 33, STRING));         // TODO: Dual-use position
-        fields.add(create(AlertFields.ALERT_SIGNATURE_CATEGORY, 33, STRING)); // TODO: Dual-use position
+        fields.add(create(AlertFields.ALERT_CATEGORY, 33, STRING)); // TODO: Used twice
         fields.add(create(VendorFields.VENDOR_ALERT_SEVERITY, 34, STRING));
 
         fields.add(create(PaloAlto9xFields.PAN_ALERT_DIRECTION, 35, STRING));
@@ -326,20 +324,20 @@ public class PaloAlto9xTemplates {
         fields.add(create(HttpFields.HTTP_METHOD, 63, STRING));
         fields.add(create(PaloAlto9xFields.PAN_TUNNEL_ID, 64, STRING));
 
-        fields.add(create(PaloAlto9xFields.PAN_MONITOR_TAG, 65, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_MONITOR_TAG, 65, LONG));
         fields.add(create(PaloAlto9xFields.PAN_PARENT_SESSION_ID, 66, STRING));
         fields.add(create(PaloAlto9xFields.PAN_PARENT_START_TIME, 67, STRING));
         fields.add(create(NetworkFields.NETWORK_TUNNEL_TYPE, 68, STRING));
-        fields.add(create(AlertFields.ALERT_CATEGORY, 69, STRING));
+        // fields.add(create(AlertFields.ALERT_CATEGORY, 69, STRING)); // TODO: Used twice
 
         fields.add(create(AlertFields.ALERT_DEFINITIONS_VERSION, 70, STRING));
         // Field 71 is FUTURE USE
-        fields.add(create(PaloAlto9xFields.PAN_ASSOC_ID, 72, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_ASSOC_ID, 72, LONG));
         fields.add(create(PaloAlto9xFields.PAN_PPID, 73, LONG));
         fields.add(create(HttpFields.HTTP_HEADERS, 74, STRING));
 
-        fields.add(create(HttpFields.HTTP_URL_CATEGORY, 75, STRING)); // TODO: Conflict with field 33?
-        fields.add(create("policy_uuid", 76, STRING));          // TODO: Need constant, also uid or uuid?
+        fields.add(create(HttpFields.HTTP_URL_CATEGORY, 75, STRING));
+        fields.add(create("policy_uid", 76, STRING));          // TODO: Need constant
         fields.add(create(PaloAlto9xFields.PAN_HTTP2, 77, STRING));
         fields.add(create(PaloAlto9xFields.PAN_DYNUSERGROUP_NAME, 78, STRING));
 
@@ -364,7 +362,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(DestinationFields.DESTINATION_NAT_IP, 10, STRING));
         fields.add(create("rule_name", 11, STRING)); // TODO: Need constant
         fields.add(create(SourceFields.SOURCE_USER, 12, STRING));
-        fields.add(create("target_user_name", 13, STRING)); // TODO: Need constant
+        fields.add(create("target_user", 13, STRING)); // TODO: Need constant
         fields.add(create(NetworkFields.NETWORK_APPLICATION, 14, STRING));
 
         fields.add(create(HostFields.HOST_VIRTFW_ID, 15, STRING));
@@ -392,7 +390,7 @@ public class PaloAlto9xTemplates {
         fields.add(create(NetworkFields.NETWORK_PACKETS, 34, LONG));
 
         fields.add(create(EventFields.EVENT_START, 35, STRING));
-        fields.add(create(EventFields.EVENT_DURATION, 36, STRING));
+        fields.add(create(EventFields.EVENT_DURATION, 36, LONG));
         fields.add(create(HttpFields.HTTP_URL_CATEGORY, 37, STRING));
         // Field 38 is FUTURE USE
         fields.add(create(EventFields.EVENT_UID, 39, STRING));
@@ -405,11 +403,11 @@ public class PaloAlto9xTemplates {
 
         fields.add(create(DestinationFields.DESTINATION_PACKETS, 45, LONG));
         fields.add(create(PaloAlto9xFields.PAN_SESSION_END_REASON, 46, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 47, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 48, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 49, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_1, 47, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_2, 48, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_3, 49, LONG));
 
-        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 50, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_DEV_GROUP_LEVEL_4, 50, LONG));
         fields.add(create(HostFields.HOST_VIRTFW_HOSTNAME, 51, STRING));
         fields.add(create(HostFields.HOST_HOSTNAME, 52, STRING));
         fields.add(create(VendorFields.VENDOR_EVENT_DESCRIPTION, 53, STRING));
@@ -422,15 +420,15 @@ public class PaloAlto9xTemplates {
         fields.add(create(PaloAlto9xFields.PAN_PARENT_START_TIME, 59, STRING));
 
         fields.add(create(NetworkFields.NETWORK_TUNNEL_TYPE, 60, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_ASSOC_ID, 61, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_ASSOC_ID, 61, LONG));
         fields.add(create(PaloAlto9xFields.PAN_SCTP_CHUNKS_SUM, 62, STRING));
         fields.add(create(PaloAlto9xFields.PAN_SCTP_CHUNKS_TX, 63, STRING));
         fields.add(create(PaloAlto9xFields.PAN_SCTP_CHUNKS_RX, 64, STRING));
 
-        fields.add(create("policy_uid", 65, STRING)); // TODO: Need constant, also uid or uuid?
+        fields.add(create("policy_uid", 65, STRING)); // TODO: Need constant
         fields.add(create(PaloAlto9xFields.PAN_HTTP2, 66, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_LINK_CHANGES, 67, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_SDWAN_POLICY_ID, 68, STRING)); // TODO: policy_id or policyid?
+        fields.add(create(PaloAlto9xFields.PAN_LINK_CHANGES, 67, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_SDWAN_POLICY_ID, 68, STRING));
         fields.add(create(PaloAlto9xFields.PAN_LINK_SWITCHES, 69, STRING));
 
         fields.add(create(PaloAlto9xFields.PAN_SDWAN_CLUSTER, 70, STRING));
