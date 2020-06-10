@@ -6,6 +6,10 @@ import { Alert as BootstrapAlert } from 'react-bootstrap';
 
 
 const StyledAlert = styled(BootstrapAlert)(({ bsStyle, theme }) => {
+  if (!bsStyle) {
+    return undefined;
+  }
+
   const borderColor = theme.colors.variant.light[bsStyle];
   const backgroundColor = theme.colors.variant.lightest[bsStyle];
 

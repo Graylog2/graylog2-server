@@ -5,6 +5,10 @@ import { Badge as BootstrapBadge } from 'react-bootstrap';
 
 
 const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
+  if (!bsStyle) {
+    return undefined;
+  }
+
   const backgroundColor = theme.colors.variant[bsStyle];
   const textColor = theme.utils.readableColor(backgroundColor);
 

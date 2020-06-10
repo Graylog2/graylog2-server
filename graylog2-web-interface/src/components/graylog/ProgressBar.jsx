@@ -46,10 +46,16 @@ const animatedStripes = keyframes`
   }
 `;
 
-const progressBarVariants = css(({ bsStyle, theme }) => `
-  background-color: ${theme.colors.variant[bsStyle]};
-  color: ${theme.utils.readableColor(theme.colors.variant[bsStyle])};
-`);
+const progressBarVariants = css(({ bsStyle, theme }) => {
+  if (!bsStyle) {
+    return undefined;
+  }
+
+  return `
+    background-color: ${theme.colors.variant[bsStyle]};
+    color: ${theme.utils.readableColor(theme.colors.variant[bsStyle])};
+  `;
+});
 
 const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   height: 20px;
