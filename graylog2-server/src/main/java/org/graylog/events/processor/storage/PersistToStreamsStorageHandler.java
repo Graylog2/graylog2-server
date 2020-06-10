@@ -24,7 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.events.event.EventWithContext;
-import org.graylog.events.indices.MoreIndices;
+import org.graylog.events.indices.EventIndexer;
 import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +41,10 @@ public class PersistToStreamsStorageHandler implements EventStorageHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PersistToStreamsStorageHandler.class);
 
     private final Config config;
-    private final MoreIndices indices;
+    private final EventIndexer indices;
 
     @Inject
-    public PersistToStreamsStorageHandler(@Assisted EventStorageHandler.Config config, MoreIndices indices) {
+    public PersistToStreamsStorageHandler(@Assisted EventStorageHandler.Config config, EventIndexer indices) {
         this.config = (Config) config;
         this.indices = indices;
     }

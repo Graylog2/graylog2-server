@@ -36,14 +36,14 @@ import java.util.stream.Collectors;
  * This class contains indices helper for the events system.
  */
 @Singleton
-public class MoreIndices {
-    private static final Logger LOG = LoggerFactory.getLogger(MoreIndices.class);
+public class EventIndexer {
+    private static final Logger LOG = LoggerFactory.getLogger(EventIndexer.class);
 
     private final StreamService streamService;
     private final MoreIndicesAdapter moreIndicesAdapter;
 
     @Inject
-    public MoreIndices(StreamService streamService, MoreIndicesAdapter moreIndicesAdapter) {
+    public EventIndexer(StreamService streamService, MoreIndicesAdapter moreIndicesAdapter) {
         this.streamService = streamService;
         this.moreIndicesAdapter = moreIndicesAdapter;
     }
