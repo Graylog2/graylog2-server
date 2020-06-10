@@ -9,7 +9,7 @@ import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
 
-import SideBar from 'views/components/sidebar/SideBar';
+import Sidebar from 'views/components/sidebar/Sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
@@ -71,7 +71,7 @@ const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
 `;
 
 const ConnectedSideBar = connect(
-  SideBar,
+  Sidebar,
   { viewMetadata: ViewMetadataStore, searches: SearchStore },
   (props) => ({
     ...props,

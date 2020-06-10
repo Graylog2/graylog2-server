@@ -60,7 +60,7 @@ const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: 
   setActiveSectionKey(sections[0].key);
 };
 
-const SideBar = ({ searchPageLayout, results, children, queryId, disableAutoClose, sections, viewMetadata }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, queryId, disableAutoClose, sections, viewMetadata }: Props) => {
   console.log('viewMetadata', viewMetadata);
   const [activeSectionKey, setActiveSectionKey] = useState<?string>(null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
@@ -82,7 +82,7 @@ const SideBar = ({ searchPageLayout, results, children, queryId, disableAutoClos
   );
 };
 
-SideBar.propTypes = {
+Sidebar.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
   queryId: PropTypes.string.isRequired,
   disableAutoClose: PropTypes.bool,
@@ -97,7 +97,7 @@ SideBar.propTypes = {
   }).isRequired,
 };
 
-SideBar.defaultProps = {
+Sidebar.defaultProps = {
   sections: sidebarSections,
   results: {},
   disableAutoClose: false,
@@ -106,7 +106,7 @@ SideBar.defaultProps = {
 const SidebarWithContext = (props: Props) => (
   <SearchPageLayoutContext.Consumer>
     {(searchPageLayout) => {
-      return <SideBar {...props} searchPageLayout={searchPageLayout} />;
+      return <Sidebar {...props} searchPageLayout={searchPageLayout} />;
     }}
   </SearchPageLayoutContext.Consumer>
 );

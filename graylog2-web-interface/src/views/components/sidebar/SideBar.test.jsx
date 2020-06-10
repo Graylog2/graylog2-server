@@ -6,7 +6,7 @@ import { StoreMock as MockStore } from 'helpers/mocking';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
-import SideBar from './SideBar';
+import Sidebar from './Sidebar';
 
 const mockCurrentUser = { timezone: 'UTC' };
 jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
@@ -56,12 +56,12 @@ describe('<Sidebar />', () => {
 
   it('should render and open when clicking on header', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
@@ -75,12 +75,12 @@ describe('<Sidebar />', () => {
     };
 
     const wrapper = mount(
-      <SideBar viewMetadata={emptyViewMetaData}
+      <Sidebar viewMetadata={emptyViewMetaData}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
@@ -96,12 +96,12 @@ describe('<Sidebar />', () => {
 
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
-        <SideBar viewMetadata={emptyViewMetaData}
+        <Sidebar viewMetadata={emptyViewMetaData}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>,
+        </Sidebar>,
       </ViewTypeContext.Provider>,
     );
 
@@ -117,12 +117,12 @@ describe('<Sidebar />', () => {
 
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <SideBar viewMetadata={emptyViewMetaData}
+        <Sidebar viewMetadata={emptyViewMetaData}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
@@ -133,12 +133,12 @@ describe('<Sidebar />', () => {
   it('should render summary and description of a view', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <SideBar viewMetadata={viewMetaData}
+        <Sidebar viewMetadata={viewMetaData}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
@@ -221,12 +221,12 @@ describe('<Sidebar />', () => {
 
   it('should render widget create options', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
@@ -236,12 +236,12 @@ describe('<Sidebar />', () => {
 
   it('should render passed children', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
@@ -251,12 +251,12 @@ describe('<Sidebar />', () => {
 
   it('should close a section when clicking on its title', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
