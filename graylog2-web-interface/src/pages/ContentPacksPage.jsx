@@ -1,5 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import { LinkContainer } from 'react-router-bootstrap';
 import styled from 'styled-components';
@@ -40,11 +41,11 @@ const ContentPacksPage = createReactClass({
         /* eslint-disable camelcase */
         let err_message = error.message;
         const err_body = error.additional.body;
-        /* eslint-enable camlecase */
         if (err_body && err_body.message) {
           err_message = error.additional.body.message;
         }
         UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
+        /* eslint-enable camelcase */
       });
     }
   },
