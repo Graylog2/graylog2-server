@@ -4,8 +4,8 @@ cluster.name: graylog
 # you could also leave this out, but makes it easier to identify the Graylog embedded Elasticsearch node
 node.name: "graylog-server"
 
-# we don't want the graylog2 client to store any data, or be master node
-node.master: false
+# we don't want the graylog2 client to store any data, or be parent node
+node.parent: false
 node.data: false
 
 # you might need to bind to a certain IP address, do that here
@@ -24,13 +24,13 @@ http.enabled: false
 ################################## Discovery ##################################
 
 # Discovery infrastructure ensures nodes can be found within a cluster
-# and master node is elected. Multicast discovery is the default.
+# and parent node is elected. Multicast discovery is the default.
 
-# Set to ensure a node sees N other master eligible nodes to be considered
+# Set to ensure a node sees N other parent eligible nodes to be considered
 # operational within the cluster. Set this option to a higher value (2-4)
 # for large clusters (>3 nodes):
 #
-# discovery.zen.minimum_master_nodes: 1
+# discovery.zen.minimum_parent_nodes: 1
 
 # Set the time to wait for ping responses from other nodes when discovering.
 # Set this option to a higher value on a slow or congested network
@@ -49,8 +49,8 @@ http.enabled: false
 #
 # discovery.zen.ping.multicast.enabled: false
 #
-# 2. Configure an initial list of master nodes in the cluster
-#    to perform discovery when new nodes (master or data) are started:
+# 2. Configure an initial list of parent nodes in the cluster
+#    to perform discovery when new nodes (parent or data) are started:
 #
 # discovery.zen.ping.unicast.hosts: ["host1", "host2:port", "host3[portX-portY]"]
 

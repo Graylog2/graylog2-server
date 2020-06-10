@@ -230,9 +230,9 @@ public class ClusterAdapterES6 implements ClusterAdapter {
 
         final NodesStats nodesStats = NodesStats.create(
                 countStats.path("total").asInt(-1),
-                countStats.path("master_only").asInt(-1),
+                countStats.path("parent_only").asInt(-1),
                 countStats.path("data_only").asInt(-1),
-                countStats.path("master_data").asInt(-1),
+                countStats.path("parent_data").asInt(-1),
                 countStats.path("client").asInt(-1)
         );
 
