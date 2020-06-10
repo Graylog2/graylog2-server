@@ -14,18 +14,6 @@ type Props = {
   showTitleOnHover: boolean,
 };
 
-const Title = styled.div`
-  padding: 5px 10px;
-  position: absolute;
-  left: 100%;
-  background-color: grey;
-  z-index: 4;
-  width: max-content;
-  font-size: 14px;
-  color: white;
-  display: none;
-`;
-
 const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => `
   display: flex;
   align-items: center;
@@ -47,13 +35,14 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
       display: block;
     }
   }
+
   :active {
     background: ${theme.colors.gray[20]};
   }
 
   &::after {
     content: ' ';
-    display: none;
+    display: ${isSelected ? 'block' : 'none'};
     position: absolute;
     right: 0;
     width: 0;
@@ -63,19 +52,28 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
     border-bottom: 10px solid transparent;
   }
 
-  ${(isSelected ? `
-    &::after {
-      display: block;
-    }
-  ` : '')}
+  :active::after {
+    display: none;
+  }
 
   ${((!isSelected && showTitleOnHover) ? `
     :hover::after {
       display: block;
-      border-right-color: grey;
-      
+      border-right-color: currentColor;
     }
   ` : '')}
+`);
+
+const Title = styled.div(({ theme }) => `
+  padding: 5px 10px;
+  position: absolute;
+  left: 100%;
+  background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
+  z-index: 4;
+  width: max-content;
+  font-size: 14px;
+  color: white;
+  display: none;
 `);
 
 const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) => {
