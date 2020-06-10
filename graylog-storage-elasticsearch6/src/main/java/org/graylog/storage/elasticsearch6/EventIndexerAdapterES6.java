@@ -34,7 +34,7 @@ public class EventIndexerAdapterES6 implements EventIndexerAdapter {
     }
 
     @Override
-    public void bulkIndex(List<Map.Entry<String, Event>> requests) {
+    public void write(List<Map.Entry<String, Event>> requests) {
         final Bulk.Builder bulk = new Bulk.Builder();
         for (final Map.Entry<String, Event> entry : requests) {
             final Event event = entry.getValue();

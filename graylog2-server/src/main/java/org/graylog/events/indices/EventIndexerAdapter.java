@@ -22,5 +22,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface EventIndexerAdapter {
-    void bulkIndex(List<Map.Entry<String, Event>> requests);
+    void write(List<Map.Entry<String, Event>> requests);
 }

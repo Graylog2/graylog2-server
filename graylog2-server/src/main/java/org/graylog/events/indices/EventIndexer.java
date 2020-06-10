@@ -67,7 +67,7 @@ public class EventIndexer {
                 // multiple streams use the same index set.
                 .flatMap(event -> assignEventsToTargetIndices(event, streamIndices))
                 .collect(Collectors.toList());
-        eventIndexerAdapter.bulkIndex(requests);
+        eventIndexerAdapter.write(requests);
     }
 
     private Stream<? extends AbstractMap.SimpleEntry<String, Event>> assignEventsToTargetIndices(Event event, Map<String, String> streamIndices) {
