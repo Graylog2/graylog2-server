@@ -80,18 +80,21 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
 
 const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) => {
   return (
-    <Container title={title} onClick={() => onClick()} isSelected={isSelected} showTitleOnHover={showTitleOnHover}>
+    <Container isSelected={isSelected}
+               onClick={onClick}
+               showTitleOnHover={showTitleOnHover}
+               title={title}>
       <Icon name={icon} />
-      {showTitleOnHover && !isSelected && <Title>{title}</Title>}
+      {(showTitleOnHover && !isSelected) && <Title>{title}</Title>}
     </Container>
   );
 };
 
 NavItem.propTypes = {
-  isSelected: PropTypes.bool,
-  title: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
+  isSelected: PropTypes.bool,
   showTitleOnHover: PropTypes.bool,
+  title: PropTypes.string.isRequired,
 };
 
 NavItem.defaultProps = {

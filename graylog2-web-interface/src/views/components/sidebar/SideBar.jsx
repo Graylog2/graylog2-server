@@ -16,11 +16,11 @@ import sidebarSections, { type SidebarSection } from './sidebarSections';
 
 type Props = {
   children: React.Element<any>,
+  disableAutoClose: boolean,
   queryId: string,
   results: {},
-  disableAutoClose: boolean,
-  sections: Array<SidebarSection>,
   searchPageLayout: ?SearchPageLayoutType,
+  sections: Array<SidebarSection>,
   viewMetadata: ViewMetadata,
 };
 
@@ -41,7 +41,6 @@ const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styl
   background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
   z-index: 2;  
 `);
-
 
 const handleClickOutside = (event: MouseEvent, activeSectionKey: ?string, toggleSidebar: () => void, disableAutoClose: boolean) => {
   // $FlowFixMe: EventTarget and className work here.
@@ -73,17 +72,29 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, disableAutoClos
 
   return (
     <Container>
-      <SectionOverview sections={sections} activeSection={activeSection} setActiveSectionKey={setActiveSectionKey} toggleSidebar={toggleSidebar} />
-      {activeSection && <SectionContent section={activeSection} closeSidebar={toggleSidebar} sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata }} isPinned={!!isSidebarPinned} searchPageLayout={searchPageLayout} viewMetadata={viewMetadata} />}
-      {(activeSection && !isSidebarPinned) && <ContentOverlay onClick={() => toggleSidebar()} />}
+      <SectionOverview activeSection={activeSection}
+                       setActiveSectionKey={setActiveSectionKey}
+                       toggleSidebar={toggleSidebar}
+                       sections={sections} />
+      {activeSection && (
+        <SectionContent closeSidebar={toggleSidebar}
+                        isPinned={!!isSidebarPinned}
+                        searchPageLayout={searchPageLayout}
+                        section={activeSection}
+                        sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata }}
+                        viewMetadata={viewMetadata} />
+      )}
+      {(activeSection && !isSidebarPinned) && (
+        <ContentOverlay onClick={toggleSidebar} />
+      )}
     </Container>
   );
 };
 
 Sidebar.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  queryId: PropTypes.string.isRequired,
   disableAutoClose: PropTypes.bool,
+  queryId: PropTypes.string.isRequired,
   results: PropTypes.object,
   sections: PropTypes.arrayOf(PropTypes.object),
   viewMetadata: PropTypes.shape({
@@ -96,9 +107,9 @@ Sidebar.propTypes = {
 };
 
 Sidebar.defaultProps = {
-  sections: sidebarSections,
-  results: {},
   disableAutoClose: false,
+  results: {},
+  sections: sidebarSections,
 };
 
 const SidebarWithContext = (props: Props) => (

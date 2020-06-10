@@ -95,11 +95,11 @@ const SectionContent = ({ section, closeSidebar, sectionProps, isPinned, searchP
         return (
           <Container isPinned={isPinned}>
             <Header title={title}>
-              <Title onClick={() => closeSidebar()}>
-                {title}
-              </Title>
+              <Title onClick={closeSidebar}>{title}</Title>
               <PinContentButton>
-                <IconButton name={isPinned ? 'layer-group' : 'columns'} title={`${isPinned ? 'Unpin' : 'Pin'} sidebar`} onClick={() => toggleSidebarPinning(searchPageLayout)} />
+                <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
+                            title={`${isPinned ? 'Unpin' : 'Pin'} sidebar`}
+                            name={isPinned ? 'layer-group' : 'columns'} />
               </PinContentButton>
             </Header>
             <HorizontalRule />

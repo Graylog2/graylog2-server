@@ -47,19 +47,22 @@ const StyledHorizontalRule = styled(HorizontalRule)`
 const SectionOverview = ({ sections, activeSection, setActiveSectionKey, toggleSidebar }: Props) => {
   const toggleIcon = activeSection ? 'angle-left' : 'angle-right';
   const activeSectionKey = activeSection?.key;
-
   return (
     <Container>
       <SidebarToggle>
-        <NavItem icon={toggleIcon} title={`${activeSection ? 'Close' : 'Open'} sidebar`} onClick={() => toggleSidebar()} showTitleOnHover={false} />
+        <NavItem icon={toggleIcon}
+                 onClick={() => toggleSidebar()}
+                 showTitleOnHover={false}
+                 title={`${activeSection ? 'Close' : 'Open'} sidebar`} />
       </SidebarToggle>
       <StyledHorizontalRule />
       <SectionList>
-        {sections.map((section) => (
-          <NavItem isSelected={activeSectionKey === section.key}
-                   title={section.title}
-                   icon={section.icon}
-                   onClick={() => setActiveSectionKey(section.key)} />
+        {sections.map(({ key, icon, title }) => (
+          <NavItem isSelected={activeSectionKey === key}
+                   icon={icon}
+                   onClick={() => setActiveSectionKey(key)}
+                   key={key}
+                   title={title} />
         ))}
       </SectionList>
     </Container>
