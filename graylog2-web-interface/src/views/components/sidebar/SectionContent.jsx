@@ -1,16 +1,18 @@
 // @flow strict
 import * as React from 'react';
-import styled, { css, type StyledComponent } from 'styled-components';
-import ViewTypeLabel from 'views/components/ViewTypeLabel';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import type { ViewType } from 'views/logic/views/View';
-import View from 'views/logic/views/View';
-import { IconButton } from 'components/common';
+import styled, { type StyledComponent } from 'styled-components';
+
+import View, { type ViewType } from 'views/logic/views/View';
 import { type ThemeInterface } from 'theme';
 import { type SearchPageLayoutType } from 'views/components/contexts/SearchPageLayoutContext';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
-import type { SidebarSection, SidebarSectionProps } from './sidebarSections';
+
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import { IconButton } from 'components/common';
 import HorizontalRule from './HorizontalRule';
+
+import type { SidebarSection, SidebarSectionProps } from './sidebarSections';
 
 type Props = {
   section: SidebarSection,

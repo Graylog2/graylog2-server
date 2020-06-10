@@ -3,9 +3,10 @@ import * as React from 'React';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
+
 import HorizontalRule from './HorizontalRule';
 import NavItem from './NavItem';
-// eslint-disable-next-line import/no-cycle
+
 import { type SidebarSection } from './sidebarSections';
 
 type Props = {

@@ -1,15 +1,14 @@
 // @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 import { isString } from 'lodash';
-import chroma from 'chroma-js';
+
 import { type ThemeInterface } from 'theme';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/viewMetadataStore';
-
 import SearchPageLayoutContext, { type SearchPageLayoutType } from 'views/components/contexts/SearchPageLayoutContext';
-
 import CustomPropTypes from '../CustomPropTypes';
 import SectionOverview from './SectionOverview';
 import SectionContent from './SectionContent';
@@ -61,7 +60,6 @@ const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: 
 };
 
 const Sidebar = ({ searchPageLayout, results, children, queryId, disableAutoClose, sections, viewMetadata }: Props) => {
-  console.log('viewMetadata', viewMetadata);
   const [activeSectionKey, setActiveSectionKey] = useState<?string>(null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
   const isSidebarPinned = searchPageLayout?.layout.sidebar.pinned;
