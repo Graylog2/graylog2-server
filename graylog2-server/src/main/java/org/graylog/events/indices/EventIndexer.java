@@ -55,12 +55,8 @@ public class EventIndexer {
         }
 
         // Pre-load all write index targets of all events to avoid looking them up for every event when building the bulk request
-        final Set<String> streamIds = eventsWithContext.stream()
-            .map(EventWithContext::event)
-            .flatMap(event -> event.getStreams().stream())
-            .collect(Collectors.toSet());
-        final Map<String, String> streamIndices = streamService.loadByIds(streamIds).stream()
-            .collect(Collectors.toMap(Persisted::getId, stream -> stream.getIndexSet().getWriteIndexAlias()));
+        final Set<String> streamIds = streamIdsForEvents(eventsWithContext);
+        final Map<String, String> streamIndices = indexAliasesForStreams(streamIds);
         final List<Map.Entry<String, Event>> requests = eventsWithContext.stream()
                 .map(EventWithContext::event)
                 // Collect a set of indices for the event to avoid writing to the same index set twice if
@@ -68,6 +64,18 @@ public class EventIndexer {
                 .flatMap(event -> assignEventsToTargetIndices(event, streamIndices))
                 .collect(Collectors.toList());
         eventIndexerAdapter.write(requests);
+    }
+
+    private Map<String, String> indexAliasesForStreams(Set<String> streamIds) {
+        return streamService.loadByIds(streamIds).stream()
+            .collect(Collectors.toMap(Persisted::getId, stream -> stream.getIndexSet().getWriteIndexAlias()));
+    }
+
+    private Set<String> streamIdsForEvents(List<EventWithContext> eventsWithContext) {
+        return eventsWithContext.stream()
+            .map(EventWithContext::event)
+            .flatMap(event -> event.getStreams().stream())
+            .collect(Collectors.toSet());
     }
 
     private Stream<? extends AbstractMap.SimpleEntry<String, Event>> assignEventsToTargetIndices(Event event, Map<String, String> streamIndices) {
