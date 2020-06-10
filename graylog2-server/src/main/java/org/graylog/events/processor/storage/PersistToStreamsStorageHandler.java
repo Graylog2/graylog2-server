@@ -55,7 +55,7 @@ public class PersistToStreamsStorageHandler implements EventStorageHandler {
             config.streams().forEach(stream -> eventWithContext.event().addStream(stream));
         });
         LOG.debug("Bulk-index {} events", eventsWithContext.size());
-        indices.bulkIndex(eventsWithContext);
+        indices.write(eventsWithContext);
     }
 
     @Override

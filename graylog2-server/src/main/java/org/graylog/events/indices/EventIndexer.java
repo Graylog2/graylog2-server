@@ -48,7 +48,7 @@ public class EventIndexer {
         this.moreIndicesAdapter = moreIndicesAdapter;
     }
 
-    public void bulkIndex(List<EventWithContext> eventsWithContext) {
+    public void write(List<EventWithContext> eventsWithContext) {
         if (eventsWithContext.isEmpty()) {
             return;
         }
