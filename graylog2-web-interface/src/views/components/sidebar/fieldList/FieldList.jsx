@@ -8,9 +8,9 @@ import { FixedSizeList as List } from 'react-window';
 
 import { Button } from 'components/graylog';
 import Field from 'views/components/Field';
-import FieldTypeIcon from 'views/components/sidebar/FieldTypeIcon';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
+import FieldTypeIcon from './FieldTypeIcon';
 
 import styles from './FieldList.css';
 

@@ -3,8 +3,8 @@ import * as React from 'react';
 
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 
-import ViewDescription from './ViewDescription';
-import AddWidgetButton from './AddWidgetButton';
+import ViewDescription from './description/ViewDescription';
+import AddWidgetButton from './create/AddWidgetButton';
 import HighlightingRules from './highlighting/HighlightingRules';
 
 
