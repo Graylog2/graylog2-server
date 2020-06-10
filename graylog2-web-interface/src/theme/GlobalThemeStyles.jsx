@@ -515,7 +515,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   nav.navbar-fixed-top ul.dropdown-menu li a {
-    font-size: ${theme.fonts.size.small};
+    font-size: ${theme.fonts.size.body};
   }
 
   nav.navbar-fixed-top ul.dropdown-menu {

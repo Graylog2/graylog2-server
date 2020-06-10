@@ -26,7 +26,7 @@ const StyledRow = styled(Row)(({ theme }) => `
   }
 
   .btn-lg {
-    font-size: ${theme.fonts.size.body};
+    font-size: ${theme.fonts.size.large};
   }
 `);
 

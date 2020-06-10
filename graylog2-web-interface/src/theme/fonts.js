@@ -31,19 +31,19 @@ const family = {
   monospace: '"Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace',
 };
 
-/* Scaled 1.20 Minor Third - https://type-scale.com/ */
+/* Scaled 1.125 Major Second - https://type-scale.com/ */
 const size = {
   root: '87.5%', /* 14px */
   body: '1em',
-  huge: '2.986em',
-  large: '1.2em',
-  small: '0.833em',
-  tiny: '0.694em',
-  h1: '2.488em',
-  h2: '2.074em',
-  h3: '1.728em',
-  h4: '1.44em',
-  h5: '1.2em',
+  huge: '2.027em',
+  large: '1.125em',
+  small: '0.889em',
+  tiny: '0.79em',
+  h1: '1.802em',
+  h2: '1.602em',
+  h3: '1.424em',
+  h4: '1.266em',
+  h5: '1.125em',
   h6: '1em',
 };
 
