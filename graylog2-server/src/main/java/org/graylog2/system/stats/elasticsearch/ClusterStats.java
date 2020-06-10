@@ -14,26 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.indices;
+package org.graylog2.system.stats.elasticsearch;
 
-import java.util.Locale;
+import com.google.auto.value.AutoValue;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+@AutoValue
+public abstract class ClusterStats {
+    public abstract String clusterName();
 
-public enum HealthStatus {
-    Red,
-    Yellow,
-    Green;
+    public abstract String clusterVersion();
 
-    public static HealthStatus fromString(String value) {
-        checkNotNull(value);
-        final String normalizedValue = value.toUpperCase(Locale.ENGLISH);
-        switch (normalizedValue) {
-            case "RED": return Red;
-            case "YELLOW": return Yellow;
-            case "GREEN": return Green;
+    public abstract NodesStats nodesStats();
 
-            default: throw new IllegalArgumentException("Unable to parse health status from string (known: GREEN/YELLOW/RED): " + normalizedValue);
-        }
+    public abstract IndicesStats indicesStats();
+
+    public static ClusterStats create(String clusterName, String clusterVersion, NodesStats nodesStats,
+                                      IndicesStats indicesStats) {
+        return new AutoValue_ClusterStats(clusterName, clusterVersion, nodesStats, indicesStats);
     }
 }

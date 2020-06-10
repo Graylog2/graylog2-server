@@ -27,7 +27,7 @@ import org.graylog.events.contentpack.facade.NotificationFacade;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
-import org.graylog.events.indices.MoreIndices;
+import org.graylog.events.indices.EventIndexer;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotification;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
@@ -72,7 +72,7 @@ public class EventsModule extends PluginModule {
         bind(EventProcessorEngine.class).asEagerSingleton();
         bind(EventStorageHandlerEngine.class).asEagerSingleton();
         bind(EventFieldSpecEngine.class).asEagerSingleton();
-        bind(MoreIndices.class).asEagerSingleton();
+        bind(EventIndexer.class).asEagerSingleton();
         bind(NotificationGracePeriodService.class).asEagerSingleton();
         bind(EventProcessorExecutionMetrics.class).asEagerSingleton();
         bind(EventNotificationExecutionMetrics.class).asEagerSingleton();

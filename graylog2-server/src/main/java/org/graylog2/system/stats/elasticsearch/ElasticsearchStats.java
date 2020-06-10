@@ -20,15 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.indexer.indices.HealthStatus;
 
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
 public abstract class ElasticsearchStats {
-    enum HealthStatus {
-        RED, YELLOW, GREEN
-    }
-
     @JsonProperty
     public abstract String clusterName();
 

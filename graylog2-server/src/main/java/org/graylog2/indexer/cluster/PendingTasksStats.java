@@ -14,26 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.indices;
+package org.graylog2.indexer.cluster;
 
-import java.util.Locale;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.List;
 
-public enum HealthStatus {
-    Red,
-    Yellow,
-    Green;
+@AutoValue
+@JsonAutoDetect
+public abstract class PendingTasksStats {
+    @JsonProperty
+    public abstract int pendingTasks();
 
-    public static HealthStatus fromString(String value) {
-        checkNotNull(value);
-        final String normalizedValue = value.toUpperCase(Locale.ENGLISH);
-        switch (normalizedValue) {
-            case "RED": return Red;
-            case "YELLOW": return Yellow;
-            case "GREEN": return Green;
+    @JsonProperty
+    public abstract List<Long> pendingTasksTimeInQueue();
 
-            default: throw new IllegalArgumentException("Unable to parse health status from string (known: GREEN/YELLOW/RED): " + normalizedValue);
-        }
+    public static PendingTasksStats create(int pendingTasks, List<Long> pendingTasksTimeInQueue) {
+        return new AutoValue_PendingTasksStats(pendingTasks, pendingTasksTimeInQueue);
     }
 }

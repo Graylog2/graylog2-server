@@ -14,26 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.indices;
+package org.graylog.events.indices;
 
-import java.util.Locale;
+import org.graylog.events.event.Event;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.List;
+import java.util.Map;
 
-public enum HealthStatus {
-    Red,
-    Yellow,
-    Green;
-
-    public static HealthStatus fromString(String value) {
-        checkNotNull(value);
-        final String normalizedValue = value.toUpperCase(Locale.ENGLISH);
-        switch (normalizedValue) {
-            case "RED": return Red;
-            case "YELLOW": return Yellow;
-            case "GREEN": return Green;
-
-            default: throw new IllegalArgumentException("Unable to parse health status from string (known: GREEN/YELLOW/RED): " + normalizedValue);
-        }
-    }
+public interface EventIndexerAdapter {
+    void write(List<Map.Entry<String, Event>> requests);
 }
