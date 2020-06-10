@@ -137,7 +137,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     .ace_content,
     .ace_placeholder {
       top: 6px;
-      font-size: ${scTheme.fonts.size.large}
+      font-size: ${scTheme.fonts.size.large};
       padding: 0 !important;
       font-family: inherit !important;
     }
